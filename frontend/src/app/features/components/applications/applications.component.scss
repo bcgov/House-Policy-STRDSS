@@ -1,0 +1,55 @@
+:host {
+    .card {
+        height: 100%;
+        overflow: auto;
+    }
+
+    overflow: auto;
+
+    .caption {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        span {
+            font-size: large;
+        }
+    }
+
+    p-dialog {
+        .lastname {
+            position: absolute;
+            top: 45px;
+            font-weight: 600;
+        }
+
+        form {
+            .row {
+                label {
+                    display: block;
+                }
+
+                input,
+                p-dropdown,
+                p-inputNumber {
+                    display: block;
+                    width: 100%;
+                }
+
+                padding-bottom: 10px;
+
+                p-dropdown {
+                    width: 100%;
+                }
+
+                &.actions {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding-bottom: 0;
+                }
+            }
+        }
+    }
+}

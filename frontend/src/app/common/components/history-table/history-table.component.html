@@ -1,0 +1,24 @@
+<p-table [value]="historyRows" [styleClass]="'p-datatable-sm'">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Entity</th>
+            <th>Entity id</th>
+            <th>Field</th>
+            <th>Old value</th>
+            <th>New value</th>
+            <th>Operation</th>
+            <th>Updated time</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-historyRow>
+        <tr>
+            <td>{{ historyRow.entity }}</td>
+            <td>{{ historyRow.entityId }}</td>
+            <td>{{ historyRow.field }}</td>
+            <td>{{ historyRow.oldValue }}</td>
+            <td>{{ historyRow.newValue }}</td>
+            <td>{{ historyRow.operation }}</td>
+            <td>{{ historyRow.updatedTime }}</td>
+        </tr>
+    </ng-template>
+</p-table>

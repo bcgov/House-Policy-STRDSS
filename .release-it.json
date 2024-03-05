@@ -1,0 +1,13 @@
+{
+  "git": {
+    "commitMessage": "chore: release candidate v${version}",
+    "tagName": "v${version}",
+    "tagAnnotation": "\n${changelog}"
+  },
+  "hooks": {
+    "after:bump": "npm run changelog"
+  },
+  "plugins": {
+    "./scripts/release-it-plugin.js": {}
+  }
+}

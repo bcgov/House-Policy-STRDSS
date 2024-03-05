@@ -1,0 +1,14 @@
+{
+  "name": "cc-str-dss",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "release": "release-it",
+    "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -n .conventional-changelog.mjs -s -r 0"
+  },
+  "devDependencies": {
+    "conventional-changelog-cli": "^4.1.0",
+    "release-it": "^16.1.5"
+  },
+  "version": "1.0.6"
+}

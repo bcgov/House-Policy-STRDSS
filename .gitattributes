@@ -1,0 +1,16 @@
+# https://github.com/desktop/desktop/issues/5323
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.jpg binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.exe binary
+*.apk binary
+
+# https://stackoverflow.com/questions/38905135/why-wont-my-docker-entrypoint-sh-execute
+*.sh text eol=lf

@@ -1,0 +1,55 @@
+version: '2.1'
+
+volumes:
+  db-data:
+
+services:
+  cc-str-dss-db:
+    image: postgis/postgis:16-3.4
+    volumes:
+      - db-data:/var/lib/postgresql
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - ALLOW_IP_RANGE=0.0.0.0/0
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 20s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  server:
+    build: ./server
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MailTrapId=
+      - MailTrapPwd=
+      - FetchEventIntervalInMinutes=1
+      - DB_HOST=db
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - postgres-password=postgres
+      - geocoder-url=https://geocoder.api.gov.bc.ca/addresses.geojson?addressString=
+      - InternalTokenSecret={9EFB3E3E-6529-41AB-B70E-713831371BAF}{F2449C35-07A3-4ABD-BB66-44546AB158EF}
+    ports:
+      - "5000:80"
+    depends_on:
+      cc-str-dss-db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.local
+    environment:
+      NODE_ENV: Development
+      STYLE_NONCE: stylenonce
+    ports:
+      - "5002:3001"
+    depends_on:
+      - server

@@ -1,0 +1,9 @@
+node_modules
+mnt
+note
+**/Properties/launchSettings.json
+helm
+postman
+terraform
+UITest
+.github

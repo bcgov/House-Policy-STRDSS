@@ -1,0 +1,107 @@
+<div class="card">
+    <app-map></app-map>
+    <p-table [value]="applications" [tableStyle]="{ 'min-width': '50rem','max-height':'calc(100% - 400px)' }">
+        <ng-template pTemplate="caption">
+            <div class="caption">
+                <span>STR Applications</span>
+                <p-button icon="pi pi-plus" severity="success" [disabled]="isAdmin" [id]="'add_new_application_button'"
+                    (click)="onAddApplication()"></p-button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngIf="isAdmin">Applicant's last name</th>
+                <th>Property's street address </th>
+                <th>STR Affiliate</th>
+                <th>Compliance status</th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-application>
+            <tr>
+                <td *ngIf="isAdmin">{{ application.applicant.lastName }}</td>
+                <td>
+                    <p-button [label]="application.streetAddress" [link]="true"
+                        (click)="onApplicationAddressClicked(application)"></p-button>
+                </td>
+                <td>{{ application.strAffiliate.label }}</td>
+                <td>{{ application.complianceStatus.label }}</td>
+                <td><p-button icon="pi pi-pencil" severity="warning" [rounded]="true" [outlined]="true" [size]="'small'"
+                        (click)="openExistingApplication(application)"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [header]="isCreate?'New application':'Edit application'" [id]="'add_new_application_dialog'"
+    [(visible)]="isAddDialogVisible" [modal]="true" [style]="{width:'500px'}" [draggable]="false" [resizable]="false"
+    [closable]="false">
+    <span class="lastname"
+        *ngIf="!isCreate && isAdmin && currentApplication">{{currentApplication.applicant.lastName}}</span>
+
+    <form [formGroup]="propertyForm" *ngIf="isAddDialogVisible" (ngSubmit)="onSubmitApplication()">
+
+        <div class="row">
+            <label for="streetAddress">Street Address:</label>
+            <input id="streetAddress" formControlName="streetAddress" pInputText />
+        </div>
+
+        <div class="row">
+            <label for="city">City:</label>
+            <input id="city" formControlName="city" pInputText />
+        </div>
+        <div class="row">
+            <label for="province">Province:</label>
+            <input id="province" formControlName="province" pInputText />
+        </div>
+        <div class="row">
+            <label for="postalCode">Postal code:</label>
+            <input id="postalCode" formControlName="postalCode" pInputText />
+        </div>
+
+        <div class="row">
+            <label for="zoningTypeId">Zoning Type:</label>
+            <p-dropdown [style]="{width:'100%'}" [id]="'zoningTypeId'" formControlName="zoningTypeId"
+                [options]="zoningTypes"></p-dropdown>
+        </div>
+
+        <div class="row">
+            <label for="squareFootage">Square Footage:</label>
+            <p-inputNumber [style]="{width:'100%'}" type="number" mode="decimal" class="p-inputnumber-sm"
+                [id]="'squareFootage'" formControlName="squareFootage"></p-inputNumber>
+        </div>
+
+        <div class="row">
+            <label for="strAffiliateId">STR Affiliate:</label>
+            <p-dropdown [style]="{width:'100%'}" id="strAffiliateId" formControlName="strAffiliateId"
+                [options]="strAffiliates"></p-dropdown>
+        </div>
+
+        <div class="row" *ngIf="!isCreate">
+            <label for="complianceStatusId">Compliance status:</label>
+            <p-dropdown appendTo="body" [style]="{width:'100%'}" id="complianceStatusId"
+                formControlName="complianceStatusId" [options]="complianceStatuses"></p-dropdown>
+        </div>
+
+        <div class="row">
+            <label for="isOwnerPrimaryResidence">Property Owner's Primary Residence:</label>
+            <p-checkbox id="isOwnerPrimaryResidence" [binary]="true"
+                formControlName="isOwnerPrimaryResidence"></p-checkbox>
+        </div>
+
+        <div class="row actions">
+            <p-button id="cancel_application_button" [outlined]="true" severity="secondary"
+                (click)="closeApplicationDialog()">Cancel</p-button>
+            <p-button label="History" *ngIf="!isCreate" [link]="true" (click)="openLogsDrawer()"></p-button>
+            <p-button type="submit" id="submit_application_button" [disabled]="propertyForm.invalid"
+                severity="success">Submit</p-button>
+        </div>
+    </form>
+</p-dialog>
+
+<p-toast></p-toast>
+<p-sidebar [style]="{'width':'50vw'}" [(visible)]="showLogs" *ngIf="currentApplication" position="right">
+    <h3>History</h3>
+    <app-history-table [applicationId]="currentApplication.id"></app-history-table>
+</p-sidebar>

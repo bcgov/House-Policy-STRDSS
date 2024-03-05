@@ -1,0 +1,22 @@
+:host {
+    display: flex;
+    align-items: center;
+
+    p-card {
+        width: 500px;
+        display: block;
+
+        .register-input {
+            display: grid;
+
+            &:not(:first-of-type) {
+                padding-top: 12px;
+            }
+        }
+
+        div.submit-button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}

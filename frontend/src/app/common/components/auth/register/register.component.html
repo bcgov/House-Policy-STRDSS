@@ -1,0 +1,51 @@
+<p-card header="Sign up">
+
+    <div class="register-input">
+        <label for="username_input">Username</label>
+        <input class="p-inputtext-sm" pInputText id="username_input" [(ngModel)]="username" />
+    </div>
+
+    <div class="register-input">
+        <label for="password_input">Password</label>
+        <p-password class="p-inputtext-sm" [(ngModel)]="password"  [inputId]="'password_input'"
+            [feedback]="false"></p-password>
+    </div>
+
+    <div class="register-input">
+        <label for="lastName_input">Last name</label>
+        <input class="p-inputtext-sm" pInputText id="lastName_input" [(ngModel)]="lastName" />
+    </div>
+
+    <div class="register-input">
+        <label for="addressStreet_input">Street address</label>
+        <input class="p-inputtext-sm" pInputText id="addressStreet_input" [(ngModel)]="addressStreet" />
+    </div>
+
+    <div class="register-input">
+        <label for="addressCity_input">City</label>
+        <input class="p-inputtext-sm" pInputText id="addressCity_input" [(ngModel)]="addressCity" />
+    </div>
+
+    <div class="register-input">
+        <label for="addressProvince_input">Province</label>
+        <input class="p-inputtext-sm" pInputText id="addressProvince_input" [(ngModel)]="addressProvince" />
+    </div>
+
+    <div class="register-input">
+        <label for="addressPostalCode_input">Postal code</label>
+        <input class="p-inputtext-sm" pInputText id="addressPostalCode_input" [(ngModel)]="addressPostalCode" />
+    </div>
+
+    <div class="register-input">
+        <label for="phone_mask_input">Mobile phone</label>
+        <p-inputMask class="p-inputtext-sm" [inputId]="'phone_mask_input'" mask="(999) 999-9999"
+            [(ngModel)]="mobilePhone" placeholder="(999) 999-9999"></p-inputMask>
+    </div>
+
+    <div class="m-0 submit-button-container">
+        <p-button label="Sign in" [link]="true" [id]="'to_register_link'" (onClick)="redirectToLogin()"></p-button>
+        <button pButton pRipple label="Submit" id="submit_button" class="p-button-success"
+            (click)="onSubmit()"></button>
+    </div>
+</p-card>
+<p-toast></p-toast>

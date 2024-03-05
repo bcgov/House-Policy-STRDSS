@@ -1,0 +1,18 @@
+<p-card header="Sign in">
+    <div class="login-input">
+        <label for="username_input">Username</label>
+        <input pInputText id="username_input" aria-describedby="username-help" [(ngModel)]="username" />
+    </div>
+
+    <div class="login-input">
+        <label for="password_input">Password</label>
+        <p-password [(ngModel)]="password" [inputId]="'password_input'" [feedback]="false"></p-password>
+    </div>
+
+    <p class="m-0 submit-button-container">
+        <p-button label="Sign up" [link]="true" [id]="'to_register_link'" (onClick)="redirectToSignUp()"></p-button>
+        <button pButton pRipple label="Submit" id="submit_button" class="p-button-success"
+            (click)="onSubmit()"></button>
+    </p>
+</p-card>
+<p-toast></p-toast>

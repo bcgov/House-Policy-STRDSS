@@ -1,0 +1,26 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--header-color);
+    height: 80px;
+    padding: 24px;
+}
+
+header .title {
+    font-size: 28px;
+}
+
+main {
+    height: calc(100% - 80px);
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+}

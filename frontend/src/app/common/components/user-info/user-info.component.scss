@@ -1,0 +1,13 @@
+:host {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .spacer {
+        width: 12px;
+    }
+
+    .notifications {
+        width: 300px;
+    }
+}

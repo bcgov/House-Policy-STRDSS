@@ -1,0 +1,15 @@
+<p-overlayPanel #op>
+    <ng-template pTemplate="content">
+        <div *ngIf="messages.length>0; else no_messages" class="notifications">
+            <p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
+        </div>
+        <ng-template #no_messages>No messages</ng-template>
+
+    </ng-template>
+</p-overlayPanel>
+<p-button [rounded]="true" severity="secondary" (click)="op.toggle($event)"><i class="pi pi-bell text-3xl" pBadge
+        [value]="messages.length.toString()"></i></p-button>
+<div class="spacer"></div>
+<p-chip [label]="username"></p-chip>
+<div class="spacer"></div>
+<p-button icon="pi pi-sign-out" [rounded]="true" severity="secondary" (click)="signOut()"></p-button>

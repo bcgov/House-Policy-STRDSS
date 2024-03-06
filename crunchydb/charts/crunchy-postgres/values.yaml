@@ -11,7 +11,7 @@ instances:
   name: ha # high availability
   replicas: 2
   dataVolumeClaimSpec:
-    storage: 480Mi
+    storage: 256Mi
     storageClassName: netapp-block-standard
   requests:
     cpu: 1m

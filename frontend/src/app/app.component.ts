@@ -4,6 +4,7 @@ import { LayoutComponent } from './common/layout/layout.component';
 import { CommonModule } from '@angular/common';
 import { KeycloakAngularModule } from 'keycloak-angular';
 import { KeycloakService } from 'keycloak-angular';
+import { BrowserModule } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-root',

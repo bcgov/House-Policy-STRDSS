@@ -9,6 +9,7 @@ using StrDss.Model.ComplianceNoticeReasonDtos;
 using StrDss.Model.GcNotifyTemplates;
 using StrDss.Model.PlatformDtos;
 using StrDss.Service.HttpClients;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Text.RegularExpressions;
@@ -53,9 +54,22 @@ namespace StrDss.Api.Controllers
                 return validationResult.Result;
             }
 
+            var emails = new List<string> { platform?.Email ?? "" }.Concat(dto.CcList).ToList();
+
+            var (success, error) = await SendComplianceNoticeAsync(dto, emails);
+
+            if (!error.IsEmpty())
+            {
+                return Problem($"There were some errors in sending emails. Failed sending the email to {error}." + (success.IsNotEmpty() ? $"Succeeded sending the email to {success}" : ""));
+            }
+
+            return NoContent();
+        }
+
+        private async Task<(string success, string error)> SendComplianceNoticeAsync(ComplianceNoticeCreateDto dto, List<string> emails)
+        {
             var requestBody = new EmailRequestBody<ComplianceNoticeTemplate>
             {
-                email_address = platform?.Email,
                 template_id = _config.GetValue<string>("GcNotify:ComplianceNoticeTemplateId") ?? "",
                 personalisation = new ComplianceNoticeTemplate
                 {
@@ -64,27 +78,36 @@ namespace StrDss.Api.Controllers
                 }
             };
 
-            var gcNotifyId = "";
-            try
+            var errors = new List<string>();
+            var success = new List<string>();
+
+            foreach(var email in emails)
             {
-                var response = await _gcNotifyApi.SendNotificationTypedAsync(NotificationTypes.Eamil, requestBody);
-                gcNotifyId = await _gcNotifyApi.GetGcNotifyIdAsync(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"GC Notify failed with an exception: {ex}");
-                return Problem(detail: ex.Message, statusCode: 500);
+                var gcNotifyId = "";
+                try
+                {
+                    requestBody.email_address = email;
+                    var response = await _gcNotifyApi.SendNotificationTypedAsync(NotificationTypes.Eamil, requestBody);
+                    gcNotifyId = await _gcNotifyApi.GetGcNotifyIdAsync(response);
+                    success.Add(email);
+                }
+                catch (Exception ex)
+                {
+                    var message = $"GC Notify failed with an exception: {ex}";                    
+                    _logger.LogError(message);
+                }
+
+                if (gcNotifyId.IsEmpty())
+                {
+                    var message = $"GC Notify failed to send email to {email}";
+                    _logger.LogError(message);
+                    errors.Add(email);
+                }                
+
+                _logger.LogInformation($"Sent compliance notice for {dto.ListingUrl}. GC Notify ID: {gcNotifyId}, Recipient: {email}");
             }
 
-            if (gcNotifyId.IsEmpty())
-            {
-                _logger.LogError($"GC Notify failed");
-                return Problem(detail: $"GC Notify failed", statusCode: 500);
-            }
-
-            _logger.LogInformation($"Sent compliance notice for {dto.ListingUrl}. GC Notify ID: {gcNotifyId}");
-
-            return NoContent();
+            return (string.Join(", ", success), string.Join(", ", errors));
         }
 
         [HttpPost("preview", Name = "GetComplianceNoticePreview")]

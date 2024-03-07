@@ -6,7 +6,12 @@ using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.ComplianceNoticeDtos;
 using StrDss.Model.ComplianceNoticeReasonDtos;
+using StrDss.Model.GcNotifyTemplates;
 using StrDss.Model.PlatformDtos;
+using StrDss.Service.HttpClients;
+using System.ComponentModel;
+using System.Data;
+using System.Text.RegularExpressions;
 
 namespace StrDss.Api.Controllers
 {
@@ -15,96 +20,146 @@ namespace StrDss.Api.Controllers
     [ApiController]
     public class ComplianceNoticesController : BaseApiController
     {
+        private IGcNotifyApi _gcNotifyApi;
         private ILogger<ComplianceNoticesController> _logger { get; }
 
-        public ComplianceNoticesController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<ComplianceNoticesController> logger)
+        public ComplianceNoticesController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IGcNotifyApi gcNotifyApi, ILogger<ComplianceNoticesController> logger)
             : base(currentUser, mapper, config)
         {
-            _logger = logger;
+            _gcNotifyApi = gcNotifyApi;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet("reasons/dropdown", Name = "GetComplianceNoticeReasonDrowdown")]
         [ApiAuthorize]
-        public ActionResult<DropdownDto> GetComplianceNoticeReasonDrowdown()
+        public async Task<ActionResult<DropdownDto>> GetComplianceNoticeReasonDrowdown()
         {
+            await Task.CompletedTask;
             return Ok(ComplianceNoticeReasonDto.ComplianceNoticeReasons.Select(x => new DropdownDto { Id = x.ComplianceNoticeReasonId, Description = x.Reason }));
         }
 
-
         [HttpPost("", Name = "CreateComplianceNotice")]
         [ApiAuthorize]
-        public ActionResult CreateComplianceNotice(ComplianceNoticeCreateDto dto)
+        public async Task<ActionResult> CreateComplianceNotice(ComplianceNoticeCreateDto dto)
         {
-            var errors = new Dictionary<string, List<string>>();
+            await Task.CompletedTask;
 
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
-
-            if (platform == null)
-            {
-                errors.AddItem("platformId", $"Platform ID ({dto.PlatformId}) does not exist.");
-            }
-
             var reason = ComplianceNoticeReasonDto.ComplianceNoticeReasons.FirstOrDefault(x => x.ComplianceNoticeReasonId == dto.ReasonId)?.Reason;
 
-            if (reason == null)
+            var validationResult = ValidateComplianceNotice(dto, platform, reason);
+            if (!validationResult.IsValid)
             {
-                errors.AddItem("reasonId", $"Reason ID ({dto.ReasonId}) does not exist.");
+                return validationResult.Result;
             }
 
-            if (errors.Count > 0)
+            var requestBody = new EmailRequestBody<ComplianceNoticeTemplate>
             {
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+                email_address = platform?.Email,
+                template_id = _config.GetValue<string>("GcNotify:ComplianceNoticeTemplateId") ?? "",
+                personalisation = new ComplianceNoticeTemplate
+                {
+                    listing_link = dto.ListingUrl,
+                    comments = dto.Comment
+                }
+            };
+
+            var gcNotifyId = "";
+            try
+            {
+                var response = await _gcNotifyApi.SendNotificationTypedAsync(NotificationTypes.Eamil, requestBody);
+                gcNotifyId = await _gcNotifyApi.GetGcNotifyIdAsync(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"GC Notify failed with an exception: {ex}");
+                return Problem(detail: ex.Message, statusCode: 500);
             }
 
-            _logger.LogInformation($"Compliance Notice for {dto.ListingUrl}");
+            if (gcNotifyId.IsEmpty())
+            {
+                _logger.LogError($"GC Notify failed");
+                return Problem(detail: $"GC Notify failed", statusCode: 500);
+            }
+
+            _logger.LogInformation($"Sent compliance notice for {dto.ListingUrl}. GC Notify ID: {gcNotifyId}");
 
             return NoContent();
         }
 
         [HttpPost("preview", Name = "GetComplianceNoticePreview")]
         [ApiAuthorize]
-        public ActionResult<string> GetComplianceNoticePreview(ComplianceNoticeCreateDto dto)
+        public async Task<ActionResult<string>> GetComplianceNoticePreview(ComplianceNoticeCreateDto dto)
         {
-            var errors = new Dictionary<string, List<string>>();
+            await Task.CompletedTask;
 
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var reason = ComplianceNoticeReasonDto.ComplianceNoticeReasons.FirstOrDefault(x => x.ComplianceNoticeReasonId == dto.ReasonId)?.Reason;
+
+            var validationResult = ValidateComplianceNotice(dto, platform, reason);
+            if (!validationResult.IsValid)
+            {
+                return validationResult.Result;
+            }
+
+            return FormatComplianceNoticePreview(dto);
+        }
+
+        private (bool IsValid, ActionResult Result) ValidateComplianceNotice(ComplianceNoticeCreateDto dto, PlatformDto? platform, string? reason)
+        {
+            var errors = new Dictionary<string, List<string>>();
 
             if (platform == null)
             {
                 errors.AddItem("platformId", $"Platform ID ({dto.PlatformId}) does not exist.");
             }
 
-            var reason = ComplianceNoticeReasonDto.ComplianceNoticeReasons.FirstOrDefault(x => x.ComplianceNoticeReasonId == dto.ReasonId)?.Reason;
-
             if (reason == null)
             {
                 errors.AddItem("reasonId", $"Reason ID ({dto.ReasonId}) does not exist.");
             }
 
-            if (errors.Count > 0)
+            var regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+
+            if (!Regex.IsMatch(dto.HostEmail, regex.Regex))
             {
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+                errors.AddItem("hostEmail", $"Host email is invalid");
             }
 
-            return 
-                $@"
-                To: {platform?.Name}; {dto.HostEmail}
-                cc: {string.Join(";", dto.CcList)}
+            foreach (var email in dto.CcList)
+            {
+                if (!Regex.IsMatch(email, regex.Regex))
+                {
+                    errors.AddItem("hostEmail", $"Email ({email}) is invalid");
+                }
+            }
 
-                Dear Sir/Madam,
+            if (errors.Count > 0)
+            {
+                return (false, ValidationUtils.GetValidationErrorResult(errors, ControllerContext));
+            }
 
-                The following listing has been found non-compliance to current STR regulations:
+            if (dto.SendCopy)
+            {
+                dto.CcList.Add(_currentUser.EmailAddress);
+            }
 
-                {dto.ListingUrl}
+            return (true, null);
+        }
 
-                We have identified the following issue: {ComplianceNoticeReasonDto.ComplianceNoticeReasons.FirstOrDefault(x => x.ComplianceNoticeReasonId == dto.ReasonId)?.Reason ?? ""}
-                
-                Please remedy this situation immediately to mitigate the need for any further actions.
+        private string FormatComplianceNoticePreview(ComplianceNoticeCreateDto dto)
+        {
+            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var reason = ComplianceNoticeReasonDto.ComplianceNoticeReasons.FirstOrDefault(x => x.ComplianceNoticeReasonId == dto.ReasonId)?.Reason;
 
-                {dto.Comment}
-                
-                Kind Regards,   
-                ";           
+            return $@"To: {platform?.Name}; {dto.HostEmail}{Environment.NewLine}cc: {string.Join(";", dto.CcList)}{Environment.NewLine}"
+                 + $@"{Environment.NewLine}Dear Sir/Madam,{Environment.NewLine}"
+                 + $@"{Environment.NewLine}The following listing has been found non-compliance to current STR regulations:{Environment.NewLine}"
+                 + $@"{dto.ListingUrl}{Environment.NewLine}"
+                 + $@"{Environment.NewLine}We have identified the following issue: {reason ?? ""}{Environment.NewLine}"
+                 + $@"{Environment.NewLine}Please remedy this situation immediately to mitigate the need for any further actions.{Environment.NewLine}"
+                 + (dto.Comment.IsEmpty() ? "" : $@"{Environment.NewLine}{dto.Comment}{Environment.NewLine}")
+                 + $@"{Environment.NewLine}Kind Regards,{Environment.NewLine}";
         }
     }
 }

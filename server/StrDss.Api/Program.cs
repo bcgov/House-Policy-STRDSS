@@ -10,6 +10,7 @@ using StrDss.Data;
 using StrDss.Data.Mappings;
 using StrDss.Model;
 using StrDss.Service;
+using StrDss.Service.HttpClients;
 using System.Reflection;
 using System.Text;
 
@@ -58,10 +59,8 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 //FieldValidationService as Singleton
 builder.Services.AddSingleton<IFieldValidatorService, FieldValidatorService>();
 
-//RegexDefs as Singleton
-builder.Services.AddSingleton<RegexDefs>();
-
-builder.Services.AddHttpClient();
+builder.Services.AddScoped<IApi, Api>();
+builder.Services.AddHttpClients(builder.Configuration);
 
 var mappingConfig = new MapperConfiguration(cfg =>
 {

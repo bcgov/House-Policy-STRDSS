@@ -13,12 +13,10 @@ namespace StrDss.Service
     public class FieldValidatorService : IFieldValidatorService
     {
         List<FieldValidationRule> _rules;
-        RegexDefs _regex;
         public List<CommonCodeDto> CommonCodes { get; set; } = new List<CommonCodeDto>();
-        public FieldValidatorService(RegexDefs regex)
+        public FieldValidatorService()
         {
             _rules = new List<FieldValidationRule>();
-            _regex = regex;
 
             LoadSystemUserEntityRules();
             LoadStrApplicationEntityRules();
@@ -49,7 +47,7 @@ namespace StrDss.Service
                 Required = true,
                 MinLength = 8,
                 MaxLength = 255,
-                RegexInfo = _regex.GetRegexInfo(RegexDefs.Password)
+                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Password)
             });
 
             _rules.Add(new FieldValidationRule
@@ -110,7 +108,7 @@ namespace StrDss.Service
                 Required = true,
                 MinLength = 14,
                 MaxLength = 14,
-                RegexInfo = _regex.GetRegexInfo(RegexDefs.PhoneNumber)
+                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.PhoneNumber)
             });
         }
 

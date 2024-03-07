@@ -1,12 +1,13 @@
-import { APP_INITIALIZER, ApplicationConfig } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { KeycloakService } from 'keycloak-angular';
 import { environment } from '../environments/environment';
-
+import { provideAnimations } from '@angular/platform-browser/animations'
 export const appConfig: ApplicationConfig = {
     providers: [
+        provideAnimations(),
         provideRouter(routes),
         KeycloakService,
         {

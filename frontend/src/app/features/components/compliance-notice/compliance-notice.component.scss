@@ -1,0 +1,28 @@
+:host {
+    width: 100%;
+    height: 100%;
+
+    .form-group-row {
+        // display: flex;
+        width: 100%;
+
+        &-col {
+            &.has-checkbox {
+                :first-child {
+                    margin-right: 8px;
+                }
+
+                padding-bottom: 24px;
+            }
+
+            &:not(&.has-checkbox) {
+                width: 100%;
+
+                &:last-of-type {
+                    padding: 8px 0 24px 0;
+                }
+            }
+        }
+
+    }
+}

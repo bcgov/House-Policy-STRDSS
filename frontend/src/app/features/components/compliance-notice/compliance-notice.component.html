@@ -1,0 +1,66 @@
+<form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="platformId">Select Platform recipient</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-dropdown [options]="platformOptions" formControlName="platformId" [showClear]="true"
+                placeholder="Select a platform" id="platformId" name="platformId" [required]="true"></p-dropdown>
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="listingUrl">Add listing URL</label>
+        </div>
+        <div class="form-group-row-col">
+            <input type="text" pInputText formControlName="listingUrl" id="listingUrl" name="listingUrl" required />
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="hostEmailAddress">Host E-mail Address (optional)</label>
+        </div>
+        <div class="form-group-row-col">
+            <input type="text" pInputText formControlName="hostEmailAddress" id="hostEmailAddress"
+                name="hostEmailAddress" />
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="reasonId">Select Reason for request</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-dropdown [options]="reasonOptions" formControlName="reasonId" [showClear]="true"
+                placeholder="Select a reason" id="reasonId" name="reasonId" [required]="true"></p-dropdown>
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col has-checkbox">
+            <p-checkbox formControlName="sendCopy" [binary]="true" id="sendCopy" name="sendCopy"
+                inputId="binary"></p-checkbox>
+            <label for="sendCopy">Send me a copy of this request</label>
+        </div>
+    </div>
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="additionalCcs">Additional CCs (optional)</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-chips formControlName="additionalCcs" id="additionalCcs" name="additionalCcs"></p-chips>
+        </div>
+    </div>
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="comments">Additional comments (Optional)</label>
+        </div>
+        <div class="form-group-row-col">
+            <textarea rows="5" cols="30" pInputTextarea formControlName="comments" id="comments"
+                name="comments"></textarea>
+        </div>
+    </div>
+    <button type="submit" [disabled]="!myForm.valid">Review</button>
+</form>

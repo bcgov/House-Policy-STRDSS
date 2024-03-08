@@ -5,4 +5,5 @@ export const environment = {
     ENV_NAME: "",
     VERSION: "",
     SM_LOGOFF_URL: "",
+    API_HOST: '',
 };

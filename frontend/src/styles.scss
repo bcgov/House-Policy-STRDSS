@@ -4,9 +4,31 @@
 body {
     margin: 0;
 
-    .p-dropdown,
-    .p-inputtext,
     .p-chips {
-        width: 100%;
+        width: 760px;
+    }
+
+    .p-dropdown,
+    .p-inputtext {
+        width: 368px;
+
+        &.long-text-field {
+            width: 760px;
+        }
+
+        &.full-width-text-field {
+            width: 100%;
+        }
+    }
+
+    .p-ripple.p-element.p-button.p-component {
+        background-color: #053662;
+        border-color: #053662;
+
+        &.p-button-outlined {
+            background-color: #FFFFFF;
+            border-color: #353433;
+            color: #353433;
+        }
     }
 }

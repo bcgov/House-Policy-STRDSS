@@ -125,11 +125,6 @@ namespace StrDss.Api.Controllers
 
             var regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
 
-            if (!Regex.IsMatch(dto.HostEmail, regex.Regex))
-            {
-                errors.AddItem("hostEmail", $"Host email is invalid");
-            }
-
             foreach (var email in dto.CcList)
             {
                 if (!Regex.IsMatch(email, regex.Regex))
@@ -155,7 +150,7 @@ namespace StrDss.Api.Controllers
         {
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
 
-            return $@"To: {platform?.Name}; {dto.HostEmail}{Environment.NewLine}cc: {string.Join(";", dto.CcList)}{Environment.NewLine}"
+            return $@"To: {platform?.Name}{Environment.NewLine}cc: {string.Join(";", dto.CcList)}{Environment.NewLine}"
                  + $@"{Environment.NewLine}Dear Sir/Madam,{Environment.NewLine}"
                  + $@"{Environment.NewLine}The following listing has been found non-compliance to current STR regulations:{Environment.NewLine}"
                  + $@"{dto.ListingUrl}{Environment.NewLine}"

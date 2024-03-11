@@ -6,3 +6,4 @@ helm
 terraform
 UITest
 .github
+secrets

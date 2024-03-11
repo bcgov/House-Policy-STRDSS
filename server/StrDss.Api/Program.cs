@@ -84,8 +84,8 @@ builder.Services.AddScoped<KcJwtBearerEvents>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = builder.Configuration.GetValue<string>("JWT:Authority");
-        options.Audience = builder.Configuration.GetValue<string>("JWT:Audience");
+        options.Authority = builder.Configuration.GetValue<string>("SSO_AUTHORITY");
+        options.Audience = builder.Configuration.GetValue<string>("SSO_CLIENT");
         options.IncludeErrorDetails = true;
         options.EventsType = typeof(KcJwtBearerEvents);
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();

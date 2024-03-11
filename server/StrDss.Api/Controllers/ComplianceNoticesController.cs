@@ -12,6 +12,7 @@ using StrDss.Service.HttpClients;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Api.Controllers
@@ -22,12 +23,15 @@ namespace StrDss.Api.Controllers
     public class ComplianceNoticesController : BaseApiController
     {
         private IGcNotifyApi _gcNotifyApi;
+        private IChesTokenApi _chesTokenApi;
+
         private ILogger<ComplianceNoticesController> _logger { get; }
 
-        public ComplianceNoticesController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IGcNotifyApi gcNotifyApi, ILogger<ComplianceNoticesController> logger)
+        public ComplianceNoticesController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IGcNotifyApi gcNotifyApi, IChesTokenApi chesTokenApi, ILogger<ComplianceNoticesController> logger)
             : base(currentUser, mapper, config)
         {
             _gcNotifyApi = gcNotifyApi;
+            _chesTokenApi = chesTokenApi;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -43,8 +47,6 @@ namespace StrDss.Api.Controllers
         [ApiAuthorize]
         public async Task<ActionResult> CreateComplianceNotice(ComplianceNoticeCreateDto dto)
         {
-            await Task.CompletedTask;
-
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
             var reason = ComplianceNoticeReasonDto.ComplianceNoticeReasons.FirstOrDefault(x => x.ComplianceNoticeReasonId == dto.ReasonId)?.Reason;
 
@@ -54,19 +56,64 @@ namespace StrDss.Api.Controllers
                 return validationResult.Result;
             }
 
-            var emails = new List<string> { platform?.Email ?? "" }.Concat(dto.CcList).ToList();
-
-            var (success, error) = await SendComplianceNoticeAsync(dto, emails);
+            var error = await SendComplianceNoticeAsync(dto, platform);
 
             if (!error.IsEmpty())
             {
-                return Problem($"There were some errors in sending emails. Failed sending the email to {error}." + (success.IsNotEmpty() ? $"Succeeded sending the email to {success}" : ""));
+                return Problem($"There were some errors in sending email.");
             }
 
             return NoContent();
         }
 
-        private async Task<(string success, string error)> SendComplianceNoticeAsync(ComplianceNoticeCreateDto dto, List<string> emails)
+        private async Task<string> SendComplianceNoticeAsync(ComplianceNoticeCreateDto dto, PlatformDto? platform)
+        {
+            try
+            {
+                var token = await _chesTokenApi.GetTokenAsync();
+                var chesUrl = _config.GetValue<string>("CHES_URL") ?? "";
+
+                using HttpClient httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
+
+                var emailContent = new
+                {
+                    bcc = new string[] { },
+                    bodyType = "text",
+                    body = FormatComplianceNoticeEmailContent(dto, true),
+                    cc = dto.CcList.ToArray(),
+                    delayTS = 0,
+                    encoding = "utf-8",
+                    from = "no_reply@gov.bc.ca",
+                    priority = "normal",
+                    subject = "Compliance Notice",
+                    to = new string[] { platform?.Email ?? "" },
+                };
+
+                var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(emailContent);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"Sent compliance notice to {emailContent.to} for {dto.ListingUrl}");
+                }
+                else
+                {
+                    _logger.LogError($"Failed to send email. Status code: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                var error = $"Failed to send email with an exception";
+                _logger.LogError($"{error} - {ex}");
+                return error;
+            }
+
+            return "";
+        }
+
+        private async Task<(string success, string error)> SendComplianceNoticeByGcNotifyAsync(ComplianceNoticeCreateDto dto, List<string> emails)
         {
             var requestBody = new EmailRequestBody<ComplianceNoticeTemplate>
             {
@@ -125,7 +172,7 @@ namespace StrDss.Api.Controllers
                 return validationResult.Result;
             }
 
-            return FormatComplianceNoticePreview(dto);
+            return FormatComplianceNoticeEmailContent(dto, false);
         }
 
         private (bool IsValid, ActionResult Result) ValidateComplianceNotice(ComplianceNoticeCreateDto dto, PlatformDto? platform, string? reason)
@@ -170,13 +217,13 @@ namespace StrDss.Api.Controllers
             return (true, null);
         }
 
-        private string FormatComplianceNoticePreview(ComplianceNoticeCreateDto dto)
+        private string FormatComplianceNoticeEmailContent(ComplianceNoticeCreateDto dto, bool contentOnly)
         {
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
             var reason = ComplianceNoticeReasonDto.ComplianceNoticeReasons.FirstOrDefault(x => x.ComplianceNoticeReasonId == dto.ReasonId)?.Reason;
 
-            return $@"To: {platform?.Name}; {dto.HostEmail}{Environment.NewLine}cc: {string.Join(";", dto.CcList)}{Environment.NewLine}"
-                 + $@"{Environment.NewLine}Dear Sir/Madam,{Environment.NewLine}"
+            return (contentOnly ? "" : $@"To: {platform?.Name}; {dto.HostEmail}{Environment.NewLine}cc: {string.Join(";", dto.CcList)}{Environment.NewLine}{Environment.NewLine}")
+                 + $@"Dear Sir/Madam,{Environment.NewLine}"
                  + $@"{Environment.NewLine}The following listing has been found non-compliance to current STR regulations:{Environment.NewLine}"
                  + $@"{dto.ListingUrl}{Environment.NewLine}"
                  + $@"{Environment.NewLine}We have identified the following issue: {reason ?? ""}{Environment.NewLine}"

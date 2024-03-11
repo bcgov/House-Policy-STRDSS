@@ -4,14 +4,14 @@
         <div class="main-title">Short-Term Rental Data Portal</div>
     </div>
     <div class="header-menu">
-        header-menu
+        <div class="menu-container">
+            <p-button [className]="'menu-item'" label="Home" [link]="true" (click)="onHomeClicked()"></p-button>
+        </div>
     </div>
 </div>
 
 <div class="content">
-
     <router-outlet />
-
 </div>
 <div class="footer">
     <div class="cc">© 2024 Government of British Columbia.</div>

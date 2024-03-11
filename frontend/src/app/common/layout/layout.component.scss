@@ -41,11 +41,20 @@
     .header-menu {
         background-color: #38598A;
         height: 52px;
+        padding: 0 184px;
+
+        .menu-container {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
     }
 }
 
 .content {
-    width: 1200px;
+    margin: 0 184px;
+    width: calc(100% - 368px);
     background-color: #FFFFFF;
     overflow-y: auto;
     display: flex;

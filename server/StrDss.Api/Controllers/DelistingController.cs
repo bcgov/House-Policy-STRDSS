@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
 using StrDss.Common;
 using StrDss.Model;
+using StrDss.Model.ComplianceNoticeDtos;
+using StrDss.Model.ComplianceNoticeReasonDtos;
 using StrDss.Model.DelistingRequestDtos;
 using StrDss.Model.GcNotifyTemplates;
 using StrDss.Model.PlatformDtos;
 using StrDss.Service.HttpClients;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Api.Controllers
@@ -18,12 +21,15 @@ namespace StrDss.Api.Controllers
     public class DelistingController : BaseApiController
     {
         private IGcNotifyApi _gcNotifyApi;
+        private IChesTokenApi _chesTokenApi;
+
         private ILogger<DelistingController> _logger { get; }
 
-        public DelistingController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IGcNotifyApi gcNotifyApi, ILogger<DelistingController> logger)
+        public DelistingController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IGcNotifyApi gcNotifyApi, IChesTokenApi chesTokenApi, ILogger<DelistingController> logger)
             : base(currentUser, mapper, config)
         {
             _gcNotifyApi = gcNotifyApi;
+            _chesTokenApi = chesTokenApi;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -31,8 +37,6 @@ namespace StrDss.Api.Controllers
         [ApiAuthorize]
         public async Task<ActionResult> CreateDelistingRequest(DelistingRequestCreateDto dto)
         {
-            await Task.CompletedTask;
-
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
 
             var validationResult = ValidateDelistingRequest(dto, platform);
@@ -41,19 +45,66 @@ namespace StrDss.Api.Controllers
                 return validationResult.Result;
             }
 
-            var emails = new List<string> { platform?.Email ?? "" }.Concat(dto.CcList).ToList();
-
-            var (success, error) = await SendDelistingRequestAsync(dto, emails);
+            var error = await SendDelistingRequestAsync(dto, platform);
 
             if (!error.IsEmpty())
             {
-                return Problem($"There were some errors in sending emails. Failed sending the email to {error}." + (success.IsNotEmpty() ? $"Succeeded sending the email to {success}" : ""));
+                return Problem($"There were some errors in sending email.");
             }
 
             return NoContent();
         }
 
-        private async Task<(string success, string error)> SendDelistingRequestAsync(DelistingRequestCreateDto dto, List<string> emails)
+        private async Task<string> SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform)
+        {
+            try
+            {
+                var token = await _chesTokenApi.GetTokenAsync();
+                var chesUrl = _config.GetValue<string>("CHES_URL") ?? "";
+
+                using HttpClient httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
+
+                var emailContent = new
+                {
+                    bcc = new string[] { },
+                    bodyType = "text",
+                    body = FormatDelistingRequestEmailContent(dto, true),
+                    cc = dto.CcList.ToArray(),
+                    delayTS = 0,
+                    encoding = "utf-8",
+                    from = "no_reply@gov.bc.ca",
+                    priority = "normal",
+                    subject = "Compliance Notice",
+                    to = new string[] { platform?.Email ?? "" },
+                };
+
+                var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(emailContent);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"Sent delisting request to {emailContent.to} for {dto.ListingUrl}");
+                }
+                else
+                {
+                    _logger.LogError($"Failed to send email. Status code: {response.StatusCode}");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var error = $"Sending email failed with an exception";
+                _logger.LogError($"{error} - {ex}");
+                return error;
+            }
+
+            _logger.LogInformation($"Sent compliance notice.");
+            return "";
+        }
+
+        private async Task<(string success, string error)> SendDelistingRequestByGcNotifyAsync(DelistingRequestCreateDto dto, List<string> emails)
         {
             var requestBody = new EmailRequestBody<ComplianceNoticeTemplate>
             {
@@ -111,7 +162,7 @@ namespace StrDss.Api.Controllers
                 return validationResult.Result;
             }
 
-            return FormatDelistingRequestPreview(dto);
+            return FormatDelistingRequestEmailContent(dto, false);
         }
 
         private (bool IsValid, ActionResult Result) ValidateDelistingRequest(DelistingRequestCreateDto dto, PlatformDto? platform)
@@ -146,12 +197,12 @@ namespace StrDss.Api.Controllers
             return (true, null);
         }
 
-        private string FormatDelistingRequestPreview(DelistingRequestCreateDto dto)
+        private string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly)
         {
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
 
-            return $@"To: {platform?.Name}{Environment.NewLine}cc: {string.Join(";", dto.CcList)}{Environment.NewLine}"
-                 + $@"{Environment.NewLine}Dear Sir/Madam,{Environment.NewLine}"
+            return (contentOnly ? "" : $@"To: {platform?.Name}{Environment.NewLine}cc: {string.Join(";", dto.CcList)}{Environment.NewLine}{Environment.NewLine}")
+                 + $@"Dear Sir/Madam,{Environment.NewLine}"
                  + $@"{Environment.NewLine}The following listing has been found non-compliance to current STR regulations:{Environment.NewLine}"
                  + $@"{dto.ListingUrl}{Environment.NewLine}"
                  + $@"{Environment.NewLine}Please remove this listing from your platform immediately to mitigate the need for any further actions.{Environment.NewLine}"

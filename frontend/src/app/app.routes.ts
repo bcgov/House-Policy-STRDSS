@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { ComplianceNoticeComponent } from './features/components/compliance-notice/compliance-notice.component';
 import { DashboardComponent } from './features/components/dashboard/dashboard.component';
+import { DelistingRequestComponent } from './features/components/delisting-request/delisting-request.component';
 
 export const routes: Routes = [
     {
@@ -10,5 +11,10 @@ export const routes: Routes = [
     {
         path: 'compliance-notice',
         component: ComplianceNoticeComponent
+    }
+    ,
+    {
+        path: 'delisting-request',
+        component: DelistingRequestComponent
     }
 ];

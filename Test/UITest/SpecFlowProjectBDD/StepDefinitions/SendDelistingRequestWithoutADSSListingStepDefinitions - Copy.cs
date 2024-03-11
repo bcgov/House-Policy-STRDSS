@@ -17,8 +17,8 @@ using System.Collections.Generic;
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
-    [Scope(Scenario = "SendDelistingWarningWithoutADSSListing")]
-    public sealed class SendDelistingWarningWithoutADSSListingStepDefinitions
+    [Scope(Scenario = "SendDelistingRequestWithoutADSSListing")]
+    public sealed class SendDelistingRequestWithoutADSSListingStepDefinitions
     {
         LoginPage _loginPage;
         SignupPage _signupPage;
@@ -27,7 +27,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         IDriver _driver;
 
  
-        public SendDelistingWarningWithoutADSSListingStepDefinitions(SeleniumDriver Driver)
+        public SendDelistingRequestWithoutADSSListingStepDefinitions(SeleniumDriver Driver)
         {
             _driver = Driver;
             _loginPage = new LoginPage(_driver);
@@ -43,19 +43,19 @@ namespace SpecFlowProjectBDD.StepDefinitions
         }
 
 
-        [When("I navigate to the delisting warning feature")]
-        public void WhenINavigateToTheDelistingWarningFeature()
+        [When("I navigate to the delisting request feature")]
+        public void WhenINavigateToTheDelistingRequestFeature()
         {
         }
 
         //Input Form
-        [Then("I should be presented with an input form that includes fields for the listing URL, and an optional field for the host email address")]
+        [Then("I should be presented with an input form that includes fields for the listing URL")]
         public void IshouldBePresentedWithAnInputFormThatIncludesFields()
         {
         }
 
-        [Then("I should be presented with a field to select which platform to send the warning to")]
-        public void IShouldBePresentedWithAFieldToSelectWhichPlatformToSendTheWarningTo()
+        [Then("I should be presented with a field to select which platform to send the request to")]
+        public void IShouldBePresentedWithAFieldToSelectWhichPlatformToSendTheRequestTo()
         {
         }
         
@@ -92,64 +92,64 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
         }
 
-
-        //HostEmailAddressField
-        [When("entering the optional host email address")]
-        public void WhenENteringTheOptionalHostEmailAddress() 
-        { 
-        }
-
-
-        [Then("the system should validate the email format")]
-        public void ThenTheSystemShouldValidateTheEmailFormat() 
-        { 
-        }
-
-        //ReasonForDelisting
-        [When("I select a reason for delisting")]
-        public void WhenISelectAReasonForDelisting() { }
-
-        [Then("the system should present a list of reasons for requesting delisting: No business licence provided, invalid business licence number, expired business licence, or suspended business license")]
-        public void ThenTheSystemShouldPresentAListOfReasonsForRequestingDelisting() { }
-
-
-        //DelistingWarningMessage
+        //DelistingRequestMessage
         [When("all required fields are entered")]
-        public void WhenALlRequiredFieldsAreEntered() { }
+        public void WhenALlRequiredFieldsAreEntered() 
+        { 
+        }
 
-        [Then("I see a template delisting warning message that will be sent to both the platform and host")]
-        public void ThenISeeATemplateDelistingWarningMessage() { }
+        [Then("I see a template delisting request message that will be sent to both the platform")]
+        public void ThenISeeATemplateDelistingRequestMessage() 
+        { 
+        }
 
         //SendDelistingRequest
         [When("I submit the form with valid information")]
-        public void WhenISubmitTheFormWithValidInformation() { }
+        public void WhenISubmitTheFormWithValidInformation() 
+        { 
+        }
 
-        [Then("the system should send the delisting warning message to the provided platform and host email addresses")]
-        public void ThenTheSystemShouldSendTheDelistingWarningMessage() { }
+        [Then("the system should send the delisting request message to the platform email addresses associated with the selected platform")]
+        public void ThenTheSystemShouldSendTheDelistingRequestMessage() 
+        { 
+        }
 
         //ConfirmationMessage
         [When("successful submission")]
-        public void WhenSuccessfulSubmission() { }
+        public void WhenSuccessfulSubmission() 
+        { 
+        }
 
-        [Then("I should receive a confirmation message indicating that the delisting warning has been sent")]
-        public void ThenIShouldReceiveAConfirmationMessage() { }
+        [Then("I should receive a confirmation message indicating that the delisting request has been sent")]
+        public void ThenIShouldReceiveAConfirmationMessage() 
+        { 
+        }
 
         [Then("I should be copied on the email")]
-        public void ThenIShouldBeCopiedOnTheEmail() { }
+        public void ThenIShouldBeCopiedOnTheEmail() 
+        { 
+        }
 
         //NotificationToPlatformAndHost
-        [When("the delisting warning is submitted")]
-        public void WhenTheDelistingWarningIsSubmitted() { }
+        [When("the delisting request is submitted")]
+        public void WhenTheDelistingRequestIsSubmitted() 
+        { 
+        }
 
-        [Then("the platform and host should receive email notifications containing the delisting warning and instructions for compliance")]
-        public void ThenThePlatformAndHostShouldReceiveEmailNotifications() { }
-
+        [Then("the platform and host should receive email notifications containing the delisting request and instructions for compliance")]
+        public void ThenThePlatformAndHostShouldReceiveEmailNotifications() 
+        { 
+        }
 
         //FrontEndErrorHandling
         [When("there are issues with the submission, such as invalid email addresses or a missing URL")]
-        public void WhenThereAreIssuesWithTheSubmission() { }
+        public void WhenThereAreIssuesWithTheSubmission() 
+        { 
+        }
 
         [Then("the system should provide clear error messages guiding me on how to correct the issues")]
-        public void ThenTheSystemShouldProvideClearErrorMessages() { }
+        public void ThenTheSystemShouldProvideClearErrorMessages() 
+        { 
+        }
     }
 }

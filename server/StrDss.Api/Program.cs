@@ -10,6 +10,7 @@ using StrDss.Data;
 using StrDss.Data.Mappings;
 using StrDss.Model;
 using StrDss.Service;
+using StrDss.Service.HttpClients;
 using System.Reflection;
 using System.Text;
 
@@ -36,7 +37,7 @@ builder.Services.AddApiVersioning(options =>
 
 var assemblies = Assembly.GetExecutingAssembly()
     .GetReferencedAssemblies()
-    .Where(a => a.FullName.StartsWith("AdvSol"))
+    .Where(a => a.FullName.StartsWith("server"))
     .Select(Assembly.Load).ToArray();
 
 //Services
@@ -58,10 +59,8 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 //FieldValidationService as Singleton
 builder.Services.AddSingleton<IFieldValidatorService, FieldValidatorService>();
 
-//RegexDefs as Singleton
-builder.Services.AddSingleton<RegexDefs>();
-
-builder.Services.AddHttpClient();
+builder.Services.AddScoped<IApi, Api>();
+builder.Services.AddHttpClients(builder.Configuration);
 
 var mappingConfig = new MapperConfiguration(cfg =>
 {

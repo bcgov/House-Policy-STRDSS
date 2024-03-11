@@ -1,0 +1,295 @@
+{
+	"info": {
+		"_postman_id": "6be218e7-ea62-4a5e-8f20-7ced303c3e0e",
+		"name": "str-dss",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3660367"
+	},
+	"item": [
+		{
+			"name": "Current User",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/currentuser",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"currentuser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPlatformDrowdown",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/platforms/dropdown",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"platforms",
+						"dropdown"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetComplianceNoticeReasonDrowdown",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/compliancenotices/reasons/dropdown",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"compliancenotices",
+						"reasons",
+						"dropdown"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetComplianceNoticePreview",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"platformId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"reasonId\": 1,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ],\r\n  \"comment\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/compliancenotices/preview",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"compliancenotices",
+						"preview"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateComplianceNotice",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"platformId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"reasonId\": 1,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"comment\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/compliancenotices",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"compliancenotices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateDelistingRequest",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"platformId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ],\r\n  \"comment\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/delisting/requests",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"delisting",
+						"requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetDelistingRequestPreview",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"platformId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ],\r\n  \"comment\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/delisting/requests/preview",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"delisting",
+						"requests",
+						"preview"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "redirect_uri",
+				"value": "http://localhost:4200",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "str-dss-5303",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/token",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/auth",
+				"type": "string"
+			},
+			{
+				"key": "refreshRequestParams",
+				"value": [],
+				"type": "any"
+			},
+			{
+				"key": "tokenRequestParams",
+				"value": [],
+				"type": "any"
+			},
+			{
+				"key": "authRequestParams",
+				"value": [],
+				"type": "any"
+			},
+			{
+				"key": "challengeAlgorithm",
+				"value": "S256",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "authorization_code_with_pkce",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

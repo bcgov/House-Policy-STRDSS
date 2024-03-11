@@ -1,0 +1,6 @@
+helm install strdss-dev .
+
+helm delete strdss-dev
+
+oc port-forward svc/strdss-dev-pgbouncer 5433:5432
+

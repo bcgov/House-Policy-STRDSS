@@ -4,9 +4,15 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { KeycloakService } from 'keycloak-angular';
 import { environment } from '../environments/environment';
-
+import { provideAnimations } from '@angular/platform-browser/animations'
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './common/services/auth.interceptor';
 export const appConfig: ApplicationConfig = {
     providers: [
+        provideAnimations(),
+        provideHttpClient(
+            withInterceptors([authInterceptor])
+        ),
         provideRouter(routes),
         KeycloakService,
         {

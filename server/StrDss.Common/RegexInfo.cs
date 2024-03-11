@@ -6,7 +6,7 @@
         public string ErrorMessage { get; set; }
     }
 
-    public class RegexDefs
+    public static class RegexDefs
     {
         public const string Email = "Email";
         public const string GpsCoords = "D14_9"; //latitude longitude
@@ -26,9 +26,9 @@
         public const string Password = "Password";
         public const string PhoneNumber = "PhoneNumber";
 
-        private readonly Dictionary<string, RegexInfo> _regexInfos;
+        private static readonly Dictionary<string, RegexInfo> _regexInfos;
 
-        public RegexDefs()
+        static RegexDefs()
         {
             _regexInfos = new Dictionary<string, RegexInfo>();
 
@@ -57,9 +57,9 @@
 
         }
 
-        public RegexInfo GetRegexInfo(string name)
+        public static RegexInfo GetRegexInfo(string name)
         {
-            if (!_regexInfos.TryGetValue(name, out RegexInfo regexInfo))
+            if (!_regexInfos.TryGetValue(name, out RegexInfo? regexInfo))
             {
                 throw new Exception($"RegexInfo for {name} does not exist.");
             }

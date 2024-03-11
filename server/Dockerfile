@@ -9,4 +9,4 @@ WORKDIR /app
 COPY --from=build /app/published-app .
 EXPOSE 8080
 ENV TZ America/Vancouver
-ENTRYPOINT ["dotnet", "AdvSol.dll"]
+ENTRYPOINT ["dotnet", "StrDss.Api.dll"]

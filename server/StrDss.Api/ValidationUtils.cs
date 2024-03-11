@@ -15,7 +15,7 @@ namespace StrDss.Api
 
             var problem = new ValidationProblemDetails(errors)
             {
-                Type = "https://advsol.com/model-validation-error",
+                Type = "https://strdss.bc.gov.ca/model-validation-error",
                 Title = "One or more validation errors occurred.",
                 Status = StatusCodes.Status422UnprocessableEntity,
                 Detail = "Please refer to the errors property for additional details",
@@ -34,7 +34,7 @@ namespace StrDss.Api
         {
             var problem = new ValidationProblemDetails(context.ModelState)
             {
-                Type = "https://advsol.com/model-validation-error",
+                Type = "https://strdss.bc.gov.ca/model-validation-error",
                 Title = "One or more validation errors occurred.",
                 Status = StatusCodes.Status422UnprocessableEntity,
                 Detail = "Please refer to the errors property for additional details",
@@ -53,7 +53,7 @@ namespace StrDss.Api
         {
             var problem = new ValidationProblemDetails(context.ModelState)
             {
-                Type = "https://advsol.com/model-validation-error",
+                Type = "https://strdss.bc.gov.ca/model-validation-error",
                 Title = "Service areas missing",
                 Status = StatusCodes.Status422UnprocessableEntity,
                 Detail = "Please include service areas in the query string as comma separated string.",
@@ -72,7 +72,7 @@ namespace StrDss.Api
         {
             var problem = new ValidationProblemDetails(context.ModelState)
             {
-                Type = "https://advsol.com/model-validation-error",
+                Type = "https://strdss.bc.gov.ca/model-validation-error",
                 Title = title,
                 Status = StatusCodes.Status422UnprocessableEntity,
                 Detail = detail,
@@ -91,7 +91,7 @@ namespace StrDss.Api
         {
             var problem = new ValidationProblemDetails(context.ModelState)
             {
-                Type = "https://advsol.com/model-validation-error",
+                Type = "https://strdss.bc.gov.ca/model-validation-error",
                 Title = title,
                 Status = status,
                 Detail = detail,

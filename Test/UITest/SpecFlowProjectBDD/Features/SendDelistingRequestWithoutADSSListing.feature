@@ -1,5 +1,5 @@
 ﻿Feature: SendDelistingRequestWithoutADSSListingFeature
-Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-71
+Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-74
 
 @Delisting
 Scenario: SendDelistingRequestWithoutADSSListing

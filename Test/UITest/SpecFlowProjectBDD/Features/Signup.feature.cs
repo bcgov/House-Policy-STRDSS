@@ -42,7 +42,8 @@ namespace SpecFlowProjectBDD.Features
 	2) Visual Studio Specflow Extension
 	3) Chrome
 	4) The version of ChromeDriver.exe must match the correct version of Chrome. The version included here is for Chrome Version 122.0.6261.95 
-	5) XUnit Test Framework Extension", ProgrammingLanguage.CSharp, ((string[])(null)));
+	5) XUnit Test Framework Extension
+	6) Running containers from Coding exercise ", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -89,7 +90,7 @@ namespace SpecFlowProjectBDD.Features
                     "mytag"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Signup", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 14
+#line 15
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -109,16 +110,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 15
+#line 16
  testRunner.Given("I am a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 16
+#line 17
  testRunner.When("I navigate to the STR Homepage (\"http://localhost:5002\")", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 17
+#line 18
  testRunner.When("I click the Signup Button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 18
+#line 19
  testRunner.Then("I am presented with a signup dialog", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

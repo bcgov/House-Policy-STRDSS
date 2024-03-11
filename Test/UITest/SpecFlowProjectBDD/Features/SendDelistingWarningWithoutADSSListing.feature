@@ -1,13 +1,14 @@
-﻿Feature: Delisting
+﻿Feature: SendDelistingWarningWithoutADSSListingFeature
 Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-71
 
 @Delisting
 Scenario: SendDelistingWarningWithoutADSSListing
-#SendDelistingWarningWithoutADSSListing
+#User Authentication
 Given I am an authenticated LG staff member
 
 When I navigate to the delisting warning feature
 
+#Input Form
 Then I should be presented with an input form that includes fields for the listing URL, and an optional field for the host email address
 
 And I should be presented with a field to select which platform to send the warning to 

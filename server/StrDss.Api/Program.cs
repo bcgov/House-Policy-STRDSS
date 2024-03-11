@@ -37,7 +37,7 @@ builder.Services.AddApiVersioning(options =>
 
 var assemblies = Assembly.GetExecutingAssembly()
     .GetReferencedAssemblies()
-    .Where(a => a.FullName.StartsWith("AdvSol"))
+    .Where(a => a.FullName.StartsWith("server"))
     .Select(Assembly.Load).ToArray();
 
 //Services

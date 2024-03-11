@@ -151,7 +151,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"platformId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ],\r\n  \"comment\": \"\"\r\n}",
+					"raw": "{\r\n  \"platformId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ],\r\n  \"comment\": \"\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -184,7 +184,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"platformId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ],\r\n  \"comment\": \"\"\r\n}",
+					"raw": "{\r\n  \"platformId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ],\r\n  \"comment\": \"\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

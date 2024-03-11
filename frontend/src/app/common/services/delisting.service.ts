@@ -11,7 +11,6 @@ import { ComplianceNotice } from '../models/compliance-notice';
 export class DelistingService {
   textHeaders = new HttpHeaders().set('Content-Type', 'application/json');
 
-
   constructor(private httpClient: HttpClient) { }
 
   getPlatforms(): Observable<Array<DropdownOption>> {

@@ -7,6 +7,7 @@ import { environment } from '../environments/environment';
 import { provideAnimations } from '@angular/platform-browser/animations'
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './common/services/auth.interceptor';
+import { MessageService } from 'primeng/api';
 export const appConfig: ApplicationConfig = {
     providers: [
         provideAnimations(),
@@ -21,6 +22,7 @@ export const appConfig: ApplicationConfig = {
             multi: true,
             deps: [KeycloakService],
         },
+        MessageService,
     ],
 };
 

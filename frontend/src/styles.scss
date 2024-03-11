@@ -1,6 +1,32 @@
 @import 'primeng/resources/themes/lara-light-blue/theme.css';
 @import 'primeng/resources/primeng.css';
 
+@font-face {
+    font-family: 'BcSans-regular';
+    src: url('assets/fonts/BcSansFont_Web/2023_01_01_BCSans-Regular_2f.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BcSans-bold';
+    src: url('assets/fonts/BcSansFont_Web/2023_01_01_BCSans-Bold_2f.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BcSans-light';
+    src: url('assets/fonts/BcSansFont_Web/2023_03_14_BCSans-Light_2g.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    font-family: 'BcSans-regular';
+    font-weight: 400;
+}
+
 body {
     margin: 0;
 

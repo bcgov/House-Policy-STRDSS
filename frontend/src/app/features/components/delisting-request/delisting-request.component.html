@@ -1,0 +1,67 @@
+<div class="title">Delisting request</div>
+<div class="sub-title">All fields are required except where stated</div>
+
+<form [formGroup]="myForm" (ngSubmit)="onPreview()">
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="platformId">Select Platform recipient</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-dropdown [options]="platformOptions" formControlName="platformId" [showClear]="true"
+                placeholder="Select a platform" id="platformId" name="platformId" [required]="true"></p-dropdown>
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="listingUrl">Add listing URL</label>
+        </div>
+        <div class="form-group-row-col">
+            <input class="long-text-field" type="text" pInputText formControlName="listingUrl" id="listingUrl"
+                name="listingUrl" required />
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col has-checkbox">
+            <p-checkbox formControlName="sendCopy" [binary]="true" id="sendCopy" name="sendCopy"
+                inputId="binary"></p-checkbox>
+            <label for="sendCopy">Send me a copy of this request</label>
+        </div>
+    </div>
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="ccList">Additional CCs (optional)</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-chips formControlName="ccList" id="ccList" name="ccList"></p-chips>
+        </div>
+    </div>
+    <button type="submit" id="form-preview-btn" pButton pRipple [disabled]="!myForm.valid" label="Review"
+        class="p-button-success"></button>
+</form>
+
+<p-dialog [modal]="true" id="preview-dialog" [closable]="false" header="Preview" [(visible)]="isPreviewVisible"
+    [style]="{width: '50vw'}">
+    <p [innerText]="previewText">
+    </p>
+    <hr>
+    <div class="comment-section">
+        <div class="form-group-row">
+            <div class="form-group-row-col">
+                <label for="comment">Additional comments (Optional)</label>
+            </div>
+            <div class="form-group-row-col">
+                <textarea #textarea rows="5" cols="30" class="full-width-text-field" pInputTextarea id="comment"
+                    name="comment"></textarea>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="actions">
+        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPreviewClose()"></p-button>
+        <p-button label="Submit" id="submit-dialog-btn" (click)="onSubmit(textarea.value)"></p-button>
+    </div>
+</p-dialog>
+
+<p-toast></p-toast>

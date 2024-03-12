@@ -1,0 +1,57 @@
+global:
+  env:
+    'LOGGING__LOGLEVEL__DEFAULT': 'Error'
+    'LOGGING__LOGLEVEL__AWP': 'Information'
+    'ASPNETCORE_ENVIRONMENT': 'Test'
+    'ENV_NAME': 'test'
+    'AppBaseUrl': 'https://test-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca '
+    'SSO_CLIENT': 'str-dss-5303'
+    'SSO_HOST': 'https://test.loginproxy.gov.bc.ca/auth'
+    'SSO_REALM': 'standard'
+    'SSO_AUTHORITY': 'https://test.loginproxy.gov.bc.ca/auth/realms/standard'
+    'SM_LOGOFF_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi/'
+    'CHES_TOKEN_URL': 'https://test.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
+    'CHES_URL': 'https://ches-test.api.gov.bc.ca'
+
+nameOverride: strdss-test
+fullnameOverride: strdss-test
+
+route:
+  host: test-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca 
+  baseService: strdss-test
+
+frontend:
+  enabled: true
+  replicaCount: 1
+  nameOverride: strdss-test-frontend
+  fullnameOverride: strdss-test-frontend
+  secretName: strdss-secrets-test
+
+  resources:
+  limits:
+    cpu: 50m
+    memory: 100Mi
+  requests:
+    cpu: 20m
+    memory: 50Mi
+
+  env:
+    'API_HOST': '/api'
+
+backend:
+  enabled: true
+  replicaCount: 1
+  nameOverride: strdss-test-backend
+  fullnameOverride: strdss-test-backend
+  secretName: strdss-secrets-test
+
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 1500Mi
+    requests:
+      cpu: 20m
+      memory: 1100Mi
+
+  env:
+    'API_HOST': '/api'

@@ -180,7 +180,7 @@ namespace StrDss.Api.Controllers
             {
                 if (!Regex.IsMatch(email, regex.Regex))
                 {
-                    errors.AddItem("hostEmail", $"Email ({email}) is invalid");
+                    errors.AddItem("ccList", $"Email ({email}) is invalid");
                 }
             }
 

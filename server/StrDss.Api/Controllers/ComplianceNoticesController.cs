@@ -191,7 +191,7 @@ namespace StrDss.Api.Controllers
 
             var regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
 
-            if (!Regex.IsMatch(dto.HostEmail, regex.Regex))
+            if (dto.HostEmail.IsNotEmpty() && !Regex.IsMatch(dto.HostEmail, regex.Regex))
             {
                 errors.AddItem("hostEmail", $"Host email is invalid");
             }
@@ -200,13 +200,18 @@ namespace StrDss.Api.Controllers
             {
                 if (!Regex.IsMatch(email, regex.Regex))
                 {
-                    errors.AddItem("hostEmail", $"Email ({email}) is invalid");
+                    errors.AddItem("ccList", $"Email ({email}) is invalid");
                 }
             }
 
             if (errors.Count > 0)
             {
                 return (false, ValidationUtils.GetValidationErrorResult(errors, ControllerContext));
+            }
+
+            if (dto.HostEmail.IsNotEmpty())
+            {
+                dto.CcList.Add(dto.HostEmail);
             }
 
             if (dto.SendCopy)

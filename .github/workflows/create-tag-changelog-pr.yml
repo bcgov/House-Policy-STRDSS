@@ -32,6 +32,7 @@ jobs:
     - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
       with:
         fetch-depth: 0 # fetch all history for all branches and tags
+        # https://medium.com/prompt/trigger-another-github-workflow-without-using-a-personal-access-token-f594c21373ef
         ssh-key: "${{ secrets.COMMIT_KEY }}"
 
     - name: Setup Tools

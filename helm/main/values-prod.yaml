@@ -1,0 +1,57 @@
+global:
+  env:
+    'LOGGING__LOGLEVEL__DEFAULT': 'Error'
+    'LOGGING__LOGLEVEL__AWP': 'Information'
+    'ASPNETCORE_ENVIRONMENT': 'Production'
+    'ENV_NAME': 'prod'
+    'AppBaseUrl': 'https://prod-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca '
+    'SSO_CLIENT': 'str-dss-5303'
+    'SSO_HOST': 'https://loginproxy.gov.bc.ca/auth'
+    'SSO_REALM': 'standard'
+    'SSO_AUTHORITY': 'https://loginproxy.gov.bc.ca/auth/realms/standard'
+    'SM_LOGOFF_URL': 'https://logon7.gov.bc.ca/clp-cgi/logoff.cgi/'
+    'CHES_TOKEN_URL': 'https://loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
+    'CHES_URL': 'https://ches.api.gov.bc.ca'
+
+nameOverride: strdss-prod
+fullnameOverride: strdss-prod
+
+route:
+  host: prod-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca 
+  baseService: strdss-prod
+
+frontend:
+  enabled: true
+  replicaCount: 3
+  nameOverride: strdss-prod-frontend
+  fullnameOverride: strdss-prod-frontend
+  secretName: strdss-secrets-prod
+
+  resources:
+  limits:
+    cpu: 50m
+    memory: 100Mi
+  requests:
+    cpu: 20m
+    memory: 50Mi
+
+  env:
+    'API_HOST': '/api'
+
+backend:
+  enabled: true
+  replicaCount: 3
+  nameOverride: strdss-prod-backend
+  fullnameOverride: strdss-prod-backend
+  secretName: strdss-secrets-prod
+
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 1500Mi
+    requests:
+      cpu: 20m
+      memory: 1100Mi
+
+  env:
+    'API_HOST': '/api'

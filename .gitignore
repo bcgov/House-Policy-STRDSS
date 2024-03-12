@@ -1,0 +1,7 @@
+node_modules
+mnt
+note
+**/Properties/launchSettings.json
+UITest
+secrets
+.terraform

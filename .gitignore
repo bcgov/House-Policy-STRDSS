@@ -4,3 +4,4 @@ note
 **/Properties/launchSettings.json
 UITest
 secrets
+.terraform

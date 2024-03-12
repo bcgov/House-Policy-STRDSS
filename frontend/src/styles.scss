@@ -48,13 +48,43 @@ body {
     }
 
     .p-ripple.p-element.p-button.p-component {
-        background-color: #053662;
-        border-color: #053662;
+        &:not(.p-button-link) {
+            background-color: #053662;
+            border-color: #053662;
 
-        &.p-button-outlined {
-            background-color: #FFFFFF;
-            border-color: #353433;
-            color: #353433;
+            &.p-button-outlined {
+                background-color: #FFFFFF;
+                border-color: #353433;
+                color: #353433;
+            }
+        }
+
+        &.p-button-link {
+            .p-button-label {
+                color: #FFFFFF;
+                font-size: 16px;
+            }
+        }
+    }
+
+    .p-card {
+        border-radius: 4px;
+
+        .p-card-body {
+            padding: 18px 14px;
+
+            .p-card-title {
+                font-family: 'BcSans-regular';
+                font-size: 16px;
+                font-weight: 700;
+                color: #004578;
+            }
+
+            .p-card-content {
+                padding: 0;
+                font-family: 'BcSans-regular';
+                font-size: 16px;
+            }
         }
     }
 }

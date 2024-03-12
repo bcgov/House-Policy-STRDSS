@@ -20,20 +20,17 @@ namespace SpecFlowProjectBDD.StepDefinitions
     [Scope(Scenario = "SendDelistingRequestWithoutADSSListing")]
     public sealed class SendDelistingRequestWithoutADSSListingStepDefinitions
     {
-        LoginPage _loginPage;
-        SignupPage _signupPage;
-        DashboardPage _dashboardPage;
-        CreateApplicationPage _createApplicationPage;
+        HomePage _HomePage;
+        DelistingRequestPage _DelistingRequestPage;
+
         IDriver _driver;
 
  
         public SendDelistingRequestWithoutADSSListingStepDefinitions(SeleniumDriver Driver)
         {
             _driver = Driver;
-            _loginPage = new LoginPage(_driver);
-            _signupPage = new SignupPage(_driver);
-            _dashboardPage = new DashboardPage(_driver);
-            _createApplicationPage = new CreateApplicationPage(_driver);
+            _HomePage = new HomePage(_driver);
+            _DelistingRequestPage = new DelistingRequestPage(_driver);
         }
 
         //User Authentication
@@ -46,6 +43,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("I navigate to the delisting request feature")]
         public void WhenINavigateToTheDelistingRequestFeature()
         {
+            _driver.Url = "http://127.0.0.1:4200/delisting-request";
+            _driver.Navigate();
+
         }
 
         //Input Form

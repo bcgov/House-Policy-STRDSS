@@ -25,14 +25,14 @@ jobs:
       with:
         openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
         openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
-        namespace: b07b69-prod
+        namespace: f4a30d-prod
         insecure_skip_tls_verify: true
 
     - name: Deploy apps with Helm chart
       run: |
         vtag=${{ github.ref_name }}
         make upgrade \
-        NAMESPACE=b07b69-prod \
+        NAMESPACE=f4a30d-prod \
         NAME=strdss-prod \
         ENV_NAME=prod \
         IMAGE_TAG_FRONTEND=${vtag//v} \

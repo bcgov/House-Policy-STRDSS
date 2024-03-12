@@ -93,14 +93,14 @@ jobs:
       with:
         openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
         openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
-        namespace: b07b69-dev # dev and test live in the same 'DEV' namespace
+        namespace: f4a30d-dev # dev and test live in the same 'DEV' namespace
         insecure_skip_tls_verify: true
 
     - name: Deploy apps with Helm chart
       run: |
         vtag=${{ github.ref_name }}
         make upgrade \
-        NAMESPACE=b07b69-dev \
+        NAMESPACE=f4a30d-dev \
         NAME=strdss-test \
         ENV_NAME=test \
         IMAGE_TAG_FRONTEND=${vtag//v} \

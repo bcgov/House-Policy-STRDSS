@@ -1,0 +1,20 @@
+name: Setup NPM Packages
+description: Setup required NPM packages
+
+runs:
+  using: composite
+  steps:
+  - uses: actions/cache@67b839edb68371cc5014f6cea11c9aa77238de78
+    with:
+      path: |
+        **/node_modules
+      key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.lock') }}
+
+  - name: Install Root NPM packages
+    run: npm install
+    shell: bash
+
+  - name: Install Frontend NPM packages
+    run: npm install
+    working-directory: ./frontend
+    shell: bash

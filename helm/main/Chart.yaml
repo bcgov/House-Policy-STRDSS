@@ -1,0 +1,15 @@
+apiVersion: v2
+name: main
+description: A Helm chart for strdss
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+dependencies:
+  - name: frontend
+    version: '0.1.0'
+    repository: 'file://../_frontend'
+    condition: frontend.enabled
+  - name: backend
+    version: '0.1.0'
+    repository: 'file://../_backend'
+    condition: backend.enabled

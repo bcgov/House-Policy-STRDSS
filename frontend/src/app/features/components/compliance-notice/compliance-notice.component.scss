@@ -1,0 +1,42 @@
+:host {
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+
+    .title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .sub-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 18px;
+    }
+
+    .form-group-row {
+        width: 100%;
+
+        &-col {
+            font-size: 16px;
+
+            &.has-checkbox {
+                :first-child {
+                    margin-right: 8px;
+                }
+
+                padding-bottom: 16px;
+            }
+
+            &:not(&.has-checkbox) {
+                width: 100%;
+
+                &:last-of-type {
+                    padding: 8px 0 16px 0;
+                }
+            }
+        }
+
+    }
+}

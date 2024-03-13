@@ -35,7 +35,7 @@ namespace SpecFlowProjectBDD.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendDelistingRequestWithoutADSSListingFeature", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-71", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendDelistingRequestWithoutADSSListingFeature", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-74", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         

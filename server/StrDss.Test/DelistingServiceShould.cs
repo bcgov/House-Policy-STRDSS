@@ -25,7 +25,7 @@ namespace StrDss.Test
             DelistingService sut)
         {
             // Arrange
-            configMock.Setup(x => x.GetValue(typeof(string), "" )).Returns("https://ches.example.com");
+            configMock.Setup(x => x.GetValue(typeof(string), "")).Returns("https://ches.example.com");
 
             // Act
             var result = await sut.ValidateDelistingWarning(dto, platform, "reason");

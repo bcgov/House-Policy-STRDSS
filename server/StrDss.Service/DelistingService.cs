@@ -18,25 +18,23 @@ namespace StrDss.Service
     {
         Task<Dictionary<string, List<string>>> ValidateDelistingWarning(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason);
         Task<string> SendDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform);
-        string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, List<string> toList, bool contentOnly);
+        string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly);
         Task<Dictionary<string, List<string>>> ValidateDelistingRequest(DelistingRequestCreateDto dto, PlatformDto? platform, LocalGovernmentDto? lg);
         Task<string> SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform);
-        string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, List<string> toList, bool contentOnly);
+        string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
         private IConfiguration _config;
-        private IChesTokenApi _chesTokenApi;
-        private HttpClient _httpClient;
+        private IEmailService _emailService;
         private ILogger<DelistingService> _logger;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper,
-            IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<DelistingService> logger)
+            IConfiguration config, IEmailService emailService, ILogger<DelistingService> logger)
             : base(currentUser, validator, unitOfWork, mapper)
         {
             _config = config;
-            _chesTokenApi = chesTokenApi;
-            _httpClient = httpClient;
+            _emailService = emailService;
             _logger = logger;
         }
         public async Task<Dictionary<string, List<string>>> ValidateDelistingWarning(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason)
@@ -126,69 +124,42 @@ namespace StrDss.Service
 
         public async Task<string> SendDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform)
         {
-            try
+            dto.ToList.Add(platform?.Email ?? "");
+            if (dto.HostEmail.IsNotEmpty())
             {
-                var token = await _chesTokenApi.GetTokenAsync();
-                var chesUrl = _config.GetValue<string>("CHES_URL") ?? "";
-
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
-
-                var toList = new List<string> { platform?.Email ?? "" };
-                if (dto.HostEmail.IsNotEmpty())
-                {
-                    toList.Add(dto.HostEmail);
-                }
-
-                if (dto.SendCopy)
-                {
-                    dto.CcList.Add(_currentUser.EmailAddress);
-                }
-
-
-                var emailContent = new
-                {
-                    bcc = new string[] { },
-                    bodyType = "text",
-                    body = FormatDelistingWarningEmailContent(dto, toList, true),
-                    cc = dto.CcList.ToArray(),
-                    delayTS = 0,
-                    encoding = "utf-8",
-                    from = "no_reply@gov.bc.ca",
-                    priority = "normal",
-                    subject = "Notice of Takedown",
-                    to = toList.ToArray(),
-                };
-
-                var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(emailContent);
-                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);
-                if (response.IsSuccessStatusCode)
-                {
-                    _logger.LogInformation($"Sent delisting warning for {dto.ListingUrl}");
-                }
-                else
-                {
-                    _logger.LogError($"Failed to send delisting warning for {dto.ListingUrl}. Status code: {response.StatusCode}");
-                }
-            }
-            catch (Exception ex)
-            {
-                var error = $"$\"Exception raised when sending delisting warning for {{dto.ListingUrl}}";
-                _logger.LogError($"{error} - {ex}");
-                return error;
+                dto.ToList.Add(dto.HostEmail);
             }
 
-            return "";
+            if (dto.SendCopy)
+            {
+                dto.CcList.Add(_currentUser.EmailAddress);
+            }
+
+            var emailContent = new EmailContent
+            {
+                Bcc = Array.Empty<string>(),
+                BodyType = "text",
+                Body = FormatDelistingWarningEmailContent(dto, true),
+                Cc = dto.CcList.ToArray(),
+                DelayTS = 0,
+                Encoding = "utf-8",
+                From = "no_reply@gov.bc.ca",
+                Priority = "normal",
+                Subject = "Notice of Takedown",
+                To = dto.ToList.ToArray(),
+                Info = dto.ListingUrl
+            };
+
+            return await _emailService.SendEmailAsync(emailContent);
         }
 
-        public string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, List<string> toList, bool contentOnly)
+        public string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly)
         {
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
             var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
             var nl = Environment.NewLine;
 
-            return (contentOnly ? "" : $@"To: {string.Join(";", toList)} {dto.HostEmail}{nl}cc: {string.Join(";", dto.CcList)}{nl}{nl}")
+            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)} {dto.HostEmail}{nl}cc: {string.Join(";", dto.CcList)}{nl}{nl}")
                  + $@"Dear Short-term Rental Host,{nl}"
                  + $@"{nl}Short-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.{nl}{nl}Short-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.{nl}{nl}The short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason:"
                  + $@"{nl}{nl}{reason ?? ""}"
@@ -203,55 +174,29 @@ namespace StrDss.Service
 
         public async Task<string> SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform)
         {
-            try
+            dto.ToList.Add(platform?.Email ?? "");
+
+            if (dto.SendCopy)
             {
-                var token = await _chesTokenApi.GetTokenAsync();
-                var chesUrl = _config.GetValue<string>("CHES_URL") ?? "";
-
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
-
-                var toList = new List<string> { platform?.Email ?? "" };
-
-                if (dto.SendCopy)
-                {
-                    dto.CcList.Add(_currentUser.EmailAddress);
-                }
-
-                var emailContent = new
-                {
-                    bcc = new string[] { },
-                    bodyType = "text",
-                    body = FormatDelistingRequestEmailContent(dto, toList, true),
-                    cc = dto.CcList.ToArray(),
-                    delayTS = 0,
-                    encoding = "utf-8",
-                    from = "no_reply@gov.bc.ca",
-                    priority = "normal",
-                    subject = "Takedown Request",
-                    to = toList.ToArray(),
-                };
-
-                var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(emailContent);
-                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);
-                if (response.IsSuccessStatusCode)
-                {
-                    _logger.LogInformation($"Sent delisting request for {dto.ListingUrl}");
-                }
-                else
-                {
-                    _logger.LogError($"Failed to send delisting request for {dto.ListingUrl}. Status code: {response.StatusCode}");
-                }
-            }
-            catch (Exception ex)
-            {
-                var error = $"$\"Exception raised when sending delisting request for {{dto.ListingUrl}}";
-                _logger.LogError($"{error} - {ex}");
-                return error;
+                dto.CcList.Add(_currentUser.EmailAddress);
             }
 
-            return "";
+            var emailContent = new EmailContent
+            {
+                Bcc = Array.Empty<string>(),
+                BodyType = "text",
+                Body = FormatDelistingRequestEmailContent(dto, true),
+                Cc = dto.CcList.ToArray(),
+                DelayTS = 0,
+                Encoding = "utf-8",
+                From = "no_reply@gov.bc.ca",
+                Priority = "normal",
+                Subject = "Takedown Request",
+                To = dto.ToList.ToArray(),
+                Info = dto.ListingUrl
+            };
+
+            return await _emailService.SendEmailAsync(emailContent);
         }
 
         public async Task<Dictionary<string, List<string>>> ValidateDelistingRequest(DelistingRequestCreateDto dto, PlatformDto? platform, LocalGovernmentDto? lg)
@@ -300,12 +245,12 @@ namespace StrDss.Service
             return errors;
         }
 
-        public string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, List<string> toList, bool contentOnly)
+        public string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly)
         {
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
             var nl = Environment.NewLine;
 
-            return (contentOnly ? "" : $@"To: {string.Join(";", toList)}{nl}cc: {string.Join(";", dto.CcList)}")
+            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}{nl}cc: {string.Join(";", dto.CcList)}")
                  + $@"{nl}{nl}Request to platform service provider for takedown of non-compliant platform offering."
                  + $@"{nl}{nl}The following short-term rental listing is not in compliance with an applicable local government business licence requirement:"
                  + $@"{nl}{nl}{dto.ListingUrl}"

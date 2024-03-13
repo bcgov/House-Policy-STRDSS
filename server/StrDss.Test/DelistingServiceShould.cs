@@ -3,6 +3,7 @@ using Castle.Core.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using StrDss.Model.DelistingDtos;
+using StrDss.Model.LocalGovernmentDtos;
 using StrDss.Model.PlatformDtos;
 using StrDss.Service;
 using StrDss.Service.HttpClients;
@@ -283,6 +284,119 @@ namespace StrDss.Test
             Assert.Contains("strByLawUrl", result.Keys);
             Assert.Single(result["strByLawUrl"]);
             Assert.Equal("URL is required", result["strByLawUrl"].First());
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateDelistingRequest_NullPlatform_ReturnsPlatformIdError(
+            DelistingRequestCreateDto dto,
+            LocalGovernmentDto lg,
+            [Frozen] Mock<IConfiguration> configMock,
+            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
+            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            DelistingService sut)
+        {
+            // Arrange
+            PlatformDto platform = null;
+
+            // Act
+            var result = await sut.ValidateDelistingRequest(dto, platform, lg);
+
+            // Assert
+            Assert.Contains("platformId", result.Keys);
+            Assert.Single(result["platformId"]);
+            Assert.Equal($"Platform ID ({dto.PlatformId}) does not exist.", result["platformId"].First());
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateDelistingRequest_NullLocalGovernment_ReturnsLocalGovernmentIdError(
+            DelistingRequestCreateDto dto,
+            PlatformDto platform,
+            [Frozen] Mock<IConfiguration> configMock,
+            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
+            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            DelistingService sut)
+        {
+            // Arrange
+            LocalGovernmentDto lg = null;
+
+            // Act
+            var result = await sut.ValidateDelistingRequest(dto, platform, lg);
+
+            // Assert
+            Assert.Contains("lgId", result.Keys);
+            Assert.Single(result["lgId"]);
+            Assert.Equal($"Local Government ID ({dto.LgId}) does not exist.", result["lgId"].First());
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateDelistingRequest_EmptyListingUrl_ReturnsListingUrlError(
+            DelistingRequestCreateDto dto,
+            PlatformDto platform,
+            LocalGovernmentDto lg,
+            [Frozen] Mock<IConfiguration> configMock,
+            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
+            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            DelistingService sut)
+        {
+            // Arrange
+            dto.ListingUrl = string.Empty;
+
+            // Act
+            var result = await sut.ValidateDelistingRequest(dto, platform, lg);
+
+            // Assert
+            Assert.Contains("listingUrl", result.Keys);
+            Assert.Single(result["listingUrl"]);
+            Assert.Equal("Listing URL is required", result["listingUrl"].First());
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateDelistingRequest_InvalidListingUrl_ReturnsInvalidUrlError(
+            DelistingRequestCreateDto dto,
+            PlatformDto platform,
+            LocalGovernmentDto lg,
+            [Frozen] Mock<IConfiguration> configMock,
+            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
+            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            DelistingService sut)
+        {
+            // Arrange
+            dto.ListingUrl = "invalidurl";
+
+            // Act
+            var result = await sut.ValidateDelistingRequest(dto, platform, lg);
+
+            // Assert
+            Assert.Contains("listingUrl", result.Keys);
+            Assert.Single(result["listingUrl"]);
+            Assert.Equal("Invalid URL", result["listingUrl"].First());
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateDelistingRequest_InvalidCcListEmail_ReturnsInvalidCcListEmailError(
+            DelistingRequestCreateDto dto,
+            PlatformDto platform,
+            LocalGovernmentDto lg,
+            [Frozen] Mock<IConfiguration> configMock,
+            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
+            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            DelistingService sut)
+        {
+            // Arrange
+            dto.CcList = new List<string> { "invalidemail" };
+
+            // Act
+            var result = await sut.ValidateDelistingRequest(dto, platform, lg);
+
+            // Assert
+            Assert.Contains("ccList", result.Keys);
+            Assert.Single(result["ccList"]);
+            Assert.Equal("Email (invalidemail) is invalid", result["ccList"].First());
         }
     }
 }

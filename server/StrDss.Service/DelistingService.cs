@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
+using StrDss.Model.LocalGovernmentDtos;
 using StrDss.Model.PlatformDtos;
 using StrDss.Service.HttpClients;
 using System.Text;
@@ -17,6 +19,9 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> ValidateDelistingWarning(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason);
         Task<string> SendDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform);
         string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, List<string> toList, bool contentOnly);
+        Task<Dictionary<string, List<string>>> ValidateDelistingRequest(DelistingRequestCreateDto dto, PlatformDto? platform, LocalGovernmentDto? lg);
+        Task<string> SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform);
+        string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, List<string> toList, bool contentOnly);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -159,16 +164,16 @@ namespace StrDss.Service
                 var response = await httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"Sent delisting warning to {emailContent.to} for {dto.ListingUrl}");
+                    _logger.LogInformation($"Sent delisting warning for {dto.ListingUrl}");
                 }
                 else
                 {
-                    _logger.LogError($"Failed to send delisting warning to {emailContent.to} for {dto.ListingUrl}. Status code: {response.StatusCode}");
+                    _logger.LogError($"Failed to send delisting warning for {dto.ListingUrl}. Status code: {response.StatusCode}");
                 }
             }
             catch (Exception ex)
             {
-                var error = $"$\"Exception raised when sending delisting warning to {{emailContent.to}} for {{dto.ListingUrl}}";
+                var error = $"$\"Exception raised when sending delisting warning for {{dto.ListingUrl}}";
                 _logger.LogError($"{error} - {ex}");
                 return error;
             }
@@ -195,5 +200,118 @@ namespace StrDss.Service
                  + (dto.Comment.IsEmpty() ? "" : $@"{nl}{nl}{dto.Comment}");
         }
 
+        public async Task<string> SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform)
+        {
+            try
+            {
+                var token = await _chesTokenApi.GetTokenAsync();
+                var chesUrl = _config.GetValue<string>("CHES_URL") ?? "";
+
+                using HttpClient httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
+
+                var toList = new List<string> { platform?.Email ?? "" };
+
+                if (dto.SendCopy)
+                {
+                    dto.CcList.Add(_currentUser.EmailAddress);
+                }
+
+                var emailContent = new
+                {
+                    bcc = new string[] { },
+                    bodyType = "text",
+                    body = FormatDelistingRequestEmailContent(dto, toList, true),
+                    cc = dto.CcList.ToArray(),
+                    delayTS = 0,
+                    encoding = "utf-8",
+                    from = "no_reply@gov.bc.ca",
+                    priority = "normal",
+                    subject = "Takedown Request",
+                    to = toList.ToArray(),
+                };
+
+                var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(emailContent);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"Sent delisting request for {dto.ListingUrl}");
+                }
+                else
+                {
+                    _logger.LogError($"Failed to send delisting request for {dto.ListingUrl}. Status code: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                var error = $"$\"Exception raised when sending delisting request for {{dto.ListingUrl}}";
+                _logger.LogError($"{error} - {ex}");
+                return error;
+            }
+
+            return "";
+        }
+
+        public async Task<Dictionary<string, List<string>>> ValidateDelistingRequest(DelistingRequestCreateDto dto, PlatformDto? platform, LocalGovernmentDto? lg)
+        {
+            await Task.CompletedTask;
+
+            var errors = new Dictionary<string, List<string>>();
+            RegexInfo regex;
+
+            //Todo: Validate Platform ID
+            if (platform == null)
+            {
+                errors.AddItem("platformId", $"Platform ID ({dto.PlatformId}) does not exist.");
+            }
+
+            if (lg == null)
+            {
+                errors.AddItem("lgId", $"Local Government ID ({dto.LgId}) does not exist.");
+            }
+
+            //Todo: Validate LG ID
+
+            if (dto.ListingUrl.IsEmpty())
+            {
+                errors.AddItem("listingUrl", "Listing URL is required");
+            }
+            else
+            {
+                regex = RegexDefs.GetRegexInfo(RegexDefs.Url);
+                if (!Regex.IsMatch(dto.ListingUrl, regex.Regex))
+                {
+                    errors.AddItem("listingUrl", "Invalid URL");
+                }
+            }
+
+            regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+
+            foreach (var email in dto.CcList)
+            {
+                if (!Regex.IsMatch(email, regex.Regex))
+                {
+                    errors.AddItem("ccList", $"Email ({email}) is invalid");
+                }
+            }
+
+            return errors;
+        }
+
+        public string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, List<string> toList, bool contentOnly)
+        {
+            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var nl = Environment.NewLine;
+
+            return (contentOnly ? "" : $@"To: {string.Join(";", toList)}{nl}cc: {string.Join(";", dto.CcList)}")
+                 + $@"{nl}{nl}Request to platform service provider for takedown of non-compliant platform offering."
+                 + $@"{nl}{nl}The following short-term rental listing is not in compliance with an applicable local government business licence requirement:"
+                 + $@"{nl}{nl}{dto.ListingUrl}"
+                 + $@"{nl}{nl}Listing ID Number: {dto.ListingId}"
+                 + $@"{nl}{nl}In accordance, with 17(2) of the Short-term Rental Accommodations Act, please cease providing platform services in respect of the above platform offer within 3 days."
+                 + $@"{nl}{nl}[Name]{nl}[Title]{nl}[Local government]{nl}[Contact Information]";
+        }
     }
 }

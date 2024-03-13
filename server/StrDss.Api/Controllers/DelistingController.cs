@@ -101,7 +101,7 @@ namespace StrDss.Api.Controllers
 
         [HttpPost("requests/preview", Name = "GetDelistingRequestPreview")]
         [ApiAuthorize]
-        public async Task<ActionResult<string>> GetDelistingRequestPreview(DelistingRequestCreateDto dto)
+        public async Task<ActionResult<EmailPreview>> GetDelistingRequestPreview(DelistingRequestCreateDto dto)
         {
             await Task.CompletedTask;
 
@@ -113,7 +113,7 @@ namespace StrDss.Api.Controllers
                 return validationResult.Result;
             }
 
-            return FormatDelistingRequestEmailContent(dto, false);
+            return new EmailPreview { Content = FormatDelistingRequestEmailContent(dto, false) };
         }
 
         private (bool IsValid, ActionResult Result) ValidateDelistingRequest(DelistingRequestCreateDto dto, PlatformDto? platform)
@@ -166,7 +166,7 @@ namespace StrDss.Api.Controllers
         public async Task<ActionResult<DropdownDto>> GetWarningReasonDrowdown()
         {
             await Task.CompletedTask;
-            return Ok(WarningReasonDto.RequestReasons.Select(x => new DropdownDto { Id = x.RequestReasonId, Description = x.Reason }));
+            return Ok(WarningReasonDto.WarningReasons.Select(x => new DropdownDto { Id = x.WarningReasonId, Description = x.Reason }));
         }
 
         [HttpPost("warnings", Name = "CreateDelistingWarning")]
@@ -174,7 +174,7 @@ namespace StrDss.Api.Controllers
         public async Task<ActionResult> CreateDelistingWarning(DelistingWarningCreateDto dto)
         {
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
-            var reason = WarningReasonDto.RequestReasons.FirstOrDefault(x => x.RequestReasonId == dto.ReasonId)?.Reason;
+            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
 
             var validationResult = ValidateDelistingWarning(dto, platform, reason);
             if (!validationResult.IsValid)
@@ -241,12 +241,12 @@ namespace StrDss.Api.Controllers
 
         [HttpPost("warnings/preview", Name = "GetDelistingWarningPreview")]
         [ApiAuthorize]
-        public async Task<ActionResult<string>> GetDelistingWarningPreview(DelistingWarningCreateDto dto)
+        public async Task<ActionResult<EmailPreview>> GetDelistingWarningPreview(DelistingWarningCreateDto dto)
         {
             await Task.CompletedTask;
 
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
-            var reason = WarningReasonDto.RequestReasons.FirstOrDefault(x => x.RequestReasonId == dto.ReasonId)?.Reason;
+            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
 
             var validationResult = ValidateDelistingWarning(dto, platform, reason);
             if (!validationResult.IsValid)
@@ -254,7 +254,7 @@ namespace StrDss.Api.Controllers
                 return validationResult.Result;
             }
 
-            return FormatDelistingWarningEmailContent(dto, false);
+            return new EmailPreview { Content = FormatDelistingWarningEmailContent(dto, false) };
         }
 
         private (bool IsValid, ActionResult Result) ValidateDelistingWarning(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason)
@@ -307,7 +307,7 @@ namespace StrDss.Api.Controllers
         private string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly)
         {
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
-            var reason = WarningReasonDto.RequestReasons.FirstOrDefault(x => x.RequestReasonId == dto.ReasonId)?.Reason;
+            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
 
             return (contentOnly ? "" : $@"To: {platform?.Name}; {dto.HostEmail}{Environment.NewLine}cc: {string.Join(";", dto.CcList)}{Environment.NewLine}{Environment.NewLine}")
                  + $@"Dear Sir/Madam,{Environment.NewLine}"

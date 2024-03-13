@@ -3,11 +3,12 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using AutoFixture.Xunit2;
+using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 
 namespace StrDss.Test
 {
-    public class DelistingWarningCreateDtoSpecimenBuilder : ISpecimenBuilder
+    public class DelistingWarningCreateDtoBuilder : ISpecimenBuilder
     {
         public object Create(object request, ISpecimenContext context)
         {
@@ -58,7 +59,7 @@ namespace StrDss.Test
         }
     }
 
-    public class DelistingRequestCreateDtoSpecimenBuilder : ISpecimenBuilder
+    public class DelistingRequestCreateDtoBuilder : ISpecimenBuilder
     {
         public object Create(object request, ISpecimenContext context)
         {
@@ -91,6 +92,34 @@ namespace StrDss.Test
         }
     }
 
+    public class EmailContentBuilder : ISpecimenBuilder
+    {
+        public object Create(object request, ISpecimenContext context)
+        {
+            if (!(request is Type type) || type != typeof(EmailContent))
+            {
+                return new NoSpecimen();
+            }
+
+            var emailContent = new EmailContent
+            {
+                Bcc = context.Create<string[]>(),
+                BodyType = context.Create<string>(),
+                Body = context.Create<string>(),
+                Cc = context.Create<string[]>(),
+                DelayTS = context.Create<int>(),
+                Encoding = context.Create<string>(),
+                From = context.Create<string>(),
+                Priority = context.Create<string>(),
+                Subject = context.Create<string>(),
+                To = context.Create<string[]>(),
+                Info = context.Create<string>()
+            };
+
+            return emailContent;
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Method)]
     public class AutoDomainDataAttribute : AutoDataAttribute
     {
@@ -99,6 +128,7 @@ namespace StrDss.Test
                 .Customize(new AutoMoqCustomization())
                 .Customize(new DelistingWarningCreateDtoCustomization())
                 .Customize(new DelistingRequestCreateDtoCustomization())
+                .Customize(new EmailContentCustomization())
             )                
         {
         }
@@ -108,7 +138,7 @@ namespace StrDss.Test
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Customizations.Add(new DelistingWarningCreateDtoSpecimenBuilder());
+            fixture.Customizations.Add(new DelistingWarningCreateDtoBuilder());
         }
     }
 
@@ -116,7 +146,15 @@ namespace StrDss.Test
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Customizations.Add(new DelistingRequestCreateDtoSpecimenBuilder());
+            fixture.Customizations.Add(new DelistingRequestCreateDtoBuilder());
+        }
+    }
+
+    public class EmailContentCustomization : ICustomization
+    {
+        public void Customize(IFixture fixture)
+        {
+            fixture.Customizations.Add(new EmailContentBuilder());
         }
     }
 }

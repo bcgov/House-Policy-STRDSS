@@ -21,9 +21,9 @@ namespace UITest.PageObjects
         public NoticeOfTakeDownPage(IDriver Driver)
         {
             _Driver = Driver;
-            _CommentsTextBox = new TextBox(Driver, Enums.FINDBY.CSSSELECTOR, NoticeOfTakeDownModel.CommentsTextBox);
-            _SubmitButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, NoticeOfTakeDownModel.SubmitButton);
-            _CancelButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, NoticeOfTakeDownModel.CancelButton);
+            _CommentsTextBox = new TextBox(Driver, Enums.FINDBY.ID, NoticeOfTakeDownModel.CommentsTextBox);
+            _SubmitButton = new Button(Driver, Enums.FINDBY.ID, NoticeOfTakeDownModel.SubmitButton);
+            _CancelButton = new Button(Driver, Enums.FINDBY.ID, NoticeOfTakeDownModel.CancelButton);
         }
     }
 }

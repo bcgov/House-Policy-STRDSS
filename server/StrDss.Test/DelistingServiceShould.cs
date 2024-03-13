@@ -2,6 +2,7 @@
 using Castle.Core.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.LocalGovernmentDtos;
 using StrDss.Model.PlatformDtos;
@@ -397,6 +398,176 @@ namespace StrDss.Test
             Assert.Contains("ccList", result.Keys);
             Assert.Single(result["ccList"]);
             Assert.Equal("Email (invalidemail) is invalid", result["ccList"].First());
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task SendDelistingWarningAsync_WhenCalled_ShouldSendEmail(
+            DelistingWarningCreateDto dto,
+            PlatformDto platform,
+            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
+            DelistingService sut)
+        {
+            // Arrange
+            currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
+
+            emailServiceMock
+                .Setup(m => m.SendEmailAsync(It.IsAny<EmailContent>()))
+                .ReturnsAsync("");
+
+            // Act
+            var result = await sut.SendDelistingWarningAsync(dto, platform);
+
+            // Assert
+            emailServiceMock.Verify(m => m.SendEmailAsync(It.IsAny<EmailContent>()), Times.Once);
+            Assert.Equal("", result);
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task SendDelistingWarningAsync_WhenHostEmailIsNotEmpty_AddsHostEmailToToList(
+            DelistingWarningCreateDto dto,
+            PlatformDto platform,
+            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
+            DelistingService sut)
+        {
+            // Arrange
+            dto.HostEmail = "host@example.com";
+
+            // Act
+            var result = await sut.SendDelistingWarningAsync(dto, platform);
+
+            // Assert
+            Assert.Contains(dto.HostEmail, dto.ToList);
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task SendDelistingWarningAsync_WhenHostEmailIsEmpty_DoesNotAddHostEmailToToList(
+            DelistingWarningCreateDto dto,
+            PlatformDto platform,
+            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
+            DelistingService sut)
+        {
+            // Arrange
+            dto.HostEmail = string.Empty;
+
+            // Act
+            var result = await sut.SendDelistingWarningAsync(dto, platform);
+
+            // Assert
+            Assert.DoesNotContain(dto.HostEmail, dto.ToList);
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task SendDelistingWarningAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToCcList(
+            DelistingWarningCreateDto dto,
+            PlatformDto platform,
+            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
+            DelistingService sut)
+        {
+            // Arrange
+            dto.SendCopy = true;
+            var currentUserEmail = "user@example.com";
+            currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
+
+            // Act
+            var result = await sut.SendDelistingWarningAsync(dto, platform);
+
+            // Assert
+            Assert.Contains(currentUserEmail, dto.CcList);
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task SendDelistingWarningAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
+            DelistingWarningCreateDto dto,
+            PlatformDto platform,
+            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
+            DelistingService sut)
+        {
+            // Arrange
+            dto.SendCopy = false;
+            var currentUserEmail = "user@example.com";
+            currentUserMock.Setup(m => m.EmailAddress).Returns("user@example.com");
+
+            // Act
+            var result = await sut.SendDelistingWarningAsync(dto, platform);
+
+            // Assert
+            Assert.DoesNotContain(currentUserEmail, dto.CcList);
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task SendDelistingRequestAsync_WhenCalled_ShouldSendEmail(
+            DelistingRequestCreateDto dto,
+            PlatformDto platform,
+            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
+            DelistingService sut)
+        {
+            // Arrange
+            currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
+
+            emailServiceMock
+                .Setup(m => m.SendEmailAsync(It.IsAny<EmailContent>()))
+                .ReturnsAsync("");
+
+            // Act
+            var result = await sut.SendDelistingRequestAsync(dto, platform);
+
+            // Assert
+            emailServiceMock.Verify(m => m.SendEmailAsync(It.IsAny<EmailContent>()), Times.Once);
+            Assert.Equal("", result);
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task SendDelistingRequestAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToCcList(
+            DelistingRequestCreateDto dto,
+            PlatformDto platform,
+            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
+            DelistingService sut)
+        {
+            // Arrange
+            dto.SendCopy = true;
+            var currentUserEmail = "user@example.com";
+            currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
+
+            // Act
+            var result = await sut.SendDelistingRequestAsync(dto, platform);
+
+            // Assert
+            Assert.Contains(currentUserEmail, dto.CcList);
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task SendDelistingRequestAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
+            DelistingRequestCreateDto dto,
+            PlatformDto platform,
+            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
+            DelistingService sut)
+        {
+            // Arrange
+            dto.SendCopy = false;
+            var currentUserEmail = "user@example.com";
+            currentUserMock.Setup(m => m.EmailAddress).Returns("user@example.com");
+
+            // Act
+            var result = await sut.SendDelistingRequestAsync(dto, platform);
+
+            // Assert
+            Assert.DoesNotContain(currentUserEmail, dto.CcList);
         }
     }
 }

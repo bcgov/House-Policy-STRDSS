@@ -1,4 +1,4 @@
-﻿namespace StrDss.Model.DelistingRequestDtos
+﻿namespace StrDss.Model.DelistingDtos
 {
     public class DelistingRequestCreateDto
     {

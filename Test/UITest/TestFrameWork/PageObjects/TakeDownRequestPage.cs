@@ -20,9 +20,9 @@ namespace UITest.PageObjects
         public TakeDownRequest(IDriver Driver)
         {
             _Driver = Driver;
-            _CommentsTextBox = new TextBox(Driver, Enums.FINDBY.CSSSELECTOR, TakeDownRequestModel.CommentsTextBox);
-            _SubmitButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, TakeDownRequestModel.SubmitButton);
-            _CancelButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, TakeDownRequestModel.CancelButton);
+            _CommentsTextBox = new TextBox(Driver, Enums.FINDBY.ID, TakeDownRequestModel.CommentsTextBox);
+            _SubmitButton = new Button(Driver, Enums.FINDBY.ID, TakeDownRequestModel.SubmitButton);
+            _CancelButton = new Button(Driver, Enums.FINDBY.ID, TakeDownRequestModel.CancelButton);
         }
 
     }

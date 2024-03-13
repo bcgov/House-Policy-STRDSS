@@ -10,4 +10,8 @@
     <ProjectReference Include="..\StrDss.Common\StrDss.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="WarningReasonDtos\" />
+  </ItemGroup>
+
 </Project>

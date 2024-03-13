@@ -1,6 +1,6 @@
-﻿namespace StrDss.Model.ComplianceNoticeDtos
+﻿namespace StrDss.Model.DelistingDtos
 {
-    public class ComplianceNoticeCreateDto
+    public class DelistingWarningCreateDto
     {
         public long PlatformId { get; set; }
         public string ListingUrl { get; set; } = "";

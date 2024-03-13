@@ -83,7 +83,7 @@ namespace StrDss.Api.Controllers
                 toList.Add(dto.HostEmail);
             }
 
-            return new EmailPreview { Content = _delistingService.FormatDelistingWarningEmailContent(dto, toList, false) };
+            return new EmailPreview { Content = _delistingService.FormatDelistingWarningEmailContent(dto, false) };
         }
 
         [HttpPost("requests", Name = "CreateDelistingRequest")]
@@ -124,7 +124,7 @@ namespace StrDss.Api.Controllers
 
             var toList = new List<string> { platform?.Email ?? "" };
 
-            return new EmailPreview { Content = _delistingService.FormatDelistingRequestEmailContent(dto, toList, false) };
+            return new EmailPreview { Content = _delistingService.FormatDelistingRequestEmailContent(dto, false) };
         }
     }
 }

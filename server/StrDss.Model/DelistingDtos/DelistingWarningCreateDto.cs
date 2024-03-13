@@ -1,4 +1,6 @@
-﻿namespace StrDss.Model.DelistingDtos
+﻿using System.Text.Json.Serialization;
+
+namespace StrDss.Model.DelistingDtos
 {
     public class DelistingWarningCreateDto
     {
@@ -14,5 +16,7 @@
         public string LgContactPhone { get; set; }
         public string StrBylawUrl { get; set; }
         public string Comment { get; set; } = "";
+        [JsonIgnore]
+        public List<string> ToList { get; set; }
     }
 }

@@ -25,6 +25,7 @@
         public const string StructureNumber = "StructureNumber";
         public const string Password = "Password";
         public const string PhoneNumber = "PhoneNumber";
+        public const string Url = "Url";
 
         private static readonly Dictionary<string, RegexInfo> _regexInfos;
 
@@ -53,8 +54,13 @@
             _regexInfos.Add(StructureNumber, new RegexInfo { Regex = @"^[a-zA-Z0-9]{2,6}$", ErrorMessage = "Structure number must be alphanumeric with max length 6 and minimum length 2" });
 
             _regexInfos.Add(Password, new RegexInfo { Regex = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$", ErrorMessage = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit." });
-            _regexInfos.Add(PhoneNumber, new RegexInfo { Regex = @"^\(\d{3}\) \d{3}-\d{4}$", ErrorMessage = "Phone number must follow the phone number format (xxx) xxx-xxxx" });
+            _regexInfos.Add(PhoneNumber, new RegexInfo { Regex = @"^\d{10}$", ErrorMessage = "Phone number must follow the phone number format (xxx) xxx-xxxx" });
 
+            _regexInfos.Add(Url, new RegexInfo
+            {
+                Regex = @"\b(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]*[-A-Za-z0-9+&@#/%=~_|]",
+                ErrorMessage = "Invalid Url"
+            });
         }
 
         public static RegexInfo GetRegexInfo(string name)

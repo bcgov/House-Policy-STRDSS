@@ -13,6 +13,8 @@ using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Policy;
 using System.Collections.Generic;
+using TestFrameWork.Models;
+using System.Reflection.Metadata;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -20,38 +22,53 @@ namespace SpecFlowProjectBDD.StepDefinitions
     [Scope(Scenario = "SendDelistingRequestWithoutADSSListing")]
     public sealed class SendDelistingRequestWithoutADSSListingStepDefinitions
     {
-        LoginPage _loginPage;
-        SignupPage _signupPage;
-        DashboardPage _dashboardPage;
-        CreateApplicationPage _createApplicationPage;
+        HomePage _HomePage;
+        DelistingRequestPage _DelistingRequestPage;
+        PathFinderPage _PathFinderPage;
+        IDRLoginPage _IDRLoginPage;
+
         IDriver _driver;
 
  
         public SendDelistingRequestWithoutADSSListingStepDefinitions(SeleniumDriver Driver)
         {
             _driver = Driver;
-            _loginPage = new LoginPage(_driver);
-            _signupPage = new SignupPage(_driver);
-            _dashboardPage = new DashboardPage(_driver);
-            _createApplicationPage = new CreateApplicationPage(_driver);
+            _HomePage = new HomePage(_driver);
+            _DelistingRequestPage = new DelistingRequestPage(_driver);
+            _PathFinderPage = new PathFinderPage(_driver);
+            _IDRLoginPage = new IDRLoginPage(_driver);
         }
 
         //User Authentication
         [Given("I am an authenticated LG staff member")]
         public void GivenIAmAauthenticatedLGStaffMemberUser()
         {
+            _driver.Url = "http://127.0.0.1:4200/delisting-request";
+            _driver.Navigate();
+            
+            _PathFinderPage.IDRButton.Click();
+
+            _IDRLoginPage.UserNameTextBox.EnterText("Ricander");
+            _IDRLoginPage.PasswordTextBox.EnterText("");
+
+            _IDRLoginPage.ContinueButton.Click();
+
         }
 
 
         [When("I navigate to the delisting request feature")]
         public void WhenINavigateToTheDelistingRequestFeature()
         {
+            _driver.Url = "http://127.0.0.1:4200/delisting-request";
+            _driver.Navigate();
+
         }
 
         //Input Form
         [Then("I should be presented with an input form that includes fields for the listing URL")]
         public void IshouldBePresentedWithAnInputFormThatIncludesFields()
         {
+            _DelistingRequestPage.ListingUrlTextBox.EnterText("TestURL");
         }
 
         [Then("I should be presented with a field to select which platform to send the request to")]

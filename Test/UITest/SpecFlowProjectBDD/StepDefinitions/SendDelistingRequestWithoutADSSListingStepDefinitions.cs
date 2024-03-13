@@ -49,7 +49,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _PathFinderPage.IDRButton.Click();
 
             _IDRLoginPage.UserNameTextBox.EnterText("Ricander");
-            _IDRLoginPage.PasswordTextBox.EnterText("GULES2simper6raster8possible7dashing");
+            _IDRLoginPage.PasswordTextBox.EnterText("");
 
             _IDRLoginPage.ContinueButton.Click();
 

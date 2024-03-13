@@ -27,14 +27,16 @@ namespace StrDss.Service
     {
         private IConfiguration _config;
         private IChesTokenApi _chesTokenApi;
+        private HttpClient _httpClient;
         private ILogger<DelistingService> _logger;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper,
-            IConfiguration config, IChesTokenApi chesTokenApi, ILogger<DelistingService> logger)
+            IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<DelistingService> logger)
             : base(currentUser, validator, unitOfWork, mapper)
         {
             _config = config;
             _chesTokenApi = chesTokenApi;
+            _httpClient = httpClient;
             _logger = logger;
         }
         public async Task<Dictionary<string, List<string>>> ValidateDelistingWarning(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason)
@@ -129,8 +131,7 @@ namespace StrDss.Service
                 var token = await _chesTokenApi.GetTokenAsync();
                 var chesUrl = _config.GetValue<string>("CHES_URL") ?? "";
 
-                using HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
 
                 var toList = new List<string> { platform?.Email ?? "" };
                 if (dto.HostEmail.IsNotEmpty())
@@ -161,7 +162,7 @@ namespace StrDss.Service
                 var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(emailContent);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var response = await httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);
+                var response = await _httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation($"Sent delisting warning for {dto.ListingUrl}");
@@ -207,8 +208,7 @@ namespace StrDss.Service
                 var token = await _chesTokenApi.GetTokenAsync();
                 var chesUrl = _config.GetValue<string>("CHES_URL") ?? "";
 
-                using HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
 
                 var toList = new List<string> { platform?.Email ?? "" };
 
@@ -234,7 +234,7 @@ namespace StrDss.Service
                 var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(emailContent);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var response = await httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);
+                var response = await _httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation($"Sent delisting request for {dto.ListingUrl}");

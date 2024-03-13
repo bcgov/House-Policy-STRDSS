@@ -49,7 +49,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _PathFinderPage.IDRButton.Click();
 
             _IDRLoginPage.UserNameTextBox.EnterText("***REMOVED***");
-            _IDRLoginPage.PasswordTextBox.EnterText("***REMOVED***");
+            _IDRLoginPage.PasswordTextBox.EnterText("");
 
             _IDRLoginPage.ContinueButton.Click();
 

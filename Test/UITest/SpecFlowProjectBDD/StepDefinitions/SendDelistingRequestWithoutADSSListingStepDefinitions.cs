@@ -13,6 +13,8 @@ using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Policy;
 using System.Collections.Generic;
+using TestFrameWork.Models;
+using System.Reflection.Metadata;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -22,6 +24,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
     {
         HomePage _HomePage;
         DelistingRequestPage _DelistingRequestPage;
+        PathFinderPage _PathFinderPage;
+        IDRLoginPage _IDRLoginPage;
 
         IDriver _driver;
 
@@ -31,12 +35,24 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _driver = Driver;
             _HomePage = new HomePage(_driver);
             _DelistingRequestPage = new DelistingRequestPage(_driver);
+            _PathFinderPage = new PathFinderPage(_driver);
+            _IDRLoginPage = new IDRLoginPage(_driver);
         }
 
         //User Authentication
         [Given("I am an authenticated LG staff member")]
         public void GivenIAmAauthenticatedLGStaffMemberUser()
         {
+            _driver.Url = "http://127.0.0.1:4200/delisting-request";
+            _driver.Navigate();
+            
+            _PathFinderPage.IDRButton.Click();
+
+            _IDRLoginPage.UserNameTextBox.EnterText("Ricander");
+            _IDRLoginPage.PasswordTextBox.EnterText("GULES2simper6raster8possible7dashing");
+
+            _IDRLoginPage.ContinueButton.Click();
+
         }
 
 
@@ -52,6 +68,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should be presented with an input form that includes fields for the listing URL")]
         public void IshouldBePresentedWithAnInputFormThatIncludesFields()
         {
+            _DelistingRequestPage.ListingUrlTextBox.EnterText("TestURL");
         }
 
         [Then("I should be presented with a field to select which platform to send the request to")]

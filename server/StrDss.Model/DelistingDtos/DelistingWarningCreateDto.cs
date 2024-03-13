@@ -10,6 +10,9 @@
         public long ReasonId { get; set; }
         public bool SendCopy { get; set; }
         public List<string> CcList { get; set; } = new List<string>();
+        public string LgContactEmail { get; set; }
+        public string LgContactPhone { get; set; }
+        public string StrBylawUrl { get; set; }
         public string Comment { get; set; } = "";
     }
 }

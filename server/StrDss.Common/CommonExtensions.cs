@@ -196,7 +196,7 @@ namespace StrDss.Common
             return lastDotIndex >= 0 ? input.Substring(lastDotIndex + 1) : input;
         }
 
-        public static string GetStringBeforeDot(string input)
+        public static string GetStringBeforeFirstDot(this string input)
         {
             if (input.IsEmpty()) return "";
 

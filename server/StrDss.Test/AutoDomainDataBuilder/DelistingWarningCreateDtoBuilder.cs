@@ -49,7 +49,7 @@ namespace StrDss.Test.AutoDomainDataBuilder
                     return "lg@example.com";
 
                 case nameof(DelistingWarningCreateDto.LgContactPhone):
-                    return "1234567890";
+                    return "(123) 456-7890";
 
                 case nameof(DelistingWarningCreateDto.StrBylawUrl):
                     return "https://example.com/bylaw";

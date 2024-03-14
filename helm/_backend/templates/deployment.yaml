@@ -55,12 +55,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.dbSecretName}}
-                  key: host
+                  key: pgbouncer-host
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.dbSecretName}}
-                  key: pgbouncer-host
+                  key: dbname
             - name: DB_USER
               valueFrom:
                 secretKeyRef:

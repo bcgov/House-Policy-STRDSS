@@ -13,6 +13,7 @@ using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Policy;
 using System.Collections.Generic;
+using Configuration;
 using TestFrameWork.Models;
 using System.Reflection.Metadata;
 
@@ -26,6 +27,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
         DelistingRequestPage _DelistingRequestPage;
         PathFinderPage _PathFinderPage;
         IDRLoginPage _IDRLoginPage;
+        string _TestUserName;
+        string _TestPassword;
 
         IDriver _driver;
 
@@ -37,6 +40,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _DelistingRequestPage = new DelistingRequestPage(_driver);
             _PathFinderPage = new PathFinderPage(_driver);
             _IDRLoginPage = new IDRLoginPage(_driver);
+            AppSettings appSettings = new AppSettings();
+            _TestUserName = appSettings.GetValue("TestUserName") ?? string.Empty;
+            _TestPassword = appSettings.GetValue("TestPassword") ?? string.Empty;
         }
 
         //User Authentication
@@ -48,8 +54,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             
             _PathFinderPage.IDRButton.Click();
 
-            _IDRLoginPage.UserNameTextBox.EnterText("Ricander");
-            _IDRLoginPage.PasswordTextBox.EnterText("");
+            _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+            _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
 
             _IDRLoginPage.ContinueButton.Click();
 
@@ -68,28 +74,31 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should be presented with an input form that includes fields for the listing URL")]
         public void IshouldBePresentedWithAnInputFormThatIncludesFields()
         {
-            _DelistingRequestPage.ListingUrlTextBox.EnterText("TestURL");
         }
 
         [Then("I should be presented with a field to select which platform to send the request to")]
         public void IShouldBePresentedWithAFieldToSelectWhichPlatformToSendTheRequestTo()
         {
+            _DelistingRequestPage.PlatformReceipientDropdown.Click();
+            _DelistingRequestPage.PlatformReceipientDropdown.Click();
         }
         
-        [Then("I should be presented with a dropdown menu to select reason for delisting")]
-        public void IShouldBePresentedWithADropdownMenuToSelectReasonForDelisting()
-        {
-        }
+        //[Then("I should be presented with a dropdown menu to select reason for delisting")]
+        //public void IShouldBePresentedWithADropdownMenuToSelectReasonForDelisting()
+        //{
+        //}
 
         [Then("I should see an optional field for adding a LG staff user email address to be copied on the email")]
         public void IShouldSeeAnOptionalFieldForAddingALGStaffUserEmailAddressToBeCopiedOnTheEmail()
         {
+            _DelistingRequestPage.AdditionalCCsTextBox.EnterText("foo@foo.com");
         }
 
         //ListingURLField
         [When(@"Entering the listing URL ""(.*)""")]
         public void WhenEnteringTheListingURL(String URL)
         {
+            _DelistingRequestPage.ListingUrlTextBox.EnterText("http://listingUrl.com");
         }
 
         [Then("The system should validate the URL format and ensure it is a valid link to the property listing")]
@@ -115,6 +124,12 @@ namespace SpecFlowProjectBDD.StepDefinitions
         { 
         }
 
+        [Then("I click the review button")]
+        public void ThenIClickTheReviewButton()
+        {
+            _DelistingRequestPage.ReviewButton.Click();
+        }
+
         [Then("I see a template delisting request message that will be sent to both the platform")]
         public void ThenISeeATemplateDelistingRequestMessage() 
         { 
@@ -138,35 +153,35 @@ namespace SpecFlowProjectBDD.StepDefinitions
         }
 
         [Then("I should receive a confirmation message indicating that the delisting request has been sent")]
-        public void ThenIShouldReceiveAConfirmationMessage() 
-        { 
+        public void ThenIShouldReceiveAConfirmationMessage()
+        {
         }
 
         [Then("I should be copied on the email")]
-        public void ThenIShouldBeCopiedOnTheEmail() 
-        { 
+        public void ThenIShouldBeCopiedOnTheEmail()
+        {
         }
 
         //NotificationToPlatformAndHost
         [When("the delisting request is submitted")]
-        public void WhenTheDelistingRequestIsSubmitted() 
-        { 
+        public void WhenTheDelistingRequestIsSubmitted()
+        {
         }
 
         [Then("the platform and host should receive email notifications containing the delisting request and instructions for compliance")]
-        public void ThenThePlatformAndHostShouldReceiveEmailNotifications() 
-        { 
+        public void ThenThePlatformAndHostShouldReceiveEmailNotifications()
+        {
         }
 
         //FrontEndErrorHandling
         [When("there are issues with the submission, such as invalid email addresses or a missing URL")]
-        public void WhenThereAreIssuesWithTheSubmission() 
-        { 
+        public void WhenThereAreIssuesWithTheSubmission()
+        {
         }
 
         [Then("the system should provide clear error messages guiding me on how to correct the issues")]
-        public void ThenTheSystemShouldProvideClearErrorMessages() 
-        { 
+        public void ThenTheSystemShouldProvideClearErrorMessages()
+        {
         }
     }
 }

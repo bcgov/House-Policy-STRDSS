@@ -33,7 +33,7 @@ namespace UITest.PageObjects
             _ListingIDNumberTextBox = new TextBox(Driver, Enums.FINDBY.ID, DelistingRequestModel.ListingIDNumberTextBox);
             _SendCopyCheckbox = new CheckBox(Driver, Enums.FINDBY.ID, DelistingRequestModel.SendCopyCheckbox);
             _ListingUrlTextBox = new TextBox(Driver, Enums.FINDBY.ID, DelistingRequestModel.ListingUrlTextBox);
-            _AdditionalCCsTextBox = new TextBox(Driver, Enums.FINDBY.ID, DelistingRequestModel.AdditionalCCsTextBox);
+            _AdditionalCCsTextBox = new TextBox(Driver, Enums.FINDBY.CSSSELECTOR, DelistingRequestModel.AdditionalCCsTextBox);
             _ReviewButton = new Button(Driver, Enums.FINDBY.ID, DelistingRequestModel.ReviewButton);
         }
 

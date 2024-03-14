@@ -44,6 +44,7 @@ backend:
   nameOverride: strdss-dev-backend
   fullnameOverride: strdss-dev-backend
   secretName: strdss-secrets-dev
+  dbSecretName: strdss-dev-pguser-strdss-dev
 
   # resources:
   #   limits:

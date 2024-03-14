@@ -1,18 +1,18 @@
 using Asp.Versioning;
 using AutoMapper;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using NetCore.AutoRegisterDi;
 using StrDss.Api.Authentication;
-using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Mappings;
 using StrDss.Model;
 using StrDss.Service;
 using StrDss.Service.HttpClients;
 using System.Reflection;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +20,13 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 {
     options.AddServerHeader = false;
 });
+
+var dbHost = builder.Configuration.GetValue<string>("DB_HOST");
+var dbName = builder.Configuration.GetValue<string>("DB_NAME");
+var dbUser = builder.Configuration.GetValue<string>("DB_USER");
+var dbPass = builder.Configuration.GetValue<string>("DB_PASS");
+var dbPort = builder.Configuration.GetValue<string>("DB_PORT");
+var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
 
 builder.Services.AddHttpContextAccessor();
 
@@ -37,7 +44,7 @@ builder.Services.AddApiVersioning(options =>
 
 var assemblies = Assembly.GetExecutingAssembly()
     .GetReferencedAssemblies()
-    .Where(a => a.FullName.StartsWith("server"))
+    .Where(a => a.FullName.StartsWith("StrDss"))
     .Select(Assembly.Load).ToArray();
 
 //Services
@@ -72,6 +79,21 @@ var mappingConfig = new MapperConfiguration(cfg =>
 var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
+builder.Services
+    .AddHangfire(configuration => configuration
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UsePostgreSqlStorage((option) =>
+        {
+            option.UseNpgsqlConnection(connString);
+        }
+));
+
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = 1;
+});
 
 //Add logging
 builder.Services.AddLogging(builder => builder.AddConsole());
@@ -142,5 +164,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseHangfireDashboard();
 
 app.Run();

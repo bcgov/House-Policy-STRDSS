@@ -1,4 +1,4 @@
-﻿namespace StrDss.Model.DelistingDtos
+﻿namespace StrDss.Model.WarningReasonDtos
 {
     public class WarningReasonDto
     {

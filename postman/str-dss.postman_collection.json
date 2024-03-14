@@ -55,7 +55,31 @@
 			"response": []
 		},
 		{
-			"name": "GetComplianceNoticeReasonDrowdown",
+			"name": "GetLocalGovernmentsDrowdown",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/platforms/dropdown",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"platforms",
+						"dropdown"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetReqeustReasonDrowdown",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -80,7 +104,7 @@
 			"response": []
 		},
 		{
-			"name": "GetComplianceNoticePreview",
+			"name": "CreateDelistingWarning",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -113,7 +137,7 @@
 			"response": []
 		},
 		{
-			"name": "CreateComplianceNotice",
+			"name": "GetDelistingWarningPreview",
 			"request": {
 				"method": "POST",
 				"header": [],

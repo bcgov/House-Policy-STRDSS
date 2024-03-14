@@ -20,20 +20,16 @@ namespace SpecFlowProjectBDD.StepDefinitions
     [Scope(Scenario = "SendDelistingWarningWithoutADSSListing")]
     public sealed class SendDelistingWarningWithoutADSSListingStepDefinitions
     {
-        LoginPage _loginPage;
-        SignupPage _signupPage;
-        DashboardPage _dashboardPage;
-        CreateApplicationPage _createApplicationPage;
+        HomePage _HomePage;
+        DelistingWarningPage _DelistingWarningPage;
         IDriver _driver;
 
  
         public SendDelistingWarningWithoutADSSListingStepDefinitions(SeleniumDriver Driver)
         {
             _driver = Driver;
-            _loginPage = new LoginPage(_driver);
-            _signupPage = new SignupPage(_driver);
-            _dashboardPage = new DashboardPage(_driver);
-            _createApplicationPage = new CreateApplicationPage(_driver);
+            _HomePage = new HomePage(_driver);
+            _DelistingWarningPage = new DelistingWarningPage(_driver);
         }
 
         //User Authentication
@@ -46,6 +42,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("I navigate to the delisting warning feature")]
         public void WhenINavigateToTheDelistingWarningFeature()
         {
+           
         }
 
         //Input Form

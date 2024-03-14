@@ -31,6 +31,8 @@ Then the system should present a list of available platform options to populate 
 
 When all required fields are entered
 
+Then I click the review button
+
 Then I see a template delisting request message that will be sent to both the platform
 
 #SendDelistingRequest

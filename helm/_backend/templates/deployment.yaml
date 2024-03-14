@@ -51,11 +51,34 @@ spec:
             - name: {{ $k | quote }}
               value: {{ $v | quote }}
             {{- end }}
-          {{- if .Values.postgresSecret }}
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.dbSecretName}}
+                  key: host
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.dbSecretName}}
+                  key: pgbouncer-host
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.dbSecretName}}
+                  key: user
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.dbSecretName}}
+                  key: password
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.dbSecretName}}
+                  key: pgbouncer-port
           envFrom:
             - secretRef:
                 name: {{ .Values.secretName }}
-          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

@@ -9,6 +9,8 @@ namespace StrDss.Service.HttpClients
     {
         public static void AddHttpClients(this IServiceCollection services, IConfiguration config)
         {
+            services.AddHttpClient();
+
             services.AddScoped<IApi, Api>();
 
             services.AddHttpClient<IChesTokenApi, ChesTokenApi>(client =>

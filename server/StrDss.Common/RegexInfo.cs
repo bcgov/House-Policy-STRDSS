@@ -54,7 +54,7 @@
             _regexInfos.Add(StructureNumber, new RegexInfo { Regex = @"^[a-zA-Z0-9]{2,6}$", ErrorMessage = "Structure number must be alphanumeric with max length 6 and minimum length 2" });
 
             _regexInfos.Add(Password, new RegexInfo { Regex = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$", ErrorMessage = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit." });
-            _regexInfos.Add(PhoneNumber, new RegexInfo { Regex = @"^\d{10}$", ErrorMessage = "Phone number must follow the phone number format (xxx) xxx-xxxx" });
+            _regexInfos.Add(PhoneNumber, new RegexInfo { Regex = @"^\(\d{3}\) \d{3}-\d{4}$", ErrorMessage = "Phone number must follow the phone number format (xxx) xxx-xxxx" });
 
             _regexInfos.Add(Url, new RegexInfo
             {

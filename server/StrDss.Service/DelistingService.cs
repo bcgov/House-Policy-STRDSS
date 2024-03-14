@@ -117,7 +117,7 @@ namespace StrDss.Service
             regex = RegexDefs.GetRegexInfo(RegexDefs.Url);
             if (dto.StrBylawUrl.IsNotEmpty() && !Regex.IsMatch(dto.StrBylawUrl, regex.Regex))
             {
-                errors.AddItem("strByLawUrl", "URL is required");
+                errors.AddItem("strByLawUrl", "URL is invalid");
             }
 
             return errors;

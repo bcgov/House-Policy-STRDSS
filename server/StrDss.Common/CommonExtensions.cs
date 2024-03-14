@@ -187,13 +187,22 @@ namespace StrDss.Common
             }
         }
 
-        public static string GetWordAfterLastDot(this string input)
+        public static string GetStringAfterLastDot(this string input)
         {
             if (input.IsEmpty()) return "";
 
             var lastDotIndex = input.LastIndexOf('.');
 
             return lastDotIndex >= 0 ? input.Substring(lastDotIndex + 1) : input;
+        }
+
+        public static string GetStringBeforeDot(string input)
+        {
+            if (input.IsEmpty()) return "";
+
+            int dotIndex = input.IndexOf('.');
+
+            return dotIndex > 0 ? input.Substring(0, dotIndex) : input;
         }
     }
 }

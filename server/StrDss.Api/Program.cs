@@ -13,6 +13,7 @@ using StrDss.Model;
 using StrDss.Service;
 using StrDss.Service.HttpClients;
 using System.Reflection;
+using StrDss.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,12 +22,12 @@ builder.WebHost.ConfigureKestrel((context, options) =>
     options.AddServerHeader = false;
 });
 
-var dbHost = builder.Configuration.GetValue<string>("DB_HOST");
+var dbHost = builder.Configuration.GetValue<string>("DB_HOST") ?? "";
 var dbName = builder.Configuration.GetValue<string>("DB_NAME");
 var dbUser = builder.Configuration.GetValue<string>("DB_USER");
 var dbPass = builder.Configuration.GetValue<string>("DB_PASS");
 var dbPort = builder.Configuration.GetValue<string>("DB_PORT");
-var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
+var connString = $"Host={dbHost.GetStringBeforeFirstDot()};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
 
 builder.Services.AddHttpContextAccessor();
 

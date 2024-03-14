@@ -12,6 +12,8 @@ spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
+  updateStrategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "app.selectorLabels" . | nindent 6 }}

@@ -44,6 +44,7 @@ backend:
   nameOverride: strdss-uat-backend
   fullnameOverride: strdss-uat-backend
   secretName: strdss-secrets-uat
+  dbSecretName: strdss-uat-pguser-strdss-uat
 
   resources:
     limits:

@@ -35,7 +35,7 @@ namespace SpecFlowProjectBDD.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendDelistingRequestWithoutADSSListingFeature", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-71", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendDelistingRequestWithoutADSSListingFeature", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-74", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -138,38 +138,41 @@ testRunner.Then("the system should present a list of available platform options 
 testRunner.When("all required fields are entered", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 34
+testRunner.Then("I click the review button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 36
 testRunner.Then("I see a template delisting request message that will be sent to both the platform" +
                         "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 38
+#line 40
 testRunner.When("I submit the form with valid information", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 40
+#line 42
 testRunner.Then("the system should send the delisting request message to the platform email addres" +
                         "ses associated with the selected platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 44
+#line 46
 testRunner.When("successful submission", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 46
+#line 48
 testRunner.Then("I should receive a confirmation message indicating that the delisting request has" +
                         " been sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 48
+#line 50
 testRunner.Then("I should be copied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 51
+#line 53
 testRunner.When("the delisting request is submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 53
+#line 55
 testRunner.Then("the platform and host should receive email notifications containing the delisting" +
                         " request and instructions for compliance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 57
+#line 59
 testRunner.When("there are issues with the submission, such as invalid email addresses or a missin" +
                         "g URL", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 59
+#line 61
 testRunner.Then("the system should provide clear error messages guiding me on how to correct the i" +
                         "ssues", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

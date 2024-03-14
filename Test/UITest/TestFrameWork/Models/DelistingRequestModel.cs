@@ -9,7 +9,7 @@ namespace UITest.Models
         public static string ListingIDNumberTextBox { get => ""; }
         public static string ListingUrlTextBox { get => "listingUrl"; }
         public static string SendCopyCheckbox { get => "sendCopy"; }
-        public static string AdditionalCCsTextBox { get => "ccList"; }
+        public static string AdditionalCCsTextBox { get => "#ccList > div > ul > li > input[type=text]"; }
         public static string ReviewButton { get => "form-preview-btn"; }
     }
 }

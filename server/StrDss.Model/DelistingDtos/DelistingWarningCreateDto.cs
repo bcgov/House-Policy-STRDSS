@@ -17,6 +17,6 @@ namespace StrDss.Model.DelistingDtos
         public string StrBylawUrl { get; set; }
         public string Comment { get; set; } = "";
         [JsonIgnore]
-        public List<string> ToList { get; set; }
+        public List<string> ToList { get; set; } = new List<string>();
     }
 }

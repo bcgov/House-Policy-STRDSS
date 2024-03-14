@@ -32,6 +32,15 @@ namespace StrDss.Service
 
         public async Task<string> SendEmailAsync(EmailContent emailContent)
         {
+            var env = _config.GetValue<string>("ENV_NAME") ?? "dev";
+
+            if (env != "prod") 
+            {
+                var nl = Environment.NewLine;
+                emailContent.Subject = $"[{env.ToUpperInvariant()}] {emailContent.Subject}";
+                emailContent.Body = $"Kindly be advised that this is a test email.{nl}{nl}{emailContent.Body}";
+            }
+
             try
             {
                 var token = await _chesTokenApi.GetTokenAsync();

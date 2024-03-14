@@ -34,7 +34,7 @@ namespace StrDss.Service
         {
             var env = _config.GetValue<string>("ENV_NAME") ?? "dev";
 
-            if (env != "prod") 
+            if (env.ToLowerInvariant() != "prod") 
             {
                 var nl = Environment.NewLine;
                 emailContent.Subject = $"[{env.ToUpperInvariant()}] {emailContent.Subject}";

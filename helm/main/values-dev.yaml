@@ -26,6 +26,8 @@ frontend:
   nameOverride: strdss-dev-frontend
   fullnameOverride: strdss-dev-frontend
   secretName: strdss-secrets-dev
+  dbSecretName: strdss-pguser-dev
+  crunchdb: false
 
   resources:
     limits:
@@ -44,7 +46,8 @@ backend:
   nameOverride: strdss-dev-backend
   fullnameOverride: strdss-dev-backend
   secretName: strdss-secrets-dev
-  dbSecretName: strdss-dev-pguser-strdss-dev
+  dbSecretName: strdss-db-pguser-strdss-db
+  crunchdb: false
 
   # resources:
   #   limits:

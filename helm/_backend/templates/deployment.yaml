@@ -53,6 +53,7 @@ spec:
             - name: {{ $k | quote }}
               value: {{ $v | quote }}
             {{- end }}
+            {{- if .Values.crunchydb }}
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:
@@ -78,6 +79,12 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.dbSecretName}}
                   key: pgbouncer-port
+            {{- end }}
+          {{- if not .Values.crunchydb }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.dbSecretName }}
+          {{- end }}
           envFrom:
             - secretRef:
                 name: {{ .Values.secretName }}

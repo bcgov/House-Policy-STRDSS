@@ -284,7 +284,7 @@ namespace StrDss.Test
             // Assert
             Assert.Contains("strByLawUrl", result.Keys);
             Assert.Single(result["strByLawUrl"]);
-            Assert.Equal("URL is required", result["strByLawUrl"].First());
+            Assert.Equal("URL is invalid", result["strByLawUrl"].First());
         }
 
         [Theory]

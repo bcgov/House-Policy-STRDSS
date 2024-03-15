@@ -18,26 +18,22 @@ export class DelistingService {
   }
 
   getReasons(): Observable<Array<DropdownOption>> {
-    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/compliancenotices/reasons/dropdown`)
+    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/delisting/reasons/dropdown`)
   }
 
-  complianceNoticePreview(complianceNotice: ComplianceNotice): Observable<string> {
-    return this.httpClient.post<string>(`${environment.API_HOST}/compliancenotices/preview`, complianceNotice, {
-      headers: this.textHeaders, responseType: 'text' as any
-    })
+  complianceNoticePreview(complianceNotice: ComplianceNotice): Observable<{ content: string }> {
+    return this.httpClient.post<{ content: string }>(`${environment.API_HOST}/delisting/warnings/preview`, complianceNotice)
   }
 
-  createComplianceNotice(complianceNotice: ComplianceNotice): Observable<string> {
-    return this.httpClient.post<string>(`${environment.API_HOST}/compliancenotices`, complianceNotice)
+  createComplianceNotice(complianceNotice: ComplianceNotice): Observable<void> {
+    return this.httpClient.post<void>(`${environment.API_HOST}/delisting/warnings`, complianceNotice)
   }
 
-  delistingRequestPreview(delistingRequest: ComplianceNotice): Observable<string> {
-    return this.httpClient.post<string>(`${environment.API_HOST}/delisting/requests/preview`, delistingRequest, {
-      headers: this.textHeaders, responseType: 'text' as any
-    })
+  delistingRequestPreview(delistingRequest: ComplianceNotice): Observable<{ content: string }> {
+    return this.httpClient.post<{ content: string }>(`${environment.API_HOST}/delisting/requests/preview`, delistingRequest)
   }
 
-  createDelistingRequest(delistingRequest: ComplianceNotice): Observable<string> {
-    return this.httpClient.post<string>(`${environment.API_HOST}/delisting/requests`, delistingRequest)
+  createDelistingRequest(delistingRequest: ComplianceNotice): Observable<void> {
+    return this.httpClient.post<void>(`${environment.API_HOST}/delisting/requests`, delistingRequest)
   }
 }

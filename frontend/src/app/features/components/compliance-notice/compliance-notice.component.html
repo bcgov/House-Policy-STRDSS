@@ -1,4 +1,4 @@
-<div class="title">Compliance notice</div>
+<div class="title">Send Notice of Takedown</div>
 <div class="sub-title">All fields are required except where stated</div>
 
 <form [formGroup]="myForm" (ngSubmit)="onPreview()">
@@ -14,7 +14,20 @@
 
     <div class="form-group-row">
         <div class="form-group-row-col">
-            <label for="listingUrl">Add listing URL</label>
+            <label for="listingId">Add Listing ID Number if known (Optional)</label>
+        </div>
+        <div class="form-group-row-col">
+            <input class="long-text-field" type="text" pInputText formControlName="listingId" id="listingId"
+                name="listingId" />
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <span class="info-tooltip" pTooltip="Copy and paste the external listing URL
+                from the STR platform website" tooltipPosition="top" placeholder="Top"></span>
+            <label for="listingUrl">Add listing
+                URL</label>
         </div>
         <div class="form-group-row-col">
             <input class="long-text-field" type="text" pInputText formControlName="listingUrl" id="listingUrl"
@@ -24,10 +37,22 @@
 
     <div class="form-group-row">
         <div class="form-group-row-col">
-            <label for="hostEmail">Host E-mail Address (optional)</label>
+            <span class="info-tooltip"
+                pTooltip="Add the host's email address or check the box if there has been previous communications with the host"
+                tooltipPosition="top" placeholder="Top"></span>
+            <label for="hostEmail">Host’s Email Address (This is mandatory unless the checkbox below is checked)</label>
         </div>
         <div class="form-group-row-col">
             <input type="text" pInputText formControlName="hostEmail" id="hostEmail" name="hostEmail" />
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col has-checkbox">
+            <p-checkbox formControlName="sentAlternatively" [binary]="true" id="sentAlternatively"
+                name="sentAlternatively" inputId="sentAlternativelyInput"></p-checkbox>
+            <label for="sentAlternatively">A notice has been sent to the host through an alternate delivery
+                method.</label>
         </div>
     </div>
 
@@ -44,26 +69,65 @@
     <div class="form-group-row">
         <div class="form-group-row-col has-checkbox">
             <p-checkbox formControlName="sendCopy" [binary]="true" id="sendCopy" name="sendCopy"
-                inputId="binary"></p-checkbox>
+                inputId="sendCopyInput"></p-checkbox>
             <label for="sendCopy">Send me a copy of this request</label>
         </div>
     </div>
+
     <div class="form-group-row">
         <div class="form-group-row-col">
+            <span class="info-tooltip" pTooltip="Enter additional email addresses in the CC field separated by commas"
+                tooltipPosition="top" placeholder="Top"></span>
             <label for="ccList">Additional CCs (optional)</label>
         </div>
         <div class="form-group-row-col">
-            <p-chips formControlName="ccList" id="ccList" name="ccList"></p-chips>
+            <textarea formControlName="ccList" rows="1" cols="20" pInputTextarea id="ccList" name="ccList"></textarea>
         </div>
     </div>
+
+    <div class="sub-title">Local Government Contact Information</div>
+
+    <div class="form-group-row inline-block">
+        <div class="form-group-row-col">
+            <label for="LgContactEmail">Email</label>
+        </div>
+        <div class="form-group-row-col">
+            <input type="text" pInputText formControlName="LgContactEmail" id="LgContactEmail" name="LgContactEmail"
+                required />
+        </div>
+    </div>
+
+    <div class="form-group-row inline-block">
+        <div class="form-group-row-col">
+            <label for="LgContactPhone">Phone Number (Optional)</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-inputMask mask="(999) 999-9999" placeholder="(999) 999-9999" formControlName="LgContactPhone"
+                id="LgContactPhone" name="LgContactPhone">
+            </p-inputMask>
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <span class="info-tooltip" pTooltip="Enter additional email addresses in the CC field separated by commas."
+                tooltipPosition="top" placeholder="Top"></span>
+            <label for="StrBylawUrl">URL for Local Government Short-Term Rental Bylaw Information
+                (Optional)</label>
+        </div>
+        <div class="form-group-row-col">
+            <input class="long-text-field" type="text" pInputText formControlName="StrBylawUrl" id="StrBylawUrl"
+                name="StrBylawUrl" />
+        </div>
+    </div>
+
     <button type="submit" id="form-preview-btn" pButton pRipple [disabled]="!myForm.valid" label="Review"
         class="p-button-success"></button>
 </form>
 
 <p-dialog [modal]="true" id="preview-dialog" [closable]="false" header="Preview" [(visible)]="isPreviewVisible"
     [style]="{width: '50vw'}">
-    <p [innerText]="previewText">
-    </p>
+    <p [innerText]="previewText"> </p>
     <hr>
     <div class="comment-section">
         <div class="form-group-row">

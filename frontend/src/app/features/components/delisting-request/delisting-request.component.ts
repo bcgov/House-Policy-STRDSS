@@ -10,7 +10,7 @@ import { DelistingService } from '../../../common/services/delisting.service';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { validateEmailChips, validateUrl } from '../../../common/consts/validators.const';
+import { validateEmailListString, validateUrl } from '../../../common/consts/validators.const';
 import { ToastModule } from 'primeng/toast';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
@@ -46,7 +46,7 @@ export class DelistingRequestComponent implements OnInit {
       this.delistingService.delistingRequestPreview(this.myForm.value).subscribe(
         {
           next: preview => {
-            this.previewText = preview;
+            this.previewText = preview.content;
             this.isPreviewVisible = true;
           },
           error: error => {
@@ -90,7 +90,7 @@ export class DelistingRequestComponent implements OnInit {
       platformId: [0, Validators.required],
       listingUrl: ['', [Validators.required, validateUrl()]],
       sendCopy: [true],
-      ccList: [[], validateEmailChips()],
+      ccList: [[], validateEmailListString()],
       comment: [''],
     });
   }

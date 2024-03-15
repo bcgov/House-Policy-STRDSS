@@ -1,9 +1,9 @@
 oc login
 oc project f4a30d-dev / test
 
-helm install strdss-db-dev bitnami/postgresql -f values-dev.yaml 
+helm install strdssdev bitnami/postgresql -f values-dev.yaml 
 
-helm install strdss-db-test bitnami/postgresql -f values-test.yaml
+helm install strdsstest bitnami/postgresql -f values-test.yaml
 
 Enable PostGIS extension
 https://github.com/bitnami/charts/issues/2830
@@ -15,12 +15,19 @@ Create Extension
   CREATE EXTENSION postgis;
 
 Create Database
-CREATE DATABASE "strdss-dev";
+CREATE DATABASE strdssdev;
 
-CREATE ROLE "strdss-dev" WITH LOGIN PASSWORD '';
-GRANT ALL PRIVILEGES ON DATABASE "strdss-dev" TO "strdss-dev";
+CREATE ROLE strdssdev WITH LOGIN PASSWORD 'MMOv7RVwDS';
 
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO strdssdev;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL ON TABLES TO strdssdev ;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL  ON SEQUENCES TO strdssdev ;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL  ON FUNCTIONS TO strdssdev ;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL  ON TYPES TO strdssdev ;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL  ON SCHEMAS TO strdssdev ;
 
 Create Secret
 
-oc port-forward svc/strdss-dev 5434:5432
+oc port-forward svc/strdssdev 5433:5432

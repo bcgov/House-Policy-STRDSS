@@ -34,10 +34,7 @@ export function validateEmailListString(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
         let emailList;
 
-        if (control.value.constructor === Array) {
-            emailList = control.value;
-        }
-        else {
+        if (!!control.value) {
             emailList = (control.value as string).split(',').filter(x => !!x).map(x => x.trim()) as Array<string>;
         }
 

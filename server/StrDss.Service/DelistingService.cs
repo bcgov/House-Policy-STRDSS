@@ -139,7 +139,7 @@ namespace StrDss.Service
             var emailContent = new EmailContent
             {
                 Bcc = Array.Empty<string>(),
-                BodyType = "text",
+                BodyType = "html",
                 Body = FormatDelistingWarningEmailContent(dto, true),
                 Cc = dto.CcList.ToArray(),
                 DelayTS = 0,
@@ -160,17 +160,17 @@ namespace StrDss.Service
             var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
             var nl = Environment.NewLine;
 
-            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)} {dto.HostEmail}{nl}cc: {string.Join(";", dto.CcList)}{nl}{nl}")
-                 + $@"Dear Short-term Rental Host,{nl}"
-                 + $@"{nl}Short-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.{nl}{nl}Short-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.{nl}{nl}The short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason:"
-                 + $@"{nl}{nl}{reason ?? ""}"
-                 + $@"{nl}{nl}{dto.ListingUrl}"
-                 + $@"{nl}{nl}Listing ID Number: {dto.ListingId}"
-                 + $@"{nl}{nl}Unless you are able to demonstrate compliance with the business licence requirement, this listing may be removed from the short-term rental platform after 5 days. The local government has 90 days to submit a request to takedown the listing to the platform. For more information, contact:"
-                 + $@"{nl}{nl}Email: {dto.LgContactEmail}"
-                 + (dto.LgContactPhone.IsEmpty() ? "" : $@"{nl}Phone: {dto.LgContactPhone}")
-                 + (dto.StrBylawUrl.IsEmpty() ? "" : $@"{nl}{nl}More information about our city's STR policies can be found at:{nl}{dto.StrBylawUrl}")
-                 + (dto.Comment.IsEmpty() ? "" : $@"{nl}{nl}{dto.Comment}");
+            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)} {dto.HostEmail}<br/>cc: {string.Join(";", dto.CcList)}<br/><br/>")
+                 + $@"Dear Short-term Rental Host,<br/>"
+                 + $@"<br/>Short-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>Short-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>The short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason:"
+                 + $@"<b> {reason ?? ""}</b>"
+                 + $@"<br/><br/>{dto.ListingUrl}"
+                 + $@"<br/><br/>Listing ID Number: {dto.ListingId}"
+                 + $@"<br/><br/>Unless you are able to demonstrate compliance with the business licence requirement, this listing may be removed from the short-term rental platform after 5 days. The local government has 90 days to submit a request to takedown the listing to the platform. For more information, contact:"
+                 + $@"<br/><br/>Email: {dto.LgContactEmail}"
+                 + (dto.LgContactPhone.IsEmpty() ? "" : $@"<br/>Phone: {dto.LgContactPhone}")
+                 + (dto.StrBylawUrl.IsEmpty() ? "" : $@"<br/><br/>More information about our city's STR policies can be found at:<br/>{dto.StrBylawUrl}")
+                 + (dto.Comment.IsEmpty() ? "" : $@"<br/><br/>{dto.Comment}");
         }
 
         public async Task<string> SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform)
@@ -185,7 +185,7 @@ namespace StrDss.Service
             var emailContent = new EmailContent
             {
                 Bcc = Array.Empty<string>(),
-                BodyType = "text",
+                BodyType = "html",
                 Body = FormatDelistingRequestEmailContent(dto, true),
                 Cc = dto.CcList.ToArray(),
                 DelayTS = 0,
@@ -251,13 +251,13 @@ namespace StrDss.Service
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
             var nl = Environment.NewLine;
 
-            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}{nl}cc: {string.Join(";", dto.CcList)}")
-                 + $@"{nl}{nl}Request to platform service provider for takedown of non-compliant platform offering."
-                 + $@"{nl}{nl}The following short-term rental listing is not in compliance with an applicable local government business licence requirement:"
-                 + $@"{nl}{nl}{dto.ListingUrl}"
-                 + $@"{nl}{nl}Listing ID Number: {dto.ListingId}"
-                 + $@"{nl}{nl}In accordance, with 17(2) of the Short-term Rental Accommodations Act, please cease providing platform services in respect of the above platform offer within 3 days."
-                 + $@"{nl}{nl}[Name]{nl}[Title]{nl}[Local government]{nl}[Contact Information]";
+            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}<br/>cc: {string.Join(";", dto.CcList)}")
+                 + $@"<br/><br/>Request to platform service provider for takedown of non-compliant platform offering."
+                 + $@"<br/><br/>The following short-term rental listing is not in compliance with an applicable local government business licence requirement:"
+                 + $@"<br/><br/>{dto.ListingUrl}"
+                 + $@"<br/><br/>Listing ID Number: {dto.ListingId}"
+                 + $@"<br/><br/>In accordance, with 17(2) of the Short-term Rental Accommodations Act, please cease providing platform services in respect of the above platform offer within 3 days."
+                 + $@"<br/><br/>[Name]<br/>[Title]<br/>[Local government]<br/>[Contact Information]";
         }
     }
 }

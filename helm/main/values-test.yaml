@@ -44,15 +44,16 @@ backend:
   nameOverride: strdss-test-backend
   fullnameOverride: strdss-test-backend
   secretName: strdss-secrets-test
-  dbSecretName: strdss-test-pguser-strdss-test
+  dbSecretName: strdss-pguser-test
+  crunchdb: false
 
   resources:
     limits:
-      cpu: 1500m
-      memory: 1500Mi
+      cpu: 50m
+      memory: 100Mi
     requests:
       cpu: 20m
-      memory: 1100Mi
+      memory: 50Mi
 
   env:
     'API_HOST': '/api'

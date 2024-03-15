@@ -80,14 +80,13 @@ spec:
                   name: {{ .Values.dbSecretName}}
                   key: pgbouncer-port
             {{- end }}
-          {{- if not .Values.crunchydb }}
-          envFrom:
-            - secretRef:
-                name: {{ .Values.dbSecretName }}
-          {{- end }}
           envFrom:
             - secretRef:
                 name: {{ .Values.secretName }}
+            {{- if not .Values.crunchydb }}
+            - secretRef:
+                name: {{ .Values.dbSecretName }}
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

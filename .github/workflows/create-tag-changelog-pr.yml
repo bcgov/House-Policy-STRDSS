@@ -97,12 +97,12 @@ jobs:
             labels: ['changelog', 'v${{ steps.input.outputs.tag }}']
           });
 
-          github.rest.pulls.merge({
-            owner,
-            repo,
-            pull_number: result.data.number,
-            merge_method: 'merge'
-          });
+          # github.rest.pulls.merge({
+          #   owner,
+          #   repo,
+          #   pull_number: result.data.number,
+          #   merge_method: 'merge'
+          # });
 
     - name: Delete Changelog Branch
       run: |

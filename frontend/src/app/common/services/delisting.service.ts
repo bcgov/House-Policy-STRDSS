@@ -25,15 +25,15 @@ export class DelistingService {
     return this.httpClient.post<{ content: string }>(`${environment.API_HOST}/delisting/warnings/preview`, complianceNotice)
   }
 
-  createComplianceNotice(complianceNotice: ComplianceNotice): Observable<void> {
-    return this.httpClient.post<void>(`${environment.API_HOST}/delisting/warnings`, complianceNotice)
+  createComplianceNotice(complianceNotice: ComplianceNotice): Observable<any> {
+    return this.httpClient.post<any>(`${environment.API_HOST}/delisting/warnings`, complianceNotice)
   }
 
   delistingRequestPreview(delistingRequest: ComplianceNotice): Observable<{ content: string }> {
     return this.httpClient.post<{ content: string }>(`${environment.API_HOST}/delisting/requests/preview`, delistingRequest)
   }
 
-  createDelistingRequest(delistingRequest: ComplianceNotice): Observable<void> {
-    return this.httpClient.post<void>(`${environment.API_HOST}/delisting/requests`, delistingRequest)
+  createDelistingRequest(delistingRequest: ComplianceNotice): Observable<any> {
+    return this.httpClient.post<any>(`${environment.API_HOST}/delisting/requests`, delistingRequest)
   }
 }

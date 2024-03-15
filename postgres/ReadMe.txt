@@ -17,7 +17,7 @@ Create Extension
 Create Database
 CREATE DATABASE strdssdev;
 
-CREATE ROLE strdssdev WITH LOGIN PASSWORD 'MMOv7RVwDS';
+CREATE ROLE strdssdev WITH LOGIN PASSWORD '';
 
 
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO strdssdev;

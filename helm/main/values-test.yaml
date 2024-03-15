@@ -45,7 +45,7 @@ backend:
   fullnameOverride: strdss-test-backend
   secretName: strdss-secrets-test
   dbSecretName: strdsstest-pguser-strdsstest
-  crunchdb: false
+  crunchydb: false
 
   resources:
     limits:

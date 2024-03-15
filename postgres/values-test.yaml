@@ -5,6 +5,13 @@ primary:
     enabled: false
   persistence:
     size: 200Mi
+  resources:
+    limits:
+      cpu: 150m
+      memory: 200Mi
+    requests:
+      cpu: 50m
+      memory: 150Mi
 readReplicas:
   persistence:
     size: 200Mi

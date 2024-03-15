@@ -1,6 +1,9 @@
-helm install strdss-dev .
+helm install strdss-dev . --values values-dev.yaml
 
-helm delete strdss-dev
+
+Warning: this deletes the database file and backups
+oc delete PostgresCluster/strdss-dev
+
 
 oc port-forward svc/strdss-dev-pgbouncer 5433:5432
 

@@ -44,7 +44,8 @@ backend:
   nameOverride: strdss-prod-backend
   fullnameOverride: strdss-prod-backend
   secretName: strdss-secrets-prod
-  dbSecretName: strdss-pord-pguser-strdss-prod
+  dbSecretName: strdss-prod-pguser-strdss-prod
+  crunchdb: true
 
   resources:
     limits:

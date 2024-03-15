@@ -10,16 +10,19 @@ import { DelistingService } from '../../../common/services/delisting.service';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { validateEmailChips, validateUrl } from '../../../common/consts/validators.const';
+import { validateEmailListString, validatePhone, validateUrl } from '../../../common/consts/validators.const';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
+import { InputMaskModule } from 'primeng/inputmask';
+import { TooltipModule } from 'primeng/tooltip';
+import { ComplianceNotice } from '../../../common/models/compliance-notice';
 
 @Component({
   selector: 'app-compliance-notice',
   standalone: true,
   imports: [ReactiveFormsModule, DropdownModule, InputTextModule, InputTextareaModule,
-    CheckboxModule, CommonModule, ChipsModule, DialogModule, ButtonModule, ToastModule],
+    CheckboxModule, CommonModule, ChipsModule, DialogModule, TooltipModule, InputMaskModule, ButtonModule, ToastModule],
   templateUrl: './compliance-notice.component.html',
   styleUrl: './compliance-notice.component.scss'
 })
@@ -44,10 +47,14 @@ export class ComplianceNoticeComponent implements OnInit {
 
   onPreview(): void {
     if (this.myForm.valid) {
-      this.delistingService.complianceNoticePreview(this.myForm.value).subscribe(
+      const model: ComplianceNotice = Object.assign({}, this.myForm.value);
+
+      model.ccList = this.myForm.value['ccList'].prototype === Array ? this.myForm.value : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
+
+      this.delistingService.complianceNoticePreview(model).subscribe(
         {
           next: preview => {
-            this.previewText = preview;
+            this.previewText = preview.content;
             this.isPreviewVisible = true;
           },
           error: error => {
@@ -63,10 +70,10 @@ export class ComplianceNoticeComponent implements OnInit {
 
   onSubmit(comment: string): void {
     if (this.myForm.valid) {
-      const formValue = this.myForm.value;
-      formValue.comment = comment;
+      const model: ComplianceNotice = this.myForm.value;
+      model.comment = comment;
 
-      this.delistingService.createComplianceNotice(formValue).subscribe({
+      this.delistingService.createComplianceNotice(model).subscribe({
         next: (_) => {
           this.myForm.reset();
           this.initForm();
@@ -79,7 +86,7 @@ export class ComplianceNoticeComponent implements OnInit {
           this.onPreviewClose();
           this.showErrors(error);
         }
-      })
+      });
     }
   }
 
@@ -90,16 +97,21 @@ export class ComplianceNoticeComponent implements OnInit {
   private initForm(): void {
     this.myForm = this.fb.group({
       platformId: [0, Validators.required],
+      listingId: [''],
       listingUrl: ['', [Validators.required, validateUrl()]],
       hostEmail: ['', Validators.email],
+      sentAlternatively: [false],
       reasonId: [0, Validators.required,],
       sendCopy: [true],
-      ccList: [[], validateEmailChips()],
+      ccList: ['', validateEmailListString()],
+      LgContactEmail: ['', [Validators.required, Validators.email]],
+      LgContactPhone: [''],
+      StrBylawUrl: ['', validateUrl()],
       comment: [''],
     });
   }
 
-  showErrors(error: HttpErrorResponse | any): void {
+  private showErrors(error: HttpErrorResponse | any): void {
     let errorObject = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
     if (error.error['detail']) {
       this.messageService.add({ severity: 'error', summary: 'Validation error', detail: error.error['detail'], life: 10000 });

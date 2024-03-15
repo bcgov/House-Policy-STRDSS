@@ -49,50 +49,58 @@ export class ComplianceNoticeComponent implements OnInit {
     if (this.myForm.valid) {
       const model: ComplianceNotice = Object.assign({}, this.myForm.value);
 
-      model.ccList = this.myForm.value['ccList'].prototype === Array ? this.myForm.value : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
+      model.ccList = this.myForm.value['ccList'].prototype === Array
+        ? this.myForm.value
+        : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
 
-      this.delistingService.complianceNoticePreview(model).subscribe(
-        {
-          next: preview => {
-            this.previewText = preview.content;
-            this.isPreviewVisible = true;
-          },
-          error: error => {
-            this.showErrors(error);
+      this.delistingService.complianceNoticePreview(model)
+        .subscribe(
+          {
+            next: preview => {
+              this.previewText = preview.content;
+              this.isPreviewVisible = true;
+            },
+            error: error => {
+              this.showErrors(error);
+            }
           }
-        }
-      )
+        )
     } else {
       this.messageService.add({ severity: 'error', summary: 'Validation error', detail: "Form is invalid" });
       console.error('Form is invalid!');
     }
   }
 
-  onSubmit(comment: string): void {
+  onSubmit(comment: string, textAreaElement: HTMLTextAreaElement): void {
     if (this.myForm.valid) {
       const model: ComplianceNotice = this.myForm.value;
-      model.ccList = this.myForm.value['ccList'].prototype === Array ? this.myForm.value : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
+      model.ccList = this.myForm.value['ccList'].prototype === Array
+        ? this.myForm.value
+        : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
       model.comment = comment;
-
-      this.delistingService.createComplianceNotice(model).subscribe({
-        next: (_) => {
-          this.myForm.reset();
-          this.initForm();
-          this.onPreviewClose();
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message has been sent successfully' });
-        },
-        error: (error) => {
-          this.myForm.reset();
-          this.initForm();
-          this.onPreviewClose();
-          this.showErrors(error);
-        }
-      });
+      this.delistingService.createComplianceNotice(model)
+        .subscribe({
+          next: (_) => {
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message has been sent successfully' });
+          },
+          error: (error) => {
+            this.showErrors(error);
+          },
+          complete: () => {
+            this.myForm.reset();
+            this.initForm();
+            this.onPreviewClose();
+            this.cleanupPopupComment(textAreaElement);
+          }
+        });
     }
   }
 
   onPreviewClose(): void {
     this.isPreviewVisible = false;
+  }
+  cleanupPopupComment(commentTextArea: HTMLTextAreaElement): void {
+    commentTextArea.value = '';
   }
 
   private initForm(): void {

@@ -46,7 +46,7 @@ backend:
   nameOverride: strdss-dev-backend
   fullnameOverride: strdss-dev-backend
   secretName: strdss-secrets-dev
-  dbSecretName: strdss-db-pguser-strdss-db
+  dbSecretName: strdssdev-pguser-strdssdev
   crunchdb: false
 
   # resources:

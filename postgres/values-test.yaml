@@ -8,5 +8,5 @@ primary:
 readReplicas:
   persistence:
     size: 200Mi
-nameOverride: strdss-test
-fullnameOverride: strdss-test
+nameOverride: strdsstest
+fullnameOverride: strdsstest

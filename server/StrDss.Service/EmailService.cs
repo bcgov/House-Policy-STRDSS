@@ -38,7 +38,7 @@ namespace StrDss.Service
             {
                 var nl = Environment.NewLine;
                 emailContent.Subject = $"[{env.ToUpperInvariant()}] {emailContent.Subject}";
-                emailContent.Body = $"Kindly be advised that this is a test email.{nl}{nl}{emailContent.Body}";
+                emailContent.Body = $"<b>Kindly be advised that this is a test email.</b><br/><br/>{emailContent.Body}";
             }
 
             try

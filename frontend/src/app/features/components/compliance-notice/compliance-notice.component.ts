@@ -10,7 +10,7 @@ import { DelistingService } from '../../../common/services/delisting.service';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { validateEmailListString, validatePhone, validateUrl } from '../../../common/consts/validators.const';
+import { validateEmailListString, validateUrl } from '../../../common/consts/validators.const';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -71,6 +71,7 @@ export class ComplianceNoticeComponent implements OnInit {
   onSubmit(comment: string): void {
     if (this.myForm.valid) {
       const model: ComplianceNotice = this.myForm.value;
+      model.ccList = this.myForm.value['ccList'].prototype === Array ? this.myForm.value : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
       model.comment = comment;
 
       this.delistingService.createComplianceNotice(model).subscribe({

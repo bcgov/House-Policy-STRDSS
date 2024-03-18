@@ -32,6 +32,15 @@
         public const string RoleId = "RoleId";
 
     }
+
+    public static class AccessRequestStatuses
+    {
+        public const string Pending = "Pending";
+        public const string Granted = "Granted";
+        public const string Denied = "Denied";
+        public const string None = "None";
+    }
+
     public static class FieldTypes
     {
         public const string String = "S";

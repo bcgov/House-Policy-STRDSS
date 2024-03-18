@@ -16,7 +16,7 @@ namespace UITest.SeleniumObjects
         {
             get
             {
-                throw new NotImplementedException();
+                return (Element.Text);
             }
         }
 

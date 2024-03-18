@@ -110,7 +110,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("selecting the platform")]
         public void WhenSelectingThePlatform()
         {
-
+            _DelistingRequestPage.PlatformReceipientDropdown.Click();
+            _DelistingRequestPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
+            Assert.IsTrue( _DelistingRequestPage.PlatformReceipientDropdown.Text.Contains("AIRBNB"));
         }
 
         [Then("the system should present a list of available platform options to populate the field")]
@@ -120,7 +122,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
         //DelistingRequestMessage
         [When("all required fields are entered")]
-        public void WhenALlRequiredFieldsAreEntered() 
+        public void WhenAllRequiredFieldsAreEntered() 
         { 
         }
 

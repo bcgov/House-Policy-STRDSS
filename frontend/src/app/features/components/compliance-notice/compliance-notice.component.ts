@@ -99,6 +99,7 @@ export class ComplianceNoticeComponent implements OnInit {
   onPreviewClose(): void {
     this.isPreviewVisible = false;
   }
+
   cleanupPopupComment(commentTextArea: HTMLTextAreaElement): void {
     commentTextArea.value = '';
   }
@@ -106,7 +107,7 @@ export class ComplianceNoticeComponent implements OnInit {
   private initForm(): void {
     this.myForm = this.fb.group({
       platformId: [0, Validators.required],
-      listingId: [''],
+      listingId: [null],
       listingUrl: ['', [Validators.required, validateUrl()]],
       hostEmail: ['', Validators.email],
       sentAlternatively: [false],

@@ -14,6 +14,9 @@ using StrDss.Service;
 using StrDss.Service.HttpClients;
 using System.Reflection;
 using StrDss.Common;
+using StrDss.Data.Entities;
+using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +36,17 @@ builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+builder.Services.AddDbContext<DssDbContext>(opt =>
+{
+    opt.UseNpgsql(connString, opt => opt.UseNetTopologySuite());
+
+    if (builder.Environment.IsDevelopment())
+    {
+        opt.EnableDetailedErrors();
+        opt.EnableSensitiveDataLogging();
+    }
+});
 
 builder.Services.AddApiVersioning(options =>
 {

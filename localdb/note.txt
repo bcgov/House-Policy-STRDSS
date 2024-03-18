@@ -1,0 +1,6 @@
+# backup
+docker exec -i strdss-strdss-db-1 pg_dump -U postgres -d strdssdev --clean > backup.sql
+
+# restore
+docker cp backup.sql strdss-strdss-db-1:/backup.sql
+docker exec -i strdss-strdss-db-1 psql -U postgres -d strdssdev -f /backup.sql

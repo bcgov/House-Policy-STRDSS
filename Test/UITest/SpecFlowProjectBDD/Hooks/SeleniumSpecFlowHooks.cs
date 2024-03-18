@@ -24,6 +24,7 @@ namespace SpecFlowProjectBDD.Hooks
         public void SetupDrivers()
         {
             SeleniumDriver webDriver = new SeleniumDriver(SeleniumDriver.DRIVERTYPE.CHROME);
+            webDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
 
             _Container.RegisterInstanceAs<SeleniumDriver>(webDriver);
         }

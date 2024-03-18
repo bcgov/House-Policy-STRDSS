@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ComplianceNoticeComponent } from './compliance-notice.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { DelistingService } from '../../../common/services/delisting.service';
 
 describe('ComplianceNoticeComponent', () => {
   let component: ComplianceNoticeComponent;
@@ -8,10 +10,11 @@ describe('ComplianceNoticeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ComplianceNoticeComponent]
+      imports: [ComplianceNoticeComponent, HttpClientTestingModule],
+      providers: [DelistingService]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(ComplianceNoticeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

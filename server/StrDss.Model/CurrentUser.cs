@@ -10,14 +10,16 @@ namespace StrDss.Model
         public long Id { get; set; }
         public string UserName { get; set; }
         public Guid UserGuid { get; set; }
-        public string UserType { get; set; }
+        public string IdentityProviderNm { get; set; }
         public string EmailAddress { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string FullName { get; set; }
         public string DisplayName { get; set; }
         public bool IsActive { get; set; }
+        public string BusinessNm { get; set; }
         public string AccessRequestStatus { get; set; }
+        public List<string> Permissions { get; set; }
 
         void LoadUserSession(ClaimsPrincipal user);
         void AddClaim(ClaimsPrincipal user, string claimType, string value);
@@ -29,14 +31,16 @@ namespace StrDss.Model
         public string UserName { get; set; } = "";
         [JsonIgnore]
         public Guid UserGuid { get; set; }
-        public string UserType { get; set; } = "";
+        public string IdentityProviderNm { get; set; } = "";
         public string EmailAddress { get; set; } = "";
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
         public string FullName { get; set; } = "";
         public string DisplayName { get; set; } = "";
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; } = false;
+        public string BusinessNm { get; set; } = "";
         public string AccessRequestStatus { get; set; } = "";
+        public List<string> Permissions { get; set; } = new List<string>();
 
         public void LoadUserSession(ClaimsPrincipal user)
         {
@@ -45,13 +49,13 @@ namespace StrDss.Model
 
             var textInfo = new CultureInfo("en-US", false).TextInfo;
 
-            UserType = user.GetCustomClaim(StrDssClaimTypes.IdentityProvider);
+            IdentityProviderNm = user.GetCustomClaim(StrDssClaimTypes.IdentityProvider);
             EmailAddress = user.GetCustomClaim(ClaimTypes.Email);
             FirstName = textInfo.ToTitleCase(user.GetCustomClaim(ClaimTypes.GivenName));
             LastName = textInfo.ToTitleCase(user.GetCustomClaim(ClaimTypes.Surname));
             DisplayName = user.GetCustomClaim(StrDssClaimTypes.DisplayName);
 
-            switch (UserType)
+            switch (IdentityProviderNm)
             {
                 case StrDssUserTypes.IDIR:
                     UserGuid = new Guid(user.GetCustomClaim(StrDssClaimTypes.IdirUserGuid));
@@ -60,6 +64,7 @@ namespace StrDss.Model
                 case StrDssUserTypes.BceidBusiness:
                     UserGuid = new Guid(user.GetCustomClaim(StrDssClaimTypes.BceidUserGuid));
                     UserName = user.GetCustomClaim(StrDssClaimTypes.BceidUsername);
+                    BusinessNm = user.GetCustomClaim(StrDssClaimTypes.BceidBusinessName);
                     break;
                 case StrDssUserTypes.StrDss:
                     UserGuid = new Guid(user.GetCustomClaim(StrDssClaimTypes.StrDssUserGuid));

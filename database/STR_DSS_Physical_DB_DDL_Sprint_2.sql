@@ -242,3 +242,24 @@ COMMENT ON COLUMN dss_email_message.affected_by_user_identity_id IS 'Foreign key
 
 COMMENT ON COLUMN dss_email_message.involved_in_organization_id IS 'Foreign key';
 
+CREATE OR REPLACE FUNCTION dss_update_audit_columns() RETURNS trigger
+    LANGUAGE plpgsql AS
+$$BEGIN
+    NEW.upd_dtm := current_timestamp;
+    RETURN NEW;
+END;$$;
+
+CREATE OR REPLACE TRIGGER dss_organization_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_organization
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();
+
+CREATE OR REPLACE TRIGGER dss_organization_contact_person_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_organization_contact_person
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();
+	
+CREATE OR REPLACE TRIGGER dss_user_identity_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_user_identity
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();

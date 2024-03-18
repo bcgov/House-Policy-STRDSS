@@ -1,4 +1,6 @@
-﻿namespace StrDss.Data
+﻿using StrDss.Data.Entities;
+
+namespace StrDss.Data
 {
     public interface IUnitOfWork
     {
@@ -7,17 +9,16 @@
 
     public class UnitOfWork : IUnitOfWork
     {
-        //private readonly AppDbContext _dbContext;
+        private readonly DssDbContext _dbContext;
 
-        //public UnitOfWork(AppDbContext dbContext)
-        //{
-        //    _dbContext = dbContext;
-        //}
+        public UnitOfWork(DssDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
 
         public bool Commit()
         {
-            return true;
-            //return _dbContext.SaveChanges() >= 0;
+            return _dbContext.SaveChanges() >= 0;
         }
     }
 }

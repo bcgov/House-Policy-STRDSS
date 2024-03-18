@@ -24,4 +24,8 @@
 	<ItemGroup>
 	  <Folder Include="Entities\" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\StrDss.Model\StrDss.Model.csproj" />
+	</ItemGroup>
 </Project>

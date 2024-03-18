@@ -1,9 +1,8 @@
 export interface DelistingRequest {
-    municipalityId: number;
+    lgId: number;
     platformId: number;
-    listingId: string;
+    listingId: number;
     listingUrl: string;
     sendCopy: boolean;
     ccList: Array<string>;
-    comment: string;
 }

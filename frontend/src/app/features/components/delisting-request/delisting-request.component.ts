@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -13,10 +13,11 @@ import { ButtonModule } from 'primeng/button';
 import { validateEmailListString, validateUrl } from '../../../common/consts/validators.const';
 import { ToastModule } from 'primeng/toast';
 import { HttpErrorResponse } from '@angular/common/http';
-import { MessageService } from 'primeng/api';
+import { Message } from 'primeng/api';
 import { DelistingRequest } from '../../../common/models/delisting-request';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessagesModule } from 'primeng/messages';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-delisting-request',
@@ -45,9 +46,25 @@ export class DelistingRequestComponent implements OnInit {
   initiatorsOptions = new Array<DropdownOption>();
 
   isPreviewVisible = false;
+  hideForm = false;
   previewText = 'No preview'
 
-  constructor(private fb: FormBuilder, private delistingService: DelistingService, private messageService: MessageService) { }
+  messages = new Array<Message>();
+
+  public get lgIdControl(): AbstractControl {
+    return this.myForm.controls['lgId'];
+  }
+  public get platformIdControl(): AbstractControl {
+    return this.myForm.controls['platformId'];
+  }
+  public get listingUrlControl(): AbstractControl {
+    return this.myForm.controls['listingUrl'];
+  }
+  public get ccListControl(): AbstractControl {
+    return this.myForm.controls['ccList'];
+  }
+
+  constructor(private fb: FormBuilder, private delistingService: DelistingService, private router: Router) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -76,7 +93,7 @@ export class DelistingRequestComponent implements OnInit {
         }
       )
     } else {
-      this.messageService.add({ severity: 'error', summary: 'Validation error', detail: "Form is invalid" });
+      this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Form is invalid' }];
       console.error('Form is invalid!');
     }
   }
@@ -91,7 +108,7 @@ export class DelistingRequestComponent implements OnInit {
       this.delistingService.createDelistingRequest(model)
         .subscribe({
           next: (_) => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message has been sent successfully' });
+            this.showSuccessMessage();
           },
           error: (error) => {
             this.showErrors(error);
@@ -109,6 +126,15 @@ export class DelistingRequestComponent implements OnInit {
     this.isPreviewVisible = false;
   }
 
+  onReturnHome(): void {
+    this.router.navigateByUrl('/');
+  }
+
+  showSuccessMessage(): void {
+    this.hideForm = true;
+    this.messages = [{ severity: 'success', summary: '', detail: 'Your Notice of Takedown was Successfully Submitted!' }];
+  }
+
   private initForm(): void {
     this.myForm = this.fb.group({
       lgId: [0, Validators.required],
@@ -120,19 +146,19 @@ export class DelistingRequestComponent implements OnInit {
     });
   }
 
-  showErrors(error: HttpErrorResponse | any): void {
+  private showErrors(error: HttpErrorResponse | any): void {
     let errorObject = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
     if (error.error['detail']) {
-      this.messageService.add({ severity: 'error', summary: 'Validation error', detail: error.error['detail'], life: 10000 });
+      this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: error.error['detail'] }];
     } else {
       const errorKeys = Object.keys(errorObject.errors)
 
       if (!errorKeys) {
-        this.messageService.add({ severity: 'error', summary: 'Validation error', detail: 'Some properties are not valid' });
+        this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Some properties are not valid' }];
       }
       else {
         errorKeys.forEach(key => {
-          this.messageService.add({ severity: 'error', summary: 'Validation error', detail: errorObject.errors[key] });
+          this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: errorObject.errors[key] }];
         });
       }
     }

@@ -18,6 +18,10 @@
     .form-group-row {
         width: 100%;
 
+        label {
+            line-height: 26px;
+        }
+
         &.inline-block {
             width: 368px;
             margin-right: 24px;
@@ -33,6 +37,7 @@
             border-radius: 50%;
             width: 16px;
             height: 16px;
+            line-height: 26px;
             display: inline-flex;
             justify-content: center;
             align-items: center;

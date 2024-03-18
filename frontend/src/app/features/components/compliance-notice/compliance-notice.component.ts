@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidator, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
-import { CheckboxModule } from 'primeng/checkbox';
+import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { CommonModule } from '@angular/common';
 import { ChipsModule } from 'primeng/chips';
 import { DelistingService } from '../../../common/services/delisting.service';
@@ -12,31 +12,72 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { validateEmailListString, validateUrl } from '../../../common/consts/validators.const';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { Message } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { InputMaskModule } from 'primeng/inputmask';
 import { TooltipModule } from 'primeng/tooltip';
 import { ComplianceNotice } from '../../../common/models/compliance-notice';
+import { MessagesModule } from 'primeng/messages';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-compliance-notice',
   standalone: true,
-  imports: [ReactiveFormsModule, DropdownModule, InputTextModule, InputTextareaModule,
-    CheckboxModule, CommonModule, ChipsModule, DialogModule, TooltipModule, InputMaskModule, ButtonModule, ToastModule],
+  imports: [
+    ReactiveFormsModule,
+    DropdownModule,
+    InputTextModule,
+    InputTextareaModule,
+    MessagesModule,
+    CheckboxModule,
+    CommonModule,
+    ChipsModule,
+    DialogModule,
+    TooltipModule,
+    InputMaskModule,
+    ButtonModule,
+  ],
   templateUrl: './compliance-notice.component.html',
   styleUrl: './compliance-notice.component.scss'
 })
 export class ComplianceNoticeComponent implements OnInit {
-
   myForm!: FormGroup;
 
   platformOptions = new Array<DropdownOption>();
   reasonOptions = new Array<DropdownOption>();
 
   isPreviewVisible = false;
+  hideForm = false;
   previewText = 'No preview'
 
-  constructor(private fb: FormBuilder, private delistingService: DelistingService, private messageService: MessageService) { }
+  messages = new Array<Message>();
+
+  public get platformIdControl(): AbstractControl {
+    return this.myForm.controls['platformId'];
+  }
+  public get listingUrlControl(): AbstractControl {
+    return this.myForm.controls['listingUrl'];
+  }
+  public get hostEmailControl(): AbstractControl {
+    return this.myForm.controls['hostEmail'];
+  }
+  public get reasonIdControl(): AbstractControl {
+    return this.myForm.controls['reasonId'];
+  }
+  public get ccListControl(): AbstractControl {
+    return this.myForm.controls['ccList'];
+  }
+  public get lgContactEmailControl(): AbstractControl {
+    return this.myForm.controls['LgContactEmail'];
+  }
+  public get lgContactPhoneControl(): AbstractControl {
+    return this.myForm.controls['LgContactPhone'];
+  }
+  public get strBylawUrlControl(): AbstractControl {
+    return this.myForm.controls['StrBylawUrl'];
+  }
+
+  constructor(private fb: FormBuilder, private delistingService: DelistingService, private router: Router) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -66,12 +107,13 @@ export class ComplianceNoticeComponent implements OnInit {
           }
         )
     } else {
-      this.messageService.add({ severity: 'error', summary: 'Validation error', detail: "Form is invalid" });
+      this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Form is invalid' }];
       console.error('Form is invalid!');
     }
   }
 
   onSubmit(comment: string, textAreaElement: HTMLTextAreaElement): void {
+    this.messages = [];
     if (this.myForm.valid) {
       const model: ComplianceNotice = this.myForm.value;
       model.ccList = this.myForm.value['ccList'].prototype === Array
@@ -81,7 +123,7 @@ export class ComplianceNoticeComponent implements OnInit {
       this.delistingService.createComplianceNotice(model)
         .subscribe({
           next: (_) => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message has been sent successfully' });
+            this.showSuccessMessage();
           },
           error: (error) => {
             this.showErrors(error);
@@ -100,8 +142,27 @@ export class ComplianceNoticeComponent implements OnInit {
     this.isPreviewVisible = false;
   }
 
+  onAlternativeDeliveryChanged(value: CheckboxChangeEvent): void {
+    if (value.checked)
+      this.hostEmailControl.removeValidators([Validators.required]);
+    else
+      this.hostEmailControl.addValidators([Validators.required]);
+
+    this.hostEmailControl.updateValueAndValidity();
+    this.myForm.updateValueAndValidity();
+  }
+
   cleanupPopupComment(commentTextArea: HTMLTextAreaElement): void {
     commentTextArea.value = '';
+  }
+
+  onReturnHome(): void {
+    this.router.navigateByUrl('/');
+  }
+
+  showSuccessMessage(): void {
+    this.hideForm = true;
+    this.messages = [{ severity: 'success', summary: '', detail: 'Your Notice of Takedown was Successfully Submitted!' }];
   }
 
   private initForm(): void {
@@ -109,7 +170,7 @@ export class ComplianceNoticeComponent implements OnInit {
       platformId: [0, Validators.required],
       listingId: [null],
       listingUrl: ['', [Validators.required, validateUrl()]],
-      hostEmail: ['', Validators.email],
+      hostEmail: ['', [Validators.required, Validators.email]],
       sentAlternatively: [false],
       reasonId: [0, Validators.required,],
       sendCopy: [true],
@@ -124,16 +185,16 @@ export class ComplianceNoticeComponent implements OnInit {
   private showErrors(error: HttpErrorResponse | any): void {
     let errorObject = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
     if (error.error['detail']) {
-      this.messageService.add({ severity: 'error', summary: 'Validation error', detail: error.error['detail'], life: 10000 });
+      this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: error.error['detail'] }];
     } else {
       const errorKeys = Object.keys(errorObject.errors)
 
       if (!errorKeys) {
-        this.messageService.add({ severity: 'error', summary: 'Validation error', detail: 'Some properties are not valid' });
+        this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Some properties are not valid' }];
       }
       else {
         errorKeys.forEach(key => {
-          this.messageService.add({ severity: 'error', summary: 'Validation error', detail: errorObject.errors[key] });
+          this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: errorObject.errors[key] }];
         });
       }
     }

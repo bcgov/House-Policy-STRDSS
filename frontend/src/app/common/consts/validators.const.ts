@@ -47,6 +47,6 @@ export function validateEmailListString(): ValidatorFn {
             return emailRegex.test(email)
         })
 
-        return allValid ? null : { invalidEmailChips: true };
+        return allValid ? null : { invalidEmailList: true };
     };
 }

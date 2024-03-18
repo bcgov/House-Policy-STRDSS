@@ -14,12 +14,27 @@ import { validateEmailListString, validateUrl } from '../../../common/consts/val
 import { ToastModule } from 'primeng/toast';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
+import { DelistingRequest } from '../../../common/models/delisting-request';
+import { TooltipModule } from 'primeng/tooltip';
+import { MessagesModule } from 'primeng/messages';
 
 @Component({
   selector: 'app-delisting-request',
   standalone: true,
-  imports: [ReactiveFormsModule, DropdownModule, InputTextModule, InputTextareaModule,
-    CheckboxModule, CommonModule, ChipsModule, DialogModule, ButtonModule, ToastModule],
+  imports: [
+    ReactiveFormsModule,
+    DropdownModule,
+    InputTextModule,
+    InputTextareaModule,
+    MessagesModule,
+    CheckboxModule,
+    CommonModule,
+    ChipsModule,
+    DialogModule,
+    TooltipModule,
+    ButtonModule,
+    ToastModule,
+  ],
   templateUrl: './delisting-request.component.html',
   styleUrl: './delisting-request.component.scss'
 })
@@ -27,7 +42,7 @@ export class DelistingRequestComponent implements OnInit {
   myForm!: FormGroup;
 
   platformOptions = new Array<DropdownOption>();
-  reasonOptions = new Array<DropdownOption>();
+  initiatorsOptions = new Array<DropdownOption>();
 
   isPreviewVisible = false;
   previewText = 'No preview'
@@ -38,12 +53,18 @@ export class DelistingRequestComponent implements OnInit {
     this.initForm();
 
     this.delistingService.getPlatforms().subscribe((platformOptions) => this.platformOptions = platformOptions);
-    this.delistingService.getReasons().subscribe((reasonOptions) => this.reasonOptions = reasonOptions);
+    this.delistingService.getLocalGovernments().subscribe((lgOptions) => this.initiatorsOptions = lgOptions);
   }
 
   onPreview(): void {
     if (this.myForm.valid) {
-      this.delistingService.delistingRequestPreview(this.myForm.value).subscribe(
+      const model: DelistingRequest = Object.assign({}, this.myForm.value);
+
+      model.ccList = this.myForm.value['ccList'].prototype === Array
+        ? this.myForm.value
+        : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
+
+      this.delistingService.delistingRequestPreview(model).subscribe(
         {
           next: preview => {
             this.previewText = preview.content;
@@ -55,29 +76,32 @@ export class DelistingRequestComponent implements OnInit {
         }
       )
     } else {
+      this.messageService.add({ severity: 'error', summary: 'Validation error', detail: "Form is invalid" });
       console.error('Form is invalid!');
     }
   }
 
-  onSubmit(comment: string): void {
+  onSubmit(): void {
     if (this.myForm.valid) {
-      const formValue = this.myForm.value;
-      formValue.comment = comment;
+      const model: DelistingRequest = this.myForm.value;
+      model.ccList = this.myForm.value['ccList'].prototype === Array
+        ? this.myForm.value
+        : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
 
-      this.delistingService.createDelistingRequest(formValue).subscribe({
-        next: (_) => {
-          this.myForm.reset();
-          this.initForm();
-          this.onPreviewClose();
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message has been sent successfully' });
-        },
-        error: (error) => {
-          this.myForm.reset();
-          this.initForm();
-          this.onPreviewClose();
-          this.showErrors(error);
-        }
-      })
+      this.delistingService.createDelistingRequest(model)
+        .subscribe({
+          next: (_) => {
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message has been sent successfully' });
+          },
+          error: (error) => {
+            this.showErrors(error);
+          },
+          complete: () => {
+            this.myForm.reset();
+            this.initForm();
+            this.onPreviewClose();
+          }
+        });
     }
   }
 
@@ -87,11 +111,12 @@ export class DelistingRequestComponent implements OnInit {
 
   private initForm(): void {
     this.myForm = this.fb.group({
+      lgId: [0, Validators.required],
       platformId: [0, Validators.required],
+      listingId: [null],
       listingUrl: ['', [Validators.required, validateUrl()]],
       sendCopy: [true],
-      ccList: [[], validateEmailListString()],
-      comment: [''],
+      ccList: ['', validateEmailListString()],
     });
   }
 

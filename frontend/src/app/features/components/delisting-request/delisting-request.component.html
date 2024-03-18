@@ -1,7 +1,8 @@
 <div class="title">Send Takedown Letter Form</div>
-<div class="sub-title">All fields are required except where stated</div>
+<p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
+<div *ngIf="!hideForm" class="sub-title">All fields are required except where stated</div>
 
-<form [formGroup]="myForm" (ngSubmit)="onPreview()">
+<form *ngIf="!hideForm" [formGroup]="myForm" (ngSubmit)="onPreview()">
     <div class="form-group-row">
         <div class="form-group-row-col">
             <label for="lgId">Request Initiated by</label>
@@ -9,6 +10,10 @@
         <div class="form-group-row-col">
             <p-dropdown [options]="initiatorsOptions" formControlName="lgId" [showClear]="true"
                 placeholder="Select a platform" id="lgId" name="lgId" [required]="true"></p-dropdown>
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!lgIdControl.pristine">
+            <small id="requiredLgIdControl" *ngIf="lgIdControl.errors?.['required']">Request initiator is
+                required</small>
         </div>
     </div>
 
@@ -19,6 +24,10 @@
         <div class="form-group-row-col">
             <p-dropdown [options]="platformOptions" formControlName="platformId" [showClear]="true"
                 placeholder="Select a platform" id="platformId" name="platformId" [required]="true"></p-dropdown>
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!platformIdControl.pristine">
+            <small id="requiredPlatformId" *ngIf="platformIdControl.errors?.['required']">Platform recipient is
+                required</small>
         </div>
     </div>
 
@@ -42,6 +51,11 @@
             <input class="long-text-field" type="text" pInputText formControlName="listingUrl" id="listingUrl"
                 name="listingUrl" required />
         </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!listingUrlControl.pristine">
+            <small id="invalidUrl" *ngIf="listingUrlControl.errors?.['invalidUrl']">Please make sure the URL format that
+                you have entered is correct</small>
+            <small id="requiredUrl" *ngIf="listingUrlControl.errors?.['required']">Listing URL is required</small>
+        </div>
     </div>
 
     <div class="form-group-row">
@@ -61,6 +75,10 @@
         <div class="form-group-row-col">
             <textarea formControlName="ccList" rows="1" cols="20" pInputTextarea id="ccList" name="ccList"></textarea>
         </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine">
+            <small id="invalidCcList" *ngIf="ccListControl.errors?.['invalidEmailList']">Please make sure the email
+                format you have entered is correct</small>
+        </div>
     </div>
 
     <button type="submit" id="form-preview-btn" pButton pRipple [disabled]="!myForm.valid" label="Review"
@@ -76,5 +94,4 @@
         <p-button label="Submit" id="submit-dialog-btn" (click)="onSubmit()"></p-button>
     </div>
 </p-dialog>
-
-<p-toast></p-toast>
+<p-button *ngIf="hideForm" label="Return Home" id="return-home-btn" (click)="onReturnHome()"></p-button>

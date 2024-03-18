@@ -40,7 +40,7 @@ jobs:
         git config user.name "$GITHUB_ACTOR"
         git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
         git config commit.gpgsign false
-        git tag ${{ steps.input.outputs.tag }} -m "Release v${{ steps.input.outputs.tag }}"
+        git tag v${{ steps.input.outputs.tag }} -m "Release v${{ steps.input.outputs.tag }}"
         git push --tags origin
 
     # - name: Setup Tools

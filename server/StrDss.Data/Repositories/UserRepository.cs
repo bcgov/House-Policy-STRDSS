@@ -78,5 +78,7 @@ namespace StrDss.Data.Repositories
             var entity = await _dbSet.FirstAsync(x => x.UserIdentityId == dto.UserIdentityId);
             _mapper.Map(dto, entity);
         }
+
+        //public async Task ApproveAccessRequest
     }
 }

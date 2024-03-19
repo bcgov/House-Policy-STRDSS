@@ -18,8 +18,8 @@ namespace StrDss.Api.Controllers
         {
         }
 
-        [HttpGet("dropdown", Name = "GetLocalGovernmentsDrowdown")]
         [ApiAuthorize]
+        [HttpGet("dropdown", Name = "GetLocalGovernmentsDrowdown")]
         public ActionResult<DropdownDto> GetLocalGovernmentsDrowdown()
         {
             return Ok(LocalGovernmentDto.localGovernments.Select(x => new DropdownDto { Id = x.LocalGovernmentId, Description = x.Name }));

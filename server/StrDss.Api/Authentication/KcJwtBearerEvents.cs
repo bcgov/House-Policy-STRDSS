@@ -26,6 +26,7 @@ namespace StrDss.Api.Authentication
             {
                 _currentUser.AccessRequestStatus = AccessRequestStatuses.None;
                 _currentUser.IsActive = false;
+                _currentUser.AccessRequestRequired = true;
             }
             else
             {
@@ -33,6 +34,7 @@ namespace StrDss.Api.Authentication
                 _currentUser.IsActive = user.IsEnabled;
                 _currentUser.AccessRequestStatus = user.AccessRequestStatusDsc;
                 _currentUser.Permissions = permissions;
+                _currentUser.AccessRequestRequired = _currentUser.AccessRequestStatus == AccessRequestStatuses.Denied;
 
                 if (user.IsEnabled)
                 {

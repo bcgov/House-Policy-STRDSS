@@ -12,6 +12,8 @@ namespace StrDss.Data.Repositories
         Task<PagedDto<AccessRequestDto>> GetAccessRequestListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction);
         Task CreateUserAsync(UserCreateDto dto);
         Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid);
+        Task<UserDto?> DoesGuidExist(Guid guid);
+        Task UpdateUserAsync(UserDto dto);
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
     {
@@ -62,6 +64,18 @@ namespace StrDss.Data.Repositories
                 .ToList();
 
             return (user, permssions);
+        }
+
+        public async Task<UserDto?> DoesGuidExist(Guid guid)
+        {
+            var entity = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.UserGuid == guid);
+
+            return _mapper.Map<UserDto>(entity);
+        }
+
+        public async Task UpdateUserAsync(UserDto dto)
+        {
+            await _dbContext.AddAsync(_mapper.Map<DssUserIdentity>(dto));
         }
     }
 }

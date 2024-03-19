@@ -9,7 +9,7 @@
         </div>
         <div class="form-group-row-col">
             <p-dropdown [options]="initiatorsOptions" formControlName="lgId" [showClear]="true"
-                placeholder="Select a platform" id="lgId" name="lgId" [required]="true"></p-dropdown>
+                placeholder="Please Select Your Municipality..." id="lgId" name="lgId" [required]="true"></p-dropdown>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!lgIdControl.pristine">
             <small id="requiredLgIdControl" *ngIf="lgIdControl.errors?.['required']">Request initiator is
@@ -23,7 +23,7 @@
         </div>
         <div class="form-group-row-col">
             <p-dropdown [options]="platformOptions" formControlName="platformId" [showClear]="true"
-                placeholder="Select a platform" id="platformId" name="platformId" [required]="true"></p-dropdown>
+                placeholder="Please Select..." id="platformId" name="platformId" [required]="true"></p-dropdown>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!platformIdControl.pristine">
             <small id="requiredPlatformId" *ngIf="platformIdControl.errors?.['required']">Platform recipient is
@@ -36,8 +36,8 @@
             <label for="listingId">Add Listing ID Number if Known (Optional):</label>
         </div>
         <div class="form-group-row-col">
-            <input class="long-text-field" type="number" pInputText formControlName="listingId" id="listingId"
-                name="listingId" required />
+            <input class="long-text-field" type="number" pInputText formControlName="listingId"
+                placeholder="Enter Value..." id="listingId" name="listingId" required />
         </div>
     </div>
 
@@ -48,8 +48,8 @@
             <label for="listingUrl">Add listing URL</label>
         </div>
         <div class="form-group-row-col">
-            <input class="long-text-field" type="text" pInputText formControlName="listingUrl" id="listingUrl"
-                name="listingUrl" required />
+            <input class="long-text-field" type="text" placeholder="HTTPS://..." pInputText formControlName="listingUrl"
+                id="listingUrl" name="listingUrl" required />
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!listingUrlControl.pristine">
             <small id="invalidUrl" *ngIf="listingUrlControl.errors?.['invalidUrl']">Please make sure the URL format that
@@ -73,7 +73,8 @@
             <label for="ccList">Additional CCs (optional)</label>
         </div>
         <div class="form-group-row-col">
-            <textarea formControlName="ccList" rows="1" cols="20" pInputTextarea id="ccList" name="ccList"></textarea>
+            <textarea formControlName="ccList" placeholder="Enter Email(s)..." rows="1" cols="20" pInputTextarea
+                id="ccList" name="ccList"></textarea>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine">
             <small id="invalidCcList" *ngIf="ccListControl.errors?.['invalidEmailList']">Please make sure the email

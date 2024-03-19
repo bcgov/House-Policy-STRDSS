@@ -27,9 +27,5 @@
         public DateTime? TermsAcceptanceDtm { get; set; }
 
         public long? RepresentedByOrganizationId { get; set; }
-
-        public DateTime UpdDtm { get; set; }
-
-        public Guid? UpdUserGuid { get; set; }
     }
 }

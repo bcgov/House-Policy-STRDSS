@@ -62,8 +62,6 @@ namespace StrDss.Service
                     FamilyNm = _currentUser.LastName,
                     EmailAddressDsc = _currentUser.EmailAddress,
                     BusinessNm = _currentUser.BusinessNm,
-                    UpdDtm = DateTime.UtcNow,
-                    UpdUserGuid = _currentUser.UserGuid,
                 };
 
                 await _userRepo.CreateUserAsync(userCreateDto);
@@ -80,8 +78,6 @@ namespace StrDss.Service
                 userDto.FamilyNm = _currentUser.LastName;
                 userDto.EmailAddressDsc = _currentUser.EmailAddress;
                 userDto.BusinessNm = _currentUser.BusinessNm;
-                userDto.UpdDtm = DateTime.UtcNow;
-                userDto.UpdUserGuid = _currentUser.UserGuid;
                 userDto.RepresentedByOrganizationId = null;
 
                 await _userRepo.UpdateUserAsync(userDto);

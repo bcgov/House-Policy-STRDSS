@@ -9,7 +9,9 @@ namespace StrDss.Data.Mappings
         public ModelToEntityProfile()
         {
             CreateMap<UserCreateDto, DssUserIdentity>();
-            CreateMap<UserDto, DssUserIdentity>();
+            CreateMap<UserDto, DssUserIdentity>()
+                .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => i.ConcurrencyToken))
+                ; 
         }
     }
 }

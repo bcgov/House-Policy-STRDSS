@@ -13,6 +13,8 @@ namespace StrDss.Data.Mappings
                 .ForMember(o => o.OrganizationCd, opt => opt.MapFrom(i => i.RepresentedByOrganization == null ? "" : i.RepresentedByOrganization.OrganizationCd))
                 .ForMember(o => o.OrganizationNm, opt => opt.MapFrom(i => i.RepresentedByOrganization == null ? "" : i.RepresentedByOrganization.OrganizationNm))
                 ;
+
+            CreateMap<DssUserIdentity, UserDto>();
         }
     }
 }

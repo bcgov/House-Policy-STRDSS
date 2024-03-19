@@ -17,8 +17,8 @@ namespace StrDss.Api.Controllers
         {
         }
 
-        [HttpGet("dropdown", Name = "GetPlatformsDrowdown")]
         [ApiAuthorize]
+        [HttpGet("dropdown", Name = "GetPlatformsDrowdown")]
         public ActionResult<DropdownDto> GetPlatformsDrowdown()
         {
             return Ok(PlatformDto.Platforms.Select(x => new DropdownDto { Id = x.PlatformId, Description = x.Name }));

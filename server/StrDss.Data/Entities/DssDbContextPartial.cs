@@ -19,7 +19,7 @@ namespace StrDss.Data.Entities
 
         public override int SaveChanges()
         {
-            IEnumerable<EntityEntry> modifiedEntries = ChangeTracker.Entries()
+            var modifiedEntries = ChangeTracker.Entries()
                 .Where(e => e.State == EntityState.Modified);
 
             DateTime utcNow = DateTime.UtcNow;
@@ -30,6 +30,18 @@ namespace StrDss.Data.Entities
                 {
                     CheckConcurrency(entry);
 
+                    entry.Member("UpdDtm").CurrentValue = utcNow;
+                    entry.Member("UpdUserGuid").CurrentValue = _currentUser.UserGuid;
+                }
+            }
+
+            var addedEntries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added);
+
+            foreach (var entry in addedEntries)
+            {
+                if (entry.Members.Any(m => m.Metadata.Name == "UpdDtm"))
+                {
                     entry.Member("UpdDtm").CurrentValue = utcNow;
                     entry.Member("UpdUserGuid").CurrentValue = _currentUser.UserGuid;
                 }
@@ -48,7 +60,7 @@ namespace StrDss.Data.Entities
             }
             catch (Exception e)
             {
-
+                throw;
             }
 
             return result;

@@ -2,5 +2,5 @@
 Generate / Update Model:
 ********************************************
 CD StrDss.Data
-dotnet ef dbcontext scaffold "Host=localhost;Database=strdssdev;Username=strdssdev;Password=postgres" Npgsql.EntityFrameworkCore.PostgreSQL -o Entities --context "DssDbContext" --no-onconfiguring --force
+dotnet ef dbcontext scaffold "Host=localhost;Database=strdssdev;Username=strdssdev;Password=postgres" Npgsql.EntityFrameworkCore.PostgreSQL -o Entities --context "DssDbContext" --no-onconfiguring --force --schema dss
 

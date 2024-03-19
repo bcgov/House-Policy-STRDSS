@@ -22,25 +22,26 @@ namespace StrDss.Api.Controllers
             _userService = userService;
         }
 
-        [HttpGet("currentuser", Name = "GetCurrentUser")]
         [ApiAuthorize]
+        [HttpGet("currentuser", Name = "GetCurrentUser")]
         public ActionResult<ICurrentUser> GetCurrentUser()
         {
             return Ok(_currentUser);
         }
 
-        [HttpGet("accessrequestlist", Name = "GetAccessRequestList")]
         [ApiAuthorize]
+        [HttpGet("accessrequestlist", Name = "GetAccessRequestList")]
         public async Task<ActionResult<PagedDto<AccessRequestDto>>> GetAccessRequestList(string? status, int pageSize, int pageNumber, string orderBy = "AccessRequestDtm", string direction = "")
         {
             var list = await _userService.GetAccessRequestListAsync(status ?? "", pageSize, pageNumber, orderBy, direction);
             return Ok(list);
         }
 
-        [HttpPost(Name = "CreateAccessRequest")]
+        [ApiAuthorize]
+        [HttpPost("createaccessrequest", Name = "CreateAccessRequest")]
         public async Task<ActionResult> CreateAccessRequest(AccessRequestCreateDto dto)
         {
-            var errors = await _userService.CreateAccessRequest(dto);
+            var errors = await _userService.CreateAccessRequestAsync(dto);
 
             if (errors.Count > 0)
             {

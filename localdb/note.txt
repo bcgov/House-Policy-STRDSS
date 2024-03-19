@@ -4,6 +4,8 @@ CREATE DATABASE strdssdev;
 CREATE EXTENSION postgis;
 CREATE SCHEMA IF NOT EXISTS dss;
 ALTER DATABASE strdssdev SET search_path TO dss;
+CREATE ROLE strdssdev WITH LOGIN PASSWORD 'postgres';
+ALTER DATABASE strdssdev OWNER TO strdssdev;
 
 # backup
 docker exec -i strdss-strdss-db-1 pg_dump -U postgres -d strdssdev --clean > backup.sql

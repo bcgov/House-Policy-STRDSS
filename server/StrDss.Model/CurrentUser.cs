@@ -19,8 +19,8 @@ namespace StrDss.Model
         public bool IsActive { get; set; }
         public string BusinessNm { get; set; }
         public string AccessRequestStatus { get; set; }
+        public bool AccessRequestRequired { get; set; }
         public List<string> Permissions { get; set; }
-
         void LoadUserSession(ClaimsPrincipal user);
         void AddClaim(ClaimsPrincipal user, string claimType, string value);
     }
@@ -40,6 +40,7 @@ namespace StrDss.Model
         public bool IsActive { get; set; } = false;
         public string BusinessNm { get; set; } = "";
         public string AccessRequestStatus { get; set; } = "";
+        public bool AccessRequestRequired { get; set; }
         public List<string> Permissions { get; set; } = new List<string>();
 
         public void LoadUserSession(ClaimsPrincipal user)

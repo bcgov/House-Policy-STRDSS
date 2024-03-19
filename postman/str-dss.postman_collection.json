@@ -104,6 +104,44 @@
 			"response": []
 		},
 		{
+			"name": "GetReqeustAccessList",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/accessrequestlist?status=&pageSize=10&pageNumber=1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"accessrequestlist"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": ""
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "CreateDelistingWarning",
 			"request": {
 				"method": "POST",
@@ -232,6 +270,39 @@
 						"delisting",
 						"requests",
 						"preview"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Access Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/createaccessrequest",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"createaccessrequest"
 					]
 				}
 			},

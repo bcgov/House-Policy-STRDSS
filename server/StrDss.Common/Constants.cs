@@ -35,8 +35,8 @@
 
     public static class AccessRequestStatuses
     {
-        public const string Pending = "Pending";
-        public const string Granted = "Granted";
+        public const string Requested = "Requested";
+        public const string Approved = "Approved";
         public const string Denied = "Denied";
         public const string None = "None";
     }

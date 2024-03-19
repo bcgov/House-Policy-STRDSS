@@ -15,7 +15,6 @@ using StrDss.Service.HttpClients;
 using System.Reflection;
 using StrDss.Common;
 using StrDss.Data.Entities;
-using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

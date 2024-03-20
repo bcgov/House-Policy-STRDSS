@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrDss.Common;
@@ -9,8 +8,6 @@ using StrDss.Model.DelistingDtos;
 using StrDss.Model.LocalGovernmentDtos;
 using StrDss.Model.PlatformDtos;
 using StrDss.Model.WarningReasonDtos;
-using StrDss.Service.HttpClients;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Service

@@ -32,7 +32,7 @@ namespace StrDss.Api.Authentication
             {
                 _currentUser.Id = user.UserIdentityId;
                 _currentUser.IsActive = user.IsEnabled;
-                _currentUser.AccessRequestStatus = user.AccessRequestStatusDsc;
+                _currentUser.AccessRequestStatus = user.AccessRequestStatusCd;
                 _currentUser.Permissions = permissions;
                 _currentUser.AccessRequestRequired = _currentUser.AccessRequestStatus == AccessRequestStatuses.Denied;
 

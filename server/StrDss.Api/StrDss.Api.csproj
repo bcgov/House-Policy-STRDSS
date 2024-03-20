@@ -20,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\StrDss.Common\StrDss.Common.csproj" />
 		<ProjectReference Include="..\StrDss.Data\StrDss.Data.csproj" />
 		<ProjectReference Include="..\StrDss.Model\StrDss.Model.csproj" />
 		<ProjectReference Include="..\StrDss.Service\StrDss.Service.csproj" />

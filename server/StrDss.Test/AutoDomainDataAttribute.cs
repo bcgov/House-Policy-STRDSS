@@ -14,6 +14,7 @@ namespace StrDss.Test
                 .Customize(new DelistingWarningCreateDtoCustomization())
                 .Customize(new DelistingRequestCreateDtoCustomization())
                 .Customize(new EmailContentCustomization())
+                .Customize (new OrganizationDtoCustomization())
             )                
         {
         }

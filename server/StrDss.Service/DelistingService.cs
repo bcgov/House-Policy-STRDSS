@@ -1,56 +1,81 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
-using StrDss.Model.LocalGovernmentDtos;
-using StrDss.Model.PlatformDtos;
+using StrDss.Model.OrganizationDtos;
 using StrDss.Model.WarningReasonDtos;
-using StrDss.Service.HttpClients;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Service
 {
     public interface IDelistingService
     {
-        Task<Dictionary<string, List<string>>> ValidateDelistingWarning(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason);
-        Task<string> SendDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform);
-        string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly);
-        Task<Dictionary<string, List<string>>> ValidateDelistingRequest(DelistingRequestCreateDto dto, PlatformDto? platform, LocalGovernmentDto? lg);
-        Task<string> SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform);
-        string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly);
+        Task<Dictionary<string, List<string>>> CreateDelistingWarningAsync(DelistingWarningCreateDto dto);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto);
+        Task<Dictionary<string, List<string>>> CreateDelistingRequestAsync(DelistingRequestCreateDto dto);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingRequestPreviewAsync(DelistingRequestCreateDto dto);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
         private IConfiguration _config;
         private IEmailService _emailService;
+        private IOrganizationService _orgService;
         private ILogger<DelistingService> _logger;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper,
-            IConfiguration config, IEmailService emailService, ILogger<DelistingService> logger)
+            IConfiguration config, IEmailService emailService, IOrganizationService orgService, ILogger<DelistingService> logger)
             : base(currentUser, validator, unitOfWork, mapper)
         {
             _config = config;
             _emailService = emailService;
+            _orgService = orgService;
             _logger = logger;
         }
-        public async Task<Dictionary<string, List<string>>> ValidateDelistingWarning(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason)
+
+        public async Task<Dictionary<string, List<string>>> CreateDelistingWarningAsync(DelistingWarningCreateDto dto)
+        {
+            var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
+
+            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
+
+            var errors = await ValidateDelistingWarningAsync(dto, platform, reason);
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            await SendDelistingWarningAsync(dto, platform);
+
+            return errors;
+        }
+
+        private async Task<Dictionary<string, List<string>>> ValidateDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform, string? reason)
         {
             await Task.CompletedTask;
 
             var errors = new Dictionary<string, List<string>>();
             RegexInfo regex;
 
-            //Todo: Validate Platform ID
             if (platform == null)
             {
                 errors.AddItem("platformId", $"Platform ID ({dto.PlatformId}) does not exist.");
             }
+            else
+            {
+                if (platform.OrganizationType != OrganizationTypes.Platform)
+                {
+                    errors.AddItem("platformId", $"Organization ({dto.PlatformId}) is not a platform");
+                }
 
+                if (platform.ContactPeople == null || !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty()))
+                {
+                    errors.AddItem("platformId", $"Platform ({dto.PlatformId}) does not have the primary contact info");
+                }
+            }
 
             if (dto.ListingUrl.IsEmpty())
             {
@@ -123,9 +148,11 @@ namespace StrDss.Service
             return errors;
         }
 
-        public async Task<string> SendDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform)
+        private async Task SendDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform)
         {
-            dto.ToList.Add(platform?.Email ?? "");
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+
+            dto.ToList.Add(contact.EmailAddressDsc);
             if (dto.HostEmail.IsNotEmpty())
             {
                 dto.ToList.Add(dto.HostEmail);
@@ -151,16 +178,37 @@ namespace StrDss.Service
                 Info = dto.ListingUrl
             };
 
-            return await _emailService.SendEmailAsync(emailContent);
+            await _emailService.SendEmailAsync(emailContent);
         }
 
-        public string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly)
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
+            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
+
+            var errors = await ValidateDelistingWarningAsync(dto, platform, reason);
+            if (errors.Count > 0)
+            {
+                return (errors, new EmailPreview());
+            }
+
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+            dto.ToList.Add(contact.EmailAddressDsc);
+
+            if (dto.HostEmail.IsNotEmpty())
+            {
+                dto.ToList.Add(dto.HostEmail);
+            }
+
+            return (errors, new EmailPreview { Content = FormatDelistingWarningEmailContent(dto, false).HtmlToPlainText() });
+        }
+
+        private string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly)
+        {
             var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
             var nl = Environment.NewLine;
 
-            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)} {dto.HostEmail}<br/>cc: {string.Join(";", dto.CcList)}<br/><br/>")
+            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}<br/>cc: {string.Join(";", dto.CcList)}<br/><br/>")
                  + $@"Dear Short-term Rental Host,<br/>"
                  + $@"<br/>Short-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>Short-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>The short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason:"
                  + $@"<b> {reason ?? ""}</b>"
@@ -173,52 +221,57 @@ namespace StrDss.Service
                  + (dto.Comment.IsEmpty() ? "" : $@"<br/><br/>{dto.Comment}");
         }
 
-        public async Task<string> SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform)
+        public async Task<Dictionary<string, List<string>>> CreateDelistingRequestAsync(DelistingRequestCreateDto dto)
         {
-            dto.ToList.Add(platform?.Email ?? "");
+            var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
+            var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
 
-            if (dto.SendCopy)
+            var errors = await ValidateDelistingRequestAsync(dto, platform, lg);
+            if (errors.Count > 0)
             {
-                dto.CcList.Add(_currentUser.EmailAddress);
+                return errors;
             }
 
-            var emailContent = new EmailContent
-            {
-                Bcc = Array.Empty<string>(),
-                BodyType = "html",
-                Body = FormatDelistingRequestEmailContent(dto, true),
-                Cc = dto.CcList.ToArray(),
-                DelayTS = 0,
-                Encoding = "utf-8",
-                From = "no_reply@gov.bc.ca",
-                Priority = "normal",
-                Subject = "Takedown Request",
-                To = dto.ToList.ToArray(),
-                Info = dto.ListingUrl
-            };
+            await SendDelistingRequestAsync(dto, platform);
 
-            return await _emailService.SendEmailAsync(emailContent);
+            return errors;
         }
 
-        public async Task<Dictionary<string, List<string>>> ValidateDelistingRequest(DelistingRequestCreateDto dto, PlatformDto? platform, LocalGovernmentDto? lg)
+        private async Task<Dictionary<string, List<string>>> ValidateDelistingRequestAsync(DelistingRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
         {
             await Task.CompletedTask;
 
             var errors = new Dictionary<string, List<string>>();
             RegexInfo regex;
 
-            //Todo: Validate Platform ID
             if (platform == null)
             {
                 errors.AddItem("platformId", $"Platform ID ({dto.PlatformId}) does not exist.");
+            }
+            else
+            {
+                if (platform.OrganizationType != OrganizationTypes.Platform)
+                {
+                    errors.AddItem("platformId", $"Organization ({dto.PlatformId}) is not a platform");
+                }
+
+                if (platform.ContactPeople == null || !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty()))
+                {
+                    errors.AddItem("platformId", $"Platform ({dto.PlatformId}) does not have the primary contact info");
+                }
             }
 
             if (lg == null)
             {
                 errors.AddItem("lgId", $"Local Government ID ({dto.LgId}) does not exist.");
             }
-
-            //Todo: Validate LG ID
+            else
+            {
+                if (lg.OrganizationType != OrganizationTypes.LG)
+                {
+                    errors.AddItem("platformId", $"Organization ({dto.PlatformId}) is not a local government");
+                }
+            }
 
             if (dto.ListingUrl.IsEmpty())
             {
@@ -246,9 +299,54 @@ namespace StrDss.Service
             return errors;
         }
 
-        public string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly)
+        private async Task SendDelistingRequestAsync(DelistingRequestCreateDto dto, OrganizationDto? platform)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+            dto.ToList.Add(contact.EmailAddressDsc);
+
+            if (dto.SendCopy)
+            {
+                dto.CcList.Add(_currentUser.EmailAddress);
+            }
+
+            var emailContent = new EmailContent
+            {
+                Bcc = Array.Empty<string>(),
+                BodyType = "html",
+                Body = FormatDelistingRequestEmailContent(dto, true),
+                Cc = dto.CcList.ToArray(),
+                DelayTS = 0,
+                Encoding = "utf-8",
+                From = "no_reply@gov.bc.ca",
+                Priority = "normal",
+                Subject = "Takedown Request",
+                To = dto.ToList.ToArray(),
+                Info = dto.ListingUrl
+            };
+
+            await _emailService.SendEmailAsync(emailContent);
+        }
+
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingRequestPreviewAsync(DelistingRequestCreateDto dto)
+        {
+            var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
+            var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
+
+            var errors = await ValidateDelistingRequestAsync(dto, platform, lg);
+            if (errors.Count > 0)
+            {
+                return (errors, new EmailPreview());
+            }
+
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+            dto.ToList.Add(contact.EmailAddressDsc);
+
+            return (errors, new EmailPreview { Content = FormatDelistingRequestEmailContent(dto, false).HtmlToPlainText() });
+
+        }
+
+        private string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly)
+        {
             var nl = Environment.NewLine;
 
             return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}<br/>cc: {string.Join(";", dto.CcList)}")
@@ -259,5 +357,6 @@ namespace StrDss.Service
                  + $@"<br/><br/>In accordance, with 17(2) of the Short-term Rental Accommodations Act, please cease providing platform services in respect of the above platform offer within 3 days."
                  + $@"<br/><br/>[Name]<br/>[Title]<br/>[Local government]<br/>[Contact Information]";
         }
+
     }
 }

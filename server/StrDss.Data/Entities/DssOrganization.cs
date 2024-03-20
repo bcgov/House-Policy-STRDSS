@@ -58,4 +58,6 @@ public partial class DssOrganization
     public virtual ICollection<DssOrganization> InverseManagingOrganization { get; set; } = new List<DssOrganization>();
 
     public virtual DssOrganization? ManagingOrganization { get; set; }
+
+    public virtual DssOrganizationType OrganizationTypeNavigation { get; set; } = null!;
 }

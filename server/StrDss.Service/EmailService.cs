@@ -10,7 +10,7 @@ namespace StrDss.Service
 {
     public interface IEmailService
     {
-        Task<string> SendEmailAsync(EmailContent emailContent);
+        Task SendEmailAsync(EmailContent emailContent);
     }
 
     public class EmailService : ServiceBase, IEmailService
@@ -30,7 +30,7 @@ namespace StrDss.Service
             _logger = logger;
         }
 
-        public async Task<string> SendEmailAsync(EmailContent emailContent)
+        public async Task SendEmailAsync(EmailContent emailContent)
         {
             var env = _config.GetValue<string>("ENV_NAME") ?? "dev";
 
@@ -60,16 +60,15 @@ namespace StrDss.Service
                 {
                     var error = $"Failed to send '{emailContent.Subject}' for {emailContent.Info}. Status code: {response.StatusCode}";
                     _logger.LogError(error);
-                    return error;
+                    throw new Exception(error);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Exception raised when sending '{emailContent.Subject}' for {emailContent.Info} - {ex}");
-                return ex.Message;
+                var error = $"Exception raised when sending '{emailContent.Subject}' for {emailContent.Info}.";
+                _logger.LogError($"{error} - {ex}");
+                throw new Exception(error);
             }
-
-            return "";
         }
     }
 

@@ -40,10 +40,10 @@ jobs:
       - name: Build backend
         run: |
           pwd
-          dotnet build ./server/AdvSol.sln
+          dotnet build ./server/server.sln
 
       - name: Test backend
-        run: dotnet test ./server/AdvSol.sln --no-build
+        run: dotnet test ./server/server.sln --no-build
 
      # SonarQube integration for backend
       - name: SonarQube Scan Backend

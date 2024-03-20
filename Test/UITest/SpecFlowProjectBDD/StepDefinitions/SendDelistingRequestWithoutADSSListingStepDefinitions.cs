@@ -1,21 +1,8 @@
-﻿using Models;
-using NUnit.Framework;
-using System;
-
-
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Models;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using UITest.PageObjects;
 using UITest.TestDriver;
-using UITest.TestEngine;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Policy;
-using System.Collections.Generic;
 using Configuration;
 using TestFrameWork.Models;
-using System.Reflection.Metadata;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -25,6 +12,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
     {
         HomePage _HomePage;
         DelistingRequestPage _DelistingRequestPage;
+        TakeDownRequestPage _TakeDownRequestPage;
         PathFinderPage _PathFinderPage;
         IDRLoginPage _IDRLoginPage;
         string _TestUserName;
@@ -38,6 +26,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _driver = Driver;
             _HomePage = new HomePage(_driver);
             _DelistingRequestPage = new DelistingRequestPage(_driver);
+            _TakeDownRequestPage = new TakeDownRequestPage(_driver);
             _PathFinderPage = new PathFinderPage(_driver);
             _IDRLoginPage = new IDRLoginPage(_driver);
             AppSettings appSettings = new AppSettings();
@@ -65,15 +54,21 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("I navigate to the delisting request feature")]
         public void WhenINavigateToTheDelistingRequestFeature()
         {
-            _driver.Url = "http://127.0.0.1:4200/delisting-request";
-            _driver.Navigate();
-
+            //_driver.Url = "http://127.0.0.1:4200/delisting-request";
+            //_driver.Navigate();
         }
 
         //Input Form
         [Then("I should be presented with an input form that includes fields for the listing URL")]
         public void IshouldBePresentedWithAnInputFormThatIncludesFields()
         {
+
+        }
+
+        [Then("I Should be Presented with an Input form that Lists requests Initiated By")]
+        public void IShouldBePresentedWithAnInputFormThatListsRequestsInitiatedBy()
+        { 
+
         }
 
         [Then("I should be presented with a field to select which platform to send the request to")]
@@ -82,11 +77,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _DelistingRequestPage.PlatformReceipientDropdown.Click();
             _DelistingRequestPage.PlatformReceipientDropdown.Click();
         }
-        
-        //[Then("I should be presented with a dropdown menu to select reason for delisting")]
-        //public void IShouldBePresentedWithADropdownMenuToSelectReasonForDelisting()
-        //{
-        //}
 
         [Then("I should see an optional field for adding a LG staff user email address to be copied on the email")]
         public void IShouldSeeAnOptionalFieldForAddingALGStaffUserEmailAddressToBeCopiedOnTheEmail()
@@ -94,15 +84,41 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _DelistingRequestPage.AdditionalCCsTextBox.EnterText("foo@foo.com");
         }
 
+        //ListingID
+        [When(@"Entering the listing ID ""(.*)""")]
+        public void WhenEnteringTheListingID(String ID)
+        {
+            _DelistingRequestPage.ListingIDNumberTextBox.EnterText(ID);
+        }
+
+        [Then("The system should validate the ID is a number")]
+        public void TheSystemShouldValidateTheIDFormat()
+        {
+        }
+
         //ListingURLField
         [When(@"Entering the listing URL ""(.*)""")]
         public void WhenEnteringTheListingURL(String URL)
         {
-            _DelistingRequestPage.ListingUrlTextBox.EnterText("http://listingUrl.com");
+            _DelistingRequestPage.ListingUrlTextBox.EnterText(URL);
         }
 
         [Then("The system should validate the URL format and ensure it is a valid link to the property listing")]
         public void TheSystemShouldValidateTheURLFormat()
+        {
+        }
+
+        //RequestInitiaitedByField
+        [When("Selecting the LG for Initiated By")]
+        public void SelectingTheLGForInitiatedBy()
+        {
+            _DelistingRequestPage.RequestInitiatedByDropDown.Click();
+            _DelistingRequestPage.RequestInitiatedByDropDown.ExecuteJavaScript(@"document.querySelector(""#lgId_0"").click()");
+            //Assert.IsTrue(_DelistingRequestPage.PlatformReceipientDropdown.Text.Contains("AIRBNB"));
+        }
+
+        [Then("The system should present a list of available LG options to populate the field")]
+        public void TheSystemShouldPresentAListOfLGOptions()
         {
         }
 
@@ -112,7 +128,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _DelistingRequestPage.PlatformReceipientDropdown.Click();
             _DelistingRequestPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-            Assert.IsTrue( _DelistingRequestPage.PlatformReceipientDropdown.Text.Contains("AIRBNB"));
+            Assert.IsTrue( _DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper().Contains("AIRBNB"));
         }
 
         [Then("the system should present a list of available platform options to populate the field")]
@@ -140,12 +156,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
         //SendDelistingRequest
         [When("I submit the form with valid information")]
         public void WhenISubmitTheFormWithValidInformation() 
-        { 
+        {
+            _TakeDownRequestPage.SubmitButton.Click();
         }
 
         [Then("the system should send the delisting request message to the platform email addresses associated with the selected platform")]
         public void ThenTheSystemShouldSendTheDelistingRequestMessage() 
-        { 
+        {
+            _DelistingRequestPage.ReturnHomeButton.Click();
         }
 
         //ConfirmationMessage

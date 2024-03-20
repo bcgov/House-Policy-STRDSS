@@ -11,14 +11,27 @@ When I navigate to the delisting request feature
 #Input Form
 Then I should be presented with an input form that includes fields for the listing URL
 
-And I should be presented with a field to select which platform to send the request to 
+And I Should be Presented with an Input form that Lists requests Initiated By
 
+And I should be presented with a field to select which platform to send the request to 
 
 And I should see an optional field for adding a LG staff user email address to be copied on the email
 
+#Initiated By
+
+When Selecting the LG for Initiated By
+
+Then The system should present a list of available LG options to populate the field
+
+#ListingIDField
+
+When Entering the listing ID "0"
+
+Then The system should validate the ID is a number
+
 #ListingURLField
 
-When Entering the listing URL "ListingURL"
+When Entering the listing URL "http://listingURL.com"
 
 Then The system should validate the URL format and ensure it is a valid link to the property listing
 

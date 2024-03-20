@@ -1,4 +1,4 @@
-name: Build
+name: Build and Push
 
 on:
   workflow_dispatch:
@@ -83,10 +83,10 @@ jobs:
           cd ./frontend
           ng build --configuration=production
 
-      - name: Chrome launcher
+      - name: Firefox launcher
         run: |
           cd ./frontend
-          npm install karma-chrome-launcher --save-dev
+          npm install karma-firefox-launcher --save-dev
       
       - name: Run frontend tests
         run: |

@@ -78,10 +78,10 @@ namespace StrDss.Api.Controllers
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
             }
 
-            var toList = new List<string> { platform?.Email ?? "" };
+            dto.ToList.Add(platform?.Email ?? "");
             if (dto.HostEmail.IsNotEmpty())
             {
-                toList.Add(dto.HostEmail);
+                dto.ToList.Add(dto.HostEmail);
             }
 
             return new EmailPreview { Content = _delistingService.FormatDelistingWarningEmailContent(dto, false).HtmlToPlainText() };
@@ -123,7 +123,7 @@ namespace StrDss.Api.Controllers
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
             }
 
-            var toList = new List<string> { platform?.Email ?? "" };
+            dto.ToList.Add(platform?.Email ?? "");
 
             return new EmailPreview { Content = _delistingService.FormatDelistingRequestEmailContent(dto, false).HtmlToPlainText() };
         }

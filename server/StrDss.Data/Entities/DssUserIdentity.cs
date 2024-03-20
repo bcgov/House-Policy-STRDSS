@@ -36,7 +36,7 @@ public partial class DssUserIdentity
     /// <summary>
     /// The current status of the most recent access request made by the user (restricted to Requested, Approved, or Denied)
     /// </summary>
-    public string AccessRequestStatusDsc { get; set; } = null!;
+    public string AccessRequestStatusCd { get; set; } = null!;
 
     /// <summary>
     /// A timestamp indicating when the most recent access request was made by the user
@@ -88,11 +88,13 @@ public partial class DssUserIdentity
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
 
+    public virtual DssAccessRequestStatus AccessRequestStatusCdNavigation { get; set; } = null!;
+
     public virtual ICollection<DssEmailMessage> DssEmailMessageAffectedByUserIdentities { get; set; } = new List<DssEmailMessage>();
 
     public virtual ICollection<DssEmailMessage> DssEmailMessageInitiatingUserIdentities { get; set; } = new List<DssEmailMessage>();
 
-    public virtual ICollection<DssUserRoleAssignment> DssUserRoleAssignments { get; set; } = new List<DssUserRoleAssignment>();
-
     public virtual DssOrganization? RepresentedByOrganization { get; set; }
+
+    public virtual ICollection<DssUserRole> UserRoleCds { get; set; } = new List<DssUserRole>();
 }

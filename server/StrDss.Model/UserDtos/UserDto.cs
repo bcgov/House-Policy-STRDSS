@@ -15,7 +15,7 @@ namespace StrDss.Model.UserDtos
 
         public bool IsEnabled { get; set; }
 
-        public string AccessRequestStatusDsc { get; set; } = null!;
+        public string AccessRequestStatusCd { get; set; } = null!;
 
         public DateTime? AccessRequestDtm { get; set; }
 
@@ -34,7 +34,6 @@ namespace StrDss.Model.UserDtos
         public long? RepresentedByOrganizationId { get; set; }
 
         public DateTime UpdDtm { get; set; }
-
-        public Guid? UpdUserGuid { get; set; }
+        public virtual ICollection<RoleDto> UserRoleCds { get; set; } = new List<RoleDto>();
     }
 }

@@ -9,7 +9,7 @@ namespace StrDss.Data.Mappings
         public ModelToEntityProfile()
         {
             CreateMap<UserCreateDto, DssUserIdentity>();
-            CreateMap<UserDto, DssUserIdentity>();
+            CreateMap<UserDto, DssUserIdentity>(); 
         }
     }
 }

@@ -10,7 +10,7 @@
 
         public bool IsEnabled { get; set; }
 
-        public string AccessRequestStatusDsc { get; set; } = null!;
+        public string AccessRequestStatusCd { get; set; } = null!;
 
         public DateTime? AccessRequestDtm { get; set; }
 
@@ -27,9 +27,5 @@
         public DateTime? TermsAcceptanceDtm { get; set; }
 
         public long? RepresentedByOrganizationId { get; set; }
-
-        public DateTime UpdDtm { get; set; }
-
-        public Guid? UpdUserGuid { get; set; }
     }
 }

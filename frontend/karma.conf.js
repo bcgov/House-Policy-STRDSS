@@ -9,13 +9,14 @@ module.exports = function (config) {
 
         autoWatch: true,
 
-        browsers: ['FirefoxHeadless'],
+        browsers: ['ChromeHeadless'],
+
         customLaunchers: {
-            FirefoxHeadless: {
-                base: 'Firefox',
-                flags: ['-headless'],
-            },
-        },
+                ChromeHeadless: {
+                    base: 'Chrome',
+                    flags: ['--headless', '--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage']
+                }
+        }
         
     });
 };

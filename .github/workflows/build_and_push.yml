@@ -83,10 +83,11 @@ jobs:
           cd ./frontend
           ng build --configuration=production
 
-      - name: Firefox launcher
+      - name: Chrome launcher
         run: |
           cd ./frontend
-          npm install karma-firefox-launcher --save-dev
+          npm install karma-chrome-launcher --save-dev
+          google-chrome --version
       
       - name: Run frontend tests
         run: |

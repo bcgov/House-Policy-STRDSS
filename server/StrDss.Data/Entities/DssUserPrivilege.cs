@@ -9,19 +9,14 @@ namespace StrDss.Data.Entities;
 public partial class DssUserPrivilege
 {
     /// <summary>
-    /// Unique generated key
-    /// </summary>
-    public long UserPrivilegeId { get; set; }
-
-    /// <summary>
     /// The immutable system code that identifies the privilege
     /// </summary>
-    public string PrivilegeCd { get; set; } = null!;
+    public string UserPrivilegeCd { get; set; } = null!;
 
     /// <summary>
     /// The human-readable name that is given for the role
     /// </summary>
-    public string PrivilegeNm { get; set; } = null!;
+    public string UserPrivilegeNm { get; set; } = null!;
 
-    public virtual ICollection<DssUserRolePrivilege> DssUserRolePrivileges { get; set; } = new List<DssUserRolePrivilege>();
+    public virtual ICollection<DssUserRole> UserRoleCds { get; set; } = new List<DssUserRole>();
 }

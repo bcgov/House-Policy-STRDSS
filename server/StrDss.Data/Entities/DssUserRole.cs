@@ -9,11 +9,6 @@ namespace StrDss.Data.Entities;
 public partial class DssUserRole
 {
     /// <summary>
-    /// Unique generated key
-    /// </summary>
-    public long UserRoleId { get; set; }
-
-    /// <summary>
     /// The immutable system code that identifies the role
     /// </summary>
     public string UserRoleCd { get; set; } = null!;
@@ -23,7 +18,7 @@ public partial class DssUserRole
     /// </summary>
     public string UserRoleNm { get; set; } = null!;
 
-    public virtual ICollection<DssUserRoleAssignment> DssUserRoleAssignments { get; set; } = new List<DssUserRoleAssignment>();
+    public virtual ICollection<DssUserIdentity> UserIdentities { get; set; } = new List<DssUserIdentity>();
 
-    public virtual ICollection<DssUserRolePrivilege> DssUserRolePrivileges { get; set; } = new List<DssUserRolePrivilege>();
+    public virtual ICollection<DssUserPrivilege> UserPrivilegeCds { get; set; } = new List<DssUserPrivilege>();
 }

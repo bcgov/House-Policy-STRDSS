@@ -343,6 +343,129 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Get Platforms",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/organizations?type=Platform",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"organizations"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "Platform"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Local Governments",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/organizations?type=LG",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"organizations"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "LG"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get BC Governments",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/organizations?type=BCGov",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"organizations"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "BCGov"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {

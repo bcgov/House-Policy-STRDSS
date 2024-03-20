@@ -7,7 +7,7 @@ ALTER DATABASE strdssdev SET search_path TO dss;
 CREATE ROLE strdssdev WITH LOGIN PASSWORD 'postgres';
 ALTER DATABASE strdssdev OWNER TO strdssdev;
 
-# backup
+# backup - Do in on WSL (linux)
 docker exec -i strdss-strdss-db-1 pg_dump -U postgres -d strdssdev --clean > backup.sql
 
 # restore when the project folder is strdss

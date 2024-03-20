@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using StrDss.Data.Entities;
+using StrDss.Model.OrganizationDtos;
 using StrDss.Model.UserDtos;
 
 namespace StrDss.Data.Mappings
@@ -15,6 +16,10 @@ namespace StrDss.Data.Mappings
                 ;
 
             CreateMap<DssUserIdentity, UserDto>();
+            CreateMap<DssOrganizationType, OrganizationTypeDto>();
+            CreateMap<DssAccessRequestStatus, AccessRequestStatusDto>();
+            CreateMap<DssUserRole, RoleDto>();
+            CreateMap<DssUserPrivilege, PermissionDto>();
         }
     }
 }

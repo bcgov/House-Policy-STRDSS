@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
@@ -18,13 +19,7 @@ namespace StrDss.Data.Repositories
 
         public async Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc()
         {
-            await Task.CompletedTask;
-
-            var types = new List<OrganizationTypeDto>
-            {
-                new OrganizationTypeDto { Value = "BCGov", Label = "Compliace Enforcement Unit Staff" },
-                new OrganizationTypeDto { Value = "LocalGov", Label = "Local Government Staff" },
-            };
+            var types = _mapper.Map<List<OrganizationTypeDto>>(await _dbContext.DssOrganizationTypes.AsNoTracking().ToListAsync());
 
             return types;
         }

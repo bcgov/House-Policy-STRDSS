@@ -1,8 +1,12 @@
-﻿namespace StrDss.Model.OrganizationDtos
+﻿using System.Text.Json.Serialization;
+
+namespace StrDss.Model.OrganizationDtos
 {
     public class OrganizationTypeDto
     {
-        public string Value { get; set; } = "";
-        public string Label { get; set; } = "";
+        [JsonPropertyName("value")]
+        public string OrganizationType { get; set; } = "";
+        [JsonPropertyName("label")]
+        public string OrganizationTypeNm { get; set; } = "";
     }
 }

@@ -6,7 +6,7 @@
 
         public bool IsEnabled { get; set; }
 
-        public string AccessRequestStatusDsc { get; set; } = null!;
+        public string AccessRequestStatusCd { get; set; } = null!;
 
         public DateTime? AccessRequestDtm { get; set; }
 

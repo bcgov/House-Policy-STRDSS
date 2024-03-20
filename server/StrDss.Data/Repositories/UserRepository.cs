@@ -27,7 +27,7 @@ namespace StrDss.Data.Repositories
 
             if (status.IsNotEmpty() && status != "All")
             {
-                query = query.Where(x => x.AccessRequestStatusDsc == status);
+                query = query.Where(x => x.AccessRequestStatusCd == status);
             }
 
             query = query.Include(x => x.RepresentedByOrganization);
@@ -45,22 +45,22 @@ namespace StrDss.Data.Repositories
         public async Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByGuidAsync(Guid guid)
         {
             var query = await _dbSet.AsNoTracking()
-                .Include(x => x.DssUserRoleAssignments)
-                    .ThenInclude(x => x.UserRole)
-                        .ThenInclude(x => x.DssUserRolePrivileges)
-                            .ThenInclude(x => x.UserPrivilege)
+                .Include(x => x.UserRoleCds)
                 .FirstOrDefaultAsync(x => x.UserGuid == guid);
 
             if (query == null)
                 return (null, new List<string>());
 
-            var user = _mapper.Map<UserDto>(query);
-            var permssions = query.DssUserRoleAssignments
-                .Select(x => x.UserRole)
-                .SelectMany(x => x.DssUserRolePrivileges.Select(y => y.UserPrivilege))
-                .ToLookup(x => x.PrivilegeCd)
+            var user = _mapper.Map<UserDto>(query); 
+
+            var roles = user.UserRoleCds.Select(x => x.UserRoleCd).ToList();
+
+            var permssions = _dbContext.DssUserRoles
+                .Where(x => roles.Contains(x.UserRoleCd))
+                .SelectMany(x => x.UserPrivilegeCds)
+                .ToLookup(x => x.UserPrivilegeCd)
                 .Select(x => x.First())
-                .Select(x => x.PrivilegeCd)
+                .Select(x => x.UserPrivilegeCd)
                 .ToList();
 
             return (user, permssions);

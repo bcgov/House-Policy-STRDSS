@@ -24,9 +24,16 @@ namespace StrDss.Api.Controllers
 
         [HttpGet("types", Name = "GetOrganizationTypes")]
         [ApiAuthorize]
-        public async Task<ActionResult<OrganizationTypeDto>> GetOrganizationTypes()
+        public async Task<ActionResult<List<OrganizationTypeDto>>> GetOrganizationTypes()
         {
             return Ok(await _orgService.GetOrganizationTypesAsnc());
+        }
+
+        [HttpGet("", Name = "GetOrganizations")]
+        [ApiAuthorize]
+        public async Task<ActionResult<List<OrganizationDto>>> GetOrganizations(string? type)
+        {
+            return Ok(await _orgService.GetOrganizationsAsync(type));
         }
     }
 }

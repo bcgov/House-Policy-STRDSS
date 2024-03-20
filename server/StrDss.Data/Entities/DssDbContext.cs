@@ -11,11 +11,17 @@ public partial class DssDbContext : DbContext
     {
     }
 
+    public virtual DbSet<DssAccessRequestStatus> DssAccessRequestStatuses { get; set; }
+
     public virtual DbSet<DssEmailMessage> DssEmailMessages { get; set; }
+
+    public virtual DbSet<DssEmailMessageType> DssEmailMessageTypes { get; set; }
 
     public virtual DbSet<DssOrganization> DssOrganizations { get; set; }
 
     public virtual DbSet<DssOrganizationContactPerson> DssOrganizationContactPeople { get; set; }
+
+    public virtual DbSet<DssOrganizationType> DssOrganizationTypes { get; set; }
 
     public virtual DbSet<DssUserIdentity> DssUserIdentities { get; set; }
 
@@ -23,13 +29,23 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssUserRole> DssUserRoles { get; set; }
 
-    public virtual DbSet<DssUserRoleAssignment> DssUserRoleAssignments { get; set; }
-
-    public virtual DbSet<DssUserRolePrivilege> DssUserRolePrivileges { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("postgis");
+
+        modelBuilder.Entity<DssAccessRequestStatus>(entity =>
+        {
+            entity.HasKey(e => e.AccessRequestStatusCd).HasName("dss_access_request_status_pk");
+
+            entity.ToTable("dss_access_request_status", "dss");
+
+            entity.Property(e => e.AccessRequestStatusCd)
+                .HasMaxLength(25)
+                .HasColumnName("access_request_status_cd");
+            entity.Property(e => e.AccessRequestStatusNm)
+                .HasMaxLength(250)
+                .HasColumnName("access_request_status_nm");
+        });
 
         modelBuilder.Entity<DssEmailMessage>(entity =>
         {
@@ -82,6 +98,11 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.AffectedByUserIdentityId)
                 .HasConstraintName("dss_email_message_fk_affecting");
 
+            entity.HasOne(d => d.EmailMessageTypeNavigation).WithMany(p => p.DssEmailMessages)
+                .HasForeignKey(d => d.EmailMessageType)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_email_message_fk_communicating");
+
             entity.HasOne(d => d.InitiatingUserIdentity).WithMany(p => p.DssEmailMessageInitiatingUserIdentities)
                 .HasForeignKey(d => d.InitiatingUserIdentityId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -90,6 +111,20 @@ public partial class DssDbContext : DbContext
             entity.HasOne(d => d.InvolvedInOrganization).WithMany(p => p.DssEmailMessages)
                 .HasForeignKey(d => d.InvolvedInOrganizationId)
                 .HasConstraintName("dss_email_message_fk_involving");
+        });
+
+        modelBuilder.Entity<DssEmailMessageType>(entity =>
+        {
+            entity.HasKey(e => e.EmailMessageType).HasName("dss_email_message_type_pk");
+
+            entity.ToTable("dss_email_message_type", "dss");
+
+            entity.Property(e => e.EmailMessageType)
+                .HasMaxLength(50)
+                .HasColumnName("email_message_type");
+            entity.Property(e => e.EmailMessageTypeNm)
+                .HasMaxLength(250)
+                .HasColumnName("email_message_type_nm");
         });
 
         modelBuilder.Entity<DssOrganization>(entity =>
@@ -130,6 +165,11 @@ public partial class DssDbContext : DbContext
             entity.HasOne(d => d.ManagingOrganization).WithMany(p => p.InverseManagingOrganization)
                 .HasForeignKey(d => d.ManagingOrganizationId)
                 .HasConstraintName("dss_organization_fk_managed_by");
+
+            entity.HasOne(d => d.OrganizationTypeNavigation).WithMany(p => p.DssOrganizations)
+                .HasForeignKey(d => d.OrganizationType)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_organization_fk_treated_as");
         });
 
         modelBuilder.Entity<DssOrganizationContactPerson>(entity =>
@@ -177,6 +217,20 @@ public partial class DssDbContext : DbContext
                 .HasConstraintName("dss_organization_contact_person_fk_contacted_for");
         });
 
+        modelBuilder.Entity<DssOrganizationType>(entity =>
+        {
+            entity.HasKey(e => e.OrganizationType).HasName("dss_organization_type_pk");
+
+            entity.ToTable("dss_organization_type", "dss");
+
+            entity.Property(e => e.OrganizationType)
+                .HasMaxLength(25)
+                .HasColumnName("organization_type");
+            entity.Property(e => e.OrganizationTypeNm)
+                .HasMaxLength(250)
+                .HasColumnName("organization_type_nm");
+        });
+
         modelBuilder.Entity<DssUserIdentity>(entity =>
         {
             entity.HasKey(e => e.UserIdentityId).HasName("dss_user_identity_pk");
@@ -194,10 +248,10 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(250)
                 .HasComment("The most recent user-provided reason for requesting application access")
                 .HasColumnName("access_request_justification_txt");
-            entity.Property(e => e.AccessRequestStatusDsc)
+            entity.Property(e => e.AccessRequestStatusCd)
                 .HasMaxLength(25)
                 .HasComment("The current status of the most recent access request made by the user (restricted to Requested, Approved, or Denied)")
-                .HasColumnName("access_request_status_dsc");
+                .HasColumnName("access_request_status_cd");
             entity.Property(e => e.BusinessNm)
                 .HasMaxLength(250)
                 .HasComment("A human-readable organization name that is associated with the user by the identity provider")
@@ -241,41 +295,87 @@ public partial class DssDbContext : DbContext
                 .HasComment("An immutable unique identifier assigned by the identity provider")
                 .HasColumnName("user_guid");
 
+            entity.HasOne(d => d.AccessRequestStatusCdNavigation).WithMany(p => p.DssUserIdentities)
+                .HasForeignKey(d => d.AccessRequestStatusCd)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_user_identity_fk_given");
+
             entity.HasOne(d => d.RepresentedByOrganization).WithMany(p => p.DssUserIdentities)
                 .HasForeignKey(d => d.RepresentedByOrganizationId)
                 .HasConstraintName("dss_user_identity_fk_representing");
+
+            entity.HasMany(d => d.UserRoleCds).WithMany(p => p.UserIdentities)
+                .UsingEntity<Dictionary<string, object>>(
+                    "DssUserRoleAssignment",
+                    r => r.HasOne<DssUserRole>().WithMany()
+                        .HasForeignKey("UserRoleCd")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("dss_user_role_assignment_fk_granted"),
+                    l => l.HasOne<DssUserIdentity>().WithMany()
+                        .HasForeignKey("UserIdentityId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("dss_user_role_assignment_fk_granted_to"),
+                    j =>
+                    {
+                        j.HasKey("UserIdentityId", "UserRoleCd").HasName("dss_user_role_assignment_pk");
+                        j.ToTable("dss_user_role_assignment", "dss", tb => tb.HasComment("The association of a grantee credential to a role for the purpose of conveying application privileges"));
+                        j.IndexerProperty<long>("UserIdentityId")
+                            .HasComment("Foreign key")
+                            .HasColumnName("user_identity_id");
+                        j.IndexerProperty<string>("UserRoleCd")
+                            .HasMaxLength(25)
+                            .HasComment("Foreign key")
+                            .HasColumnName("user_role_cd");
+                    });
         });
 
         modelBuilder.Entity<DssUserPrivilege>(entity =>
         {
-            entity.HasKey(e => e.UserPrivilegeId).HasName("dss_user_privilege_pk");
+            entity.HasKey(e => e.UserPrivilegeCd).HasName("dss_user_privilege_pk");
 
             entity.ToTable("dss_user_privilege", "dss", tb => tb.HasComment("A granular access right or privilege within the application that may be granted to a role"));
 
-            entity.Property(e => e.UserPrivilegeId)
-                .HasComment("Unique generated key")
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("user_privilege_id");
-            entity.Property(e => e.PrivilegeCd)
+            entity.Property(e => e.UserPrivilegeCd)
                 .HasMaxLength(25)
                 .HasComment("The immutable system code that identifies the privilege")
-                .HasColumnName("privilege_cd");
-            entity.Property(e => e.PrivilegeNm)
+                .HasColumnName("user_privilege_cd");
+            entity.Property(e => e.UserPrivilegeNm)
                 .HasMaxLength(250)
                 .HasComment("The human-readable name that is given for the role")
-                .HasColumnName("privilege_nm");
+                .HasColumnName("user_privilege_nm");
+
+            entity.HasMany(d => d.UserRoleCds).WithMany(p => p.UserPrivilegeCds)
+                .UsingEntity<Dictionary<string, object>>(
+                    "DssUserRolePrivilege",
+                    r => r.HasOne<DssUserRole>().WithMany()
+                        .HasForeignKey("UserRoleCd")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("dss_user_role_privilege_fk_conferred_by"),
+                    l => l.HasOne<DssUserPrivilege>().WithMany()
+                        .HasForeignKey("UserPrivilegeCd")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("dss_user_role_privilege_fk_conferring"),
+                    j =>
+                    {
+                        j.HasKey("UserPrivilegeCd", "UserRoleCd").HasName("dss_user_role_privilege_pk");
+                        j.ToTable("dss_user_role_privilege", "dss", tb => tb.HasComment("The association of a granular application privilege to a role"));
+                        j.IndexerProperty<string>("UserPrivilegeCd")
+                            .HasMaxLength(25)
+                            .HasComment("Foreign key")
+                            .HasColumnName("user_privilege_cd");
+                        j.IndexerProperty<string>("UserRoleCd")
+                            .HasMaxLength(25)
+                            .HasComment("Foreign key")
+                            .HasColumnName("user_role_cd");
+                    });
         });
 
         modelBuilder.Entity<DssUserRole>(entity =>
         {
-            entity.HasKey(e => e.UserRoleId).HasName("dss_user_role_pk");
+            entity.HasKey(e => e.UserRoleCd).HasName("dss_user_role_pk");
 
             entity.ToTable("dss_user_role", "dss", tb => tb.HasComment("A set of access rights and privileges within the application that may be granted to users"));
 
-            entity.Property(e => e.UserRoleId)
-                .HasComment("Unique generated key")
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("user_role_id");
             entity.Property(e => e.UserRoleCd)
                 .HasMaxLength(25)
                 .HasComment("The immutable system code that identifies the role")
@@ -284,62 +384,6 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(250)
                 .HasComment("The human-readable name that is given for the role")
                 .HasColumnName("user_role_nm");
-        });
-
-        modelBuilder.Entity<DssUserRoleAssignment>(entity =>
-        {
-            entity.HasKey(e => e.UserRoleAssignmentId).HasName("dss_user_role_assignment_pk");
-
-            entity.ToTable("dss_user_role_assignment", "dss", tb => tb.HasComment("The association of a grantee credential to a role for the purpose of conveying application privileges"));
-
-            entity.Property(e => e.UserRoleAssignmentId)
-                .HasComment("Unique generated key")
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("user_role_assignment_id");
-            entity.Property(e => e.UserIdentityId)
-                .HasComment("Foreign key")
-                .HasColumnName("user_identity_id");
-            entity.Property(e => e.UserRoleId)
-                .HasComment("Foreign key")
-                .HasColumnName("user_role_id");
-
-            entity.HasOne(d => d.UserIdentity).WithMany(p => p.DssUserRoleAssignments)
-                .HasForeignKey(d => d.UserIdentityId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("dss_user_role_assignment_fk_granted_to");
-
-            entity.HasOne(d => d.UserRole).WithMany(p => p.DssUserRoleAssignments)
-                .HasForeignKey(d => d.UserRoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("dss_user_role_assignment_fk_granted");
-        });
-
-        modelBuilder.Entity<DssUserRolePrivilege>(entity =>
-        {
-            entity.HasKey(e => e.UserRolePrivilegeId).HasName("dss_user_role_privilege_pk");
-
-            entity.ToTable("dss_user_role_privilege", "dss", tb => tb.HasComment("The association of a granular application privilege to a role"));
-
-            entity.Property(e => e.UserRolePrivilegeId)
-                .HasComment("Unique generated key")
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("user_role_privilege_id");
-            entity.Property(e => e.UserPrivilegeId)
-                .HasComment("Foreign key")
-                .HasColumnName("user_privilege_id");
-            entity.Property(e => e.UserRoleId)
-                .HasComment("Foreign key")
-                .HasColumnName("user_role_id");
-
-            entity.HasOne(d => d.UserPrivilege).WithMany(p => p.DssUserRolePrivileges)
-                .HasForeignKey(d => d.UserPrivilegeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("dss_user_role_privilege_fk_conferring");
-
-            entity.HasOne(d => d.UserRole).WithMany(p => p.DssUserRolePrivileges)
-                .HasForeignKey(d => d.UserRoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("dss_user_role_privilege_fk_conferred_by");
         });
 
         OnModelCreatingPartial(modelBuilder);

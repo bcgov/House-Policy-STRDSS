@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
-using StrDss.Model.LocalGovernmentDtos;
-using StrDss.Model.PlatformDtos;
+using StrDss.Model.OrganizationDtos;
 using StrDss.Model.WarningReasonDtos;
 using System.Text.RegularExpressions;
 
@@ -23,20 +23,23 @@ namespace StrDss.Service
     {
         private IConfiguration _config;
         private IEmailService _emailService;
+        private IOrganizationService _orgService;
         private ILogger<DelistingService> _logger;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper,
-            IConfiguration config, IEmailService emailService, ILogger<DelistingService> logger)
+            IConfiguration config, IEmailService emailService, IOrganizationService orgService, ILogger<DelistingService> logger)
             : base(currentUser, validator, unitOfWork, mapper)
         {
             _config = config;
             _emailService = emailService;
+            _orgService = orgService;
             _logger = logger;
         }
 
         public async Task<Dictionary<string, List<string>>> CreateDelistingWarningAsync(DelistingWarningCreateDto dto)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
+
             var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
 
             var errors = await ValidateDelistingWarningAsync(dto, platform, reason);
@@ -50,19 +53,29 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidateDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason)
+        private async Task<Dictionary<string, List<string>>> ValidateDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform, string? reason)
         {
             await Task.CompletedTask;
 
             var errors = new Dictionary<string, List<string>>();
             RegexInfo regex;
 
-            //Todo: Validate Platform ID
             if (platform == null)
             {
                 errors.AddItem("platformId", $"Platform ID ({dto.PlatformId}) does not exist.");
             }
+            else
+            {
+                if (platform.OrganizationType != OrganizationTypes.Platform)
+                {
+                    errors.AddItem("platformId", $"Organization ({dto.PlatformId}) is not a platform");
+                }
 
+                if (platform.ContactPeople == null || !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty()))
+                {
+                    errors.AddItem("platformId", $"Platform ({dto.PlatformId}) does not have the primary contact info");
+                }
+            }
 
             if (dto.ListingUrl.IsEmpty())
             {
@@ -135,9 +148,11 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform)
+        private async Task SendDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform)
         {
-            dto.ToList.Add(platform?.Email ?? "");
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+
+            dto.ToList.Add(contact.EmailAddressDsc);
             if (dto.HostEmail.IsNotEmpty())
             {
                 dto.ToList.Add(dto.HostEmail);
@@ -168,7 +183,7 @@ namespace StrDss.Service
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
 
             var errors = await ValidateDelistingWarningAsync(dto, platform, reason);
@@ -177,7 +192,9 @@ namespace StrDss.Service
                 return (errors, new EmailPreview());
             }
 
-            dto.ToList.Add(platform?.Email ?? "");
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+            dto.ToList.Add(contact.EmailAddressDsc);
+
             if (dto.HostEmail.IsNotEmpty())
             {
                 dto.ToList.Add(dto.HostEmail);
@@ -188,7 +205,6 @@ namespace StrDss.Service
 
         private string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
             var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
             var nl = Environment.NewLine;
 
@@ -207,8 +223,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> CreateDelistingRequestAsync(DelistingRequestCreateDto dto)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
-            var lg = LocalGovernmentDto.localGovernments.FirstOrDefault(x => x.LocalGovernmentId == dto.LgId);
+            var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
+            var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
 
             var errors = await ValidateDelistingRequestAsync(dto, platform, lg);
             if (errors.Count > 0)
@@ -221,25 +237,41 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidateDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform, LocalGovernmentDto? lg)
+        private async Task<Dictionary<string, List<string>>> ValidateDelistingRequestAsync(DelistingRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
         {
             await Task.CompletedTask;
 
             var errors = new Dictionary<string, List<string>>();
             RegexInfo regex;
 
-            //Todo: Validate Platform ID
             if (platform == null)
             {
                 errors.AddItem("platformId", $"Platform ID ({dto.PlatformId}) does not exist.");
+            }
+            else
+            {
+                if (platform.OrganizationType != OrganizationTypes.Platform)
+                {
+                    errors.AddItem("platformId", $"Organization ({dto.PlatformId}) is not a platform");
+                }
+
+                if (platform.ContactPeople == null || !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty()))
+                {
+                    errors.AddItem("platformId", $"Platform ({dto.PlatformId}) does not have the primary contact info");
+                }
             }
 
             if (lg == null)
             {
                 errors.AddItem("lgId", $"Local Government ID ({dto.LgId}) does not exist.");
             }
-
-            //Todo: Validate LG ID
+            else
+            {
+                if (lg.OrganizationType != OrganizationTypes.LG)
+                {
+                    errors.AddItem("platformId", $"Organization ({dto.PlatformId}) is not a local government");
+                }
+            }
 
             if (dto.ListingUrl.IsEmpty())
             {
@@ -267,9 +299,10 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform)
+        private async Task SendDelistingRequestAsync(DelistingRequestCreateDto dto, OrganizationDto? platform)
         {
-            dto.ToList.Add(platform?.Email ?? "");
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+            dto.ToList.Add(contact.EmailAddressDsc);
 
             if (dto.SendCopy)
             {
@@ -296,8 +329,8 @@ namespace StrDss.Service
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingRequestPreviewAsync(DelistingRequestCreateDto dto)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
-            var lg = LocalGovernmentDto.localGovernments.FirstOrDefault(x => x.LocalGovernmentId == dto.LgId);
+            var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
+            var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
 
             var errors = await ValidateDelistingRequestAsync(dto, platform, lg);
             if (errors.Count > 0)
@@ -305,7 +338,8 @@ namespace StrDss.Service
                 return (errors, new EmailPreview());
             }
 
-            dto.ToList.Add(platform?.Email ?? "");
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+            dto.ToList.Add(contact.EmailAddressDsc);
 
             return (errors, new EmailPreview { Content = FormatDelistingRequestEmailContent(dto, false).HtmlToPlainText() });
 
@@ -313,7 +347,6 @@ namespace StrDss.Service
 
         private string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
             var nl = Environment.NewLine;
 
             return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}<br/>cc: {string.Join(";", dto.CcList)}")

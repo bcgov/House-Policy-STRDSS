@@ -35,6 +35,7 @@ namespace StrDss.Api.Authentication
                 _currentUser.AccessRequestStatus = user.AccessRequestStatusCd;
                 _currentUser.Permissions = permissions;
                 _currentUser.AccessRequestRequired = _currentUser.AccessRequestStatus == AccessRequestStatuses.Denied;
+                _currentUser.OrganizationType = user.RepresentedByOrganization?.OrganizationType ?? "";
 
                 if (user.IsEnabled)
                 {

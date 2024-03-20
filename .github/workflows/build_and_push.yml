@@ -50,7 +50,7 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_HOST_URL: https://sonarcloud.io
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
   build-frontend:
     runs-on: ubuntu-22.04
@@ -87,7 +87,7 @@ jobs:
         run: |
           cd ./frontend
           npm install karma-chrome-launcher karma-firefox-launcher --save-dev
-          ng config karma --merge=true
+          ng config projects.frontend.architect.test.options.karmaConfig=true
           cat karma.conf.js
       
       - name: Run frontend tests
@@ -108,7 +108,7 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_HOST_URL: https://sonarcloud.io
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
   # Docker-build-backend:
   #   needs: [build-backend]

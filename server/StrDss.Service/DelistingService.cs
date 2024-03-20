@@ -157,7 +157,7 @@ namespace StrDss.Service
             var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
             var nl = Environment.NewLine;
 
-            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)} {dto.HostEmail}<br/>cc: {string.Join(";", dto.CcList)}<br/><br/>")
+            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}<br/>cc: {string.Join(";", dto.CcList)}<br/><br/>")
                  + $@"Dear Short-term Rental Host,<br/>"
                  + $@"<br/>Short-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>Short-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>The short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason:"
                  + $@"<b> {reason ?? ""}</b>"

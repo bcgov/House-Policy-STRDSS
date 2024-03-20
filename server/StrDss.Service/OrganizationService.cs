@@ -9,6 +9,7 @@ namespace StrDss.Service
     public interface IOrganizationService
     {
         Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc();
+        Task<List<OrganizationDto>> GetOrganizationsAsync(string? type);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -24,6 +25,11 @@ namespace StrDss.Service
         public async Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc()
         {
             return await _orgRepo.GetOrganizationTypesAsnc();
+        }
+
+        public async Task<List<OrganizationDto>> GetOrganizationsAsync(string? type)
+        {
+            return await _orgRepo.GetOrganizationsAsync(type);
         }
     }
 }

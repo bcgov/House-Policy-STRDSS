@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
-using StrDss.Model.PlatformDtos;
 using StrDss.Model.WarningReasonDtos;
 using StrDss.Service;
 using StrDss.Service.HttpClients;
@@ -35,7 +34,7 @@ namespace StrDss.Api.Controllers
         public async Task<ActionResult<DropdownDto>> GetWarningReasonDrowdown()
         {
             await Task.CompletedTask;
-            return Ok(WarningReasonDto.WarningReasons.Select(x => new DropdownDto { Id = x.WarningReasonId, Description = x.Reason }));
+            return Ok(WarningReasonDto.WarningReasons.Select(x => new DropdownDto { Id = x.WarningReasonId.ToString(), Description = x.Reason }));
         }
 
         [HttpPost("warnings", Name = "CreateDelistingWarning")]
@@ -55,9 +54,6 @@ namespace StrDss.Api.Controllers
         [ApiAuthorize]
         public async Task<ActionResult<EmailPreview>> GetDelistingWarningPreview(DelistingWarningCreateDto dto)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
-            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
-
             var (errors, preview) = await _delistingService.GetDelistingWarningPreviewAsync(dto);
             if (errors.Count > 0)
             {

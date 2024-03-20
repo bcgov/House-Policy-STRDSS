@@ -35,5 +35,12 @@ namespace StrDss.Api.Controllers
         {
             return Ok(await _orgService.GetOrganizationsAsync(type));
         }
+
+        [HttpGet("dropdown", Name = "GetOrganizationsDropdown")]
+        [ApiAuthorize]
+        public async Task<ActionResult<List<DropdownDto>>> GetOrganizationsDropdown(string? type)
+        {
+            return Ok(await _orgService.GetOrganizationsDropdownAsync(type));
+        }
     }
 }

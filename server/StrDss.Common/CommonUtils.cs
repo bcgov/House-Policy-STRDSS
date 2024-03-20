@@ -1,4 +1,5 @@
 ﻿using NetTopologySuite.Geometries;
+using System.Reflection;
 
 namespace StrDss.Common
 {
@@ -29,6 +30,22 @@ namespace StrDss.Common
             {
                 return firstName;
             }
+        }
+
+        public static T CloneObject<T>(T obj)
+        {
+            T newObj = Activator.CreateInstance<T>();
+            PropertyInfo[] properties = typeof(T).GetProperties();
+
+            foreach (PropertyInfo property in properties)
+            {
+                if (property.CanWrite)
+                {
+                    property.SetValue(newObj, property.GetValue(obj));
+                }
+            }
+
+            return newObj;
         }
     }
 }

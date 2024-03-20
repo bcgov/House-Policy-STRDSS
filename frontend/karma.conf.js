@@ -14,6 +14,7 @@ module.exports = function (config) {
         customLaunchers: {
                 ChromeHeadless: {
                     base: 'Chrome',
+                    binary: '/usr/bin/google-chrome',
                     flags: ['--headless', '--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage']
                 }
         }

@@ -65,6 +65,8 @@ public partial class DssEmailMessage
 
     public virtual DssUserIdentity? AffectedByUserIdentity { get; set; }
 
+    public virtual DssEmailMessageType EmailMessageTypeNavigation { get; set; } = null!;
+
     public virtual DssUserIdentity InitiatingUserIdentity { get; set; } = null!;
 
     public virtual DssOrganization? InvolvedInOrganization { get; set; }

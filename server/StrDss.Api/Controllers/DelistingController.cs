@@ -10,8 +10,6 @@ using StrDss.Model.PlatformDtos;
 using StrDss.Model.WarningReasonDtos;
 using StrDss.Service;
 using StrDss.Service.HttpClients;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace StrDss.Api.Controllers
 {
@@ -46,20 +44,10 @@ namespace StrDss.Api.Controllers
         [ApiAuthorize]
         public async Task<ActionResult> CreateDelistingWarning(DelistingWarningCreateDto dto)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
-            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
-
-            var errors = await _delistingService.ValidateDelistingWarning(dto, platform, reason);
+            var errors = await _delistingService.CreateDelistingWarningAsync(dto);
             if (errors.Count > 0)
             {
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
-            }
-
-            var error = await _delistingService.SendDelistingWarningAsync(dto, platform);
-
-            if (!error.IsEmpty())
-            {
-                return Problem($"There were some errors in sending email.");
             }
 
             return NoContent();
@@ -72,39 +60,23 @@ namespace StrDss.Api.Controllers
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
             var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
 
-            var errors = await _delistingService.ValidateDelistingWarning(dto, platform, reason);
+            var (errors, preview) = await _delistingService.GetDelistingWarningPreviewAsync(dto);
             if (errors.Count > 0)
             {
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
             }
 
-            dto.ToList.Add(platform?.Email ?? "");
-            if (dto.HostEmail.IsNotEmpty())
-            {
-                dto.ToList.Add(dto.HostEmail);
-            }
-
-            return new EmailPreview { Content = _delistingService.FormatDelistingWarningEmailContent(dto, false).HtmlToPlainText() };
+            return preview;
         }
 
         [HttpPost("requests", Name = "CreateDelistingRequest")]
         [ApiAuthorize]
         public async Task<ActionResult> CreateDelistingRequest(DelistingRequestCreateDto dto)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
-            var lg = LocalGovernmentDto.localGovernments.FirstOrDefault(x => x.LocalGovernmentId == dto.LgId);
-
-            var errors = await _delistingService.ValidateDelistingRequest(dto, platform, lg);
+            var errors = await _delistingService.CreateDelistingRequestAsync(dto);
             if (errors.Count > 0)
             {
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
-            }
-
-            var error = await _delistingService.SendDelistingRequestAsync(dto, platform);
-
-            if (!error.IsEmpty())
-            {
-                return Problem($"There were some errors in sending email.");
             }
 
             return NoContent();
@@ -114,18 +86,13 @@ namespace StrDss.Api.Controllers
         [ApiAuthorize]
         public async Task<ActionResult<EmailPreview>> GetDelistingRequestPreview(DelistingRequestCreateDto dto)
         {
-            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
-            var lg = LocalGovernmentDto.localGovernments.FirstOrDefault(x => x.LocalGovernmentId == dto.LgId);
-
-            var errors = await _delistingService.ValidateDelistingRequest(dto, platform, lg);
+            var (errors, preview) = await _delistingService.GetDelistingRequestPreviewAsync(dto);
             if (errors.Count > 0)
             {
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
             }
 
-            dto.ToList.Add(platform?.Email ?? "");
-
-            return new EmailPreview { Content = _delistingService.FormatDelistingRequestEmailContent(dto, false).HtmlToPlainText() };
+            return preview;
         }
     }
 }

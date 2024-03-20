@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrDss.Common;
@@ -14,12 +15,10 @@ namespace StrDss.Service
 {
     public interface IDelistingService
     {
-        Task<Dictionary<string, List<string>>> ValidateDelistingWarning(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason);
-        Task<string> SendDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform);
-        string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly);
-        Task<Dictionary<string, List<string>>> ValidateDelistingRequest(DelistingRequestCreateDto dto, PlatformDto? platform, LocalGovernmentDto? lg);
-        Task<string> SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform);
-        string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly);
+        Task<Dictionary<string, List<string>>> CreateDelistingWarningAsync(DelistingWarningCreateDto dto);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto);
+        Task<Dictionary<string, List<string>>> CreateDelistingRequestAsync(DelistingRequestCreateDto dto);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingRequestPreviewAsync(DelistingRequestCreateDto dto);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -35,7 +34,24 @@ namespace StrDss.Service
             _emailService = emailService;
             _logger = logger;
         }
-        public async Task<Dictionary<string, List<string>>> ValidateDelistingWarning(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason)
+
+        public async Task<Dictionary<string, List<string>>> CreateDelistingWarningAsync(DelistingWarningCreateDto dto)
+        {
+            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
+
+            var errors = await ValidateDelistingWarningAsync(dto, platform, reason);
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            await SendDelistingWarningAsync(dto, platform);
+
+            return errors;
+        }
+
+        private async Task<Dictionary<string, List<string>>> ValidateDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform, string? reason)
         {
             await Task.CompletedTask;
 
@@ -120,7 +136,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        public async Task<string> SendDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform)
+        private async Task SendDelistingWarningAsync(DelistingWarningCreateDto dto, PlatformDto? platform)
         {
             dto.ToList.Add(platform?.Email ?? "");
             if (dto.HostEmail.IsNotEmpty())
@@ -148,10 +164,30 @@ namespace StrDss.Service
                 Info = dto.ListingUrl
             };
 
-            return await _emailService.SendEmailAsync(emailContent);
+            await _emailService.SendEmailAsync(emailContent);
         }
 
-        public string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly)
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto)
+        {
+            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
+
+            var errors = await ValidateDelistingWarningAsync(dto, platform, reason);
+            if (errors.Count > 0)
+            {
+                return (errors, new EmailPreview());
+            }
+
+            dto.ToList.Add(platform?.Email ?? "");
+            if (dto.HostEmail.IsNotEmpty())
+            {
+                dto.ToList.Add(dto.HostEmail);
+            }
+
+            return (errors, new EmailPreview { Content = FormatDelistingWarningEmailContent(dto, false).HtmlToPlainText() });
+        }
+
+        private string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly)
         {
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
             var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
@@ -170,34 +206,23 @@ namespace StrDss.Service
                  + (dto.Comment.IsEmpty() ? "" : $@"<br/><br/>{dto.Comment}");
         }
 
-        public async Task<string> SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform)
+        public async Task<Dictionary<string, List<string>>> CreateDelistingRequestAsync(DelistingRequestCreateDto dto)
         {
-            dto.ToList.Add(platform?.Email ?? "");
+            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var lg = LocalGovernmentDto.localGovernments.FirstOrDefault(x => x.LocalGovernmentId == dto.LgId);
 
-            if (dto.SendCopy)
+            var errors = await ValidateDelistingRequestAsync(dto, platform, lg);
+            if (errors.Count > 0)
             {
-                dto.CcList.Add(_currentUser.EmailAddress);
+                return errors;
             }
 
-            var emailContent = new EmailContent
-            {
-                Bcc = Array.Empty<string>(),
-                BodyType = "html",
-                Body = FormatDelistingRequestEmailContent(dto, true),
-                Cc = dto.CcList.ToArray(),
-                DelayTS = 0,
-                Encoding = "utf-8",
-                From = "no_reply@gov.bc.ca",
-                Priority = "normal",
-                Subject = "Takedown Request",
-                To = dto.ToList.ToArray(),
-                Info = dto.ListingUrl
-            };
+            await SendDelistingRequestAsync(dto, platform);
 
-            return await _emailService.SendEmailAsync(emailContent);
+            return errors;
         }
 
-        public async Task<Dictionary<string, List<string>>> ValidateDelistingRequest(DelistingRequestCreateDto dto, PlatformDto? platform, LocalGovernmentDto? lg)
+        private async Task<Dictionary<string, List<string>>> ValidateDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform, LocalGovernmentDto? lg)
         {
             await Task.CompletedTask;
 
@@ -243,7 +268,51 @@ namespace StrDss.Service
             return errors;
         }
 
-        public string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly)
+        private async Task SendDelistingRequestAsync(DelistingRequestCreateDto dto, PlatformDto? platform)
+        {
+            dto.ToList.Add(platform?.Email ?? "");
+
+            if (dto.SendCopy)
+            {
+                dto.CcList.Add(_currentUser.EmailAddress);
+            }
+
+            var emailContent = new EmailContent
+            {
+                Bcc = Array.Empty<string>(),
+                BodyType = "html",
+                Body = FormatDelistingRequestEmailContent(dto, true),
+                Cc = dto.CcList.ToArray(),
+                DelayTS = 0,
+                Encoding = "utf-8",
+                From = "no_reply@gov.bc.ca",
+                Priority = "normal",
+                Subject = "Takedown Request",
+                To = dto.ToList.ToArray(),
+                Info = dto.ListingUrl
+            };
+
+            await _emailService.SendEmailAsync(emailContent);
+        }
+
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingRequestPreviewAsync(DelistingRequestCreateDto dto)
+        {
+            var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
+            var lg = LocalGovernmentDto.localGovernments.FirstOrDefault(x => x.LocalGovernmentId == dto.LgId);
+
+            var errors = await ValidateDelistingRequestAsync(dto, platform, lg);
+            if (errors.Count > 0)
+            {
+                return (errors, new EmailPreview());
+            }
+
+            dto.ToList.Add(platform?.Email ?? "");
+
+            return (errors, new EmailPreview { Content = FormatDelistingRequestEmailContent(dto, false).HtmlToPlainText() });
+
+        }
+
+        private string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly)
         {
             var platform = PlatformDto.Platforms.FirstOrDefault(x => x.PlatformId == dto.PlatformId);
             var nl = Environment.NewLine;
@@ -256,5 +325,6 @@ namespace StrDss.Service
                  + $@"<br/><br/>In accordance, with 17(2) of the Short-term Rental Accommodations Act, please cease providing platform services in respect of the above platform offer within 3 days."
                  + $@"<br/><br/>[Name]<br/>[Title]<br/>[Local government]<br/>[Contact Information]";
         }
+
     }
 }

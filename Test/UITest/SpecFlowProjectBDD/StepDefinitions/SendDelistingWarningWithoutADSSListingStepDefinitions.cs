@@ -1,18 +1,6 @@
-﻿using Models;
-using NUnit.Framework;
-using System;
-
-
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Models;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using UITest.PageObjects;
 using UITest.TestDriver;
-using UITest.TestEngine;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Policy;
-using System.Collections.Generic;
 using TestFrameWork.Models;
 using Configuration;
 
@@ -137,7 +125,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("entering the optional host email address")]
         public void WhenEnteringTheOptionalHostEmailAddress() 
         {
-            _DelistingWarningPage.AdditionalCCsTextBox.EnterText("foo@foo.com");
+            _DelistingWarningPage.HostEmailAddressTextBox.EnterText("host@foo.com");
         }
 
 

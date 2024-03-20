@@ -1,12 +1,9 @@
-using System.Diagnostics;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
 using Configuration;
 
 using Xunit.Abstractions;
-using OpenQA.Selenium.DevTools.V118.Page;
-using UITest.Models;
 
 namespace XUnitTests
 {
@@ -18,11 +15,13 @@ namespace XUnitTests
         private DelistingRequestPage _DelistingRequestPage;
         private DelistingWarningPage _DelistingWarningPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
+        private TakeDownRequestPage _TakeDownRequestPage;
         private PathFinderPage _PathFinderPage;
         private IDRLoginPage _IDRLoginPage;
         private string _TestUserName;
         private string _TestPassword;
         private IDriver _Driver;
+        private string _FeURL = "http://127.0.0.1:4200";
 
         public HousrSTRE2E(ITestOutputHelper output)
         {
@@ -32,6 +31,7 @@ namespace XUnitTests
             _DelistingRequestPage = new DelistingRequestPage(_Driver);
             _DelistingWarningPage = new DelistingWarningPage(_Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
+            _TakeDownRequestPage = new TakeDownRequestPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDRLoginPage = new IDRLoginPage(_Driver);
             AppSettings appSettings = new AppSettings();
@@ -46,7 +46,7 @@ namespace XUnitTests
             try
             {
                 _Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
-                _Driver.Url = "http://127.0.0.1:4200/delisting-request";
+                _Driver.Url = _FeURL+ "/delisting-request";
                 _Driver.Navigate();
 
                 _PathFinderPage.IDRButton.WaitFor();
@@ -62,10 +62,13 @@ namespace XUnitTests
                 _IDRLoginPage.ContinueButton.WaitFor();
                 _IDRLoginPage.ContinueButton.Click();
 
+
                 //Click to populate dropdown values
                 _DelistingRequestPage.PlatformReceipientDropdown.Click();
 
                 Assert.Contains("SELECT A PLATFORM", _DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper());
+
+                _DelistingRequestPage.ListingIDNumberTextBox.EnterText("1");
 
                 //Click to deselect
                 _DelistingRequestPage.PlatformReceipientDropdown.Click();
@@ -80,11 +83,20 @@ namespace XUnitTests
 
                 _DelistingRequestPage.ListingUrlTextBox.EnterText("http://listingUrl.com");
 
+                _DelistingRequestPage.RequestInitiatedByDropDown.Click();
+                _DelistingRequestPage.RequestInitiatedByDropDown.ExecuteJavaScript(@"document.querySelector(""#lgId_0"").click()");
+
                 _DelistingRequestPage.PlatformReceipientDropdown.Click();
                 _DelistingRequestPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
                 Assert.Contains("AIRBNB", _DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper());
 
                 _DelistingRequestPage.ReviewButton.Click();
+
+                _TakeDownRequestPage.SubmitButton.Click();
+
+                _DelistingRequestPage.ReturnHomeButton.Click();
+
+                
             }
             finally
             {
@@ -99,7 +111,7 @@ namespace XUnitTests
             try
             {
                 _Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
-                _Driver.Url = "http://127.0.0.1:4200/compliance-notice";
+                _Driver.Url = _FeURL + "/compliance-notice";
                 _Driver.Navigate();
 
                 _PathFinderPage.IDRButton.WaitFor();
@@ -115,11 +127,8 @@ namespace XUnitTests
                 _IDRLoginPage.ContinueButton.WaitFor();
                 _IDRLoginPage.ContinueButton.Click();
 
-
-                //_Driver.Url = "http://127.0.0.1:4200/delisting-request";
-                //_Driver.Navigate();
-
                 //Add Platform receipient
+                _DelistingWarningPage.PlatformReceipientDropdown.WaitFor();
                 _DelistingWarningPage.PlatformReceipientDropdown.Click();
                 _DelistingWarningPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
                 Assert.Contains("AIRBNB", _DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper());

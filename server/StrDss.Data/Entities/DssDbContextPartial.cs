@@ -53,11 +53,6 @@ namespace StrDss.Data.Entities
             {
                 result = base.SaveChanges();
             }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                _logger.LogInformation(ex.Message);
-                throw;
-            }
             catch (Exception e)
             {
                 throw;
@@ -66,9 +61,23 @@ namespace StrDss.Data.Entities
             return result;
         }
 
-        public void CheckConcurrency(EntityEntry entry)
+        /// <summary>
+        /// Checks for concurrency conflicts in the entity being updated.
+        /// This method is used as a workaround for the limitations of the database-first approach,
+        /// where the ConcurrencyCheck annotation is wiped out during scaffolding and must be manually added.
+        /// While this implementation has its limitations, it can handle most cases.
+        /// </summary>
+        /// <param name="entry">The EntityEntry representing the entity being updated.</param>
+        /// <exception cref="DbUpdateConcurrencyException">
+        /// Thrown when a concurrency conflict is detected during the update operation.
+        /// </exception>
+
+        private void CheckConcurrency(EntityEntry entry)
         {
+            // values from the database before the values of the DTO is applied
             var originalValues = entry.OriginalValues;
+
+            // values from the DTO. UpdDtm is not supposed be updated and remain as it was retrieved.
             var currentValues = entry.CurrentValues;
 
             var originalValue = (DateTime) (originalValues["UpdDtm"] ?? DateTime.MinValue);
@@ -76,9 +85,20 @@ namespace StrDss.Data.Entities
 
             if (originalValue != currentValue)
             {
-                var entityType = Model.FindEntityType(entry.Entity.GetType());
+                var entityName = Model.FindEntityType(entry.Entity.GetType())?.ShortName();
+                if (entityName != null && entityName.StartsWith("Dss") )
+                { 
+                    entityName = entityName.Substring(3);
+                }
+                else
+                {
+                    entityName = "?";
+                }
 
-                throw new DbUpdateConcurrencyException($"Update conflict detected when updating {entityType?.GetTableName()}!");
+                var message = $"Update conflict detected when updating {entityName}!";
+                _logger.LogInformation(message);
+
+                throw new DbUpdateConcurrencyException(message);
             }
         }
     }

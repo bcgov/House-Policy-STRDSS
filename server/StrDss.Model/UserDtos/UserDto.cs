@@ -33,6 +33,6 @@ namespace StrDss.Model.UserDtos
 
         public long? RepresentedByOrganizationId { get; set; }
 
-        public DateTime ConcurrencyToken { get; set; }
+        public DateTime UpdDtm { get; set; }
     }
 }

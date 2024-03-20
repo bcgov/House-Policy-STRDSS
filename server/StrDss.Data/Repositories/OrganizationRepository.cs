@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using StrDss.Data.Entities;
 using StrDss.Model;
-using StrDss.Model.LocalGovernmentDtos;
 using StrDss.Model.OrganizationDtos;
 
 namespace StrDss.Data.Repositories

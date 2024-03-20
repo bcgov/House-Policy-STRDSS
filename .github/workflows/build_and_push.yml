@@ -82,6 +82,9 @@ jobs:
         run: |
           cd ./frontend
           ng build --configuration=production
+
+      - name: Install Chrome
+        run: apt-get install Chrome
       
       - name: Run frontend tests
         run: |

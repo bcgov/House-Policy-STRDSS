@@ -83,8 +83,12 @@ jobs:
           cd ./frontend
           ng build --configuration=production
 
-      - name: Install Chrome
-        run: apt-get install Chrome
+      - name: Chrome launcher
+        run: |
+          cd ./frontend
+          npm install karma-chrome-launcher karma-firefox-launcher --save-dev
+          ng config karma --merge=true
+          cat karma.conf.js
       
       - name: Run frontend tests
         run: |

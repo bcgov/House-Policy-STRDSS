@@ -28,7 +28,7 @@ namespace StrDss.Test
             configMock.Setup(x => x.GetValue(typeof(string), "")).Returns("https://ches.example.com");
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, "reason");
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Empty(result);
@@ -45,10 +45,10 @@ namespace StrDss.Test
             DelistingService sut)
         {
             // Arrange
-            PlatformDto platform = null;
+            dto.PlatformId = 0;
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("platformId", result.Keys);
@@ -71,7 +71,7 @@ namespace StrDss.Test
             dto.ListingUrl = string.Empty;
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("listingUrl", result.Keys);
@@ -94,7 +94,7 @@ namespace StrDss.Test
             dto.ListingUrl = "invalidurl";
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("listingUrl", result.Keys);
@@ -118,7 +118,7 @@ namespace StrDss.Test
             dto.HostEmail = string.Empty;
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("hostEmail", result.Keys);
@@ -141,7 +141,7 @@ namespace StrDss.Test
             dto.HostEmail = "invalidemail";
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("hostEmail", result.Keys);
@@ -161,10 +161,10 @@ namespace StrDss.Test
             DelistingService sut)
         {
             // Arrange
-            reason = null;
+            dto.ReasonId = 0;
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("reasonId", result.Keys);
@@ -187,7 +187,7 @@ namespace StrDss.Test
             dto.CcList = new List<string> { "invalidemail" };
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("ccList", result.Keys);
@@ -210,7 +210,7 @@ namespace StrDss.Test
             dto.LgContactEmail = string.Empty;
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("lgContactEmail", result.Keys);
@@ -233,7 +233,7 @@ namespace StrDss.Test
             dto.LgContactEmail = "invalidemail";
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("lgContactEmail", result.Keys);
@@ -256,7 +256,7 @@ namespace StrDss.Test
             dto.LgContactPhone = "invalidphone";
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("lgContactPhone", result.Keys);
@@ -279,7 +279,7 @@ namespace StrDss.Test
             dto.StrBylawUrl = "invalidurl";
 
             // Act
-            var result = await sut.ValidateDelistingWarning(dto, platform, reason);
+            var result = await sut.CreateDelistingWarningAsync(dto);;
 
             // Assert
             Assert.Contains("strByLawUrl", result.Keys);
@@ -298,10 +298,10 @@ namespace StrDss.Test
             DelistingService sut)
         {
             // Arrange
-            PlatformDto platform = null;
+            dto.PlatformId = 0;
 
             // Act
-            var result = await sut.ValidateDelistingRequest(dto, platform, lg);
+            var result = await sut.CreateDelistingRequestAsync(dto);
 
             // Assert
             Assert.Contains("platformId", result.Keys);
@@ -320,10 +320,10 @@ namespace StrDss.Test
             DelistingService sut)
         {
             // Arrange
-            LocalGovernmentDto lg = null;
+            dto.LgId = 0;
 
             // Act
-            var result = await sut.ValidateDelistingRequest(dto, platform, lg);
+            var result = await sut.CreateDelistingRequestAsync(dto);
 
             // Assert
             Assert.Contains("lgId", result.Keys);
@@ -346,7 +346,7 @@ namespace StrDss.Test
             dto.ListingUrl = string.Empty;
 
             // Act
-            var result = await sut.ValidateDelistingRequest(dto, platform, lg);
+            var result = await sut.CreateDelistingRequestAsync(dto);
 
             // Assert
             Assert.Contains("listingUrl", result.Keys);
@@ -369,7 +369,7 @@ namespace StrDss.Test
             dto.ListingUrl = "invalidurl";
 
             // Act
-            var result = await sut.ValidateDelistingRequest(dto, platform, lg);
+            var result = await sut.CreateDelistingRequestAsync(dto);
 
             // Assert
             Assert.Contains("listingUrl", result.Keys);
@@ -392,7 +392,7 @@ namespace StrDss.Test
             dto.CcList = new List<string> { "invalidemail" };
 
             // Act
-            var result = await sut.ValidateDelistingRequest(dto, platform, lg);
+            var result = await sut.CreateDelistingRequestAsync(dto);
 
             // Assert
             Assert.Contains("ccList", result.Keys);
@@ -412,16 +412,11 @@ namespace StrDss.Test
             // Arrange
             currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
 
-            emailServiceMock
-                .Setup(m => m.SendEmailAsync(It.IsAny<EmailContent>()))
-                .ReturnsAsync("");
-
             // Act
-            var result = await sut.SendDelistingWarningAsync(dto, platform);
+            await sut.CreateDelistingWarningAsync(dto);
 
             // Assert
             emailServiceMock.Verify(m => m.SendEmailAsync(It.IsAny<EmailContent>()), Times.Once);
-            Assert.Equal("", result);
         }
 
         [Theory]
@@ -437,7 +432,7 @@ namespace StrDss.Test
             dto.HostEmail = "host@example.com";
 
             // Act
-            var result = await sut.SendDelistingWarningAsync(dto, platform);
+            await sut.CreateDelistingWarningAsync(dto);
 
             // Assert
             Assert.Contains(dto.HostEmail, dto.ToList);
@@ -456,7 +451,7 @@ namespace StrDss.Test
             dto.HostEmail = string.Empty;
 
             // Act
-            var result = await sut.SendDelistingWarningAsync(dto, platform);
+            await sut.CreateDelistingWarningAsync(dto);
 
             // Assert
             Assert.DoesNotContain(dto.HostEmail, dto.ToList);
@@ -477,7 +472,7 @@ namespace StrDss.Test
             currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
 
             // Act
-            var result = await sut.SendDelistingWarningAsync(dto, platform);
+            await sut.CreateDelistingWarningAsync(dto);
 
             // Assert
             Assert.Contains(currentUserEmail, dto.CcList);
@@ -498,7 +493,7 @@ namespace StrDss.Test
             currentUserMock.Setup(m => m.EmailAddress).Returns("user@example.com");
 
             // Act
-            var result = await sut.SendDelistingWarningAsync(dto, platform);
+            await sut.CreateDelistingWarningAsync(dto);
 
             // Assert
             Assert.DoesNotContain(currentUserEmail, dto.CcList);
@@ -516,16 +511,11 @@ namespace StrDss.Test
             // Arrange
             currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
 
-            emailServiceMock
-                .Setup(m => m.SendEmailAsync(It.IsAny<EmailContent>()))
-                .ReturnsAsync("");
-
             // Act
-            var result = await sut.SendDelistingRequestAsync(dto, platform);
+            await sut.CreateDelistingRequestAsync(dto);
 
             // Assert
             emailServiceMock.Verify(m => m.SendEmailAsync(It.IsAny<EmailContent>()), Times.Once);
-            Assert.Equal("", result);
         }
 
         [Theory]
@@ -543,7 +533,7 @@ namespace StrDss.Test
             currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
 
             // Act
-            var result = await sut.SendDelistingRequestAsync(dto, platform);
+            await sut.CreateDelistingRequestAsync(dto);
 
             // Assert
             Assert.Contains(currentUserEmail, dto.CcList);
@@ -564,7 +554,7 @@ namespace StrDss.Test
             currentUserMock.Setup(m => m.EmailAddress).Returns("user@example.com");
 
             // Act
-            var result = await sut.SendDelistingRequestAsync(dto, platform);
+            await sut.CreateDelistingRequestAsync(dto);
 
             // Assert
             Assert.DoesNotContain(currentUserEmail, dto.CcList);

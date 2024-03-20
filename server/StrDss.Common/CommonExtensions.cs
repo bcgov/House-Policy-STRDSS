@@ -204,5 +204,16 @@ namespace StrDss.Common
 
             return dotIndex > 0 ? input.Substring(0, dotIndex) : input;
         }
+
+        public static bool IsNumericType(this Type type)
+        {
+            if (type == typeof(int) || type == typeof(long) || type == typeof(float) ||
+                type == typeof(double) || type == typeof(decimal))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

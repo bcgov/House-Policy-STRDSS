@@ -10,6 +10,7 @@ namespace StrDss.Data.Repositories
     {
         Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc();
         Task<List<OrganizationDto>> GetOrganizationsAsync(string? type);
+        Task<OrganizationDto> GetOrganizationByIdAsync(long id);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -37,6 +38,15 @@ namespace StrDss.Data.Repositories
             query = query.Include(x => x.DssOrganizationContactPeople);
 
             return _mapper.Map<List<OrganizationDto>>(await query.ToListAsync());
+        }
+
+        public async Task<OrganizationDto> GetOrganizationByIdAsync(long id)
+        {
+            var org = await _dbSet.AsNoTracking()
+                .Include(x => x.DssOrganizationContactPeople)
+                .FirstOrDefaultAsync(x => x.OrganizationId == id);
+
+            return _mapper.Map<OrganizationDto>(org);
         }
     }
 }

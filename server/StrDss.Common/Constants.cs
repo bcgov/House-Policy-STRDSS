@@ -110,4 +110,11 @@
             return fullName.Contains("/") ? fullName.Substring(fullName.LastIndexOf("/") + 1) : fullName;
         }
     }
+
+    public static class OrganizationTypes
+    {
+        public const string BCGov = "BCGov";
+        public const string Platform = "Platform";
+        public const string LG = "LG";
+    }
 }

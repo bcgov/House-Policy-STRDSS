@@ -86,9 +86,7 @@ jobs:
       - name: Chrome launcher
         run: |
           cd ./frontend
-          npm install karma-chrome-launcher karma-firefox-launcher --save-dev
-          ng config projects.frontend.architect.test.options.karmaConfig=true
-          cat karma.conf.js
+          npm install karma-chrome-launcher --save-dev
       
       - name: Run frontend tests
         run: |

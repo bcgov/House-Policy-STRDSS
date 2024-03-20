@@ -16,6 +16,7 @@ using System.Reflection;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using StrDss.Api.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -180,5 +181,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseHangfireDashboard();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.Run();

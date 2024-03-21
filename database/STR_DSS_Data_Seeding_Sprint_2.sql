@@ -1,3 +1,5 @@
+SET search_path TO dss, public;
+
 MERGE INTO dss_access_request_status AS tgt
 USING ( SELECT * FROM (VALUES
 ('Requested','Requested'),
@@ -30,6 +32,21 @@ email_message_type_nm=src.email_message_type_nm
 WHEN NOT MATCHED
 THEN INSERT (email_message_type, email_message_type_nm)
 VALUES (src.email_message_type, src.email_message_type_nm);
+
+MERGE INTO dss_message_reason AS tgt
+USING ( SELECT * FROM (VALUES
+('Notice of Takedown','No Business Licence Number on Listing'),
+('Notice of Takedown','Invalid Business Licence Number'),
+('Notice of Takedown','Expired Business Licence'),
+('Notice of Takedown','Suspended Business Licence'),
+('Notice of Takedown','Revoked Business Licence'),
+('Notice of Takedown','Business Licence Denied'))
+AS s (email_message_type, message_reason_dsc)
+) AS src
+ON (tgt.email_message_type=src.email_message_type AND tgt.message_reason_dsc=src.message_reason_dsc)
+WHEN NOT MATCHED
+THEN INSERT (email_message_type, message_reason_dsc)
+VALUES (src.email_message_type, src.message_reason_dsc);
 
 MERGE INTO dss_organization_type AS tgt
 USING ( SELECT * FROM (VALUES

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using StrDss.Data;
 using StrDss.Data.Repositories;
@@ -18,9 +19,9 @@ namespace StrDss.Service
     {
         private IOrganizationRepository _orgRepo;
 
-        public OrganizationService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper,
+        public OrganizationService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo) 
-            : base(currentUser, validator, unitOfWork, mapper)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
             _orgRepo = orgRepo;
         }

@@ -56,44 +56,6 @@
 			"response": []
 		},
 		{
-			"name": "GetRequestAccessList",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://127.0.0.1:5174/api/users/accessrequests?status=&pageSize=10&pageNumber=1",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5174",
-					"path": [
-						"api",
-						"users",
-						"accessrequests"
-					],
-					"query": [
-						{
-							"key": "status",
-							"value": ""
-						},
-						{
-							"key": "pageSize",
-							"value": "10"
-						},
-						{
-							"key": "pageNumber",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "CreateDelistingWarning",
 			"request": {
 				"method": "POST",
@@ -222,73 +184,6 @@
 						"delisting",
 						"requests",
 						"preview"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Access Request",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://127.0.0.1:5174/api/users/accessrequests",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5174",
-					"path": [
-						"api",
-						"users",
-						"accessrequests"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Deny Access Request",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"userIdentityId\": 4,\r\n  \"updDtm\": \"2024-03-20T18:42:01.075809Z\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://127.0.0.1:5174/api/users/accessrequests/deny",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5174",
-					"path": [
-						"api",
-						"users",
-						"accessrequests",
-						"deny"
 					]
 				}
 			},
@@ -491,6 +386,145 @@
 							"key": "type",
 							"value": "BCGov"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetRequestAccessList",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/accessrequests?status=&pageSize=10&pageNumber=1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"accessrequests"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": ""
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Access Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organizationType\": \"BCGov\",\r\n  \"organizationName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/accessrequests",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"accessrequests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deny Access Request",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userIdentityId\": 4,\r\n  \"updDtm\": \"2024-03-21T15:02:28.966095Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/accessrequests/deny",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"accessrequests",
+						"deny"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approve Access Request",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userIdentityId\": 6,\r\n  \"representedByOrganizationId\": 4,\r\n  \"updDtm\": \"2024-03-21T16:04:17.210947Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/accessrequests/approve",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"accessrequests",
+						"approve"
 					]
 				}
 			},

@@ -57,7 +57,7 @@ namespace StrDss.Service
                     IsEnabled = false,
                     AccessRequestStatusCd = AccessRequestStatuses.Requested,
                     AccessRequestDtm = DateTime.UtcNow,
-                    AccessRequestJustificationTxt = $"{dto.OrganiztionType}, {dto.OrganiztionName}",
+                    AccessRequestJustificationTxt = $"{dto.OrganizationType}, {dto.OrganizationName}",
                     GivenNm = _currentUser.FirstName,
                     FamilyNm = _currentUser.LastName,
                     EmailAddressDsc = _currentUser.EmailAddress,
@@ -73,7 +73,7 @@ namespace StrDss.Service
                 userDto.IsEnabled = false;
                 userDto.AccessRequestStatusCd = AccessRequestStatuses.Requested;
                 userDto.AccessRequestDtm = DateTime.UtcNow;
-                userDto.AccessRequestJustificationTxt = $"{dto.OrganiztionType}, {dto.OrganiztionName}";
+                userDto.AccessRequestJustificationTxt = $"{dto.OrganizationType}, {dto.OrganizationName}";
                 userDto.GivenNm = _currentUser.FirstName;
                 userDto.FamilyNm = _currentUser.LastName;
                 userDto.EmailAddressDsc = _currentUser.EmailAddress;
@@ -116,14 +116,14 @@ namespace StrDss.Service
 
             var orgTypes = await _orgRepo.GetOrganizationTypesAsnc();
 
-            if (!orgTypes.Any(x => x.OrganizationType == dto.OrganiztionType))
+            if (!orgTypes.Any(x => x.OrganizationType == dto.OrganizationType))
             {
-                errors.AddItem("organiztionType", "Organization type is not valid");
+                errors.AddItem("organizationType", "Organization type is not valid");
             }
 
-            if (dto.OrganiztionName.IsEmpty())
+            if (dto.OrganizationName.IsEmpty())
             {
-                errors.AddItem("organiztionName", "Organization name is mandatory");
+                errors.AddItem("organizationName", "Organization name is mandatory");
             }
 
             return (errors, userDto);

@@ -9,7 +9,7 @@ namespace StrDss.Model
 
         public IEnumerable<string> Bcc { get; set; }
 
-        public string BodyType { get; set; } = "";
+        public string BodyType { get; set; } = "html";
 
         public string Body { get; set; } = "";
 

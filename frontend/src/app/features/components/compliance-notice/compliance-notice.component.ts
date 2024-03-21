@@ -166,7 +166,7 @@ export class ComplianceNoticeComponent implements OnInit {
 
   private initForm(): void {
     this.myForm = this.fb.group({
-      platformId: ['', Validators.required],
+      platformId: [0, Validators.required],
       listingId: [null],
       listingUrl: ['', [Validators.required, validateUrl()]],
       hostEmail: ['', [Validators.required, Validators.email]],

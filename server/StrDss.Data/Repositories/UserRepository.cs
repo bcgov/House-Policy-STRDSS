@@ -12,8 +12,10 @@ namespace StrDss.Data.Repositories
         Task<PagedDto<AccessRequestDto>> GetAccessRequestListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction);
         Task CreateUserAsync(UserCreateDto dto);
         Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByGuidAsync(Guid guid);
+        Task<UserDto?> GetUserById(long id);
         Task<UserDto?> GetUserByGuid(Guid guid);
         Task UpdateUserAsync(UserDto dto);
+        Task DenyAccessRequest(AccessRequestDenyDto dto);
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
     {
@@ -67,10 +69,15 @@ namespace StrDss.Data.Repositories
             return (user, permssions);
         }
 
+        public async Task<UserDto?> GetUserById(long id)
+        {
+            var entity = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.UserIdentityId == id);
+            return _mapper.Map<UserDto>(entity);
+        }
+
         public async Task<UserDto?> GetUserByGuid(Guid guid)
         {
             var entity = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.UserGuid == guid);
-
             return _mapper.Map<UserDto>(entity);
         }
 
@@ -80,6 +87,11 @@ namespace StrDss.Data.Repositories
             _mapper.Map(dto, entity);
         }
 
-        //public async Task ApproveAccessRequest
+        public async Task DenyAccessRequest(AccessRequestDenyDto dto)
+        {
+            var entity = await _dbSet.FirstAsync(x => x.UserIdentityId == dto.UserIdentityId);
+            _mapper.Map(dto, entity); //apply the timestamp (concurrency token)
+            entity.AccessRequestStatusCd = AccessRequestStatuses.Denied;
+        }
     }
 }

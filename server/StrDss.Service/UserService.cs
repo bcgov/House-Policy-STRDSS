@@ -12,6 +12,7 @@ namespace StrDss.Service
         Task<PagedDto<AccessRequestDto>> GetAccessRequestListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction);
         Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid);
         Task<Dictionary<string, List<string>>> CreateAccessRequestAsync(AccessRequestCreateDto dto);
+        Task<Dictionary<string, List<string>>> DenyAccessRequest(AccessRequestDenyDto dto);
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -125,6 +126,33 @@ namespace StrDss.Service
             }
 
             return (errors, userDto);
+        }
+
+        public async Task<Dictionary<string, List<string>>> DenyAccessRequest(AccessRequestDenyDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var user = await _userRepo.GetUserById(dto.UserIdentityId);
+
+            if (user == null)
+            {
+                errors.AddItem("entity", $"Access request ({dto.UserIdentityId}) doesn't exist");
+                return errors;
+            }
+            else
+            {
+                if (user.AccessRequestStatusCd  != AccessRequestStatuses.Requested) 
+                {
+                    errors.AddItem("entity", $"Unable to deny access request. The request is currently in status '{user.AccessRequestStatusCd}', which does not allow denial.");
+                    return errors;
+                }
+            }
+
+            await _userRepo.DenyAccessRequest(dto);
+
+            _unitOfWork.Commit();
+
+            return errors;
         }
     }
 }

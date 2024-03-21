@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
 import { RequestAccessService } from '../../../common/services/request-access.service';
 import { AccessRequest } from '../../../common/models/access-request';
+import { UserDataService } from '../../../common/services/user-data.service';
 
 @Component({
   selector: 'app-access-request',
@@ -31,8 +32,11 @@ export class AccessRequestComponent implements OnInit {
 
   messages = new Array<Message>();
   roles = new Array<DropdownOption>();
+  currentUser: any;
 
   hideForm = false;
+  showRequestedSuccessfullyMessage = false;
+  showRequestedFailedMessage = false;
 
   public get organizationTypeControl(): AbstractControl {
     return this.myForm.controls['organizationType'];
@@ -44,39 +48,68 @@ export class AccessRequestComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private requestAccessService: RequestAccessService,
+    private userDataService: UserDataService,
   ) { }
 
   ngOnInit(): void {
+    this.initData();
     this.initForm();
   }
 
   onRequest(): void {
-    const model: AccessRequest = this.myForm.getRawValue()
+    this.messages = [];
+    this.showRequestedFailedMessage = false;
+    this.showRequestedSuccessfullyMessage = false;
+    const model: AccessRequest = this.myForm.getRawValue();
     this.requestAccessService.createAccessRequest(model).subscribe({
-      next: res => {
-        console.log(res);
+      next: _ => {
         this.hideForm = true;
+        this.showRequestedSuccessfullyMessage = true;
+        this.messages = [];
       },
       error: (error: {
-        errors: {
-          organizationType: string[],
-          organizationName: string[],
+        error: {
+          errors: {
+            organizationType: string[],
+            organizationName: string[],
+
+            entity: string[]
+          }
         }
       }) => {
-
-      }
+        this.showRequestedFailedMessage = true;
+        if (error.error.errors.entity) {
+          this.messages = [{ severity: 'error', summary: 'Request cannot be sent!', detail: error.error.errors.entity[0] }];
+        }
+        if (error.error.errors.organizationType) {
+          this.messages.push({ severity: 'error', summary: 'Request failed!', detail: error.error.errors.organizationType[0] });
+        }
+        if (error.error.errors.organizationName) {
+          this.messages.push({ severity: 'error', summary: 'Request failed!', detail: error.error.errors.organizationName[0] });
+        }
+        if (!this.messages.length) {
+          this.messages.push({ severity: 'error', summary: 'Request failed!', detail: 'Unhandled error.' });
+        }
+      },
     })
   }
 
-  private initForm(): void {
+  private initData(): void {
     this.requestAccessService.getOrganizationTypes().subscribe({
       next: (types => {
         this.roles = types;
       }),
     });
+    this.userDataService.getCurrentUser().subscribe({
+      next: user => {
+        this.currentUser = user;
+      }
+    })
+  }
 
+  private initForm(): void {
     this.myForm = this.fb.group({
-      organizationType: [0, Validators.required],
+      organizationType: ['', Validators.required],
       organizationName: ['', Validators.required],
     });
   }

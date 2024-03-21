@@ -28,7 +28,7 @@ CREATE  TABLE dss_organization_contact_person (
 	given_nm             varchar(25)  NOT NULL  ,
 	family_nm            varchar(25)  NOT NULL  ,
 	phone_no             varchar(13)  NOT NULL  ,
-	email_address_dsc    varchar(250)  NOT NULL  ,
+	email_address_dsc    varchar(320)  NOT NULL  ,
 	contacted_through_organization_id bigint  NOT NULL  ,
 	upd_dtm              timestamptz  NOT NULL  ,
 	upd_user_guid        uuid    ,
@@ -90,10 +90,10 @@ CREATE  TABLE dss_email_message (
 	email_message_type   varchar(50)  NOT NULL  ,
 	message_delivery_dtm timestamptz  NOT NULL  ,
 	message_template_dsc varchar(4000)  NOT NULL  ,
-	message_reason_dsc   varchar(250)    ,
+	message_reason_id     bigint   ,
 	unreported_listing_url varchar(250)    ,
-	host_email_address_dsc varchar(250)    ,
-	cc_email_address_dsc varchar(250)    ,
+	host_email_address_dsc varchar(320)    ,
+	cc_email_address_dsc varchar(320)    ,
 	initiating_user_identity_id bigint  NOT NULL  ,
 	affected_by_user_identity_id bigint    ,
 	involved_in_organization_id bigint    ,
@@ -106,6 +106,13 @@ CREATE  TABLE dss_email_message_type (
 	CONSTRAINT dss_email_message_type_pk PRIMARY KEY ( email_message_type )
  );
 
+CREATE  TABLE dss_message_reason ( 
+	message_reason_id    bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
+	email_message_type    varchar(50)  NOT NULL  ,
+	message_reason_dsc   varchar(250)  NOT NULL  ,
+	CONSTRAINT dss_message_reason_pk PRIMARY KEY ( message_reason_id )
+ );
+
 ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_initiated_by FOREIGN KEY ( initiating_user_identity_id ) REFERENCES dss_user_identity( user_identity_id );
 
 ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_affecting FOREIGN KEY ( affected_by_user_identity_id ) REFERENCES dss_user_identity( user_identity_id );
@@ -113,6 +120,10 @@ ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_affecting FORE
 ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_involving FOREIGN KEY ( involved_in_organization_id ) REFERENCES dss_organization( organization_id );
 
 ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_communicating FOREIGN KEY ( email_message_type ) REFERENCES dss_email_message_type( email_message_type );
+
+ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_justified_by FOREIGN KEY ( message_reason_id ) REFERENCES dss_message_reason( message_reason_id );
+
+ALTER TABLE dss_message_reason ADD CONSTRAINT dss_message_reason_fk_justifying FOREIGN KEY ( email_message_type ) REFERENCES dss_email_message_type( email_message_type );
 
 ALTER TABLE dss_organization ADD CONSTRAINT dss_organization_fk_managed_by FOREIGN KEY ( managing_organization_id ) REFERENCES dss_organization( organization_id );
 
@@ -238,7 +249,7 @@ COMMENT ON COLUMN dss_email_message.message_delivery_dtm IS 'A timestamp indicat
 
 COMMENT ON COLUMN dss_email_message.message_template_dsc IS 'The full text or template for the message that is sent';
 
-COMMENT ON COLUMN dss_email_message.message_reason_dsc IS 'A description of the justification for initiating the message';
+COMMENT ON COLUMN dss_message_reason.message_reason_dsc IS 'A description of the justification for initiating a message';
 
 COMMENT ON COLUMN dss_email_message.unreported_listing_url IS 'User-provided URL for a short-term rental platform listing that is the subject of the message';
 

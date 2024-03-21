@@ -1,6 +1,6 @@
 export interface DelistingRequest {
     lgId: number;
-    platformId: number;
+    platformId: string;
     listingId: number;
     listingUrl: string;
     sendCopy: boolean;

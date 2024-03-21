@@ -11,6 +11,7 @@ namespace StrDss.Data.Mappings
             CreateMap<UserCreateDto, DssUserIdentity>();
             CreateMap<UserDto, DssUserIdentity>();
             CreateMap<AccessRequestDenyDto, DssUserIdentity>();
+            CreateMap<AccessRequestApproveDto, DssUserIdentity>();
         }
     }
 }

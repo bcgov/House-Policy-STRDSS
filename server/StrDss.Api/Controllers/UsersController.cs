@@ -52,10 +52,16 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize]
-        [HttpPut("accessrequests/{id}", Name = "DenyRequest")]
-        public async Task<ActionResult> DenyRequest(long id)
+        [HttpPut("accessrequests/deny", Name = "DenyRequest")]
+        public async Task<ActionResult> DenyRequest(AccessRequestDenyDto dto)
         {
-            await Task.CompletedTask;
+            var errors = await _userService.DenyAccessRequest(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
             return Ok();
         }
     }

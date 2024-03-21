@@ -1,11 +1,9 @@
-# initial db configuration
 psql -U postgres
-CREATE DATABASE strdssdev;
-CREATE EXTENSION postgis;
-CREATE SCHEMA IF NOT EXISTS dss;
-ALTER DATABASE strdssdev SET search_path TO dss;
 CREATE ROLE strdssdev WITH LOGIN PASSWORD 'postgres';
+CREATE DATABASE strdssdev;
 ALTER DATABASE strdssdev OWNER TO strdssdev;
+\c strdssdev
+CREATE EXTENSION postgis;
 
 # backup - Do in on WSL (linux)
 docker exec -i strdss-strdss-db-1 pg_dump -U postgres -d strdssdev --clean > backup.sql
@@ -17,3 +15,7 @@ docker exec -i strdss-strdss-db-1 psql -U postgres -d strdssdev -f /backup.sql
 # restore when the project folder is house-policy-strdss
 docker cp backup.sql house-policy-strdss-strdss-db-1:/backup.sql
 docker exec -i house-policy-strdss-strdss-db-1 psql -U postgres -d strdssdev -f /backup.sql
+
+
+
+

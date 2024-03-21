@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
@@ -26,9 +27,9 @@ namespace StrDss.Service
         private IOrganizationService _orgService;
         private ILogger<DelistingService> _logger;
 
-        public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper,
+        public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IConfiguration config, IEmailService emailService, IOrganizationService orgService, ILogger<DelistingService> logger)
-            : base(currentUser, validator, unitOfWork, mapper)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
             _config = config;
             _emailService = emailService;
@@ -171,7 +172,7 @@ namespace StrDss.Service
                 Cc = dto.CcList.ToArray(),
                 DelayTS = 0,
                 Encoding = "utf-8",
-                From = "no_reply@gov.bc.ca",
+                From = NoReply.Default,
                 Priority = "normal",
                 Subject = "Notice of Takedown",
                 To = dto.ToList.ToArray(),
@@ -317,7 +318,7 @@ namespace StrDss.Service
                 Cc = dto.CcList.ToArray(),
                 DelayTS = 0,
                 Encoding = "utf-8",
-                From = "no_reply@gov.bc.ca",
+                From = NoReply.Default,
                 Priority = "normal",
                 Subject = "Takedown Request",
                 To = dto.ToList.ToArray(),

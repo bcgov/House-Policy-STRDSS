@@ -1,16 +1,19 @@
 ﻿namespace StrDss.Service.EmailTemplates
 {
-    public class AccessRequestApproval
+    public class AccessRequestApproval : EmailTemplateBase
     {
-        public string Subject { get; } = "STR Data Portal - Access Granted";
+        public AccessRequestApproval(IEmailService emailService) : base(emailService)
+        {
+        }
+
         public string Link { get; set; } = "";
         public string AdminEmail { get; set; } = "";
-        public string Content
+        public override string GetContent()
         {
-            get {
-                return
+            Subject = "STR Data Portal - Access Granted";
+
+            return
 $@"You have been granted access to the Short Term Rental Data Portal. Please access the portal here: {Link}. If you have any issues accessing this link, please contact {AdminEmail}.";
-            }
         }
 
     }

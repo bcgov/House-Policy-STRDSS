@@ -29,5 +29,6 @@
         public string OrganizationCd { get; set; } = null!;
 
         public string OrganizationNm { get; set; } = null!;
+        public DateTime UpdDtm { get; set; }
     }
 }

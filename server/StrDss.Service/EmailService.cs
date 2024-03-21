@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrDss.Data;
@@ -20,9 +21,9 @@ namespace StrDss.Service
         private readonly IChesTokenApi _chesTokenApi;
         private readonly ILogger<EmailService> _logger;
 
-        public EmailService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper,
+        public EmailService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<EmailService> logger)
-            : base(currentUser, validator, unitOfWork, mapper)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
             _config = config;
             _httpClient = httpClient;

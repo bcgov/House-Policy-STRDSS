@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.UserDtos;
+using StrDss.Service.EmailTemplates;
 
 namespace StrDss.Service
 {
@@ -19,13 +21,15 @@ namespace StrDss.Service
     {
         private IUserRepository _userRepo;
         private IOrganizationRepository _orgRepo;
+        private IEmailService _emailService;
 
-        public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper,
-            IUserRepository userRepo, IOrganizationRepository orgRepo)
-            : base(currentUser, validator, unitOfWork, mapper)
+        public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
+            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailService emailService)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
             _userRepo = userRepo;
             _orgRepo = orgRepo;
+            _emailService = emailService;
         }
 
         public async Task<PagedDto<AccessRequestDto>> GetAccessRequestListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction)
@@ -149,9 +153,36 @@ namespace StrDss.Service
                 }
             }
 
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
             await _userRepo.DenyAccessRequest(dto);
 
             _unitOfWork.Commit();
+
+            if (user.EmailAddressDsc.IsEmpty())
+            {
+                errors.AddItem("entity", $"The user doesn't have email address.");
+                return errors;
+            }
+
+            var template = new AccessRequestDenial
+            {
+                AdminEmail = _currentUser.EmailAddress
+            };
+
+            var emailContent = new EmailContent
+            {
+                Body = template.Content,
+                From = NoReply.Default,
+                Subject = template.Subject,
+                To = new string[] { user.EmailAddressDsc },
+                Info = $"Approval email for {user.DisplayNm}"
+            };
+
+            await _emailService.SendEmailAsync(emailContent);
 
             return errors;
         }
@@ -188,6 +219,10 @@ namespace StrDss.Service
             if (user.IdentityProviderNm != StrDssIdProviders.Idir && org.OrganizationType == OrganizationTypes.BCGov)
             {
                 errors.AddItem("representedByOrganizationId", $"Not IDIR account cannot be associated with {OrganizationTypes.BCGov} type organization");
+            }
+
+            if (errors.Count > 0)
+            {
                 return errors;
             }
 
@@ -207,6 +242,29 @@ namespace StrDss.Service
             await _userRepo.ApproveAccessRequest(dto, role);
 
             _unitOfWork.Commit();
+
+            if (user.EmailAddressDsc.IsEmpty())
+            {
+                errors.AddItem("entity", $"The user doesn't have email address.");
+                return errors;
+            }
+
+            var template = new AccessRequestApproval
+            {
+                Link = GetHostUrl(),
+                AdminEmail = _currentUser.EmailAddress
+            };
+
+            var emailContent = new EmailContent
+            {
+                Body = template.Content,
+                From = NoReply.Default,
+                Subject = template.Subject,
+                To = new string[] { user.EmailAddressDsc },
+                Info = $"Approval email for {user.DisplayNm}"
+            };
+
+            await _emailService.SendEmailAsync(emailContent);
 
             return errors;
         }

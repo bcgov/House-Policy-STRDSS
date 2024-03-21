@@ -17,6 +17,8 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssEmailMessageType> DssEmailMessageTypes { get; set; }
 
+    public virtual DbSet<DssMessageReason> DssMessageReasons { get; set; }
+
     public virtual DbSet<DssOrganization> DssOrganizations { get; set; }
 
     public virtual DbSet<DssOrganizationContactPerson> DssOrganizationContactPeople { get; set; }
@@ -37,7 +39,7 @@ public partial class DssDbContext : DbContext
         {
             entity.HasKey(e => e.AccessRequestStatusCd).HasName("dss_access_request_status_pk");
 
-            entity.ToTable("dss_access_request_status", "dss");
+            entity.ToTable("dss_access_request_status");
 
             entity.Property(e => e.AccessRequestStatusCd)
                 .HasMaxLength(25)
@@ -51,7 +53,7 @@ public partial class DssDbContext : DbContext
         {
             entity.HasKey(e => e.EmailMessageId).HasName("dss_email_message_pk");
 
-            entity.ToTable("dss_email_message", "dss", tb => tb.HasComment("A message that is sent to one or more recipients via email"));
+            entity.ToTable("dss_email_message", tb => tb.HasComment("A message that is sent to one or more recipients via email"));
 
             entity.Property(e => e.EmailMessageId)
                 .HasComment("Unique generated key")
@@ -61,7 +63,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("Foreign key")
                 .HasColumnName("affected_by_user_identity_id");
             entity.Property(e => e.CcEmailAddressDsc)
-                .HasMaxLength(250)
+                .HasMaxLength(320)
                 .HasComment("E-mail address of a secondary message recipient (directly entered by the user)")
                 .HasColumnName("cc_email_address_dsc");
             entity.Property(e => e.EmailMessageType)
@@ -69,7 +71,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("Business term for the type or purpose of the message (e.g. Notice of Takedown, Takedown Request, Delisting Warning, Delisting Request, Access Granted Notification, Access Denied Notification)")
                 .HasColumnName("email_message_type");
             entity.Property(e => e.HostEmailAddressDsc)
-                .HasMaxLength(250)
+                .HasMaxLength(320)
                 .HasComment("E-mail address of a short term rental host (directly entered by the user as a message recipient)")
                 .HasColumnName("host_email_address_dsc");
             entity.Property(e => e.InitiatingUserIdentityId)
@@ -81,10 +83,7 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.MessageDeliveryDtm)
                 .HasComment("A timestamp indicating when the message delivery was initiated")
                 .HasColumnName("message_delivery_dtm");
-            entity.Property(e => e.MessageReasonDsc)
-                .HasMaxLength(250)
-                .HasComment("A description of the justification for initiating the message")
-                .HasColumnName("message_reason_dsc");
+            entity.Property(e => e.MessageReasonId).HasColumnName("message_reason_id");
             entity.Property(e => e.MessageTemplateDsc)
                 .HasMaxLength(4000)
                 .HasComment("The full text or template for the message that is sent")
@@ -111,13 +110,17 @@ public partial class DssDbContext : DbContext
             entity.HasOne(d => d.InvolvedInOrganization).WithMany(p => p.DssEmailMessages)
                 .HasForeignKey(d => d.InvolvedInOrganizationId)
                 .HasConstraintName("dss_email_message_fk_involving");
+
+            entity.HasOne(d => d.MessageReason).WithMany(p => p.DssEmailMessages)
+                .HasForeignKey(d => d.MessageReasonId)
+                .HasConstraintName("dss_email_message_fk_justified_by");
         });
 
         modelBuilder.Entity<DssEmailMessageType>(entity =>
         {
             entity.HasKey(e => e.EmailMessageType).HasName("dss_email_message_type_pk");
 
-            entity.ToTable("dss_email_message_type", "dss");
+            entity.ToTable("dss_email_message_type");
 
             entity.Property(e => e.EmailMessageType)
                 .HasMaxLength(50)
@@ -127,11 +130,34 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("email_message_type_nm");
         });
 
+        modelBuilder.Entity<DssMessageReason>(entity =>
+        {
+            entity.HasKey(e => e.MessageReasonId).HasName("dss_message_reason_pk");
+
+            entity.ToTable("dss_message_reason");
+
+            entity.Property(e => e.MessageReasonId)
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("message_reason_id");
+            entity.Property(e => e.EmailMessageType)
+                .HasMaxLength(50)
+                .HasColumnName("email_message_type");
+            entity.Property(e => e.MessageReasonDsc)
+                .HasMaxLength(250)
+                .HasComment("A description of the justification for initiating a message")
+                .HasColumnName("message_reason_dsc");
+
+            entity.HasOne(d => d.EmailMessageTypeNavigation).WithMany(p => p.DssMessageReasons)
+                .HasForeignKey(d => d.EmailMessageType)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_message_reason_fk_justifying");
+        });
+
         modelBuilder.Entity<DssOrganization>(entity =>
         {
             entity.HasKey(e => e.OrganizationId).HasName("dss_organization_pk");
 
-            entity.ToTable("dss_organization", "dss", tb => tb.HasComment("A private company or governing body that plays a role in short term rental reporting or enforcement"));
+            entity.ToTable("dss_organization", tb => tb.HasComment("A private company or governing body that plays a role in short term rental reporting or enforcement"));
 
             entity.Property(e => e.OrganizationId)
                 .HasComment("Unique generated key")
@@ -176,7 +202,7 @@ public partial class DssDbContext : DbContext
         {
             entity.HasKey(e => e.OrganizationContactPersonId).HasName("dss_organization_contact_person_pk");
 
-            entity.ToTable("dss_organization_contact_person", "dss", tb => tb.HasComment("A person who has been identified as a notable contact for a particular organization"));
+            entity.ToTable("dss_organization_contact_person", tb => tb.HasComment("A person who has been identified as a notable contact for a particular organization"));
 
             entity.Property(e => e.OrganizationContactPersonId)
                 .HasComment("Unique generated key")
@@ -186,7 +212,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("Foreign key")
                 .HasColumnName("contacted_through_organization_id");
             entity.Property(e => e.EmailAddressDsc)
-                .HasMaxLength(250)
+                .HasMaxLength(320)
                 .HasComment("E-mail address given for the contact by the organization")
                 .HasColumnName("email_address_dsc");
             entity.Property(e => e.FamilyNm)
@@ -221,7 +247,7 @@ public partial class DssDbContext : DbContext
         {
             entity.HasKey(e => e.OrganizationType).HasName("dss_organization_type_pk");
 
-            entity.ToTable("dss_organization_type", "dss");
+            entity.ToTable("dss_organization_type");
 
             entity.Property(e => e.OrganizationType)
                 .HasMaxLength(25)
@@ -235,7 +261,7 @@ public partial class DssDbContext : DbContext
         {
             entity.HasKey(e => e.UserIdentityId).HasName("dss_user_identity_pk");
 
-            entity.ToTable("dss_user_identity", "dss", tb => tb.HasComment("An externally defined domain directory object representing a potential application user or group"));
+            entity.ToTable("dss_user_identity", tb => tb.HasComment("An externally defined domain directory object representing a potential application user or group"));
 
             entity.Property(e => e.UserIdentityId)
                 .HasComment("Unique generated key")
@@ -318,7 +344,7 @@ public partial class DssDbContext : DbContext
                     j =>
                     {
                         j.HasKey("UserIdentityId", "UserRoleCd").HasName("dss_user_role_assignment_pk");
-                        j.ToTable("dss_user_role_assignment", "dss", tb => tb.HasComment("The association of a grantee credential to a role for the purpose of conveying application privileges"));
+                        j.ToTable("dss_user_role_assignment", tb => tb.HasComment("The association of a grantee credential to a role for the purpose of conveying application privileges"));
                         j.IndexerProperty<long>("UserIdentityId")
                             .HasComment("Foreign key")
                             .HasColumnName("user_identity_id");
@@ -333,7 +359,7 @@ public partial class DssDbContext : DbContext
         {
             entity.HasKey(e => e.UserPrivilegeCd).HasName("dss_user_privilege_pk");
 
-            entity.ToTable("dss_user_privilege", "dss", tb => tb.HasComment("A granular access right or privilege within the application that may be granted to a role"));
+            entity.ToTable("dss_user_privilege", tb => tb.HasComment("A granular access right or privilege within the application that may be granted to a role"));
 
             entity.Property(e => e.UserPrivilegeCd)
                 .HasMaxLength(25)
@@ -358,7 +384,7 @@ public partial class DssDbContext : DbContext
                     j =>
                     {
                         j.HasKey("UserPrivilegeCd", "UserRoleCd").HasName("dss_user_role_privilege_pk");
-                        j.ToTable("dss_user_role_privilege", "dss", tb => tb.HasComment("The association of a granular application privilege to a role"));
+                        j.ToTable("dss_user_role_privilege", tb => tb.HasComment("The association of a granular application privilege to a role"));
                         j.IndexerProperty<string>("UserPrivilegeCd")
                             .HasMaxLength(25)
                             .HasComment("Foreign key")
@@ -374,7 +400,7 @@ public partial class DssDbContext : DbContext
         {
             entity.HasKey(e => e.UserRoleCd).HasName("dss_user_role_pk");
 
-            entity.ToTable("dss_user_role", "dss", tb => tb.HasComment("A set of access rights and privileges within the application that may be granted to users"));
+            entity.ToTable("dss_user_role", tb => tb.HasComment("A set of access rights and privileges within the application that may be granted to users"));
 
             entity.Property(e => e.UserRoleCd)
                 .HasMaxLength(25)

@@ -28,10 +28,7 @@ public partial class DssEmailMessage
     /// </summary>
     public string MessageTemplateDsc { get; set; } = null!;
 
-    /// <summary>
-    /// A description of the justification for initiating the message
-    /// </summary>
-    public string? MessageReasonDsc { get; set; }
+    public long? MessageReasonId { get; set; }
 
     /// <summary>
     /// User-provided URL for a short-term rental platform listing that is the subject of the message
@@ -70,4 +67,6 @@ public partial class DssEmailMessage
     public virtual DssUserIdentity InitiatingUserIdentity { get; set; } = null!;
 
     public virtual DssOrganization? InvolvedInOrganization { get; set; }
+
+    public virtual DssMessageReason? MessageReason { get; set; }
 }

@@ -2,7 +2,7 @@
 {
     public class AccessRequestCreateDto
     {
-        public string OrganiztionType { get; set; } = "";
-        public string OrganiztionName { get; set; } = "";
+        public string OrganizationType { get; set; } = "";
+        public string OrganizationName { get; set; } = "";
     }
 }

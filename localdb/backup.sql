@@ -1341,7 +1341,7 @@ COPY hangfire.schema (version) FROM stdin;
 --
 
 COPY hangfire.server (id, data, lastheartbeat, updatecount) FROM stdin;
-cnd2214638-n:36164:113c75a8-bb20-41c6-9bae-a24c901a511b	{"Queues": ["default"], "StartedAt": "2024-03-21T22:13:38.5282307Z", "WorkerCount": 1}	2024-03-21 22:14:08.652227+00	0
+cnd2214638-n:12416:052c2cf9-8160-49f1-8b16-86126fe70302	{"Queues": ["default"], "StartedAt": "2024-03-21T22:24:15.2267996Z", "WorkerCount": 1}	2024-03-21 22:45:30.895205+00	0
 \.
 
 
@@ -1425,6 +1425,7 @@ COPY public.dss_organization (organization_id, organization_type, organization_c
 --
 
 COPY public.dss_organization_contact_person (organization_contact_person_id, is_primary, given_nm, family_nm, phone_no, email_address_dsc, contacted_through_organization_id, upd_dtm, upd_user_guid) FROM stdin;
+1	t	John	Doe		young-jin.chung@gov.bc.ca	2	2024-03-21 22:44:35.886492+00	\N
 \.
 
 
@@ -1576,7 +1577,7 @@ SELECT pg_catalog.setval('public.dss_message_reason_message_reason_id_seq', 6, t
 -- Name: dss_organization_contact_pers_organization_contact_person_i_seq; Type: SEQUENCE SET; Schema: public; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('public.dss_organization_contact_pers_organization_contact_person_i_seq', 1, false);
+SELECT pg_catalog.setval('public.dss_organization_contact_pers_organization_contact_person_i_seq', 1, true);
 
 
 --

@@ -22,22 +22,22 @@ namespace StrDss.Api.Controllers
             _orgService = orgService;
         }
 
-        [HttpGet("types", Name = "GetOrganizationTypes")]
         [ApiAuthorize]
+        [HttpGet("types", Name = "GetOrganizationTypes")]
         public async Task<ActionResult<List<OrganizationTypeDto>>> GetOrganizationTypes()
         {
             return Ok(await _orgService.GetOrganizationTypesAsnc());
         }
 
-        [HttpGet("", Name = "GetOrganizations")]
         [ApiAuthorize]
+        [HttpGet("", Name = "GetOrganizations")]
         public async Task<ActionResult<List<OrganizationDto>>> GetOrganizations(string? type)
         {
             return Ok(await _orgService.GetOrganizationsAsync(type));
         }
 
-        [HttpGet("dropdown", Name = "GetOrganizationsDropdown")]
         [ApiAuthorize]
+        [HttpGet("dropdown", Name = "GetOrganizationsDropdown")]
         public async Task<ActionResult<List<DropdownDto>>> GetOrganizationsDropdown(string? type)
         {
             return Ok(await _orgService.GetOrganizationsDropdownAsync(type));

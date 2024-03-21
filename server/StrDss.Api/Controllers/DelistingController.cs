@@ -29,16 +29,16 @@ namespace StrDss.Api.Controllers
             _delistingService = delistingService;
         }
 
-        [HttpGet("reasons/dropdown", Name = "GetWarningReasonDrowdown")]
         [ApiAuthorize]
+        [HttpGet("reasons/dropdown", Name = "GetWarningReasonDrowdown")]
         public async Task<ActionResult<DropdownDto>> GetWarningReasonDrowdown()
         {
             await Task.CompletedTask;
             return Ok(WarningReasonDto.WarningReasons.Select(x => new DropdownDto { Id = x.WarningReasonId.ToString(), Description = x.Reason }));
         }
 
-        [HttpPost("warnings", Name = "CreateDelistingWarning")]
         [ApiAuthorize]
+        [HttpPost("warnings", Name = "CreateDelistingWarning")]
         public async Task<ActionResult> CreateDelistingWarning(DelistingWarningCreateDto dto)
         {
             var errors = await _delistingService.CreateDelistingWarningAsync(dto);
@@ -50,8 +50,8 @@ namespace StrDss.Api.Controllers
             return NoContent();
         }
 
-        [HttpPost("warnings/preview", Name = "GetDelistingWarningPreview")]
         [ApiAuthorize]
+        [HttpPost("warnings/preview", Name = "GetDelistingWarningPreview")]
         public async Task<ActionResult<EmailPreview>> GetDelistingWarningPreview(DelistingWarningCreateDto dto)
         {
             var (errors, preview) = await _delistingService.GetDelistingWarningPreviewAsync(dto);
@@ -63,8 +63,8 @@ namespace StrDss.Api.Controllers
             return preview;
         }
 
-        [HttpPost("requests", Name = "CreateDelistingRequest")]
         [ApiAuthorize]
+        [HttpPost("requests", Name = "CreateDelistingRequest")]
         public async Task<ActionResult> CreateDelistingRequest(DelistingRequestCreateDto dto)
         {
             var errors = await _delistingService.CreateDelistingRequestAsync(dto);
@@ -76,8 +76,8 @@ namespace StrDss.Api.Controllers
             return NoContent();
         }
 
-        [HttpPost("requests/preview", Name = "GetDelistingRequestPreview")]
         [ApiAuthorize]
+        [HttpPost("requests/preview", Name = "GetDelistingRequestPreview")]
         public async Task<ActionResult<EmailPreview>> GetDelistingRequestPreview(DelistingRequestCreateDto dto)
         {
             var (errors, preview) = await _delistingService.GetDelistingRequestPreviewAsync(dto);

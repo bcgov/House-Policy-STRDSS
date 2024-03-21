@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AccessRequestComponent } from './access-request.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('AccessRequestComponent', () => {
   let component: AccessRequestComponent;
@@ -8,10 +9,10 @@ describe('AccessRequestComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AccessRequestComponent]
+      imports: [AccessRequestComponent, HttpClientTestingModule]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(AccessRequestComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

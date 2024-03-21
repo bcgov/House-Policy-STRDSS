@@ -1,9 +1,3 @@
-DROP SCHEMA IF EXISTS dss CASCADE;
-
-CREATE SCHEMA IF NOT EXISTS dss;
-
-SET search_path TO dss, public;
-
 CREATE  TABLE dss_organization ( 
 	organization_id      bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
 	organization_type    varchar(25)  NOT NULL  ,
@@ -90,10 +84,16 @@ CREATE  TABLE dss_email_message (
 	email_message_type   varchar(50)  NOT NULL  ,
 	message_delivery_dtm timestamptz  NOT NULL  ,
 	message_template_dsc varchar(4000)  NOT NULL  ,
+	is_host_contacted_externally boolean  NOT NULL  ,
+	is_submitter_cc_required boolean  NOT NULL  ,
 	message_reason_id     bigint   ,
-	unreported_listing_url varchar(250)    ,
+	lg_phone_no varchar(13)    ,
+	unreported_listing_no varchar(25)    ,
 	host_email_address_dsc varchar(320)    ,
-	cc_email_address_dsc varchar(320)    ,
+	lg_email_address_dsc varchar(320)    ,
+	cc_email_address_dsc varchar(4000)    ,
+	unreported_listing_url varchar(4000)    ,
+	lg_str_bylaw_url varchar(4000)    ,
 	initiating_user_identity_id bigint  NOT NULL  ,
 	affected_by_user_identity_id bigint    ,
 	involved_in_organization_id bigint    ,

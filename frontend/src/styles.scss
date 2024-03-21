@@ -45,6 +45,21 @@ body {
 
         &.full-width-text-field {
             width: 100%;
+
+            .p-dropdown {
+                width: 100%;
+            }
+        }
+    }
+
+    p-dropdown,
+    input {
+        &.full-width-text-field {
+            width: 100%;
+
+            .p-dropdown {
+                width: 100%;
+            }
         }
     }
 

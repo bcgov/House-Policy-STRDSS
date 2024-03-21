@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, AsyncValidator, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -11,7 +11,6 @@ import { DropdownOption } from '../../../common/models/dropdown-option';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { validateEmailListString, validateUrl } from '../../../common/consts/validators.const';
-import { ToastModule } from 'primeng/toast';
 import { Message } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { InputMaskModule } from 'primeng/inputmask';
@@ -25,12 +24,12 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    CommonModule,
     DropdownModule,
     InputTextModule,
     InputTextareaModule,
     MessagesModule,
     CheckboxModule,
-    CommonModule,
     ChipsModule,
     DialogModule,
     TooltipModule,

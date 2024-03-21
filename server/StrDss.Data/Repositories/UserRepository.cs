@@ -16,6 +16,7 @@ namespace StrDss.Data.Repositories
         Task<UserDto?> GetUserByGuid(Guid guid);
         Task UpdateUserAsync(UserDto dto);
         Task DenyAccessRequest(AccessRequestDenyDto dto);
+        Task ApproveAccessRequest(AccessRequestApproveDto dto, string role);
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
     {
@@ -71,7 +72,9 @@ namespace StrDss.Data.Repositories
 
         public async Task<UserDto?> GetUserById(long id)
         {
-            var entity = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.UserIdentityId == id);
+            var entity = await _dbSet.AsNoTracking()
+                .Include(x => x.RepresentedByOrganization)
+                .FirstOrDefaultAsync(x => x.UserIdentityId == id);
             return _mapper.Map<UserDto>(entity);
         }
 
@@ -90,8 +93,16 @@ namespace StrDss.Data.Repositories
         public async Task DenyAccessRequest(AccessRequestDenyDto dto)
         {
             var entity = await _dbSet.FirstAsync(x => x.UserIdentityId == dto.UserIdentityId);
-            _mapper.Map(dto, entity); //apply the timestamp (concurrency token)
-            entity.AccessRequestStatusCd = AccessRequestStatuses.Denied;
+            _mapper.Map(dto, entity);
+        }
+
+        public async Task ApproveAccessRequest(AccessRequestApproveDto dto, string role)
+        {
+            var entity = await _dbSet.FirstAsync(x => x.UserIdentityId == dto.UserIdentityId);
+            _mapper.Map(dto, entity);
+
+            var roleEntity = await _dbContext.DssUserRoles.FirstAsync(x => x.UserRoleCd == role);
+            entity.UserRoleCds.Add(roleEntity);
         }
     }
 }

@@ -13,6 +13,7 @@ namespace StrDss.Service
         Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid);
         Task<Dictionary<string, List<string>>> CreateAccessRequestAsync(AccessRequestCreateDto dto);
         Task<Dictionary<string, List<string>>> DenyAccessRequest(AccessRequestDenyDto dto);
+        Task<Dictionary<string, List<string>>> ApproveAccessRequest(AccessRequestApproveDto dto);
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -149,6 +150,61 @@ namespace StrDss.Service
             }
 
             await _userRepo.DenyAccessRequest(dto);
+
+            _unitOfWork.Commit();
+
+            return errors;
+        }
+
+        public async Task<Dictionary<string, List<string>>> ApproveAccessRequest(AccessRequestApproveDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var user = await _userRepo.GetUserById(dto.UserIdentityId);
+
+            if (user == null)
+            {
+                errors.AddItem("entity", $"Access request ({dto.UserIdentityId}) doesn't exist");
+                return errors;
+            }
+            else
+            {
+                if (user.AccessRequestStatusCd != AccessRequestStatuses.Requested)
+                {
+                    errors.AddItem("entity", $"Unable to approve access request. The request is currently in status '{user.AccessRequestStatusCd}', which does not allow approval.");
+                    return errors;
+                }
+            }
+
+            var org = await _orgRepo.GetOrganizationByIdAsync(dto.RepresentedByOrganizationId);
+
+            if (org == null)
+            {
+                errors.AddItem("representedByOrganizationId", $"Organization ({dto.RepresentedByOrganizationId}) doesn't exist");
+                return errors;
+            }
+
+            //only IDIR account can have BCGov org type
+            if (user.IdentityProviderNm != StrDssIdProviders.Idir && org.OrganizationType == OrganizationTypes.BCGov)
+            {
+                errors.AddItem("representedByOrganizationId", $"Not IDIR account cannot be associated with {OrganizationTypes.BCGov} type organization");
+                return errors;
+            }
+
+            var role = "";
+            switch (org.OrganizationType)
+            {
+                case OrganizationTypes.BCGov:
+                    role = Roles.CeuStaff; break;
+                case OrganizationTypes.LG:
+                    role = Roles.LgStaff; break;
+                case OrganizationTypes.Platform:
+                    role = Roles.PlatformStaff; break;
+                default:
+                    throw new Exception($"Unknow organization type {org.OrganizationType}");
+            }
+
+            await _userRepo.ApproveAccessRequest(dto, role);
 
             _unitOfWork.Commit();
 

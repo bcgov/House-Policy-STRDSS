@@ -168,21 +168,14 @@ namespace StrDss.Service
                 return errors;
             }
 
-            var template = new AccessRequestDenial
+            var template = new AccessRequestDenial(_emailService)
             {
-                AdminEmail = _currentUser.EmailAddress
-            };
-
-            var emailContent = new EmailContent
-            {
-                Body = template.Content,
-                From = NoReply.Default,
-                Subject = template.Subject,
+                AdminEmail = _currentUser.EmailAddress,
                 To = new string[] { user.EmailAddressDsc },
-                Info = $"Approval email for {user.DisplayNm}"
+                Info = $"Denial email for {user.DisplayNm}"
             };
 
-            await _emailService.SendEmailAsync(emailContent);
+            await template.SendEmail();
 
             return errors;
         }
@@ -249,22 +242,15 @@ namespace StrDss.Service
                 return errors;
             }
 
-            var template = new AccessRequestApproval
+            var template = new AccessRequestApproval(_emailService)
             {
                 Link = GetHostUrl(),
-                AdminEmail = _currentUser.EmailAddress
-            };
-
-            var emailContent = new EmailContent
-            {
-                Body = template.Content,
-                From = NoReply.Default,
-                Subject = template.Subject,
+                AdminEmail = _currentUser.EmailAddress,
                 To = new string[] { user.EmailAddressDsc },
                 Info = $"Approval email for {user.DisplayNm}"
             };
 
-            await _emailService.SendEmailAsync(emailContent);
+            await template.SendEmail();
 
             return errors;
         }

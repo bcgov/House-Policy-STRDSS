@@ -15,11 +15,11 @@ export class DelistingService {
   constructor(private httpClient: HttpClient) { }
 
   getPlatforms(): Observable<Array<DropdownOption>> {
-    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/platforms/dropdown`)
+    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/dropdown/?type=Platform`)
   }
 
   getLocalGovernments(): Observable<Array<DropdownOption>> {
-    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/LocalGovernments/dropdown`)
+    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations?type=LG`)
   }
 
   getReasons(): Observable<Array<DropdownOption>> {

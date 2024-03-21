@@ -1,5 +1,3 @@
-SET search_path TO dss, public;
-
 MERGE INTO dss_access_request_status AS tgt
 USING ( SELECT * FROM (VALUES
 ('Requested','Requested'),
@@ -17,12 +15,12 @@ VALUES (src.access_request_status_cd, src.access_request_status_nm);
 
 MERGE INTO dss_email_message_type AS tgt
 USING ( SELECT * FROM (VALUES
-('Notice of Takedown','Notice of Takedown'),
+('Notice of Takedown','Notice of Takedown of Short Term Rental Platform Offer'),
 ('Takedown Request','Takedown Request'),
-('Delisting Warning','Delisting Warning'),
-('Delisting Request','Delisting Request'),
-('Access Granted Notification','Access Granted Notification'),
-('Access Denied Notification','Access Denied Notification'))
+('Escalation Request','STR Escalation Request'),
+('Compliance Order','Provincial Compliance Order'),
+('Access Granted','Access Granted Notification'),
+('Access Denied','Access Denied Notification'))
 AS s (email_message_type, email_message_type_nm)
 ) AS src
 ON (tgt.email_message_type=src.email_message_type)
@@ -65,7 +63,7 @@ VALUES (src.organization_type, src.organization_type_nm);
 
 MERGE INTO dss_user_privilege AS tgt
 USING ( SELECT * FROM (VALUES
-('takedown_action_write','Create Takedown Action'))
+('takedown_action','Create Takedown Action'))
 AS s (user_privilege_cd, user_privilege_nm)
 ) AS src
 ON (tgt.user_privilege_cd=src.user_privilege_cd)
@@ -95,7 +93,7 @@ VALUES (src.user_role_cd, src.user_role_nm);
 
 MERGE INTO dss_user_role_privilege AS tgt
 USING ( SELECT * FROM (VALUES
-('ceu_admin','takedown_action_write'))
+('ceu_admin','takedown_action'))
 AS s (user_role_cd, user_privilege_cd)
 ) AS src
 ON (tgt.user_role_cd=src.user_role_cd AND tgt.user_privilege_cd=src.user_privilege_cd)

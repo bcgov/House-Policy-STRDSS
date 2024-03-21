@@ -30,7 +30,7 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize]
-        [HttpGet("accessrequestlist", Name = "GetAccessRequestList")]
+        [HttpGet("accessrequests", Name = "GetAccessRequestList")]
         public async Task<ActionResult<PagedDto<AccessRequestDto>>> GetAccessRequestList(string? status, int pageSize, int pageNumber, string orderBy = "AccessRequestDtm", string direction = "")
         {
             var list = await _userService.GetAccessRequestListAsync(status ?? "", pageSize, pageNumber, orderBy, direction);
@@ -38,7 +38,7 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize]
-        [HttpPost("createaccessrequest", Name = "CreateAccessRequest")]
+        [HttpPost("accessrequests", Name = "CreateAccessRequest")]
         public async Task<ActionResult> CreateAccessRequest(AccessRequestCreateDto dto)
         {
             var errors = await _userService.CreateAccessRequestAsync(dto);
@@ -48,6 +48,14 @@ namespace StrDss.Api.Controllers
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
             }
 
+            return Ok();
+        }
+
+        [ApiAuthorize]
+        [HttpPut("accessrequests/{id}", Name = "DenyRequest")]
+        public async Task<ActionResult> DenyRequest(long id)
+        {
+            await Task.CompletedTask;
             return Ok();
         }
     }

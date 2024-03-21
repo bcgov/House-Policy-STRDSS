@@ -31,10 +31,10 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize]
         [HttpGet("reasons/dropdown", Name = "GetWarningReasonDrowdown")]
-        public async Task<ActionResult<DropdownDto>> GetWarningReasonDrowdown()
+        public async Task<ActionResult<DropdownStrDto>> GetWarningReasonDrowdown()
         {
             await Task.CompletedTask;
-            return Ok(WarningReasonDto.WarningReasons.Select(x => new DropdownDto { Id = x.WarningReasonId.ToString(), Description = x.Reason }));
+            return Ok(WarningReasonDto.WarningReasons.Select(x => new DropdownStrDto { Id = x.WarningReasonId.ToString(), Description = x.Reason }));
         }
 
         [ApiAuthorize]

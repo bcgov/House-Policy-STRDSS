@@ -64,5 +64,19 @@ namespace StrDss.Api.Controllers
 
             return Ok();
         }
+
+        [ApiAuthorize]
+        [HttpPut("accessrequests/approve", Name = "ApproveRequest")]
+        public async Task<ActionResult> ApproveRequest(AccessRequestApproveDto dto)
+        {
+            var errors = await _userService.ApproveAccessRequest(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
+        }
     }
 }

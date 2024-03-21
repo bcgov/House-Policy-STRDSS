@@ -60,16 +60,16 @@ namespace StrDss.Model
 
             switch (IdentityProviderNm)
             {
-                case StrDssUserTypes.IDIR:
+                case StrDssIdProviders.Idir:
                     UserGuid = new Guid(user.GetCustomClaim(StrDssClaimTypes.IdirUserGuid));
                     UserName = user.GetCustomClaim(StrDssClaimTypes.IdirUsername);
                     break;
-                case StrDssUserTypes.BceidBusiness:
+                case StrDssIdProviders.BceidBusiness:
                     UserGuid = new Guid(user.GetCustomClaim(StrDssClaimTypes.BceidUserGuid));
                     UserName = user.GetCustomClaim(StrDssClaimTypes.BceidUsername);
                     BusinessNm = user.GetCustomClaim(StrDssClaimTypes.BceidBusinessName);
                     break;
-                case StrDssUserTypes.StrDss:
+                case StrDssIdProviders.StrDss:
                     UserGuid = new Guid(user.GetCustomClaim(StrDssClaimTypes.StrDssUserGuid));
                     UserName = user.GetCustomClaim(StrDssClaimTypes.StrDssUsername);
                     break;

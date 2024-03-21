@@ -61,7 +61,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/users/accessrequestlist?status=&pageSize=10&pageNumber=1",
+					"raw": "http://127.0.0.1:5174/api/users/accessrequests?status=&pageSize=10&pageNumber=1",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -73,7 +73,7 @@
 					"path": [
 						"api",
 						"users",
-						"accessrequestlist"
+						"accessrequests"
 					],
 					"query": [
 						{
@@ -242,7 +242,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/users/createaccessrequest",
+					"raw": "http://127.0.0.1:5174/api/users/accessrequests",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -254,7 +254,7 @@
 					"path": [
 						"api",
 						"users",
-						"createaccessrequest"
+						"accessrequests"
 					]
 				}
 			},

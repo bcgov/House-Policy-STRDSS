@@ -1,5 +1,5 @@
 export interface ComplianceNotice {
-    platformId: number;
+    platformId: string;
     listingId?: number;
     listingUrl: string;
     hostEmail?: string;

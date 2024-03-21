@@ -2,7 +2,7 @@
 
 namespace StrDss.Model
 {
-    public class DropdownDto
+    public class DropdownStrDto
     {
         [JsonPropertyName("value")]
         public string Id { get; set; }

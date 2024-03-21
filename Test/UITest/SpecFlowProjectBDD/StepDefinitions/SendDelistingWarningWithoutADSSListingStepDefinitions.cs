@@ -1,18 +1,8 @@
-﻿using Models;
-using NUnit.Framework;
-using System;
-
-
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Models;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using UITest.PageObjects;
 using UITest.TestDriver;
-using UITest.TestEngine;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Policy;
-using System.Collections.Generic;
+using TestFrameWork.Models;
+using Configuration;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -21,28 +11,53 @@ namespace SpecFlowProjectBDD.StepDefinitions
     public sealed class SendDelistingWarningWithoutADSSListingStepDefinitions
     {
         HomePage _HomePage;
-        DelistingWarningPage _DelistingWarningPage;
-        IDriver _driver;
 
- 
+        IDriver _Driver;
+
+        DelistingWarningPage _DelistingWarningPage;
+        PathFinderPage _PathFinderPage;
+        IDRLoginPage _IDRLoginPage;
+        NoticeOfTakeDownPage _NoticeOfTakeDownPage;
+
+        string _TestUserName;
+        string _TestPassword;
+
+
         public SendDelistingWarningWithoutADSSListingStepDefinitions(SeleniumDriver Driver)
         {
-            _driver = Driver;
-            _HomePage = new HomePage(_driver);
-            _DelistingWarningPage = new DelistingWarningPage(_driver);
+            _Driver = Driver;
+            _HomePage = new HomePage(_Driver);
+            _DelistingWarningPage = new DelistingWarningPage(_Driver);
+            _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
+            _PathFinderPage = new PathFinderPage(_Driver);
+            _IDRLoginPage = new IDRLoginPage(_Driver);
+
+            AppSettings appSettings = new AppSettings();
+            _TestUserName = appSettings.GetValue("TestUserName") ?? string.Empty;
+            _TestPassword = appSettings.GetValue("TestPassword") ?? string.Empty;
         }
 
         //User Authentication
         [Given("I am an authenticated LG staff member")]
         public void GivenIAmAauthenticatedLGStaffMemberUser()
         {
+            _Driver.Url = "http://127.0.0.1:4200/compliance-notice";
+            _Driver.Navigate();
+
+            _PathFinderPage.IDRButton.Click();
+
+            _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+            _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+
+            _IDRLoginPage.ContinueButton.Click();
         }
 
 
         [When("I navigate to the delisting warning feature")]
         public void WhenINavigateToTheDelistingWarningFeature()
         {
-           
+            //_Driver.Url = "http://127.0.0.1:4200/compliance-notice";
+            //_Driver.Navigate();
         }
 
         //Input Form
@@ -54,22 +69,35 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should be presented with a field to select which platform to send the warning to")]
         public void IShouldBePresentedWithAFieldToSelectWhichPlatformToSendTheWarningTo()
         {
+            _DelistingWarningPage.PlatformReceipientDropdown.Click();
+            _DelistingWarningPage.PlatformReceipientDropdown.Click();
         }
         
         [Then("I should be presented with a dropdown menu to select reason for delisting")]
         public void IShouldBePresentedWithADropdownMenuToSelectReasonForDelisting()
         {
+            _DelistingWarningPage.ReasonDropdown.Click();
+            _DelistingWarningPage.ReasonDropdown.Click();
+        }
+
+        [Then("I should see an optional field for Listing ID")]
+        public void IIhouldDeeAnOptionalFieldForListingID()
+        {
+            //add listing ID
+            _DelistingWarningPage.ListingIDNumberTextBox.EnterText("0");
         }
 
         [Then("I should see an optional field for adding a LG staff user email address to be copied on the email")]
         public void IShouldSeeAnOptionalFieldForAddingALGStaffUserEmailAddressToBeCopiedOnTheEmail()
         {
+            _DelistingWarningPage.LocalGovEmailTextBox.EnterText("Local@gov.com");
         }
 
         //ListingURLField
         [When(@"Entering the listing URL ""(.*)""")]
         public void WhenEnteringTheListingURL(String URL)
         {
+            _DelistingWarningPage.ListingUrlTextBox.EnterText("http://listingUrl.com");
         }
 
         [Then("The system should validate the URL format and ensure it is a valid link to the property listing")]
@@ -81,19 +109,23 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("selecting the platform")]
         public void WhenSelectingThePlatform()
         {
+            _DelistingWarningPage.PlatformReceipientDropdown.Click();
 
         }
 
         [Then("the system should present a list of available platform options to populate the field")]
         public void TheSystemShouldPresentAListOfAvailablePlatformOption()
         {
+            _DelistingWarningPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
+            Assert.IsTrue(_DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper().Contains("AIRBNB"));
         }
 
 
         //HostEmailAddressField
         [When("entering the optional host email address")]
-        public void WhenENteringTheOptionalHostEmailAddress() 
-        { 
+        public void WhenEnteringTheOptionalHostEmailAddress() 
+        {
+            _DelistingWarningPage.HostEmailAddressTextBox.EnterText("host@foo.com");
         }
 
 
@@ -104,49 +136,81 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
         //ReasonForDelisting
         [When("I select a reason for delisting")]
-        public void WhenISelectAReasonForDelisting() { }
+        public void WhenISelectAReasonForDelisting() 
+        {
+            _DelistingWarningPage.ReasonDropdown.Click();
+            _DelistingWarningPage.ReasonDropdown.ExecuteJavaScript(@"document.querySelector(""#reasonId_0"").click()");
+        }
 
         [Then("the system should present a list of reasons for requesting delisting: No business licence provided, invalid business licence number, expired business licence, or suspended business license")]
-        public void ThenTheSystemShouldPresentAListOfReasonsForRequestingDelisting() { }
-
+        public void ThenTheSystemShouldPresentAListOfReasonsForRequestingDelisting() 
+        { 
+        
+        }
 
         //DelistingWarningMessage
         [When("all required fields are entered")]
-        public void WhenALlRequiredFieldsAreEntered() { }
+        public void WhenALlRequiredFieldsAreEnteredandIClickTheReviewButton() 
+        {
+            _DelistingWarningPage.ReviewButton.Click();
+        }
 
         [Then("I see a template delisting warning message that will be sent to both the platform and host")]
-        public void ThenISeeATemplateDelistingWarningMessage() { }
+        public void ThenISeeATemplateDelistingWarningMessage() 
+        {
+        }
 
         //SendDelistingRequest
         [When("I submit the form with valid information")]
-        public void WhenISubmitTheFormWithValidInformation() { }
+        public void WhenISubmitTheFormWithValidInformation() 
+        {
+
+            _NoticeOfTakeDownPage.CommentsTextBox.EnterText("get a business license");
+            _NoticeOfTakeDownPage.SubmitButton.Click();
+        }
 
         [Then("the system should send the delisting warning message to the provided platform and host email addresses")]
-        public void ThenTheSystemShouldSendTheDelistingWarningMessage() { }
+        public void ThenTheSystemShouldSendTheDelistingWarningMessage() 
+        { 
+        }
 
         //ConfirmationMessage
         [When("successful submission")]
-        public void WhenSuccessfulSubmission() { }
+        public void WhenSuccessfulSubmission() 
+        { 
+        }
 
         [Then("I should receive a confirmation message indicating that the delisting warning has been sent")]
-        public void ThenIShouldReceiveAConfirmationMessage() { }
+        public void ThenIShouldReceiveAConfirmationMessage() 
+        { 
+        }
 
         [Then("I should be copied on the email")]
-        public void ThenIShouldBeCopiedOnTheEmail() { }
+        public void ThenIShouldBeCopiedOnTheEmail()
+        {
+        }
 
         //NotificationToPlatformAndHost
         [When("the delisting warning is submitted")]
-        public void WhenTheDelistingWarningIsSubmitted() { }
+        public void WhenTheDelistingWarningIsSubmitted() 
+            { 
+            }
 
         [Then("the platform and host should receive email notifications containing the delisting warning and instructions for compliance")]
-        public void ThenThePlatformAndHostShouldReceiveEmailNotifications() { }
+        public void ThenThePlatformAndHostShouldReceiveEmailNotifications() 
+        { 
+        }
 
 
         //FrontEndErrorHandling
         [When("there are issues with the submission, such as invalid email addresses or a missing URL")]
-        public void WhenThereAreIssuesWithTheSubmission() { }
+        public void WhenThereAreIssuesWithTheSubmission() 
+        { 
+        }
 
         [Then("the system should provide clear error messages guiding me on how to correct the issues")]
-        public void ThenTheSystemShouldProvideClearErrorMessages() { }
+        public void ThenTheSystemShouldProvideClearErrorMessages() 
+        { 
+        }
     }
 }

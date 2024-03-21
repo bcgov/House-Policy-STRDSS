@@ -46,6 +46,7 @@ namespace StrDss.Data.Repositories
         {
             var query = await _dbSet.AsNoTracking()
                 .Include(x => x.UserRoleCds)
+                .Include(x => x.RepresentedByOrganization)
                 .FirstOrDefaultAsync(x => x.UserGuid == guid);
 
             if (query == null)

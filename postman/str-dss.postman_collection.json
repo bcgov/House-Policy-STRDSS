@@ -31,54 +31,6 @@
 			"response": []
 		},
 		{
-			"name": "GetPlatformDrowdown",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://127.0.0.1:5174/api/platforms/dropdown",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5174",
-					"path": [
-						"api",
-						"platforms",
-						"dropdown"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetLocalGovernmentsDrowdown",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://127.0.0.1:5174/api/localgovernments/dropdown",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5174",
-					"path": [
-						"api",
-						"localgovernments",
-						"dropdown"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "GetReqeustReasonDrowdown",
 			"request": {
 				"method": "GET",
@@ -104,7 +56,7 @@
 			"response": []
 		},
 		{
-			"name": "GetReqeustAccessList",
+			"name": "GetRequestAccessList",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -346,6 +298,47 @@
 		},
 		{
 			"name": "Get Platforms",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/organizations?type=Platform",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"organizations"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "Platform"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Platforms Dropdown",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},

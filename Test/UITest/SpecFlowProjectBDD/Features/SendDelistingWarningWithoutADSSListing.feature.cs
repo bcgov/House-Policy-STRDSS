@@ -120,73 +120,76 @@ testRunner.And("I should be presented with a field to select which platform to s
 testRunner.And("I should be presented with a dropdown menu to select reason for delisting", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 18
+testRunner.And("I should see an optional field for Listing ID", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 20
 testRunner.And("I should see an optional field for adding a LG staff user email address to be cop" +
                         "ied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 22
+#line 24
 testRunner.When("Entering the listing URL \"ListingURL\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 24
+#line 26
 testRunner.Then("The system should validate the URL format and ensure it is a valid link to the pr" +
                         "operty listing", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 27
+#line 29
 testRunner.When("selecting the platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 29
+#line 31
 testRunner.Then("the system should present a list of available platform options to populate the fi" +
                         "eld", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 32
+#line 34
 testRunner.When("entering the optional host email address", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 34
+#line 36
 testRunner.Then("the system should validate the email format", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 38
+#line 40
 testRunner.When("I select a reason for delisting", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 40
+#line 42
 testRunner.Then("the system should present a list of reasons for requesting delisting: No business" +
                         " licence provided, invalid business licence number, expired business licence, or" +
                         " suspended business license", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 44
+#line 46
 testRunner.When("all required fields are entered", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 46
+#line 48
 testRunner.Then("I see a template delisting warning message that will be sent to both the platform" +
                         " and host", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 50
+#line 52
 testRunner.When("I submit the form with valid information", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 52
+#line 54
 testRunner.Then("the system should send the delisting warning message to the provided platform and" +
                         " host email addresses", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 56
+#line 58
 testRunner.When("successful submission", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 58
+#line 60
 testRunner.Then("I should receive a confirmation message indicating that the delisting warning has" +
                         " been sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 60
+#line 62
 testRunner.Then("I should be copied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 63
+#line 65
 testRunner.When("the delisting warning is submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 65
+#line 67
 testRunner.Then("the platform and host should receive email notifications containing the delisting" +
                         " warning and instructions for compliance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 69
+#line 71
 testRunner.When("there are issues with the submission, such as invalid email addresses or a missin" +
                         "g URL", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 71
+#line 73
 testRunner.Then("the system should provide clear error messages guiding me on how to correct the i" +
                         "ssues", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

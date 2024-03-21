@@ -1,17 +1,19 @@
 ﻿namespace StrDss.Service.EmailTemplates
 {
-    public class AccessRequestDenial
+    public class AccessRequestDenial : EmailTemplateBase
     {
-        public string Subject { get;  } = "STR Data Portal - Access Denied";
+        public AccessRequestDenial(IEmailService emailService) : base(emailService)
+        {
+        }
+
         public string AdminEmail { get; set; } = "";
 
-        public string Content
+        public override string GetContent()
         {
-            get
-            {
-                return
+            Subject = "STR Data Portal - Access Denied";
+
+            return
 $@"Access to the STR Data Portal is restricted to authorized provincial and local government staff and short-term rental platforms. Please contact {AdminEmail} for more information.";
-            }
         }
     }
 }

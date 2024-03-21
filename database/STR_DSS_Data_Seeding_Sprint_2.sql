@@ -78,7 +78,11 @@ VALUES (src.user_privilege_cd, src.user_privilege_nm);
 
 MERGE INTO dss_user_role AS tgt
 USING ( SELECT * FROM (VALUES
-('ceu_admin','CEU Admin'))
+('ceu_admin','CEU Admin'),
+('ceu_staff','CEU Staff'),
+('bc_staff','Other Provincial Government'),
+('lg_staff','Local Government'),
+('platform_staff','Short Term Rental Platform'))
 AS s (user_role_cd, user_role_nm)
 ) AS src
 ON (tgt.user_role_cd=src.user_role_cd)

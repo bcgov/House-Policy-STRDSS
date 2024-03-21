@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using StrDss.Model.OrganizationDtos;
+using System.Text.Json.Serialization;
 
 namespace StrDss.Model.UserDtos
 {
@@ -34,6 +35,7 @@ namespace StrDss.Model.UserDtos
         public long? RepresentedByOrganizationId { get; set; }
 
         public DateTime UpdDtm { get; set; }
+        public virtual OrganizationDto? RepresentedByOrganization { get; set; }
         public virtual ICollection<RoleDto> UserRoleCds { get; set; } = new List<RoleDto>();
     }
 }

@@ -56,9 +56,9 @@
         public const string ComplianceStatus = "COMPLIANCE_STATUS";
     }
 
-    public static class StrDssUserTypes
+    public static class StrDssIdProviders
     {
-        public const string IDIR = "idir";
+        public const string Idir = "idir";
         public const string BceidBusiness = "bceidbusiness";
         public const string External = "external";
         public const string Aps = "aps";
@@ -68,9 +68,9 @@
         {
             switch (userType.ToLowerInvariant())
             {
-                case StrDssUserTypes.IDIR:
+                case StrDssIdProviders.Idir:
                     return BceidUserTypes.Internal;
-                case StrDssUserTypes.BceidBusiness:
+                case StrDssIdProviders.BceidBusiness:
                     return BceidUserTypes.Business;
                 default:
                     return "Unknown";
@@ -110,11 +110,18 @@
             return fullName.Contains("/") ? fullName.Substring(fullName.LastIndexOf("/") + 1) : fullName;
         }
     }
-
     public static class OrganizationTypes
     {
         public const string BCGov = "BCGov";
         public const string Platform = "Platform";
         public const string LG = "LG";
+    }
+
+    public static class Roles
+    {
+        public const string CeuAdmin = "ceu_admin";
+        public const string CeuStaff = "ceu_staff";
+        public const string LgStaff = "lg_staff";
+        public const string PlatformStaff = "platform_staff";
     }
 }

@@ -124,4 +124,9 @@
         public const string LgStaff = "lg_staff";
         public const string PlatformStaff = "platform_staff";
     }
+
+    public static class NoReply
+    {
+        public const string Default = "no_reply@gov.bc.ca";
+    }
 }

@@ -1,11 +1,4 @@
 ﻿using BoDi;
-using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using UITest.TestDriver;
 
 namespace SpecFlowProjectBDD.Hooks
@@ -24,6 +17,7 @@ namespace SpecFlowProjectBDD.Hooks
         public void SetupDrivers()
         {
             SeleniumDriver webDriver = new SeleniumDriver(SeleniumDriver.DRIVERTYPE.CHROME);
+            webDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
 
             _Container.RegisterInstanceAs<SeleniumDriver>(webDriver);
         }

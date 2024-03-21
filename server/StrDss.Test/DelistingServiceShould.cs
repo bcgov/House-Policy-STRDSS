@@ -2,10 +2,10 @@
 using Castle.Core.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
-using StrDss.Model.LocalGovernmentDtos;
-using StrDss.Model.PlatformDtos;
+using StrDss.Model.OrganizationDtos;
 using StrDss.Service;
 using StrDss.Service.HttpClients;
 using Xunit;
@@ -18,14 +18,16 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_ValidDto_ReturnsNoErrors(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
             [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
         {
             // Arrange
             configMock.Setup(x => x.GetValue(typeof(string), "")).Returns("https://ches.example.com");
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
 
             // Act
             var result = await sut.CreateDelistingWarningAsync(dto);;
@@ -60,7 +62,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_EmptyListingUrl_ReturnsListingUrlError(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -83,7 +85,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidListingUrl_ReturnsInvalidUrlError(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -106,7 +108,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_HostEmailSentFalseAndEmptyHostEmail_ReturnsHostEmailRequiredError(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -130,7 +132,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidHostEmail_ReturnsInvalidHostEmailError(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -153,7 +155,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_NullReason_ReturnsReasonIdError(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -176,7 +178,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidCcListEmail_ReturnsInvalidCcListEmailError(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -199,7 +201,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_EmptyLgContactEmail_ReturnsLgContactEmailRequiredError(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -222,7 +224,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidLgContactEmail_ReturnsInvalidLgContactEmailError(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -245,7 +247,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidLgContactPhone_ReturnsInvalidLgContactPhoneError(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -268,7 +270,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidStrBylawUrl_ReturnsStrBylawUrlRequiredError(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -291,7 +293,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_NullPlatform_ReturnsPlatformIdError(
             DelistingRequestCreateDto dto,
-            LocalGovernmentDto lg,
+            OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
             [Frozen] Mock<ILogger<DelistingService>> loggerMock,
@@ -313,7 +315,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_NullLocalGovernment_ReturnsLocalGovernmentIdError(
             DelistingRequestCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
             [Frozen] Mock<ILogger<DelistingService>> loggerMock,
@@ -335,8 +337,8 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_EmptyListingUrl_ReturnsListingUrlError(
             DelistingRequestCreateDto dto,
-            PlatformDto platform,
-            LocalGovernmentDto lg,
+            OrganizationDto platform,
+            OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
             [Frozen] Mock<ILogger<DelistingService>> loggerMock,
@@ -358,8 +360,8 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_InvalidListingUrl_ReturnsInvalidUrlError(
             DelistingRequestCreateDto dto,
-            PlatformDto platform,
-            LocalGovernmentDto lg,
+            OrganizationDto platform,
+            OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
             [Frozen] Mock<ILogger<DelistingService>> loggerMock,
@@ -381,8 +383,8 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_InvalidCcListEmail_ReturnsInvalidCcListEmailError(
             DelistingRequestCreateDto dto,
-            PlatformDto platform,
-            LocalGovernmentDto lg,
+            OrganizationDto platform,
+            OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
             [Frozen] Mock<ILogger<DelistingService>> loggerMock,
@@ -404,13 +406,15 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenCalled_ShouldSendEmail(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             [Frozen] Mock<IEmailService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
+            [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
         {
             // Arrange
             currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
 
             // Act
             await sut.CreateDelistingWarningAsync(dto);
@@ -423,13 +427,15 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenHostEmailIsNotEmpty_AddsHostEmailToToList(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             [Frozen] Mock<IEmailService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
+            [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
         {
             // Arrange
             dto.HostEmail = "host@example.com";
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
 
             // Act
             await sut.CreateDelistingWarningAsync(dto);
@@ -442,7 +448,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenHostEmailIsEmpty_DoesNotAddHostEmailToToList(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             [Frozen] Mock<IEmailService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
@@ -461,15 +467,17 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToCcList(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             [Frozen] Mock<IEmailService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
+            [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
         {
             // Arrange
             dto.SendCopy = true;
             var currentUserEmail = "user@example.com";
             currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
 
             // Act
             await sut.CreateDelistingWarningAsync(dto);
@@ -482,7 +490,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
             DelistingWarningCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             [Frozen] Mock<IEmailService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
@@ -503,13 +511,19 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingRequestAsync_WhenCalled_ShouldSendEmail(
             DelistingRequestCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             [Frozen] Mock<IEmailService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
+            [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
         {
             // Arrange
             currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
+
+            var lg = CommonUtils.CloneObject(platform);
+            lg.OrganizationType = OrganizationTypes.LG;
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.LgId)).ReturnsAsync(lg);
 
             // Act
             await sut.CreateDelistingRequestAsync(dto);
@@ -522,15 +536,21 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingRequestAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToCcList(
             DelistingRequestCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             [Frozen] Mock<IEmailService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
+            [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
         {
             // Arrange
             dto.SendCopy = true;
             var currentUserEmail = "user@example.com";
             currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
+
+            var lg = CommonUtils.CloneObject(platform);
+            lg.OrganizationType = OrganizationTypes.LG;
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.LgId)).ReturnsAsync(lg);
 
             // Act
             await sut.CreateDelistingRequestAsync(dto);
@@ -543,7 +563,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingRequestAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
             DelistingRequestCreateDto dto,
-            PlatformDto platform,
+            OrganizationDto platform,
             [Frozen] Mock<IEmailService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)

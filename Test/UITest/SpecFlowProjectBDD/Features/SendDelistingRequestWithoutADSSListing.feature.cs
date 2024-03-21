@@ -113,66 +113,81 @@ testRunner.Then("I should be presented with an input form that includes fields f
                         "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 14
+testRunner.And("I Should be Presented with an Input form that Lists requests Initiated By", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 16
 testRunner.And("I should be presented with a field to select which platform to send the request t" +
                         "o", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 17
+#line 18
 testRunner.And("I should see an optional field for adding a LG staff user email address to be cop" +
                         "ied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 21
-testRunner.When("Entering the listing URL \"ListingURL\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 22
+testRunner.When("Selecting the LG for Initiated By", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 23
+#line 24
+testRunner.Then("The system should present a list of available LG options to populate the field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 28
+testRunner.When("Entering the listing ID \"0\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 30
+testRunner.Then("The system should validate the ID is a number", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 34
+testRunner.When("Entering the listing URL \"http://listingURL.com\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 36
 testRunner.Then("The system should validate the URL format and ensure it is a valid link to the pr" +
                         "operty listing", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 26
+#line 39
 testRunner.When("selecting the platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 28
+#line 41
 testRunner.Then("the system should present a list of available platform options to populate the fi" +
                         "eld", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 32
+#line 45
 testRunner.When("all required fields are entered", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 34
+#line 47
 testRunner.Then("I click the review button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 36
+#line 49
 testRunner.Then("I see a template delisting request message that will be sent to both the platform" +
                         "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 40
+#line 53
 testRunner.When("I submit the form with valid information", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 42
+#line 55
 testRunner.Then("the system should send the delisting request message to the platform email addres" +
                         "ses associated with the selected platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 46
+#line 59
 testRunner.When("successful submission", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 48
+#line 61
 testRunner.Then("I should receive a confirmation message indicating that the delisting request has" +
                         " been sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 50
+#line 63
 testRunner.Then("I should be copied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 53
+#line 66
 testRunner.When("the delisting request is submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 55
+#line 68
 testRunner.Then("the platform and host should receive email notifications containing the delisting" +
                         " request and instructions for compliance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 59
+#line 72
 testRunner.When("there are issues with the submission, such as invalid email addresses or a missin" +
                         "g URL", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 61
+#line 74
 testRunner.Then("the system should provide clear error messages guiding me on how to correct the i" +
                         "ssues", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

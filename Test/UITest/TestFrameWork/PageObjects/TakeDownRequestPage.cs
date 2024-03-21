@@ -1,11 +1,10 @@
 ﻿using TestFrameWork.Models;
-using UITest.Models;
 using UITest.SeleniumObjects;
 using UITest.TestDriver;
 
 namespace UITest.PageObjects
 {
-    public class TakeDownRequest
+    public class TakeDownRequestPage
     {
         private TextBox _CommentsTextBox;
         private Button _SubmitButton;
@@ -17,7 +16,7 @@ namespace UITest.PageObjects
         public Button SubmitButton { get => _SubmitButton; }
         public Button CancelButton { get => _CancelButton; }
 
-        public TakeDownRequest(IDriver Driver)
+        public TakeDownRequestPage(IDriver Driver)
         {
             _Driver = Driver;
             _CommentsTextBox = new TextBox(Driver, Enums.FINDBY.ID, TakeDownRequestModel.CommentsTextBox);

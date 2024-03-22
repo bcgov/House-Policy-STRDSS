@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project name="dss" id="PostgreSQL-548" database="PostgreSQL" >
 	<schema name="dss" >
+		<table name="dss_access_request_status" spec="" >
+			<column name="access_request_status_cd" type="varchar" length="25" jt="12" mandatory="y" />
+			<column name="access_request_status_nm" type="varchar" length="250" jt="12" mandatory="y" />
+			<index name="dss_access_request_status_pk" unique="PRIMARY_KEY" >
+				<column name="access_request_status_cd" />
+			</index>
+		</table>
 		<table name="dss_email_message" prior="dss_user_role_assignment_0" >
 			<comment><![CDATA[A message that is sent to one or more recipients via email]]></comment>
 			<column name="email_message_id" prior="email_messager_id" type="bigint" jt="-5" mandatory="y" >
@@ -16,18 +23,22 @@
 			<column name="message_template_dsc" type="varchar" length="4000" jt="12" mandatory="y" >
 				<comment><![CDATA[The full text or template for the message that is sent]]></comment>
 			</column>
-			<column name="message_reason_dsc" type="varchar" length="250" jt="12" >
-				<comment><![CDATA[A description of the justification for initiating the message]]></comment>
-			</column>
-			<column name="unreported_listing_url" type="varchar" length="250" jt="12" >
+			<column name="is_host_contacted_externally" type="boolean" jt="16" mandatory="y" />
+			<column name="is_submitter_cc_required" type="boolean" jt="16" mandatory="y" />
+			<column name="message_reason_id" type="bigint" length="64" jt="-5" />
+			<column name="lg_phone_no" type="varchar" length="13" jt="12" />
+			<column name="unreported_listing_no" type="varchar" length="25" jt="12" />
+			<column name="unreported_listing_url" type="varchar" length="4000" jt="12" >
 				<comment><![CDATA[User-provided URL for a short-term rental platform listing that is the subject of the message]]></comment>
 			</column>
-			<column name="host_email_address_dsc" type="varchar" length="250" jt="12" >
+			<column name="lg_email_address_dsc" type="varchar" length="320" jt="12" />
+			<column name="host_email_address_dsc" type="varchar" length="320" jt="12" >
 				<comment><![CDATA[E-mail address of a short term rental host (directly entered by the user as a message recipient)]]></comment>
 			</column>
-			<column name="cc_email_address_dsc" type="varchar" length="250" jt="12" >
+			<column name="cc_email_address_dsc" type="varchar" length="4000" jt="12" >
 				<comment><![CDATA[E-mail address of a secondary message recipient (directly entered by the user)]]></comment>
 			</column>
+			<column name="lg_str_bylaw_url" type="varchar" length="4000" jt="12" />
 			<column name="initiating_user_identity_id" prior="user_identity_id" type="bigint" jt="-5" mandatory="y" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
@@ -40,9 +51,6 @@
 			<index name="dss_email_message_pk" unique="PRIMARY_KEY" >
 				<column name="email_message_id" />
 			</index>
-			<constraint name="dss_email_message_ck" >
-				<string><![CDATA[email_message_type in ('Notice of Takedown','Takedown Request','Delisting Warning','Delisting Request','Access Granted Notification','Access Denied Notification')]]></string>
-			</constraint>
 			<fk name="dss_email_message_fk_initiated_by" to_schema="dss" to_table="dss_user_identity" >
 				<fk_column name="initiating_user_identity_id" pk="user_identity_id" />
 			</fk>
@@ -51,6 +59,35 @@
 			</fk>
 			<fk name="dss_email_message_fk_involving" to_schema="dss" to_table="dss_organization" >
 				<fk_column name="involved_in_organization_id" pk="organization_id" />
+			</fk>
+			<fk name="dss_email_message_fk_communicating" to_schema="dss" to_table="dss_email_message_type" options="" >
+				<fk_column name="email_message_type" pk="email_message_type" />
+			</fk>
+			<fk name="dss_email_message_fk_justified_by" to_schema="dss" to_table="dss_message_reason" options="" >
+				<fk_column name="message_reason_id" pk="message_reason_id" />
+			</fk>
+		</table>
+		<table name="dss_email_message_type" spec="" >
+			<column name="email_message_type" type="varchar" length="50" jt="12" mandatory="y" />
+			<column name="email_message_type_nm" type="varchar" length="250" jt="12" mandatory="y" />
+			<index name="dss_email_message_type_pk" unique="PRIMARY_KEY" >
+				<column name="email_message_type" />
+			</index>
+		</table>
+		<table name="dss_message_reason" spec="" >
+			<comment><![CDATA[A description of the justification for initiating a message]]></comment>
+			<column name="message_reason_id" type="bigint" length="64" jt="-5" mandatory="y" >
+				<identity><![CDATA[GENERATED  ALWAYS AS IDENTITY]]></identity>
+			</column>
+			<column name="email_message_type" type="varchar" length="50" jt="12" mandatory="y" />
+			<column name="message_reason_dsc" type="varchar" length="250" jt="12" mandatory="y" >
+				<comment><![CDATA[A description of the justification for initiating a message]]></comment>
+			</column>
+			<index name="dss_message_reason_pk" unique="PRIMARY_KEY" >
+				<column name="message_reason_id" />
+			</index>
+			<fk name="dss_message_reason_fk_justifying" to_schema="dss" to_table="dss_email_message_type" >
+				<fk_column name="email_message_type" pk="email_message_type" />
 			</fk>
 		</table>
 		<table name="dss_organization" prior="dss_str_organization" >
@@ -83,11 +120,11 @@
 			<index name="dss_organization_pk" unique="PRIMARY_KEY" >
 				<column name="organization_id" />
 			</index>
-			<constraint name="dss_organization_ck" >
-				<string><![CDATA[organization_type in ('BCGov','LG','Platform')]]></string>
-			</constraint>
 			<fk name="dss_organization_fk_managed_by" to_schema="dss" to_table="dss_organization" >
 				<fk_column name="managing_organization_id" pk="organization_id" />
+			</fk>
+			<fk name="dss_organization_fk_treated_as" to_schema="dss" to_table="dss_organization_type" options="" >
+				<fk_column name="organization_type" pk="organization_type" />
 			</fk>
 		</table>
 		<table name="dss_organization_contact_person" prior="dss_user_contact_person" >
@@ -108,7 +145,7 @@
 			<column name="phone_no" type="varchar" length="13" jt="12" mandatory="y" >
 				<comment><![CDATA[Phone number given for the contact by the organization (contains only digits)]]></comment>
 			</column>
-			<column name="email_address_dsc" type="varchar" length="250" jt="12" mandatory="y" >
+			<column name="email_address_dsc" type="varchar" length="320" jt="12" mandatory="y" >
 				<comment><![CDATA[E-mail address given for the contact by the organization]]></comment>
 			</column>
 			<column name="contacted_through_organization_id" prior="represented_by_organization_id" type="bigint" jt="-5" mandatory="y" >
@@ -126,6 +163,13 @@
 			<fk name="dss_organization_contact_person_fk_contacted_for" to_schema="dss" to_table="dss_organization" >
 				<fk_column name="contacted_through_organization_id" pk="organization_id" />
 			</fk>
+		</table>
+		<table name="dss_organization_type" spec="" >
+			<column name="organization_type" type="varchar" length="25" jt="12" mandatory="y" />
+			<column name="organization_type_nm" type="varchar" length="250" jt="12" mandatory="y" />
+			<index name="dss_organization_type_pk" unique="PRIMARY_KEY" >
+				<column name="organization_type" />
+			</index>
 		</table>
 		<table name="dss_user_identity" prior="dss_person" >
 			<comment><![CDATA[An externally defined domain directory object representing a potential application user or group]]></comment>
@@ -145,7 +189,7 @@
 			<column name="is_enabled" prior="is_active" type="boolean" jt="16" mandatory="y" >
 				<comment><![CDATA[Indicates whether access is currently permitted using this identity]]></comment>
 			</column>
-			<column name="access_request_status_dsc" type="varchar" length="25" jt="12" mandatory="y" >
+			<column name="access_request_status_cd" type="varchar" length="25" jt="12" mandatory="y" >
 				<comment><![CDATA[The current status of the most recent access request made by the user (restricted to Requested, Approved, or Denied)]]></comment>
 			</column>
 			<column name="access_request_dtm" type="timestamptz" jt="93" >
@@ -181,35 +225,27 @@
 			<index name="dss_user_identity_pk" unique="PRIMARY_KEY" >
 				<column name="user_identity_id" />
 			</index>
-			<constraint name="dss_user_identity_ck" >
-				<string><![CDATA[access_request_status_dsc in ('Requested','Approved','Denied')]]></string>
-			</constraint>
 			<fk name="dss_user_identity_fk_representing" to_schema="dss" to_table="dss_organization" >
 				<fk_column name="represented_by_organization_id" pk="organization_id" />
+			</fk>
+			<fk name="dss_user_identity_fk_given" to_schema="dss" to_table="dss_access_request_status" options="" >
+				<fk_column name="access_request_status_cd" pk="access_request_status_cd" />
 			</fk>
 		</table>
 		<table name="dss_user_privilege" prior="dss_system_privilege" >
 			<comment><![CDATA[A granular access right or privilege within the application that may be granted to a role]]></comment>
-			<column name="user_privilege_id" prior="system_privilege_id" type="bigint" jt="-5" mandatory="y" >
-				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
-				<comment><![CDATA[Unique generated key]]></comment>
-			</column>
-			<column name="privilege_cd" prior="system_privilege_cd" type="varchar" length="25" jt="12" mandatory="y" >
+			<column name="user_privilege_cd" type="varchar" length="25" jt="12" mandatory="y" >
 				<comment><![CDATA[The immutable system code that identifies the privilege]]></comment>
 			</column>
-			<column name="privilege_nm" type="varchar" length="250" jt="12" mandatory="y" >
+			<column name="user_privilege_nm" type="varchar" length="250" jt="12" mandatory="y" >
 				<comment><![CDATA[The human-readable name that is given for the role]]></comment>
 			</column>
 			<index name="dss_user_privilege_pk" unique="PRIMARY_KEY" >
-				<column name="user_privilege_id" />
+				<column name="user_privilege_cd" />
 			</index>
 		</table>
 		<table name="dss_user_role" prior="dss_str_organization_0" >
 			<comment><![CDATA[A set of access rights and privileges within the application that may be granted to users]]></comment>
-			<column name="user_role_id" prior="uer_role_id" type="bigint" jt="-5" mandatory="y" >
-				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
-				<comment><![CDATA[Unique generated key]]></comment>
-			</column>
 			<column name="user_role_cd" prior="organization_type" type="varchar" length="25" jt="12" mandatory="y" >
 				<comment><![CDATA[The immutable system code that identifies the role]]></comment>
 			</column>
@@ -217,26 +253,23 @@
 				<comment><![CDATA[The human-readable name that is given for the role]]></comment>
 			</column>
 			<index name="dss_user_role_pk" unique="PRIMARY_KEY" >
-				<column name="user_role_id" />
+				<column name="user_role_cd" />
 			</index>
 		</table>
 		<table name="dss_user_role_assignment" prior="dss_str_listing_report" spec="" >
 			<comment><![CDATA[The association of a grantee credential to a role for the purpose of conveying application privileges]]></comment>
-			<column name="user_role_assignment_id" prior="str_listing_report_id" type="bigint" jt="-5" mandatory="y" >
-				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
-				<comment><![CDATA[Unique generated key]]></comment>
+			<column name="user_role_cd" type="varchar" length="25" jt="12" mandatory="y" >
+				<comment><![CDATA[Foreign key]]></comment>
 			</column>
 			<column name="user_identity_id" prior="person_id" type="bigint" jt="-5" mandatory="y" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
-			<column name="user_role_id" type="bigint" jt="-5" mandatory="y" >
-				<comment><![CDATA[Foreign key]]></comment>
-			</column>
 			<index name="dss_user_role_assignment_pk" unique="PRIMARY_KEY" >
-				<column name="user_role_assignment_id" />
+				<column name="user_identity_id" />
+				<column name="user_role_cd" />
 			</index>
 			<fk name="dss_user_role_assignment_fk_granted" to_schema="dss" to_table="dss_user_role" >
-				<fk_column name="user_role_id" pk="user_role_id" />
+				<fk_column name="user_role_cd" pk="user_role_cd" />
 			</fk>
 			<fk name="dss_user_role_assignment_fk_granted_to" to_schema="dss" to_table="dss_user_identity" >
 				<fk_column name="user_identity_id" pk="user_identity_id" />
@@ -244,72 +277,59 @@
 		</table>
 		<table name="dss_user_role_privilege" prior="dss_user_role_assignment_0" >
 			<comment><![CDATA[The association of a granular application privilege to a role]]></comment>
-			<column name="user_role_privilege_id" prior="user_role_assignment_id" type="bigint" jt="-5" mandatory="y" >
-				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
-				<comment><![CDATA[Unique generated key]]></comment>
-			</column>
-			<column name="user_privilege_id" prior="system_privilege_id" type="bigint" jt="-5" mandatory="y" >
+			<column name="user_privilege_cd" type="varchar" length="25" jt="12" mandatory="y" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
-			<column name="user_role_id" type="bigint" jt="-5" mandatory="y" >
+			<column name="user_role_cd" type="varchar" length="25" jt="12" mandatory="y" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
 			<index name="dss_user_role_privilege_pk" unique="PRIMARY_KEY" >
-				<column name="user_role_privilege_id" />
+				<column name="user_privilege_cd" />
+				<column name="user_role_cd" />
 			</index>
 			<fk name="dss_user_role_privilege_fk_conferred_by" to_schema="dss" to_table="dss_user_role" >
-				<fk_column name="user_role_id" pk="user_role_id" />
+				<fk_column name="user_role_cd" pk="user_role_cd" />
 			</fk>
 			<fk name="dss_user_role_privilege_fk_conferring" to_schema="dss" to_table="dss_user_privilege" >
-				<fk_column name="user_privilege_id" pk="user_privilege_id" />
+				<fk_column name="user_privilege_cd" pk="user_privilege_cd" />
 			</fk>
 		</table>
-		<trigger name="dss_organization_br_iu_tr.sql" table="dss_organization" id="Trigger-20fa" isSystem="false" >
-			<string><![CDATA[CREATE TRIGGER <name> { BEFORE | AFTER } { event [ OR ... ] }
- ON table [ FOR [ EACH ] { ROW | STATEMENT } ]
- EXECUTE PROCEDURE funcname ( arguments );]]></string>
+		<trigger name="dss_organization_br_iu_tr" table="dss_organization" id="Trigger-104c" isSystem="false" >
+			<string><![CDATA[CREATE TRIGGER dss_organization_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_organization FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
 		</trigger>
-		<trigger name="dss_organization_contact_person_br_iu_tr.sql" table="dss_organization_contact_person" id="Trigger-1fec" isSystem="false" >
-			<string><![CDATA[CREATE OR REPLACE TRIGGER dss_organization_contact_person_br_iu_tr
-     BEFORE INSERT OR UPDATE ON dss_organization
-    FOR EACH ROW
-    EXECUTE PROCEDURE dss_update_audit_columns();]]></string>
+		<trigger name="dss_organization_contact_person_br_iu_tr" table="dss_organization_contact_person" id="Trigger-ced" isSystem="false" >
+			<string><![CDATA[CREATE TRIGGER dss_organization_contact_person_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_organization_contact_person FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
 		</trigger>
-		<trigger name="dss_user_identity_br_iu_tr.sql" table="dss_user_identity" id="Trigger-42e" isSystem="false" >
-			<string><![CDATA[CREATE TRIGGER <name> { BEFORE | AFTER } { event [ OR ... ] }
- ON table [ FOR [ EACH ] { ROW | STATEMENT } ]
- EXECUTE PROCEDURE funcname ( arguments );]]></string>
+		<trigger name="dss_user_identity_br_iu_tr" table="dss_user_identity" id="Trigger-cfc" isSystem="false" >
+			<string><![CDATA[CREATE TRIGGER dss_user_identity_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_user_identity FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
 		</trigger>
-		<function name="dss_update_audit_columns.sql" id="Function-257c" isSystem="true" params_known="n" >
-			<string><![CDATA[CREATE [ OR REPLACE ] FUNCTION <name> ( [ [ argmode ] [ argname ] argtype [ { DEFAULT | = } default_expr ] [, ...] ] ) 
- [ RETURNS rettype 
- | RETURNS TABLE ( column_name column_type [, ...] ) ] 
- { LANGUAGE lang_name 
- | TRANSFORM { FOR TYPE type_name } [, ... ] 
- | WINDOW 
- | IMMUTABLE | STABLE | VOLATILE | [ NOT ] LEAKPROOF 
- | CALLED ON NULL INPUT | RETURNS NULL ON NULL INPUT | STRICT 
- | [ EXTERNAL ] SECURITY INVOKER | [ EXTERNAL ] SECURITY DEFINER 
- | COST execution_cost 
- | ROWS result_rows 
- | SET configuration_parameter { TO value | = value | FROM CURRENT } 
- | AS 'definition' 
- | AS 'obj_file', 'link_symbol' 
- } ... 
- [ WITH ( attribute [, ...] ) ]]]></string>
+		<function name="dss_update_audit_columns" id="Function-23dd" isSystem="false" params_known="y" >
+			<string><![CDATA[CREATE OR REPLACE FUNCTION dss.dss_update_audit_columns()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$BEGIN
+    NEW.upd_dtm := current_timestamp;
+    RETURN NEW;
+END;$function$
+ ]]></string>
+			<result_param jt="-1" />
 		</function>
 	</schema>
 	<layout name="Default Layout" id="Layout-662" show_column_type="y" show_relation="name" >
 		<comment><![CDATA[Default Layout]]></comment>
-		<entity schema="dss" name="dss_email_message" color="3986C1" x="1072" y="208" />
-		<entity schema="dss" name="dss_organization" color="C1D8EE" x="48" y="208" />
-		<entity schema="dss" name="dss_organization_contact_person" color="3986C1" x="640" y="64" />
-		<entity schema="dss" name="dss_user_identity" color="3986C1" x="544" y="320" />
-		<entity schema="dss" name="dss_user_privilege" color="3986C1" x="672" y="768" />
-		<entity schema="dss" name="dss_user_role" color="3986C1" x="672" y="656" />
-		<entity schema="dss" name="dss_user_role_assignment" color="C1D8EE" x="1120" y="608" />
-		<entity schema="dss" name="dss_user_role_privilege" color="3986C1" x="1136" y="736" />
-		<callout x="64" y="48" pointer="Round" >
+		<entity schema="dss" name="dss_access_request_status" color="3986C1" x="544" y="624" />
+		<entity schema="dss" name="dss_email_message" color="3986C1" x="1536" y="208" />
+		<entity schema="dss" name="dss_email_message_type" color="3986C1" x="560" y="208" />
+		<entity schema="dss" name="dss_message_reason" color="3986C1" x="1056" y="256" />
+		<entity schema="dss" name="dss_organization" color="C1D8EE" x="512" y="336" />
+		<entity schema="dss" name="dss_organization_contact_person" color="3986C1" x="512" y="736" />
+		<entity schema="dss" name="dss_organization_type" color="3986C1" x="48" y="352" />
+		<entity schema="dss" name="dss_user_identity" color="3986C1" x="1008" y="416" />
+		<entity schema="dss" name="dss_user_privilege" color="3986C1" x="1104" y="832" />
+		<entity schema="dss" name="dss_user_role" color="3986C1" x="1136" y="736" />
+		<entity schema="dss" name="dss_user_role_assignment" color="C1D8EE" x="1584" y="704" />
+		<entity schema="dss" name="dss_user_role_privilege" color="3986C1" x="1584" y="800" />
+		<callout x="48" y="48" pointer="Round" >
 			<comment><![CDATA[Ministry of Housing
 Short Term Rental Data Sharing
 Physical Data Diagram (Sprint 2)

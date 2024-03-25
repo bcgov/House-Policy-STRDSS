@@ -407,7 +407,7 @@ namespace StrDss.Test
         public async Task SendDelistingWarningAsync_WhenCalled_ShouldSendEmail(
             DelistingWarningCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
@@ -428,7 +428,7 @@ namespace StrDss.Test
         public async Task SendDelistingWarningAsync_WhenHostEmailIsNotEmpty_AddsHostEmailToToList(
             DelistingWarningCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
@@ -449,7 +449,7 @@ namespace StrDss.Test
         public async Task SendDelistingWarningAsync_WhenHostEmailIsEmpty_DoesNotAddHostEmailToToList(
             DelistingWarningCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {
@@ -468,7 +468,7 @@ namespace StrDss.Test
         public async Task SendDelistingWarningAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToCcList(
             DelistingWarningCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
@@ -491,7 +491,7 @@ namespace StrDss.Test
         public async Task SendDelistingWarningAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
             DelistingWarningCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {
@@ -512,7 +512,7 @@ namespace StrDss.Test
         public async Task SendDelistingRequestAsync_WhenCalled_ShouldSendEmail(
             DelistingRequestCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
@@ -537,7 +537,7 @@ namespace StrDss.Test
         public async Task SendDelistingRequestAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToCcList(
             DelistingRequestCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
@@ -564,7 +564,7 @@ namespace StrDss.Test
         public async Task SendDelistingRequestAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
             DelistingRequestCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailService> emailServiceMock,
+            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {

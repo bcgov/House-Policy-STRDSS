@@ -20,8 +20,10 @@ namespace UITest.PageObjects
         private TextBox _LocalGovPhoneTextBox;
         private TextBox _LocalGovUrlTextBox;
         private Button _ReviewButton;
+        private Button _ReturnHomeButton;
+        private TextBox _StatusMessage;
 
-        private IDriver _Driver;
+        private IDriver _EmbededDriver;
 
         public DropDownList PlatformReceipientDropdown { get => _PlatformReceipientDropdown;  }
         public TextBox ListingIDNumberTextBox { get => _ListingIDNumberTextBox;  }
@@ -38,10 +40,13 @@ namespace UITest.PageObjects
         public TextBox LocalGovPhoneTextBox { get => _LocalGovPhoneTextBox; }
         public TextBox LocalGovUrlTextBox { get => _LocalGovUrlTextBox; }
         public Button ReviewButton { get => _ReviewButton; }
+        public Button ReturnHomeButton { get => _ReturnHomeButton; }
+        public TextBox StatusMessage { get => _StatusMessage; }
+        public IDriver EmbededDriver { get => _EmbededDriver; }
 
         public DelistingWarningPage(IDriver Driver)
         {
-            _Driver = Driver;
+            _EmbededDriver = Driver;
 
             _PlatformReceipientDropdown = new DropDownList(Driver, Enums.FINDBY.ID, DelistingWarningModel.PlatformReceipientDropDown);
             _ListingIDNumberTextBox = new TextBox(Driver, Enums.FINDBY.ID, DelistingWarningModel.ListingIDNumberTextBox);
@@ -55,6 +60,7 @@ namespace UITest.PageObjects
             _LocalGovPhoneTextBox = new TextBox(Driver, Enums.FINDBY.ID, DelistingWarningModel.LocalGovPhoneTextBox);
             _LocalGovUrlTextBox = new TextBox(Driver, Enums.FINDBY.ID, DelistingWarningModel.LocalGovUrlTextBox);
             _ReviewButton = new Button(Driver, Enums.FINDBY.ID, DelistingWarningModel.ReviewButton);
+            _ReturnHomeButton = new Button(Driver, Enums.FINDBY.ID, DelistingWarningModel.ReturnHomeButton);
         }
 
     }

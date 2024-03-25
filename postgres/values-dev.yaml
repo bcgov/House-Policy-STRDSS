@@ -4,7 +4,7 @@ primary:
   containerSecurityContext:
     enabled: false
   persistence:
-    size: 200Mi
+    size: 400Mi
   resources:
     limits:
       cpu: 150m
@@ -14,6 +14,6 @@ primary:
       memory: 150Mi
 readReplicas:
   persistence:
-    size: 200Mi
+    size: 400Mi
 nameOverride: strdssdev
 fullnameOverride: strdssdev

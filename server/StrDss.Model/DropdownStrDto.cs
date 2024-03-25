@@ -2,10 +2,10 @@
 
 namespace StrDss.Model
 {
-    public class DropdownDto
+    public class DropdownStrDto
     {
         [JsonPropertyName("value")]
-        public long Id { get; set; }
+        public string Id { get; set; }
         [JsonPropertyName("label")]
         public string Description { get; set; } = "";
     }

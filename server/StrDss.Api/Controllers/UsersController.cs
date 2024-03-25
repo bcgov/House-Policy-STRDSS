@@ -3,6 +3,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
 using StrDss.Model;
+using StrDss.Model.UserDtos;
+using StrDss.Service;
 
 namespace StrDss.Api.Controllers
 {
@@ -11,16 +13,70 @@ namespace StrDss.Api.Controllers
     [ApiController]
     public class UsersController : BaseApiController
     {
-        public UsersController(ICurrentUser currentUser, IMapper mapper, IConfiguration config)
+        private IUserService _userService;
+
+        public UsersController(ICurrentUser currentUser, IMapper mapper, IConfiguration config,
+            IUserService userService)
             : base(currentUser, mapper, config)
         {
+            _userService = userService;
         }
 
-        [HttpGet("currentuser", Name = "GetCurrentUser")]
         [ApiAuthorize]
+        [HttpGet("currentuser", Name = "GetCurrentUser")]
         public ActionResult<ICurrentUser> GetCurrentUser()
         {
             return Ok(_currentUser);
+        }
+
+        [ApiAuthorize]
+        [HttpGet("accessrequests", Name = "GetAccessRequestList")]
+        public async Task<ActionResult<PagedDto<AccessRequestDto>>> GetAccessRequestList(string? status, int pageSize, int pageNumber, string orderBy = "AccessRequestDtm", string direction = "")
+        {
+            var list = await _userService.GetAccessRequestListAsync(status ?? "", pageSize, pageNumber, orderBy, direction);
+            return Ok(list);
+        }
+
+        [ApiAuthorize]
+        [HttpPost("accessrequests", Name = "CreateAccessRequest")]
+        public async Task<ActionResult> CreateAccessRequest(AccessRequestCreateDto dto)
+        {
+            var errors = await _userService.CreateAccessRequestAsync(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
+        }
+
+        [ApiAuthorize]
+        [HttpPut("accessrequests/deny", Name = "DenyRequest")]
+        public async Task<ActionResult> DenyRequest(AccessRequestDenyDto dto)
+        {
+            var errors = await _userService.DenyAccessRequest(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
+        }
+
+        [ApiAuthorize]
+        [HttpPut("accessrequests/approve", Name = "ApproveRequest")]
+        public async Task<ActionResult> ApproveRequest(AccessRequestApproveDto dto)
+        {
+            var errors = await _userService.ApproveAccessRequest(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
         }
     }
 }

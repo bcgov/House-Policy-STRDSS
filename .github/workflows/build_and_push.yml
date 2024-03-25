@@ -97,11 +97,11 @@ jobs:
        
 
      # SonarQube integration
-      # - name: SonarQube Scan
-      #   uses: sonarsource/sonarcloud-github-action@v2
-      #   env:
-      #     SONAR_HOST_URL: https://sonarcloud.io
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
+      - name: SonarQube Scan
+        uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_HOST_URL: https://sonarcloud.io
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
   # Docker-build-backend:
   #   needs: [build-backend]

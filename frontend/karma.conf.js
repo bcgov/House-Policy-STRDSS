@@ -1,22 +1,22 @@
-module.exports = function (config) {
-    config.set({
-        basePath: '../',
+// module.exports = function (config) {
+//     config.set({
+//         basePath: '../',
 
-        files: [
-        ],
+//         files: [
+//         ],
 
-        frameworks: ['jasmine'],
+//         frameworks: ['jasmine'],
 
-        autoWatch: true,
+//         autoWatch: true,
 
-        browsers: ['ChromeHeadless'],
+//         browsers: ['ChromiumHeadless'],
 
-        customLaunchers: {
-                ChromeHeadless: {
-                    base: 'Chrome',
-                    flags: ['--headless', '--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage']
-                }
-        }
+//         customLaunchers: {
+//                 ChromiumHeadless: {
+//                     base: 'Chromium',
+//                     flags: ['--headless', '--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage']
+//                 }
+//         }
         
-    });
-};
+//     });
+// };

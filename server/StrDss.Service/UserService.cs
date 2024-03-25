@@ -89,6 +89,22 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
+            var adminUsers = await _userRepo.GetAdminUsers();
+
+            if (adminUsers.Count > 0)
+            {
+                var emails = adminUsers.Select(x => x.EmailAddressDsc);
+
+                var template = new NewAccessRequest(_emailService)
+                {
+                    Link = GetHostUrl(),
+                    To = emails,
+                    Info = $"New Access Request email for {_currentUser.DisplayName}"
+                };
+
+                await template.SendEmail();
+            }
+
             return errors;
         }
 

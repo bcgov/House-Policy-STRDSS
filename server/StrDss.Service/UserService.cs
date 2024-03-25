@@ -21,10 +21,10 @@ namespace StrDss.Service
     {
         private IUserRepository _userRepo;
         private IOrganizationRepository _orgRepo;
-        private IEmailService _emailService;
+        private IEmailMessageService _emailService;
 
         public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailService emailService)
+            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
             _userRepo = userRepo;

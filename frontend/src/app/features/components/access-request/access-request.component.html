@@ -1,0 +1,93 @@
+<p-card *ngIf="currentUser">
+    <ng-template pTemplate="header">
+        <div class="header-container bold-text">
+            Request Access
+        </div>
+    </ng-template>
+
+    <div class="content-header">
+        <div class="text-header bold-text">Hello, {{currentUser.firstName}}</div>
+        <div *ngIf="!hideForm" class="sub-header">Please identify yourself and your reason for requesting access</div>
+        <div *ngIf="hideForm" class="sub-header">Thank you for submitting your request</div>
+    </div>
+
+    <form *ngIf="!hideForm" [formGroup]="myForm">
+
+        <div class="form-group-row inline-block left-block">
+            <div class="form-group-row-col">
+                <label for="organizationType">What role best describes you?</label>
+            </div>
+            <div class="form-group-row-col">
+                <p-dropdown [options]="roles" formControlName="organizationType" [showClear]="true"
+                    placeholder="Please Select..." id="organizationType" name="organizationType"
+                    [ngClass]="'full-width-text-field'" [required]="true"></p-dropdown>
+            </div>
+        </div>
+
+        <div class="form-group-row inline-block right-block">
+            <div class="form-group-row-col">
+                <label for="organizationName">Your Organization</label>
+            </div>
+            <div class="form-group-row-col">
+                <input placeholder="Enter Name..." [ngClass]="'full-width-text-field'" type="text" pInputText
+                    formControlName="organizationName" id="organizationName" name="organizationName" />
+            </div>
+        </div>
+
+        <div class="form-group-row inline-block form-spacer">
+            <div class="form-group-row-col validation-errors" *ngIf="!organizationTypeControl.pristine">
+
+                <small id="requiredOrganizationType" *ngIf="organizationTypeControl.errors?.['required']">Local
+                    Role is required
+                </small>
+            </div>
+            <div class="form-group-row-col validation-errors" *ngIf="!organizationNameControl.pristine">
+
+                <small id="requiredOrganizationName" *ngIf="organizationNameControl.errors?.['required']">Local
+                    Organization name is
+                    required</small>
+            </div>
+        </div>
+    </form>
+
+    <div *ngIf="!hideForm" class="disclaimer">
+        <span class="bold-text">[Text coming soon - need to check with legal team, so this is just a place holder!]
+        </span>
+        <p>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Explicabo nobis molestiae in ducimus quasi qui et
+            maxime quaerat rerum mollitia, sunt itaque a, culpa, minima error. Impedit odio blanditiis ab dolorem
+            mollitia, dicta provident obcaecati corporis?
+        </p>
+    </div>
+
+    <p-messages *ngIf="showRequestedSuccessfullyMessage" severity="success">
+        <ng-template pTemplate>
+            <div class="message-icon-block">
+                <img src="../../../../assets/images/circle-check.svg" alt="Success icon" width="20" />
+            </div>
+            <div class="ml-2 message">
+                <strong class="bold-text">Request sent successfully!</strong>
+                <p> Your request has been successfully submitted and is waiting for approval.</p>
+                <strong class="bold-text">What happens next</strong>
+                <p> You will receive an email with further details once your request has been processed.</p>
+            </div>
+        </ng-template>
+    </p-messages>
+
+    <p-messages *ngIf="showRequestedFailedMessage" severity="error">
+        <ng-template pTemplate>
+            <div class="message-icon-block">
+                <img src="../../../../assets/images/circle-failed.svg" alt="Error icon" width="20" />
+            </div>
+            <div class="ml-2 message">
+                <div *ngFor="let error of messages">
+                    <strong class="bold-text">{{error.summary}}</strong>
+                    <p> {{error.detail}}</p>
+                </div>
+            </div>
+        </ng-template>
+    </p-messages>
+
+    <p-button *ngIf="!hideForm" label="Submit" (click)="onRequest()" id="form-submit-btn"
+        [disabled]="!myForm.valid"></p-button>
+</p-card>

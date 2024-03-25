@@ -29,7 +29,7 @@ namespace StrDss.Test.AutoDomainDataBuilder
                 case nameof(DelistingRequestCreateDto.ListingId):
                     return 1;
                 case nameof(DelistingRequestCreateDto.LgId):
-                    return 1;
+                    return 2;
 
                 case nameof(DelistingRequestCreateDto.ListingUrl):
                     return "https://example.com/listing";

@@ -28,25 +28,34 @@ public partial class DssEmailMessage
     /// </summary>
     public string MessageTemplateDsc { get; set; } = null!;
 
-    /// <summary>
-    /// A description of the justification for initiating the message
-    /// </summary>
-    public string? MessageReasonDsc { get; set; }
+    public bool IsHostContactedExternally { get; set; }
 
-    /// <summary>
-    /// User-provided URL for a short-term rental platform listing that is the subject of the message
-    /// </summary>
-    public string? UnreportedListingUrl { get; set; }
+    public bool IsSubmitterCcRequired { get; set; }
+
+    public long? MessageReasonId { get; set; }
+
+    public string? LgPhoneNo { get; set; }
+
+    public string? UnreportedListingNo { get; set; }
 
     /// <summary>
     /// E-mail address of a short term rental host (directly entered by the user as a message recipient)
     /// </summary>
     public string? HostEmailAddressDsc { get; set; }
 
+    public string? LgEmailAddressDsc { get; set; }
+
     /// <summary>
     /// E-mail address of a secondary message recipient (directly entered by the user)
     /// </summary>
     public string? CcEmailAddressDsc { get; set; }
+
+    /// <summary>
+    /// User-provided URL for a short-term rental platform listing that is the subject of the message
+    /// </summary>
+    public string? UnreportedListingUrl { get; set; }
+
+    public string? LgStrBylawUrl { get; set; }
 
     /// <summary>
     /// Foreign key
@@ -65,7 +74,11 @@ public partial class DssEmailMessage
 
     public virtual DssUserIdentity? AffectedByUserIdentity { get; set; }
 
+    public virtual DssEmailMessageType EmailMessageTypeNavigation { get; set; } = null!;
+
     public virtual DssUserIdentity InitiatingUserIdentity { get; set; } = null!;
 
     public virtual DssOrganization? InvolvedInOrganization { get; set; }
+
+    public virtual DssMessageReason? MessageReason { get; set; }
 }

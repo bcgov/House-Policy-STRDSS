@@ -1,36 +1,41 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrDss.Data;
+using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Service.HttpClients;
 using System.Text;
 
 namespace StrDss.Service
 {
-    public interface IEmailService
+    public interface IEmailMessageService
     {
-        Task<string> SendEmailAsync(EmailContent emailContent);
+        Task SendEmailAsync(EmailContent emailContent);
+        Task<List<DropdownNumDto>> GetMessageReasons(string messageType);
     }
 
-    public class EmailService : ServiceBase, IEmailService
+    public class EmailMessageService : ServiceBase, IEmailMessageService
     {
         private readonly HttpClient _httpClient;
+        private readonly IEmailMessageRepository _emailRepo;
         private readonly IConfiguration _config;
         private readonly IChesTokenApi _chesTokenApi;
-        private readonly ILogger<EmailService> _logger;
+        private readonly ILogger<EmailMessageService> _logger;
 
-        public EmailService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper,
-            IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<EmailService> logger)
-            : base(currentUser, validator, unitOfWork, mapper)
+        public EmailMessageService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
+            IEmailMessageRepository emailRepo, IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<EmailMessageService> logger)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
+            _emailRepo = emailRepo;
             _config = config;
             _httpClient = httpClient;
             _chesTokenApi = chesTokenApi;
             _logger = logger;
         }
 
-        public async Task<string> SendEmailAsync(EmailContent emailContent)
+        public async Task SendEmailAsync(EmailContent emailContent)
         {
             var env = _config.GetValue<string>("ENV_NAME") ?? "dev";
 
@@ -60,16 +65,20 @@ namespace StrDss.Service
                 {
                     var error = $"Failed to send '{emailContent.Subject}' for {emailContent.Info}. Status code: {response.StatusCode}";
                     _logger.LogError(error);
-                    return error;
+                    throw new Exception(error);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Exception raised when sending '{emailContent.Subject}' for {emailContent.Info} - {ex}");
-                return ex.Message;
+                var error = $"Exception raised when sending '{emailContent.Subject}' for {emailContent.Info}.";
+                _logger.LogError($"{error} - {ex}");
+                throw new Exception(error);
             }
+        }
 
-            return "";
+        public async Task<List<DropdownNumDto>> GetMessageReasons(string messageType)
+        {
+            return await _emailRepo.GetMessageReasons(messageType);
         }
     }
 

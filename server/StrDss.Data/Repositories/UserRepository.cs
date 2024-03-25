@@ -110,7 +110,9 @@ namespace StrDss.Data.Repositories
         {
             var adminUsers = await _dbContext.DssUserRoles
                 .Where(x => x.UserRoleCd == Roles.CeuAdmin)
-                .SelectMany(x => x.UserIdentities).ToListAsync();
+                .SelectMany(x => x.UserIdentities)
+                .Where(x => x.IsEnabled == true)
+                .ToListAsync();
 
             return _mapper.Map<List<UserDto>>(adminUsers);
         }

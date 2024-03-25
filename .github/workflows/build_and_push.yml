@@ -46,11 +46,11 @@ jobs:
         run: dotnet test ./server/server.sln --no-build
 
      # SonarQube integration for backend
-      - name: SonarQube Scan Backend
-        uses: sonarsource/sonarcloud-github-action@v2
-        env:
-          SONAR_HOST_URL: https://sonarcloud.io
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
+      # - name: SonarQube Scan Backend
+      #   uses: sonarsource/sonarcloud-github-action@v2
+      #   env:
+      #     SONAR_HOST_URL: https://sonarcloud.io
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
   build-frontend:
     runs-on: ubuntu-22.04
@@ -96,8 +96,8 @@ jobs:
         continue-on-error: true
        
 
-     # SonarQube integration for frontend
-      - name: SonarQube Scan Frontend
+     # SonarQube integration
+      - name: SonarQube Scan
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_HOST_URL: https://sonarcloud.io

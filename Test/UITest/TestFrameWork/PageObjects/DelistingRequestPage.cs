@@ -17,7 +17,7 @@ namespace UITest.PageObjects
         private Button _ReviewButton;
         private Button _ReturnHomeButton;
 
-        private IDriver _Driver;
+        private IDriver _EmbededDriver;
 
         public DropDownList PlatformReceipientDropdown { get => _PlatformReceipientDropdown; }
         public DropDownList RequestInitiatedByDropDown { get => _RequestInitiatedByDropDown; }
@@ -29,10 +29,12 @@ namespace UITest.PageObjects
         public Button ReviewButton { get => _ReviewButton; }
 
         public Button ReturnHomeButton { get => _ReturnHomeButton; }
+        public IDriver EmbededDriver { get => _EmbededDriver; }
+
 
         public DelistingRequestPage(IDriver Driver)
         {
-            _Driver = Driver;
+            _EmbededDriver = Driver;
             //_RequestInitiatedByDropDown = new DropDownList(Driver, Enums.FINDBY.ID, DelistingRequestModel.RequestInitiatedByDropDown);
             _PlatformReceipientDropdown = new DropDownList(Driver, Enums.FINDBY.ID, DelistingRequestModel.PlaformRecepientDropDown);
             _RequestInitiatedByDropDown = new DropDownList(Driver, Enums.FINDBY.ID, DelistingRequestModel.RequestInitiatedByDropDown);

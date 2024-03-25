@@ -27,5 +27,8 @@
         public static string LocalGovUrlTextBox { get => "StrBylawUrl"; }
 
         public static string ReviewButton { get => "form-preview-btn"; }
+
+        public static string ReturnHomeButton { get => "return-home-btn"; }
+
     }
 }

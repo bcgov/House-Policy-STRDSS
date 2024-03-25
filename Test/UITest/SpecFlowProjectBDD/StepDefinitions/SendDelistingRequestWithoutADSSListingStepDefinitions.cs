@@ -163,13 +163,15 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("the system should send the delisting request message to the platform email addresses associated with the selected platform")]
         public void ThenTheSystemShouldSendTheDelistingRequestMessage() 
         {
-            _DelistingRequestPage.ReturnHomeButton.Click();
+
         }
 
         //ConfirmationMessage
         [When("successful submission")]
         public void WhenSuccessfulSubmission() 
-        { 
+        {
+            Assert.IsTrue(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+            _DelistingRequestPage.ReturnHomeButton.Click();
         }
 
         [Then("I should receive a confirmation message indicating that the delisting request has been sent")]

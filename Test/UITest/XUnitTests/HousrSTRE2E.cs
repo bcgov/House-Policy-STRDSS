@@ -62,24 +62,11 @@ namespace XUnitTests
                 _IDRLoginPage.ContinueButton.WaitFor();
                 _IDRLoginPage.ContinueButton.Click();
 
-
-                //Click to populate dropdown values
-                _DelistingRequestPage.PlatformReceipientDropdown.Click();
-
-                Assert.Contains("SELECT A PLATFORM", _DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper());
-
+                //Enter ListingID Number
                 _DelistingRequestPage.ListingIDNumberTextBox.EnterText("1");
-
-                //Click to deselect
-                _DelistingRequestPage.PlatformReceipientDropdown.Click();
 
                 //Test with Valid email address
                 _DelistingRequestPage.AdditionalCCsTextBox.EnterText("foo@foo.com");
-
-
-
-                //Test with Invalid email address
-                //_DelistingRequestPage.AdditionalCCsTextBox.EnterText("foo@@joe");
 
                 _DelistingRequestPage.ListingUrlTextBox.EnterText("http://listingUrl.com");
 
@@ -94,6 +81,8 @@ namespace XUnitTests
 
                 _TakeDownRequestPage.SubmitButton.Click();
 
+                //Validate successful submission 
+                Assert.True(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
                 _DelistingRequestPage.ReturnHomeButton.Click();
 
                 
@@ -156,11 +145,6 @@ namespace XUnitTests
                 //Additional CCs
                 _DelistingWarningPage.AdditionalCCsTextBox.EnterText("foo@foo.com");
                 
-
-                //_DelistingWarningPage.PlatformReceipientDropdown.Click();
-                //_DelistingWarningPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-                //Assert.Contains("AIRBNB", _DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper());
-
                 //local gov email
                 _DelistingWarningPage.LocalGovEmailTextBox.EnterText("Local@gov.com");
 
@@ -170,12 +154,20 @@ namespace XUnitTests
                 //local gov STR by-law info
                 _DelistingWarningPage.LocalGovUrlTextBox.EnterText("http://STRBylaw.local.gov");
 
+
+                //Click Review Button
                 _DelistingWarningPage.ReviewButton.Click();
 
+                //Add comment and submit the request
                 _NoticeOfTakeDownPage.CommentsTextBox.EnterText("get a business license");
                 _NoticeOfTakeDownPage.SubmitButton.Click();
 
 
+                //Validate successful submission 
+                Assert.True(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+
+                //If submit is sucessful, then return  to home page
+                _DelistingWarningPage.ReturnHomeButton.Click();
             }
             finally
             {

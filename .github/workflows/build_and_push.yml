@@ -96,7 +96,7 @@ jobs:
         continue-on-error: true
        
 
-     # SonarQube integration
+     # SonarQube integration frontend
       - name: SonarQube Scan
         uses: sonarsource/sonarcloud-github-action@v2
         env:

@@ -8,21 +8,16 @@ helm install strdsstest bitnami/postgresql -f values-test.yaml
 Enable PostGIS extension
 https://github.com/bitnami/charts/issues/2830
 
-Login
-  psql -U postgres
-
-Create Extension
-  CREATE EXTENSION postgis;
-
-Create Database
-
+psql -U postgres
+CREATE ROLE strdssdev WITH LOGIN PASSWORD 'postgres';
 CREATE DATABASE strdssdev;
-CREATE EXTENSION postgis;
-CREATE ROLE strdssdev WITH LOGIN PASSWORD '';
 ALTER DATABASE strdssdev OWNER TO strdssdev;
-CREATE SCHEMA IF NOT EXISTS dss;
-ALTER DATABASE strdssdev SET search_path TO dss;
+\c strdssdev
+CREATE EXTENSION postgis;
 
+
+
+# Drop
 REASSIGN OWNED BY strdssdev TO postgres;
 DROP OWNED BY strdssdev;
 DROP ROLE strdssdev;

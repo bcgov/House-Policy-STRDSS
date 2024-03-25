@@ -2,7 +2,7 @@
 {
     public class AccessRequestDenial : EmailTemplateBase
     {
-        public AccessRequestDenial(IEmailService emailService) : base(emailService)
+        public AccessRequestDenial(IEmailMessageService emailService) : base(emailService)
         {
         }
 

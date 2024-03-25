@@ -63,7 +63,14 @@ VALUES (src.organization_type, src.organization_type_nm);
 
 MERGE INTO dss_user_privilege AS tgt
 USING ( SELECT * FROM (VALUES
-('takedown_action','Create Takedown Action'))
+('user_read','View users'),
+('user_write','Manage users'),
+('listing_read','View listings'),
+('licence_file_upload','Upload business licence files'),
+('listing_file_upload','Upload platform listing files'),
+('audit_read','View audit logs'),
+('takedown_action','Create Takedown Action'),
+('ceu_action','Create CEU Action'))
 AS s (user_privilege_cd, user_privilege_nm)
 ) AS src
 ON (tgt.user_privilege_cd=src.user_privilege_cd)
@@ -93,7 +100,22 @@ VALUES (src.user_role_cd, src.user_role_nm);
 
 MERGE INTO dss_user_role_privilege AS tgt
 USING ( SELECT * FROM (VALUES
-('ceu_admin','takedown_action'))
+('ceu_admin','user_read'),
+('ceu_admin','user_write'),
+('ceu_admin','listing_read'),
+('ceu_admin','licence_file_upload'),
+('ceu_admin','listing_file_upload'),
+('ceu_admin','ceu_action'),
+('ceu_staff','listing_read'),
+('ceu_staff','audit_read'),
+('ceu_staff','ceu_action'),
+('bc_staff','listing_read'),
+('bc_staff','audit_read'),
+('lg_staff','listing_read'),
+('lg_staff','licence_file_upload'),
+('lg_staff','audit_read'),
+('lg_staff','takedown_action'),
+('platform_staff','listing_file_upload'))
 AS s (user_role_cd, user_privilege_cd)
 ) AS src
 ON (tgt.user_role_cd=src.user_role_cd AND tgt.user_privilege_cd=src.user_privilege_cd)

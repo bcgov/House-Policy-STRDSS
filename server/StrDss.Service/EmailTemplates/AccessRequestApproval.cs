@@ -2,7 +2,7 @@
 {
     public class AccessRequestApproval : EmailTemplateBase
     {
-        public AccessRequestApproval(IEmailService emailService) : base(emailService)
+        public AccessRequestApproval(IEmailMessageService emailService) : base(emailService)
         {
         }
 

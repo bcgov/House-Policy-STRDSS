@@ -28,22 +28,34 @@ public partial class DssEmailMessage
     /// </summary>
     public string MessageTemplateDsc { get; set; } = null!;
 
+    public bool IsHostContactedExternally { get; set; }
+
+    public bool IsSubmitterCcRequired { get; set; }
+
     public long? MessageReasonId { get; set; }
 
-    /// <summary>
-    /// User-provided URL for a short-term rental platform listing that is the subject of the message
-    /// </summary>
-    public string? UnreportedListingUrl { get; set; }
+    public string? LgPhoneNo { get; set; }
+
+    public string? UnreportedListingNo { get; set; }
 
     /// <summary>
     /// E-mail address of a short term rental host (directly entered by the user as a message recipient)
     /// </summary>
     public string? HostEmailAddressDsc { get; set; }
 
+    public string? LgEmailAddressDsc { get; set; }
+
     /// <summary>
     /// E-mail address of a secondary message recipient (directly entered by the user)
     /// </summary>
     public string? CcEmailAddressDsc { get; set; }
+
+    /// <summary>
+    /// User-provided URL for a short-term rental platform listing that is the subject of the message
+    /// </summary>
+    public string? UnreportedListingUrl { get; set; }
+
+    public string? LgStrBylawUrl { get; set; }
 
     /// <summary>
     /// Foreign key

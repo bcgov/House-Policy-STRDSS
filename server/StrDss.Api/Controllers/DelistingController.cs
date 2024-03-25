@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
+using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.WarningReasonDtos;
@@ -20,21 +21,23 @@ namespace StrDss.Api.Controllers
         private ILogger<DelistingController> _logger { get; }
         private IDelistingService _delistingService { get; }
 
+        private IEmailMessageService _emailService;
+
         public DelistingController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IChesTokenApi chesTokenApi, ILogger<DelistingController> logger,
-            IDelistingService delistingService)
+            IDelistingService delistingService, IEmailMessageService emailService)
             : base(currentUser, mapper, config)
         {
             _chesTokenApi = chesTokenApi;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _delistingService = delistingService;
+            _emailService = emailService;
         }
 
         [ApiAuthorize]
         [HttpGet("reasons/dropdown", Name = "GetWarningReasonDrowdown")]
-        public async Task<ActionResult<DropdownStrDto>> GetWarningReasonDrowdown()
+        public async Task<ActionResult<List<DropdownNumDto>>> GetWarningReasonDrowdown()
         {
-            await Task.CompletedTask;
-            return Ok(WarningReasonDto.WarningReasons.Select(x => new DropdownStrDto { Id = x.WarningReasonId.ToString(), Description = x.Reason }));
+            return await _emailService.GetMessageReasons(EmailMessageTypes.NoticeOfTakedown);
         }
 
         [ApiAuthorize]

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { DropdownOption } from '../models/dropdown-option';
 import { ComplianceNotice } from '../models/compliance-notice';
+import { DelistingRequest } from '../models/delisting-request';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,11 @@ export class DelistingService {
   constructor(private httpClient: HttpClient) { }
 
   getPlatforms(): Observable<Array<DropdownOption>> {
-    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/platforms/dropdown`)
+    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/dropdown/?type=Platform`)
+  }
+
+  getLocalGovernments(): Observable<Array<DropdownOption>> {
+    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations?type=LG`)
   }
 
   getReasons(): Observable<Array<DropdownOption>> {
@@ -29,11 +34,11 @@ export class DelistingService {
     return this.httpClient.post<any>(`${environment.API_HOST}/delisting/warnings`, complianceNotice)
   }
 
-  delistingRequestPreview(delistingRequest: ComplianceNotice): Observable<{ content: string }> {
+  delistingRequestPreview(delistingRequest: DelistingRequest): Observable<{ content: string }> {
     return this.httpClient.post<{ content: string }>(`${environment.API_HOST}/delisting/requests/preview`, delistingRequest)
   }
 
-  createDelistingRequest(delistingRequest: ComplianceNotice): Observable<any> {
+  createDelistingRequest(delistingRequest: DelistingRequest): Observable<any> {
     return this.httpClient.post<any>(`${environment.API_HOST}/delisting/requests`, delistingRequest)
   }
 }

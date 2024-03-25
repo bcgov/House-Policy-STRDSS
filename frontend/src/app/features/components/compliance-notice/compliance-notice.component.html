@@ -1,14 +1,19 @@
 <div class="title">Send Notice of Takedown</div>
-<div class="sub-title">All fields are required except where stated</div>
+<p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
+<div *ngIf="!hideForm" class="sub-title">All fields are required except where stated</div>
 
-<form [formGroup]="myForm" (ngSubmit)="onPreview()">
+<form *ngIf="!hideForm" [formGroup]="myForm" (ngSubmit)="onPreview()">
     <div class="form-group-row">
         <div class="form-group-row-col">
             <label for="platformId">Select Platform recipient</label>
         </div>
         <div class="form-group-row-col">
             <p-dropdown [options]="platformOptions" formControlName="platformId" [showClear]="true"
-                placeholder="Select a platform" id="platformId" name="platformId" [required]="true"></p-dropdown>
+                placeholder="Please Select..." id="platformId" name="platformId" [required]="true"></p-dropdown>
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!platformIdControl.pristine">
+            <small id="requiredPlatformId" *ngIf="platformIdControl.errors?.['required']">Platform recipient is
+                required</small>
         </div>
     </div>
 
@@ -17,8 +22,8 @@
             <label for="listingId">Add Listing ID Number if known (Optional)</label>
         </div>
         <div class="form-group-row-col">
-            <input class="long-text-field" type="number" pInputText formControlName="listingId" id="listingId"
-                name="listingId" />
+            <input class="long-text-field" placeholder="Enter Value..." type="number" pInputText
+                formControlName="listingId" id="listingId" name="listingId" />
         </div>
     </div>
 
@@ -30,8 +35,13 @@
                 URL</label>
         </div>
         <div class="form-group-row-col">
-            <input class="long-text-field" type="text" pInputText formControlName="listingUrl" id="listingUrl"
-                name="listingUrl" required />
+            <input class="long-text-field" type="text" placeholder="HTTPS://..." pInputText formControlName="listingUrl"
+                id="listingUrl" name="listingUrl" required />
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!listingUrlControl.pristine">
+            <small id="invalidUrl" *ngIf="listingUrlControl.errors?.['invalidUrl']">Please make sure the URL format that
+                you have entered is correct</small>
+            <small id="requiredUrl" *ngIf="listingUrlControl.errors?.['required']">Listing URL is required</small>
         </div>
     </div>
 
@@ -43,14 +53,22 @@
             <label for="hostEmail">Host’s Email Address (This is mandatory unless the checkbox below is checked)</label>
         </div>
         <div class="form-group-row-col">
-            <input type="text" pInputText formControlName="hostEmail" id="hostEmail" name="hostEmail" />
+            <input type="text" placeholder="Enter Value..." pInputText formControlName="hostEmail" id="hostEmail"
+                name="hostEmail" />
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!hostEmailControl.pristine">
+            <small id="invalidEmail" *ngIf="hostEmailControl.errors?.['email']">Please make sure the email format
+                you have entered is correct</small>
+            <small id="requiredEmail" *ngIf="hostEmailControl.errors?.['required']">Host’s Email Address is
+                required</small>
         </div>
     </div>
 
     <div class="form-group-row">
         <div class="form-group-row-col has-checkbox">
             <p-checkbox formControlName="sentAlternatively" [binary]="true" id="sentAlternatively"
-                name="sentAlternatively" inputId="sentAlternativelyInput"></p-checkbox>
+                name="sentAlternatively" inputId="sentAlternativelyInput"
+                (onChange)="onAlternativeDeliveryChanged($event)"></p-checkbox>
             <label for="sentAlternatively">A notice has been sent to the host through an alternate delivery
                 method.</label>
         </div>
@@ -62,7 +80,11 @@
         </div>
         <div class="form-group-row-col">
             <p-dropdown [options]="reasonOptions" formControlName="reasonId" [showClear]="true"
-                placeholder="Select a reason" id="reasonId" name="reasonId" [required]="true"></p-dropdown>
+                placeholder="Please Select..." id="reasonId" name="reasonId" [required]="true"></p-dropdown>
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!reasonIdControl.pristine">
+            <small id="requiredReasonId" *ngIf="reasonIdControl.errors?.['required']">Reason for request is
+                required</small>
         </div>
     </div>
 
@@ -81,7 +103,13 @@
             <label for="ccList">Additional CCs (optional)</label>
         </div>
         <div class="form-group-row-col">
-            <textarea formControlName="ccList" rows="1" cols="20" pInputTextarea id="ccList" name="ccList"></textarea>
+            <textarea formControlName="ccList" placeholder="Enter Email(s)..." rows="1" cols="20" pInputTextarea
+                id="ccList" name="ccList"></textarea>
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine">
+            <small id="invalidCcList" *ngIf="ccListControl.errors?.['invalidEmailList']">Please make sure the email
+                format
+                you have entered is correct</small>
         </div>
     </div>
 
@@ -92,8 +120,8 @@
             <label for="LgContactEmail">Email</label>
         </div>
         <div class="form-group-row-col">
-            <input type="text" pInputText formControlName="LgContactEmail" id="LgContactEmail" name="LgContactEmail"
-                required />
+            <input type="text" placeholder="Enter Email..." pInputText formControlName="LgContactEmail"
+                id="LgContactEmail" name="LgContactEmail" required />
         </div>
     </div>
 
@@ -108,6 +136,17 @@
         </div>
     </div>
 
+    <div class="form-group-row inline-block form-spacer">
+        <div class="form-group-row-col validation-errors" *ngIf="!lgContactEmailControl.pristine">
+            <small id="invalidLgContactEmail" *ngIf="lgContactEmailControl.errors?.['email']">Please make sure the email
+                format
+                you have entered is correct</small>
+            <small id="requiredLgContactEmail" *ngIf="lgContactEmailControl.errors?.['required']">Local Government’s
+                Email Address is
+                required</small>
+        </div>
+    </div>
+
     <div class="form-group-row">
         <div class="form-group-row-col">
             <span class="info-tooltip" pTooltip="Enter additional email addresses in the CC field separated by commas."
@@ -116,8 +155,14 @@
                 (Optional)</label>
         </div>
         <div class="form-group-row-col">
-            <input class="long-text-field" type="text" pInputText formControlName="StrBylawUrl" id="StrBylawUrl"
-                name="StrBylawUrl" />
+            <input class="long-text-field" placeholder="HTTPS://..." type="text" pInputText
+                formControlName="StrBylawUrl" id="StrBylawUrl" name="StrBylawUrl" />
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!strBylawUrlControl.pristine">
+            <small id="invalidStrBylawUrlControl" *ngIf="strBylawUrlControl.errors?.['invalidUrl']">Please make sure the
+                URL
+                format that
+                you have entered is correct</small>
         </div>
     </div>
 
@@ -146,5 +191,4 @@
         <p-button label="Submit" id="submit-dialog-btn" (click)="onSubmit(textarea.value,textarea)"></p-button>
     </div>
 </p-dialog>
-
-<p-toast></p-toast>
+<p-button *ngIf="hideForm" label="Return Home" id="return-home-btn" (click)="onReturnHome()"></p-button>

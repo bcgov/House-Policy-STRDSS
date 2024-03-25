@@ -177,7 +177,11 @@ namespace SpecFlowProjectBDD.StepDefinitions
         //ConfirmationMessage
         [When("successful submission")]
         public void WhenSuccessfulSubmission() 
-        { 
+        {
+            //Validate message and return to home page
+            System.Threading.Thread.Sleep(3000);
+            Assert.IsTrue(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+            _DelistingWarningPage.ReturnHomeButton.Click();
         }
 
         [Then("I should receive a confirmation message indicating that the delisting warning has been sent")]

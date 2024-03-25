@@ -6,7 +6,7 @@ namespace UITest.PageObjects
 {
     public class HomePage
     {
-        private string _URL = @"localhost:5002/login";
+        private string _URL = @"localhost:4200/login";
         private Button _ViewPolicyGuidenceButton;
         private Button _SendNoticeButton;
         private Button _SendTakedownLetterButton;

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -13,13 +13,29 @@ import { ButtonModule } from 'primeng/button';
 import { validateEmailListString, validateUrl } from '../../../common/consts/validators.const';
 import { ToastModule } from 'primeng/toast';
 import { HttpErrorResponse } from '@angular/common/http';
-import { MessageService } from 'primeng/api';
+import { Message } from 'primeng/api';
+import { DelistingRequest } from '../../../common/models/delisting-request';
+import { TooltipModule } from 'primeng/tooltip';
+import { MessagesModule } from 'primeng/messages';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-delisting-request',
   standalone: true,
-  imports: [ReactiveFormsModule, DropdownModule, InputTextModule, InputTextareaModule,
-    CheckboxModule, CommonModule, ChipsModule, DialogModule, ButtonModule, ToastModule],
+  imports: [
+    ReactiveFormsModule,
+    DropdownModule,
+    InputTextModule,
+    InputTextareaModule,
+    MessagesModule,
+    CheckboxModule,
+    CommonModule,
+    ChipsModule,
+    DialogModule,
+    TooltipModule,
+    ButtonModule,
+    ToastModule,
+  ],
   templateUrl: './delisting-request.component.html',
   styleUrl: './delisting-request.component.scss'
 })
@@ -27,23 +43,45 @@ export class DelistingRequestComponent implements OnInit {
   myForm!: FormGroup;
 
   platformOptions = new Array<DropdownOption>();
-  reasonOptions = new Array<DropdownOption>();
+  initiatorsOptions = new Array<DropdownOption>();
 
   isPreviewVisible = false;
+  hideForm = false;
   previewText = 'No preview'
 
-  constructor(private fb: FormBuilder, private delistingService: DelistingService, private messageService: MessageService) { }
+  messages = new Array<Message>();
+
+  public get lgIdControl(): AbstractControl {
+    return this.myForm.controls['lgId'];
+  }
+  public get platformIdControl(): AbstractControl {
+    return this.myForm.controls['platformId'];
+  }
+  public get listingUrlControl(): AbstractControl {
+    return this.myForm.controls['listingUrl'];
+  }
+  public get ccListControl(): AbstractControl {
+    return this.myForm.controls['ccList'];
+  }
+
+  constructor(private fb: FormBuilder, private delistingService: DelistingService, private router: Router) { }
 
   ngOnInit(): void {
     this.initForm();
 
     this.delistingService.getPlatforms().subscribe((platformOptions) => this.platformOptions = platformOptions);
-    this.delistingService.getReasons().subscribe((reasonOptions) => this.reasonOptions = reasonOptions);
+    this.delistingService.getLocalGovernments().subscribe((lgOptions) => this.initiatorsOptions = lgOptions);
   }
 
   onPreview(): void {
     if (this.myForm.valid) {
-      this.delistingService.delistingRequestPreview(this.myForm.value).subscribe(
+      const model: DelistingRequest = Object.assign({}, this.myForm.value);
+
+      model.ccList = this.myForm.value['ccList'].prototype === Array
+        ? this.myForm.value
+        : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
+
+      this.delistingService.delistingRequestPreview(model).subscribe(
         {
           next: preview => {
             this.previewText = preview.content;
@@ -55,29 +93,32 @@ export class DelistingRequestComponent implements OnInit {
         }
       )
     } else {
+      this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Form is invalid' }];
       console.error('Form is invalid!');
     }
   }
 
-  onSubmit(comment: string): void {
+  onSubmit(): void {
     if (this.myForm.valid) {
-      const formValue = this.myForm.value;
-      formValue.comment = comment;
+      const model: DelistingRequest = this.myForm.value;
+      model.ccList = this.myForm.value['ccList'].prototype === Array
+        ? this.myForm.value
+        : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
 
-      this.delistingService.createDelistingRequest(formValue).subscribe({
-        next: (_) => {
-          this.myForm.reset();
-          this.initForm();
-          this.onPreviewClose();
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message has been sent successfully' });
-        },
-        error: (error) => {
-          this.myForm.reset();
-          this.initForm();
-          this.onPreviewClose();
-          this.showErrors(error);
-        }
-      })
+      this.delistingService.createDelistingRequest(model)
+        .subscribe({
+          next: (_) => {
+            this.showSuccessMessage();
+          },
+          error: (error) => {
+            this.showErrors(error);
+          },
+          complete: () => {
+            this.myForm.reset();
+            this.initForm();
+            this.onPreviewClose();
+          }
+        });
     }
   }
 
@@ -85,29 +126,39 @@ export class DelistingRequestComponent implements OnInit {
     this.isPreviewVisible = false;
   }
 
+  onReturnHome(): void {
+    this.router.navigateByUrl('/');
+  }
+
+  showSuccessMessage(): void {
+    this.hideForm = true;
+    this.messages = [{ severity: 'success', summary: '', detail: 'Your Notice of Takedown was Successfully Submitted!' }];
+  }
+
   private initForm(): void {
     this.myForm = this.fb.group({
+      lgId: [0, Validators.required],
       platformId: [0, Validators.required],
+      listingId: [null],
       listingUrl: ['', [Validators.required, validateUrl()]],
       sendCopy: [true],
-      ccList: [[], validateEmailListString()],
-      comment: [''],
+      ccList: ['', validateEmailListString()],
     });
   }
 
-  showErrors(error: HttpErrorResponse | any): void {
+  private showErrors(error: HttpErrorResponse | any): void {
     let errorObject = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
     if (error.error['detail']) {
-      this.messageService.add({ severity: 'error', summary: 'Validation error', detail: error.error['detail'], life: 10000 });
+      this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: error.error['detail'] }];
     } else {
       const errorKeys = Object.keys(errorObject.errors)
 
       if (!errorKeys) {
-        this.messageService.add({ severity: 'error', summary: 'Validation error', detail: 'Some properties are not valid' });
+        this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Some properties are not valid' }];
       }
       else {
         errorKeys.forEach(key => {
-          this.messageService.add({ severity: 'error', summary: 'Validation error', detail: errorObject.errors[key] });
+          this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: errorObject.errors[key] }];
         });
       }
     }

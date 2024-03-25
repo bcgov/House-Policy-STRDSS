@@ -1,0 +1,104 @@
+:host {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+
+    .message-icon-block {
+        align-self: start;
+        margin-right: 16px;
+    }
+
+    p-card {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+
+        * {
+            font-family: 'BcSans-regular';
+        }
+
+        .bold-text {
+            font-family: 'BcSans-bold';
+        }
+
+        .header-container {
+            height: 51px;
+            background-color: #053662;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            color: white;
+            padding: 10px 25px;
+
+            font-size: 20px;
+            line-height: 27px;
+        }
+
+        .content-header {
+            .text-header {
+                padding-bottom: 12px;
+            }
+
+            .sub-header {
+                padding-bottom: 12px;
+            }
+        }
+
+        .form-group-row {
+            width: 100%;
+
+            .validation-errors {
+                small {
+                    color: #D32F2F;
+                }
+            }
+
+            label {
+                line-height: 26px;
+            }
+
+            &.form-spacer {
+                padding-top: 0;
+                margin-top: -14px;
+            }
+
+            &.inline-block {
+                width: 50%;
+                display: inline-block;
+
+                &.left-block {
+                    padding-right: 12px;
+                }
+
+                &.right-block {
+                    padding-left: 12px;
+                }
+            }
+
+            span.info-tooltip {
+                background-image: url(../../../../assets/images/info-icon.svg);
+                border-radius: 50%;
+                width: 16px;
+                height: 16px;
+                line-height: 26px;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                margin-right: 4px;
+            }
+
+            &-col {
+                &:first-child {
+                    width: 100%;
+                }
+
+                font-size: 16px;
+                width: 100%;
+
+                &:last-of-type {
+                    padding: 8px 0 16px 0;
+                }
+            }
+        }
+    }
+}

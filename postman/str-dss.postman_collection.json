@@ -31,54 +31,6 @@
 			"response": []
 		},
 		{
-			"name": "GetPlatformDrowdown",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://127.0.0.1:5174/api/platforms/dropdown",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5174",
-					"path": [
-						"api",
-						"platforms",
-						"dropdown"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetLocalGovernmentsDrowdown",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://127.0.0.1:5174/api/localgovernments/dropdown",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5174",
-					"path": [
-						"api",
-						"localgovernments",
-						"dropdown"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "GetReqeustReasonDrowdown",
 			"request": {
 				"method": "GET",
@@ -110,7 +62,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"platformId\": 1,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"hostEmailSent\": false,  \r\n  \"reasonId\": 1,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"lgContactEmail\": \"lgcontact@lg.ca\",\r\n  \"lgContactPhone\": \"(123) 456-7890\",\r\n  \"strBylawUrl\": \"https://bylaw.ca\",\r\n  \"comment\": \"Test comment\"\r\n}",
+					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"hostEmailSent\": false,  \r\n  \"reasonId\": 1,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"lgContactEmail\": \"lgcontact@lg.ca\",\r\n  \"lgContactPhone\": \"(123) 456-7890\",\r\n  \"strBylawUrl\": \"https://bylaw.ca\",\r\n  \"comment\": \"Test comment\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -143,7 +95,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"platformId\": 1,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"hostEmailSent\": false,  \r\n  \"reasonId\": 1,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"lgContactEmail\": \"lgcontact@lg.ca\",\r\n  \"lgContactPhone\": \"(123) 456-7890\",\r\n  \"strBylawUrl\": \"https://bylaw.ca\",\r\n  \"comment\": \"Test comment\"\r\n}",
+					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@dxc.com\",\r\n  \"hostEmailSent\": false,  \r\n  \"reasonId\": 1,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"lgContactEmail\": \"lgcontact@lg.ca\",\r\n  \"lgContactPhone\": \"(123) 456-7890\",\r\n  \"strBylawUrl\": \"https://bylaw.ca\",\r\n  \"comment\": \"Test comment\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -177,7 +129,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"lgId\": 1,\r\n  \"platformId\": 1,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ]\r\n}",
+					"raw": "{\r\n  \"lgId\": 1,\r\n  \"platformId\": 2,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -210,7 +162,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"lgId\": 1,\r\n  \"platformId\": 1,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ]\r\n}",
+					"raw": "{\r\n  \"lgId\": 1,\r\n  \"platformId\": 2,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -232,6 +184,347 @@
 						"delisting",
 						"requests",
 						"preview"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Organization Types",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/organizations/types",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"organizations",
+						"types"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Platforms",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/organizations?type=Platform",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"organizations"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "Platform"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Platforms Dropdown",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/organizations/dropdown/?type=Platform",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"organizations",
+						"dropdown",
+						""
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "Platform"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Local Governments",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/organizations?type=LG",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"organizations"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "LG"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get BC Governments",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/organizations?type=BCGov",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"organizations"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "BCGov"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetRequestAccessList",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/accessrequests?status=&pageSize=10&pageNumber=1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"accessrequests"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": ""
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Access Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organizationType\": \"BCGov\",\r\n  \"organizationName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/accessrequests",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"accessrequests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deny Access Request",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userIdentityId\": 4,\r\n  \"updDtm\": \"2024-03-21T15:02:28.966095Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/accessrequests/deny",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"accessrequests",
+						"deny"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approve Access Request",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userIdentityId\": 6,\r\n  \"representedByOrganizationId\": 4,\r\n  \"updDtm\": \"2024-03-21T16:04:17.210947Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5174/api/users/accessrequests/approve",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5174",
+					"path": [
+						"api",
+						"users",
+						"accessrequests",
+						"approve"
 					]
 				}
 			},

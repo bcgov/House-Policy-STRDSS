@@ -15,6 +15,8 @@ And I should be presented with a field to select which platform to send the warn
 
 And I should be presented with a dropdown menu to select reason for delisting
 
+And I should see an optional field for Listing ID
+
 And I should see an optional field for adding a LG staff user email address to be copied on the email
 
 #ListingURLField

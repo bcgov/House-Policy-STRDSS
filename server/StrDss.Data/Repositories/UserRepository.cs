@@ -17,6 +17,7 @@ namespace StrDss.Data.Repositories
         Task UpdateUserAsync(UserDto dto);
         Task DenyAccessRequest(AccessRequestDenyDto dto);
         Task ApproveAccessRequest(AccessRequestApproveDto dto, string role);
+        Task<List<UserDto>> GetAdminUsers();
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
     {
@@ -103,6 +104,15 @@ namespace StrDss.Data.Repositories
 
             var roleEntity = await _dbContext.DssUserRoles.FirstAsync(x => x.UserRoleCd == role);
             entity.UserRoleCds.Add(roleEntity);
+        }
+
+        public async Task<List<UserDto>> GetAdminUsers()
+        {
+            var adminUsers = await _dbContext.DssUserRoles
+                .Where(x => x.UserRoleCd == Roles.CeuAdmin)
+                .SelectMany(x => x.UserIdentities).ToListAsync();
+
+            return _mapper.Map<List<UserDto>>(adminUsers);
         }
     }
 }

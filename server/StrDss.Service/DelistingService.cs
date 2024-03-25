@@ -23,12 +23,12 @@ namespace StrDss.Service
     public class DelistingService : ServiceBase, IDelistingService
     {
         private IConfiguration _config;
-        private IEmailService _emailService;
+        private IEmailMessageService _emailService;
         private IOrganizationService _orgService;
         private ILogger<DelistingService> _logger;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IConfiguration config, IEmailService emailService, IOrganizationService orgService, ILogger<DelistingService> logger)
+            IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, ILogger<DelistingService> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
             _config = config;

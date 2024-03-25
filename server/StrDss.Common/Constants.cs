@@ -129,4 +129,14 @@
     {
         public const string Default = "no_reply@gov.bc.ca";
     }
+
+    public static class EmailMessageTypes
+    {
+        public const string AccessGrantedNotification = "Access Granted Notification";
+        public const string DelistingWarning = "Delisting Warning";
+        public const string TakedownRequest = "Takedown Request";
+        public const string DelistingRequest = "Delisting Request";
+        public const string AccessDeniedNotification = "Access Denied Notification";
+        public const string NoticeOfTakedown = "Notice of Takedown";
+    }
 }

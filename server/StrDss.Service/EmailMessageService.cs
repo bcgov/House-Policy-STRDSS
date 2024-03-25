@@ -3,28 +3,32 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrDss.Data;
+using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Service.HttpClients;
 using System.Text;
 
 namespace StrDss.Service
 {
-    public interface IEmailService
+    public interface IEmailMessageService
     {
         Task SendEmailAsync(EmailContent emailContent);
+        Task<List<DropdownNumDto>> GetMessageReasons(string messageType);
     }
 
-    public class EmailService : ServiceBase, IEmailService
+    public class EmailMessageService : ServiceBase, IEmailMessageService
     {
         private readonly HttpClient _httpClient;
+        private readonly IEmailMessageRepository _emailRepo;
         private readonly IConfiguration _config;
         private readonly IChesTokenApi _chesTokenApi;
-        private readonly ILogger<EmailService> _logger;
+        private readonly ILogger<EmailMessageService> _logger;
 
-        public EmailService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<EmailService> logger)
+        public EmailMessageService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
+            IEmailMessageRepository emailRepo, IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<EmailMessageService> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
+            _emailRepo = emailRepo;
             _config = config;
             _httpClient = httpClient;
             _chesTokenApi = chesTokenApi;
@@ -70,6 +74,11 @@ namespace StrDss.Service
                 _logger.LogError($"{error} - {ex}");
                 throw new Exception(error);
             }
+        }
+
+        public async Task<List<DropdownNumDto>> GetMessageReasons(string messageType)
+        {
+            return await _emailRepo.GetMessageReasons(messageType);
         }
     }
 

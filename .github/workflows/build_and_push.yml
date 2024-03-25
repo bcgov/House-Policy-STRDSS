@@ -94,13 +94,7 @@ jobs:
           cd ./frontend
           ng test --watch=false --progress=false --browsers=ChromeHeadless --code-coverage --source-map=false
         continue-on-error: true
-
-      - name: Create test results directory
-        run: mkdir -p ./frontend/test-results
-
-      - name: Copy test results
-        run: cp -r ./coverage ./frontend/test-results
-        
+       
 
      # SonarQube integration for frontend
       - name: SonarQube Scan Frontend

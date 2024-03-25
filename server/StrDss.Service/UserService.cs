@@ -89,7 +89,7 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            var adminUsers = (await _userRepo.GetAdminUsers()).Where(x => x.IsEnabled).ToList();
+            var adminUsers = await _userRepo.GetAdminUsers();
 
             if (adminUsers.Count > 0)
             {

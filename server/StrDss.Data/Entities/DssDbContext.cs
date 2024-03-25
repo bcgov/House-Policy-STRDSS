@@ -63,7 +63,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("Foreign key")
                 .HasColumnName("affected_by_user_identity_id");
             entity.Property(e => e.CcEmailAddressDsc)
-                .HasMaxLength(320)
+                .HasMaxLength(4000)
                 .HasComment("E-mail address of a secondary message recipient (directly entered by the user)")
                 .HasColumnName("cc_email_address_dsc");
             entity.Property(e => e.EmailMessageType)
@@ -80,6 +80,17 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.InvolvedInOrganizationId)
                 .HasComment("Foreign key")
                 .HasColumnName("involved_in_organization_id");
+            entity.Property(e => e.IsHostContactedExternally).HasColumnName("is_host_contacted_externally");
+            entity.Property(e => e.IsSubmitterCcRequired).HasColumnName("is_submitter_cc_required");
+            entity.Property(e => e.LgEmailAddressDsc)
+                .HasMaxLength(320)
+                .HasColumnName("lg_email_address_dsc");
+            entity.Property(e => e.LgPhoneNo)
+                .HasMaxLength(13)
+                .HasColumnName("lg_phone_no");
+            entity.Property(e => e.LgStrBylawUrl)
+                .HasMaxLength(4000)
+                .HasColumnName("lg_str_bylaw_url");
             entity.Property(e => e.MessageDeliveryDtm)
                 .HasComment("A timestamp indicating when the message delivery was initiated")
                 .HasColumnName("message_delivery_dtm");
@@ -88,8 +99,11 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(4000)
                 .HasComment("The full text or template for the message that is sent")
                 .HasColumnName("message_template_dsc");
+            entity.Property(e => e.UnreportedListingNo)
+                .HasMaxLength(25)
+                .HasColumnName("unreported_listing_no");
             entity.Property(e => e.UnreportedListingUrl)
-                .HasMaxLength(250)
+                .HasMaxLength(4000)
                 .HasComment("User-provided URL for a short-term rental platform listing that is the subject of the message")
                 .HasColumnName("unreported_listing_url");
 

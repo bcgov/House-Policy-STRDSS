@@ -83,16 +83,16 @@ jobs:
           cd ./frontend
           ng build --configuration=production
 
-      - name: Chrome launcher
-        run: |
-          cd ./frontend
-          npm install karma-chrome-launcher --save-dev
-          google-chrome --version
+      # - name: Chrome launcher
+      #   run: |
+      #     cd ./frontend
+      #     npm install karma-chrome-launcher --save-dev
+      #     google-chrome --version
       
       - name: Run frontend tests
         run: |
           cd ./frontend
-          ng test --watch=false --code-coverage=true
+          ng test --watch=false --progress=false --browsers=ChromeHeadless --code-coverage --source-map=false
         continue-on-error: true
 
       - name: Create test results directory

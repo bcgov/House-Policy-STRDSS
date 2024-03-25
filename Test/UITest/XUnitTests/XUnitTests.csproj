@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Configuration\Configuration.csproj" />
     <ProjectReference Include="..\TestFrameWork\TestFrameWork.csproj" />
   </ItemGroup>
 

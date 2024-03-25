@@ -1,0 +1,27 @@
+oc login
+oc project f4a30d-dev / test
+
+helm install strdssdev bitnami/postgresql -f values-dev.yaml 
+
+helm install strdsstest bitnami/postgresql -f values-test.yaml
+
+Enable PostGIS extension
+https://github.com/bitnami/charts/issues/2830
+
+psql -U postgres
+CREATE ROLE strdssdev WITH LOGIN PASSWORD 'postgres';
+CREATE DATABASE strdssdev;
+ALTER DATABASE strdssdev OWNER TO strdssdev;
+\c strdssdev
+CREATE EXTENSION postgis;
+
+
+
+# Drop
+REASSIGN OWNED BY strdssdev TO postgres;
+DROP OWNED BY strdssdev;
+DROP ROLE strdssdev;
+
+Create Secret
+
+oc port-forward svc/strdssdev 5433:5432

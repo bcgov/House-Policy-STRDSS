@@ -12,15 +12,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/users/currentuser",
-					"protocol": "http",
+					"raw": "{{host}}/api/users/currentuser",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"users",
@@ -36,15 +31,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/delisting/reasons/dropdown",
-					"protocol": "http",
+					"raw": "{{host}}/api/delisting/reasons/dropdown",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"delisting",
@@ -70,15 +60,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/delisting/warnings",
-					"protocol": "http",
+					"raw": "{{host}}/api/delisting/warnings",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"delisting",
@@ -95,7 +80,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@dxc.com\",\r\n  \"hostEmailSent\": false,  \r\n  \"reasonId\": 1,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"lgContactEmail\": \"lgcontact@lg.ca\",\r\n  \"lgContactPhone\": \"(123) 456-7890\",\r\n  \"strBylawUrl\": \"https://bylaw.ca\",\r\n  \"comment\": \"Test comment\"\r\n}",
+					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@dxc.com\",\r\n  \"hostEmailSent\": false,  \r\n  \"reasonId\": 5,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"lgContactEmail\": \"lgcontact@lg.ca\",\r\n  \"lgContactPhone\": \"(123) 456-7890\",\r\n  \"strBylawUrl\": \"https://bylaw.ca\",\r\n  \"comment\": \"Test comment\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -103,15 +88,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/delisting/warnings/preview",
-					"protocol": "http",
+					"raw": "{{host}}/api/delisting/warnings/preview",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"delisting",
@@ -137,15 +117,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/delisting/requests",
-					"protocol": "http",
+					"raw": "{{host}}/api/delisting/requests",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"delisting",
@@ -170,15 +145,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/delisting/requests/preview",
-					"protocol": "http",
+					"raw": "{{host}}/api/delisting/requests/preview",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"delisting",
@@ -207,15 +177,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/organizations/types",
-					"protocol": "http",
+					"raw": "{{host}}/api/organizations/types",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"organizations",
@@ -226,7 +191,7 @@
 			"response": []
 		},
 		{
-			"name": "Get Platforms",
+			"name": "Get Organizations",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -243,24 +208,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/organizations?type=Platform",
-					"protocol": "http",
+					"raw": "{{host}}/api/organizations",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"organizations"
-					],
-					"query": [
-						{
-							"key": "type",
-							"value": "Platform"
-						}
 					]
 				}
 			},
@@ -284,15 +238,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/organizations/dropdown/?type=Platform",
-					"protocol": "http",
+					"raw": "{{host}}/api/organizations/dropdown/?type=Platform",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"organizations",
@@ -327,15 +276,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/organizations?type=LG",
-					"protocol": "http",
+					"raw": "{{host}}/api/organizations?type=LG",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"organizations"
@@ -368,15 +312,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/organizations?type=BCGov",
-					"protocol": "http",
+					"raw": "{{host}}/api/organizations?type=BCGov",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"organizations"
@@ -392,24 +331,18 @@
 			"response": []
 		},
 		{
-			"name": "GetRequestAccessList",
+			"name": "GetUserList",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/users/accessrequests?status=&pageSize=10&pageNumber=1",
-					"protocol": "http",
+					"raw": "{{host}}/api/users?status=&pageSize=20&pageNumber=1",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
-						"users",
-						"accessrequests"
+						"users"
 					],
 					"query": [
 						{
@@ -418,7 +351,7 @@
 						},
 						{
 							"key": "pageSize",
-							"value": "10"
+							"value": "20"
 						},
 						{
 							"key": "pageNumber",
@@ -444,15 +377,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/users/accessrequests",
-					"protocol": "http",
+					"raw": "{{host}}/api/users/accessrequests",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"users",
@@ -469,7 +397,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"userIdentityId\": 4,\r\n  \"updDtm\": \"2024-03-21T15:02:28.966095Z\"\r\n}",
+					"raw": "{\r\n  \"userIdentityId\": 21,\r\n  \"updDtm\": \"2024-03-26T17:19:12.803656Z\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -477,15 +405,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/users/accessrequests/deny",
-					"protocol": "http",
+					"raw": "{{host}}/api/users/accessrequests/deny",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"users",
@@ -503,7 +426,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"userIdentityId\": 6,\r\n  \"representedByOrganizationId\": 4,\r\n  \"updDtm\": \"2024-03-21T16:04:17.210947Z\"\r\n}",
+					"raw": "{\r\n  \"userIdentityId\": 22,\r\n  \"representedByOrganizationId\": 4,\r\n  \"updDtm\": \"2024-03-26T17:22:24.043814Z\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -511,20 +434,43 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5174/api/users/accessrequests/approve",
-					"protocol": "http",
+					"raw": "{{host}}/api/users/accessrequests/approve",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "5174",
 					"path": [
 						"api",
 						"users",
 						"accessrequests",
 						"approve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update IsEnabled",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userIdentityId\": 21,\r\n  \"isEnabled\": true,\r\n  \"updDtm\": \"2024-03-26T17:19:12.803656Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/users/updateisenabled",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"updateisenabled"
 					]
 				}
 			},

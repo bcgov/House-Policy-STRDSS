@@ -1,0 +1,81 @@
+:host {
+    width: 100%;
+    height: 100%;
+    padding: 24px;
+    background-color: #FFFFFF;
+
+    * {
+        font-family: 'BcSans-regular';
+    }
+
+    .bold-text {
+        font-family: 'BcSans-bold';
+    }
+
+    .title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-group-row {
+        width: 100%;
+
+        &.extra-space-bottom {
+            margin-bottom: 14px;
+        }
+
+        label {
+            line-height: 26px;
+        }
+
+        &.form-spacer {
+            padding-top: 0;
+            margin-top: -14px;
+        }
+
+        &.inline-block {
+            width: 50%;
+            display: inline-block;
+
+            &.left-block {
+                padding-right: 12px;
+            }
+
+            &.right-block {
+                padding-left: 12px;
+            }
+
+
+            &:last-of-type {
+                margin-right: 0;
+            }
+        }
+
+    }
+
+    p-table {
+        tr {
+            font-size: 14px;
+
+            td {
+                p-button {
+                    &:first-of-type {
+                        margin-right: 8px;
+                    }
+                }
+            }
+        }
+    }
+
+    p-dialog {
+        .actions {
+            display: flex;
+            justify-content: end;
+
+            :last-child {
+                margin-left: 8px;
+            }
+        }
+    }
+}

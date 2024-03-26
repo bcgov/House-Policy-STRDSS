@@ -315,8 +315,8 @@ END;$function$
 			<result_param jt="-1" />
 		</function>
 	</schema>
-	<layout name="Physical Data Diagram (Sprint 2)" id="Layout-662" show_column_type="y" show_relation="name" >
-		<comment><![CDATA[Physical Data Diagram (Sprint 2)]]></comment>
+	<layout name="Physical Data Diagram (Sprint 3)" id="Layout-662" show_column_type="y" show_relation="name" >
+		<comment><![CDATA[Physical Data Diagram (Sprint 3)]]></comment>
 		<entity schema="dss" name="dss_access_request_status" color="3986C1" x="656" y="448" />
 		<entity schema="dss" name="dss_email_message" color="3986C1" x="2304" y="48" />
 		<entity schema="dss" name="dss_email_message_type" color="3986C1" x="1360" y="96" />
@@ -332,9 +332,9 @@ END;$function$
 		<callout x="64" y="64" pointer="Round" >
 			<comment><![CDATA[Ministry of Housing
 Short Term Rental Data Sharing
-Physical Data Diagram (Sprint 2)
+Physical Data Diagram (Sprint 3)
 Leif Larsen, DXC Technology
-March 25, 2024]]></comment>
+March 26, 2024]]></comment>
 		</callout>
 	</layout>
 </project>

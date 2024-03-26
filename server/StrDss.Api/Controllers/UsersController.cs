@@ -99,5 +99,13 @@ namespace StrDss.Api.Controllers
         {
             return Ok(await _userService.GetAccessRequestStatuses());
         }
+
+        [ApiAuthorize]
+        [HttpPut("accepttermsconditions", Name = "AcceptTermsConditions")]
+        public async Task<ActionResult> AcceptTermsConditions()
+        {
+            await _userService.AcceptTermsConditions();
+            return Ok();
+        }
     }
 }

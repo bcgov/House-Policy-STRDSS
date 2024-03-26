@@ -138,3 +138,12 @@ organization_nm=src.organization_nm
 WHEN NOT MATCHED
 THEN INSERT (organization_type, organization_cd, organization_nm)
 VALUES (src.organization_type, src.organization_cd, src.organization_nm);
+
+INSERT INTO dss_organization_contact_person
+(is_primary, given_nm, family_nm, phone_no, email_address_dsc, contacted_through_organization_id)
+SELECT true, 'Test', 'Contact', '1234567890', :quoted_tester_email, organization_id
+FROM dss_organization AS o
+WHERE NOT EXISTS (
+SELECT 1
+FROM dss_organization_contact_person AS ocp
+WHERE o.organization_id=ocp.contacted_through_organization_id AND is_primary=true);

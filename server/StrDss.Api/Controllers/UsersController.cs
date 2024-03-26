@@ -92,5 +92,12 @@ namespace StrDss.Api.Controllers
 
             return Ok();
         }
+
+        [ApiAuthorize]
+        [HttpGet("accessrequeststatuses", Name = "GetAccessRequestStatuses")]
+        public async Task<ActionResult<List<DropdownStrDto>>> GetAccessRequestStatuses()
+        {
+            return Ok(await _userService.GetAccessRequestStatuses());
+        }
     }
 }

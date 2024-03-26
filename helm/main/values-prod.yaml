@@ -4,7 +4,7 @@ global:
     'LOGGING__LOGLEVEL__AWP': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Production'
     'ENV_NAME': 'prod'
-    'AppBaseUrl': 'https://prod-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca '
+    'AppBaseUrl': 'https://prod-strdss.f4a30d-prod.apps.silver.devops.gov.bc.ca '
     'SSO_CLIENT': 'str-dss-5303'
     'SSO_HOST': 'https://loginproxy.gov.bc.ca/auth'
     'SSO_REALM': 'standard'
@@ -17,7 +17,7 @@ nameOverride: strdss-prod
 fullnameOverride: strdss-prod
 
 route:
-  host: prod-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca 
+  host: prod-strdss.f4a30d-prod.apps.silver.devops.gov.bc.ca 
   baseService: strdss-prod
 
 frontend:

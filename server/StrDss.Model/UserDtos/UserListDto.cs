@@ -11,6 +11,7 @@
         public DateTime? AccessRequestDtm { get; set; }
 
         public string? AccessRequestJustificationTxt { get; set; }
+        public string IdentityProviderNm { get; set; } = null!;
 
         public string? GivenNm { get; set; }
 

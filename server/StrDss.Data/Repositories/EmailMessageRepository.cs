@@ -8,6 +8,7 @@ namespace StrDss.Data.Repositories
     public interface IEmailMessageRepository
     {
         Task<List<DropdownNumDto>> GetMessageReasons(string messageType);
+        Task<DropdownNumDto?> GetMessageReasonByMessageTypeAndId(string messageType, long id);
     }
     public class EmailMessageRepository : RepositoryBase<DssEmailMessage>, IEmailMessageRepository
     {
@@ -24,6 +25,16 @@ namespace StrDss.Data.Repositories
                 .ToListAsync();
 
             return reasons;
+        }
+
+        public async Task<DropdownNumDto?> GetMessageReasonByMessageTypeAndId(string messageType, long id)
+        {
+            var reason = await _dbContext.DssMessageReasons.AsNoTracking()
+                .Where(x => x.EmailMessageType == messageType && x.MessageReasonId == id)
+                .Select(x => new DropdownNumDto { Id = x.MessageReasonId, Description = x.MessageReasonDsc })
+                .FirstOrDefaultAsync();
+
+            return reason;
         }
     }
 }

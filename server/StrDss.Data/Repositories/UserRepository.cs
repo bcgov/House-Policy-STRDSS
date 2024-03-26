@@ -20,6 +20,7 @@ namespace StrDss.Data.Repositories
         Task<List<UserDto>> GetAdminUsers();
         Task UpdateIsEnabled(UpdateIsEnabledDto dto);
         Task<List<DropdownStrDto>> GetAccessRequestStatuses();
+        Task AcceptTermsConditions();
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
     {
@@ -131,6 +132,14 @@ namespace StrDss.Data.Repositories
                 .ToListAsync();
 
             return statuses;
+        }
+
+        public async Task AcceptTermsConditions()
+        {
+            var entity = await _dbSet.FirstAsync(x => x.UserIdentityId == _currentUser.Id);
+
+            if(entity != null)
+                entity.TermsAcceptanceDtm = DateTime.UtcNow;
         }
     }
 }

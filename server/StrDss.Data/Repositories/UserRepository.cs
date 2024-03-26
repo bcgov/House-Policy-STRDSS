@@ -29,16 +29,14 @@ namespace StrDss.Data.Repositories
 
         public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction)
         {
-            var query = _dbSet.AsNoTracking();
+            var query = _dbContext.DssUserIdentityViews.AsNoTracking();
 
             if (status.IsNotEmpty() && status != "All")
             {
                 query = query.Where(x => x.AccessRequestStatusCd == status);
             }
 
-            query = query.Include(x => x.RepresentedByOrganization);
-
-            var results = await Page<DssUserIdentity, UserListtDto>(query, pageSize, pageNumber, orderBy, direction);
+            var results = await Page<DssUserIdentityView, UserListtDto>(query, pageSize, pageNumber, orderBy, direction);
 
             return results;
         }

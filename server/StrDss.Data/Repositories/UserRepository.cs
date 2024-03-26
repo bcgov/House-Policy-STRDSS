@@ -9,7 +9,7 @@ namespace StrDss.Data.Repositories
 {
     public interface IUserRepository
     {
-        Task<PagedDto<AccessRequestDto>> GetAccessRequestListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction);
         Task CreateUserAsync(UserCreateDto dto);
         Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByGuidAsync(Guid guid);
         Task<UserDto?> GetUserById(long id);
@@ -18,6 +18,7 @@ namespace StrDss.Data.Repositories
         Task DenyAccessRequest(AccessRequestDenyDto dto);
         Task ApproveAccessRequest(AccessRequestApproveDto dto, string role);
         Task<List<UserDto>> GetAdminUsers();
+        Task UpdateIsEnabled(UpdateIsEnabledDto dto);
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
     {
@@ -25,7 +26,7 @@ namespace StrDss.Data.Repositories
         {
         }
 
-        public async Task<PagedDto<AccessRequestDto>> GetAccessRequestListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction)
         {
             var query = _dbSet.AsNoTracking();
 
@@ -36,7 +37,7 @@ namespace StrDss.Data.Repositories
 
             query = query.Include(x => x.RepresentedByOrganization);
 
-            var results = await Page<DssUserIdentity, AccessRequestDto>(query, pageSize, pageNumber, orderBy, direction);
+            var results = await Page<DssUserIdentity, UserListtDto>(query, pageSize, pageNumber, orderBy, direction);
 
             return results;
         }
@@ -115,6 +116,12 @@ namespace StrDss.Data.Repositories
                 .ToListAsync();
 
             return _mapper.Map<List<UserDto>>(adminUsers);
+        }
+
+        public async Task UpdateIsEnabled(UpdateIsEnabledDto dto)
+        {
+            var entity = await _dbSet.FirstAsync(x => x.UserIdentityId == dto.UserIdentityId);
+            _mapper.Map(dto, entity);
         }
     }
 }

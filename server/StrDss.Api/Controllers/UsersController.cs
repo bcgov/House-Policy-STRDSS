@@ -30,10 +30,10 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize]
-        [HttpGet("accessrequests", Name = "GetAccessRequestList")]
-        public async Task<ActionResult<PagedDto<AccessRequestDto>>> GetAccessRequestList(string? status, int pageSize, int pageNumber, string orderBy = "AccessRequestDtm", string direction = "")
+        [HttpGet("", Name = "GetUserList")]
+        public async Task<ActionResult<PagedDto<UserListtDto>>> GetUserList(string? status, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
-            var list = await _userService.GetAccessRequestListAsync(status ?? "", pageSize, pageNumber, orderBy, direction);
+            var list = await _userService.GetUserListAsync(status ?? "", pageSize, pageNumber, orderBy, direction);
             return Ok(list);
         }
 
@@ -70,6 +70,20 @@ namespace StrDss.Api.Controllers
         public async Task<ActionResult> ApproveRequest(AccessRequestApproveDto dto)
         {
             var errors = await _userService.ApproveAccessRequest(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
+        }
+
+        [ApiAuthorize]
+        [HttpPut("updateisenabled", Name = "UpdateIsEnabled")]
+        public async Task<ActionResult> UpdateIsEnabled(UpdateIsEnabledDto dto)
+        {
+            var errors = await _userService.UpdateIsEnabled(dto);
 
             if (errors.Count > 0)
             {

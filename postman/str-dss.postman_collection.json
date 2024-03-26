@@ -507,6 +507,34 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Accept Terms Conditions",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userIdentityId\": 22,\r\n  \"isEnabled\": true,\r\n  \"updDtm\": \"2024-03-26T18:42:43.29137Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/users/accepttermsconditions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"accepttermsconditions"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {

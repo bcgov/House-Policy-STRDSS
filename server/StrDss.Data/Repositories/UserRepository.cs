@@ -19,6 +19,7 @@ namespace StrDss.Data.Repositories
         Task ApproveAccessRequest(AccessRequestApproveDto dto, string role);
         Task<List<UserDto>> GetAdminUsers();
         Task UpdateIsEnabled(UpdateIsEnabledDto dto);
+        Task<List<DropdownStrDto>> GetAccessRequestStatuses();
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
     {
@@ -122,6 +123,16 @@ namespace StrDss.Data.Repositories
         {
             var entity = await _dbSet.FirstAsync(x => x.UserIdentityId == dto.UserIdentityId);
             _mapper.Map(dto, entity);
+        }
+
+        public async Task<List<DropdownStrDto>> GetAccessRequestStatuses()
+        {
+            var statuses = await _dbContext.DssAccessRequestStatuses
+                .AsNoTracking()
+                .Select(x => new DropdownStrDto { Id = x.AccessRequestStatusCd, Description = x.AccessRequestStatusNm })
+                .ToListAsync();
+
+            return statuses;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace StrDss.Model.UserDtos
 {
-    public class AccessRequestDto
+    public class UserListtDto
     {
         public long UserIdentityId { get; set; }
 
@@ -11,6 +11,7 @@
         public DateTime? AccessRequestDtm { get; set; }
 
         public string? AccessRequestJustificationTxt { get; set; }
+        public string IdentityProviderNm { get; set; } = null!;
 
         public string? GivenNm { get; set; }
 

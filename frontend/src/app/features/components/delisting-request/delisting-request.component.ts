@@ -57,6 +57,9 @@ export class DelistingRequestComponent implements OnInit {
   public get platformIdControl(): AbstractControl {
     return this.myForm.controls['platformId'];
   }
+  public get listingIdControl(): AbstractControl {
+    return this.myForm.controls['listingId'];
+  }
   public get listingUrlControl(): AbstractControl {
     return this.myForm.controls['listingUrl'];
   }
@@ -139,7 +142,7 @@ export class DelistingRequestComponent implements OnInit {
     this.myForm = this.fb.group({
       lgId: [0, Validators.required],
       platformId: [0, Validators.required],
-      listingId: [null],
+      listingId: [null, [Validators.pattern(/\d+/)]],
       listingUrl: ['', [Validators.required, validateUrl()]],
       sendCopy: [true],
       ccList: ['', validateEmailListString()],

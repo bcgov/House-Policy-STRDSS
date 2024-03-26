@@ -315,59 +315,25 @@ END;$function$
 			<result_param jt="-1" />
 		</function>
 	</schema>
-	<layout name="Default Layout" id="Layout-662" show_column_type="y" show_relation="name" >
-		<comment><![CDATA[Default Layout]]></comment>
-		<entity schema="dss" name="dss_access_request_status" color="3986C1" x="544" y="624" />
-		<entity schema="dss" name="dss_email_message" color="3986C1" x="1536" y="208" />
-		<entity schema="dss" name="dss_email_message_type" color="3986C1" x="560" y="208" />
-		<entity schema="dss" name="dss_message_reason" color="3986C1" x="1056" y="256" />
-		<entity schema="dss" name="dss_organization" color="C1D8EE" x="512" y="336" />
-		<entity schema="dss" name="dss_organization_contact_person" color="3986C1" x="512" y="736" />
-		<entity schema="dss" name="dss_organization_type" color="3986C1" x="48" y="352" />
-		<entity schema="dss" name="dss_user_identity" color="3986C1" x="1008" y="416" />
-		<entity schema="dss" name="dss_user_privilege" color="3986C1" x="1104" y="832" />
-		<entity schema="dss" name="dss_user_role" color="3986C1" x="1136" y="736" />
-		<entity schema="dss" name="dss_user_role_assignment" color="C1D8EE" x="1584" y="704" />
-		<entity schema="dss" name="dss_user_role_privilege" color="3986C1" x="1584" y="800" />
-		<callout x="48" y="48" pointer="Round" >
+	<layout name="Physical Data Diagram (Sprint 2)" id="Layout-662" show_column_type="y" show_relation="name" >
+		<entity schema="dss" name="dss_access_request_status" color="3986C1" x="656" y="448" />
+		<entity schema="dss" name="dss_email_message" color="3986C1" x="2304" y="48" />
+		<entity schema="dss" name="dss_email_message_type" color="3986C1" x="1360" y="96" />
+		<entity schema="dss" name="dss_message_reason" color="3986C1" x="1840" y="48" />
+		<entity schema="dss" name="dss_organization" color="C1D8EE" x="496" y="208" />
+		<entity schema="dss" name="dss_organization_contact_person" color="3986C1" x="1072" y="64" />
+		<entity schema="dss" name="dss_organization_type" color="3986C1" x="48" y="224" />
+		<entity schema="dss" name="dss_user_identity" color="3986C1" x="1088" y="304" />
+		<entity schema="dss" name="dss_user_privilege" color="3986C1" x="1184" y="720" />
+		<entity schema="dss" name="dss_user_role" color="3986C1" x="1216" y="624" />
+		<entity schema="dss" name="dss_user_role_assignment" color="C1D8EE" x="1664" y="592" />
+		<entity schema="dss" name="dss_user_role_privilege" color="3986C1" x="1664" y="688" />
+		<callout x="64" y="64" pointer="Round" >
 			<comment><![CDATA[Ministry of Housing
 Short Term Rental Data Sharing
 Physical Data Diagram (Sprint 2)
 Leif Larsen, DXC Technology
-March 15, 2024]]></comment>
+March 25, 2024]]></comment>
 		</callout>
-		<script name="SQL_Editor" id="Editor-1229" language="SQL" >
-			<string><![CDATA[CREATE SCHEMA IF NOT EXISTS dss;
-
-CREATE  TABLE dss.dss_str_hosting_platforms ( 
-	str_hosting_platform_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY GENERATED ALWAYS AS ( null )  ,
-	business_name        varchar(100)  NOT NULL  ,
-	CONSTRAINT pk_dss_str_hosting_platforms PRIMARY KEY ( str_hosting_platform_id )
- );
-
-CREATE  TABLE dss.dss_str_listing_report ( 
-	str_listing_report_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
-	period_ym            date  NOT NULL  ,
-	str_hosting_platform_id bigint  NOT NULL  ,
-	CONSTRAINT pk_dss_str_listing_report PRIMARY KEY ( str_listing_report_id )
- );
-
-CREATE INDEX idx_dss_str_listing_report_str_hosting_platform_id ON dss.dss_str_listing_report  ( str_hosting_platform_id );
-
-ALTER TABLE dss.dss_str_listing_report ADD CONSTRAINT fk_dss_str_listing_report FOREIGN KEY ( str_hosting_platform_id ) REFERENCES dss.dss_str_hosting_platforms( str_hosting_platform_id );
-
-COMMENT ON CONSTRAINT fk_dss_str_listing_report ON dss.dss_str_listing_report IS 'provided by';
-
-COMMENT ON TABLE dss.dss_str_hosting_platforms IS 'A service providing the ability to advertise housing units for short-term rental';
-
-COMMENT ON COLUMN dss.dss_str_hosting_platforms.str_hosting_platform_id IS 'Unique generated key';
-
-COMMENT ON TABLE dss.dss_str_listing_report IS 'A delivery of rental listing information that is relevant to a specific month';
-
-COMMENT ON COLUMN dss.dss_str_listing_report.period_ym IS 'The month to which the listing information is relevant';
-
-COMMENT ON COLUMN dss.dss_str_listing_report.str_hosting_platform_id IS 'Foreign key';
-]]></string>
-		</script>
 	</layout>
 </project>

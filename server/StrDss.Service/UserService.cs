@@ -11,11 +11,12 @@ namespace StrDss.Service
 {
     public interface IUserService
     {
-        Task<PagedDto<AccessRequestDto>> GetAccessRequestListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction);
         Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid);
         Task<Dictionary<string, List<string>>> CreateAccessRequestAsync(AccessRequestCreateDto dto);
         Task<Dictionary<string, List<string>>> DenyAccessRequest(AccessRequestDenyDto dto);
         Task<Dictionary<string, List<string>>> ApproveAccessRequest(AccessRequestApproveDto dto);
+        Task<Dictionary<string, List<string>>> UpdateIsEnabled(UpdateIsEnabledDto dto);
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -32,9 +33,9 @@ namespace StrDss.Service
             _emailService = emailService;
         }
 
-        public async Task<PagedDto<AccessRequestDto>> GetAccessRequestListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction)
         {
-            return await _userRepo.GetAccessRequestListAsync(status, pageSize, pageNumber, orderBy, direction);
+            return await _userRepo.GetUserListAsync(status, pageSize, pageNumber, orderBy, direction);
         }
 
         public async Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid)
@@ -270,5 +271,30 @@ namespace StrDss.Service
 
             return errors;
         }
+
+        public async Task<Dictionary<string, List<string>>> UpdateIsEnabled(UpdateIsEnabledDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var user = await _userRepo.GetUserById(dto.UserIdentityId);
+
+            if (user == null)
+            {
+                errors.AddItem("entity", $"User ({dto.UserIdentityId}) doesn't exist");
+                return errors;
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            await _userRepo.UpdateIsEnabled(dto);
+
+            _unitOfWork.Commit();
+
+            return errors;
+        }
+
     }
 }

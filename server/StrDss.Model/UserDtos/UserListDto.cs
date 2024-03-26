@@ -1,6 +1,6 @@
 ﻿namespace StrDss.Model.UserDtos
 {
-    public class AccessRequestDto
+    public class UserListtDto
     {
         public long UserIdentityId { get; set; }
 

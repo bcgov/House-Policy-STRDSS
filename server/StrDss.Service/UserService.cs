@@ -18,6 +18,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> ApproveAccessRequest(AccessRequestApproveDto dto);
         Task<Dictionary<string, List<string>>> UpdateIsEnabled(UpdateIsEnabledDto dto);
         Task<List<DropdownStrDto>> GetAccessRequestStatuses();
+        Task AcceptTermsConditions();
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -302,5 +303,10 @@ namespace StrDss.Service
             return await _userRepo.GetAccessRequestStatuses();
         }
 
+        public async Task AcceptTermsConditions()
+        {
+            await _userRepo.AcceptTermsConditions();
+            _unitOfWork.Commit();
+        }
     }
 }

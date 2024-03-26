@@ -24,6 +24,7 @@ namespace StrDss.Data.Mappings
             CreateMap<DssAccessRequestStatus, AccessRequestStatusDto>();
             CreateMap<DssUserRole, RoleDto>();
             CreateMap<DssUserPrivilege, PermissionDto>();
+            CreateMap<DssUserIdentityView, UserListtDto>();
         }
     }
 }

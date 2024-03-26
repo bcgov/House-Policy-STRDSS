@@ -64,6 +64,8 @@ body {
     }
 
     .p-ripple.p-element.p-button.p-component {
+        border-radius: 4px;
+
         &:not(.p-button-link) {
             background-color: #053662;
             border-color: #053662;
@@ -100,6 +102,24 @@ body {
                 padding: 0;
                 font-family: 'BcSans-regular';
                 font-size: 16px;
+            }
+        }
+    }
+
+    .p-dialog {
+        border-radius: 4px;
+
+        .p-dialog-header {
+            border-top-right-radius: 4px;
+            border-top-left-radius: 4px;
+        }
+
+        .p-dialog-content {
+            padding-bottom: 1rem;
+
+            &:last-of-type {
+                border-bottom-right-radius: 4px;
+                border-bottom-left-radius: 4px;
             }
         }
     }

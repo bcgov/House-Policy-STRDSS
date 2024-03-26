@@ -54,6 +54,9 @@ export class ComplianceNoticeComponent implements OnInit {
   public get platformIdControl(): AbstractControl {
     return this.myForm.controls['platformId'];
   }
+  public get listingIdControl(): AbstractControl {
+    return this.myForm.controls['listingId'];
+  }
   public get listingUrlControl(): AbstractControl {
     return this.myForm.controls['listingUrl'];
   }
@@ -167,7 +170,7 @@ export class ComplianceNoticeComponent implements OnInit {
   private initForm(): void {
     this.myForm = this.fb.group({
       platformId: [0, Validators.required],
-      listingId: [null],
+      listingId: [null, [Validators.pattern(/\d+/)]],
       listingUrl: ['', [Validators.required, validateUrl()]],
       hostEmail: ['', [Validators.required, Validators.email]],
       sentAlternatively: [false],

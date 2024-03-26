@@ -17,6 +17,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> DenyAccessRequest(AccessRequestDenyDto dto);
         Task<Dictionary<string, List<string>>> ApproveAccessRequest(AccessRequestApproveDto dto);
         Task<Dictionary<string, List<string>>> UpdateIsEnabled(UpdateIsEnabledDto dto);
+        Task<List<DropdownStrDto>> GetAccessRequestStatuses();
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -294,6 +295,11 @@ namespace StrDss.Service
             _unitOfWork.Commit();
 
             return errors;
+        }
+
+        public async Task<List<DropdownStrDto>> GetAccessRequestStatuses()
+        {
+            return await _userRepo.GetAccessRequestStatuses();
         }
 
     }

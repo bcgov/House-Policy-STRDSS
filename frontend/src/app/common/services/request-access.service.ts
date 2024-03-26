@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { DropdownOption } from '../models/dropdown-option';
 import { environment } from '../../../environments/environment';
 import { AccessRequest } from '../models/access-request';
+import { PagingRequest } from '../models/paging-request';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,19 @@ export class RequestAccessService {
     return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/types`);
   }
 
+  getOrganizations(type?: string): Observable<Array<DropdownOption>> {
+    if (type) {
+      return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations?type=${type}`);
+    } else {
+      return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations`);
+    }
+  }
+
   createAccessRequest(body: AccessRequest): Observable<unknown> {
     return this.httpClient.post<unknown>(`${environment.API_HOST}/users/accessrequests`, body);
+  }
+
+  getAccessRequests(pagingRequest: PagingRequest, status: string = ''): Observable<any> {
+    return this.httpClient.get(`${environment.API_HOST}/users?status=${status}&pageSize=${pagingRequest?.pageSize}&pageNumber=${pagingRequest?.pageNumber}`)
   }
 }

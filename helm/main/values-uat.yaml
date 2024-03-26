@@ -4,20 +4,20 @@ global:
     'LOGGING__LOGLEVEL__AWP': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Staging'
     'ENV_NAME': 'uat'
-    'AppBaseUrl': 'https://uat-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca '
+    'AppBaseUrl': 'https://uat-strdss.f4a30d-test.apps.silver.devops.gov.bc.ca '
     'SSO_CLIENT': 'str-dss-5303'
     'SSO_HOST': 'https://test.loginproxy.gov.bc.ca/auth'
     'SSO_REALM': 'standard'
     'SSO_AUTHORITY': 'https://test.loginproxy.gov.bc.ca/auth/realms/standard'
     'SM_LOGOFF_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi/'
-    'CHES_TOKEN_URL': 'https://test.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
-    'CHES_URL': 'https://ches-test.api.gov.bc.ca'
+    'CHES_TOKEN_URL': 'https://dev.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
+    'CHES_URL': 'https://ches-dev.api.gov.bc.ca'
 
 nameOverride: strdss-uat
 fullnameOverride: strdss-uat
 
 route:
-  host: uat-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca 
+  host: uat-strdss.f4a30d-test.apps.silver.devops.gov.bc.ca 
   baseService: strdss-uat
 
 frontend:

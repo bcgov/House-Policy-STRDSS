@@ -1,0 +1,170 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - database/**
+      - package.json
+      - package-lock.json
+      - CHANGELOG.md
+      - .conventional-changelog.mjs
+      - .release-it.json
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.400'
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget
+
+      - name: Setup Tools
+        uses: ./.github/actions/setup-tools
+
+      - name: Build backend
+        run: |
+          pwd
+          dotnet build ./server/server.sln
+
+      - name: Test backend
+        run: dotnet test ./server/server.sln --no-build
+
+     # SonarQube integration for backend
+      - name: SonarQube Scan Backend
+        uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_HOST_URL: https://sonarcloud.io
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build-frontend:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Angular CLI
+        run: |
+          cd ./frontend
+          npm install -g @angular/cli
+
+      - name: Install project dependencies
+        run: |
+          cd ./frontend
+          npm install
+          
+      - name: Build frontend
+        run: |
+          cd ./frontend
+          ng build --configuration=production
+      
+      - name: Run frontend tests
+        run: |
+          cd ./frontend
+          ng test --watch=false --code-coverage=true
+        continue-on-error: true
+
+      - name: Create test results directory
+        run: mkdir -p ./frontend/test-results
+
+      - name: Copy test results
+        run: cp -r ./coverage ./frontend/test-results
+        
+
+     # SonarQube integration for frontend
+      - name: SonarQube Scan Frontend
+        uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_HOST_URL: https://sonarcloud.io
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # Docker-build-backend:
+  #   needs: [build-backend]
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 10
+  #   permissions:
+  #     contents: read
+  #     packages: write
+
+  #   steps:
+  #   - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
+  #   - uses: actions/checkout@v4
+
+  #   - name: Setup Tools
+  #     uses: ./.github/actions/setup-tools
+
+  #   - name: Build and Push
+  #     uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
+  #     with:
+  #       registry-url: ${{ env.GITHUB_REGISTRY }}
+  #       registry-username: ${{ github.actor }}
+  #       registry-password: ${{ secrets.GITHUB_TOKEN }}
+  #       image-name: ${{ env.IMAGE_NAME_BACKEND }}
+  #       docker-context: server
+  #       docker-file: server/Dockerfile
+  #       metadata-tags: |
+  #         type=ref,event=branch
+  #         type=sha,format=long,prefix=,suffix=
+
+  # Docker-build-frontend:
+  #   needs: [build-frontend]
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 10
+  #   permissions:
+  #     contents: read
+  #     packages: write
+
+  #   steps:
+  #   - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
+  #   - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+
+  #   - name: Setup Tools
+  #     uses: ./.github/actions/setup-tools
+
+  #   - name: Render style_nonce
+  #     id: render_style_nonce
+  #     run: echo "::set-output name=style_nonce::$(echo -n ${{ github.sha }} | base64)"
+
+  #   - name: Build and Push
+  #     uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
+  #     with:
+  #       registry-url: ${{ env.GITHUB_REGISTRY }}
+  #       registry-username: ${{ github.actor }}
+  #       registry-password: ${{ secrets.GITHUB_TOKEN }}
+  #       image-name: ${{ env.IMAGE_NAME_FRONTEND }}
+  #       docker-context: frontend
+  #       docker-file: frontend/Dockerfile
+  #       docker-args: |
+  #         generate_sourcemap=true
+  #         style_nonce=${{ steps.render_style_nonce.outputs.style_nonce }}
+  #       metadata-tags: |
+  #         type=ref,event=branch
+  #         type=sha,format=long,prefix=,suffix=
+
+
+

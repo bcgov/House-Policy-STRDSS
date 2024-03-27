@@ -11,7 +11,7 @@
             <p-dropdown [options]="initiatorsOptions" formControlName="lgId" [showClear]="true"
                 placeholder="Please Select Your Municipality..." id="lgId" name="lgId" [required]="true"></p-dropdown>
         </div>
-        <div class="form-group-row-col validation-errors" *ngIf="!lgIdControl.pristine">
+        <div class="form-group-row-col validation-errors" *ngIf="!lgIdControl.pristine && lgIdControl.errors">
             <small id="requiredLgIdControl" *ngIf="lgIdControl.errors?.['required']">Request initiator is
                 required</small>
         </div>
@@ -25,7 +25,8 @@
             <p-dropdown [options]="platformOptions" formControlName="platformId" [showClear]="true"
                 placeholder="Please Select..." id="platformId" name="platformId" [required]="true"></p-dropdown>
         </div>
-        <div class="form-group-row-col validation-errors" *ngIf="!platformIdControl.pristine">
+        <div class="form-group-row-col validation-errors"
+            *ngIf="!platformIdControl.pristine && platformIdControl.errors">
             <small id="requiredPlatformId" *ngIf="platformIdControl.errors?.['required']">Platform recipient is
                 required</small>
         </div>
@@ -36,12 +37,9 @@
             <label for="listingId">Add Listing ID Number if Known (Optional):</label>
         </div>
         <div class="form-group-row-col">
-            <input class="long-text-field" pattern="\d+" type="text" pInputText formControlName="listingId"
-                placeholder="Enter Value..." id="listingId" name="listingId" />
-        </div>
-        <div class="form-group-row-col validation-errors" *ngIf="!listingIdControl.pristine">
-            <small id="patternListingId" *ngIf="listingIdControl.errors?.['pattern']"> Listing ID should be a positive
-                number</small>
+            <p-inputNumber inputStyleClass="long-text-field" formControlName="listingId" placeholder="Enter Value..."
+                inputId="listingId" mode="decimal" [min]="0" [max]="9000000000000000000" [useGrouping]="false">
+            </p-inputNumber>
         </div>
     </div>
 
@@ -55,7 +53,8 @@
             <input class="long-text-field" type="text" placeholder="HTTPS://..." pInputText formControlName="listingUrl"
                 id="listingUrl" name="listingUrl" required />
         </div>
-        <div class="form-group-row-col validation-errors" *ngIf="!listingUrlControl.pristine">
+        <div class="form-group-row-col validation-errors"
+            *ngIf="!listingUrlControl.pristine && listingUrlControl.errors">
             <small id="invalidUrl" *ngIf="listingUrlControl.errors?.['invalidUrl']">Please make sure the URL format that
                 you have entered is correct</small>
             <small id="requiredUrl" *ngIf="listingUrlControl.errors?.['required']">Listing URL is required</small>
@@ -80,7 +79,7 @@
             <textarea formControlName="ccList" placeholder="Enter Email(s)..." rows="1" cols="20" pInputTextarea
                 id="ccList" name="ccList"></textarea>
         </div>
-        <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine">
+        <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine && ccListControl.errors">
             <small id="invalidCcList" *ngIf="ccListControl.errors?.['invalidEmailList']">Please make sure the email
                 format you have entered is correct</small>
         </div>

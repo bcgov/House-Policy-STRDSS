@@ -25,7 +25,7 @@ Then The system should present a list of available LG options to populate the fi
 
 #ListingIDField
 
-When Entering the listing ID "0"
+When Entering the listing ID "<ListingID>"
 
 Then The system should validate the ID is a number
 
@@ -73,6 +73,9 @@ When there are issues with the submission, such as invalid email addresses or a 
 
 Then the system should provide clear error messages guiding me on how to correct the issues
 
-
-
-
+Examples:
+| ListingID | Comment  |
+| -1        | Negative |
+| 0         | Boundary |
+| 9999      | Max      |
+| test      | string   |

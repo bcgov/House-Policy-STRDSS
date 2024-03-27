@@ -17,6 +17,7 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using StrDss.Api.Middlewares;
+using StrDss.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -148,6 +149,9 @@ builder.Services.AddAuthorization(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var healthCheck = new HealthCheck(connString);
+builder.Services.AddHealthChecks().AddCheck("DbConnection", healthCheck);
 
 var app = builder.Build();
 

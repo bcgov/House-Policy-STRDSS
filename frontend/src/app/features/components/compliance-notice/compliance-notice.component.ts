@@ -18,6 +18,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ComplianceNotice } from '../../../common/models/compliance-notice';
 import { MessagesModule } from 'primeng/messages';
 import { Router } from '@angular/router';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 @Component({
   selector: 'app-compliance-notice',
@@ -27,6 +28,7 @@ import { Router } from '@angular/router';
     CommonModule,
     DropdownModule,
     InputTextModule,
+    InputNumberModule,
     InputTextareaModule,
     MessagesModule,
     CheckboxModule,
@@ -53,9 +55,6 @@ export class ComplianceNoticeComponent implements OnInit {
 
   public get platformIdControl(): AbstractControl {
     return this.myForm.controls['platformId'];
-  }
-  public get listingIdControl(): AbstractControl {
-    return this.myForm.controls['listingId'];
   }
   public get listingUrlControl(): AbstractControl {
     return this.myForm.controls['listingUrl'];
@@ -90,13 +89,7 @@ export class ComplianceNoticeComponent implements OnInit {
 
   onPreview(): void {
     if (this.myForm.valid) {
-      const model: ComplianceNotice = Object.assign({}, this.myForm.value);
-
-      model.ccList = this.myForm.value['ccList'].prototype === Array
-        ? this.myForm.value
-        : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
-
-      this.delistingService.complianceNoticePreview(model)
+      this.delistingService.complianceNoticePreview(this.prepareFormModel(this.myForm))
         .subscribe(
           {
             next: preview => {
@@ -117,11 +110,9 @@ export class ComplianceNoticeComponent implements OnInit {
   onSubmit(comment: string, textAreaElement: HTMLTextAreaElement): void {
     this.messages = [];
     if (this.myForm.valid) {
-      const model: ComplianceNotice = this.myForm.value;
-      model.ccList = this.myForm.value['ccList'].prototype === Array
-        ? this.myForm.value
-        : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
+      const model: ComplianceNotice = this.prepareFormModel(this.myForm);
       model.comment = comment;
+
       this.delistingService.createComplianceNotice(model)
         .subscribe({
           next: (_) => {
@@ -167,10 +158,22 @@ export class ComplianceNoticeComponent implements OnInit {
     this.messages = [{ severity: 'success', summary: '', detail: 'Your Notice of Takedown was Successfully Submitted!' }];
   }
 
+  private prepareFormModel(form: FormGroup): ComplianceNotice {
+    const model: ComplianceNotice = Object.assign({}, form.value);
+
+    model.listingId = Number.parseInt(model.listingId as any);
+
+    model.ccList = form.value['ccList'].prototype === Array
+      ? form.value
+      : (form.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
+
+    return model;
+  }
+
   private initForm(): void {
     this.myForm = this.fb.group({
       platformId: [0, Validators.required],
-      listingId: [null, [Validators.pattern(/\d+/)]],
+      listingId: [null],
       listingUrl: ['', [Validators.required, validateUrl()]],
       hostEmail: ['', [Validators.required, Validators.email]],
       sentAlternatively: [false],
@@ -187,16 +190,16 @@ export class ComplianceNoticeComponent implements OnInit {
   private showErrors(error: HttpErrorResponse | any): void {
     let errorObject = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
     if (error.error['detail']) {
-      this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: error.error['detail'] }];
+      this.messages = [{ severity: 'error', summary: 'Server error', closable: true, detail: error.error['detail'] }];
     } else {
       const errorKeys = Object.keys(errorObject.errors)
 
       if (!errorKeys) {
-        this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Some properties are not valid' }];
+        this.messages = [{ severity: 'error', summary: 'Server error', closable: true, detail: 'Some properties are not valid' }];
       }
       else {
         errorKeys.forEach(key => {
-          this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: errorObject.errors[key] }];
+          this.messages = [{ severity: 'error', summary: 'Server error', closable: true, detail: errorObject.errors[key] }];
         });
       }
     }

@@ -28,7 +28,7 @@ namespace SpecFlowProjectBDD.Features
         
         private string[] _featureTags = ((string[])(null));
         
-#line 1 "SendDelistingRequestWithoutADSSListing.feature"
+#line 1 "SendTakeDownRequestWithoutADSSListing.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
@@ -76,11 +76,22 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("SendDelistingRequestWithoutADSSListing")]
         [NUnit.Framework.CategoryAttribute("Delisting")]
-        public virtual void SendDelistingRequestWithoutADSSListing()
+        [NUnit.Framework.TestCaseAttribute("-1", "Negative", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "Boundary", null)]
+        [NUnit.Framework.TestCaseAttribute("9999", "Max", null)]
+        [NUnit.Framework.TestCaseAttribute("test", "string", null)]
+        public virtual void SendDelistingRequestWithoutADSSListing(string listingID, string comment, string[] exampleTags)
         {
-            string[] tagsOfScenario = new string[] {
+            string[] @__tags = new string[] {
                     "Delisting"};
+            if ((exampleTags != null))
+            {
+                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
+            }
+            string[] tagsOfScenario = @__tags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("ListingID", listingID);
+            argumentsOfScenario.Add("Comment", comment);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("SendDelistingRequestWithoutADSSListing", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
 #line 5
 this.ScenarioInitialize(scenarioInfo);
@@ -130,7 +141,7 @@ testRunner.When("Selecting the LG for Initiated By", ((string)(null)), ((TechTal
 testRunner.Then("The system should present a list of available LG options to populate the field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 28
-testRunner.When("Entering the listing ID \"0\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+testRunner.When(string.Format("Entering the listing ID \"{0}\"", listingID), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 30
 testRunner.Then("The system should validate the ID is a number", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

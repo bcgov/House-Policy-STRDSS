@@ -1,6 +1,8 @@
 global:
   env:
-    'LOGGING__LOGLEVEL__DEFAULT': 'Information'
+    'Logging__LogLevel__Default': 'Information'
+    'Logging__LogLevel__Microsoft.EntityFrameworkCore': 'Warning'
+    'Logging__LogLevel__Microsoft.AspNetCore': 'Warning'
     'ASPNETCORE_ENVIRONMENT': 'Production'
     'ENV_NAME': 'prod'
     'AppBaseUrl': 'https://prod-strdata.apps.silver.devops.gov.bc.ca'

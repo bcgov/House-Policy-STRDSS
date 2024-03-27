@@ -39,6 +39,15 @@ frontend:
   env:
     'API_HOST': '/api'
 
+  affinityTemplate: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchLabels: {{ include "app.selectorLabels" . | nindent 10 }}    
+
 backend:
   enabled: true
   replicaCount: 2
@@ -66,3 +75,12 @@ backend:
 
   env:
     'API_HOST': '/api'
+    
+  affinityTemplate: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchLabels: {{ include "app.selectorLabels" . | nindent 10 }}    

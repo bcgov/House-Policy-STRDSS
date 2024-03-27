@@ -27,5 +27,5 @@ networking:
   # Enable OpenShift route whitch allows you to host your application at a public URL
   route:
     enabled: true
-    host: # eg: crunchy-postgres.apps.silver.devops.gov.bc.ca
+    host: uat-strdata-db.apps.silver.devops.gov.bc.ca
 

@@ -1,7 +1,6 @@
 global:
   env:
-    'LOGGING__LOGLEVEL__DEFAULT': 'Error'
-    'LOGGING__LOGLEVEL__AWP': 'Information'
+    'LOGGING__LOGLEVEL__DEFAULT': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Test'
     'ENV_NAME': 'test'
     'AppBaseUrl': 'https://test-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca '

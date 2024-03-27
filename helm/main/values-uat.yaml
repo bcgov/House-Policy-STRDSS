@@ -1,7 +1,6 @@
 global:
   env:
-    'LOGGING__LOGLEVEL__DEFAULT': 'Error'
-    'LOGGING__LOGLEVEL__AWP': 'Information'
+    'LOGGING__LOGLEVEL__DEFAULT': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Staging'
     'ENV_NAME': 'uat'
     'AppBaseUrl': 'https://uat-strdss.f4a30d-test.apps.silver.devops.gov.bc.ca '

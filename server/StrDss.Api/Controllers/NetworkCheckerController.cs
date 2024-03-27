@@ -10,7 +10,7 @@ namespace StrDss.Api.Controllers
     public class NetworkCheckerController : ControllerBase
     {
         [AllowAnonymous]
-        [HttpGet("networkchecker")]
+        [HttpGet]
         public IActionResult GetNetworkStatus()
         {
             return Ok(new { status = true });

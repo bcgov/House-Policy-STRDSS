@@ -26,7 +26,7 @@ namespace StrDss.Test.AutoDomainDataBuilder
                 case nameof(DelistingWarningCreateDto.PlatformId):
                     return 1;
                 case nameof(DelistingWarningCreateDto.ListingId):
-                    return 1;
+                    return 1L;
                 case nameof(DelistingWarningCreateDto.ReasonId):
                     return 1;
 

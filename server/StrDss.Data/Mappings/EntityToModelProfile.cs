@@ -9,7 +9,7 @@ namespace StrDss.Data.Mappings
     {
         public EntityToModelProfile()
         {
-            CreateMap<DssUserIdentity, AccessRequestDto>()
+            CreateMap<DssUserIdentity, UserListtDto>()
                 .ForMember(o => o.OrganizationType, opt => opt.MapFrom(i => i.RepresentedByOrganization == null ? "" : i.RepresentedByOrganization.OrganizationType))
                 .ForMember(o => o.OrganizationCd, opt => opt.MapFrom(i => i.RepresentedByOrganization == null ? "" : i.RepresentedByOrganization.OrganizationCd))
                 .ForMember(o => o.OrganizationNm, opt => opt.MapFrom(i => i.RepresentedByOrganization == null ? "" : i.RepresentedByOrganization.OrganizationNm))
@@ -24,6 +24,7 @@ namespace StrDss.Data.Mappings
             CreateMap<DssAccessRequestStatus, AccessRequestStatusDto>();
             CreateMap<DssUserRole, RoleDto>();
             CreateMap<DssUserPrivilege, PermissionDto>();
+            CreateMap<DssUserIdentityView, UserListtDto>();
         }
     }
 }

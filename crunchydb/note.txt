@@ -1,12 +1,11 @@
-helm install strdssdev . --values values-dev.yaml
+helm install strdssuat . --values values-uat.yaml
 
 
 Warning: this deletes the database file and backups
 oc delete PostgresCluster/strdssdev
 
 
-oc port-forward svc/strdssdev-pgbouncer 5434:5432
+oc port-forward svc/strdssuat-pgbouncer 5434:5432
 
-ALTER DATABASE strdssdev OWNER TO strdssdev;
+ALTER DATABASE strdssuat OWNER TO strdssuat;
 
-ALTER DATABASE strdssdev SET search_path TO dss;

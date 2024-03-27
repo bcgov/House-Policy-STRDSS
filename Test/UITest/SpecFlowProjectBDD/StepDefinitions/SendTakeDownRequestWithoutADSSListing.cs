@@ -8,7 +8,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
     [Scope(Scenario = "SendDelistingRequestWithoutADSSListing")]
-    public sealed class SendDelistingRequestWithoutADSSListingStepDefinitions
+    public sealed class SendTakeDownRequestWithoutADSSListing
     {
         HomePage _HomePage;
         DelistingRequestPage _DelistingRequestPage;
@@ -21,7 +21,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         IDriver _driver;
 
  
-        public SendDelistingRequestWithoutADSSListingStepDefinitions(SeleniumDriver Driver)
+        public SendTakeDownRequestWithoutADSSListing(SeleniumDriver Driver)
         {
             _driver = Driver;
             _HomePage = new HomePage(_driver);
@@ -170,13 +170,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("successful submission")]
         public void WhenSuccessfulSubmission() 
         {
-            Assert.IsTrue(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
-            _DelistingRequestPage.ReturnHomeButton.Click();
         }
 
         [Then("I should receive a confirmation message indicating that the delisting request has been sent")]
         public void ThenIShouldReceiveAConfirmationMessage()
         {
+            System.Threading.Thread.Sleep(3000);
+            Assert.IsTrue(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+            _DelistingRequestPage.ReturnHomeButton.Click();
         }
 
         [Then("I should be copied on the email")]

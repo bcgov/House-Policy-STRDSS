@@ -9,3 +9,20 @@ oc port-forward svc/strdssuat-pgbouncer 5434:5432
 
 ALTER DATABASE strdssuat OWNER TO strdssuat;
 
+The size of each table and index:
+
+SELECT
+    relname AS "Table",
+    pg_size_pretty(pg_total_relation_size(relid)) AS "Total Size",
+    pg_size_pretty(pg_relation_size(relid)) AS "Data Size",
+    pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) AS "Index Size"
+FROM
+    pg_catalog.pg_statio_user_tables
+ORDER BY
+    pg_total_relation_size(relid) DESC;
+
+
+The total disk space used by the entire database cluster:
+
+SELECT
+    pg_size_pretty(pg_database_size(current_database())) AS "Database Size";

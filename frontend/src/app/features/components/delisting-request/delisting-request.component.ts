@@ -18,6 +18,7 @@ import { DelistingRequest } from '../../../common/models/delisting-request';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessagesModule } from 'primeng/messages';
 import { Router } from '@angular/router';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 @Component({
   selector: 'app-delisting-request',
@@ -26,6 +27,7 @@ import { Router } from '@angular/router';
     ReactiveFormsModule,
     DropdownModule,
     InputTextModule,
+    InputNumberModule,
     InputTextareaModule,
     MessagesModule,
     CheckboxModule,
@@ -57,9 +59,6 @@ export class DelistingRequestComponent implements OnInit {
   public get platformIdControl(): AbstractControl {
     return this.myForm.controls['platformId'];
   }
-  public get listingIdControl(): AbstractControl {
-    return this.myForm.controls['listingId'];
-  }
   public get listingUrlControl(): AbstractControl {
     return this.myForm.controls['listingUrl'];
   }
@@ -78,23 +77,18 @@ export class DelistingRequestComponent implements OnInit {
 
   onPreview(): void {
     if (this.myForm.valid) {
-      const model: DelistingRequest = Object.assign({}, this.myForm.value);
-
-      model.ccList = this.myForm.value['ccList'].prototype === Array
-        ? this.myForm.value
-        : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
-
-      this.delistingService.delistingRequestPreview(model).subscribe(
-        {
-          next: preview => {
-            this.previewText = preview.content;
-            this.isPreviewVisible = true;
-          },
-          error: error => {
-            this.showErrors(error);
+      this.delistingService.delistingRequestPreview(this.prepareFormModel(this.myForm))
+        .subscribe(
+          {
+            next: preview => {
+              this.previewText = preview.content;
+              this.isPreviewVisible = true;
+            },
+            error: error => {
+              this.showErrors(error);
+            }
           }
-        }
-      )
+        )
     } else {
       this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Form is invalid' }];
       console.error('Form is invalid!');
@@ -103,12 +97,7 @@ export class DelistingRequestComponent implements OnInit {
 
   onSubmit(): void {
     if (this.myForm.valid) {
-      const model: DelistingRequest = this.myForm.value;
-      model.ccList = this.myForm.value['ccList'].prototype === Array
-        ? this.myForm.value
-        : (this.myForm.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
-
-      this.delistingService.createDelistingRequest(model)
+      this.delistingService.createDelistingRequest(this.prepareFormModel(this.myForm))
         .subscribe({
           next: (_) => {
             this.showSuccessMessage();
@@ -138,11 +127,20 @@ export class DelistingRequestComponent implements OnInit {
     this.messages = [{ severity: 'success', summary: '', detail: 'Your Notice of Takedown was Successfully Submitted!' }];
   }
 
+  private prepareFormModel(form: FormGroup): DelistingRequest {
+    const model: DelistingRequest = form.value;
+    model.ccList = form.value['ccList'].prototype === Array
+      ? form.value
+      : (form.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
+
+    return model;
+  }
+
   private initForm(): void {
     this.myForm = this.fb.group({
       lgId: [0, Validators.required],
       platformId: [0, Validators.required],
-      listingId: [null, [Validators.pattern(/\d+/)]],
+      listingId: [null],
       listingUrl: ['', [Validators.required, validateUrl()]],
       sendCopy: [true],
       ccList: ['', validateEmailListString()],
@@ -152,16 +150,16 @@ export class DelistingRequestComponent implements OnInit {
   private showErrors(error: HttpErrorResponse | any): void {
     let errorObject = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
     if (error.error['detail']) {
-      this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: error.error['detail'] }];
+      this.messages = [{ severity: 'error', summary: 'Server error', closable: true, detail: `${error.error['detail']}` }];
     } else {
       const errorKeys = Object.keys(errorObject.errors)
 
       if (!errorKeys) {
-        this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Some properties are not valid' }];
+        this.messages = [{ severity: 'error', summary: 'Server error', closable: true, detail: 'Some properties are not valid' }];
       }
       else {
         errorKeys.forEach(key => {
-          this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: errorObject.errors[key] }];
+          this.messages = [{ severity: 'error', summary: 'Server error', closable: true, detail: `${errorObject.errors[key]}` }];
         });
       }
     }

@@ -89,6 +89,7 @@ DROP TABLE public.dss_user_role_privilege;
 DROP TABLE public.dss_user_role_assignment;
 DROP TABLE public.dss_user_role;
 DROP TABLE public.dss_user_privilege;
+DROP VIEW public.dss_user_identity_view;
 DROP TABLE public.dss_user_identity;
 DROP TABLE public.dss_organization_type;
 DROP TABLE public.dss_organization_contact_person;
@@ -1075,6 +1076,33 @@ ALTER TABLE public.dss_user_identity ALTER COLUMN user_identity_id ADD GENERATED
 
 
 --
+-- Name: dss_user_identity_view; Type: VIEW; Schema: public; Owner: strdssdev
+--
+
+CREATE VIEW public.dss_user_identity_view AS
+ SELECT u.user_identity_id,
+    u.is_enabled,
+    u.access_request_status_cd,
+    u.access_request_dtm,
+    u.access_request_justification_txt,
+    u.identity_provider_nm,
+    u.given_nm,
+    u.family_nm,
+    u.email_address_dsc,
+    u.business_nm,
+    u.terms_acceptance_dtm,
+    u.represented_by_organization_id,
+    o.organization_type,
+    o.organization_cd,
+    o.organization_nm,
+    u.upd_dtm
+   FROM (public.dss_user_identity u
+     LEFT JOIN public.dss_organization o ON ((u.represented_by_organization_id = o.organization_id)));
+
+
+ALTER VIEW public.dss_user_identity_view OWNER TO strdssdev;
+
+--
 -- Name: dss_user_privilege; Type: TABLE; Schema: public; Owner: strdssdev
 --
 
@@ -1347,7 +1375,7 @@ COPY hangfire.schema (version) FROM stdin;
 --
 
 COPY hangfire.server (id, data, lastheartbeat, updatecount) FROM stdin;
-cnd2214638-n:17896:acbd8bd9-502f-480f-b565-de9d136c842d	{"Queues": ["default"], "StartedAt": "2024-03-25T15:53:58.0476485Z", "WorkerCount": 1}	2024-03-25 16:20:36.276805+00	0
+cnd2214638-n:32592:1e50dbbf-6569-4730-9e9c-97b815426e07	{"Queues": ["default"], "StartedAt": "2024-03-26T19:45:32.3962059Z", "WorkerCount": 1}	2024-03-26 19:51:40.170381+00	0
 \.
 
 
@@ -1466,6 +1494,8 @@ COPY public.dss_user_identity (user_identity_id, user_guid, display_nm, identity
 13	550e8400-e29b-41d4-a716-446655440012	User13 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User13 Given Name	User13 Family Name	user13@example.com	User13 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
 14	550e8400-e29b-41d4-a716-446655440013	User14 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User14 Given Name	User14 Family Name	user14@example.com	User14 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
 15	550e8400-e29b-41d4-a716-446655440014	User15 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User15 Given Name	User15 Family Name	user15@example.com	User15 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
+22	bc3577d3-f3f8-4687-a093-4594fa43f679	Chung, Young-Jin MOTI:EX	idir	t	Approved	2024-03-26 17:22:24.042276+00	BCGov, Ministry of Housing	Young-Jin	Chung	young-jin.chung@gov.bc.ca		\N	4	2024-03-26 18:43:24.168405+00	bc3577d3-f3f8-4687-a093-4594fa43f679
+18	8494b7d6-1ccf-48ff-9004-eac34ea99b63	Chung, Young-Jin 1 HOUS:EX	idir	t	Approved	2024-03-25 21:06:25.133679+00	BCGov, Ministry of Housing	Young-Jin	Chung	young-jin.1.chung@gov.bc.ca		\N	4	2024-03-25 21:07:20.197502+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
 \.
 
 
@@ -1503,6 +1533,8 @@ platform_staff	Short Term Rental Platform
 --
 
 COPY public.dss_user_role_assignment (user_identity_id, user_role_cd) FROM stdin;
+18	ceu_admin
+22	ceu_staff
 \.
 
 
@@ -1633,7 +1665,7 @@ SELECT pg_catalog.setval('public.dss_organization_organization_id_seq', 4, true)
 -- Name: dss_user_identity_user_identity_id_seq; Type: SEQUENCE SET; Schema: public; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('public.dss_user_identity_user_identity_id_seq', 15, true);
+SELECT pg_catalog.setval('public.dss_user_identity_user_identity_id_seq', 22, true);
 
 
 --

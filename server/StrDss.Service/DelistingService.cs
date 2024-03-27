@@ -2,13 +2,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Geometries;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
-using StrDss.Model.WarningReasonDtos;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Service
@@ -40,21 +38,20 @@ namespace StrDss.Service
         public async Task<Dictionary<string, List<string>>> CreateDelistingWarningAsync(DelistingWarningCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
+            var reasonDto = await _emailService.GetMessageReasonByMessageTypeAndId(EmailMessageTypes.NoticeOfTakedown, dto.ReasonId);
 
-            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
-
-            var errors = await ValidateDelistingWarningAsync(dto, platform, reason);
+            var errors = await ValidateDelistingWarningAsync(dto, platform, reasonDto);
             if (errors.Count > 0)
             {
                 return errors;
             }
 
-            await SendDelistingWarningAsync(dto, platform);
+            await SendDelistingWarningAsync(dto, platform, reasonDto);
 
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidateDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform, string? reason)
+        private async Task<Dictionary<string, List<string>>> ValidateDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
         {
             await Task.CompletedTask;
 
@@ -107,7 +104,7 @@ namespace StrDss.Service
                 }
             }
 
-            if (reason == null)
+            if (reasonDto == null)
             {
                 errors.AddItem("reasonId", $"Reason ID ({dto.ReasonId}) does not exist.");
             }
@@ -149,7 +146,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform)
+        private async Task SendDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
         {
             var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
 
@@ -168,7 +165,7 @@ namespace StrDss.Service
             {
                 Bcc = Array.Empty<string>(),
                 BodyType = "html",
-                Body = FormatDelistingWarningEmailContent(dto, true),
+                Body = FormatDelistingWarningEmailContent(dto, reasonDto, true),
                 Cc = dto.CcList.ToArray(),
                 DelayTS = 0,
                 Encoding = "utf-8",
@@ -185,9 +182,9 @@ namespace StrDss.Service
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
-            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
+            var reasonDto = await _emailService.GetMessageReasonByMessageTypeAndId(EmailMessageTypes.NoticeOfTakedown, dto.ReasonId);
 
-            var errors = await ValidateDelistingWarningAsync(dto, platform, reason);
+            var errors = await ValidateDelistingWarningAsync(dto, platform, reasonDto);
             if (errors.Count > 0)
             {
                 return (errors, new EmailPreview());
@@ -201,12 +198,12 @@ namespace StrDss.Service
                 dto.ToList.Add(dto.HostEmail);
             }
 
-            return (errors, new EmailPreview { Content = FormatDelistingWarningEmailContent(dto, false).HtmlToPlainText() });
+            return (errors, new EmailPreview { Content = (FormatDelistingWarningEmailContent(dto, reasonDto, false)).HtmlToPlainText() });
         }
 
-        private string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, bool contentOnly)
+        private string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, DropdownNumDto? reasonDto, bool contentOnly)
         {
-            var reason = WarningReasonDto.WarningReasons.FirstOrDefault(x => x.WarningReasonId == dto.ReasonId)?.Reason;
+            var reason = reasonDto?.Description;
             var nl = Environment.NewLine;
 
             return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}<br/>cc: {string.Join(";", dto.CcList)}<br/><br/>")

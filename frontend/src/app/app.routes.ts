@@ -3,6 +3,7 @@ import { ComplianceNoticeComponent } from './features/components/compliance-noti
 import { DashboardComponent } from './features/components/dashboard/dashboard.component';
 import { DelistingRequestComponent } from './features/components/delisting-request/delisting-request.component';
 import { AccessRequestComponent } from './features/components/access-request/access-request.component';
+import { AccessRequestListComponent } from './features/components/access-request-list/access-request-list.component';
 
 export const routes: Routes = [
     {
@@ -20,6 +21,10 @@ export const routes: Routes = [
     {
         path: 'access-request',
         component: AccessRequestComponent,
+    },
+    {
+        path: 'access-request-list',
+        component: AccessRequestListComponent,
     },
 
 ];

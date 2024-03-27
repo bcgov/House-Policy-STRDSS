@@ -96,9 +96,9 @@ spec:
               path: /healthz
               port: http
               scheme: HTTP
-            initialDelaySeconds: 60
+            initialDelaySeconds: 10
             timeoutSeconds: 10
-            periodSeconds: 60
+            periodSeconds: 10
             successThreshold: 1
             failureThreshold: 5
           livenessProbe:
@@ -106,9 +106,9 @@ spec:
               path: /api/networkchecker
               port: http
               scheme: HTTP
-            initialDelaySeconds: 60
+            initialDelaySeconds: 10
             timeoutSeconds: 10
-            periodSeconds: 60
+            periodSeconds: 10
             successThreshold: 1
             failureThreshold: 5
           resources:

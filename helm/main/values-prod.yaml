@@ -1,7 +1,6 @@
 global:
   env:
-    'LOGGING__LOGLEVEL__DEFAULT': 'Error'
-    'LOGGING__LOGLEVEL__AWP': 'Information'
+    'LOGGING__LOGLEVEL__DEFAULT': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Production'
     'ENV_NAME': 'prod'
     'AppBaseUrl': 'https://prod-strdss.f4a30d-prod.apps.silver.devops.gov.bc.ca '

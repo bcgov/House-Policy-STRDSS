@@ -18,4 +18,8 @@ crunchy-postgres:
         memory: 32Mi
       limits:
         cpu: 50m
-        memory: 64Mi  
+        memory: 64Mi
+crunchy-postgres-tools:
+  networking:
+    route:
+      host: uat-strdata-db.apps.silver.devops.gov.bc.ca

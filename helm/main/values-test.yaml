@@ -11,7 +11,7 @@ global:
     'SSO_AUTHORITY': 'https://dev.loginproxy.gov.bc.ca/auth/realms/standard'
     'SM_LOGOFF_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi/'
     'CHES_TOKEN_URL': 'https://dev.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
-    'CHES_URL': 'https://ches-test.api.gov.bc.ca'
+    'CHES_URL': 'https://ches-dev.api.gov.bc.ca'
 
 nameOverride: strdss-test
 fullnameOverride: strdss-test

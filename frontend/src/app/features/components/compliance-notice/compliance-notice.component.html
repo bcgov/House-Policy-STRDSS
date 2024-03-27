@@ -22,8 +22,12 @@
             <label for="listingId">Add Listing ID Number if known (Optional)</label>
         </div>
         <div class="form-group-row-col">
-            <input class="long-text-field" placeholder="Enter Value..." type="number" pInputText
-                formControlName="listingId" id="listingId" name="listingId" />
+            <input class="long-text-field" pattern="\d+" type="text" pInputText formControlName="listingId"
+                placeholder="Enter Value..." id="listingId" name="listingId" />
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!listingIdControl.pristine">
+            <small id="patternListingId" *ngIf="listingIdControl.errors?.['pattern']"> Listing ID should be a positive
+                number</small>
         </div>
     </div>
 

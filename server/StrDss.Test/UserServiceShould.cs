@@ -310,10 +310,11 @@ namespace StrDss.Test
             currentUserMock.Setup(x => x.BusinessNm).Returns("Test Business");
         }
 
-        public void SetupUserRepository(Mock<IUserRepository> userRepoMock, UserDto currentUserDto)
+        public void SetupUserRepository(Mock<IUserRepository> userRepoMock, UserDto userDto)
         {
-            userRepoMock.Setup(x => x.GetUserByGuid(It.IsAny<Guid>())).ReturnsAsync(currentUserDto);
+            userRepoMock.Setup(x => x.GetUserByGuid(It.IsAny<Guid>())).ReturnsAsync(userDto);
             userRepoMock.Setup(x => x.CreateUserAsync(It.IsAny<UserCreateDto>())).Returns(Task.CompletedTask);
+            userRepoMock.Setup(x => x.GetAdminUsers()).ReturnsAsync(new List<UserDto> { userDto });
         }
 
         public void SetupUnitOfWork(Mock<IUnitOfWork> unitOfWorkMock)

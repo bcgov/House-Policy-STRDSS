@@ -23,11 +23,13 @@ namespace StrDss.Test
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
             [Frozen] Mock<ILogger<DelistingService>> loggerMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
+            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             DelistingService sut)
         {
             // Arrange
             configMock.Setup(x => x.GetValue(typeof(string), "")).Returns("https://ches.example.com");
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
+            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Act
             var result = await sut.CreateDelistingWarningAsync(dto);;
@@ -415,7 +417,7 @@ namespace StrDss.Test
             // Arrange
             currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
-
+            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             // Act
             await sut.CreateDelistingWarningAsync(dto);
 
@@ -436,6 +438,7 @@ namespace StrDss.Test
             // Arrange
             dto.HostEmail = "host@example.com";
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
+            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Act
             await sut.CreateDelistingWarningAsync(dto);
@@ -458,6 +461,7 @@ namespace StrDss.Test
 
             // Act
             await sut.CreateDelistingWarningAsync(dto);
+            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Assert
             Assert.DoesNotContain(dto.HostEmail, dto.ToList);
@@ -478,6 +482,7 @@ namespace StrDss.Test
             var currentUserEmail = "user@example.com";
             currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
+            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Act
             await sut.CreateDelistingWarningAsync(dto);
@@ -499,6 +504,7 @@ namespace StrDss.Test
             dto.SendCopy = false;
             var currentUserEmail = "user@example.com";
             currentUserMock.Setup(m => m.EmailAddress).Returns("user@example.com");
+            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Act
             await sut.CreateDelistingWarningAsync(dto);

@@ -27,6 +27,8 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssUserIdentity> DssUserIdentities { get; set; }
 
+    public virtual DbSet<DssUserIdentityView> DssUserIdentityViews { get; set; }
+
     public virtual DbSet<DssUserPrivilege> DssUserPrivileges { get; set; }
 
     public virtual DbSet<DssUserRole> DssUserRoles { get; set; }
@@ -367,6 +369,50 @@ public partial class DssDbContext : DbContext
                             .HasComment("Foreign key")
                             .HasColumnName("user_role_cd");
                     });
+        });
+
+        modelBuilder.Entity<DssUserIdentityView>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("dss_user_identity_view");
+
+            entity.Property(e => e.AccessRequestDtm).HasColumnName("access_request_dtm");
+            entity.Property(e => e.AccessRequestJustificationTxt)
+                .HasMaxLength(250)
+                .HasColumnName("access_request_justification_txt");
+            entity.Property(e => e.AccessRequestStatusCd)
+                .HasMaxLength(25)
+                .HasColumnName("access_request_status_cd");
+            entity.Property(e => e.BusinessNm)
+                .HasMaxLength(250)
+                .HasColumnName("business_nm");
+            entity.Property(e => e.EmailAddressDsc)
+                .HasMaxLength(320)
+                .HasColumnName("email_address_dsc");
+            entity.Property(e => e.FamilyNm)
+                .HasMaxLength(25)
+                .HasColumnName("family_nm");
+            entity.Property(e => e.GivenNm)
+                .HasMaxLength(25)
+                .HasColumnName("given_nm");
+            entity.Property(e => e.IdentityProviderNm)
+                .HasMaxLength(25)
+                .HasColumnName("identity_provider_nm");
+            entity.Property(e => e.IsEnabled).HasColumnName("is_enabled");
+            entity.Property(e => e.OrganizationCd)
+                .HasMaxLength(25)
+                .HasColumnName("organization_cd");
+            entity.Property(e => e.OrganizationNm)
+                .HasMaxLength(250)
+                .HasColumnName("organization_nm");
+            entity.Property(e => e.OrganizationType)
+                .HasMaxLength(25)
+                .HasColumnName("organization_type");
+            entity.Property(e => e.RepresentedByOrganizationId).HasColumnName("represented_by_organization_id");
+            entity.Property(e => e.TermsAcceptanceDtm).HasColumnName("terms_acceptance_dtm");
+            entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
+            entity.Property(e => e.UserIdentityId).HasColumnName("user_identity_id");
         });
 
         modelBuilder.Entity<DssUserPrivilege>(entity =>

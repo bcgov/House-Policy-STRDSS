@@ -21,7 +21,7 @@ route:
 
 frontend:
   enabled: true
-  replicaCount: 3
+  replicaCount: 2
   nameOverride: strdss-uat-frontend
   fullnameOverride: strdss-uat-frontend
   secretName: strdss-secrets-uat
@@ -39,20 +39,28 @@ frontend:
 
 backend:
   enabled: true
-  replicaCount: 3
+  replicaCount: 2
   nameOverride: strdss-uat-backend
   fullnameOverride: strdss-uat-backend
   secretName: strdss-secrets-uat
   dbSecretName: strdssuat-pguser-strdssuat
   crunchydb: true
 
+  # resources:
+  #   limits:
+  #     cpu: 1500m
+  #     memory: 1500Mi
+  #   requests:
+  #     cpu: 20m
+  #     memory: 1100Mi
+
   resources:
-    limits:
-      cpu: 1500m
-      memory: 1500Mi
-    requests:
-      cpu: 20m
-      memory: 1100Mi
+  limits:
+    cpu: 200m
+    memory: 150Mi
+  requests:
+    cpu: 20m
+    memory: 100Mi
 
   env:
     'API_HOST': '/api'

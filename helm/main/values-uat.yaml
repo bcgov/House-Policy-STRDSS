@@ -23,7 +23,7 @@ route:
 
 frontend:
   enabled: true
-  replicaCount: 1
+  replicaCount: 2
   nameOverride: strdss-uat-frontend
   fullnameOverride: strdss-uat-frontend
   secretName: strdss-secrets-uat

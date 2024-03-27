@@ -33,7 +33,7 @@
         {
             _regexInfos = new Dictionary<string, RegexInfo>();
 
-            _regexInfos.Add(Email, new RegexInfo { Regex = @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorMessage = "Wrong email address" });
+            _regexInfos.Add(Email, new RegexInfo { Regex = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", ErrorMessage = "Wrong email address" });
 
             _regexInfos.Add(GpsCoords, new RegexInfo { Regex = @"^\-?\d{1,5}(\.\d{1,9})?$", ErrorMessage = "Value must be a number of less than 6 digits optionally with maximum 9 decimal digits" });
             _regexInfos.Add(Offset, new RegexInfo { Regex = @"^\-?\d{1,4}(\.\d{1,3})?$", ErrorMessage = "Value must be a number of less than 5 digits optionally with maximum 3 decimal digits" });

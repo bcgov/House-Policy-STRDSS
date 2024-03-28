@@ -11,7 +11,7 @@ namespace StrDss.Service
 {
     public interface IUserService
     {
-        Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid);
         Task<Dictionary<string, List<string>>> CreateAccessRequestAsync(AccessRequestCreateDto dto);
         Task<Dictionary<string, List<string>>> DenyAccessRequest(AccessRequestDenyDto dto);
@@ -35,9 +35,9 @@ namespace StrDss.Service
             _emailService = emailService;
         }
 
-        public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction)
         {
-            return await _userRepo.GetUserListAsync(status, pageSize, pageNumber, orderBy, direction);
+            return await _userRepo.GetUserListAsync(status, search, orgranizationId, pageSize, pageNumber, orderBy, direction);
         }
 
         public async Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid)

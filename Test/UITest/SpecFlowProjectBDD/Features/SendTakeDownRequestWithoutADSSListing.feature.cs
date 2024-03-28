@@ -26,16 +26,13 @@ namespace SpecFlowProjectBDD.Features
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
-        private string[] _featureTags = ((string[])(null));
-        
-#line 1 "SendTakeDownRequestWithoutADSSListing.feature"
-#line hidden
+        private static string[] featureTags = ((string[])(null));
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendDelistingRequestWithoutADSSListingFeature", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-74", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendDelistingRequestWithoutADSSListingFeature", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-74", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -47,28 +44,28 @@ namespace SpecFlowProjectBDD.Features
         }
         
         [NUnit.Framework.SetUpAttribute()]
-        public virtual void TestInitialize()
+        public void TestInitialize()
         {
         }
         
         [NUnit.Framework.TearDownAttribute()]
-        public virtual void TestTearDown()
+        public void TestTearDown()
         {
             testRunner.OnScenarioEnd();
         }
         
-        public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
+        public void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
             testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<NUnit.Framework.TestContext>(NUnit.Framework.TestContext.CurrentContext);
         }
         
-        public virtual void ScenarioStart()
+        public void ScenarioStart()
         {
             testRunner.OnScenarioStart();
         }
         
-        public virtual void ScenarioCleanup()
+        public void ScenarioCleanup()
         {
             testRunner.CollectScenarioErrors();
         }
@@ -76,11 +73,16 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("SendDelistingRequestWithoutADSSListing")]
         [NUnit.Framework.CategoryAttribute("Delisting")]
-        [NUnit.Framework.TestCaseAttribute("-1", "Negative", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "Boundary", null)]
-        [NUnit.Framework.TestCaseAttribute("9999", "Max", null)]
-        [NUnit.Framework.TestCaseAttribute("test", "string", null)]
-        public virtual void SendDelistingRequestWithoutADSSListing(string listingID, string comment, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("-1", "ListingID - Negative number test", "fail", "http://listingURL.com", "richard.anderson@dxc.com", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", null)]
+        [NUnit.Framework.TestCaseAttribute("9223372036854775807", "ListingID - Test for Max value", "pass", "http://listingURL.com", "richard.anderson@dxc.com", null)]
+        [NUnit.Framework.TestCaseAttribute("test", "ListingID - Test for string", "fail", "http://listingURL.com", "richard.anderson@dxc.com", null)]
+        [NUnit.Framework.TestCaseAttribute("e", "ListingID - Test for exponential", "fail", "http://listingURL.com", "richard.anderson@dxc.com", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Valid URL", "pass", "HTTP://listingURL.com", "richard.anderson@dxc.com", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Valid URL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Long URL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", null)]
+        public void SendDelistingRequestWithoutADSSListing(string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "Delisting"};
@@ -91,117 +93,56 @@ namespace SpecFlowProjectBDD.Features
             string[] tagsOfScenario = @__tags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("ListingID", listingID);
-            argumentsOfScenario.Add("Comment", comment);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("SendDelistingRequestWithoutADSSListing", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 5
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            argumentsOfScenario.Add("Description", description);
+            argumentsOfScenario.Add("ExpectedResult", expectedResult);
+            argumentsOfScenario.Add("ListingURL", listingURL);
+            argumentsOfScenario.Add("AdditionalCCsTextBox", additionalCCsTextBox);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("SendDelistingRequestWithoutADSSListing", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            this.ScenarioInitialize(scenarioInfo);
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
             else
             {
                 this.ScenarioStart();
-#line 7
-testRunner.Given("I am an authenticated LG staff member", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 9
-testRunner.When("I navigate to the delisting request feature", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 12
-testRunner.Then("I should be presented with an input form that includes fields for the listing URL" +
+                testRunner.Given(string.Format("I am an authenticated LG staff member and the expected result is \"{0}\"", expectedResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+                testRunner.When("I navigate to the delisting request feature", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                testRunner.Then("I should be presented with an input form that includes fields for the listing URL" +
                         "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 14
-testRunner.And("I Should be Presented with an Input form that Lists requests Initiated By", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 16
-testRunner.And("I should be presented with a field to select which platform to send the request t" +
+                testRunner.And("I Should be Presented with an Input form that Lists requests Initiated By", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+                testRunner.And("I should be presented with a field to select which platform to send the request t" +
                         "o", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 18
-testRunner.And("I should see an optional field for adding a LG staff user email address to be cop" +
+                testRunner.And("I should see an optional field for adding a LG staff user email address to be cop" +
                         "ied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 22
-testRunner.When("Selecting the LG for Initiated By", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 24
-testRunner.Then("The system should present a list of available LG options to populate the field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 28
-testRunner.When(string.Format("Entering the listing ID \"{0}\"", listingID), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 30
-testRunner.Then("The system should validate the ID is a number", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 34
-testRunner.When("Entering the listing URL \"http://listingURL.com\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 36
-testRunner.Then("The system should validate the URL format and ensure it is a valid link to the pr" +
+                testRunner.When("Selecting the LG for Initiated By", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                testRunner.Then("The system should present a list of available LG options to populate the field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                testRunner.When(string.Format("Entering the listing ID \"{0}\"", listingID), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                testRunner.Then("The system should validate the ID is a number", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                testRunner.When(string.Format("Entering the listing URL \"{0}\"", listingURL), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                testRunner.Then("The system should validate the URL format and ensure it is a valid link to the pr" +
                         "operty listing", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 39
-testRunner.When("selecting the platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 41
-testRunner.Then("the system should present a list of available platform options to populate the fi" +
+                testRunner.When("selecting the platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                testRunner.Then("the system should present a list of available platform options to populate the fi" +
                         "eld", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 45
-testRunner.When("all required fields are entered", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 47
-testRunner.Then("I click the review button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 49
-testRunner.Then("I see a template delisting request message that will be sent to both the platform" +
+                testRunner.When("all required fields are entered", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                testRunner.Then("I click the review button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                testRunner.Then("I see a template delisting request message that will be sent to both the platform" +
                         "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 53
-testRunner.When("I submit the form with valid information", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 55
-testRunner.Then("the system should send the delisting request message to the platform email addres" +
+                testRunner.When("I submit the form with valid information", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                testRunner.Then("the system should send the delisting request message to the platform email addres" +
                         "ses associated with the selected platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 59
-testRunner.When("successful submission", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 61
-testRunner.Then("I should receive a confirmation message indicating that the delisting request has" +
+                testRunner.When("successful submission", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                testRunner.Then("I should receive a confirmation message indicating that the delisting request has" +
                         " been sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 63
-testRunner.Then("I should be copied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 66
-testRunner.When("the delisting request is submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 68
-testRunner.Then("the platform and host should receive email notifications containing the delisting" +
+                testRunner.Then("I should be copied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                testRunner.When("the delisting request is submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                testRunner.Then("the platform and host should receive email notifications containing the delisting" +
                         " request and instructions for compliance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 72
-testRunner.When("there are issues with the submission, such as invalid email addresses or a missin" +
+                testRunner.When("there are issues with the submission, such as invalid email addresses or a missin" +
                         "g URL", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 74
-testRunner.Then("the system should provide clear error messages guiding me on how to correct the i" +
+                testRunner.Then("the system should provide clear error messages guiding me on how to correct the i" +
                         "ssues", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
             }
             this.ScenarioCleanup();
         }

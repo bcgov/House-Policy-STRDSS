@@ -140,12 +140,6 @@ export class UserManagementComponent implements OnInit {
   }
 
   private initData(): void {
-    this.statuses = [
-      { label: 'Approved', value: 1 },
-      { label: 'Denied', value: 2 },
-      { label: 'Pending', value: 3 },
-    ]
-
     this.userDataService.getStatuses().subscribe({
       next: (data: Array<DropdownOption>) => {
         this.statuses = data;

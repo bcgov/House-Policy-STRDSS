@@ -155,4 +155,27 @@ body {
             }
         }
     }
+
+    .p-menubar {
+        background-color: transparent;
+        color: #FFFFFF;
+        border: none;
+        padding: 0;
+
+        .p-menuitem-text,
+        .p-submenu-icon {
+            color: #FFFFFF;
+        }
+
+        .p-menuitem-content {
+            &:hover {
+
+                .p-menuitem-text,
+                .p-submenu-icon {
+                    // color: #FFFFFF;
+                    color: #053662;
+                }
+            }
+        }
+    }
 }

@@ -104,7 +104,13 @@ namespace StrDss.Api.Controllers
         [HttpPut("accepttermsconditions", Name = "AcceptTermsConditions")]
         public async Task<ActionResult> AcceptTermsConditions()
         {
-            await _userService.AcceptTermsConditions();
+            var errors = await _userService.AcceptTermsConditions();
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
             return Ok();
         }
     }

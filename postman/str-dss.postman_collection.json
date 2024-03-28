@@ -354,7 +354,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/users?status=&pageSize=20&pageNumber=1&orderby=organizationNm",
+					"raw": "{{host}}/api/users?status=&pageSize=20&pageNumber=1&orderby=organizationNm&organizationId=4",
 					"host": [
 						"{{host}}"
 					],
@@ -378,6 +378,10 @@
 						{
 							"key": "orderby",
 							"value": "organizationNm"
+						},
+						{
+							"key": "organizationId",
+							"value": "4"
 						}
 					]
 				}

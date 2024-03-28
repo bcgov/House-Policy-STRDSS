@@ -3,7 +3,7 @@ import { ComplianceNoticeComponent } from './features/components/compliance-noti
 import { DashboardComponent } from './features/components/dashboard/dashboard.component';
 import { DelistingRequestComponent } from './features/components/delisting-request/delisting-request.component';
 import { AccessRequestComponent } from './features/components/access-request/access-request.component';
-import { AccessRequestListComponent } from './features/components/access-request-list/access-request-list.component';
+import { UserManagementComponent } from './features/components/user-management/user-management.component';
 
 export const routes: Routes = [
     {
@@ -23,8 +23,8 @@ export const routes: Routes = [
         component: AccessRequestComponent,
     },
     {
-        path: 'access-request-list',
-        component: AccessRequestListComponent,
+        path: 'user-management',
+        component: UserManagementComponent,
     },
 
 ];

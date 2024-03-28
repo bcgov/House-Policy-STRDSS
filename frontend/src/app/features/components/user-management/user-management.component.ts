@@ -15,6 +15,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { UserDataService } from '../../../common/services/user-data.service';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-user-management',
@@ -30,6 +31,7 @@ import { UserDataService } from '../../../common/services/user-data.service';
     DateFormatPipe,
     InputSwitchModule,
     ConfirmDialogModule,
+    InputTextModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './user-management.component.html',
@@ -42,7 +44,12 @@ export class UserManagementComponent implements OnInit {
 
   accessRequests = new Array<AccessRequestTableItem>();
   currentPage!: PagingResponsePageInfo;
-  currentStatus = '';
+
+  searchParams = {
+    searchStatus: '',
+    searchOrganization: '',
+    searchTerm: '',
+  }
 
   showApprovePopup = false;
   showRejectPopup = false;
@@ -60,9 +67,8 @@ export class UserManagementComponent implements OnInit {
     this.initForm();
     this.initData();
   }
+  onSearchModelChanged(): void {
 
-  onFilterChanged(statusId: any): void {
-    console.log('statusId', statusId);
   }
 
   onApprovePopup(accessRequest: AccessRequestTableItem): void {

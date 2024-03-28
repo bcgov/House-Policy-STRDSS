@@ -76,4 +76,13 @@
             }
         }
     }
+
+    .actions {
+        display: flex;
+        justify-content: end;
+
+        p-button:last-of-type {
+            margin-left: 8px;
+        }
+    }
 }

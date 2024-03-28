@@ -171,6 +171,62 @@
 				<column name="organization_type" />
 			</index>
 		</table>
+		<table name="dss_rental_listing" prior="dss_rental_listing_report_0" >
+			<comment><![CDATA[A rental listing snapshot that is relevant to a specific month]]></comment>
+			<column name="rental_listing_id" prior="rental_listing_report_id" type="bigint" jt="-5" mandatory="y" >
+				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
+				<comment><![CDATA[Unique generated key]]></comment>
+			</column>
+			<column name="is_current" type="boolean" jt="16" mandatory="y" >
+				<comment><![CDATA[Indicates whether the report is the one with the most recent reporting month for the platform (and therefore current)]]></comment>
+			</column>
+			<column name="report_period_ym" type="date" jt="91" mandatory="y" >
+				<comment><![CDATA[The month to which the listing information is relevant (always set to the first day of the month)]]></comment>
+			</column>
+			<column name="including_organization_id" prior="providing_organization_id" type="bigint" jt="-5" mandatory="y" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
+			<column name="upd_dtm" type="timestamptz" jt="93" mandatory="y" >
+				<comment><![CDATA[Trigger-updated timestamp of last change]]></comment>
+			</column>
+			<column name="upd_user_guid" type="uuid" jt="102" >
+				<comment><![CDATA[The globally unique identifier (assigned by the identity provider) for the most recent user to record a change]]></comment>
+			</column>
+			<index name="dss_rental_listing_pk" unique="PRIMARY_KEY" >
+				<column name="rental_listing_id" />
+			</index>
+			<fk name="dss_rental_listing_fk_provided_for" to_schema="dss" to_table="dss_organization" >
+				<fk_column name="including_organization_id" pk="organization_id" />
+			</fk>
+		</table>
+		<table name="dss_rental_listing_report" prior="dss_organization_contact_person_0" >
+			<comment><![CDATA[A delivery of rental listing information that is relevant to a specific month]]></comment>
+			<column name="rental_listing_report_id" prior="organization_contact_person_id" type="bigint" jt="-5" mandatory="y" >
+				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
+				<comment><![CDATA[Unique generated key]]></comment>
+			</column>
+			<column name="is_current" prior="is_active" type="boolean" jt="16" mandatory="y" >
+				<comment><![CDATA[Indicates whether the report is the one with the most recent reporting month for the platform (and therefore current)]]></comment>
+			</column>
+			<column name="report_period_ym" prior="given_nm" type="date" jt="91" mandatory="y" >
+				<comment><![CDATA[The month to which the listing information is relevant (always set to the first day of the month)]]></comment>
+			</column>
+			<column name="providing_organization_id" prior="contacted_through_organization_id" type="bigint" jt="-5" mandatory="y" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
+			<column name="upd_dtm" type="timestamptz" jt="93" mandatory="y" >
+				<comment><![CDATA[Trigger-updated timestamp of last change]]></comment>
+			</column>
+			<column name="upd_user_guid" type="uuid" jt="102" >
+				<comment><![CDATA[The globally unique identifier (assigned by the identity provider) for the most recent user to record a change]]></comment>
+			</column>
+			<index name="dss_rental_listing_report_pk" unique="PRIMARY_KEY" >
+				<column name="rental_listing_report_id" />
+			</index>
+			<fk name="dss_rental_listing_report_fk_provided_by" to_schema="dss" to_table="dss_organization" >
+				<fk_column name="providing_organization_id" pk="organization_id" />
+			</fk>
+		</table>
 		<table name="dss_user_identity" prior="dss_person" >
 			<comment><![CDATA[An externally defined domain directory object representing a potential application user or group]]></comment>
 			<column name="user_identity_id" prior="person_id" type="bigint" jt="-5" mandatory="y" >
@@ -324,6 +380,8 @@ END;$function$
 		<entity schema="dss" name="dss_organization" color="C1D8EE" x="496" y="208" />
 		<entity schema="dss" name="dss_organization_contact_person" color="3986C1" x="1072" y="64" />
 		<entity schema="dss" name="dss_organization_type" color="3986C1" x="48" y="224" />
+		<entity schema="dss" name="dss_rental_listing" color="3986C1" x="496" y="1088" />
+		<entity schema="dss" name="dss_rental_listing_report" color="3986C1" x="608" y="656" />
 		<entity schema="dss" name="dss_user_identity" color="3986C1" x="1088" y="304" />
 		<entity schema="dss" name="dss_user_privilege" color="3986C1" x="1184" y="720" />
 		<entity schema="dss" name="dss_user_role" color="3986C1" x="1216" y="624" />

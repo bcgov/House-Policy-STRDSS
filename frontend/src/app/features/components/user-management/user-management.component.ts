@@ -10,10 +10,14 @@ import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/p
 import { DialogModule } from 'primeng/dialog';
 import { PaginatorModule } from 'primeng/paginator';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
+import { DateFormatPipe } from '../../../common/pipes/date-format.pipe';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { UserDataService } from '../../../common/services/user-data.service';
 
 @Component({
-  selector: 'app-access-request-list',
+  selector: 'app-user-management',
   standalone: true,
   imports: [
     ReactiveFormsModule,
@@ -23,17 +27,22 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
     ButtonModule,
     DialogModule,
     PaginatorModule,
+    DateFormatPipe,
+    InputSwitchModule,
+    ConfirmDialogModule,
   ],
-  templateUrl: './access-request-list.component.html',
-  styleUrl: './access-request-list.component.scss'
+  providers: [ConfirmationService, MessageService],
+  templateUrl: './user-management.component.html',
+  styleUrl: './user-management.component.scss'
 })
-export class AccessRequestListComponent implements OnInit {
+export class UserManagementComponent implements OnInit {
   statuses = new Array<DropdownOption>();
   organizationTypes = new Array<DropdownOption>();
   organizations = new Array<DropdownOption>();
 
   accessRequests = new Array<AccessRequestTableItem>();
   currentPage!: PagingResponsePageInfo;
+  currentStatus = '';
 
   showApprovePopup = false;
   showRejectPopup = false;
@@ -45,7 +54,7 @@ export class AccessRequestListComponent implements OnInit {
   first = 0;
   total = 120;
 
-  constructor(private requestAccessService: RequestAccessService, private fb: FormBuilder,) { }
+  constructor(private requestAccessService: RequestAccessService, private userDataService: UserDataService, private fb: FormBuilder, private confirmationService: ConfirmationService, private messageService: MessageService) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -83,6 +92,46 @@ export class AccessRequestListComponent implements OnInit {
     this.showRejectPopup = false;
   }
 
+  onActivateDeactivateToggle(event: any, accessRequest: AccessRequestTableItem): void {
+    if (accessRequest.accessRequestStatusCd === 'Requested') {
+      return;
+    }
+
+    const user = `${accessRequest.givenNm} ${accessRequest.familyNm}`;
+    const messageAction = `${accessRequest.isEnabled ? 'Deactivate' : 'Activate'}`;
+    const titleAction = `${accessRequest.isEnabled ? 'Deactivating' : 'Activating'}`;
+    const acceptButtonLabel = `${accessRequest.isEnabled ? 'Deactivate' : 'Activate'}`;
+    const acceptButtonClass = `${!accessRequest.isEnabled || 'p-button-red'}`;
+
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: `Are you sure that you want to ${messageAction} ${user}'s account?`,
+      header: `${titleAction} User's Account`,
+      icon: 'none',
+      acceptIcon: 'none',
+      rejectIcon: 'none',
+      rejectButtonStyleClass: 'p-button-outlined',
+      acceptButtonStyleClass: acceptButtonClass,
+      acceptLabel: acceptButtonLabel,
+      rejectLabel: 'Cancel',
+      closeOnEscape: false,
+      accept: () => {
+        this.userDataService.updateIsEnabled(accessRequest.userIdentityId, !accessRequest.isEnabled, accessRequest.updDtm).subscribe({
+          next: () => {
+            this.getUsers();
+          },
+          error: (error) => {
+            console.error(error);
+          }
+        })
+        accessRequest.isEnabled = !accessRequest.isEnabled;
+      },
+      reject: () => {
+        accessRequest.isEnabled = accessRequest.isEnabled;
+      }, defaultFocus: 'reject'
+    });
+  }
+
   private initForm(): void {
     this.myForm = this.fb.group({
       userIdentityId: [0, Validators.required],
@@ -91,11 +140,11 @@ export class AccessRequestListComponent implements OnInit {
   }
 
   private initData(): void {
-    this.statuses = [
-      { label: 'Approved', value: 1 },
-      { label: 'Denied', value: 2 },
-      { label: 'Pending', value: 3 },
-    ]
+    this.userDataService.getStatuses().subscribe({
+      next: (data: Array<DropdownOption>) => {
+        this.statuses = data;
+      }
+    })
 
     this.requestAccessService.getOrganizations().subscribe({
       next: (data) => {
@@ -115,6 +164,10 @@ export class AccessRequestListComponent implements OnInit {
       }
     })
 
+    this.getUsers();
+  }
+
+  private getUsers(): void {
     this.requestAccessService.getAccessRequests({ pageNumber: 1, pageSize: 10 }).subscribe({
       next: (response: PagingResponse<AccessRequestTableItem>) => {
         this.accessRequests = response.sourceList;
@@ -122,7 +175,7 @@ export class AccessRequestListComponent implements OnInit {
         console.log(response);
       },
       error: (error: any) => {
-        console.log(error);
+        console.error(error);
       }
     })
   }

@@ -9,7 +9,7 @@ namespace StrDss.Data.Repositories
 {
     public interface IUserRepository
     {
-        Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction);
         Task CreateUserAsync(UserCreateDto dto);
         Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByGuidAsync(Guid guid);
         Task<UserDto?> GetUserById(long id);
@@ -28,13 +28,28 @@ namespace StrDss.Data.Repositories
         {
         }
 
-        public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction)
         {
             var query = _dbContext.DssUserIdentityViews.AsNoTracking();
 
             if (status.IsNotEmpty() && status != "All")
             {
                 query = query.Where(x => x.AccessRequestStatusCd == status);
+            }
+
+            if (orgranizationId != null)
+            {
+                query = query.Where(x => x.RepresentedByOrganizationId == orgranizationId);
+            }
+
+            if (search.IsNotEmpty())
+            {
+                query = query.Where(x => x.GivenNm != null && x.GivenNm.Contains(search)
+                    || x.FamilyNm != null && x.FamilyNm.Contains(search)
+                    || x.OrganizationNm != null && x.OrganizationNm.Contains(search)
+                    || x.OrganizationType != null && x.OrganizationType.Contains(search)
+                    || x.EmailAddressDsc != null && x.EmailAddressDsc.Contains(search)
+                );
             }
 
             var results = await Page<DssUserIdentityView, UserListtDto>(query, pageSize, pageNumber, orderBy, direction);

@@ -8,8 +8,8 @@
             <label for="platformId">Select Platform recipient</label>
         </div>
         <div class="form-group-row-col">
-            <p-dropdown [options]="platformOptions" formControlName="platformId" [showClear]="true"
-                placeholder="Please Select..." id="platformId" name="platformId" [required]="true"></p-dropdown>
+            <p-dropdown [options]="platformOptions" formControlName="platformId" placeholder="Please Select..."
+                id="platformId" name="platformId" [required]="true"></p-dropdown>
         </div>
         <div class="form-group-row-col validation-errors"
             *ngIf="!platformIdControl.pristine && platformIdControl.errors">
@@ -82,8 +82,8 @@
             <label for="reasonId">Select Reason for request</label>
         </div>
         <div class="form-group-row-col">
-            <p-dropdown [options]="reasonOptions" formControlName="reasonId" [showClear]="true"
-                placeholder="Please Select..." id="reasonId" name="reasonId" [required]="true"></p-dropdown>
+            <p-dropdown [options]="reasonOptions" formControlName="reasonId" placeholder="Please Select..."
+                id="reasonId" name="reasonId" [required]="true"></p-dropdown>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!reasonIdControl.pristine && reasonIdControl.errors">
             <small id="requiredReasonId" *ngIf="reasonIdControl.errors?.['required']">Reason for request is
@@ -171,29 +171,27 @@
         </div>
     </div>
 
-    <button type="submit" id="form-preview-btn" pButton pRipple [disabled]="!myForm.valid" label="Review"
-        class="p-button-success"></button>
+    <p-button type="submit" label="Review" id="form-preview-btn" [disabled]="!myForm.valid"></p-button>
 </form>
 
-<p-dialog [modal]="true" id="preview-dialog" [closable]="false" header="Preview" [(visible)]="isPreviewVisible"
-    [style]="{width: '50vw'}">
+<p-dialog [modal]="true" id="preview-dialog" [closable]="false" header="Notice of Takedown"
+    [(visible)]="isPreviewVisible" [style]="{width: '50vw'}">
     <p [innerText]="previewText"> </p>
-    <hr>
+    <div class="spacer-hr"></div>
     <div class="comment-section">
         <div class="form-group-row">
             <div class="form-group-row-col">
-                <label for="comment">Additional comments (Optional)</label>
+                <label for="comment">Add Additional Comments to Email (Optional)</label>
             </div>
             <div class="form-group-row-col">
                 <textarea #textarea rows="5" cols="30" class="full-width-text-field" pInputTextarea id="comment"
-                    name="comment"></textarea>
+                    name="comment" placeholder="Enter Additional Comment Here..."></textarea>
             </div>
         </div>
     </div>
-    <hr>
     <div class="actions">
-        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPreviewClose()"></p-button>
         <p-button label="Submit" id="submit-dialog-btn" (click)="onSubmit(textarea.value,textarea)"></p-button>
+        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPreviewClose()"></p-button>
     </div>
 </p-dialog>
 <p-button *ngIf="hideForm" label="Return Home" id="return-home-btn" (click)="onReturnHome()"></p-button>

@@ -31,9 +31,9 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize]
         [HttpGet("", Name = "GetUserList")]
-        public async Task<ActionResult<PagedDto<UserListtDto>>> GetUserList(string? status, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
+        public async Task<ActionResult<PagedDto<UserListtDto>>> GetUserList(string? status, string? search, long? organizationId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
-            var list = await _userService.GetUserListAsync(status ?? "", pageSize, pageNumber, orderBy, direction);
+            var list = await _userService.GetUserListAsync(status ?? "", search ?? "", organizationId, pageSize, pageNumber, orderBy, direction);
             return Ok(list);
         }
 

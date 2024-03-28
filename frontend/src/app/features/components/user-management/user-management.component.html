@@ -1,12 +1,12 @@
-<div class="title">Access Requests</div>
+<div class="title extra-space-bottom">User Management</div>
 <div class="table-card-container">
-    <div class="form-group-row">
+    <div class="form-group-row extra-space-bottom">
         <div class="form-group-row-col">
             <label for="platformId">Status</label>
         </div>
-        <div class="form-group-row-col extra-space-bottom">
-            <p-dropdown [options]="statuses" (onChange)="onFilterChanged($event)" placeholder="All" [showClear]="true"
-                id="statusId" name="statusId"></p-dropdown>
+        <div class="form-group-row-col">
+            <p-dropdown [options]="statuses" [(ngModel)]="currentStatus" (onChange)="onFilterChanged($event)"
+                placeholder="All" [showClear]="true" id="statusId" name="statusId"></p-dropdown>
         </div>
     </div>
     <div class="table-container">
@@ -16,29 +16,39 @@
                 <tr>
                     <th pSortableColumn="accessRequestDtm">Requested Date<p-sortIcon
                             field="accessRequestDtm"></p-sortIcon></th>
-                    <th pSortableColumn="idProvider">ID Provider<p-sortIcon field="givenNm"></p-sortIcon></th>
+                    <th pSortableColumn="identityProviderNm">ID Provider<p-sortIcon field="givenNm"></p-sortIcon></th>
                     <th pSortableColumn="givenNm">First Name<p-sortIcon field="givenNm"></p-sortIcon></th>
                     <th pSortableColumn="familyNm">Last Name<p-sortIcon field="familyNm"></p-sortIcon></th>
-                    <th pSortableColumn="code1">User Type<p-sortIcon field="code1"></p-sortIcon></th>
+                    <th pSortableColumn="code1">Org Type<p-sortIcon field="code1"></p-sortIcon></th>
                     <th pSortableColumn="emailAddressDsc">Email Address<p-sortIcon field="emailAddressDsc"></p-sortIcon>
                     </th>
                     <th pSortableColumn="code2">Organization<p-sortIcon field="code2"></p-sortIcon></th>
+                    <th pSortableColumn="code2">Status<p-sortIcon field="code2"></p-sortIcon></th>
                     <th pSortableColumn="action">Action<p-sortIcon field="action"></p-sortIcon></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-accessRequest>
                 <tr>
-                    <td>{{ accessRequest.accessRequestDtm }}</td>
+                    <td>{{ accessRequest.accessRequestDtm | dateFormat }}</td>
+                    <td>{{ accessRequest.identityProviderNm }}</td>
                     <td>{{ accessRequest.givenNm }}</td>
                     <td>{{ accessRequest.familyNm }}</td>
-                    <td>{{ 'UNKNOWN' }}</td>
+                    <td>{{ accessRequest.organizationType }}</td>
                     <td>{{ accessRequest.emailAddressDsc }}</td>
-                    <td>{{ 'UNKNOWN' }}</td>
+                    <td>{{ accessRequest.organizationNm }}</td>
                     <td>
-                        <p-button label="Approve" (click)="onApprovePopup(accessRequest)" size="small" [outlined]="true"
-                            id="form-approve-btn"></p-button>
-                        <p-button label="Reject" (click)="onRejectPopup(accessRequest)" size="small"
+                        <p-button label="Approve" (click)="onApprovePopup(accessRequest)" class="table-small-btn"
+                            [outlined]="true" id="form-approve-btn"></p-button>
+                        <p-button label="Reject" (click)="onRejectPopup(accessRequest)" class="table-small-btn"
                             id="form-reject-btn"></p-button>
+                    </td>
+                    <td>
+                        <span
+                            (click)="accessRequest.accessRequestStatusCd === 'Requested' || onActivateDeactivateToggle($event, accessRequest)">
+                            <p-inputSwitch class="table-small-switch"
+                                [disabled]="accessRequest.accessRequestStatusCd ==='Requested'"
+                                [(ngModel)]="accessRequest.isEnabled" [readonly]="true"></p-inputSwitch>
+                        </span>
                     </td>
 
                 </tr>
@@ -92,3 +102,5 @@
     <div class="form-group-row-col"><strong>Requested User Type:</strong>[User Type]</div>
     <div class="form-group-row-col extra-space-bottom"><strong>Organization:</strong> [Organization Name]</div>
 </p-dialog>
+
+<p-confirmDialog [closable]="false"></p-confirmDialog>

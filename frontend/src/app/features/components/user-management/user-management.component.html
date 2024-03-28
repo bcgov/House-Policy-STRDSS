@@ -1,12 +1,34 @@
 <div class="title extra-space-bottom">User Management</div>
 <div class="table-card-container">
-    <div class="form-group-row extra-space-bottom">
-        <div class="form-group-row-col">
-            <label for="platformId">Status</label>
+    <div class="search-filter-container extra-space-bottom">
+        <div class="form-row">
+            <div class="form-group-row-col">
+                <label for="platformId">Status</label>
+            </div>
+            <div class="form-group-row-col">
+                <p-dropdown [options]="statuses" [(ngModel)]="searchParams.searchStatus"
+                    (ngModelChange)="onSearchModelChanged()" placeholder="All" id="statusSearchId"
+                    name="statusSearchId"></p-dropdown>
+            </div>
         </div>
-        <div class="form-group-row-col">
-            <p-dropdown [options]="statuses" [(ngModel)]="currentStatus" (onChange)="onFilterChanged($event)"
-                placeholder="All" [showClear]="true" id="statusId" name="statusId"></p-dropdown>
+        <div class="form-row">
+            <div class="form-group-row-col">
+                <label for="platformId">Organization</label>
+            </div>
+            <div class="form-group-row-col">
+                <p-dropdown [options]="organizations" [(ngModel)]="searchParams.searchOrganization"
+                    (ngModelChange)="onSearchModelChanged()" placeholder="All" id="organizationSearchId"
+                    name="organizationSearchId"></p-dropdown>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group-row-col">
+                <label for="platformId">Search</label>
+            </div>
+            <div class="form-group-row-col">
+                <input type="text" pInputText [(ngModel)]="searchParams.searchTerm" id="searchTerm" name="searchTerm"
+                    (ngModelChange)="onSearchModelChanged()" placeholder="Search.." />
+            </div>
         </div>
     </div>
     <div class="table-container">
@@ -38,9 +60,9 @@
                     <td>{{ accessRequest.organizationNm }}</td>
                     <td>
                         <p-button label="Approve" (click)="onApprovePopup(accessRequest)" class="table-small-btn"
-                            [outlined]="true" id="form-approve-btn"></p-button>
-                        <p-button label="Reject" (click)="onRejectPopup(accessRequest)" class="table-small-btn"
-                            id="form-reject-btn"></p-button>
+                            id="form-approve-btn"></p-button>
+                        <p-button label="Deny" [outlined]="true" (click)="onRejectPopup(accessRequest)"
+                            class="table-small-btn" id="form-reject-btn"></p-button>
                     </td>
                     <td>
                         <span
@@ -72,7 +94,7 @@
             </div>
             <div class="form-group-row-col">
                 <p-dropdown [options]="organizationTypes" appendTo="body" formControlName="userIdentityId"
-                    [showClear]="true" placeholder="Please Select..." id="userIdentityId" name="userIdentityId"
+                    placeholder="Please Select..." id="userIdentityId" name="userIdentityId"
                     [ngClass]="'full-width-text-field'" [required]="true"></p-dropdown>
             </div>
         </div>
@@ -82,9 +104,8 @@
             </div>
             <div class="form-group-row-col">
                 <p-dropdown [options]="organizations" appendTo="body" formControlName="representedByOrganizationId"
-                    [showClear]="true" placeholder="Please Select..." id="representedByOrganizationId"
-                    name="representedByOrganizationId" [ngClass]="'full-width-text-field'"
-                    [required]="true"></p-dropdown>
+                    placeholder="Please Select..." id="representedByOrganizationId" name="representedByOrganizationId"
+                    [ngClass]="'full-width-text-field'" [required]="true"></p-dropdown>
             </div>
         </div>
     </form>

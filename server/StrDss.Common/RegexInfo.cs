@@ -58,7 +58,7 @@
 
             _regexInfos.Add(Url, new RegexInfo
             {
-                Regex = @"\b(?:[Hh][Tt][Tt][Pp][Ss]?|HTTPS?):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]",
+                Regex = @"\b(?:[Hh][Tt][Tt][Pp][Ss]?):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]",
                 ErrorMessage = "Invalid Url"
             });
         }

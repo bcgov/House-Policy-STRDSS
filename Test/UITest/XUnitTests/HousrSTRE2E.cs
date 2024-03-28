@@ -84,6 +84,9 @@ namespace XUnitTests
                 _TakeDownRequestPage.SubmitButton.Click();
 
                 //Validate successful submission 
+
+                //Wait for page source to load
+                System.Threading.Thread.Sleep(3000);
                 Assert.True(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
                 _DelistingRequestPage.ReturnHomeButton.Click();
 
@@ -166,6 +169,9 @@ namespace XUnitTests
 
 
                 //Validate successful submission 
+
+                //Wait for page source to load
+                System.Threading.Thread.Sleep(3000);
                 Assert.True(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
 
                 //If submit is sucessful, then return  to home page
@@ -201,9 +207,10 @@ namespace XUnitTests
                 _IDRLoginPage.ContinueButton.Click();
 
                 _RequestAccessPage.UserRoleDropDown.Click();
-                _RequestAccessPage.UserRoleDropDown.ExecuteJavaScript("@\"document.querySelector(\"\"##organizationType_0\"\").click()\"");
+                _RequestAccessPage.UserRoleDropDown.WaitFor();
+                _RequestAccessPage.UserRoleDropDown.ExecuteJavaScript(@"document.querySelector(""#organizationType_0"").click()");
                 _RequestAccessPage.UserOrganizationTextBox.EnterText("Test Org");
-
+                _RequestAccessPage.SubmitButton.Click();
             }
             finally
             {

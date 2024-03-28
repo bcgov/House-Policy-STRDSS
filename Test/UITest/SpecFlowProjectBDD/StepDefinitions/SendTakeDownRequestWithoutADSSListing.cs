@@ -3,6 +3,10 @@ using UITest.PageObjects;
 using UITest.TestDriver;
 using Configuration;
 using TestFrameWork.Models;
+using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
+using Gherkin.CucumberMessages.Types;
+using NUnit.Framework.Legacy;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -17,10 +21,23 @@ namespace SpecFlowProjectBDD.StepDefinitions
         IDRLoginPage _IDRLoginPage;
         string _TestUserName;
         string _TestPassword;
+        int _CurrentRow = 0;
+        bool _ExpectedResult = false;
+        bool _ActualResult = false;
+        //IEnumerable<ScenarioParameters> _ScenarioParameters;
+        //private readonly ScenarioContext _scenarioContext;
 
         IDriver _driver;
 
- 
+        [AfterScenario]
+        public void AfterScenario()
+        {
+
+
+        }
+
+
+
         public SendTakeDownRequestWithoutADSSListing(SeleniumDriver Driver)
         {
             _driver = Driver;
@@ -35,18 +52,25 @@ namespace SpecFlowProjectBDD.StepDefinitions
         }
 
         //User Authentication
-        [Given("I am an authenticated LG staff member")]
-        public void GivenIAmAauthenticatedLGStaffMemberUser()
+        [Given(@"I am an authenticated LG staff member and the expected result is ""(.*)""")]
+        public void GivenIAmAauthenticatedLGStaffMemberUser(string ExpectedResult)
         {
+            _ActualResult = true;
+            //var inputsTable = ScenarioContext.Current["table"] as Table;
+            //_ScenarioParameters = inputsTable.CreateSet<ScenarioParameters>().ToList<ScenarioParameters>();
+            _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
+
             _driver.Url = "http://127.0.0.1:4200/delisting-request";
             _driver.Navigate();
-            
+
             _PathFinderPage.IDRButton.Click();
 
+            _IDRLoginPage.UserNameTextBox.WaitFor();
             _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
             _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
 
             _IDRLoginPage.ContinueButton.Click();
+            _ActualResult = true;
 
         }
 
@@ -67,7 +91,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
         [Then("I Should be Presented with an Input form that Lists requests Initiated By")]
         public void IShouldBePresentedWithAnInputFormThatListsRequestsInitiatedBy()
-        { 
+        {
 
         }
 
@@ -86,9 +110,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
         //ListingID
         [When(@"Entering the listing ID ""(.*)""")]
-        public void WhenEnteringTheListingID(String ID)
+        public void WhenEnteringTheListingID(string ListingID)
         {
-            _DelistingRequestPage.ListingIDNumberTextBox.EnterText(ID);
+            _DelistingRequestPage.ListingIDNumberTextBox.EnterText(ListingID);
         }
 
         [Then("The system should validate the ID is a number")]
@@ -97,8 +121,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
         }
 
         //ListingURLField
+        //[When(@"Entering the listing URL")]
         [When(@"Entering the listing URL ""(.*)""")]
-        public void WhenEnteringTheListingURL(String URL)
+        public void WhenEnteringTheListingURL(string URL)
         {
             _DelistingRequestPage.ListingUrlTextBox.EnterText(URL);
         }
@@ -114,7 +139,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _DelistingRequestPage.RequestInitiatedByDropDown.Click();
             _DelistingRequestPage.RequestInitiatedByDropDown.ExecuteJavaScript(@"document.querySelector(""#lgId_0"").click()");
-            //Assert.IsTrue(_DelistingRequestPage.PlatformReceipientDropdown.Text.Contains("AIRBNB"));
+            //ClassicAssert.IsTrue(_DelistingRequestPage.PlatformReceipientDropdown.Text.Contains("AIRBNB"));
         }
 
         [Then("The system should present a list of available LG options to populate the field")]
@@ -128,7 +153,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _DelistingRequestPage.PlatformReceipientDropdown.Click();
             _DelistingRequestPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-            Assert.IsTrue( _DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper().Contains("AIRBNB"));
+            ClassicAssert.IsTrue(_DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper().Contains("AIRBNB"));
         }
 
         [Then("the system should present a list of available platform options to populate the field")]
@@ -138,46 +163,60 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
         //DelistingRequestMessage
         [When("all required fields are entered")]
-        public void WhenAllRequiredFieldsAreEntered() 
-        { 
+        public void WhenAllRequiredFieldsAreEntered()
+        {
         }
 
         [Then("I click the review button")]
         public void ThenIClickTheReviewButton()
         {
-            _DelistingRequestPage.ReviewButton.Click();
+            try
+            {
+                _DelistingRequestPage.ReviewButton.Click();
+                _ActualResult = true;
+            }
+            catch (Exception ex)
+            {
+                if (_ExpectedResult == true)
+                    Assert.Fail();
+            }
+
         }
 
         [Then("I see a template delisting request message that will be sent to both the platform")]
-        public void ThenISeeATemplateDelistingRequestMessage() 
-        { 
+        public void ThenISeeATemplateDelistingRequestMessage()
+        {
         }
 
         //SendDelistingRequest
         [When("I submit the form with valid information")]
-        public void WhenISubmitTheFormWithValidInformation() 
+        public void WhenISubmitTheFormWithValidInformation()
         {
+            _ActualResult = false;
             _TakeDownRequestPage.SubmitButton.Click();
+            _ActualResult = true;
         }
 
         [Then("the system should send the delisting request message to the platform email addresses associated with the selected platform")]
-        public void ThenTheSystemShouldSendTheDelistingRequestMessage() 
+        public void ThenTheSystemShouldSendTheDelistingRequestMessage()
         {
 
         }
 
         //ConfirmationMessage
         [When("successful submission")]
-        public void WhenSuccessfulSubmission() 
+        public void WhenSuccessfulSubmission()
         {
         }
 
         [Then("I should receive a confirmation message indicating that the delisting request has been sent")]
         public void ThenIShouldReceiveAConfirmationMessage()
         {
+            _ActualResult = false;
             System.Threading.Thread.Sleep(3000);
-            Assert.IsTrue(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+            ClassicAssert.IsTrue(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
             _DelistingRequestPage.ReturnHomeButton.Click();
+            _ActualResult = true;
         }
 
         [Then("I should be copied on the email")]
@@ -206,5 +245,15 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void ThenTheSystemShouldProvideClearErrorMessages()
         {
         }
+    }
+
+    public class ScenarioParameters
+    {
+        public string ListingID { get; set; }
+        public string Comment { get; set; }
+        public string LIDExpectedResult { get; set; }
+        public string ListingURL { get; set; }
+        public string LstExpectedResult { get; set; }
+
     }
 }

@@ -18,7 +18,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> ApproveAccessRequest(AccessRequestApproveDto dto);
         Task<Dictionary<string, List<string>>> UpdateIsEnabled(UpdateIsEnabledDto dto);
         Task<List<DropdownStrDto>> GetAccessRequestStatuses();
-        Task AcceptTermsConditions();
+        Task<Dictionary<string, List<string>>> AcceptTermsConditions();
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -303,10 +303,25 @@ namespace StrDss.Service
             return await _userRepo.GetAccessRequestStatuses();
         }
 
-        public async Task AcceptTermsConditions()
+        public async Task<Dictionary<string, List<string>>> AcceptTermsConditions()
         {
+            var errors = new Dictionary<string, List<string>>();
+
+            if (_currentUser.Id == 0)
+            {
+                errors.AddItem("entity", $"The user doesn't exist.");
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
             await _userRepo.AcceptTermsConditions();
+
             _unitOfWork.Commit();
+
+            return errors;
         }
     }
 }

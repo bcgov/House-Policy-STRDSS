@@ -3,6 +3,7 @@ using UITest.PageObjects;
 using UITest.TestDriver;
 using TestFrameWork.Models;
 using Configuration;
+using NUnit.Framework.Legacy;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -117,7 +118,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void TheSystemShouldPresentAListOfAvailablePlatformOption()
         {
             _DelistingWarningPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-            Assert.IsTrue(_DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper().Contains("AIRBNB"));
+            ClassicAssert.IsTrue(_DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper().Contains("AIRBNB"));
         }
 
 
@@ -185,7 +186,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             //Validate message and return to home page
             System.Threading.Thread.Sleep(3000);
-            Assert.IsTrue(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+            ClassicAssert.IsTrue(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
             _DelistingWarningPage.ReturnHomeButton.Click();
         }
 

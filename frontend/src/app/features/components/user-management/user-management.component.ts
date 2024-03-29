@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DropdownModule } from 'primeng/dropdown';
+import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
@@ -16,6 +16,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { InputTextModule } from 'primeng/inputtext';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-user-management',
@@ -32,6 +33,7 @@ import { InputTextModule } from 'primeng/inputtext';
     InputSwitchModule,
     ConfirmDialogModule,
     InputTextModule,
+    ToastModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './user-management.component.html',
@@ -55,6 +57,8 @@ export class UserManagementComponent implements OnInit {
   showRejectPopup = false;
 
   currentTableItem!: AccessRequestTableItem;
+  currentOrganizationSelected: DropdownOption | undefined;
+  currentOrganizationTypeSelected: DropdownOption | undefined;
 
   myForm!: FormGroup;
 
@@ -67,17 +71,18 @@ export class UserManagementComponent implements OnInit {
     this.initForm();
     this.initData();
   }
+
   onSearchModelChanged(): void {
 
   }
 
   onApprovePopup(accessRequest: AccessRequestTableItem): void {
-    console.log('Approve', accessRequest);
+    this.currentTableItem = accessRequest;
     this.showApprovePopup = true;
   }
 
   onRejectPopup(accessRequest: AccessRequestTableItem): void {
-    console.log('Reject', accessRequest);
+    this.currentTableItem = accessRequest;
     this.showRejectPopup = true;
   }
 
@@ -85,15 +90,54 @@ export class UserManagementComponent implements OnInit {
     console.log('pagingEvent', pagingEvent);
   }
 
-  onApprove(): void {
-    this.currentTableItem.userIdentityId;
+  onApprove(orgTypeIdElem: Dropdown, orgId: Dropdown): void {
+    const model = {
+      userIdentityId: this.currentTableItem.userIdentityId,
+      representedByOrganizationId: orgId.value,
+      isEnabled: true,
+      updDtm: this.currentTableItem.updDtm,
+    };
+
+    this.currentOrganizationSelected = undefined;
+    this.currentOrganizationTypeSelected = undefined;
+
+    this.requestAccessService.approveAccessRequest(model).subscribe({
+      next: () => {
+        this.getUsers();
+        this.onPopupClose()
+      },
+      error: (msg) => {
+        if (msg.error.status === 422) {
+          this.handleConcurrencyError(msg);
+        }
+        this.onPopupClose()
+      }
+    });
   }
 
   onReject(): void {
+    const model = {
+      userIdentityId: this.currentTableItem.userIdentityId,
+      updDtm: this.currentTableItem.updDtm,
+    };
 
+    this.requestAccessService.denyAccessRequest(model).subscribe({
+      next: () => {
+        this.getUsers();
+        this.onPopupClose()
+      },
+      error: (msg) => {
+        if (msg.error.status === 422) {
+          this.handleConcurrencyError(msg);
+        }
+        this.onPopupClose()
+      }
+    });
   }
 
   onPopupClose(): void {
+    this.currentOrganizationSelected = undefined;
+    this.currentOrganizationTypeSelected = undefined;
     this.showApprovePopup = false;
     this.showRejectPopup = false;
   }
@@ -138,6 +182,11 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
+  private handleConcurrencyError(errorMsg: any): void {
+    let details = `${errorMsg.error.errors.entity[0]} Instance: ${errorMsg.error.instance}`;
+    this.showErrorToast(errorMsg.error.title, details);
+  }
+
   private initForm(): void {
     this.myForm = this.fb.group({
       userIdentityId: [0, Validators.required],
@@ -174,7 +223,7 @@ export class UserManagementComponent implements OnInit {
   }
 
   private getUsers(): void {
-    this.requestAccessService.getAccessRequests({ pageNumber: 1, pageSize: 10 }).subscribe({
+    this.requestAccessService.getAccessRequests({ pageNumber: this.currentPage?.pageNumber || 1, pageSize: 10 }).subscribe({
       next: (response: PagingResponse<AccessRequestTableItem>) => {
         this.accessRequests = response.sourceList;
         this.currentPage = response.pageInfo;
@@ -184,5 +233,9 @@ export class UserManagementComponent implements OnInit {
         console.error(error);
       }
     })
+  }
+
+  private showErrorToast(title: string, errorMsg: string) {
+    this.messageService.add({ severity: 'error', summary: title, detail: errorMsg, sticky: true });
   }
 }

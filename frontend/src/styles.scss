@@ -68,9 +68,18 @@ body {
                 width: 100%;
             }
         }
+
+        &.width340px {
+            width: 340px;
+
+            .p-inputtext,
+            .p-dropdown {
+                width: 340px;
+            }
+        }
     }
 
-    .p-ripple.p-element.p-button.p-component {
+    .p-element.p-button.p-component {
         border-radius: 4px;
 
         &:not(.p-button-link) {
@@ -95,6 +104,12 @@ body {
                 color: #FFFFFF;
                 font-size: 16px;
             }
+        }
+
+        &:disabled {
+            background-color: #EDEBE9;
+            color: #9F9D9C;
+            border-color: #EDEBE9;
         }
     }
 

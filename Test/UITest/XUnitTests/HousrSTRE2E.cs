@@ -4,6 +4,7 @@ using UITest.TestDriver;
 using Configuration;
 
 using Xunit.Abstractions;
+using TestFrameWork.PageObjects;
 
 namespace XUnitTests
 {
@@ -18,6 +19,7 @@ namespace XUnitTests
         private TakeDownRequestPage _TakeDownRequestPage;
         private PathFinderPage _PathFinderPage;
         private IDRLoginPage _IDRLoginPage;
+        private RequestAccessPage _RequestAccessPage;
         private string _TestUserName;
         private string _TestPassword;
         private IDriver _Driver;
@@ -82,6 +84,9 @@ namespace XUnitTests
                 _TakeDownRequestPage.SubmitButton.Click();
 
                 //Validate successful submission 
+
+                //Wait for page source to load
+                System.Threading.Thread.Sleep(3000);
                 Assert.True(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
                 _DelistingRequestPage.ReturnHomeButton.Click();
 
@@ -164,10 +169,48 @@ namespace XUnitTests
 
 
                 //Validate successful submission 
+
+                //Wait for page source to load
+                System.Threading.Thread.Sleep(3000);
                 Assert.True(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
 
                 //If submit is sucessful, then return  to home page
                 _DelistingWarningPage.ReturnHomeButton.Click();
+            }
+            finally
+            {
+                _Driver.Close();
+            }
+        }
+
+        [Fact]
+        public void TestRequestAccess()
+        {
+            _RequestAccessPage = new RequestAccessPage(_Driver);
+            try
+            {
+                _Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
+                _Driver.Url = _FeURL + "/access-request";
+                _Driver.Navigate();
+
+                _PathFinderPage.IDRButton.WaitFor();
+                _PathFinderPage.IDRButton.Click();
+
+
+                _IDRLoginPage.UserNameTextBox.WaitFor();
+                _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+
+                _IDRLoginPage.PasswordTextBox.WaitFor();
+                _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+
+                _IDRLoginPage.ContinueButton.WaitFor();
+                _IDRLoginPage.ContinueButton.Click();
+
+                _RequestAccessPage.UserRoleDropDown.Click();
+                _RequestAccessPage.UserRoleDropDown.WaitFor();
+                _RequestAccessPage.UserRoleDropDown.ExecuteJavaScript(@"document.querySelector(""#organizationType_0"").click()");
+                _RequestAccessPage.UserOrganizationTextBox.EnterText("Test Org");
+                _RequestAccessPage.SubmitButton.Click();
             }
             finally
             {

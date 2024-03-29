@@ -12,7 +12,7 @@ jobs:
       contents: read
     environment:
       name: prod
-      url: https://prod-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca/
+      url: https://prod-strdata.apps.silver.devops.gov.bc.ca/
 
     steps:
     - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a

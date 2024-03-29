@@ -1,14 +1,15 @@
 global:
   env:
-    'LOGGING__LOGLEVEL__DEFAULT': 'Error'
-    'LOGGING__LOGLEVEL__AWP': 'Information'
+    'Logging__LogLevel__Default': 'Information'
+    'Logging__LogLevel__Microsoft.EntityFrameworkCore': 'Warning'
+    'Logging__LogLevel__Microsoft.AspNetCore': 'Warning'
     'ASPNETCORE_ENVIRONMENT': 'Staging'
     'ENV_NAME': 'uat'
-    'AppBaseUrl': 'https://uat-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca '
+    'AppBaseUrl': 'https://uat-strdata.apps.silver.devops.gov.bc.ca'
     'SSO_CLIENT': 'str-dss-5303'
-    'SSO_HOST': 'https://test.loginproxy.gov.bc.ca/auth'
+    'SSO_HOST': 'https://dev.loginproxy.gov.bc.ca/auth'
     'SSO_REALM': 'standard'
-    'SSO_AUTHORITY': 'https://test.loginproxy.gov.bc.ca/auth/realms/standard'
+    'SSO_AUTHORITY': 'https://dev.loginproxy.gov.bc.ca/auth/realms/standard'
     'SM_LOGOFF_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi/'
     'CHES_TOKEN_URL': 'https://test.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
     'CHES_URL': 'https://ches-test.api.gov.bc.ca'
@@ -17,12 +18,12 @@ nameOverride: strdss-uat
 fullnameOverride: strdss-uat
 
 route:
-  host: uat-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca 
+  host: uat-strdata.apps.silver.devops.gov.bc.ca
   baseService: strdss-uat
 
 frontend:
   enabled: true
-  replicaCount: 3
+  replicaCount: 2
   nameOverride: strdss-uat-frontend
   fullnameOverride: strdss-uat-frontend
   secretName: strdss-secrets-uat
@@ -40,20 +41,28 @@ frontend:
 
 backend:
   enabled: true
-  replicaCount: 3
+  replicaCount: 2
   nameOverride: strdss-uat-backend
   fullnameOverride: strdss-uat-backend
   secretName: strdss-secrets-uat
   dbSecretName: strdssuat-pguser-strdssuat
   crunchydb: true
 
+  # resources:
+  #   limits:
+  #     cpu: 1500m
+  #     memory: 1500Mi
+  #   requests:
+  #     cpu: 20m
+  #     memory: 1100Mi
+
   resources:
     limits:
-      cpu: 1500m
-      memory: 1500Mi
+      cpu: 200m
+      memory: 300Mi
     requests:
       cpu: 20m
-      memory: 1100Mi
+      memory: 200Mi
 
   env:
     'API_HOST': '/api'

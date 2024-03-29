@@ -91,26 +91,26 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          # readinessProbe:
-          #   httpGet:
-          #     path: /healthz
-          #     port: http
-          #     scheme: HTTP
-          #   initialDelaySeconds: 30
-          #   timeoutSeconds: 3
-          #   periodSeconds: 10
-          #   successThreshold: 1
-          #   failureThreshold: 3
-          # livenessProbe:
-          #   httpGet:
-          #     path: /api/networkchecker
-          #     port: http
-          #     scheme: HTTP
-          #   initialDelaySeconds: 30
-          #   timeoutSeconds: 3
-          #   periodSeconds: 10
-          #   successThreshold: 1
-          #   failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /api/networkchecker
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

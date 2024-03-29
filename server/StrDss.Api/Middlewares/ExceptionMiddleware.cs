@@ -50,7 +50,7 @@ namespace StrDss.Api.Middlewares
                 Title = "An unexpected error occurred!",
                 Status = StatusCodes.Status500InternalServerError,
                 Detail = "The instance value should be used to identify the problem when calling customer support",
-                Instance = $"urn:crt:error:{guid}"
+                Instance = $"urn:strdss:error:{guid}"
             };
 
             problem.Extensions.Add("traceId", context.TraceIdentifier);
@@ -73,7 +73,7 @@ namespace StrDss.Api.Middlewares
                 Title = "Update conflict detected",
                 Status = StatusCodes.Status422UnprocessableEntity,
                 Detail = "Please refer to the errors property for additional details",
-                Instance = $"urn:crt:error:{guid}"
+                Instance = $"urn:strdss:error:{guid}"
             };
 
             problem.Extensions.Add("traceId", context.TraceIdentifier);

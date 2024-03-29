@@ -5,7 +5,9 @@
     </div>
     <div class="header-menu">
         <div class="menu-container">
-            <p-button [className]="'menu-item'" label="Home" [link]="true" (click)="onHomeClicked()"></p-button>
+            <p-menubar [model]="items"></p-menubar>
+
+            <!-- <p-button [className]="'menu-item'" label="Home" [link]="true" (click)="onHomeClicked()"></p-button> -->
         </div>
     </div>
 </div>

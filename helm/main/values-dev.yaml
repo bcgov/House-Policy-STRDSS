@@ -1,10 +1,11 @@
 global:
   env:
-    'LOGGING__LOGLEVEL__DEFAULT': 'Error'
-    'LOGGING__LOGLEVEL__AWP': 'Information'
+    'Logging__LogLevel__Default': 'Information'
+    'Logging__LogLevel__Microsoft.EntityFrameworkCore': 'Warning'
+    'Logging__LogLevel__Microsoft.AspNetCore': 'Warning'
     'ASPNETCORE_ENVIRONMENT': 'Development'
     'ENV_NAME': 'dev'
-    'AppBaseUrl': 'https://dev-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca'
+    'AppBaseUrl': 'https://dev-strdata.apps.silver.devops.gov.bc.ca'
     'SSO_CLIENT': 'str-dss-5303'
     'SSO_HOST': 'https://dev.loginproxy.gov.bc.ca/auth'
     'SSO_REALM': 'standard'
@@ -17,7 +18,7 @@ nameOverride: strdss-dev
 fullnameOverride: strdss-dev
 
 route:
-  host: dev-strdss.f4a30d-dev.apps.silver.devops.gov.bc.ca
+  host: dev-strdata.apps.silver.devops.gov.bc.ca
   baseService: strdss-dev
 
 frontend:
@@ -59,10 +60,10 @@ backend:
   resources:
     limits:
       cpu: 200m
-      memory: 150Mi
+      memory: 300Mi
     requests:
       cpu: 20m
-      memory: 100Mi
+      memory: 200Mi
 
   env:
     'API_HOST': '/api'

@@ -17,6 +17,7 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using StrDss.Api.Middlewares;
+using StrDss.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -149,6 +150,9 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var healthCheck = new HealthCheck(connString);
+builder.Services.AddHealthChecks().AddCheck("DbConnection", healthCheck);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -157,6 +161,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHealthChecks("/healthz");
 
 app.Use(async (context, next) =>
 {

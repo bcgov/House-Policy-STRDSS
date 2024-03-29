@@ -3,12 +3,13 @@ using UITest.PageObjects;
 using UITest.TestDriver;
 using TestFrameWork.Models;
 using Configuration;
+using NUnit.Framework.Legacy;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
     [Scope(Scenario = "SendDelistingWarningWithoutADSSListing")]
-    public sealed class SendDelistingWarningWithoutADSSListingStepDefinitions
+    public sealed class SendTakeDownNoticeWithoutADSSListing
     {
         HomePage _HomePage;
 
@@ -23,7 +24,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         string _TestPassword;
 
 
-        public SendDelistingWarningWithoutADSSListingStepDefinitions(SeleniumDriver Driver)
+        public SendTakeDownNoticeWithoutADSSListing(SeleniumDriver Driver)
         {
             _Driver = Driver;
             _HomePage = new HomePage(_Driver);
@@ -117,7 +118,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void TheSystemShouldPresentAListOfAvailablePlatformOption()
         {
             _DelistingWarningPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-            Assert.IsTrue(_DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper().Contains("AIRBNB"));
+            ClassicAssert.IsTrue(_DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper().Contains("AIRBNB"));
         }
 
 
@@ -178,15 +179,15 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("successful submission")]
         public void WhenSuccessfulSubmission() 
         {
-            //Validate message and return to home page
-            System.Threading.Thread.Sleep(3000);
-            Assert.IsTrue(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
-            _DelistingWarningPage.ReturnHomeButton.Click();
         }
 
         [Then("I should receive a confirmation message indicating that the delisting warning has been sent")]
         public void ThenIShouldReceiveAConfirmationMessage() 
-        { 
+        {
+            //Validate message and return to home page
+            System.Threading.Thread.Sleep(3000);
+            ClassicAssert.IsTrue(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+            _DelistingWarningPage.ReturnHomeButton.Click();
         }
 
         [Then("I should be copied on the email")]

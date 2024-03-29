@@ -1,2 +1,25 @@
 crunchy-postgres:
   fullnameOverride: strdssuat
+  instances:
+    name: ha # high availability
+    replicas: 2
+    dataVolumeClaimSpec:
+      storage: 5Gi
+      storageClassName: netapp-block-standard
+    requests:
+      cpu: 1m
+      memory: 256Mi
+    limits:
+      cpu: 100m
+      memory: 512Mi
+    replicaCertCopy:
+      requests:
+        cpu: 1m
+        memory: 32Mi
+      limits:
+        cpu: 50m
+        memory: 64Mi
+crunchy-postgres-tools:
+  networking:
+    route:
+      host: uat-strdata-db.apps.silver.devops.gov.bc.ca

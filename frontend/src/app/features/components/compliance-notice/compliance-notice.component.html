@@ -171,7 +171,7 @@
         </div>
     </div>
 
-    <p-button type="submit" label="Review" id="form-preview-btn" [disabled]="!myForm.valid"></p-button>
+    <button type="submit" id="form-preview-btn" pButton pRipple [disabled]="!myForm.valid" label="Review"></button>
 </form>
 
 <p-dialog [modal]="true" id="preview-dialog" [closable]="false" header="Notice of Takedown"

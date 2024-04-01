@@ -2,7 +2,7 @@
 Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-74
 
 @Delisting
-Scenario: SendDelistingRequestWithoutADSSListing
+Scenario: SendTakedownRequestWithoutADSSListing
 #User Authentication
 	Given I am an authenticated LG staff member and the expected result is "<ExpectedResult>"
 
@@ -75,12 +75,12 @@ Scenario: SendDelistingRequestWithoutADSSListing
 
 Examples:
 	| ListingID           | Description                      | ExpectedResult | ListingURL                                                   | AdditionalCCsTextBox     |
-	| -1                  | ListingID - Negative number test | fail           | http://listingURL.com                                        | richard.anderson@dxc.com |
 	| 0                   | ListingID - Boundary             | pass           | http://listingURL.com                                        | richard.anderson@dxc.com |
 	| 9223372036854775807 | ListingID - Test for Max value   | pass           | http://listingURL.com                                        | richard.anderson@dxc.com |
-	| test                | ListingID - Test for string      | fail           | http://listingURL.com                                        | richard.anderson@dxc.com |
-	| e                   | ListingID - Test for exponential | fail           | http://listingURL.com                                        | richard.anderson@dxc.com |
 	| 0                   | ListingURL - Valid URL           | pass           | HTTP://listingURL.com                                        | richard.anderson@dxc.com |
 	| 0                   | ListingURL - Valid URL           | pass           | HTTPS://listingURL.com                                       | richard.anderson@dxc.com |
-	| 0                   | ListingURL - Invalid URL         | fail           | http://listingURL                                            | richard.anderson@dxc.com |
 	| 0                   | ListingURL - Long URL            | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com |
+	| -1                  | ListingID - Negative number test | fail           | http://listingURL.com                                        | richard.anderson@dxc.com |
+	| test                | ListingID - Test for string      | fail           | http://listingURL.com                                        | richard.anderson@dxc.com |
+	| e                   | ListingID - Test for exponential | fail           | http://listingURL.com                                        | richard.anderson@dxc.com |
+	| 0                   | ListingURL - Invalid URL         | fail           | http://listingURL                                            | richard.anderson@dxc.com |

@@ -16,7 +16,7 @@
                 <label for="platformId">Organization</label>
             </div>
             <div class="form-group-row-col">
-                <p-dropdown [options]="organizations" [(ngModel)]="searchParams.searchOrganization"
+                <p-dropdown [options]="organizationDropdown" [(ngModel)]="searchParams.searchOrganization"
                     (ngModelChange)="onSearchModelChanged()" class="width340px" placeholder="All"
                     id="organizationSearchId" name="organizationSearchId"></p-dropdown>
             </div>
@@ -85,8 +85,10 @@
                 </tr>
             </ng-template>
         </p-table>
-        <p-paginator *ngIf="currentPage" (onPageChange)="onPageChange($event)" [first]="first" [rows]="10"
-            [totalRecords]="total"></p-paginator>
+        <p-paginator class="users-paginator" #paginator *ngIf="currentPage" (onPageChange)="onPageChange($event)"
+            [rows]="10" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
+            [showCurrentPageReport]="true" [showFirstLastIcon]="false"
+            [currentPageReportTemplate]="'Rows per page: 10 &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
     </div>
 </div>
 

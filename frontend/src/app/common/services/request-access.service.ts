@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DropdownOption } from '../models/dropdown-option';
 import { environment } from '../../../environments/environment';
-import { AccessRequest } from '../models/access-request';
+import { AccessRequest, ApproveRequestModel, DenyRequestModel } from '../models/access-request';
 import { PagingRequest } from '../models/paging-request';
 
 @Injectable({
@@ -31,5 +31,13 @@ export class RequestAccessService {
 
   getAccessRequests(pagingRequest: PagingRequest, status: string = ''): Observable<any> {
     return this.httpClient.get(`${environment.API_HOST}/users?status=${status}&pageSize=${pagingRequest?.pageSize}&pageNumber=${pagingRequest?.pageNumber}`)
+  }
+
+  approveAccessRequest(model: ApproveRequestModel): Observable<unknown> {
+    return this.httpClient.put<unknown>(`${environment.API_HOST}/users/accessrequests/approve`, model);
+  }
+
+  denyAccessRequest(model: DenyRequestModel): Observable<unknown> {
+    return this.httpClient.put<unknown>(`${environment.API_HOST}/users/accessrequests/deny`, model);
   }
 }

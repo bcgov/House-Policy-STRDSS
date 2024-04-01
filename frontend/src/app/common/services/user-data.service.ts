@@ -12,7 +12,13 @@ export class UserDataService {
   constructor(private httpClient: HttpClient) { }
 
   getCurrentUser(): Observable<unknown> {
-    return this.httpClient.get<unknown>(`${environment.API_HOST}/users/currentuser`)
+    return this.httpClient.get<unknown>(`${environment.API_HOST}/users/currentuser`);
+  }
+
+  getUsers(status: string, search: string, organizationId: number | null, pageSize: number, pageNumber: number, orderBy: string, direction: 'asc' | 'desc'): Observable<any> {
+    return this.httpClient.get(
+      `${environment.API_HOST}/users?status=${status ?? ''}&search=${search ?? ''}&organizationId=${organizationId ?? ''}&pageSize=${pageSize ?? ''}&pageNumber=${pageNumber ?? ''}&orderBy=${orderBy ?? ''}&direction=${direction ?? ''}`
+    );
   }
 
   updateIsEnabled(userIdentityId: number, isEnabled: boolean, updDtm: string): Observable<void> {

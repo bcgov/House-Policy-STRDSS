@@ -42,7 +42,7 @@ namespace XUnitTests
         }
 
         [Fact]
-        public void TestLoginAndRequestDelisting()
+        public void SendTakeDownRequestWithoutADSSListing()
         {
 
             try
@@ -99,7 +99,7 @@ namespace XUnitTests
         }
 
         [Fact]
-        public void TestLoginAndSendWarningDelisting()
+        public void SendNoticeOfTakedownWithoutADSSlisting()
         {
 
             try

@@ -88,6 +88,8 @@ export class ComplianceNoticeComponent implements OnInit {
   }
 
   onPreview(): void {
+    this.messages = [];
+
     if (this.myForm.valid) {
       this.delistingService.complianceNoticePreview(this.prepareFormModel(this.myForm))
         .subscribe(
@@ -109,6 +111,7 @@ export class ComplianceNoticeComponent implements OnInit {
 
   onSubmit(comment: string, textAreaElement: HTMLTextAreaElement): void {
     this.messages = [];
+
     if (this.myForm.valid) {
       const model: ComplianceNotice = this.prepareFormModel(this.myForm);
       model.comment = comment;

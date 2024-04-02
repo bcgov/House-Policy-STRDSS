@@ -23,7 +23,7 @@ namespace StrDss.Service.EmailTemplates
             return "";
         }
 
-        public async Task SendEmail()
+        public async Task<bool> SendEmail()
         {
             var emailContent = new EmailContent
             {
@@ -36,7 +36,7 @@ namespace StrDss.Service.EmailTemplates
                 Info = Info
             };
 
-            await _emailService.SendEmailAsync(emailContent);
+            return await _emailService.SendEmailAsync(emailContent);
         }
     }
 }

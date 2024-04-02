@@ -68,9 +68,18 @@ body {
                 width: 100%;
             }
         }
+
+        &.width340px {
+            width: 340px;
+
+            .p-inputtext,
+            .p-dropdown {
+                width: 340px;
+            }
+        }
     }
 
-    .p-ripple.p-element.p-button.p-component {
+    .p-element.p-button.p-component {
         border-radius: 4px;
 
         &:not(.p-button-link) {
@@ -95,6 +104,12 @@ body {
                 color: #FFFFFF;
                 font-size: 16px;
             }
+        }
+
+        &:disabled {
+            background-color: #EDEBE9;
+            color: #9F9D9C;
+            border-color: #EDEBE9;
         }
     }
 
@@ -202,6 +217,26 @@ body {
                 .p-menuitem-text,
                 .p-submenu-icon {
                     color: #053662;
+                }
+            }
+        }
+    }
+
+    p-paginator {
+        &.users-paginator {
+            .p-paginator.p-component {
+                height: 50px;
+                padding: 0;
+            }
+
+            .p-paginator-element {
+
+                &.p-paginator-prev,
+                &.p-paginator-next {
+                    svg {
+                        width: 26px;
+                        height: 26px;
+                    }
                 }
             }
         }

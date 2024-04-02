@@ -4,6 +4,7 @@ export interface AccessRequestTableItem {
     accessRequestStatusCd: string;
     accessRequestDtm: string;
     accessRequestJustificationTxt: string;
+    identityProviderNm: string;
     givenNm: string;
     familyNm: string;
     emailAddressDsc: string;

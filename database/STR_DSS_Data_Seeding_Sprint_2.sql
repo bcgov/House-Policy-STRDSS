@@ -141,7 +141,7 @@ VALUES (src.organization_type, src.organization_cd, src.organization_nm);
 
 INSERT INTO dss_organization_contact_person
 (is_primary, given_nm, family_nm, phone_no, email_address_dsc, contacted_through_organization_id)
-SELECT true, 'Test', 'Contact', '1234567890', :quoted_tester_email, organization_id
+SELECT true, 'Test', 'Contact', '123-456-7890', :quoted_tester_email, organization_id
 FROM dss_organization AS o
 WHERE NOT EXISTS (
 SELECT 1

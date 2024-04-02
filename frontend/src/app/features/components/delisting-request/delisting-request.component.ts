@@ -76,6 +76,8 @@ export class DelistingRequestComponent implements OnInit {
   }
 
   onPreview(): void {
+    this.messages = [];
+
     if (this.myForm.valid) {
       this.delistingService.delistingRequestPreview(this.prepareFormModel(this.myForm))
         .subscribe(
@@ -96,6 +98,8 @@ export class DelistingRequestComponent implements OnInit {
   }
 
   onSubmit(): void {
+    this.messages = [];
+
     if (this.myForm.valid) {
       this.delistingService.createDelistingRequest(this.prepareFormModel(this.myForm))
         .subscribe({

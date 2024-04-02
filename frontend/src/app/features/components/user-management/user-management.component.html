@@ -7,7 +7,7 @@
             </div>
             <div class="form-group-row-col">
                 <p-dropdown [options]="statuses" [(ngModel)]="searchParams.searchStatus"
-                    (ngModelChange)="onSearchModelChanged()" placeholder="All" id="statusSearchId"
+                    (ngModelChange)="onSearchModelChanged()" class="width340px" placeholder="All" id="statusSearchId"
                     name="statusSearchId"></p-dropdown>
             </div>
         </div>
@@ -16,9 +16,9 @@
                 <label for="platformId">Organization</label>
             </div>
             <div class="form-group-row-col">
-                <p-dropdown [options]="organizations" [(ngModel)]="searchParams.searchOrganization"
-                    (ngModelChange)="onSearchModelChanged()" placeholder="All" id="organizationSearchId"
-                    name="organizationSearchId"></p-dropdown>
+                <p-dropdown [options]="organizationDropdown" [(ngModel)]="searchParams.searchOrganization"
+                    (ngModelChange)="onSearchModelChanged()" class="width340px" placeholder="All"
+                    id="organizationSearchId" name="organizationSearchId"></p-dropdown>
             </div>
         </div>
         <div class="form-row">
@@ -26,8 +26,8 @@
                 <label for="platformId">Search</label>
             </div>
             <div class="form-group-row-col">
-                <input type="text" pInputText [(ngModel)]="searchParams.searchTerm" id="searchTerm" name="searchTerm"
-                    (ngModelChange)="onSearchModelChanged()" placeholder="Search.." />
+                <input type="text" pInputText [(ngModel)]="searchParams.searchTerm" class="width340px" id="searchTerm"
+                    name="searchTerm" (ngModelChange)="onSearchModelChanged()" placeholder="Search.." />
             </div>
         </div>
     </div>
@@ -59,10 +59,20 @@
                     <td>{{ accessRequest.emailAddressDsc }}</td>
                     <td>{{ accessRequest.organizationNm }}</td>
                     <td>
-                        <p-button label="Approve" (click)="onApprovePopup(accessRequest)" class="table-small-btn"
-                            id="form-approve-btn"></p-button>
-                        <p-button label="Deny" [outlined]="true" (click)="onRejectPopup(accessRequest)"
-                            class="table-small-btn" id="form-reject-btn"></p-button>
+                        <ng-container [ngSwitch]="accessRequest.accessRequestStatusCd">
+                            <ng-container *ngSwitchCase="'Approved'">
+                                <span [style]="{'color':'#42814A'}">Approved</span>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'Denied'">
+                                <span [style]="{'color':'#CE3E39'}">Denied</span>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'Requested'">
+                                <p-button label="Approve" (click)="onApprovePopup(accessRequest)"
+                                    class="table-small-btn" id="form-approve-btn"></p-button>
+                                <p-button label="Deny" [outlined]="true" (click)="onRejectPopup(accessRequest)"
+                                    class="table-small-btn" id="form-reject-btn"></p-button>
+                            </ng-container>
+                        </ng-container>
                     </td>
                     <td>
                         <span
@@ -72,56 +82,70 @@
                                 [(ngModel)]="accessRequest.isEnabled" [readonly]="true"></p-inputSwitch>
                         </span>
                     </td>
-
                 </tr>
             </ng-template>
         </p-table>
-        <p-paginator *ngIf="currentPage" (onPageChange)="onPageChange($event)" [first]="first" [rows]="10"
-            [totalRecords]="total"></p-paginator>
+        <p-paginator class="users-paginator" #paginator *ngIf="currentPage" (onPageChange)="onPageChange($event)"
+            [rows]="10" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
+            [showCurrentPageReport]="true" [showFirstLastIcon]="false"
+            [currentPageReportTemplate]="'Rows per page: 10 &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
     </div>
 </div>
 
-<p-dialog header="Approve Access Request" [modal]="true" [(visible)]="showApprovePopup" [style]="{width: '50vw'}">
-    <form [formGroup]="myForm">
-
-        <div class="form-group-row"><strong class="bold-text">User ID:</strong> [User ID]</div>
-        <div class="form-group-row"><strong class="bold-text">Requested User Type:</strong> [User Type]</div>
-        <div class="form-group-row extra-space-bottom"><strong class="bold-text">Organization:</strong> [Organization
-            Name]</div>
-        <div class="form-group-row inline-block left-block">
-            <div class="form-group-row-col">
-                <label for="userIdentityId">What role best describes you?</label>
-            </div>
-            <div class="form-group-row-col">
-                <p-dropdown [options]="organizationTypes" appendTo="body" formControlName="userIdentityId"
-                    placeholder="Please Select..." id="userIdentityId" name="userIdentityId"
-                    [ngClass]="'full-width-text-field'" [required]="true"></p-dropdown>
-            </div>
+<p-dialog *ngIf="currentTableItem" header="Approve Access Request" [modal]="true" [(visible)]="showApprovePopup"
+    [style]="{width: '50vw'}">
+    <div class="form-group-row"><strong class="bold-text">User Email: </strong>{{currentTableItem.emailAddressDsc}}
+    </div>
+    <div class="form-group-row"><strong class="bold-text">ID Provider: </strong>
+        {{currentTableItem.identityProviderNm}}</div>
+    <div class="form-group-row extra-space-bottom"><strong class="bold-text">Requested User
+            Type: </strong>{{currentTableItem.accessRequestJustificationTxt}}</div>
+    <div class="form-group-row inline-block left-block extra-space-bottom">
+        <div class="form-group-row-col">
+            <label for="userIdentityId">What role best describes you?</label>
         </div>
-        <div class="form-group-row inline-block right-block extra-space-bottom">
-            <div class="form-group-row-col">
-                <label for="representedByOrganizationId">What role best describes you?</label>
-            </div>
-            <div class="form-group-row-col">
-                <p-dropdown [options]="organizations" appendTo="body" formControlName="representedByOrganizationId"
-                    placeholder="Please Select..." id="representedByOrganizationId" name="representedByOrganizationId"
-                    [ngClass]="'full-width-text-field'" [required]="true"></p-dropdown>
-            </div>
+        <div class="form-group-row-col">
+            <p-dropdown #approveOrgTypeElem [(ngModel)]="currentOrganizationTypeSelected" [options]="organizationTypes"
+                appendTo="body" placeholder="Please Select..." id="userIdentityId" name="userIdentityId"
+                [ngClass]="'full-width-text-field'" [required]="true"></p-dropdown>
         </div>
-    </form>
+    </div>
+    <div class="form-group-row inline-block right-block extra-space-bottom">
+        <div class="form-group-row-col">
+            <label for="representedByOrganizationId">What role best describes you?</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-dropdown #approveOrgNameElem [(ngModel)]="currentOrganizationSelected" [options]="organizations"
+                appendTo="body" placeholder="Please Select..." id="representedByOrganizationId"
+                name="representedByOrganizationId" [ngClass]="'full-width-text-field'" [required]="true"></p-dropdown>
+        </div>
+    </div>
     <strong class="bold-text">Exercise caution and ensure accuracy before proceeding. Granting (or denying) access is
         irreversible.</strong>
-    <hr>
+    <div class="spacer-hr"></div>
     <div class="actions">
+        <p-button label="Submit" id="submit-dialog-btn"
+            (click)="onApprove(approveOrgTypeElem,approveOrgNameElem)"></p-button>
         <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPopupClose()"></p-button>
-        <p-button label="Submit" id="submit-dialog-btn" (click)="onApprove()"></p-button>
     </div>
 </p-dialog>
 
-<p-dialog header="Reject Access Request" [modal]="true" [(visible)]="showRejectPopup" [style]="{width: '50vw'}">
-    <div class="form-group-row-col"><strong>User ID:</strong>[User ID]</div>
-    <div class="form-group-row-col"><strong>Requested User Type:</strong>[User Type]</div>
-    <div class="form-group-row-col extra-space-bottom"><strong>Organization:</strong> [Organization Name]</div>
+<p-dialog *ngIf="currentTableItem" header="Reject Access Request" [modal]="true" [(visible)]="showRejectPopup"
+    [style]="{width: '50vw'}">
+    <div class="form-group-row-col"><strong class="bold-text">User ID: </strong>{{currentTableItem.emailAddressDsc}}
+    </div>
+    <div class="form-group-row-col"><strong class="bold-text">Requested User
+            Type: </strong>{{currentTableItem.accessRequestJustificationTxt}}</div>
+    <div class="form-group-row-col extra-space-bottom"><strong class="bold-text">Provider: </strong>
+        {{currentTableItem.identityProviderNm}}</div>
+    <strong class="bold-text">Exercise caution and ensure accuracy before proceeding. Granting (or denying) access is
+        irreversible.</strong>
+    <div class="spacer-hr"></div>
+    <div class="actions">
+        <button pButton label="Deny request" id="submit-dialog-btn" class="p-button-red" (click)="onReject()"></button>
+        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPopupClose()"></p-button>
+    </div>
 </p-dialog>
 
 <p-confirmDialog [closable]="false"></p-confirmDialog>
+<p-toast></p-toast>

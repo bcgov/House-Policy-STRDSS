@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data;
+using StrDss.Data.Entities;
+using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
@@ -23,15 +25,17 @@ namespace StrDss.Service
         private IConfiguration _config;
         private IEmailMessageService _emailService;
         private IOrganizationService _orgService;
+        private IEmailMessageRepository _emailRepo;
         private ILogger<DelistingService> _logger;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, ILogger<DelistingService> logger)
+            IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, IEmailMessageRepository emailRepo, ILogger<DelistingService> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
             _config = config;
             _emailService = emailService;
             _orgService = orgService;
+            _emailRepo = emailRepo;
             _logger = logger;
         }
 
@@ -161,11 +165,13 @@ namespace StrDss.Service
                 dto.CcList.Add(_currentUser.EmailAddress);
             }
 
+            var body = FormatDelistingWarningEmailContent(dto, reasonDto, true);
+
             var emailContent = new EmailContent
             {
                 Bcc = Array.Empty<string>(),
                 BodyType = "html",
-                Body = FormatDelistingWarningEmailContent(dto, reasonDto, true),
+                Body = body,
                 Cc = dto.CcList.ToArray(),
                 DelayTS = 0,
                 Encoding = "utf-8",
@@ -176,7 +182,34 @@ namespace StrDss.Service
                 Info = dto.ListingUrl
             };
 
-            await _emailService.SendEmailAsync(emailContent);
+            var sent = await _emailService.SendEmailAsync(emailContent);
+
+            if (sent)
+            {
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = EmailMessageTypes.NoticeOfTakedown,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = body,
+                    IsHostContactedExternally = dto.HostEmailSent,
+                    IsSubmitterCcRequired = dto.SendCopy,
+                    MessageReasonId = reasonDto?.Id,
+                    LgPhoneNo = dto.LgContactPhone,
+                    UnreportedListingNo = dto.ListingId.ToString(),
+                    HostEmailAddressDsc = dto.HostEmail,
+                    LgEmailAddressDsc = dto.LgContactEmail,
+                    CcEmailAddressDsc = string.Join("; ", dto.CcList),
+                    UnreportedListingUrl = dto.ListingUrl,
+                    LgStrBylawUrl = dto.StrBylawUrl,
+                    InitiatingUserIdentityId = _currentUser.Id,
+                    AffectedByUserIdentityId = null,
+                    InvolvedInOrganizationId = dto.PlatformId
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                _unitOfWork.Commit();
+            }
         }
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto)
@@ -307,11 +340,13 @@ namespace StrDss.Service
                 dto.CcList.Add(_currentUser.EmailAddress);
             }
 
+            var body = FormatDelistingRequestEmailContent(dto, true);
+
             var emailContent = new EmailContent
             {
                 Bcc = Array.Empty<string>(),
                 BodyType = "html",
-                Body = FormatDelistingRequestEmailContent(dto, true),
+                Body = body,
                 Cc = dto.CcList.ToArray(),
                 DelayTS = 0,
                 Encoding = "utf-8",
@@ -322,7 +357,34 @@ namespace StrDss.Service
                 Info = dto.ListingUrl
             };
 
-            await _emailService.SendEmailAsync(emailContent);
+            var sent = await _emailService.SendEmailAsync(emailContent);
+
+            if (sent)
+            {
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = EmailMessageTypes.TakedownRequest,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = body,
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = dto.SendCopy,
+                    MessageReasonId = null,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = dto.ListingId.ToString(),
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = string.Join("; ", dto.CcList),
+                    UnreportedListingUrl = dto.ListingUrl,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = _currentUser.Id,
+                    AffectedByUserIdentityId = null,
+                    InvolvedInOrganizationId = dto.PlatformId
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                _unitOfWork.Commit();
+            }
         }
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingRequestPreviewAsync(DelistingRequestCreateDto dto)

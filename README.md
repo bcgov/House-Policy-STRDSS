@@ -44,3 +44,14 @@ Our CI/CD process is facilitated through GitHub Actions, ensuring seamless integ
 
    - Supports for generating version tags.
    - Triggered through the GitHub UI, allowing specification of tag versions excluding prefixes.
+
+## Hotfix Procedure
+
+When it's necessary to deploy a hotfix (critical fix) to Production, the steps below identify how to deploy the hotfix to production and then update the main branch with the hotfix code.
+
+### Procedure
+1. Identify the tag where the hotfix should be included (I.E. the tag listed in the last production deployment log for deploy-prod under Github Actions)
+2. Create a branch from the tag
+3. Implement the hot fix
+4. Run `Create Version Tag with Changelog PR' with the hot fix branch updatung the hotfix value in the version by 1 (I.E. 1.8.1 -> 1.8.2)
+5. Merge the hot fix branch to the main branch

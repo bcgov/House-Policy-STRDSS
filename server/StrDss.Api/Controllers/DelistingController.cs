@@ -39,7 +39,7 @@ namespace StrDss.Api.Controllers
             return await _emailService.GetMessageReasons(EmailMessageTypes.NoticeOfTakedown);
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.TakedownAction)]
         [HttpPost("warnings", Name = "CreateDelistingWarning")]
         public async Task<ActionResult> CreateDelistingWarning(DelistingWarningCreateDto dto)
         {
@@ -52,7 +52,7 @@ namespace StrDss.Api.Controllers
             return NoContent();
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.TakedownAction)]
         [HttpPost("warnings/preview", Name = "GetDelistingWarningPreview")]
         public async Task<ActionResult<EmailPreview>> GetDelistingWarningPreview(DelistingWarningCreateDto dto)
         {
@@ -65,7 +65,7 @@ namespace StrDss.Api.Controllers
             return preview;
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.TakedownAction)]
         [HttpPost("requests", Name = "CreateDelistingRequest")]
         public async Task<ActionResult> CreateDelistingRequest(DelistingRequestCreateDto dto)
         {
@@ -78,7 +78,7 @@ namespace StrDss.Api.Controllers
             return NoContent();
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.TakedownAction)]
         [HttpPost("requests/preview", Name = "GetDelistingRequestPreview")]
         public async Task<ActionResult<EmailPreview>> GetDelistingRequestPreview(DelistingRequestCreateDto dto)
         {

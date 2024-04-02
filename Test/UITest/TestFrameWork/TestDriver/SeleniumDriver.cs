@@ -175,9 +175,11 @@ namespace UITest.TestDriver
 
             return (elements);
         }
-        public void WaitFor(Enums.FINDBY By, string Locator, int WaitSeconds = 3)
+        public void WaitFor(Enums.FINDBY By, string Locator, int WaitSeconds = 5)
         {
             WebDriverWait wait = new WebDriverWait(Driver, System.TimeSpan.FromSeconds(WaitSeconds));
+            //set default timeout
+            wait.Timeout = new TimeSpan(0,0,WaitSeconds);
             try
             {
                 switch (By)

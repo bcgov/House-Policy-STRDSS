@@ -19,6 +19,7 @@ USING ( SELECT * FROM (VALUES
 ('Takedown Request','Takedown Request'),
 ('Escalation Request','STR Escalation Request'),
 ('Compliance Order','Provincial Compliance Order'),
+('Access Requested','Access Requested Notification'),
 ('Access Granted','Access Granted Notification'),
 ('Access Denied','Access Denied Notification'))
 AS s (email_message_type, email_message_type_nm)

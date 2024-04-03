@@ -9,6 +9,7 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
+using StrDss.Service.EmailTemplates;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Service
@@ -152,37 +153,9 @@ namespace StrDss.Service
 
         private async Task SendTakedownNoticeAsync(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
         {
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+            var template = GetTakedownNoticeTemplate(dto, platform, reasonDto);
 
-            dto.ToList.Add(contact.EmailAddressDsc);
-            if (dto.HostEmail.IsNotEmpty())
-            {
-                dto.ToList.Add(dto.HostEmail);
-            }
-
-            if (dto.SendCopy)
-            {
-                dto.CcList.Add(_currentUser.EmailAddress);
-            }
-
-            var body = FormatTakedownNoticeEmailContent(dto, reasonDto, true);
-
-            var emailContent = new EmailContent
-            {
-                Bcc = Array.Empty<string>(),
-                BodyType = "html",
-                Body = body,
-                Cc = dto.CcList.ToArray(),
-                DelayTS = 0,
-                Encoding = "utf-8",
-                From = NoReply.Default,
-                Priority = "normal",
-                Subject = "Notice of Takedown",
-                To = dto.ToList.ToArray(),
-                Info = dto.ListingUrl
-            };
-
-            var sent = await _emailService.SendEmailAsync(emailContent);
+            var sent = await template.SendEmail();
 
             if (sent)
             {
@@ -190,7 +163,7 @@ namespace StrDss.Service
                 {
                     EmailMessageType = EmailMessageTypes.NoticeOfTakedown,
                     MessageDeliveryDtm = DateTime.UtcNow,
-                    MessageTemplateDsc = body,
+                    MessageTemplateDsc = template.GetContent(),
                     IsHostContactedExternally = dto.HostEmailSent,
                     IsSubmitterCcRequired = dto.SendCopy,
                     MessageReasonId = reasonDto?.Id,
@@ -212,6 +185,36 @@ namespace StrDss.Service
             }
         }
 
+        private TakedownNotice GetTakedownNoticeTemplate(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto, bool preview = false)
+        {
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+
+            dto.ToList.Add(contact.EmailAddressDsc);
+            if (dto.HostEmail.IsNotEmpty())
+            {
+                dto.ToList.Add(dto.HostEmail);
+            }
+
+            if (dto.SendCopy)
+            {
+                dto.CcList.Add(_currentUser.EmailAddress);
+            }
+
+            var template = new TakedownNotice(_emailService)
+            {
+                Reason = reasonDto.Description,
+                Url = dto.ListingUrl,
+                ListingId = dto.ListingId,
+                LgContactInfo = dto.LgContactEmail,
+                LgStrBylawLink = dto.StrBylawUrl,
+                To = dto.ToList,
+                Cc = dto.CcList,
+                Info = dto.ListingUrl,
+                Comment = dto.Comment,
+            };
+            return template;
+        }
+
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
@@ -223,33 +226,9 @@ namespace StrDss.Service
                 return (errors, new EmailPreview());
             }
 
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
-            dto.ToList.Add(contact.EmailAddressDsc);
+            var template = GetTakedownNoticeTemplate(dto, platform, reasonDto, true);
 
-            if (dto.HostEmail.IsNotEmpty())
-            {
-                dto.ToList.Add(dto.HostEmail);
-            }
-
-            return (errors, new EmailPreview { Content = (FormatTakedownNoticeEmailContent(dto, reasonDto, false)).HtmlToPlainText() });
-        }
-
-        private string FormatTakedownNoticeEmailContent(TakedownNoticeCreateDto dto, DropdownNumDto? reasonDto, bool contentOnly)
-        {
-            var reason = reasonDto?.Description;
-            var nl = Environment.NewLine;
-
-            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}<br/>cc: {string.Join(";", dto.CcList)}<br/><br/>")
-                 + $@"Dear Short-term Rental Host,<br/>"
-                 + $@"<br/>Short-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>Short-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>The short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason:"
-                 + $@"<b> {reason ?? ""}</b>"
-                 + $@"<br/><br/>{dto.ListingUrl}"
-                 + $@"<br/><br/>Listing ID Number: {dto.ListingId}"
-                 + $@"<br/><br/>Unless you are able to demonstrate compliance with the business licence requirement, this listing may be removed from the short-term rental platform after 5 days. The local government has 90 days to submit a request to takedown the listing to the platform. For more information, contact:"
-                 + $@"<br/><br/>Email: {dto.LgContactEmail}"
-                 + (dto.LgContactPhone.IsEmpty() ? "" : $@"<br/>Phone: {dto.LgContactPhone}")
-                 + (dto.StrBylawUrl.IsEmpty() ? "" : $@"<br/><br/>More information about our city's STR policies can be found at:<br/>{dto.StrBylawUrl}")
-                 + (dto.Comment.IsEmpty() ? "" : $@"<br/><br/>{dto.Comment}");
+            return (errors, new EmailPreview { Content = (template.GetContent()).HtmlToPlainText() });
         }
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto)

@@ -15,10 +15,10 @@ namespace StrDss.Service
 {
     public interface IDelistingService
     {
-        Task<Dictionary<string, List<string>>> CreateDelistingWarningAsync(DelistingWarningCreateDto dto);
-        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto);
-        Task<Dictionary<string, List<string>>> CreateDelistingRequestAsync(DelistingRequestCreateDto dto);
-        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingRequestPreviewAsync(DelistingRequestCreateDto dto);
+        Task<Dictionary<string, List<string>>> CreateTakedownNoticeAsync(TakedownNoticeCreateDto dto);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto);
+        Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -39,23 +39,23 @@ namespace StrDss.Service
             _logger = logger;
         }
 
-        public async Task<Dictionary<string, List<string>>> CreateDelistingWarningAsync(DelistingWarningCreateDto dto)
+        public async Task<Dictionary<string, List<string>>> CreateTakedownNoticeAsync(TakedownNoticeCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var reasonDto = await _emailService.GetMessageReasonByMessageTypeAndId(EmailMessageTypes.NoticeOfTakedown, dto.ReasonId);
 
-            var errors = await ValidateDelistingWarningAsync(dto, platform, reasonDto);
+            var errors = await ValidateTakedownNoticeAsync(dto, platform, reasonDto);
             if (errors.Count > 0)
             {
                 return errors;
             }
 
-            await SendDelistingWarningAsync(dto, platform, reasonDto);
+            await SendTakedownNoticeAsync(dto, platform, reasonDto);
 
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidateDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
+        private async Task<Dictionary<string, List<string>>> ValidateTakedownNoticeAsync(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
         {
             await Task.CompletedTask;
 
@@ -150,7 +150,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
+        private async Task SendTakedownNoticeAsync(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
         {
             var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
 
@@ -165,7 +165,7 @@ namespace StrDss.Service
                 dto.CcList.Add(_currentUser.EmailAddress);
             }
 
-            var body = FormatDelistingWarningEmailContent(dto, reasonDto, true);
+            var body = FormatTakedownNoticeEmailContent(dto, reasonDto, true);
 
             var emailContent = new EmailContent
             {
@@ -212,12 +212,12 @@ namespace StrDss.Service
             }
         }
 
-        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto)
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var reasonDto = await _emailService.GetMessageReasonByMessageTypeAndId(EmailMessageTypes.NoticeOfTakedown, dto.ReasonId);
 
-            var errors = await ValidateDelistingWarningAsync(dto, platform, reasonDto);
+            var errors = await ValidateTakedownNoticeAsync(dto, platform, reasonDto);
             if (errors.Count > 0)
             {
                 return (errors, new EmailPreview());
@@ -231,10 +231,10 @@ namespace StrDss.Service
                 dto.ToList.Add(dto.HostEmail);
             }
 
-            return (errors, new EmailPreview { Content = (FormatDelistingWarningEmailContent(dto, reasonDto, false)).HtmlToPlainText() });
+            return (errors, new EmailPreview { Content = (FormatTakedownNoticeEmailContent(dto, reasonDto, false)).HtmlToPlainText() });
         }
 
-        private string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, DropdownNumDto? reasonDto, bool contentOnly)
+        private string FormatTakedownNoticeEmailContent(TakedownNoticeCreateDto dto, DropdownNumDto? reasonDto, bool contentOnly)
         {
             var reason = reasonDto?.Description;
             var nl = Environment.NewLine;
@@ -252,12 +252,12 @@ namespace StrDss.Service
                  + (dto.Comment.IsEmpty() ? "" : $@"<br/><br/>{dto.Comment}");
         }
 
-        public async Task<Dictionary<string, List<string>>> CreateDelistingRequestAsync(DelistingRequestCreateDto dto)
+        public async Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
 
-            var errors = await ValidateDelistingRequestAsync(dto, platform, lg);
+            var errors = await ValidateTakedownRequestAsync(dto, platform, lg);
             if (errors.Count > 0)
             {
                 return errors;
@@ -268,7 +268,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidateDelistingRequestAsync(DelistingRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
+        private async Task<Dictionary<string, List<string>>> ValidateTakedownRequestAsync(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
         {
             await Task.CompletedTask;
 
@@ -330,7 +330,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendDelistingRequestAsync(DelistingRequestCreateDto dto, OrganizationDto? platform)
+        private async Task SendDelistingRequestAsync(TakedownRequestCreateDto dto, OrganizationDto? platform)
         {
             var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
             dto.ToList.Add(contact.EmailAddressDsc);
@@ -340,7 +340,7 @@ namespace StrDss.Service
                 dto.CcList.Add(_currentUser.EmailAddress);
             }
 
-            var body = FormatDelistingRequestEmailContent(dto, true);
+            var body = FormatTakedownRequestEmailContent(dto, true);
 
             var emailContent = new EmailContent
             {
@@ -387,12 +387,12 @@ namespace StrDss.Service
             }
         }
 
-        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingRequestPreviewAsync(DelistingRequestCreateDto dto)
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
 
-            var errors = await ValidateDelistingRequestAsync(dto, platform, lg);
+            var errors = await ValidateTakedownRequestAsync(dto, platform, lg);
             if (errors.Count > 0)
             {
                 return (errors, new EmailPreview());
@@ -401,11 +401,11 @@ namespace StrDss.Service
             var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
             dto.ToList.Add(contact.EmailAddressDsc);
 
-            return (errors, new EmailPreview { Content = FormatDelistingRequestEmailContent(dto, false).HtmlToPlainText() });
+            return (errors, new EmailPreview { Content = FormatTakedownRequestEmailContent(dto, false).HtmlToPlainText() });
 
         }
 
-        private string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly)
+        private string FormatTakedownRequestEmailContent(TakedownRequestCreateDto dto, bool contentOnly)
         {
             var nl = Environment.NewLine;
 

@@ -11,7 +11,7 @@ using NUnit.Framework.Legacy;
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
-    [Scope(Scenario = "SendDelistingRequestWithoutADSSListing")]
+    [Scope(Scenario = "SendTakedownRequestWithoutADSSListing")]
     public sealed class SendTakeDownRequestWithoutADSSListing
     {
         HomePage _HomePage;

@@ -20,8 +20,8 @@ namespace SpecFlowProjectBDD.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("SendDelistingRequestWithoutADSSListingFeature")]
-    public partial class SendDelistingRequestWithoutADSSListingFeatureFeature
+    [NUnit.Framework.DescriptionAttribute("SendTakedownRequestWithoutADSSListing")]
+    public partial class SendTakedownRequestWithoutADSSListingFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
@@ -35,7 +35,7 @@ namespace SpecFlowProjectBDD.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendDelistingRequestWithoutADSSListingFeature", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-74", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendTakedownRequestWithoutADSSListing", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-74", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -76,16 +76,16 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("SendTakedownRequestWithoutADSSListing")]
         [NUnit.Framework.CategoryAttribute("Delisting")]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", null)]
-        [NUnit.Framework.TestCaseAttribute("9223372036854775807", "ListingID - Test for Max value", "pass", "http://listingURL.com", "richard.anderson@dxc.com", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Valid URL", "pass", "HTTP://listingURL.com", "richard.anderson@dxc.com", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Valid URL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Long URL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", null)]
-        [NUnit.Framework.TestCaseAttribute("-1", "ListingID - Negative number test", "fail", "http://listingURL.com", "richard.anderson@dxc.com", null)]
-        [NUnit.Framework.TestCaseAttribute("test", "ListingID - Test for string", "fail", "http://listingURL.com", "richard.anderson@dxc.com", null)]
-        [NUnit.Framework.TestCaseAttribute("e", "ListingID - Test for exponential", "fail", "http://listingURL.com", "richard.anderson@dxc.com", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", null)]
-        public void SendTakedownRequestWithoutADSSListing(string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("9223372036854775807", "ListingID - Test for Max value", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Valid URL", "pass", "HTTP://listingURL.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Valid URL SSL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Long URL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("-1", "ListingID - Negative number test", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "Should pass because non-numberic values are ignored and Listing ID is optional", null)]
+        [NUnit.Framework.TestCaseAttribute("test", "ListingID - Test for string", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "should pass because non-numberic values are ignored and Listing ID is optional", null)]
+        [NUnit.Framework.TestCaseAttribute("e", "ListingID - Test for exponential", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "should pass because non-numberic values are ignored and Listing ID is optional", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", "", null)]
+        public void SendTakedownRequestWithoutADSSListing(string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string comment, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "Delisting"};
@@ -100,6 +100,7 @@ namespace SpecFlowProjectBDD.Features
             argumentsOfScenario.Add("ExpectedResult", expectedResult);
             argumentsOfScenario.Add("ListingURL", listingURL);
             argumentsOfScenario.Add("AdditionalCCsTextBox", additionalCCsTextBox);
+            argumentsOfScenario.Add("Comment", comment);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("SendTakedownRequestWithoutADSSListing", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 5
 this.ScenarioInitialize(scenarioInfo);

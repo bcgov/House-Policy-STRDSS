@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
+using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.UserDtos;
 using StrDss.Service;
@@ -29,7 +30,7 @@ namespace StrDss.Api.Controllers
             return Ok(_currentUser);
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.UserRead)]
         [HttpGet("", Name = "GetUserList")]
         public async Task<ActionResult<PagedDto<UserListtDto>>> GetUserList(string? status, string? search, long? organizationId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
@@ -51,7 +52,7 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.UserWrite)]
         [HttpPut("accessrequests/deny", Name = "DenyRequest")]
         public async Task<ActionResult> DenyRequest(AccessRequestDenyDto dto)
         {
@@ -65,7 +66,7 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.UserWrite)]
         [HttpPut("accessrequests/approve", Name = "ApproveRequest")]
         public async Task<ActionResult> ApproveRequest(AccessRequestApproveDto dto)
         {
@@ -79,7 +80,7 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.UserWrite)]
         [HttpPut("updateisenabled", Name = "UpdateIsEnabled")]
         public async Task<ActionResult> UpdateIsEnabled(UpdateIsEnabledDto dto)
         {

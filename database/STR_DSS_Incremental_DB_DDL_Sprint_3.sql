@@ -25,10 +25,19 @@ CREATE  TABLE dss_rental_listing_report (
 	CONSTRAINT dss_rental_listing_report_pk PRIMARY KEY ( rental_listing_report_id )
  ) ;
 
+CREATE  TABLE dss_listing_line_error ( 
+	listing_line_error_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
+	error_txt            varchar(4000)  NOT NULL  ,
+	source_line_txt      varchar(32000)  NOT NULL  ,
+	platform_listing_no  varchar(25)    ,
+	including_rental_listing_report_id bigint  NOT NULL  ,
+	CONSTRAINT dss_listing_line_error_pk PRIMARY KEY ( listing_line_error_id )
+ ) ;
+
 CREATE  TABLE dss_rental_listing ( 
 	rental_listing_id    bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
+	platform_listing_no  varchar(25)  NOT NULL  ,
 	platform_listing_url varchar(4000)    ,
-	platform_listing_no  varchar(25)    ,
 	business_licence_no  varchar(25)    ,
 	bc_registry_no       varchar(25)    ,
 	is_entire_unit       boolean    ,
@@ -62,6 +71,8 @@ CREATE  TABLE dss_rental_listing_contact (
 ALTER TABLE dss_physical_address ADD CONSTRAINT dss_physical_address_fk_contained_in FOREIGN KEY ( containing_organization_id ) REFERENCES dss_organization( organization_id )   ;
 
 ALTER TABLE dss_rental_listing_report ADD CONSTRAINT dss_rental_listing_report_fk_provided_by FOREIGN KEY ( providing_organization_id ) REFERENCES dss_organization( organization_id )   ;
+
+ALTER TABLE dss_listing_line_error ADD CONSTRAINT dss_listing_line_error_fk_included_in FOREIGN KEY ( including_rental_listing_report_id ) REFERENCES dss_rental_listing_report( rental_listing_report_id )   ;
 
 ALTER TABLE dss_rental_listing ADD CONSTRAINT dss_rental_listing_fk_offered_by FOREIGN KEY ( offering_organization_id ) REFERENCES dss_organization( organization_id )   ;
 
@@ -101,13 +112,25 @@ COMMENT ON COLUMN dss_rental_listing_report.upd_dtm IS 'Trigger-updated timestam
 
 COMMENT ON COLUMN dss_rental_listing_report.upd_user_guid IS 'The globally unique identifier (assigned by the identity provider) for the most recent user to record a change';
 
+COMMENT ON TABLE dss_listing_line_error IS 'A rental listing report line that could not be interpreted as a valid listing';
+
+COMMENT ON COLUMN dss_listing_line_error.listing_line_error_id IS 'Unique generated key';
+
+COMMENT ON COLUMN dss_listing_line_error.error_txt IS 'Freeform description of the problem found while attempting to interpret the report line';
+
+COMMENT ON COLUMN dss_listing_line_error.source_line_txt IS 'Full text of the report line that could not be interpreted';
+
+COMMENT ON COLUMN dss_listing_line_error.platform_listing_no IS 'The platform issued identification number for the listing';
+
+COMMENT ON COLUMN dss_listing_line_error.including_rental_listing_report_id IS 'Foreign key';
+
 COMMENT ON TABLE dss_rental_listing IS 'A rental listing snapshot that is relevant to a specific month';
 
 COMMENT ON COLUMN dss_rental_listing.rental_listing_id IS 'Unique generated key';
 
-COMMENT ON COLUMN dss_rental_listing.platform_listing_url IS 'URL for the short-term rental platform listing';
-
 COMMENT ON COLUMN dss_rental_listing.platform_listing_no IS 'The platform issued identification number for the listing';
+
+COMMENT ON COLUMN dss_rental_listing.platform_listing_url IS 'URL for the short-term rental platform listing';
 
 COMMENT ON COLUMN dss_rental_listing.business_licence_no IS 'The local government issued licence number that applies to the rental offering';
 

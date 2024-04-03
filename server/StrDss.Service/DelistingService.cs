@@ -211,6 +211,7 @@ namespace StrDss.Service
                 Cc = dto.CcList,
                 Info = dto.ListingUrl,
                 Comment = dto.Comment,
+                Preview = preview
             };
             return template;
         }
@@ -228,7 +229,7 @@ namespace StrDss.Service
 
             var template = GetTakedownNoticeTemplate(dto, platform, reasonDto, true);
 
-            return (errors, new EmailPreview { Content = (template.GetContent()).HtmlToPlainText() });
+            return (errors, new EmailPreview { Content = template.GetContent().HtmlToPlainText() });
         }
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto)
@@ -242,7 +243,7 @@ namespace StrDss.Service
                 return errors;
             }
 
-            await SendDelistingRequestAsync(dto, platform);
+            await SendTakedownRequestAsync(dto, platform, lg);
 
             return errors;
         }
@@ -309,34 +310,11 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendDelistingRequestAsync(TakedownRequestCreateDto dto, OrganizationDto? platform)
+        private async Task SendTakedownRequestAsync(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
         {
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
-            dto.ToList.Add(contact.EmailAddressDsc);
-
-            if (dto.SendCopy)
-            {
-                dto.CcList.Add(_currentUser.EmailAddress);
-            }
-
-            var body = FormatTakedownRequestEmailContent(dto, true);
-
-            var emailContent = new EmailContent
-            {
-                Bcc = Array.Empty<string>(),
-                BodyType = "html",
-                Body = body,
-                Cc = dto.CcList.ToArray(),
-                DelayTS = 0,
-                Encoding = "utf-8",
-                From = NoReply.Default,
-                Priority = "normal",
-                Subject = "Takedown Request",
-                To = dto.ToList.ToArray(),
-                Info = dto.ListingUrl
-            };
-
-            var sent = await _emailService.SendEmailAsync(emailContent);
+            var template = GetTakedownRequestTemplate(dto, platform, lg);
+    
+            var sent = await template.SendEmail();
 
             if (sent)
             {
@@ -344,7 +322,7 @@ namespace StrDss.Service
                 {
                     EmailMessageType = EmailMessageTypes.TakedownRequest,
                     MessageDeliveryDtm = DateTime.UtcNow,
-                    MessageTemplateDsc = body,
+                    MessageTemplateDsc = template.GetContent(),
                     IsHostContactedExternally = false,
                     IsSubmitterCcRequired = dto.SendCopy,
                     MessageReasonId = null,
@@ -365,6 +343,32 @@ namespace StrDss.Service
                 _unitOfWork.Commit();
             }
         }
+        private TakedownRequest GetTakedownRequestTemplate(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg, bool preview = false)
+        {
+            var platformContact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+
+            dto.ToList.Add(platformContact.EmailAddressDsc);
+
+            var lgContact = lg.ContactPeople.FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+
+            if (dto.SendCopy)
+            {
+                dto.CcList.Add(_currentUser.EmailAddress);
+            }
+
+            var template = new TakedownRequest(_emailService)
+            {
+                Url = dto.ListingUrl,
+                ListingId = dto.ListingId,
+                LgContactInfo = lgContact.EmailAddressDsc,
+                LgName = lg.OrganizationNm,
+                To = dto.ToList,
+                Cc = dto.CcList,
+                Info = dto.ListingUrl,
+                Preview = preview
+            };
+            return template;
+        }
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto)
         {
@@ -377,25 +381,10 @@ namespace StrDss.Service
                 return (errors, new EmailPreview());
             }
 
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
-            dto.ToList.Add(contact.EmailAddressDsc);
+            var template = GetTakedownRequestTemplate(dto, platform, lg, true);
 
-            return (errors, new EmailPreview { Content = FormatTakedownRequestEmailContent(dto, false).HtmlToPlainText() });
+            return (errors, new EmailPreview { Content = template.GetContent().HtmlToPlainText() });
 
         }
-
-        private string FormatTakedownRequestEmailContent(TakedownRequestCreateDto dto, bool contentOnly)
-        {
-            var nl = Environment.NewLine;
-
-            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}<br/>cc: {string.Join(";", dto.CcList)}")
-                 + $@"<br/><br/>Request to platform service provider for takedown of non-compliant platform offering."
-                 + $@"<br/><br/>The following short-term rental listing is not in compliance with an applicable local government business licence requirement:"
-                 + $@"<br/><br/>{dto.ListingUrl}"
-                 + $@"<br/><br/>Listing ID Number: {dto.ListingId}"
-                 + $@"<br/><br/>In accordance, with 17(2) of the Short-term Rental Accommodations Act, please cease providing platform services in respect of the above platform offer within 3 days."
-                 + $@"<br/><br/>[Name]<br/>[Title]<br/>[Local government]<br/>[Contact Information]";
-        }
-
     }
 }

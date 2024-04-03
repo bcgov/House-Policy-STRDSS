@@ -82,13 +82,7 @@ jobs:
         run: |
           cd ./frontend
           ng build --configuration=production
-
-      # - name: Chrome launcher
-      #   run: |
-      #     cd ./frontend
-      #     npm install karma-chrome-launcher --save-dev
-      #     google-chrome --version
-      
+    
       - name: Run frontend tests
         run: |
           cd ./frontend
@@ -103,33 +97,46 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
-  # Docker-build-backend:
-  #   needs: [build-backend]
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 10
-  #   permissions:
-  #     contents: read
-  #     packages: write
+  Docker-build-backend:
+    needs: [build-backend]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
 
-  #   steps:
-  #   - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-  #   - uses: actions/checkout@v4
+    steps:
+    # - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
+    - uses: actions/checkout@v4
 
-  #   - name: Setup Tools
-  #     uses: ./.github/actions/setup-tools
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
 
-  #   - name: Build and Push
-  #     uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
-  #     with:
-  #       registry-url: ${{ env.GITHUB_REGISTRY }}
-  #       registry-username: ${{ github.actor }}
-  #       registry-password: ${{ secrets.GITHUB_TOKEN }}
-  #       image-name: ${{ env.IMAGE_NAME_BACKEND }}
-  #       docker-context: server
-  #       docker-file: server/Dockerfile
-  #       metadata-tags: |
-  #         type=ref,event=branch
-  #         type=sha,format=long,prefix=,suffix=
+    # - name: Build and Push
+      # uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
+      # with:
+      #   registry-url: ${{ env.GITHUB_REGISTRY }}
+      #   registry-username: ${{ github.actor }}
+      #   registry-password: ${{ secrets.GITHUB_TOKEN }}
+      #   image-name: ${{ env.IMAGE_NAME_BACKEND }}
+      #   docker-context: server
+      #   docker-file: server/Dockerfile
+      #   metadata-tags: |
+      #     type=ref,event=branch
+      #     type=sha,format=long,prefix=,suffix=
+
+    - name: Build Docker image
+      run: docker build -t strdss-dev-image -f server/Dockerfile .
+
+    - name: Tag Docker image
+      run: docker tag strdss-dev-image https://artifacts.developer.gov.bc.ca:443/artifactory/strdss-dev-image:latest
+
+    - name: Push Docker image to Artifactory
+      run: |
+        docker login https://artifacts.developer.gov.bc.ca:443/artifactory -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push https://artifacts.developer.gov.bc.ca:443/artifactory/strdss-dev-image:latest
+
+
 
   # Docker-build-frontend:
   #   needs: [build-frontend]

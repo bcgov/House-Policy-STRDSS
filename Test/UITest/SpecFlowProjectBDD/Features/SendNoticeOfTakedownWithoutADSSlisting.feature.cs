@@ -20,8 +20,8 @@ namespace SpecFlowProjectBDD.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("SendDelistingWarningWithoutADSSListingFeature")]
-    public partial class SendDelistingWarningWithoutADSSListingFeatureFeature
+    [NUnit.Framework.DescriptionAttribute("SendNoticeOfTakedownWithoutADSSlisting")]
+    public partial class SendNoticeOfTakedownWithoutADSSlistingFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
@@ -35,7 +35,7 @@ namespace SpecFlowProjectBDD.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendDelistingWarningWithoutADSSListingFeature", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-71", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendNoticeOfTakedownWithoutADSSlisting", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-71", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,13 +80,13 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestCaseAttribute("9223372036854775807", "ListingID - Test for Max value", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
         [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Valid URL", "pass", "HTTP://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
         [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Valid URL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Long URL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Long URL SSL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
         [NUnit.Framework.TestCaseAttribute("0", "Phone Number - Valid  \'-\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "999-123-1234", "Get a business license", null)]
         [NUnit.Framework.TestCaseAttribute("0", "Phone Number - Valid  \'(\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "(999)1231234", "Get a business license", null)]
         [NUnit.Framework.TestCaseAttribute("0", "Phone Number - Valid  \'- and (\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "(999)-123-1234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("-1", "ListingID - Negative number test", "fail", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("test", "ListingID - Test for string", "fail", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("e", "ListingID - Test for exponential", "fail", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("-1", "ListingID - Negative number test", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("test", "ListingID - Test for string", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("e", "ListingID - Test for exponential", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
         [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
         public void SendNoticeOfTakedownWithoutADSSlisting(string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string govPhoneNumber, string takedownReason, string[] exampleTags)
         {
@@ -117,7 +117,7 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 7
- testRunner.Given("I am an authenticated LG staff member", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given(string.Format("I am an authenticated LG staff member and the expected result is \"{0}\"", expectedResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 9
  testRunner.When("I navigate to the delisting warning feature", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

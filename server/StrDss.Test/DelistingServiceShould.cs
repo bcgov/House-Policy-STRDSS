@@ -19,7 +19,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_ValidDto_ReturnsNoErrors(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -34,7 +34,7 @@ namespace StrDss.Test
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Empty(result);
@@ -43,7 +43,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_NullPlatform_ReturnsPlatformIdError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -54,7 +54,7 @@ namespace StrDss.Test
             dto.PlatformId = 0;
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("platformId", result.Keys);
@@ -65,7 +65,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_EmptyListingUrl_ReturnsListingUrlError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
@@ -77,7 +77,7 @@ namespace StrDss.Test
             dto.ListingUrl = string.Empty;
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("listingUrl", result.Keys);
@@ -88,7 +88,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidListingUrl_ReturnsInvalidUrlError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
@@ -100,7 +100,7 @@ namespace StrDss.Test
             dto.ListingUrl = "invalidurl";
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("listingUrl", result.Keys);
@@ -111,7 +111,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_HostEmailSentFalseAndEmptyHostEmail_ReturnsHostEmailRequiredError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
@@ -124,7 +124,7 @@ namespace StrDss.Test
             dto.HostEmail = string.Empty;
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("hostEmail", result.Keys);
@@ -135,7 +135,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidHostEmail_ReturnsInvalidHostEmailError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
@@ -147,7 +147,7 @@ namespace StrDss.Test
             dto.HostEmail = "invalidemail";
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("hostEmail", result.Keys);
@@ -158,7 +158,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_NullReason_ReturnsReasonIdError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
@@ -170,7 +170,7 @@ namespace StrDss.Test
             dto.ReasonId = 0;
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("reasonId", result.Keys);
@@ -181,7 +181,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidCcListEmail_ReturnsInvalidCcListEmailError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
@@ -193,7 +193,7 @@ namespace StrDss.Test
             dto.CcList = new List<string> { "invalidemail" };
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("ccList", result.Keys);
@@ -204,7 +204,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_EmptyLgContactEmail_ReturnsLgContactEmailRequiredError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
@@ -216,7 +216,7 @@ namespace StrDss.Test
             dto.LgContactEmail = string.Empty;
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("lgContactEmail", result.Keys);
@@ -227,7 +227,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidLgContactEmail_ReturnsInvalidLgContactEmailError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
@@ -239,7 +239,7 @@ namespace StrDss.Test
             dto.LgContactEmail = "invalidemail";
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("lgContactEmail", result.Keys);
@@ -250,7 +250,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidLgContactPhone_ReturnsInvalidLgContactPhoneError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
@@ -262,7 +262,7 @@ namespace StrDss.Test
             dto.LgContactPhone = "invalidphone";
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("lgContactPhone", result.Keys);
@@ -273,7 +273,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidStrBylawUrl_ReturnsStrBylawUrlRequiredError(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
@@ -285,7 +285,7 @@ namespace StrDss.Test
             dto.StrBylawUrl = "invalidurl";
 
             // Act
-            var result = await sut.CreateDelistingWarningAsync(dto);;
+            var result = await sut.CreateTakedownNoticeAsync(dto);;
 
             // Assert
             Assert.Contains("strByLawUrl", result.Keys);
@@ -296,7 +296,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingRequest_NullPlatform_ReturnsPlatformIdError(
-            DelistingRequestCreateDto dto,
+            TakedownRequestCreateDto dto,
             OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -307,7 +307,7 @@ namespace StrDss.Test
             dto.PlatformId = 0;
 
             // Act
-            var result = await sut.CreateDelistingRequestAsync(dto);
+            var result = await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
             Assert.Contains("platformId", result.Keys);
@@ -318,7 +318,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingRequest_NullLocalGovernment_ReturnsLocalGovernmentIdError(
-            DelistingRequestCreateDto dto,
+            TakedownRequestCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
@@ -329,7 +329,7 @@ namespace StrDss.Test
             dto.LgId = 0;
 
             // Act
-            var result = await sut.CreateDelistingRequestAsync(dto);
+            var result = await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
             Assert.Contains("lgId", result.Keys);
@@ -340,7 +340,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingRequest_EmptyListingUrl_ReturnsListingUrlError(
-            DelistingRequestCreateDto dto,
+            TakedownRequestCreateDto dto,
             OrganizationDto platform,
             OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
@@ -352,7 +352,7 @@ namespace StrDss.Test
             dto.ListingUrl = string.Empty;
 
             // Act
-            var result = await sut.CreateDelistingRequestAsync(dto);
+            var result = await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
             Assert.Contains("listingUrl", result.Keys);
@@ -363,7 +363,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingRequest_InvalidListingUrl_ReturnsInvalidUrlError(
-            DelistingRequestCreateDto dto,
+            TakedownRequestCreateDto dto,
             OrganizationDto platform,
             OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
@@ -375,7 +375,7 @@ namespace StrDss.Test
             dto.ListingUrl = "invalidurl";
 
             // Act
-            var result = await sut.CreateDelistingRequestAsync(dto);
+            var result = await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
             Assert.Contains("listingUrl", result.Keys);
@@ -386,7 +386,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingRequest_InvalidCcListEmail_ReturnsInvalidCcListEmailError(
-            DelistingRequestCreateDto dto,
+            TakedownRequestCreateDto dto,
             OrganizationDto platform,
             OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
@@ -398,7 +398,7 @@ namespace StrDss.Test
             dto.CcList = new List<string> { "invalidemail" };
 
             // Act
-            var result = await sut.CreateDelistingRequestAsync(dto);
+            var result = await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
             Assert.Contains("ccList", result.Keys);
@@ -409,7 +409,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenCalled_ShouldSendEmail(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
@@ -423,7 +423,7 @@ namespace StrDss.Test
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             emailRepositoryMock.Setup(x => x.AddEmailMessage(It.IsAny<DssEmailMessage>()));
             // Act
-            await sut.CreateDelistingWarningAsync(dto);
+            await sut.CreateTakedownNoticeAsync(dto);
 
             // Assert
             emailServiceMock.Verify(m => m.SendEmailAsync(It.IsAny<EmailContent>()), Times.Once);
@@ -432,7 +432,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenHostEmailIsNotEmpty_AddsHostEmailToToList(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
@@ -445,7 +445,7 @@ namespace StrDss.Test
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Act
-            await sut.CreateDelistingWarningAsync(dto);
+            await sut.CreateTakedownNoticeAsync(dto);
 
             // Assert
             Assert.Contains(dto.HostEmail, dto.ToList);
@@ -454,7 +454,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenHostEmailIsEmpty_DoesNotAddHostEmailToToList(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
@@ -464,7 +464,7 @@ namespace StrDss.Test
             dto.HostEmail = string.Empty;
 
             // Act
-            await sut.CreateDelistingWarningAsync(dto);
+            await sut.CreateTakedownNoticeAsync(dto);
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Assert
@@ -474,7 +474,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToCcList(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
@@ -489,7 +489,7 @@ namespace StrDss.Test
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Act
-            await sut.CreateDelistingWarningAsync(dto);
+            await sut.CreateTakedownNoticeAsync(dto);
 
             // Assert
             Assert.Contains(currentUserEmail, dto.CcList);
@@ -498,7 +498,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
-            DelistingWarningCreateDto dto,
+            TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
@@ -511,7 +511,7 @@ namespace StrDss.Test
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Act
-            await sut.CreateDelistingWarningAsync(dto);
+            await sut.CreateTakedownNoticeAsync(dto);
 
             // Assert
             Assert.DoesNotContain(currentUserEmail, dto.CcList);
@@ -520,7 +520,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task SendDelistingRequestAsync_WhenCalled_ShouldSendEmail(
-            DelistingRequestCreateDto dto,
+            TakedownRequestCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
@@ -536,7 +536,7 @@ namespace StrDss.Test
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.LgId)).ReturnsAsync(lg);
 
             // Act
-            await sut.CreateDelistingRequestAsync(dto);
+            await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
             emailServiceMock.Verify(m => m.SendEmailAsync(It.IsAny<EmailContent>()), Times.Once);
@@ -545,7 +545,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task SendDelistingRequestAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToCcList(
-            DelistingRequestCreateDto dto,
+            TakedownRequestCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
@@ -563,7 +563,7 @@ namespace StrDss.Test
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.LgId)).ReturnsAsync(lg);
 
             // Act
-            await sut.CreateDelistingRequestAsync(dto);
+            await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
             Assert.Contains(currentUserEmail, dto.CcList);
@@ -572,7 +572,7 @@ namespace StrDss.Test
         [Theory]
         [AutoDomainData]
         public async Task SendDelistingRequestAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
-            DelistingRequestCreateDto dto,
+            TakedownRequestCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
@@ -584,7 +584,7 @@ namespace StrDss.Test
             currentUserMock.Setup(m => m.EmailAddress).Returns("user@example.com");
 
             // Act
-            await sut.CreateDelistingRequestAsync(dto);
+            await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
             Assert.DoesNotContain(currentUserEmail, dto.CcList);

@@ -17,13 +17,19 @@ namespace StrDss.Service.EmailTemplates
         public IEnumerable<string> Cc { get; set; } = new List<string>();   
         public IEnumerable<string> Bcc { get; set; } = new List<string>();
         public string Info { get; set; }
+        public bool Preview { get; set; } = false;
+
+        public string GetPreviewContent()
+        {
+            return $@"To: {string.Join(";", To)}<br/>cc: {string.Join(";", Cc)}<br/><br/>";
+        }
 
         public virtual string GetContent()
         {
             return "";
         }
 
-        public async Task SendEmail()
+        public async Task<bool> SendEmail()
         {
             var emailContent = new EmailContent
             {
@@ -36,7 +42,7 @@ namespace StrDss.Service.EmailTemplates
                 Info = Info
             };
 
-            await _emailService.SendEmailAsync(emailContent);
+            return await _emailService.SendEmailAsync(emailContent);
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using StrDss.Common;
 using StrDss.Data;
+using StrDss.Data.Entities;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.UserDtos;
@@ -25,14 +26,16 @@ namespace StrDss.Service
         private IUserRepository _userRepo;
         private IOrganizationRepository _orgRepo;
         private IEmailMessageService _emailService;
+        private IEmailMessageRepository _emailRepo;
 
         public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService)
+            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
             _userRepo = userRepo;
             _orgRepo = orgRepo;
             _emailService = emailService;
+            _emailRepo = emailRepo;
         }
 
         public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction)
@@ -92,6 +95,8 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
+            var user = _userRepo.GetUserByGuid(_currentUser.UserGuid);
+
             var adminUsers = await _userRepo.GetAdminUsers();
 
             if (adminUsers.Count > 0)
@@ -105,7 +110,34 @@ namespace StrDss.Service
                     Info = $"New Access Request email for {_currentUser.DisplayName}"
                 };
 
-                await template.SendEmail();
+                var sent = await template.SendEmail();
+
+                if (sent)
+                {
+                    var emailEntity = new DssEmailMessage
+                    {
+                        EmailMessageType = EmailMessageTypes.AccessRequested,
+                        MessageDeliveryDtm = DateTime.UtcNow,
+                        MessageTemplateDsc = template.GetContent(),
+                        IsHostContactedExternally = false,
+                        IsSubmitterCcRequired = false,
+                        MessageReasonId = null,
+                        LgPhoneNo = null,
+                        UnreportedListingNo = null,
+                        HostEmailAddressDsc = null,
+                        LgEmailAddressDsc = null,
+                        CcEmailAddressDsc = null,
+                        UnreportedListingUrl = null,
+                        LgStrBylawUrl = null,
+                        InitiatingUserIdentityId = _currentUser.Id,
+                        AffectedByUserIdentityId = user.Id,
+                        InvolvedInOrganizationId = null
+                    };
+
+                    await _emailRepo.AddEmailMessage(emailEntity);
+
+                    _unitOfWork.Commit();
+                }
             }
 
             return errors;
@@ -194,7 +226,34 @@ namespace StrDss.Service
                 Info = $"Denial email for {user.DisplayNm}"
             };
 
-            await template.SendEmail();
+            var sent = await template.SendEmail();
+
+            if (sent)
+            {
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = EmailMessageTypes.AccessDenied,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = false,
+                    MessageReasonId = null,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = null,
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = null,
+                    UnreportedListingUrl = null,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = _currentUser.Id,
+                    AffectedByUserIdentityId = user.UserIdentityId,
+                    InvolvedInOrganizationId = null
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                _unitOfWork.Commit();
+            }
 
             return errors;
         }
@@ -269,7 +328,34 @@ namespace StrDss.Service
                 Info = $"Approval email for {user.DisplayNm}"
             };
 
-            await template.SendEmail();
+            var sent = await template.SendEmail();
+
+            if (sent)
+            {
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = EmailMessageTypes.AccessGranted,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = false,
+                    MessageReasonId = null,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = null,
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = null,
+                    UnreportedListingUrl = null,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = _currentUser.Id,
+                    AffectedByUserIdentityId = user.UserIdentityId,
+                    InvolvedInOrganizationId = null
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                _unitOfWork.Commit();
+            }
 
             return errors;
         }

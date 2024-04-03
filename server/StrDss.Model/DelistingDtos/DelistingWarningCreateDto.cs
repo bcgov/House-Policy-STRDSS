@@ -2,7 +2,7 @@
 
 namespace StrDss.Model.DelistingDtos
 {
-    public class DelistingWarningCreateDto
+    public class TakedownNoticeCreateDto
     {
         public long PlatformId { get; set; }
         public long? ListingId { get; set; }

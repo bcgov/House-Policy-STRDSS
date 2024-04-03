@@ -9,7 +9,7 @@
 
         public string Reason { get; set; } = "";
         public string Url { get; set; } = "";
-        public string ListingId { get; set; } = "";
+        public long? ListingId { get; set; }
         public string LgContactInfo { get; set; } = "";
         public string LgStrBylawLink { get; set; } = "";
         public string Comment { get; set; }

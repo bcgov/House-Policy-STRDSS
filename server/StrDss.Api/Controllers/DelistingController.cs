@@ -33,8 +33,8 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize]
-        [HttpGet("reasons/dropdown", Name = "GetWarningReasonDropdown")]
-        public async Task<ActionResult<List<DropdownNumDto>>> GetWarningReasonDropdown()
+        [HttpGet("reasons/dropdown", Name = "GetReasonDropdown")]
+        public async Task<ActionResult<List<DropdownNumDto>>> GetReasonDropdown()
         {
             return await _emailService.GetMessageReasons(EmailMessageTypes.NoticeOfTakedown);
         }

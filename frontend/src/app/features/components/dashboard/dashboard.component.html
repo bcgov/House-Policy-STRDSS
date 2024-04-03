@@ -1,2 +1,11 @@
 <h2>Home</h2>
-<app-lg-staff-user-screen></app-lg-staff-user-screen>
+
+<div class="cards">
+    <p-card class="dashboard-card" *ngFor="let card of cardsToDisplay" [header]="card.title">
+        <p class="m-0">
+            {{card.description}}
+        </p>
+        <p-button [disabled]="card.isButtonDisabled" [label]="card.buttonText" id="navigate-to-compliance-notice-btn"
+            (click)="navigateTo(card.route)"></p-button>
+    </p-card>
+</div>

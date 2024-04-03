@@ -171,6 +171,14 @@ body {
         }
     }
 
+    .dashboard-card {
+        .p-card {
+            .p-card-body {
+                min-height: 200px;
+            }
+        }
+    }
+
     .p-dialog {
         border-radius: 4px;
 

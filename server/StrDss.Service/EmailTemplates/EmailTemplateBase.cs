@@ -17,6 +17,12 @@ namespace StrDss.Service.EmailTemplates
         public IEnumerable<string> Cc { get; set; } = new List<string>();   
         public IEnumerable<string> Bcc { get; set; } = new List<string>();
         public string Info { get; set; }
+        public bool Preview { get; set; } = false;
+
+        public string GetPreviewContent()
+        {
+            return $@"To: {string.Join(";", To)}<br/>cc: {string.Join(";", Cc)}<br/><br/>";
+        }
 
         public virtual string GetContent()
         {

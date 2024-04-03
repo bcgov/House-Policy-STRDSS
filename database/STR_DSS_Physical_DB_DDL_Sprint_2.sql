@@ -1,3 +1,4 @@
+/* Create all Sprint 2 DB Objects STR DSS */
 
 CREATE  TABLE dss_access_request_status ( 
 	access_request_status_cd         varchar(25)  NOT NULL  ,
@@ -144,29 +145,6 @@ ALTER TABLE dss_user_role_privilege ADD CONSTRAINT dss_user_role_privilege_fk_co
 
 ALTER TABLE dss_user_role_privilege ADD CONSTRAINT dss_user_role_privilege_fk_conferring FOREIGN KEY ( user_privilege_cd ) REFERENCES dss_user_privilege( user_privilege_cd );
 
-
-CREATE OR REPLACE FUNCTION dss_update_audit_columns() RETURNS trigger
-    LANGUAGE plpgsql AS
-$$BEGIN
-    NEW.upd_dtm := current_timestamp;
-    RETURN NEW;
-END;$$;
-
-CREATE OR REPLACE TRIGGER dss_organization_br_iu_tr
-     BEFORE INSERT OR UPDATE ON dss_organization
-    FOR EACH ROW
-    EXECUTE PROCEDURE dss_update_audit_columns();
-
-CREATE OR REPLACE TRIGGER dss_organization_contact_person_br_iu_tr
-     BEFORE INSERT OR UPDATE ON dss_organization_contact_person
-    FOR EACH ROW
-    EXECUTE PROCEDURE dss_update_audit_columns();
-	
-CREATE OR REPLACE TRIGGER dss_user_identity_br_iu_tr
-     BEFORE INSERT OR UPDATE ON dss_user_identity
-    FOR EACH ROW
-    EXECUTE PROCEDURE dss_update_audit_columns();
-
 COMMENT ON COLUMN dss_message_reason.message_reason_dsc IS 'A description of the justification for initiating a message';
 
 COMMENT ON TABLE dss_user_privilege IS 'A granular access right or privilege within the application that may be granted to a role';
@@ -286,3 +264,25 @@ COMMENT ON COLUMN dss_email_message.initiating_user_identity_id IS 'Foreign key'
 COMMENT ON COLUMN dss_email_message.affected_by_user_identity_id IS 'Foreign key';
 
 COMMENT ON COLUMN dss_email_message.involved_in_organization_id IS 'Foreign key';
+
+CREATE OR REPLACE FUNCTION dss_update_audit_columns() RETURNS trigger
+    LANGUAGE plpgsql AS
+$$BEGIN
+    NEW.upd_dtm := current_timestamp;
+    RETURN NEW;
+END;$$;
+
+CREATE OR REPLACE TRIGGER dss_organization_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_organization
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();
+
+CREATE OR REPLACE TRIGGER dss_organization_contact_person_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_organization_contact_person
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();
+	
+CREATE OR REPLACE TRIGGER dss_user_identity_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_user_identity
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();

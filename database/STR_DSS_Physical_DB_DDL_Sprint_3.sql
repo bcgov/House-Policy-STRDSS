@@ -71,12 +71,13 @@ CREATE  TABLE dss_organization_contact_person (
 CREATE  TABLE dss_physical_address ( 
 	physical_address_id  bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
 	original_address_txt varchar(250)  NOT NULL  ,
+	match_result_json    json    ,
 	match_address_txt    varchar(250)    ,
 	match_score_amt      smallint    ,
 	site_no              varchar(50)    ,
 	block_no             varchar(50)    ,
-	is_exempt            boolean    ,
 	location_geometry    geometry    ,
+	is_exempt            boolean    ,
 	containing_organization_id bigint    ,
 	upd_dtm              timestamptz  NOT NULL  ,
 	upd_user_guid        uuid    ,
@@ -293,9 +294,19 @@ COMMENT ON COLUMN dss_physical_address.physical_address_id IS 'Unique generated 
 
 COMMENT ON COLUMN dss_physical_address.original_address_txt IS 'The source-provided address of a short-term rental offering';
 
+COMMENT ON COLUMN dss_physical_address.match_result_json IS 'Full JSON result of the source address matching attempt';
+
 COMMENT ON COLUMN dss_physical_address.match_address_txt IS 'The sanitized physical address that has been derived from the original';
 
+COMMENT ON COLUMN dss_physical_address.match_score_amt IS 'The relative score returned from the address matching attempt';
+
+COMMENT ON COLUMN dss_physical_address.site_no IS 'The siteID returned by the address match';
+
+COMMENT ON COLUMN dss_physical_address.block_no IS 'The blockID returned by the address match';
+
 COMMENT ON COLUMN dss_physical_address.location_geometry IS 'The computed location point of the matched address';
+
+COMMENT ON COLUMN dss_physical_address.is_exempt IS 'Indicates whether the address has been identified as exempt from Short Term Rental regulations';
 
 COMMENT ON COLUMN dss_physical_address.containing_organization_id IS 'Foreign key';
 

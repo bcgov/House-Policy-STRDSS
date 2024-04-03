@@ -45,7 +45,7 @@ namespace StrDss.Test.AutoDomainDataBuilder
                             IsPrimary = true,
                             GivenNm = "John",
                             FamilyNm = "Doe",
-                            PhoneNo = "(999) 999-9999",
+                            PhoneNo = "999-999-9999",
                             EmailAddressDsc = "foo@foo.com",
                             ContactedThroughOrganizationId = 0
                         } 

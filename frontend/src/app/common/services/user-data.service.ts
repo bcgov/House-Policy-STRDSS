@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { DropdownOption } from '../models/dropdown-option';
+import { User } from '../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,8 @@ export class UserDataService {
 
   constructor(private httpClient: HttpClient) { }
 
-  getCurrentUser(): Observable<unknown> {
-    return this.httpClient.get<unknown>(`${environment.API_HOST}/users/currentuser`);
+  getCurrentUser(): Observable<User> {
+    return this.httpClient.get<User>(`${environment.API_HOST}/users/currentuser`);
   }
 
   getUsers(status: string, search: string, organizationId: number | null, pageSize: number, pageNumber: number, orderBy: string, direction: 'asc' | 'desc'): Observable<any> {

@@ -8,26 +8,42 @@
         font-size: 24px;
         font-weight: 700;
         margin-top: 0;
+        margin-bottom: 0;
     }
 
-    .cards-row {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 24px;
+        /* Optional margin for spacing */
+        justify-items: space-between;
+        /* Evenly distribute items */
 
+
+        /* Evenly distribute items */
         p-card {
-            margin-left: 12px;
-            margin-right: 12px;
-            flex: 1 1 0%;
-            width: 33.33%;
-
-            &:first-of-type {
-                margin-left: 0;
+            &:first-child {
+                height: 195px;
             }
 
-            &:last-of-type {
-                margin-right: 0;
-            }
+            // margin-left: 12px;
+            // margin-right: 12px;
+            // flex: 1 1 0%;
+            // width: 33.33%;
+            // flex: 1 0 33.33%;
+            // /* Flex ratio, minimum width, and no shrinking */
+            // width: 33.33%;
+            // /* Optional for initial layout (can be removed) */
+            // margin: 5px;
+
+            /* Optional margin for spacing */
+            // &:first-of-type {
+            //     margin-left: 0;
+            // }
+
+            // &:last-of-type {
+            //     margin-right: 0;
+            // }
         }
     }
 }

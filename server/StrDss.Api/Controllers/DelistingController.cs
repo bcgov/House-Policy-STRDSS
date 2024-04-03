@@ -33,17 +33,17 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize]
-        [HttpGet("reasons/dropdown", Name = "GetWarningReasonDrowdown")]
-        public async Task<ActionResult<List<DropdownNumDto>>> GetWarningReasonDrowdown()
+        [HttpGet("reasons/dropdown", Name = "GetWarningReasonDropdown")]
+        public async Task<ActionResult<List<DropdownNumDto>>> GetWarningReasonDropdown()
         {
             return await _emailService.GetMessageReasons(EmailMessageTypes.NoticeOfTakedown);
         }
 
         [ApiAuthorize(Permissions.TakedownAction)]
-        [HttpPost("warnings", Name = "CreateDelistingWarning")]
-        public async Task<ActionResult> CreateDelistingWarning(DelistingWarningCreateDto dto)
+        [HttpPost("warnings", Name = "CreateTakedownNotice")]
+        public async Task<ActionResult> CreateTakedownNotice(TakedownNoticeCreateDto dto)
         {
-            var errors = await _delistingService.CreateDelistingWarningAsync(dto);
+            var errors = await _delistingService.CreateTakedownNoticeAsync(dto);
             if (errors.Count > 0)
             {
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
@@ -53,10 +53,10 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.TakedownAction)]
-        [HttpPost("warnings/preview", Name = "GetDelistingWarningPreview")]
-        public async Task<ActionResult<EmailPreview>> GetDelistingWarningPreview(DelistingWarningCreateDto dto)
+        [HttpPost("warnings/preview", Name = "GetTakedownNoticePreview")]
+        public async Task<ActionResult<EmailPreview>> GetTakedownNoticePreview(TakedownNoticeCreateDto dto)
         {
-            var (errors, preview) = await _delistingService.GetDelistingWarningPreviewAsync(dto);
+            var (errors, preview) = await _delistingService.GetTakedownNoticePreviewAsync(dto);
             if (errors.Count > 0)
             {
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
@@ -66,10 +66,10 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.TakedownAction)]
-        [HttpPost("requests", Name = "CreateDelistingRequest")]
-        public async Task<ActionResult> CreateDelistingRequest(DelistingRequestCreateDto dto)
+        [HttpPost("requests", Name = "CreateTakedownRequest")]
+        public async Task<ActionResult> CreateTakedownRequest(TakedownRequestCreateDto dto)
         {
-            var errors = await _delistingService.CreateDelistingRequestAsync(dto);
+            var errors = await _delistingService.CreateTakedownRequestAsync(dto);
             if (errors.Count > 0)
             {
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
@@ -79,10 +79,10 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.TakedownAction)]
-        [HttpPost("requests/preview", Name = "GetDelistingRequestPreview")]
-        public async Task<ActionResult<EmailPreview>> GetDelistingRequestPreview(DelistingRequestCreateDto dto)
+        [HttpPost("requests/preview", Name = "GetTakedownRequestPreview")]
+        public async Task<ActionResult<EmailPreview>> GetTakedownRequestPreview(TakedownRequestCreateDto dto)
         {
-            var (errors, preview) = await _delistingService.GetDelistingRequestPreviewAsync(dto);
+            var (errors, preview) = await _delistingService.GetTakedownRequestPreviewAsync(dto);
             if (errors.Count > 0)
             {
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);

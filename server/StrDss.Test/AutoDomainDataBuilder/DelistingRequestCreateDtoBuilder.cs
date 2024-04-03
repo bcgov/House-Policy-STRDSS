@@ -24,20 +24,20 @@ namespace StrDss.Test.AutoDomainDataBuilder
 
             switch (pi.Name)
             {
-                case nameof(DelistingRequestCreateDto.PlatformId):
+                case nameof(TakedownRequestCreateDto.PlatformId):
                     return 1;
-                case nameof(DelistingRequestCreateDto.ListingId):
+                case nameof(TakedownRequestCreateDto.ListingId):
                     return 1;
-                case nameof(DelistingRequestCreateDto.LgId):
+                case nameof(TakedownRequestCreateDto.LgId):
                     return 2;
 
-                case nameof(DelistingRequestCreateDto.ListingUrl):
+                case nameof(TakedownRequestCreateDto.ListingUrl):
                     return "https://example.com/listing";
 
-                case nameof(DelistingRequestCreateDto.SendCopy):
+                case nameof(TakedownRequestCreateDto.SendCopy):
                     return true;
 
-                case nameof(DelistingRequestCreateDto.CcList):
+                case nameof(TakedownRequestCreateDto.CcList):
                     return new List<string> { "cc1@example.com", "cc2@example.com" };
 
                 default:

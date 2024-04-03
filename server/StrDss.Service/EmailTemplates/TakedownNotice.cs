@@ -17,7 +17,7 @@
         {
             Subject = "Notice of Takedown of Short Term Rental Platform Offer";
 
-            return (preview ? GetPreviewContent() : "") + $@"
+            return (Preview ? GetPreviewContent() : "") + $@"
 Dear Short-term Rental Host,<br/><br/>
 Short-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>
 Short-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>

@@ -132,11 +132,25 @@
 
     public static class EmailMessageTypes
     {
-        public const string AccessGrantedNotification = "Access Granted Notification";
-        public const string DelistingWarning = "Delisting Warning";
+        public const string ComplianceOrder = "Compliance Order";
+        public const string AccessGranted = "Access Granted";
+        public const string EscalationRequest = "Escalation Request";
         public const string TakedownRequest = "Takedown Request";
-        public const string DelistingRequest = "Delisting Request";
-        public const string AccessDeniedNotification = "Access Denied Notification";
+        public const string AccessRequested = "Access Requested";
+        public const string AccessDenied = "Access Denied";
         public const string NoticeOfTakedown = "Notice of Takedown";
     }
+
+    public static class Permissions
+    {
+        public const string CeuAction = "ceu_action";
+        public const string AuditRead = "audit_read";
+        public const string ListingRead = "listing_read";
+        public const string TakedownAction = "takedown_action";
+        public const string UserRead = "user_read";
+        public const string LicenceFileUpload = "licence_file_upload";
+        public const string ListingFileUpload = "listing_file_upload";
+        public const string UserWrite = "user_write";
+    }
+
 }

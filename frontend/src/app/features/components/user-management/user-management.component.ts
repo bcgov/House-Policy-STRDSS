@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { CommonModule } from '@angular/common';
@@ -8,7 +8,7 @@ import { RequestAccessService } from '../../../common/services/request-access.se
 import { AccessRequestTableItem } from '../../../common/models/access-request-table-item';
 import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { DialogModule } from 'primeng/dialog';
-import { PaginatorModule } from 'primeng/paginator';
+import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DateFormatPipe } from '../../../common/pipes/date-format.pipe';
 import { InputSwitchModule } from 'primeng/inputswitch';
@@ -40,16 +40,19 @@ import { ToastModule } from 'primeng/toast';
   styleUrl: './user-management.component.scss'
 })
 export class UserManagementComponent implements OnInit {
+  @ViewChild("paginator") paginator!: Paginator;
+
   statuses = new Array<DropdownOption>();
   organizationTypes = new Array<DropdownOption>();
   organizations = new Array<DropdownOption>();
+  organizationDropdown = new Array<DropdownOption>();
 
   accessRequests = new Array<AccessRequestTableItem>();
   currentPage!: PagingResponsePageInfo;
 
   searchParams = {
     searchStatus: '',
-    searchOrganization: '',
+    searchOrganization: null,
     searchTerm: '',
   }
 
@@ -62,9 +65,6 @@ export class UserManagementComponent implements OnInit {
 
   myForm!: FormGroup;
 
-  first = 0;
-  total = 120;
-
   constructor(private requestAccessService: RequestAccessService, private userDataService: UserDataService, private fb: FormBuilder, private confirmationService: ConfirmationService, private messageService: MessageService) { }
 
   ngOnInit(): void {
@@ -73,7 +73,13 @@ export class UserManagementComponent implements OnInit {
   }
 
   onSearchModelChanged(): void {
+    if (this.paginator) {
+      this.paginator.changePage(0);
 
+      if (this.paginator.empty()) {
+        this.getUsers();
+      }
+    }
   }
 
   onApprovePopup(accessRequest: AccessRequestTableItem): void {
@@ -87,10 +93,10 @@ export class UserManagementComponent implements OnInit {
   }
 
   onPageChange(pagingEvent: any): void {
-    console.log('pagingEvent', pagingEvent);
+    this.getUsers(pagingEvent.page + 1);
   }
 
-  onApprove(orgTypeIdElem: Dropdown, orgId: Dropdown): void {
+  onApprove(_orgTypeIdElem: Dropdown, orgId: Dropdown): void {
     const model = {
       userIdentityId: this.currentTableItem.userIdentityId,
       representedByOrganizationId: orgId.value,
@@ -104,13 +110,16 @@ export class UserManagementComponent implements OnInit {
     this.requestAccessService.approveAccessRequest(model).subscribe({
       next: () => {
         this.getUsers();
-        this.onPopupClose()
+        this.onPopupClose();
       },
       error: (msg) => {
         if (msg.error.status === 422) {
           this.handleConcurrencyError(msg);
+        } else {
+          this.showErrorToast('Error', 'Unable to change user\'s access status. Check console for additional details')
         }
-        this.onPopupClose()
+        console.error(msg);
+        this.onPopupClose();
       }
     });
   }
@@ -124,13 +133,17 @@ export class UserManagementComponent implements OnInit {
     this.requestAccessService.denyAccessRequest(model).subscribe({
       next: () => {
         this.getUsers();
-        this.onPopupClose()
+        this.onPopupClose();
       },
       error: (msg) => {
         if (msg.error.status === 422) {
           this.handleConcurrencyError(msg);
         }
-        this.onPopupClose()
+        else {
+          this.showErrorToast('Error', 'Unable to change user\'s access status. Check console for additional details')
+        }
+        console.error(msg);
+        this.onPopupClose();
       }
     });
   }
@@ -170,8 +183,14 @@ export class UserManagementComponent implements OnInit {
           next: () => {
             this.getUsers();
           },
-          error: (error) => {
-            console.error(error);
+          error: (msg) => {
+            if (msg.error.status === 422) {
+              this.handleConcurrencyError(msg);
+            }
+            else {
+              this.showErrorToast('Error', 'Unable to change user\'s active status. Check console for additional details')
+            }
+            console.error(msg);
           }
         })
         accessRequest.isEnabled = !accessRequest.isEnabled;
@@ -197,42 +216,58 @@ export class UserManagementComponent implements OnInit {
   private initData(): void {
     this.userDataService.getStatuses().subscribe({
       next: (data: Array<DropdownOption>) => {
-        this.statuses = data;
-      }
-    })
+        this.statuses = [{ label: 'All', value: '' }, ...data];
+      },
+      error: (error) => {
+        this.showErrorToast('Error', 'Unable to retrieve Statuses. Check console for additional details')
+        console.error(error);
+      },
+    });
 
     this.requestAccessService.getOrganizations().subscribe({
       next: (data) => {
         this.organizations = data;
+        this.organizationDropdown = [{ label: 'All', value: '' }, ...data];
       },
       error: (error: any) => {
+        this.showErrorToast('Error', 'Unable to retrieve Organizations. Check console for additional details')
         console.log(error);
       }
-    })
+    });
 
     this.requestAccessService.getOrganizationTypes().subscribe({
       next: (data) => {
         this.organizationTypes = data;
       },
       error: (error: any) => {
-        console.log(error);
+        this.showErrorToast('Error', 'Unable to retrieve Organization Types. Check console for additional details')
+        console.error(error);
       }
-    })
+    });
 
     this.getUsers();
   }
 
-  private getUsers(): void {
-    this.requestAccessService.getAccessRequests({ pageNumber: this.currentPage?.pageNumber || 1, pageSize: 10 }).subscribe({
+  private getUsers(selectedPageNumber?: number): void {
+    const status = this.searchParams.searchStatus;
+    const search = this.searchParams.searchTerm;
+    const organizationId = this.searchParams.searchOrganization;
+    const pageSize = this.currentPage?.pageSize || 10;
+    const pageNumber = selectedPageNumber ?? (this.currentPage?.pageNumber || 0);
+    const orderBy = '';
+    const direction = 'desc';
+
+    this.userDataService.getUsers(status, search, organizationId, pageSize, pageNumber, orderBy, direction).subscribe({
       next: (response: PagingResponse<AccessRequestTableItem>) => {
         this.accessRequests = response.sourceList;
         this.currentPage = response.pageInfo;
-        console.log(response);
+
       },
       error: (error: any) => {
+        this.showErrorToast('Error', 'Unable to retrieve users. Check console for additional details')
         console.error(error);
       }
-    })
+    });
   }
 
   private showErrorToast(title: string, errorMsg: string) {

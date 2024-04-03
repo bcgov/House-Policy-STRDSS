@@ -1,3 +1,4 @@
+/* Create all Sprint 3 DB Objects STR DSS */
 
 CREATE  TABLE dss_access_request_status ( 
 	access_request_status_cd varchar(25)  NOT NULL  ,
@@ -72,26 +73,9 @@ CREATE  TABLE dss_physical_address (
 	original_address_txt varchar(250)  NOT NULL  ,
 	match_address_txt    varchar(250)    ,
 	match_score_amt      smallint    ,
-	match_precision_dsc  varchar(50)    ,
-	match_precision_amt  smallint    ,
-	site_nm              varchar(50)    ,
-	unit_designator_txt  varchar(50)    ,
-	unit_no              varchar(50)    ,
-	unit_number_suffix_txt varchar(50)    ,
-	civic_no             varchar(50)    ,
-	civic_number_suffix_txt varchar(50)    ,
-	street_nm            varchar(100)    ,
-	street_type_dsc      varchar(50)    ,
-	is_street_type_prefix boolean    ,
-	street_direction_dsc varchar(50)    ,
-	is_street_direction_prefix boolean    ,
-	street_qualifier_dsc varchar(50)    ,
-	locality_nm          varchar(100)    ,
-	locality_type_dsc    varchar(50)    ,
-	electoral_area_nm    varchar(100)    ,
 	site_no              varchar(50)    ,
 	block_no             varchar(50)    ,
-	is_official          boolean    ,
+	is_exempt            boolean    ,
 	location_geometry    geometry    ,
 	containing_organization_id bigint    ,
 	upd_dtm              timestamptz  NOT NULL  ,
@@ -101,8 +85,8 @@ CREATE  TABLE dss_physical_address (
 
 CREATE  TABLE dss_rental_listing_report ( 
 	rental_listing_report_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
-	is_current           boolean  NOT NULL  ,
 	report_period_ym     date  NOT NULL  ,
+	source_bin           bytea    ,
 	providing_organization_id bigint  NOT NULL  ,
 	upd_dtm              timestamptz  NOT NULL  ,
 	upd_user_guid        uuid    ,
@@ -158,7 +142,8 @@ CREATE  TABLE dss_email_message (
 
 CREATE  TABLE dss_rental_listing ( 
 	rental_listing_id    bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
-	platform_listing_no  varchar    ,
+	platform_listing_url varchar(4000)    ,
+	platform_listing_no  varchar(25)    ,
 	business_licence_no  varchar(25)    ,
 	bc_registry_no       varchar(25)    ,
 	is_entire_unit       boolean    ,
@@ -177,6 +162,7 @@ CREATE  TABLE dss_rental_listing_contact (
 	rental_listing_contact_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
 	is_property_owner    boolean  NOT NULL  ,
 	listing_contact_nbr  smallint    ,
+	supplier_host_no     varchar(25)    ,
 	full_nm              varchar(50)    ,
 	phone_no             varchar(13)    ,
 	fax_no               varchar(13)    ,
@@ -230,28 +216,7 @@ ALTER TABLE dss_user_role_privilege ADD CONSTRAINT dss_user_role_privilege_fk_co
 
 ALTER TABLE dss_user_role_privilege ADD CONSTRAINT dss_user_role_privilege_fk_conferring FOREIGN KEY ( user_privilege_cd ) REFERENCES dss_user_privilege( user_privilege_cd );
 
-
-CREATE OR REPLACE FUNCTION dss_update_audit_columns() RETURNS trigger
-    LANGUAGE plpgsql AS
-$$BEGIN
-    NEW.upd_dtm := current_timestamp;
-    RETURN NEW;
-END;$$;
-
-CREATE OR REPLACE TRIGGER dss_organization_br_iu_tr
-     BEFORE INSERT OR UPDATE ON dss_organization
-    FOR EACH ROW
-    EXECUTE PROCEDURE dss_update_audit_columns();
-
-CREATE OR REPLACE TRIGGER dss_organization_contact_person_br_iu_tr
-     BEFORE INSERT OR UPDATE ON dss_organization_contact_person
-    FOR EACH ROW
-    EXECUTE PROCEDURE dss_update_audit_columns();
-
-CREATE OR REPLACE TRIGGER dss_user_identity_br_iu_tr
-     BEFORE INSERT OR UPDATE ON dss_user_identity
-    FOR EACH ROW
-    EXECUTE PROCEDURE dss_update_audit_columns();
+COMMENT ON TABLE dss_message_reason IS 'A description of the justification for initiating a message';
 
 COMMENT ON COLUMN dss_message_reason.message_reason_dsc IS 'A description of the justification for initiating a message';
 
@@ -331,9 +296,9 @@ COMMENT ON TABLE dss_rental_listing_report IS 'A delivery of rental listing info
 
 COMMENT ON COLUMN dss_rental_listing_report.rental_listing_report_id IS 'Unique generated key';
 
-COMMENT ON COLUMN dss_rental_listing_report.is_current IS 'Indicates whether the report is the one with the most recent reporting month for the platform (and therefore current)';
-
 COMMENT ON COLUMN dss_rental_listing_report.report_period_ym IS 'The month to which the listing information is relevant (always set to the first day of the month)';
+
+COMMENT ON COLUMN dss_rental_listing_report.source_bin IS 'The binary image of the information that was uploaded';
 
 COMMENT ON COLUMN dss_rental_listing_report.providing_organization_id IS 'Foreign key';
 
@@ -407,6 +372,8 @@ COMMENT ON TABLE dss_rental_listing IS 'A rental listing snapshot that is releva
 
 COMMENT ON COLUMN dss_rental_listing.rental_listing_id IS 'Unique generated key';
 
+COMMENT ON COLUMN dss_rental_listing.platform_listing_url IS 'URL for the short-term rental platform listing';
+
 COMMENT ON COLUMN dss_rental_listing.platform_listing_no IS 'The platform issued identification number for the listing';
 
 COMMENT ON COLUMN dss_rental_listing.business_licence_no IS 'The local government issued licence number that applies to the rental offering';
@@ -439,6 +406,8 @@ COMMENT ON COLUMN dss_rental_listing_contact.is_property_owner IS 'Indicates a p
 
 COMMENT ON COLUMN dss_rental_listing_contact.listing_contact_nbr IS 'Indicates which of the five possible supplier hosts is represented by this contact';
 
+COMMENT ON COLUMN dss_rental_listing_contact.supplier_host_no IS 'The platform identifier for the supplier host';
+
 COMMENT ON COLUMN dss_rental_listing_contact.full_nm IS 'The full name of the contact person as inluded in the listing';
 
 COMMENT ON COLUMN dss_rental_listing_contact.phone_no IS 'Phone number given for the contact';
@@ -455,3 +424,44 @@ COMMENT ON COLUMN dss_rental_listing_contact.upd_dtm IS 'Trigger-updated timesta
 
 COMMENT ON COLUMN dss_rental_listing_contact.upd_user_guid IS 'The globally unique identifier (assigned by the identity provider) for the most recent user to record a change';
 
+CREATE OR REPLACE FUNCTION dss_update_audit_columns() RETURNS trigger
+    LANGUAGE plpgsql AS
+$$BEGIN
+    NEW.upd_dtm := current_timestamp;
+    RETURN NEW;
+END;$$;
+
+CREATE OR REPLACE TRIGGER dss_organization_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_organization
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();
+
+CREATE OR REPLACE TRIGGER dss_organization_contact_person_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_organization_contact_person
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();
+
+CREATE OR REPLACE TRIGGER dss_user_identity_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_user_identity
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();
+
+CREATE OR REPLACE TRIGGER dss_physical_address_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_physical_address
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();
+
+CREATE OR REPLACE TRIGGER dss_rental_listing_report_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_rental_listing_report
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();
+
+CREATE OR REPLACE TRIGGER dss_rental_listing_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_rental_listing
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();
+
+CREATE OR REPLACE TRIGGER dss_rental_listing_contact_br_iu_tr
+     BEFORE INSERT OR UPDATE ON dss_rental_listing_contact
+    FOR EACH ROW
+    EXECUTE PROCEDURE dss_update_audit_columns();

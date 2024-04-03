@@ -205,15 +205,26 @@
 			<column name="original_address_txt" prior="is_property_owner" type="varchar" length="250" jt="12" mandatory="y" >
 				<comment><![CDATA[The source-provided address of a short-term rental offering]]></comment>
 			</column>
+			<column name="match_result_json" type="json" jt="2000" >
+				<comment><![CDATA[Full JSON result of the source address matching attempt]]></comment>
+			</column>
 			<column name="match_address_txt" prior="full_address_txt" type="varchar" length="250" jt="12" >
 				<comment><![CDATA[The sanitized physical address that has been derived from the original]]></comment>
 			</column>
-			<column name="match_score_amt" prior="address_match_score_amt" type="smallint" jt="5" />
-			<column name="site_no" type="varchar" length="50" jt="12" />
-			<column name="block_no" type="varchar" length="50" jt="12" />
-			<column name="is_exempt" prior="is_official" type="boolean" jt="16" />
+			<column name="match_score_amt" prior="address_match_score_amt" type="smallint" jt="5" >
+				<comment><![CDATA[The relative score returned from the address matching attempt]]></comment>
+			</column>
+			<column name="site_no" type="varchar" length="50" jt="12" >
+				<comment><![CDATA[The siteID returned by the address match]]></comment>
+			</column>
+			<column name="block_no" type="varchar" length="50" jt="12" >
+				<comment><![CDATA[The blockID returned by the address match]]></comment>
+			</column>
 			<column name="location_geometry" type="geometry" jt="1111" >
 				<comment><![CDATA[The computed location point of the matched address]]></comment>
+			</column>
+			<column name="is_exempt" prior="is_official" type="boolean" jt="16" >
+				<comment><![CDATA[Indicates whether the address has been identified as exempt from Short Term Rental regulations]]></comment>
 			</column>
 			<column name="containing_organization_id" prior="contacted_through_rental_listing_id" type="bigint" jt="-5" >
 				<comment><![CDATA[Foreign key]]></comment>

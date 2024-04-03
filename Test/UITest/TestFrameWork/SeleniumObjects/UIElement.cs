@@ -75,7 +75,6 @@ namespace UITest.SeleniumObjects
                 throw new ArgumentNullException("No driver defined");
             else
             {
-                Console.WriteLine(_Driver.GetType().FullName);
                 IJavaScriptExecutor js = _Driver.Driver as IJavaScriptExecutor;
                 js.ExecuteScript(JavaScript);
             }
@@ -116,6 +115,12 @@ namespace UITest.SeleniumObjects
             _Driver.WaitFor(LocatorType, Locator, Seconds);
 
             return (true);
+        }
+
+        public bool IsEnabled()
+        {
+            FindElement(LocatorType, Locator);
+            return (Element.Enabled);
         }
 
         /// <summary>

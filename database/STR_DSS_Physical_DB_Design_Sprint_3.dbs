@@ -184,26 +184,9 @@
 				<comment><![CDATA[The sanitized physical address that has been derived from the original]]></comment>
 			</column>
 			<column name="match_score_amt" prior="address_match_score_amt" type="smallint" jt="5" />
-			<column name="match_precision_dsc" prior="match_precision_txt" type="varchar" length="50" jt="12" />
-			<column name="match_precision_amt" type="smallint" jt="5" />
-			<column name="site_nm" prior="site_name_txt" type="varchar" length="50" jt="12" />
-			<column name="unit_designator_txt" prior="email_address_dsc" type="varchar" length="50" jt="12" />
-			<column name="unit_no" prior="unit_number_txt" type="varchar" length="50" jt="12" />
-			<column name="unit_number_suffix_txt" type="varchar" length="50" jt="12" />
-			<column name="civic_no" prior="civic_number_txt" type="varchar" length="50" jt="12" />
-			<column name="civic_number_suffix_txt" type="varchar" length="50" jt="12" />
-			<column name="street_nm" type="varchar" length="100" jt="12" />
-			<column name="street_type_dsc" type="varchar" length="50" jt="12" />
-			<column name="is_street_type_prefix" type="boolean" jt="16" />
-			<column name="street_direction_dsc" type="varchar" length="50" jt="12" />
-			<column name="is_street_direction_prefix" type="boolean" jt="16" />
-			<column name="street_qualifier_dsc" type="varchar" length="50" jt="12" />
-			<column name="locality_nm" type="varchar" length="100" jt="12" />
-			<column name="locality_type_dsc" type="varchar" length="50" jt="12" />
-			<column name="electoral_area_nm" type="varchar" length="100" jt="12" />
 			<column name="site_no" type="varchar" length="50" jt="12" />
 			<column name="block_no" type="varchar" length="50" jt="12" />
-			<column name="is_official" type="boolean" jt="16" />
+			<column name="is_exempt" prior="is_official" type="boolean" jt="16" />
 			<column name="location_geometry" type="geometry" jt="1111" >
 				<comment><![CDATA[The computed location point of the matched address]]></comment>
 			</column>
@@ -229,7 +212,10 @@
 				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
 				<comment><![CDATA[Unique generated key]]></comment>
 			</column>
-			<column name="platform_listing_no" type="varchar" jt="12" >
+			<column name="platform_listing_url" type="varchar" length="4000" jt="12" >
+				<comment><![CDATA[URL for the short-term rental platform listing]]></comment>
+			</column>
+			<column name="platform_listing_no" type="varchar" length="25" jt="12" >
 				<comment><![CDATA[The platform issued identification number for the listing]]></comment>
 			</column>
 			<column name="business_licence_no" prior="is_current" type="varchar" length="25" jt="12" >
@@ -278,6 +264,58 @@
 				<fk_column name="locating_physical_address_id" pk="physical_address_id" />
 			</fk>
 		</table>
+		<table name="dss_rental_listing_0" >
+			<comment><![CDATA[A rental listing snapshot that is relevant to a specific month]]></comment>
+			<column name="rental_listing_id" type="bigint" jt="-5" mandatory="y" >
+				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
+				<comment><![CDATA[Unique generated key]]></comment>
+			</column>
+			<column name="platform_listing_url" type="varchar" length="4000" jt="12" >
+				<comment><![CDATA[URL for the short-term rental platform listing]]></comment>
+			</column>
+			<column name="platform_listing_no" type="varchar" length="25" jt="12" >
+				<comment><![CDATA[The platform issued identification number for the listing]]></comment>
+			</column>
+			<column name="business_licence_no" type="varchar" length="25" jt="12" >
+				<comment><![CDATA[The local government issued licence number that applies to the rental offering]]></comment>
+			</column>
+			<column name="bc_registry_no" type="varchar" length="25" jt="12" >
+				<comment><![CDATA[The Short Term Registry issued permit number]]></comment>
+			</column>
+			<column name="is_entire_unit" type="boolean" jt="16" >
+				<comment><![CDATA[Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)]]></comment>
+			</column>
+			<column name="available_bedrooms_qty" type="smallint" jt="5" >
+				<comment><![CDATA[The number of bedrooms in the dwelling unit that are available for short term rental]]></comment>
+			</column>
+			<column name="nights_booked_qty" type="smallint" jt="5" >
+				<comment><![CDATA[The number of nights that short term rental accommodation services were provided during the reporting period]]></comment>
+			</column>
+			<column name="separate_reservations_qty" type="smallint" jt="5" >
+				<comment><![CDATA[The number of separate reservations that were taken during the reporting period]]></comment>
+			</column>
+			<column name="including_rental_listing_report_id" type="bigint" jt="-5" mandatory="y" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
+			<column name="offering_organization_id" type="bigint" jt="-5" mandatory="y" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
+			<column name="locating_physical_address_id" type="bigint" jt="-5" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
+			<column name="upd_dtm" type="timestamptz" jt="93" mandatory="y" >
+				<comment><![CDATA[Trigger-updated timestamp of last change]]></comment>
+			</column>
+			<column name="upd_user_guid" type="uuid" jt="102" >
+				<comment><![CDATA[The globally unique identifier (assigned by the identity provider) for the most recent user to record a change]]></comment>
+			</column>
+			<index name="dss_rental_listing_pk_0" unique="PRIMARY_KEY" >
+				<column name="rental_listing_id" />
+			</index>
+			<fk name="dss_rental_listing_fk_included_in_0" to_schema="dss" to_table="dss_rental_listing_report" >
+				<fk_column name="including_rental_listing_report_id" pk="rental_listing_report_id" />
+			</fk>
+		</table>
 		<table name="dss_rental_listing_contact" prior="dss_organization_contact_person_0" >
 			<comment><![CDATA[A person who has been identified as a notable contact for a particular rental listing]]></comment>
 			<column name="rental_listing_contact_id" prior="organization_contact_person_id" type="bigint" jt="-5" mandatory="y" >
@@ -289,6 +327,9 @@
 			</column>
 			<column name="listing_contact_nbr" prior="family_nm" type="smallint" jt="5" >
 				<comment><![CDATA[Indicates which of the five possible supplier hosts is represented by this contact]]></comment>
+			</column>
+			<column name="supplier_host_no" type="varchar" length="25" jt="12" >
+				<comment><![CDATA[The platform identifier for the supplier host]]></comment>
 			</column>
 			<column name="full_nm" prior="given_nm" type="varchar" length="50" jt="12" >
 				<comment><![CDATA[The full name of the contact person as inluded in the listing]]></comment>
@@ -327,11 +368,11 @@
 				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
 				<comment><![CDATA[Unique generated key]]></comment>
 			</column>
-			<column name="is_current" prior="is_active" type="boolean" jt="16" mandatory="y" >
-				<comment><![CDATA[Indicates whether the report is the one with the most recent reporting month for the platform (and therefore current)]]></comment>
-			</column>
 			<column name="report_period_ym" prior="given_nm" type="date" jt="91" mandatory="y" >
 				<comment><![CDATA[The month to which the listing information is relevant (always set to the first day of the month)]]></comment>
+			</column>
+			<column name="source_bin" type="bytea" jt="-2" >
+				<comment><![CDATA[The binary image of the information that was uploaded]]></comment>
 			</column>
 			<column name="providing_organization_id" prior="contacted_through_organization_id" type="bigint" jt="-5" mandatory="y" >
 				<comment><![CDATA[Foreign key]]></comment>
@@ -478,6 +519,18 @@
 		<trigger name="dss_organization_contact_person_br_iu_tr" table="dss_organization_contact_person" id="Trigger-ced" isSystem="false" >
 			<string><![CDATA[CREATE TRIGGER dss_organization_contact_person_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_organization_contact_person FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
 		</trigger>
+		<trigger name="dss_physical_address_br_iu_tr" table="dss_physical_address" id="Trigger-829" isSystem="false" >
+			<string><![CDATA[CREATE TRIGGER dss_physical_address_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_physical_address FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
+		</trigger>
+		<trigger name="dss_rental_listing_br_iu_tr" table="dss_rental_listing" id="Trigger-22c" isSystem="false" >
+			<string><![CDATA[CREATE TRIGGER dss_rental_listing_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_rental_listing FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
+		</trigger>
+		<trigger name="dss_rental_listing_contact_br_iu_tr" table="dss_rental_listing_contact" id="Trigger-10d4" isSystem="false" >
+			<string><![CDATA[CREATE TRIGGER dss_rental_listing_contact_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_rental_listing_contact FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
+		</trigger>
+		<trigger name="dss_rental_listing_report_br_iu_tr" table="dss_rental_listing_report" id="Trigger-5db" isSystem="false" >
+			<string><![CDATA[CREATE TRIGGER dss_rental_listing_report_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_rental_listing_report FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
+		</trigger>
 		<trigger name="dss_user_identity_br_iu_tr" table="dss_user_identity" id="Trigger-cfc" isSystem="false" >
 			<string><![CDATA[CREATE TRIGGER dss_user_identity_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_user_identity FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
 		</trigger>
@@ -503,9 +556,10 @@ END;$function$
 		<entity schema="dss" name="dss_organization_contact_person" color="3986C1" x="1072" y="64" />
 		<entity schema="dss" name="dss_organization_type" color="3986C1" x="48" y="224" />
 		<entity schema="dss" name="dss_physical_address" color="5EC139" x="320" y="640" />
-		<entity schema="dss" name="dss_rental_listing" color="5EC139" x="432" y="1360" />
-		<entity schema="dss" name="dss_rental_listing_contact" color="5EC139" x="992" y="1360" />
-		<entity schema="dss" name="dss_rental_listing_report" color="5EC139" x="608" y="800" />
+		<entity schema="dss" name="dss_rental_listing" color="5EC139" x="432" y="1088" />
+		<entity schema="dss" name="dss_rental_listing_0" color="5EC139" x="1216" y="800" />
+		<entity schema="dss" name="dss_rental_listing_contact" color="5EC139" x="992" y="1088" />
+		<entity schema="dss" name="dss_rental_listing_report" color="5EC139" x="608" y="720" />
 		<entity schema="dss" name="dss_user_identity" color="3986C1" x="1088" y="304" />
 		<entity schema="dss" name="dss_user_privilege" color="3986C1" x="1184" y="720" />
 		<entity schema="dss" name="dss_user_role" color="3986C1" x="1216" y="624" />

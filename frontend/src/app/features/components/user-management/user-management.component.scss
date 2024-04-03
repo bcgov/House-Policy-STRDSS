@@ -1,7 +1,7 @@
 :host {
     width: 100%;
     height: 100%;
-    padding: 24px;
+    padding: 22px;
     background-color: #FFFFFF;
 
     * {
@@ -82,6 +82,11 @@
                 }
             }
         }
+    }
+
+    p-paginator {
+        display: flex;
+        justify-content: end;
     }
 
     p-dialog {

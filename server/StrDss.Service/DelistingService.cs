@@ -4,54 +4,59 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data;
+using StrDss.Data.Entities;
+using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
+using StrDss.Service.EmailTemplates;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Service
 {
     public interface IDelistingService
     {
-        Task<Dictionary<string, List<string>>> CreateDelistingWarningAsync(DelistingWarningCreateDto dto);
-        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto);
-        Task<Dictionary<string, List<string>>> CreateDelistingRequestAsync(DelistingRequestCreateDto dto);
-        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingRequestPreviewAsync(DelistingRequestCreateDto dto);
+        Task<Dictionary<string, List<string>>> CreateTakedownNoticeAsync(TakedownNoticeCreateDto dto);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto);
+        Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
         private IConfiguration _config;
         private IEmailMessageService _emailService;
         private IOrganizationService _orgService;
+        private IEmailMessageRepository _emailRepo;
         private ILogger<DelistingService> _logger;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, ILogger<DelistingService> logger)
+            IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, IEmailMessageRepository emailRepo, ILogger<DelistingService> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
             _config = config;
             _emailService = emailService;
             _orgService = orgService;
+            _emailRepo = emailRepo;
             _logger = logger;
         }
 
-        public async Task<Dictionary<string, List<string>>> CreateDelistingWarningAsync(DelistingWarningCreateDto dto)
+        public async Task<Dictionary<string, List<string>>> CreateTakedownNoticeAsync(TakedownNoticeCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var reasonDto = await _emailService.GetMessageReasonByMessageTypeAndId(EmailMessageTypes.NoticeOfTakedown, dto.ReasonId);
 
-            var errors = await ValidateDelistingWarningAsync(dto, platform, reasonDto);
+            var errors = await ValidateTakedownNoticeAsync(dto, platform, reasonDto);
             if (errors.Count > 0)
             {
                 return errors;
             }
 
-            await SendDelistingWarningAsync(dto, platform, reasonDto);
+            await SendTakedownNoticeAsync(dto, platform, reasonDto);
 
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidateDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
+        private async Task<Dictionary<string, List<string>>> ValidateTakedownNoticeAsync(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
         {
             await Task.CompletedTask;
 
@@ -146,7 +151,41 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendDelistingWarningAsync(DelistingWarningCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
+        private async Task SendTakedownNoticeAsync(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
+        {
+            var template = GetTakedownNoticeTemplate(dto, platform, reasonDto);
+
+            var sent = await template.SendEmail();
+
+            if (sent)
+            {
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = EmailMessageTypes.NoticeOfTakedown,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = dto.HostEmailSent,
+                    IsSubmitterCcRequired = dto.SendCopy,
+                    MessageReasonId = reasonDto?.Id,
+                    LgPhoneNo = dto.LgContactPhone,
+                    UnreportedListingNo = dto.ListingId.ToString(),
+                    HostEmailAddressDsc = dto.HostEmail,
+                    LgEmailAddressDsc = dto.LgContactEmail,
+                    CcEmailAddressDsc = string.Join("; ", dto.CcList),
+                    UnreportedListingUrl = dto.ListingUrl,
+                    LgStrBylawUrl = dto.StrBylawUrl,
+                    InitiatingUserIdentityId = _currentUser.Id,
+                    AffectedByUserIdentityId = null,
+                    InvolvedInOrganizationId = dto.PlatformId
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                _unitOfWork.Commit();
+            }
+        }
+
+        private TakedownNotice GetTakedownNoticeTemplate(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto, bool preview = false)
         {
             var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
 
@@ -161,81 +200,55 @@ namespace StrDss.Service
                 dto.CcList.Add(_currentUser.EmailAddress);
             }
 
-            var emailContent = new EmailContent
+            var template = new TakedownNotice(_emailService)
             {
-                Bcc = Array.Empty<string>(),
-                BodyType = "html",
-                Body = FormatDelistingWarningEmailContent(dto, reasonDto, true),
-                Cc = dto.CcList.ToArray(),
-                DelayTS = 0,
-                Encoding = "utf-8",
-                From = NoReply.Default,
-                Priority = "normal",
-                Subject = "Notice of Takedown",
-                To = dto.ToList.ToArray(),
-                Info = dto.ListingUrl
+                Reason = reasonDto.Description,
+                Url = dto.ListingUrl,
+                ListingId = dto.ListingId,
+                LgContactInfo = dto.LgContactEmail,
+                LgStrBylawLink = dto.StrBylawUrl,
+                To = dto.ToList,
+                Cc = dto.CcList,
+                Info = dto.ListingUrl,
+                Comment = dto.Comment,
+                Preview = preview
             };
-
-            await _emailService.SendEmailAsync(emailContent);
+            return template;
         }
 
-        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingWarningPreviewAsync(DelistingWarningCreateDto dto)
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var reasonDto = await _emailService.GetMessageReasonByMessageTypeAndId(EmailMessageTypes.NoticeOfTakedown, dto.ReasonId);
 
-            var errors = await ValidateDelistingWarningAsync(dto, platform, reasonDto);
+            var errors = await ValidateTakedownNoticeAsync(dto, platform, reasonDto);
             if (errors.Count > 0)
             {
                 return (errors, new EmailPreview());
             }
 
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
-            dto.ToList.Add(contact.EmailAddressDsc);
+            var template = GetTakedownNoticeTemplate(dto, platform, reasonDto, true);
 
-            if (dto.HostEmail.IsNotEmpty())
-            {
-                dto.ToList.Add(dto.HostEmail);
-            }
-
-            return (errors, new EmailPreview { Content = (FormatDelistingWarningEmailContent(dto, reasonDto, false)).HtmlToPlainText() });
+            return (errors, new EmailPreview { Content = template.GetContent().HtmlToPlainText() });
         }
 
-        private string FormatDelistingWarningEmailContent(DelistingWarningCreateDto dto, DropdownNumDto? reasonDto, bool contentOnly)
-        {
-            var reason = reasonDto?.Description;
-            var nl = Environment.NewLine;
-
-            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}<br/>cc: {string.Join(";", dto.CcList)}<br/><br/>")
-                 + $@"Dear Short-term Rental Host,<br/>"
-                 + $@"<br/>Short-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>Short-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>The short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason:"
-                 + $@"<b> {reason ?? ""}</b>"
-                 + $@"<br/><br/>{dto.ListingUrl}"
-                 + $@"<br/><br/>Listing ID Number: {dto.ListingId}"
-                 + $@"<br/><br/>Unless you are able to demonstrate compliance with the business licence requirement, this listing may be removed from the short-term rental platform after 5 days. The local government has 90 days to submit a request to takedown the listing to the platform. For more information, contact:"
-                 + $@"<br/><br/>Email: {dto.LgContactEmail}"
-                 + (dto.LgContactPhone.IsEmpty() ? "" : $@"<br/>Phone: {dto.LgContactPhone}")
-                 + (dto.StrBylawUrl.IsEmpty() ? "" : $@"<br/><br/>More information about our city's STR policies can be found at:<br/>{dto.StrBylawUrl}")
-                 + (dto.Comment.IsEmpty() ? "" : $@"<br/><br/>{dto.Comment}");
-        }
-
-        public async Task<Dictionary<string, List<string>>> CreateDelistingRequestAsync(DelistingRequestCreateDto dto)
+        public async Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
 
-            var errors = await ValidateDelistingRequestAsync(dto, platform, lg);
+            var errors = await ValidateTakedownRequestAsync(dto, platform, lg);
             if (errors.Count > 0)
             {
                 return errors;
             }
 
-            await SendDelistingRequestAsync(dto, platform);
+            await SendTakedownRequestAsync(dto, platform, lg);
 
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidateDelistingRequestAsync(DelistingRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
+        private async Task<Dictionary<string, List<string>>> ValidateTakedownRequestAsync(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
         {
             await Task.CompletedTask;
 
@@ -297,64 +310,81 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendDelistingRequestAsync(DelistingRequestCreateDto dto, OrganizationDto? platform)
+        private async Task SendTakedownRequestAsync(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
         {
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
-            dto.ToList.Add(contact.EmailAddressDsc);
+            var template = GetTakedownRequestTemplate(dto, platform, lg);
+    
+            var sent = await template.SendEmail();
+
+            if (sent)
+            {
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = EmailMessageTypes.TakedownRequest,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = dto.SendCopy,
+                    MessageReasonId = null,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = dto.ListingId.ToString(),
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = string.Join("; ", dto.CcList),
+                    UnreportedListingUrl = dto.ListingUrl,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = _currentUser.Id,
+                    AffectedByUserIdentityId = null,
+                    InvolvedInOrganizationId = dto.PlatformId
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                _unitOfWork.Commit();
+            }
+        }
+        private TakedownRequest GetTakedownRequestTemplate(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg, bool preview = false)
+        {
+            var platformContact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+
+            dto.ToList.Add(platformContact.EmailAddressDsc);
+
+            var lgContact = lg.ContactPeople.FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
 
             if (dto.SendCopy)
             {
                 dto.CcList.Add(_currentUser.EmailAddress);
             }
 
-            var emailContent = new EmailContent
+            var template = new TakedownRequest(_emailService)
             {
-                Bcc = Array.Empty<string>(),
-                BodyType = "html",
-                Body = FormatDelistingRequestEmailContent(dto, true),
-                Cc = dto.CcList.ToArray(),
-                DelayTS = 0,
-                Encoding = "utf-8",
-                From = NoReply.Default,
-                Priority = "normal",
-                Subject = "Takedown Request",
-                To = dto.ToList.ToArray(),
-                Info = dto.ListingUrl
+                Url = dto.ListingUrl,
+                ListingId = dto.ListingId,
+                LgContactInfo = lgContact.EmailAddressDsc,
+                LgName = lg.OrganizationNm,
+                To = dto.ToList,
+                Cc = dto.CcList,
+                Info = dto.ListingUrl,
+                Preview = preview
             };
-
-            await _emailService.SendEmailAsync(emailContent);
+            return template;
         }
 
-        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetDelistingRequestPreviewAsync(DelistingRequestCreateDto dto)
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
 
-            var errors = await ValidateDelistingRequestAsync(dto, platform, lg);
+            var errors = await ValidateTakedownRequestAsync(dto, platform, lg);
             if (errors.Count > 0)
             {
                 return (errors, new EmailPreview());
             }
 
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
-            dto.ToList.Add(contact.EmailAddressDsc);
+            var template = GetTakedownRequestTemplate(dto, platform, lg, true);
 
-            return (errors, new EmailPreview { Content = FormatDelistingRequestEmailContent(dto, false).HtmlToPlainText() });
+            return (errors, new EmailPreview { Content = template.GetContent().HtmlToPlainText() });
 
         }
-
-        private string FormatDelistingRequestEmailContent(DelistingRequestCreateDto dto, bool contentOnly)
-        {
-            var nl = Environment.NewLine;
-
-            return (contentOnly ? "" : $@"To: {string.Join(";", dto.ToList)}<br/>cc: {string.Join(";", dto.CcList)}")
-                 + $@"<br/><br/>Request to platform service provider for takedown of non-compliant platform offering."
-                 + $@"<br/><br/>The following short-term rental listing is not in compliance with an applicable local government business licence requirement:"
-                 + $@"<br/><br/>{dto.ListingUrl}"
-                 + $@"<br/><br/>Listing ID Number: {dto.ListingId}"
-                 + $@"<br/><br/>In accordance, with 17(2) of the Short-term Rental Accommodations Act, please cease providing platform services in respect of the above platform offer within 3 days."
-                 + $@"<br/><br/>[Name]<br/>[Title]<br/>[Local government]<br/>[Contact Information]";
-        }
-
     }
 }

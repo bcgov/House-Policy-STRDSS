@@ -221,4 +221,24 @@ body {
             }
         }
     }
+
+    p-paginator {
+        &.users-paginator {
+            .p-paginator.p-component {
+                height: 50px;
+                padding: 0;
+            }
+
+            .p-paginator-element {
+
+                &.p-paginator-prev,
+                &.p-paginator-next {
+                    svg {
+                        width: 26px;
+                        height: 26px;
+                    }
+                }
+            }
+        }
+    }
 }

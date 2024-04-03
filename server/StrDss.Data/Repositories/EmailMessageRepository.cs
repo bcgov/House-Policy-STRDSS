@@ -9,6 +9,7 @@ namespace StrDss.Data.Repositories
     {
         Task<List<DropdownNumDto>> GetMessageReasons(string messageType);
         Task<DropdownNumDto?> GetMessageReasonByMessageTypeAndId(string messageType, long id);
+        Task AddEmailMessage(DssEmailMessage message);
     }
     public class EmailMessageRepository : RepositoryBase<DssEmailMessage>, IEmailMessageRepository
     {
@@ -35,6 +36,11 @@ namespace StrDss.Data.Repositories
                 .FirstOrDefaultAsync();
 
             return reason;
+        }
+
+        public async Task AddEmailMessage(DssEmailMessage message)
+        {
+            await _dbSet.AddAsync(message);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace XUnitTests
     public class HousrSTRE2E
     {
         private ITestOutputHelper _Output;
-        private HomePage _HomePage;
+        private LandingPage _HomePage;
         private DelistingRequestPage _DelistingRequestPage;
         private DelistingWarningPage _DelistingWarningPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
@@ -29,7 +29,7 @@ namespace XUnitTests
         {
             this._Output = output;
             _Driver = new SeleniumDriver(SeleniumDriver.DRIVERTYPE.CHROME);
-            _HomePage = new HomePage(_Driver);
+            _HomePage = new LandingPage(_Driver);
             _DelistingRequestPage = new DelistingRequestPage(_Driver);
             _DelistingWarningPage = new DelistingWarningPage(_Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);

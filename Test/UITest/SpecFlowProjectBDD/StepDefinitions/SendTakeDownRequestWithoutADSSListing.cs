@@ -16,7 +16,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
     [Scope(Scenario = "SendTakedownRequestWithoutADSSListing")]
     public sealed class SendTakeDownRequestWithoutADSSListing
     {
-        private HomePage _HomePage;
+        private LandingPage _HomePage;
         private DelistingRequestPage _DelistingRequestPage;
         private TakeDownRequestPage _TakeDownRequestPage;
         private PathFinderPage _PathFinderPage;
@@ -30,7 +30,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public SendTakeDownRequestWithoutADSSListing(SeleniumDriver Driver)
         {
             _Driver = Driver;
-            _HomePage = new HomePage(_Driver);
+            _HomePage = new LandingPage(_Driver);
             _DelistingRequestPage = new DelistingRequestPage(_Driver);
             _TakeDownRequestPage = new TakeDownRequestPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);

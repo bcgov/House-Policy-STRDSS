@@ -10,10 +10,6 @@ COPY . .
 
 RUN npm run build --prod
 
-# Inject style nonce
-# ARG style_nonce
-# RUN sed -i -e "s|<script|<script nonce=\"${style_nonce}\"|g" -e "s|<link|<link nonce=\"${style_nonce}\"|g" -e "s|<style|<style nonce=\"${style_nonce}\"|g" /app/dist/frontend/browser/index.html
-
 FROM nginx:stable-alpine as builder-modules
 
 # Ensure that the version of nginx of the builder image is compatible with the nginx version of the main image.

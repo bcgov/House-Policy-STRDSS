@@ -83,12 +83,6 @@ jobs:
           cd ./frontend
           ng build --configuration=production
 
-      # - name: Chrome launcher
-      #   run: |
-      #     cd ./frontend
-      #     npm install karma-chrome-launcher --save-dev
-      #     google-chrome --version
-      
       - name: Run frontend tests
         run: |
           cd ./frontend
@@ -103,34 +97,6 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
-  # Docker-build-backend:
-  #   needs: [build-backend]
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 10
-  #   permissions:
-  #     contents: read
-  #     packages: write
-
-  #   steps:
-  #   - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-  #   - uses: actions/checkout@v4
-
-  #   - name: Setup Tools
-  #     uses: ./.github/actions/setup-tools
-
-  #   - name: Build and Push
-  #     uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
-  #     with:
-  #       registry-url: ${{ env.GITHUB_REGISTRY }}
-  #       registry-username: ${{ github.actor }}
-  #       registry-password: ${{ secrets.GITHUB_TOKEN }}
-  #       image-name: ${{ env.IMAGE_NAME_BACKEND }}
-  #       docker-context: server
-  #       docker-file: server/Dockerfile
-  #       metadata-tags: |
-  #         type=ref,event=branch
-  #         type=sha,format=long,prefix=,suffix=
-
   Docker-build-backend:
     needs: [build-backend]
     runs-on: ubuntu-22.04
@@ -140,24 +106,10 @@ jobs:
       packages: write
 
     steps:
-    # - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
     - uses: actions/checkout@v4
 
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
-
-    # - name: Build and Push
-      # uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
-      # with:
-      #   registry-url: ${{ env.GITHUB_REGISTRY }}
-      #   registry-username: ${{ github.actor }}
-      #   registry-password: ${{ secrets.GITHUB_TOKEN }}
-      #   image-name: ${{ env.IMAGE_NAME_BACKEND }}
-      #   docker-context: server
-      #   docker-file: server/Dockerfile
-      #   metadata-tags: |
-      #     type=ref,event=branch
-      #     type=sha,format=long,prefix=,suffix=
 
     - name: Build Docker image
       run: cd server && docker build -t strdss-backend-dev -f Dockerfile .
@@ -179,8 +131,6 @@ jobs:
       packages: write
 
     steps:
-  #   - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-  #   - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
     - uses: actions/checkout@v4
 
     - name: Setup Tools
@@ -189,22 +139,6 @@ jobs:
     - name: Render style_nonce
       id: render_style_nonce
       run: echo "::set-output name=style_nonce::$(echo -n ${{ github.sha }} | base64)"
-
-  #   - name: Build and Push
-  #     uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
-  #     with:
-  #       registry-url: ${{ env.GITHUB_REGISTRY }}
-  #       registry-username: ${{ github.actor }}
-  #       registry-password: ${{ secrets.GITHUB_TOKEN }}
-  #       image-name: ${{ env.IMAGE_NAME_FRONTEND }}
-  #       docker-context: frontend
-  #       docker-file: frontend/Dockerfile
-  #       docker-args: |
-  #         generate_sourcemap=true
-  #         style_nonce=${{ steps.render_style_nonce.outputs.style_nonce }}
-  #       metadata-tags: |
-  #         type=ref,event=branch
-  #         type=sha,format=long,prefix=,suffix=
 
     - name: Build Docker image
       run: cd server && docker build -t strdss-frontend-dev -f Dockerfile .
@@ -216,4 +150,3 @@ jobs:
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend-dev:latest
-

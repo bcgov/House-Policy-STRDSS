@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# this script is for populating nonce with the environment variable when starting the container
-
 set -e
 
 echo "hit entrypoint..."

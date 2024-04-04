@@ -27,17 +27,8 @@ services:
 
   server:
     build: ./server
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - MailTrapId=
-      - MailTrapPwd=
-      - FetchEventIntervalInMinutes=1
-      - DB_HOST=db
-      - DB_NAME=postgres
-      - DB_USER=postgres
-      - postgres-password=postgres
-      - geocoder-url=https://geocoder.api.gov.bc.ca/addresses.geojson?addressString=
-      - InternalTokenSecret={9EFB3E3E-6529-41AB-B70E-713831371BAF}{F2449C35-07A3-4ABD-BB66-44546AB158EF}
+    env_file:
+      ./docker.env
     ports:
       - "5000:80"
     depends_on:
@@ -48,9 +39,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.local
-    environment:
-      NODE_ENV: Development
-      STYLE_NONCE: stylenonce
+    env_file:
+      ./docker.env
     ports:
       - "5002:3001"
     depends_on:

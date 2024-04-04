@@ -26,7 +26,11 @@ export class DashboardComponent implements OnInit {
 
   cardsToDisplay = new Array<DashboardCard>();
 
-  constructor(private router: Router, private userDataService: UserDataService, private dashboardService: DashboardService) { }
+  constructor(
+    private router: Router,
+    private userDataService: UserDataService,
+    private dashboardService: DashboardService
+  ) { }
 
   ngOnInit(): void {
     this.userDataService.getCurrentUser().subscribe({
@@ -59,7 +63,7 @@ export class DashboardComponent implements OnInit {
   navigateTo(route: string): void {
     if (route) {
       if (route.toLowerCase().startsWith('http')) {
-        window.location.href = route;
+        window.open(route);
       } else {
         this.router.navigateByUrl(route);
       }

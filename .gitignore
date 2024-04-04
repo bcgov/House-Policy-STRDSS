@@ -4,3 +4,4 @@ note
 **/Properties/launchSettings.json
 secrets
 .terraform
+docker.env

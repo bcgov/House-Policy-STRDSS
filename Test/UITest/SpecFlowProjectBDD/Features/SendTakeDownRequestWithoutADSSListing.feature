@@ -1,4 +1,4 @@
-﻿Feature: SendDelistingRequestWithoutADSSListingFeature
+﻿Feature: SendTakedownRequestWithoutADSSListing
 Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-74
 
 @Delisting
@@ -74,13 +74,13 @@ Scenario: SendTakedownRequestWithoutADSSListing
 	Then the system should provide clear error messages guiding me on how to correct the issues
 
 Examples:
-	| ListingID           | Description                      | ExpectedResult | ListingURL                                                   | AdditionalCCsTextBox     |
-	| 0                   | ListingID - Boundary             | pass           | http://listingURL.com                                        | richard.anderson@dxc.com |
-	| 9223372036854775807 | ListingID - Test for Max value   | pass           | http://listingURL.com                                        | richard.anderson@dxc.com |
-	| 0                   | ListingURL - Valid URL           | pass           | HTTP://listingURL.com                                        | richard.anderson@dxc.com |
-	| 0                   | ListingURL - Valid URL           | pass           | HTTPS://listingURL.com                                       | richard.anderson@dxc.com |
-	| 0                   | ListingURL - Long URL            | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com |
-	| -1                  | ListingID - Negative number test | fail           | http://listingURL.com                                        | richard.anderson@dxc.com |
-	| test                | ListingID - Test for string      | fail           | http://listingURL.com                                        | richard.anderson@dxc.com |
-	| e                   | ListingID - Test for exponential | fail           | http://listingURL.com                                        | richard.anderson@dxc.com |
-	| 0                   | ListingURL - Invalid URL         | fail           | http://listingURL                                            | richard.anderson@dxc.com |
+	| ListingID           | Description                      | ExpectedResult | ListingURL                                                   | AdditionalCCsTextBox     | Comment                                                                        |
+	| 0                   | ListingID - Boundary             | pass           | http://listingURL.com                                        | richard.anderson@dxc.com |                                                                                |
+	| 9223372036854775807 | ListingID - Test for Max value   | pass           | http://listingURL.com                                        | richard.anderson@dxc.com |                                                                                |
+	| 0                   | ListingURL - Valid URL           | pass           | HTTP://listingURL.com                                        | richard.anderson@dxc.com |                                                                                |
+	| 0                   | ListingURL - Valid URL SSL       | pass           | HTTPS://listingURL.com                                       | richard.anderson@dxc.com |                                                                                |
+	| 0                   | ListingURL - Long URL            | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com |                                                                                |
+	| -1                  | ListingID - Negative number test | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | Should pass because non-numberic values are ignored and Listing ID is optional |
+	| test                | ListingID - Test for string      | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | should pass because non-numberic values are ignored and Listing ID is optional |
+	| e                   | ListingID - Test for exponential | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | should pass because non-numberic values are ignored and Listing ID is optional |
+	| 0                   | ListingURL - Invalid URL         | fail           | http://listingURL                                            | richard.anderson@dxc.com |                                                                                |

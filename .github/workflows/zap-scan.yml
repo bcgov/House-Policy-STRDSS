@@ -1,0 +1,31 @@
+name: Run ZAP Full Scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        type: choice
+        description: The Target URL
+        options:
+        - https://dev-strdata.apps.silver.devops.gov.bc.ca/
+        - https://test-strdata.apps.silver.devops.gov.bc.ca/
+        - https://uat-strdata.apps.silver.devops.gov.bc.ca/
+
+jobs:
+  zap-scan:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+    - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
+    - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+      with:
+        ref: main
+    - name: ZAP Scan
+      uses: zaproxy/action-full-scan@c8994d4f913cf872ec9964ac2d998c9bec369060
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        target: ${{ github.event.inputs.url }}

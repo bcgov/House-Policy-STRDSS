@@ -77,7 +77,7 @@ namespace XUnitTests
 
                 _DelistingRequestPage.PlatformReceipientDropdown.Click();
                 _DelistingRequestPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-                Assert.Contains("AIRBNB", _DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper());
+                Assert.Contains("TEST PLATFORM", _DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper());
 
                 _DelistingRequestPage.ReviewButton.Click();
 
@@ -125,7 +125,7 @@ namespace XUnitTests
                 _DelistingWarningPage.PlatformReceipientDropdown.WaitFor();
                 _DelistingWarningPage.PlatformReceipientDropdown.Click();
                 _DelistingWarningPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-                Assert.Contains("AIRBNB", _DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper());
+                Assert.Contains("TEST PLATFORM", _DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper());
 
                 //Click to deselect
                 _DelistingWarningPage.PlatformReceipientDropdown.Click();

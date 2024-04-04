@@ -4,9 +4,6 @@ using UITest.TestDriver;
 using TestFrameWork.Models;
 using Configuration;
 using NUnit.Framework.Legacy;
-using FluentAssertions.Equivalency;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Security.Cryptography.X509Certificates;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -14,18 +11,15 @@ namespace SpecFlowProjectBDD.StepDefinitions
     [Scope(Scenario = "SendNoticeOfTakedownWithoutADSSlisting")]
     public sealed class SendNoticeOfTakedownWithoutADSSlisting
     {
-        HomePage _HomePage;
-
-        IDriver _Driver;
-
-        DelistingWarningPage _DelistingWarningPage;
-        PathFinderPage _PathFinderPage;
-        IDRLoginPage _IDRLoginPage;
-        NoticeOfTakeDownPage _NoticeOfTakeDownPage;
-
-        string _TestUserName;
-        string _TestPassword;
-
+        private IDriver _Driver;
+        private HomePage _HomePage;
+        private DelistingWarningPage _DelistingWarningPage;
+        private PathFinderPage _PathFinderPage;
+        private IDRLoginPage _IDRLoginPage;
+        private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
+        private string _TestUserName;
+        private string _TestPassword;
+        private bool _ExpectedResult = false;
 
         public SendNoticeOfTakedownWithoutADSSlisting(SeleniumDriver Driver)
         {
@@ -42,13 +36,18 @@ namespace SpecFlowProjectBDD.StepDefinitions
         }
 
         //User Authentication
-        [Given("I am an authenticated LG staff member")]
-        public void GivenIAmAauthenticatedLGStaffMemberUser()
+        //[Given(@"I am an authenticated LG staff member and the expected result is ""(.*)""")]
+        [Given(@"I am an authenticated LG staff member and the expected result is ""(.*)""")]
+        public void GivenIAmAauthenticatedLGStaffMemberUser(string ExpectedResult)
         {
+            _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
+  
             _Driver.Url = "http://127.0.0.1:4200/compliance-notice";
             _Driver.Navigate();
 
             _PathFinderPage.IDRButton.Click();
+
+            _IDRLoginPage.UserNameTextBox.WaitFor(5);
 
             _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
             _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
@@ -128,7 +127,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _DelistingWarningPage.PlatformReceipientDropdown.WaitFor();
             _DelistingWarningPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-            ClassicAssert.IsTrue(_DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper().Contains("AIRBNB"));
+            ClassicAssert.IsTrue(_DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper().Contains("TEST PLATFORM"));
         }
 
         [Then("the system should validate the email format")]
@@ -178,6 +177,12 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("all required fields are entered")]
         public void WhenALlRequiredFieldsAreEnteredandIClickTheReviewButton()
         {
+            if (!_DelistingWarningPage.ReviewButton.IsEnabled())
+                if (_ExpectedResult == false)
+                    Assert.Pass("Expected result was false. Actual result is false. Review button was disabled");
+                else
+                    Assert.Fail("Expected result was true, but the review button is disabled");
+
             _DelistingWarningPage.ReviewButton.WaitFor();
             _DelistingWarningPage.ReviewButton.Click();
         }

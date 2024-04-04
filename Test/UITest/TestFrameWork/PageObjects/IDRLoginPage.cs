@@ -18,8 +18,8 @@ namespace TestFrameWork.Models
         public IDRLoginPage(IDriver Driver)
         {
             _Driver = Driver;
-            _UserNameTextBox = new TextBox(Driver, Enums.FINDBY.CSSSELECTOR, IDirLogonModel.IDRUserName);
-            _PasswordTextBox = new TextBox(Driver, Enums.FINDBY.CSSSELECTOR, IDirLogonModel.IDRPassword);
+            _UserNameTextBox = new TextBox(Driver, Enums.FINDBY.ID, IDirLogonModel.IDRUserName);
+            _PasswordTextBox = new TextBox(Driver, Enums.FINDBY.ID, IDirLogonModel.IDRPassword);
             _ContinueButton = new(Driver, Enums.FINDBY.CSSSELECTOR, IDirLogonModel.ContinueButton);
         }
 

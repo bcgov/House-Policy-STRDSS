@@ -33,6 +33,27 @@ export class LayoutComponent {
         routerLink: '/',
       },
       {
+        label: 'Listings',
+        routerLink: '/',
+      },
+      {
+        label: 'Alerts',
+        routerLink: '/',
+      },
+      {
+        label: 'Upload',
+        items: [
+          {
+            label: 'Upload Listing Data',
+            routerLink: '',
+          },
+          {
+            label: 'Platform Upload History',
+            routerLink: '',
+          },
+        ]
+      },
+      {
         label: 'Admin tools',
         items: [
           {

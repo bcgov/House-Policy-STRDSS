@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DashboardCard } from '../models/dashboard-card';
 import { ceu_action, listing_file_upload, listing_read, takedown_action, user_write } from '../consts/permissions.const';
+import { User } from '../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,24 @@ export class DashboardService {
 
   getCards(): Array<DashboardCard> {
     return [...this.cards];
+  }
+
+  getCardsPerUserType(user: User): Array<DashboardCard> {
+    const cardsPerUser = new Array<DashboardCard>();
+
+    this.cards.forEach((card) => {
+      if (card.isItOrgTypeBased) {
+        if (user.organizationType === card.orgType) {
+          cardsPerUser.push(card);
+        }
+      } else {
+        if (user.permissions.includes(card.accessPermission)) {
+          cardsPerUser.push(card);
+        }
+      }
+    });
+
+    return cardsPerUser;
   }
 
   private initCards() {

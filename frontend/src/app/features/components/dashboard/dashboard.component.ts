@@ -36,27 +36,9 @@ export class DashboardComponent implements OnInit {
     this.userDataService.getCurrentUser().subscribe({
       next: (value: User) => {
         this.currentUser = value;
-        this.cardsToDisplay = this.filterCardsByUserClaims(this.dashboardService.getCards());
+        this.cardsToDisplay = this.dashboardService.getCardsPerUserType(this.currentUser);
       },
     })
-  }
-
-  filterCardsByUserClaims(cardsFromService: Array<DashboardCard>): Array<DashboardCard> {
-    const cards = new Array<DashboardCard>();
-
-    cardsFromService.forEach((card) => {
-      if (card.isItOrgTypeBased) {
-        if (this.currentUser.organizationType === card.orgType) {
-          cards.push(card);
-        }
-      } else {
-        if (this.currentUser.permissions.includes(card.accessPermission)) {
-          cards.push(card);
-        }
-      }
-    });
-
-    return cards;
   }
 
   navigateTo(route: string): void {

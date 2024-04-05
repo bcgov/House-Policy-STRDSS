@@ -23,6 +23,6 @@ export const accessRequestTokenGuard: CanActivateFn = (route, state) => {
       return router.createUrlTree(['401']);
     }),
   );
-
 };
+
 export const canActivateChild: CanActivateChildFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => accessRequestTokenGuard(route, state);

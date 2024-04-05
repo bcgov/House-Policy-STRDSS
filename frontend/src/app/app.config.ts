@@ -1,19 +1,17 @@
-import { APP_INITIALIZER, ApplicationConfig } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, CSP_NONCE } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { KeycloakService } from 'keycloak-angular';
 import { environment } from '../environments/environment';
-import { provideAnimations } from '@angular/platform-browser/animations'
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './common/services/auth.interceptor';
 import { MessageService } from 'primeng/api';
 export const appConfig: ApplicationConfig = {
     providers: [
         provideAnimations(),
-        provideHttpClient(
-            withInterceptors([authInterceptor])
-        ),
+        provideHttpClient(withInterceptors([authInterceptor])),
         provideRouter(routes),
         KeycloakService,
         {
@@ -23,6 +21,10 @@ export const appConfig: ApplicationConfig = {
             deps: [KeycloakService],
         },
         MessageService,
+        {
+            provide: CSP_NONCE,
+            useValue: document.querySelector('meta[name="csp-nonce"]')?.getAttribute('content'),
+        },
     ],
 }
 

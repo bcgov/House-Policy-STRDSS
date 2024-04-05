@@ -44,8 +44,6 @@ spec:
               value: {{ $deploymentTag | quote }}
             - name: DEPLOYMENT_TIME
               value: {{ $deploymentTime | quote }}
-            - name: STYLE_NONCE
-              value: {{ $styleNonce | quote }}
             {{- $env := merge (.Values.global.env | default dict) (.Values.env | default dict) -}}
             {{ range $k, $v := $env }}
             - name: {{ $k | quote }}

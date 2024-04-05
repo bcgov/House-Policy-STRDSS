@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DashboardCard } from '../models/dashboard-card';
+import { ceu_action, listing_file_upload, listing_read, takedown_action, user_write } from '../consts/permissions.const';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class DashboardService {
     this.cards = [
       {
         title: 'Platform Upload History',
-        accessPermission: 'listing_read',
+        accessPermission: listing_read,
         description: 'View all platform upload history here',
         buttonIcon: '',
         buttonText: 'Platform Upload History',
@@ -26,7 +27,7 @@ export class DashboardService {
         isButtonDisabled: true,
       },
       {
-        accessPermission: 'ceu_action',
+        accessPermission: ceu_action,
         buttonIcon: '',
         buttonText: 'View Delisting Escalation Requests',
         description: 'View all delisting escalation requests sent by local governments',
@@ -35,7 +36,7 @@ export class DashboardService {
         isButtonDisabled: true,
       },
       {
-        accessPermission: 'ceu_action',
+        accessPermission: ceu_action,
         buttonIcon: '',
         buttonText: 'Send Provincial Compliance Order',
         description: 'Send Provincial Compliance Orders to platforms that have not taken action on De-listing requests',
@@ -44,7 +45,7 @@ export class DashboardService {
         isButtonDisabled: true,
       },
       {
-        accessPermission: 'user_write',
+        accessPermission: user_write,
         buttonIcon: '',
         buttonText: 'Manage Access Requests',
         description: 'Process new requests for system access',
@@ -62,7 +63,7 @@ export class DashboardService {
         orgType: 'LG'
       },
       {
-        accessPermission: 'takedown_action',
+        accessPermission: takedown_action,
         buttonIcon: '',
         buttonText: 'Escalate to CEU',
         description: 'Notify the Compliance and Enforcement Unit that a platform has failed to remove a listing',
@@ -71,7 +72,7 @@ export class DashboardService {
         isButtonDisabled: true,
       },
       {
-        accessPermission: 'takedown_action',
+        accessPermission: takedown_action,
         buttonIcon: '',
         buttonText: 'Send Notice',
         description: 'Send a notice to a short-term rental host and platform that a listing may be removed',
@@ -79,7 +80,7 @@ export class DashboardService {
         title: 'Send Notice of Takedown',
       },
       {
-        accessPermission: 'takedown_action',
+        accessPermission: takedown_action,
         buttonIcon: '',
         buttonText: 'Send Takedown Letter',
         description: 'Send a request to remove a short-term rental listing to a platform',
@@ -97,7 +98,7 @@ export class DashboardService {
         orgType: 'Platform'
       },
       {
-        accessPermission: 'listing_file_upload',
+        accessPermission: listing_file_upload,
         buttonIcon: '',
         buttonText: 'Upload data',
         description: 'Upload listing data to the system ',

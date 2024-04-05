@@ -36,7 +36,6 @@ export class DashboardComponent implements OnInit {
     this.userDataService.getCurrentUser().subscribe({
       next: (value: User) => {
         this.currentUser = value;
-
         this.cardsToDisplay = this.filterCardsByUserClaims(this.dashboardService.getCards());
       },
     })

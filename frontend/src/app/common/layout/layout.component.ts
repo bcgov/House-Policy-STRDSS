@@ -18,14 +18,6 @@ export class LayoutComponent {
   constructor(private router: Router) {
   }
 
-  onHomeClicked(): void {
-    this.router.navigateByUrl('/');
-  }
-
-  onUserManagementClicked(): void {
-    this.router.navigateByUrl('/user-management');
-  }
-
   ngOnInit() {
     this.items = [
       {

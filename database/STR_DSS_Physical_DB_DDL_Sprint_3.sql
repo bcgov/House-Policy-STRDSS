@@ -60,7 +60,7 @@ CREATE  TABLE dss_organization_contact_person (
 	is_primary           boolean  NOT NULL  ,
 	given_nm             varchar(25)  NOT NULL  ,
 	family_nm            varchar(25)  NOT NULL  ,
-	phone_no             varchar(13)  NOT NULL  ,
+	phone_no             varchar(30)  NOT NULL  ,
 	email_address_dsc    varchar(320)  NOT NULL  ,
 	contacted_through_organization_id bigint  NOT NULL  ,
 	upd_dtm              timestamptz  NOT NULL  ,
@@ -86,6 +86,7 @@ CREATE  TABLE dss_physical_address (
 
 CREATE  TABLE dss_rental_listing_report ( 
 	rental_listing_report_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
+	is_processed         boolean  NOT NULL  ,
 	report_period_ym     date  NOT NULL  ,
 	source_bin           bytea    ,
 	providing_organization_id bigint  NOT NULL  ,
@@ -128,7 +129,7 @@ CREATE  TABLE dss_email_message (
 	is_host_contacted_externally boolean  NOT NULL  ,
 	is_submitter_cc_required boolean  NOT NULL  ,
 	message_reason_id    bigint    ,
-	lg_phone_no          varchar(13)    ,
+	lg_phone_no          varchar(30)    ,
 	unreported_listing_no varchar(25)    ,
 	host_email_address_dsc varchar(320)    ,
 	lg_email_address_dsc varchar(320)    ,
@@ -139,15 +140,6 @@ CREATE  TABLE dss_email_message (
 	affected_by_user_identity_id bigint    ,
 	involved_in_organization_id bigint    ,
 	CONSTRAINT dss_email_message_pk PRIMARY KEY ( email_message_id )
- );
-
-CREATE  TABLE dss_listing_line_error ( 
-	listing_line_error_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
-	error_txt            varchar(4000)  NOT NULL  ,
-	source_line_txt      varchar(32000)  NOT NULL  ,
-	platform_listing_no  varchar(25)    ,
-	including_rental_listing_report_id bigint  NOT NULL  ,
-	CONSTRAINT dss_listing_line_error_pk PRIMARY KEY ( listing_line_error_id )
  );
 
 CREATE  TABLE dss_rental_listing ( 
@@ -174,14 +166,26 @@ CREATE  TABLE dss_rental_listing_contact (
 	listing_contact_nbr  smallint    ,
 	supplier_host_no     varchar(25)    ,
 	full_nm              varchar(50)    ,
-	phone_no             varchar(13)    ,
-	fax_no               varchar(13)    ,
+	phone_no             varchar(30)    ,
+	fax_no               varchar(30)    ,
 	full_address_txt     varchar(250)    ,
 	email_address_dsc    varchar(320)    ,
 	contacted_through_rental_listing_id bigint  NOT NULL  ,
 	upd_dtm              timestamptz  NOT NULL  ,
 	upd_user_guid        uuid    ,
 	CONSTRAINT dss_rental_listing_contact_pk PRIMARY KEY ( rental_listing_contact_id )
+ );
+
+CREATE  TABLE dss_rental_listing_line ( 
+	rental_listing_line_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
+	is_validation_failure boolean  NOT NULL  ,
+	is_system_failure    boolean  NOT NULL  ,
+	organization_cd      varchar(25)  NOT NULL  ,
+	platform_listing_no  varchar(25)  NOT NULL  ,
+	source_line_txt      varchar(32000)  NOT NULL  ,
+	error_txt            varchar(32000)    ,
+	including_rental_listing_report_id bigint  NOT NULL  ,
+	CONSTRAINT dss_rental_listing_line_pk PRIMARY KEY ( rental_listing_line_id )
  );
 
 ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_initiated_by FOREIGN KEY ( initiating_user_identity_id ) REFERENCES dss_user_identity( user_identity_id );
@@ -193,8 +197,6 @@ ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_involving FORE
 ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_communicating FOREIGN KEY ( email_message_type ) REFERENCES dss_email_message_type( email_message_type );
 
 ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_justified_by FOREIGN KEY ( message_reason_id ) REFERENCES dss_message_reason( message_reason_id );
-
-ALTER TABLE dss_listing_line_error ADD CONSTRAINT dss_listing_line_error_fk_included_in FOREIGN KEY ( including_rental_listing_report_id ) REFERENCES dss_rental_listing_report( rental_listing_report_id );
 
 ALTER TABLE dss_message_reason ADD CONSTRAINT dss_message_reason_fk_justifying FOREIGN KEY ( email_message_type ) REFERENCES dss_email_message_type( email_message_type );
 
@@ -213,6 +215,8 @@ ALTER TABLE dss_rental_listing ADD CONSTRAINT dss_rental_listing_fk_included_in 
 ALTER TABLE dss_rental_listing ADD CONSTRAINT dss_rental_listing_fk_located_at FOREIGN KEY ( locating_physical_address_id ) REFERENCES dss_physical_address( physical_address_id );
 
 ALTER TABLE dss_rental_listing_contact ADD CONSTRAINT dss_rental_listing_contact_fk_contacted_for FOREIGN KEY ( contacted_through_rental_listing_id ) REFERENCES dss_rental_listing( rental_listing_id );
+
+ALTER TABLE dss_rental_listing_line ADD CONSTRAINT dss_rental_listing_line_fk_included_in FOREIGN KEY ( including_rental_listing_report_id ) REFERENCES dss_rental_listing_report( rental_listing_report_id );
 
 ALTER TABLE dss_rental_listing_report ADD CONSTRAINT dss_rental_listing_report_fk_provided_by FOREIGN KEY ( providing_organization_id ) REFERENCES dss_organization( organization_id );
 
@@ -390,18 +394,6 @@ COMMENT ON COLUMN dss_email_message.affected_by_user_identity_id IS 'Foreign key
 
 COMMENT ON COLUMN dss_email_message.involved_in_organization_id IS 'Foreign key';
 
-COMMENT ON TABLE dss_listing_line_error IS 'A rental listing report line that could not be interpreted as a valid listing';
-
-COMMENT ON COLUMN dss_listing_line_error.listing_line_error_id IS 'Unique generated key';
-
-COMMENT ON COLUMN dss_listing_line_error.error_txt IS 'Freeform description of the problem found while attempting to interpret the report line';
-
-COMMENT ON COLUMN dss_listing_line_error.source_line_txt IS 'Full text of the report line that could not be interpreted';
-
-COMMENT ON COLUMN dss_listing_line_error.platform_listing_no IS 'The platform issued identification number for the listing';
-
-COMMENT ON COLUMN dss_listing_line_error.including_rental_listing_report_id IS 'Foreign key';
-
 COMMENT ON TABLE dss_rental_listing IS 'A rental listing snapshot that is relevant to a specific month';
 
 COMMENT ON COLUMN dss_rental_listing.rental_listing_id IS 'Unique generated key';
@@ -457,6 +449,26 @@ COMMENT ON COLUMN dss_rental_listing_contact.contacted_through_rental_listing_id
 COMMENT ON COLUMN dss_rental_listing_contact.upd_dtm IS 'Trigger-updated timestamp of last change';
 
 COMMENT ON COLUMN dss_rental_listing_contact.upd_user_guid IS 'The globally unique identifier (assigned by the identity provider) for the most recent user to record a change';
+
+COMMENT ON TABLE dss_rental_listing_line IS 'A rental listing report line that has been extracted from the source';
+
+COMMENT ON COLUMN dss_rental_listing_line.rental_listing_line_id IS 'Unique generated key';
+
+COMMENT ON COLUMN dss_rental_listing_line.is_validation_failure IS 'Indicates that there has been a validation problem that prevents successful ingestion of the rental listing';
+
+COMMENT ON COLUMN dss_rental_listing_line.is_system_failure IS 'Indicates that a system fault has prevented complete ingestion of the rental listing';
+
+COMMENT ON COLUMN dss_rental_listing_line.organization_cd IS 'An immutable system code that identifies the listing organization (e.g. AIRBNB)';
+
+COMMENT ON COLUMN dss_rental_listing_line.platform_listing_no IS 'The platform issued identification number for the listing';
+
+COMMENT ON COLUMN dss_rental_listing_line.source_line_txt IS 'Full text of the report line that could not be interpreted';
+
+COMMENT ON COLUMN dss_rental_listing_line.error_txt IS 'Freeform description of the problem found while attempting to interpret the report line';
+
+COMMENT ON COLUMN dss_rental_listing_line.including_rental_listing_report_id IS 'Foreign key';
+
+/* Manual script additions start here */
 
 CREATE OR REPLACE FUNCTION dss_update_audit_columns() RETURNS trigger
     LANGUAGE plpgsql AS

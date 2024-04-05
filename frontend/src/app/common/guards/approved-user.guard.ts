@@ -17,4 +17,5 @@ export const approvedUserGuard: CanActivateFn = (route, state): Observable<boole
   )
 
 };
+
 export const canActivateChild: CanActivateChildFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => approvedUserGuard(route, state);

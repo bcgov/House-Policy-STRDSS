@@ -4,27 +4,54 @@ import { DashboardComponent } from './features/components/dashboard/dashboard.co
 import { DelistingRequestComponent } from './features/components/delisting-request/delisting-request.component';
 import { AccessRequestComponent } from './features/components/access-request/access-request.component';
 import { UserManagementComponent } from './features/components/user-management/user-management.component';
+import { UnauthorizedComponent } from './common/components/unauthorized/unauthorized.component';
+import { PageNotFoundComponent } from './common/components/page-not-found/page-not-found.component';
+import { approvedUserGuard } from './common/guards/approved-user.guard';
+import { activeUserGuard } from './common/guards/active-user.guard';
+import { accessRequestTokenGuard } from './common/guards/access-request-token.guard';
+import { takedown_action, user_write } from './common/consts/permissions.const';
+import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 
 export const routes: Routes = [
     {
         path: '',
+        canActivate: [approvedUserGuard, activeUserGuard],
         component: DashboardComponent,
     },
     {
         path: 'compliance-notice',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard],
         component: ComplianceNoticeComponent,
+        data: { permissions: [takedown_action] }
     },
     {
         path: 'delisting-request',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard],
         component: DelistingRequestComponent,
+        data: { permissions: [takedown_action] }
     },
     {
         path: 'access-request',
+        canActivate: [accessRequestTokenGuard, activeUserGuard],
         component: AccessRequestComponent,
     },
     {
         path: 'user-management',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard],
         component: UserManagementComponent,
+        data: { permissions: [user_write] }
     },
+    {
+        path: '401',
+        component: UnauthorizedComponent,
+    },
+    {
+        path: '404',
+        component: PageNotFoundComponent
+    },
+    {
+        path: '**',
+        redirectTo: '/404'
+    }
 
 ];

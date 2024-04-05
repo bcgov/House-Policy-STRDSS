@@ -24,7 +24,7 @@ export const appConfig: ApplicationConfig = {
         },
         MessageService,
     ],
-};
+}
 
 function initializeKeycloak(keycloak: KeycloakService) {
     return () =>
@@ -37,7 +37,6 @@ function initializeKeycloak(keycloak: KeycloakService) {
             initOptions: {
                 onLoad: 'login-required',
                 pkceMethod: 'S256',
-                // silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html',
             },
         });
 }

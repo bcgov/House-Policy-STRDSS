@@ -1,6 +1,6 @@
 ﻿namespace UITest.Models
 {
-    public class HomePageModel
+    public class LandingPageModel
     {
         public static string ViewPolicyGuidenceButton { get => ""; }
 

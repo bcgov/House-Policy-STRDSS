@@ -146,10 +146,6 @@ jobs:
   #   - name: Setup Tools
   #     uses: ./.github/actions/setup-tools
 
-  #   - name: Render style_nonce
-  #     id: render_style_nonce
-  #     run: echo "::set-output name=style_nonce::$(echo -n ${{ github.sha }} | base64)"
-
   #   - name: Build and Push
   #     uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
   #     with:
@@ -161,7 +157,6 @@ jobs:
   #       docker-file: frontend/Dockerfile
   #       docker-args: |
   #         generate_sourcemap=true
-  #         style_nonce=${{ steps.render_style_nonce.outputs.style_nonce }}
   #       metadata-tags: |
   #         type=ref,event=branch
   #         type=sha,format=long,prefix=,suffix=

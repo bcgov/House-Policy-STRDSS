@@ -27,10 +27,13 @@ export class LayoutComponent {
       {
         label: 'Listings',
         routerLink: '/',
+        disabled: true,
       },
       {
         label: 'Alerts',
         routerLink: '/',
+        disabled: true,
+        visible: false,
       },
       {
         label: 'Upload',
@@ -38,10 +41,12 @@ export class LayoutComponent {
           {
             label: 'Upload Listing Data',
             routerLink: '',
+            disabled: true,
           },
           {
             label: 'Platform Upload History',
             routerLink: '',
+            disabled: true,
           },
         ]
       },

@@ -4,9 +4,9 @@ using UITest.TestDriver;
 
 namespace UITest.PageObjects
 {
-    public class HomePage
+    public class LandingPage
     {
-        private string _URL = @"localhost:4200/login";
+        private string _URL = @"localhost:4200";
         private Button _ViewPolicyGuidenceButton;
         private Button _SendNoticeButton;
         private Button _SendTakedownLetterButton;
@@ -21,13 +21,13 @@ namespace UITest.PageObjects
         public Button EscalateTakedownToCEUButto { get => _EscalateTakedownToCEUButton; }
 
 
-        public HomePage(IDriver Driver)
+        public LandingPage(IDriver Driver)
         {
             _Driver = Driver;
-            _ViewPolicyGuidenceButton = new Button(Driver, Enums.FINDBY.ID, HomePageModel.ViewPolicyGuidenceButton);
-            _SendNoticeButton = new Button(Driver, Enums.FINDBY.ID, HomePageModel.SendNoticeButton);
-            _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.ID, HomePageModel.SendTakeDownLetterButton);
-            _EscalateTakedownToCEUButton = new Button(Driver, Enums.FINDBY.ID, HomePageModel.EscalateTakedownToCEUButton);
+            _ViewPolicyGuidenceButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ViewPolicyGuidenceButton);
+            _SendNoticeButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendNoticeButton);
+            _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendTakeDownLetterButton);
+            _EscalateTakedownToCEUButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.EscalateTakedownToCEUButton);
         }
 
         public bool Navigate()

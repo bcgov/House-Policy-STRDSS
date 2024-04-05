@@ -1,5 +1,4 @@
 export interface User {
-
     id: number,
     userName: string,
     userGuid: string,
@@ -16,5 +15,4 @@ export interface User {
     permissions: Array<string>,
     organizationType: string,
     termsAcceptanceDtm: string
-
 }

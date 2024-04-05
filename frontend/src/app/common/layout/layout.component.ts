@@ -15,8 +15,7 @@ export class LayoutComponent {
   showHeaderMenu = true;
   items: MenuItem[] | undefined;
 
-  constructor(private router: Router) {
-  }
+  constructor() { }
 
   ngOnInit() {
     this.items = [
@@ -33,7 +32,6 @@ export class LayoutComponent {
         label: 'Alerts',
         routerLink: '/',
         disabled: true,
-        visible: false,
       },
       {
         label: 'Upload',

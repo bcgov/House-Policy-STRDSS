@@ -12,7 +12,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
     public sealed class SendNoticeOfTakedownWithoutADSSlisting
     {
         private IDriver _Driver;
-        private HomePage _HomePage;
+        private LandingPage _HomePage;
         private DelistingWarningPage _DelistingWarningPage;
         private PathFinderPage _PathFinderPage;
         private IDRLoginPage _IDRLoginPage;
@@ -24,7 +24,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public SendNoticeOfTakedownWithoutADSSlisting(SeleniumDriver Driver)
         {
             _Driver = Driver;
-            _HomePage = new HomePage(_Driver);
+            _HomePage = new LandingPage(_Driver);
             _DelistingWarningPage = new DelistingWarningPage(_Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);

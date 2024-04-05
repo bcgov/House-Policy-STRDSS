@@ -35,7 +35,7 @@ A message that is sent to one or more recipients via email
 | * | is\_host\_contacted\_externally| boolean  |  |
 | * | is\_submitter\_cc\_required| boolean  |  |
 | &#11016; | message\_reason\_id| bigint  |  |
-|  | lg\_phone\_no| varchar(13)  |  |
+|  | lg\_phone\_no| varchar(30)  |  |
 |  | unreported\_listing\_no| varchar(25)  |  |
 |  | host\_email\_address\_dsc| varchar(320)  | E-mail address of a short term rental host (directly entered by the user as a message recipient) |
 |  | lg\_email\_address\_dsc| varchar(320)  |  |
@@ -75,31 +75,6 @@ A message that is sent to one or more recipients via email
 |Type |Name |On |
 |---|---|---|
 | &#128273;  | dss\_email\_message\_type\_pk | ON email\_message\_type|
-
-
-
-### Table dss.dss_listing_line_error 
-A rental listing report line that could not be interpreted as a valid listing
-
-|Idx |Name |Data Type |Description |
-|---|---|---|---|
-| * &#128273;  | listing\_line\_error\_id| bigint GENERATED ALWAYS AS IDENTITY  | Unique generated key |
-| * | error\_txt| varchar(4000)  | Freeform description of the problem found while attempting to interpret the report line |
-| * | source\_line\_txt| varchar(32000)  | Full text of the report line that could not be interpreted |
-|  | platform\_listing\_no| varchar(25)  | The platform issued identification number for the listing |
-| * &#11016; | including\_rental\_listing\_report\_id| bigint  | Foreign key |
-
-
-##### Indexes 
-|Type |Name |On |
-|---|---|---|
-| &#128273;  | dss\_listing\_line\_error\_pk | ON listing\_line\_error\_id|
-
-##### Foreign Keys
-|Type |Name |On |
-|---|---|---|
-|  | dss_listing_line_error_fk_included_in | ( including\_rental\_listing\_report\_id ) ref [dss.dss\_rental\_listing\_report](#dss\_rental\_listing\_report) (rental\_listing\_report\_id) |
-
 
 
 
@@ -172,7 +147,7 @@ A person who has been identified as a notable contact for a particular organizat
 | * | is\_primary| boolean  | Indicates whether the contact should receive all communications directed at the organization |
 | * | given\_nm| varchar(25)  | A name given to a person so that they can easily be identified among their family members (in some cultures, this is often the first name) |
 | * | family\_nm| varchar(25)  | A name that is often shared amongst members of the same family (commonly known as a surname within some cultures) |
-| * | phone\_no| varchar(13)  | Phone number given for the contact by the organization (contains only digits) |
+| * | phone\_no| varchar(30)  | Phone number given for the contact by the organization (contains only digits) |
 | * | email\_address\_dsc| varchar(320)  | E-mail address given for the contact by the organization |
 | * &#11016; | contacted\_through\_organization\_id| bigint  | Foreign key |
 | * | upd\_dtm| timestamptz  | Trigger-updated timestamp of last change |
@@ -308,8 +283,8 @@ A person who has been identified as a notable contact for a particular rental li
 |  | listing\_contact\_nbr| smallint  | Indicates which of the five possible supplier hosts is represented by this contact |
 |  | supplier\_host\_no| varchar(25)  | The platform identifier for the supplier host |
 |  | full\_nm| varchar(50)  | The full name of the contact person as inluded in the listing |
-|  | phone\_no| varchar(13)  | Phone number given for the contact |
-|  | fax\_no| varchar(13)  | Facsimile numbrer given for the contact |
+|  | phone\_no| varchar(30)  | Phone number given for the contact |
+|  | fax\_no| varchar(30)  | Facsimile numbrer given for the contact |
 |  | full\_address\_txt| varchar(250)  | Mailing address given for the contact |
 |  | email\_address\_dsc| varchar(320)  | E-mail address given for the contact |
 | * &#11016; | contacted\_through\_rental\_listing\_id| bigint  | Foreign key |
@@ -338,12 +313,41 @@ CREATE TRIGGER dss\_rental\_listing\_contact\_br\_iu\_tr BEFORE INSERT OR UPDATE
 ``` 
 
 
+### Table dss.dss_rental_listing_line 
+A rental listing report line that has been extracted from the source
+
+|Idx |Name |Data Type |Description |
+|---|---|---|---|
+| * &#128273;  | rental\_listing\_line\_id| bigint GENERATED ALWAYS AS IDENTITY  | Unique generated key |
+| * | is\_validation\_failure| boolean  | Indicates that there has been a validation problem that prevents successful ingestion of the rental listing |
+| * | is\_system\_failure| boolean  | Indicates that a system fault has prevented complete ingestion of the rental listing |
+| * | organization\_cd| varchar(25)  | An immutable system code that identifies the listing organization (e.g. AIRBNB) |
+| * | platform\_listing\_no| varchar(25)  | The platform issued identification number for the listing |
+| * | source\_line\_txt| varchar(32000)  | Full text of the report line that could not be interpreted |
+|  | error\_txt| varchar(32000)  | Freeform description of the problem found while attempting to interpret the report line |
+| * &#11016; | including\_rental\_listing\_report\_id| bigint  | Foreign key |
+
+
+##### Indexes 
+|Type |Name |On |
+|---|---|---|
+| &#128273;  | dss\_rental\_listing\_line\_pk | ON rental\_listing\_line\_id|
+
+##### Foreign Keys
+|Type |Name |On |
+|---|---|---|
+|  | dss_rental_listing_line_fk_included_in | ( including\_rental\_listing\_report\_id ) ref [dss.dss\_rental\_listing\_report](#dss\_rental\_listing\_report) (rental\_listing\_report\_id) |
+
+
+
+
 ### Table dss.dss_rental_listing_report 
 A delivery of rental listing information that is relevant to a specific month
 
 |Idx |Name |Data Type |Description |
 |---|---|---|---|
 | * &#128273;  &#11019; | rental\_listing\_report\_id| bigint GENERATED ALWAYS AS IDENTITY  | Unique generated key |
+| * | is\_processed| boolean  |  |
 | * | report\_period\_ym| date  | The month to which the listing information is relevant (always set to the first day of the month) |
 |  | source\_bin| bytea  | The binary image of the information that was uploaded |
 | * &#11016; | providing\_organization\_id| bigint  | Foreign key |

@@ -1,5 +1,9 @@
 /* Sprint 3 Incremental DB Changes to STR DSS */
 
+ALTER TABLE dss_email_message ALTER COLUMN lg_phone_no TYPE varchar(30);
+
+ALTER TABLE dss_organization_contact_person ALTER COLUMN phone_no TYPE varchar(30);
+
 CREATE  TABLE dss_physical_address ( 
 	physical_address_id  bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
 	original_address_txt varchar(250)  NOT NULL  ,
@@ -18,21 +22,13 @@ CREATE  TABLE dss_physical_address (
 
 CREATE  TABLE dss_rental_listing_report ( 
 	rental_listing_report_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
+	is_processed         boolean  NOT NULL  ,
 	report_period_ym     date  NOT NULL  ,
 	source_bin           bytea    ,
 	providing_organization_id bigint  NOT NULL  ,
 	upd_dtm              timestamptz  NOT NULL  ,
 	upd_user_guid        uuid    ,
 	CONSTRAINT dss_rental_listing_report_pk PRIMARY KEY ( rental_listing_report_id )
- ) ;
-
-CREATE  TABLE dss_listing_line_error ( 
-	listing_line_error_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
-	error_txt            varchar(4000)  NOT NULL  ,
-	source_line_txt      varchar(32000)  NOT NULL  ,
-	platform_listing_no  varchar(25)    ,
-	including_rental_listing_report_id bigint  NOT NULL  ,
-	CONSTRAINT dss_listing_line_error_pk PRIMARY KEY ( listing_line_error_id )
  ) ;
 
 CREATE  TABLE dss_rental_listing ( 
@@ -59,8 +55,8 @@ CREATE  TABLE dss_rental_listing_contact (
 	listing_contact_nbr  smallint    ,
 	supplier_host_no     varchar(25)    ,
 	full_nm              varchar(50)    ,
-	phone_no             varchar(13)    ,
-	fax_no               varchar(13)    ,
+	phone_no             varchar(30)    ,
+	fax_no               varchar(30)    ,
 	full_address_txt     varchar(250)    ,
 	email_address_dsc    varchar(320)    ,
 	contacted_through_rental_listing_id bigint  NOT NULL  ,
@@ -69,11 +65,21 @@ CREATE  TABLE dss_rental_listing_contact (
 	CONSTRAINT dss_rental_listing_contact_pk PRIMARY KEY ( rental_listing_contact_id )
  ) ;
 
+CREATE  TABLE dss_rental_listing_line ( 
+	rental_listing_line_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
+	is_validation_failure boolean  NOT NULL  ,
+	is_system_failure    boolean  NOT NULL  ,
+	organization_cd      varchar(25)  NOT NULL  ,
+	platform_listing_no  varchar(25)  NOT NULL  ,
+	source_line_txt      varchar(32000)  NOT NULL  ,
+	error_txt            varchar(32000)    ,
+	including_rental_listing_report_id bigint  NOT NULL  ,
+	CONSTRAINT dss_rental_listing_line_pk PRIMARY KEY ( rental_listing_line_id )
+ ) ;
+
 ALTER TABLE dss_physical_address ADD CONSTRAINT dss_physical_address_fk_contained_in FOREIGN KEY ( containing_organization_id ) REFERENCES dss_organization( organization_id )   ;
 
 ALTER TABLE dss_rental_listing_report ADD CONSTRAINT dss_rental_listing_report_fk_provided_by FOREIGN KEY ( providing_organization_id ) REFERENCES dss_organization( organization_id )   ;
-
-ALTER TABLE dss_listing_line_error ADD CONSTRAINT dss_listing_line_error_fk_included_in FOREIGN KEY ( including_rental_listing_report_id ) REFERENCES dss_rental_listing_report( rental_listing_report_id )   ;
 
 ALTER TABLE dss_rental_listing ADD CONSTRAINT dss_rental_listing_fk_offered_by FOREIGN KEY ( offering_organization_id ) REFERENCES dss_organization( organization_id )   ;
 
@@ -82,6 +88,8 @@ ALTER TABLE dss_rental_listing ADD CONSTRAINT dss_rental_listing_fk_included_in 
 ALTER TABLE dss_rental_listing ADD CONSTRAINT dss_rental_listing_fk_located_at FOREIGN KEY ( locating_physical_address_id ) REFERENCES dss_physical_address( physical_address_id )   ;
 
 ALTER TABLE dss_rental_listing_contact ADD CONSTRAINT dss_rental_listing_contact_fk_contacted_for FOREIGN KEY ( contacted_through_rental_listing_id ) REFERENCES dss_rental_listing( rental_listing_id )   ;
+
+ALTER TABLE dss_rental_listing_line ADD CONSTRAINT dss_rental_listing_line_fk_included_in FOREIGN KEY ( including_rental_listing_report_id ) REFERENCES dss_rental_listing_report( rental_listing_report_id )   ;
 
 COMMENT ON TABLE dss_physical_address IS 'A property address that includes any verifiable BC attributes';
 
@@ -122,18 +130,6 @@ COMMENT ON COLUMN dss_rental_listing_report.providing_organization_id IS 'Foreig
 COMMENT ON COLUMN dss_rental_listing_report.upd_dtm IS 'Trigger-updated timestamp of last change';
 
 COMMENT ON COLUMN dss_rental_listing_report.upd_user_guid IS 'The globally unique identifier (assigned by the identity provider) for the most recent user to record a change';
-
-COMMENT ON TABLE dss_listing_line_error IS 'A rental listing report line that could not be interpreted as a valid listing';
-
-COMMENT ON COLUMN dss_listing_line_error.listing_line_error_id IS 'Unique generated key';
-
-COMMENT ON COLUMN dss_listing_line_error.error_txt IS 'Freeform description of the problem found while attempting to interpret the report line';
-
-COMMENT ON COLUMN dss_listing_line_error.source_line_txt IS 'Full text of the report line that could not be interpreted';
-
-COMMENT ON COLUMN dss_listing_line_error.platform_listing_no IS 'The platform issued identification number for the listing';
-
-COMMENT ON COLUMN dss_listing_line_error.including_rental_listing_report_id IS 'Foreign key';
 
 COMMENT ON TABLE dss_rental_listing IS 'A rental listing snapshot that is relevant to a specific month';
 
@@ -190,6 +186,26 @@ COMMENT ON COLUMN dss_rental_listing_contact.contacted_through_rental_listing_id
 COMMENT ON COLUMN dss_rental_listing_contact.upd_dtm IS 'Trigger-updated timestamp of last change';
 
 COMMENT ON COLUMN dss_rental_listing_contact.upd_user_guid IS 'The globally unique identifier (assigned by the identity provider) for the most recent user to record a change';
+
+COMMENT ON TABLE dss_rental_listing_line IS 'A rental listing report line that has been extracted from the source';
+
+COMMENT ON COLUMN dss_rental_listing_line.rental_listing_line_id IS 'Unique generated key';
+
+COMMENT ON COLUMN dss_rental_listing_line.is_validation_failure IS 'Indicates that there has been a validation problem that prevents successful ingestion of the rental listing';
+
+COMMENT ON COLUMN dss_rental_listing_line.is_system_failure IS 'Indicates that a system fault has prevented complete ingestion of the rental listing';
+
+COMMENT ON COLUMN dss_rental_listing_line.organization_cd IS 'An immutable system code that identifies the listing organization (e.g. AIRBNB)';
+
+COMMENT ON COLUMN dss_rental_listing_line.platform_listing_no IS 'The platform issued identification number for the listing';
+
+COMMENT ON COLUMN dss_rental_listing_line.source_line_txt IS 'Full text of the report line that could not be interpreted';
+
+COMMENT ON COLUMN dss_rental_listing_line.error_txt IS 'Freeform description of the problem found while attempting to interpret the report line';
+
+COMMENT ON COLUMN dss_rental_listing_line.including_rental_listing_report_id IS 'Foreign key';
+
+/* Manual script additions start here */
 
 CREATE OR REPLACE TRIGGER dss_physical_address_br_iu_tr
      BEFORE INSERT OR UPDATE ON dss_physical_address

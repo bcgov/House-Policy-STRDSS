@@ -1,25 +1,53 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
+import { UserDataService } from '../../../common/services/user-data.service';
+import { CommonModule } from '@angular/common';
+import { User } from '../../../common/models/user';
+import { DashboardService } from '../../../common/services/dashboard.service';
+import { DashboardCard } from '../../../common/models/dashboard-card';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterOutlet, CardModule, ButtonModule],
+  imports: [
+    RouterOutlet,
+    CardModule,
+    ButtonModule,
+    CommonModule,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
-  constructor(private router: Router) {
+export class DashboardComponent implements OnInit {
+  userType = '' || 'BCGov' || 'Platform' || 'LG' || 'Admin';
+  currentUser!: User;
 
+  cardsToDisplay = new Array<DashboardCard>();
+
+  constructor(
+    private router: Router,
+    private userDataService: UserDataService,
+    private dashboardService: DashboardService
+  ) { }
+
+  ngOnInit(): void {
+    this.userDataService.getCurrentUser().subscribe({
+      next: (value: User) => {
+        this.currentUser = value;
+        this.cardsToDisplay = this.dashboardService.getCardsPerUserType(this.currentUser);
+      },
+    })
   }
 
-  toComplianceNotice(): void {
-    this.router.navigateByUrl('/compliance-notice')
-  }
-
-  toDelistingRequest(): void {
-    this.router.navigateByUrl('/delisting-request')
+  navigateTo(route: string): void {
+    if (route) {
+      if (route.toLowerCase().startsWith('http')) {
+        window.open(route);
+      } else {
+        this.router.navigateByUrl(route);
+      }
+    }
   }
 }

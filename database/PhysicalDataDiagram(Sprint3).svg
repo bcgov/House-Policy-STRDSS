@@ -224,15 +224,25 @@
      <stop offset='75%' stop-color='#DFEFFD' /> 
      <stop offset='100%' stop-color='#BAE0FE' /> 
   </linearGradient>
-  <linearGradient id='tbg_5EC139' x1='0%' y1='0%' x2='0%' y2='100%' >
-     <stop offset='0%' stop-color='#FEFFFE' /> 
-     <stop offset='75%' stop-color='#E7FDDF' /> 
-     <stop offset='100%' stop-color='#CCFEBA' /> 
+  <linearGradient id='tbg_C18A39' x1='0%' y1='0%' x2='0%' y2='100%' >
+     <stop offset='0%' stop-color='#FFFEFE' /> 
+     <stop offset='75%' stop-color='#FDF0DF' /> 
+     <stop offset='100%' stop-color='#FEE2BA' /> 
   </linearGradient>
   <linearGradient id='tbg_C1D8EE' x1='0%' y1='0%' x2='0%' y2='100%' >
      <stop offset='0%' stop-color='#FEFEFF' /> 
      <stop offset='75%' stop-color='#DFEEFD' /> 
      <stop offset='100%' stop-color='#BADCFE' /> 
+  </linearGradient>
+  <linearGradient id='tbg_C18A39' x1='0%' y1='0%' x2='0%' y2='100%' >
+     <stop offset='0%' stop-color='#FFFEFE' /> 
+     <stop offset='75%' stop-color='#FDF0DF' /> 
+     <stop offset='100%' stop-color='#FEE2BA' /> 
+  </linearGradient>
+  <linearGradient id='tbg_5EC139' x1='0%' y1='0%' x2='0%' y2='100%' >
+     <stop offset='0%' stop-color='#FEFFFE' /> 
+     <stop offset='75%' stop-color='#E7FDDF' /> 
+     <stop offset='100%' stop-color='#CCFEBA' /> 
   </linearGradient>
 </defs>
 
@@ -291,14 +301,6 @@ dss_email_message ref dss_message_reason ( message_reason_id )</title>
 <path transform='translate(8,0)' marker-start='url(#ZeroMore)' marker-end='url(#One)'  class='dotted '  d='M 2288,64L 2080,64' ><title>&#x1F517;  Foreign Key dss_email_message_fk_justified_by
 dss_email_message ref dss_message_reason ( message_reason_id )</title></path>
 <text x='2101' y='59' transform='rotate(0 2101,59)' class='relName'>dss&#95;email&#95;message&#95;fk&#95;justified&#95;by</text>
-<!-- == Fk 'dss_listing_line_error_dss_listing_line_error_fk_included_in' == -->
-<path id='dss_listing_line_error_dss_listing_line_error_fk_included_in'  onmouseover="hghl(['dss_listing_line_error_dss_listing_line_error_fk_included_in','dss.dss_listing_line_error.including_rental_listing_report_id','dss.dss_rental_listing_report.rental_listing_report_id'])" onmouseout="uhghl(['dss_listing_line_error_dss_listing_line_error_fk_included_in','dss.dss_listing_line_error.including_rental_listing_report_id','dss.dss_rental_listing_report.rental_listing_report_id'])" transform='translate(8,0)' class='unhighlight' d='M 1056,816L 832,816' >
-	<title>&#x1F517;  Foreign Key dss_listing_line_error_fk_included_in
-dss_listing_line_error ref dss_rental_listing_report ( including_rental_listing_report_id -&gt; rental_listing_report_id )</title>
-</path>
-<path transform='translate(8,0)' marker-start='url(#OneMore)' marker-end='url(#One)'    d='M 1056,816L 832,816' ><title>&#x1F517;  Foreign Key dss_listing_line_error_fk_included_in
-dss_listing_line_error ref dss_rental_listing_report ( including_rental_listing_report_id -&gt; rental_listing_report_id )</title></path>
-<text x='861' y='811' transform='rotate(0 861,811)' class='relName'>dss&#95;listing&#95;line&#95;error&#95;fk&#95;included&#95;in</text>
 <!-- == Fk 'dss_message_reason_dss_message_reason_fk_justifying' == -->
 <path id='dss_message_reason_dss_message_reason_fk_justifying'  onmouseover="hghl(['dss_message_reason_dss_message_reason_fk_justifying','dss.dss_message_reason.email_message_type','dss.dss_email_message_type.email_message_type'])" onmouseout="uhghl(['dss_message_reason_dss_message_reason_fk_justifying','dss.dss_message_reason.email_message_type','dss.dss_email_message_type.email_message_type'])" transform='translate(8,0)' class='unhighlight' d='M 1824,112L 1616,112' >
 	<title>&#x1F517;  Foreign Key dss_message_reason_fk_justifying
@@ -348,11 +350,11 @@ dss_rental_listing ref dss_organization ( offering_organization_id -&gt; organiz
 dss_rental_listing ref dss_organization ( offering_organization_id -&gt; organization_id )</title></path>
 <text x='563' y='1070' transform='rotate(270 563,1070)' class='relName'>dss&#95;rental&#95;listing&#95;fk&#95;offered&#95;by</text>
 <!-- == Fk 'dss_rental_listing_dss_rental_listing_fk_included_in' == -->
-<path id='dss_rental_listing_dss_rental_listing_fk_included_in'  onmouseover="hghl(['dss_rental_listing_dss_rental_listing_fk_included_in','dss.dss_rental_listing.including_rental_listing_report_id','dss.dss_rental_listing_report.rental_listing_report_id'])" onmouseout="uhghl(['dss_rental_listing_dss_rental_listing_fk_included_in','dss.dss_rental_listing.including_rental_listing_report_id','dss.dss_rental_listing_report.rental_listing_report_id'])" transform='translate(8,0)' class='unhighlight' d='M 624,1072L 624,864' >
+<path id='dss_rental_listing_dss_rental_listing_fk_included_in'  onmouseover="hghl(['dss_rental_listing_dss_rental_listing_fk_included_in','dss.dss_rental_listing.including_rental_listing_report_id','dss.dss_rental_listing_report.rental_listing_report_id'])" onmouseout="uhghl(['dss_rental_listing_dss_rental_listing_fk_included_in','dss.dss_rental_listing.including_rental_listing_report_id','dss.dss_rental_listing_report.rental_listing_report_id'])" transform='translate(8,0)' class='unhighlight' d='M 624,1072L 624,848' >
 	<title>&#x1F517;  Foreign Key dss_rental_listing_fk_included_in
 dss_rental_listing ref dss_rental_listing_report ( including_rental_listing_report_id -&gt; rental_listing_report_id )</title>
 </path>
-<path transform='translate(8,0)' marker-start='url(#OneMore)' marker-end='url(#One)'    d='M 624,1072L 624,864' ><title>&#x1F517;  Foreign Key dss_rental_listing_fk_included_in
+<path transform='translate(8,0)' marker-start='url(#OneMore)' marker-end='url(#One)'    d='M 624,1072L 624,848' ><title>&#x1F517;  Foreign Key dss_rental_listing_fk_included_in
 dss_rental_listing ref dss_rental_listing_report ( including_rental_listing_report_id -&gt; rental_listing_report_id )</title></path>
 <text x='627' y='1070' transform='rotate(270 627,1070)' class='relName'>dss&#95;rental&#95;listing&#95;fk&#95;included&#95;in</text>
 <!-- == Fk 'dss_rental_listing_dss_rental_listing_fk_located_at' == -->
@@ -371,14 +373,22 @@ dss_rental_listing_contact ref dss_rental_listing ( contacted_through_rental_lis
 <path transform='translate(8,0)' marker-start='url(#OneMore)' marker-end='url(#One)'    d='M 976,1104L 704,1104' ><title>&#x1F517;  Foreign Key dss_rental_listing_contact_fk_contacted_for
 dss_rental_listing_contact ref dss_rental_listing ( contacted_through_rental_listing_id -&gt; rental_listing_id )</title></path>
 <text x='741' y='1099' transform='rotate(0 741,1099)' class='relName'>dss&#95;rental&#95;listing&#95;contact&#95;fk&#95;contacted&#95;for</text>
+<!-- == Fk 'dss_rental_listing_line_dss_rental_listing_line_fk_included_in' == -->
+<path id='dss_rental_listing_line_dss_rental_listing_line_fk_included_in'  onmouseover="hghl(['dss_rental_listing_line_dss_rental_listing_line_fk_included_in','dss.dss_rental_listing_line.including_rental_listing_report_id','dss.dss_rental_listing_report.rental_listing_report_id'])" onmouseout="uhghl(['dss_rental_listing_line_dss_rental_listing_line_fk_included_in','dss.dss_rental_listing_line.including_rental_listing_report_id','dss.dss_rental_listing_report.rental_listing_report_id'])" transform='translate(8,0)' class='unhighlight' d='M 1056,816L 832,816' >
+	<title>&#x1F517;  Foreign Key dss_rental_listing_line_fk_included_in
+dss_rental_listing_line ref dss_rental_listing_report ( including_rental_listing_report_id -&gt; rental_listing_report_id )</title>
+</path>
+<path transform='translate(8,0)' marker-start='url(#OneMore)' marker-end='url(#One)'    d='M 1056,816L 832,816' ><title>&#x1F517;  Foreign Key dss_rental_listing_line_fk_included_in
+dss_rental_listing_line ref dss_rental_listing_report ( including_rental_listing_report_id -&gt; rental_listing_report_id )</title></path>
+<text x='857' y='811' transform='rotate(0 857,811)' class='relName'>dss&#95;rental&#95;listing&#95;line&#95;fk&#95;included&#95;in</text>
 <!-- == Fk 'dss_rental_listing_report_dss_rental_listing_report_fk_provided_by' == -->
-<path id='dss_rental_listing_report_dss_rental_listing_report_fk_provided_by'  onmouseover="hghl(['dss_rental_listing_report_dss_rental_listing_report_fk_provided_by','dss.dss_rental_listing_report.providing_organization_id','dss.dss_organization.organization_id'])" onmouseout="uhghl(['dss_rental_listing_report_dss_rental_listing_report_fk_provided_by','dss.dss_rental_listing_report.providing_organization_id','dss.dss_organization.organization_id'])" transform='translate(8,0)' class='unhighlight' d='M 624,704L 624,384' >
+<path id='dss_rental_listing_report_dss_rental_listing_report_fk_provided_by'  onmouseover="hghl(['dss_rental_listing_report_dss_rental_listing_report_fk_provided_by','dss.dss_rental_listing_report.providing_organization_id','dss.dss_organization.organization_id'])" onmouseout="uhghl(['dss_rental_listing_report_dss_rental_listing_report_fk_provided_by','dss.dss_rental_listing_report.providing_organization_id','dss.dss_organization.organization_id'])" transform='translate(8,0)' class='unhighlight' d='M 624,672L 624,384' >
 	<title>&#x1F517;  Foreign Key dss_rental_listing_report_fk_provided_by
 dss_rental_listing_report ref dss_organization ( providing_organization_id -&gt; organization_id )</title>
 </path>
-<path transform='translate(8,0)' marker-start='url(#OneMore)' marker-end='url(#One)'    d='M 624,704L 624,384' ><title>&#x1F517;  Foreign Key dss_rental_listing_report_fk_provided_by
+<path transform='translate(8,0)' marker-start='url(#OneMore)' marker-end='url(#One)'    d='M 624,672L 624,384' ><title>&#x1F517;  Foreign Key dss_rental_listing_report_fk_provided_by
 dss_rental_listing_report ref dss_organization ( providing_organization_id -&gt; organization_id )</title></path>
-<text x='627' y='702' transform='rotate(270 627,702)' class='relName'>dss&#95;rental&#95;listing&#95;report&#95;fk&#95;provided&#95;by</text>
+<text x='627' y='670' transform='rotate(270 627,670)' class='relName'>dss&#95;rental&#95;listing&#95;report&#95;fk&#95;provided&#95;by</text>
 <!-- == Fk 'dss_user_identity_dss_user_identity_fk_representing' == -->
 <path id='dss_user_identity_dss_user_identity_fk_representing'  onmouseover="hghl(['dss_user_identity_dss_user_identity_fk_representing','dss.dss_user_identity.represented_by_organization_id','dss.dss_organization.organization_id'])" onmouseout="uhghl(['dss_user_identity_dss_user_identity_fk_representing','dss.dss_user_identity.represented_by_organization_id','dss.dss_organization.organization_id'])" transform='translate(8,0)' class='unhighlight' d='M 1072,304L 752,304' >
 	<title>&#x1F517;  Foreign Key dss_user_identity_fk_representing
@@ -440,9 +450,9 @@ dss_user_role_privilege ref dss_user_privilege ( user_privilege_cd )</title></pa
      * varchar(250)</title></a>
 <text x='896' y='504' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;250&#41;</text>
 <!-- == Table 'dss_email_message' == -->
-<rect id='depict_dss&#46;dss&#95;email&#95;message' class='entity' style='stroke:#769BB9' x='2304' y='40' width='256' height='320' />
-<rect x='2304' y='40' width='256' height='28' style='stroke-width:0; fill:#F1F6FA'/>
-<line class='topLine' style='stroke:#176098;' stroke-linecap='round' x1='2304' y1='40' x2='2560' y2='40'/>
+<rect id='depict_dss&#46;dss&#95;email&#95;message' class='entity' style='stroke:#B99D76' x='2304' y='40' width='256' height='320' />
+<rect x='2304' y='40' width='256' height='28' style='stroke-width:0; fill:#FAF6F1'/>
+<line class='topLine' style='stroke:#986317;' stroke-linecap='round' x1='2304' y1='40' x2='2560' y2='40'/>
 <a xlink:href='#dss.dss_email_message'><text x='2373' y='59' >dss&#95;email&#95;message</text><title>Table dss.dss_email_message
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       A message that is sent to one or more recipients via email</title></a>
@@ -450,66 +460,66 @@ dss_user_role_privilege ref dss_user_privilege ( user_privilege_cd )</title></pa
      * bigint
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Unique generated key</title></a>
-<text x='2544' y='88' text-anchor='end' style='fill:#86A0B5;stroke:0;'>bigint</text>  <use id='nn' x='2306' y='93' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_email_message_type'><text id='dss&#46;dss&#95;email&#95;message&#46;email&#95;message&#95;type' x='2323' y='103' onmouseover="hghl(['dss_email_message_dss_email_message_fk_communicating','dss.dss_email_message_type.email_message_type'])" onmouseout="uhghl(['dss_email_message_dss_email_message_fk_communicating','dss.dss_email_message_type.email_message_type'])">email&#95;message&#95;type</text><title>&#10697;  email_message_type
+<text x='2544' y='88' text-anchor='end' style='fill:#B5A186;stroke:0;'>bigint</text>  <use id='nn' x='2306' y='93' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_email_message_type'><text id='dss&#46;dss&#95;email&#95;message&#46;email&#95;message&#95;type' x='2323' y='103' onmouseover="hghl(['dss_email_message_dss_email_message_fk_communicating','dss.dss_email_message_type.email_message_type'])" onmouseout="uhghl(['dss_email_message_dss_email_message_fk_communicating','dss.dss_email_message_type.email_message_type'])">email&#95;message&#95;type</text><title>&#10697;  email_message_type
      * varchar(50)
  &#8599; dss_email_message( email_message_type )
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Business term for the type or purpose of the message (e.g. Notice of Takedown, Takedown Request, Delisting Warning, Delisting Request, Access Granted Notification, Access Denied Notification)</title></a>
-<text x='2544' y='104' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;50&#41;</text><a xlink:href='#dss.dss_email_message.email_message_type'><use id='fk' x='2548' y='92' xlink:href='#fk'/><title>&#x1F517;  References dss_email_message_type ( email_message_type ) </title></a>
+<text x='2544' y='104' text-anchor='end' style='fill:#B5A186;stroke:0;'>varchar&#40;50&#41;</text><a xlink:href='#dss.dss_email_message.email_message_type'><use id='fk' x='2548' y='92' xlink:href='#fk'/><title>&#x1F517;  References dss_email_message_type ( email_message_type ) </title></a>
   <use id='nn' x='2306' y='109' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_message_delivery_dtm'><text id='dss&#46;dss&#95;email&#95;message&#46;message&#95;delivery&#95;dtm' x='2323' y='119'>message&#95;delivery&#95;dtm</text><title>&#10697;  message_delivery_dtm
      * timestamptz
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       A timestamp indicating when the message delivery was initiated</title></a>
-<text x='2544' y='120' text-anchor='end' style='fill:#86A0B5;stroke:0;'>timestamptz</text>  <use id='nn' x='2306' y='125' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_message_template_dsc'><text id='dss&#46;dss&#95;email&#95;message&#46;message&#95;template&#95;dsc' x='2323' y='135'>message&#95;template&#95;dsc</text><title>&#10697;  message_template_dsc
+<text x='2544' y='120' text-anchor='end' style='fill:#B5A186;stroke:0;'>timestamptz</text>  <use id='nn' x='2306' y='125' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_message_template_dsc'><text id='dss&#46;dss&#95;email&#95;message&#46;message&#95;template&#95;dsc' x='2323' y='135'>message&#95;template&#95;dsc</text><title>&#10697;  message_template_dsc
      * varchar(4000)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       The full text or template for the message that is sent</title></a>
-<text x='2544' y='136' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;4000&#41;</text>  <use id='nn' x='2306' y='141' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_is_host_contacted_externally'><text id='dss&#46;dss&#95;email&#95;message&#46;is&#95;host&#95;contacted&#95;externally' x='2323' y='151'>is&#95;host&#95;contacted&#95;externally</text><title>&#10697;  is_host_contacted_externally
+<text x='2544' y='136' text-anchor='end' style='fill:#B5A186;stroke:0;'>varchar&#40;4000&#41;</text>  <use id='nn' x='2306' y='141' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_is_host_contacted_externally'><text id='dss&#46;dss&#95;email&#95;message&#46;is&#95;host&#95;contacted&#95;externally' x='2323' y='151'>is&#95;host&#95;contacted&#95;externally</text><title>&#10697;  is_host_contacted_externally
      * boolean</title></a>
-<text x='2544' y='152' text-anchor='end' style='fill:#86A0B5;stroke:0;'>boolean</text>  <use id='nn' x='2306' y='157' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_is_submitter_cc_required'><text id='dss&#46;dss&#95;email&#95;message&#46;is&#95;submitter&#95;cc&#95;required' x='2323' y='167'>is&#95;submitter&#95;cc&#95;required</text><title>&#10697;  is_submitter_cc_required
+<text x='2544' y='152' text-anchor='end' style='fill:#B5A186;stroke:0;'>boolean</text>  <use id='nn' x='2306' y='157' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_is_submitter_cc_required'><text id='dss&#46;dss&#95;email&#95;message&#46;is&#95;submitter&#95;cc&#95;required' x='2323' y='167'>is&#95;submitter&#95;cc&#95;required</text><title>&#10697;  is_submitter_cc_required
      * boolean</title></a>
-<text x='2544' y='168' text-anchor='end' style='fill:#86A0B5;stroke:0;'>boolean</text>  <a xlink:href='#dss.dss_email_message_message_reason_id'><text id='dss&#46;dss&#95;email&#95;message&#46;message&#95;reason&#95;id' x='2323' y='183' onmouseover="hghl(['dss_email_message_dss_email_message_fk_justified_by','dss.dss_message_reason.message_reason_id'])" onmouseout="uhghl(['dss_email_message_dss_email_message_fk_justified_by','dss.dss_message_reason.message_reason_id'])">message&#95;reason&#95;id</text><title>&#10697;  message_reason_id
+<text x='2544' y='168' text-anchor='end' style='fill:#B5A186;stroke:0;'>boolean</text>  <a xlink:href='#dss.dss_email_message_message_reason_id'><text id='dss&#46;dss&#95;email&#95;message&#46;message&#95;reason&#95;id' x='2323' y='183' onmouseover="hghl(['dss_email_message_dss_email_message_fk_justified_by','dss.dss_message_reason.message_reason_id'])" onmouseout="uhghl(['dss_email_message_dss_email_message_fk_justified_by','dss.dss_message_reason.message_reason_id'])">message&#95;reason&#95;id</text><title>&#10697;  message_reason_id
      bigint
  &#8599; dss_email_message( message_reason_id )</title></a>
-<text x='2544' y='184' text-anchor='end' style='fill:#86A0B5;stroke:0;'>bigint</text><a xlink:href='#dss.dss_email_message.message_reason_id'><use id='fk' x='2548' y='172' xlink:href='#fk'/><title>&#x1F517;  References dss_message_reason ( message_reason_id ) </title></a>
+<text x='2544' y='184' text-anchor='end' style='fill:#B5A186;stroke:0;'>bigint</text><a xlink:href='#dss.dss_email_message.message_reason_id'><use id='fk' x='2548' y='172' xlink:href='#fk'/><title>&#x1F517;  References dss_message_reason ( message_reason_id ) </title></a>
   <a xlink:href='#dss.dss_email_message_lg_phone_no'><text id='dss&#46;dss&#95;email&#95;message&#46;lg&#95;phone&#95;no' x='2323' y='199'>lg&#95;phone&#95;no</text><title>&#10697;  lg_phone_no
-     varchar(13)</title></a>
-<text x='2544' y='200' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;13&#41;</text>  <a xlink:href='#dss.dss_email_message_unreported_listing_no'><text id='dss&#46;dss&#95;email&#95;message&#46;unreported&#95;listing&#95;no' x='2323' y='215'>unreported&#95;listing&#95;no</text><title>&#10697;  unreported_listing_no
+     varchar(30)</title></a>
+<text x='2544' y='200' text-anchor='end' style='fill:#B5A186;stroke:0;'>varchar&#40;30&#41;</text>  <a xlink:href='#dss.dss_email_message_unreported_listing_no'><text id='dss&#46;dss&#95;email&#95;message&#46;unreported&#95;listing&#95;no' x='2323' y='215'>unreported&#95;listing&#95;no</text><title>&#10697;  unreported_listing_no
      varchar(25)</title></a>
-<text x='2544' y='216' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;25&#41;</text>  <a xlink:href='#dss.dss_email_message_host_email_address_dsc'><text id='dss&#46;dss&#95;email&#95;message&#46;host&#95;email&#95;address&#95;dsc' x='2323' y='231'>host&#95;email&#95;address&#95;dsc</text><title>&#10697;  host_email_address_dsc
+<text x='2544' y='216' text-anchor='end' style='fill:#B5A186;stroke:0;'>varchar&#40;25&#41;</text>  <a xlink:href='#dss.dss_email_message_host_email_address_dsc'><text id='dss&#46;dss&#95;email&#95;message&#46;host&#95;email&#95;address&#95;dsc' x='2323' y='231'>host&#95;email&#95;address&#95;dsc</text><title>&#10697;  host_email_address_dsc
      varchar(320)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       E-mail address of a short term rental host (directly entered by the user as a message recipient)</title></a>
-<text x='2544' y='232' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;320&#41;</text>  <a xlink:href='#dss.dss_email_message_lg_email_address_dsc'><text id='dss&#46;dss&#95;email&#95;message&#46;lg&#95;email&#95;address&#95;dsc' x='2323' y='247'>lg&#95;email&#95;address&#95;dsc</text><title>&#10697;  lg_email_address_dsc
+<text x='2544' y='232' text-anchor='end' style='fill:#B5A186;stroke:0;'>varchar&#40;320&#41;</text>  <a xlink:href='#dss.dss_email_message_lg_email_address_dsc'><text id='dss&#46;dss&#95;email&#95;message&#46;lg&#95;email&#95;address&#95;dsc' x='2323' y='247'>lg&#95;email&#95;address&#95;dsc</text><title>&#10697;  lg_email_address_dsc
      varchar(320)</title></a>
-<text x='2544' y='248' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;320&#41;</text>  <a xlink:href='#dss.dss_email_message_cc_email_address_dsc'><text id='dss&#46;dss&#95;email&#95;message&#46;cc&#95;email&#95;address&#95;dsc' x='2323' y='263'>cc&#95;email&#95;address&#95;dsc</text><title>&#10697;  cc_email_address_dsc
+<text x='2544' y='248' text-anchor='end' style='fill:#B5A186;stroke:0;'>varchar&#40;320&#41;</text>  <a xlink:href='#dss.dss_email_message_cc_email_address_dsc'><text id='dss&#46;dss&#95;email&#95;message&#46;cc&#95;email&#95;address&#95;dsc' x='2323' y='263'>cc&#95;email&#95;address&#95;dsc</text><title>&#10697;  cc_email_address_dsc
      varchar(4000)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       E-mail address of a secondary message recipient (directly entered by the user)</title></a>
-<text x='2544' y='264' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;4000&#41;</text>  <a xlink:href='#dss.dss_email_message_unreported_listing_url'><text id='dss&#46;dss&#95;email&#95;message&#46;unreported&#95;listing&#95;url' x='2323' y='279'>unreported&#95;listing&#95;url</text><title>&#10697;  unreported_listing_url
+<text x='2544' y='264' text-anchor='end' style='fill:#B5A186;stroke:0;'>varchar&#40;4000&#41;</text>  <a xlink:href='#dss.dss_email_message_unreported_listing_url'><text id='dss&#46;dss&#95;email&#95;message&#46;unreported&#95;listing&#95;url' x='2323' y='279'>unreported&#95;listing&#95;url</text><title>&#10697;  unreported_listing_url
      varchar(4000)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       User-provided URL for a short-term rental platform listing that is the subject of the message</title></a>
-<text x='2544' y='280' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;4000&#41;</text>  <a xlink:href='#dss.dss_email_message_lg_str_bylaw_url'><text id='dss&#46;dss&#95;email&#95;message&#46;lg&#95;str&#95;bylaw&#95;url' x='2323' y='295'>lg&#95;str&#95;bylaw&#95;url</text><title>&#10697;  lg_str_bylaw_url
+<text x='2544' y='280' text-anchor='end' style='fill:#B5A186;stroke:0;'>varchar&#40;4000&#41;</text>  <a xlink:href='#dss.dss_email_message_lg_str_bylaw_url'><text id='dss&#46;dss&#95;email&#95;message&#46;lg&#95;str&#95;bylaw&#95;url' x='2323' y='295'>lg&#95;str&#95;bylaw&#95;url</text><title>&#10697;  lg_str_bylaw_url
      varchar(4000)</title></a>
-<text x='2544' y='296' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;4000&#41;</text>  <use id='nn' x='2306' y='301' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_initiating_user_identity_id'><text id='dss&#46;dss&#95;email&#95;message&#46;initiating&#95;user&#95;identity&#95;id' x='2323' y='311' onmouseover="hghl(['dss_email_message_dss_email_message_fk_initiated_by','dss.dss_user_identity.user_identity_id'])" onmouseout="uhghl(['dss_email_message_dss_email_message_fk_initiated_by','dss.dss_user_identity.user_identity_id'])">initiating&#95;user&#95;identity&#95;id</text><title>&#10697;  initiating_user_identity_id
+<text x='2544' y='296' text-anchor='end' style='fill:#B5A186;stroke:0;'>varchar&#40;4000&#41;</text>  <use id='nn' x='2306' y='301' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_initiating_user_identity_id'><text id='dss&#46;dss&#95;email&#95;message&#46;initiating&#95;user&#95;identity&#95;id' x='2323' y='311' onmouseover="hghl(['dss_email_message_dss_email_message_fk_initiated_by','dss.dss_user_identity.user_identity_id'])" onmouseout="uhghl(['dss_email_message_dss_email_message_fk_initiated_by','dss.dss_user_identity.user_identity_id'])">initiating&#95;user&#95;identity&#95;id</text><title>&#10697;  initiating_user_identity_id
      * bigint
  &#8599; dss_email_message( user_identity_id )
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Foreign key</title></a>
-<text x='2544' y='312' text-anchor='end' style='fill:#86A0B5;stroke:0;'>bigint</text><a xlink:href='#dss.dss_email_message.initiating_user_identity_id'><use id='fk' x='2548' y='300' xlink:href='#fk'/><title>&#x1F517;  References dss_user_identity ( initiating_user_identity_id -&gt; user_identity_id ) </title></a>
+<text x='2544' y='312' text-anchor='end' style='fill:#B5A186;stroke:0;'>bigint</text><a xlink:href='#dss.dss_email_message.initiating_user_identity_id'><use id='fk' x='2548' y='300' xlink:href='#fk'/><title>&#x1F517;  References dss_user_identity ( initiating_user_identity_id -&gt; user_identity_id ) </title></a>
   <a xlink:href='#dss.dss_email_message_affected_by_user_identity_id'><text id='dss&#46;dss&#95;email&#95;message&#46;affected&#95;by&#95;user&#95;identity&#95;id' x='2323' y='327' onmouseover="hghl(['dss_email_message_dss_email_message_fk_affecting','dss.dss_user_identity.user_identity_id'])" onmouseout="uhghl(['dss_email_message_dss_email_message_fk_affecting','dss.dss_user_identity.user_identity_id'])">affected&#95;by&#95;user&#95;identity&#95;id</text><title>&#10697;  affected_by_user_identity_id
      bigint
  &#8599; dss_email_message( user_identity_id )
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Foreign key</title></a>
-<text x='2544' y='328' text-anchor='end' style='fill:#86A0B5;stroke:0;'>bigint</text><a xlink:href='#dss.dss_email_message.affected_by_user_identity_id'><use id='fk' x='2548' y='316' xlink:href='#fk'/><title>&#x1F517;  References dss_user_identity ( affected_by_user_identity_id -&gt; user_identity_id ) </title></a>
+<text x='2544' y='328' text-anchor='end' style='fill:#B5A186;stroke:0;'>bigint</text><a xlink:href='#dss.dss_email_message.affected_by_user_identity_id'><use id='fk' x='2548' y='316' xlink:href='#fk'/><title>&#x1F517;  References dss_user_identity ( affected_by_user_identity_id -&gt; user_identity_id ) </title></a>
   <a xlink:href='#dss.dss_email_message_involved_in_organization_id'><text id='dss&#46;dss&#95;email&#95;message&#46;involved&#95;in&#95;organization&#95;id' x='2323' y='343' onmouseover="hghl(['dss_email_message_dss_email_message_fk_involving','dss.dss_organization.organization_id'])" onmouseout="uhghl(['dss_email_message_dss_email_message_fk_involving','dss.dss_organization.organization_id'])">involved&#95;in&#95;organization&#95;id</text><title>&#10697;  involved_in_organization_id
      bigint
  &#8599; dss_email_message( organization_id )
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Foreign key</title></a>
-<text x='2544' y='344' text-anchor='end' style='fill:#86A0B5;stroke:0;'>bigint</text><a xlink:href='#dss.dss_email_message.involved_in_organization_id'><use id='fk' x='2548' y='332' xlink:href='#fk'/><title>&#x1F517;  References dss_organization ( involved_in_organization_id -&gt; organization_id ) </title></a>
+<text x='2544' y='344' text-anchor='end' style='fill:#B5A186;stroke:0;'>bigint</text><a xlink:href='#dss.dss_email_message.involved_in_organization_id'><use id='fk' x='2548' y='332' xlink:href='#fk'/><title>&#x1F517;  References dss_organization ( involved_in_organization_id -&gt; organization_id ) </title></a>
 
 <!-- == Table 'dss_email_message_type' == -->
 <rect id='depict_dss&#46;dss&#95;email&#95;message&#95;type' class='entity' style='stroke:#769BB9' x='1360' y='88' width='256' height='80' />
@@ -525,36 +535,6 @@ Referred by dss_message_reason ( email_message_type ) </title></a>
   <use id='nn' x='1362' y='141' xlink:href='#nn'/><a xlink:href='#dss.dss_email_message_type_email_message_type_nm'><text id='dss&#46;dss&#95;email&#95;message&#95;type&#46;email&#95;message&#95;type&#95;nm' x='1379' y='151'>email&#95;message&#95;type&#95;nm</text><title>&#10697;  email_message_type_nm
      * varchar(250)</title></a>
 <text x='1600' y='152' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;250&#41;</text>
-<!-- == Table 'dss_listing_line_error' == -->
-<rect id='depict_dss&#46;dss&#95;listing&#95;line&#95;error' class='entity' style='stroke:#88B976' x='1072' y='808' width='272' height='128' />
-<rect x='1072' y='808' width='272' height='28' style='stroke-width:0; fill:#F3FAF1'/>
-<line class='topLine' style='stroke:#3A9817;' stroke-linecap='round' x1='1072' y1='808' x2='1344' y2='808'/>
-<a xlink:href='#dss.dss_listing_line_error'><text x='1146' y='827' >dss&#95;listing&#95;line&#95;error</text><title>Table dss.dss_listing_line_error
- ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-      A rental listing report line that could not be interpreted as a valid listing</title></a>
-  <use id='nn' x='1074' y='845' xlink:href='#nn'/><use id='pk' x='1074' y='844' xlink:href='#pk'><title>&#x1F511;  Pk dss_listing_line_error_pk ( listing_line_error_id ) </title></use><a xlink:href='#dss.dss_listing_line_error_listing_line_error_id'><text id='dss&#46;dss&#95;listing&#95;line&#95;error&#46;listing&#95;line&#95;error&#95;id' x='1091' y='855'>listing&#95;line&#95;error&#95;id</text><title>&#10697;  listing_line_error_id
-     * bigint
- ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-      Unique generated key</title></a>
-<text x='1328' y='856' text-anchor='end' style='fill:#92B586;stroke:0;'>bigint</text>  <use id='nn' x='1074' y='861' xlink:href='#nn'/><a xlink:href='#dss.dss_listing_line_error_error_txt'><text id='dss&#46;dss&#95;listing&#95;line&#95;error&#46;error&#95;txt' x='1091' y='871'>error&#95;txt</text><title>&#10697;  error_txt
-     * varchar(4000)
- ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-      Freeform description of the problem found while attempting to interpret the report line</title></a>
-<text x='1328' y='872' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;4000&#41;</text>  <use id='nn' x='1074' y='877' xlink:href='#nn'/><a xlink:href='#dss.dss_listing_line_error_source_line_txt'><text id='dss&#46;dss&#95;listing&#95;line&#95;error&#46;source&#95;line&#95;txt' x='1091' y='887'>source&#95;line&#95;txt</text><title>&#10697;  source_line_txt
-     * varchar(32000)
- ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-      Full text of the report line that could not be interpreted</title></a>
-<text x='1328' y='888' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;32000&#41;</text>  <a xlink:href='#dss.dss_listing_line_error_platform_listing_no'><text id='dss&#46;dss&#95;listing&#95;line&#95;error&#46;platform&#95;listing&#95;no' x='1091' y='903'>platform&#95;listing&#95;no</text><title>&#10697;  platform_listing_no
-     varchar(25)
- ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-      The platform issued identification number for the listing</title></a>
-<text x='1328' y='904' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;25&#41;</text>  <use id='nn' x='1074' y='909' xlink:href='#nn'/><a xlink:href='#dss.dss_listing_line_error_including_rental_listing_report_id'><text id='dss&#46;dss&#95;listing&#95;line&#95;error&#46;including&#95;rental&#95;listing&#95;report&#95;id' x='1091' y='919' onmouseover="hghl(['dss_listing_line_error_dss_listing_line_error_fk_included_in','dss.dss_rental_listing_report.rental_listing_report_id'])" onmouseout="uhghl(['dss_listing_line_error_dss_listing_line_error_fk_included_in','dss.dss_rental_listing_report.rental_listing_report_id'])">including&#95;rental&#95;listing&#95;report&#95;id</text><title>&#10697;  including_rental_listing_report_id
-     * bigint
- &#8599; dss_listing_line_error( rental_listing_report_id )
- ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-      Foreign key</title></a>
-<text x='1328' y='920' text-anchor='end' style='fill:#92B586;stroke:0;'>bigint</text><a xlink:href='#dss.dss_listing_line_error.including_rental_listing_report_id'><use id='fk' x='1332' y='908' xlink:href='#fk'/><title>&#x1F517;  References dss_rental_listing_report ( including_rental_listing_report_id -&gt; rental_listing_report_id ) </title></a>
-
 <!-- == Table 'dss_message_reason' == -->
 <rect id='depict_dss&#46;dss&#95;message&#95;reason' class='entity' style='stroke:#769BB9' x='1840' y='40' width='240' height='96' />
 <rect x='1840' y='40' width='240' height='28' style='stroke-width:0; fill:#F1F6FA'/>
@@ -634,9 +614,9 @@ Referred by dss_user_identity ( represented_by_organization_id -&gt; organizatio
       The globally unique identifier (assigned by the identity provider) for the most recent user to record a change</title></a>
 <text x='736' y='360' text-anchor='end' style='fill:#869EB5;stroke:0;'>uuid</text>
 <!-- == Table 'dss_organization_contact_person' == -->
-<rect id='depict_dss&#46;dss&#95;organization&#95;contact&#95;person' class='entity' style='stroke:#769BB9' x='1072' y='56' width='272' height='192' />
-<rect x='1072' y='56' width='272' height='28' style='stroke-width:0; fill:#F1F6FA'/>
-<line class='topLine' style='stroke:#176098;' stroke-linecap='round' x1='1072' y1='56' x2='1344' y2='56'/>
+<rect id='depict_dss&#46;dss&#95;organization&#95;contact&#95;person' class='entity' style='stroke:#B99D76' x='1072' y='56' width='272' height='192' />
+<rect x='1072' y='56' width='272' height='28' style='stroke-width:0; fill:#FAF6F1'/>
+<line class='topLine' style='stroke:#986317;' stroke-linecap='round' x1='1072' y1='56' x2='1344' y2='56'/>
 <a xlink:href='#dss.dss_organization_contact_person'><text x='1110' y='75' >dss&#95;organization&#95;contact&#95;person</text><title>Table dss.dss_organization_contact_person
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       A person who has been identified as a notable contact for a particular organization</title></a>
@@ -644,41 +624,41 @@ Referred by dss_user_identity ( represented_by_organization_id -&gt; organizatio
      * bigint
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Unique generated key</title></a>
-<text x='1328' y='104' text-anchor='end' style='fill:#86A0B5;stroke:0;'>bigint</text>  <use id='nn' x='1074' y='109' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_is_primary'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;is&#95;primary' x='1091' y='119'>is&#95;primary</text><title>&#10697;  is_primary
+<text x='1328' y='104' text-anchor='end' style='fill:#B5A286;stroke:0;'>bigint</text>  <use id='nn' x='1074' y='109' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_is_primary'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;is&#95;primary' x='1091' y='119'>is&#95;primary</text><title>&#10697;  is_primary
      * boolean
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Indicates whether the contact should receive all communications directed at the organization</title></a>
-<text x='1328' y='120' text-anchor='end' style='fill:#86A0B5;stroke:0;'>boolean</text>  <use id='nn' x='1074' y='125' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_given_nm'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;given&#95;nm' x='1091' y='135'>given&#95;nm</text><title>&#10697;  given_nm
+<text x='1328' y='120' text-anchor='end' style='fill:#B5A286;stroke:0;'>boolean</text>  <use id='nn' x='1074' y='125' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_given_nm'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;given&#95;nm' x='1091' y='135'>given&#95;nm</text><title>&#10697;  given_nm
      * varchar(25)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       A name given to a person so that they can easily be identified among their family members (in some cultures, this is often the first name)</title></a>
-<text x='1328' y='136' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;25&#41;</text>  <use id='nn' x='1074' y='141' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_family_nm'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;family&#95;nm' x='1091' y='151'>family&#95;nm</text><title>&#10697;  family_nm
+<text x='1328' y='136' text-anchor='end' style='fill:#B5A286;stroke:0;'>varchar&#40;25&#41;</text>  <use id='nn' x='1074' y='141' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_family_nm'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;family&#95;nm' x='1091' y='151'>family&#95;nm</text><title>&#10697;  family_nm
      * varchar(25)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       A name that is often shared amongst members of the same family (commonly known as a surname within some cultures)</title></a>
-<text x='1328' y='152' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;25&#41;</text>  <use id='nn' x='1074' y='157' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_phone_no'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;phone&#95;no' x='1091' y='167'>phone&#95;no</text><title>&#10697;  phone_no
-     * varchar(13)
+<text x='1328' y='152' text-anchor='end' style='fill:#B5A286;stroke:0;'>varchar&#40;25&#41;</text>  <use id='nn' x='1074' y='157' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_phone_no'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;phone&#95;no' x='1091' y='167'>phone&#95;no</text><title>&#10697;  phone_no
+     * varchar(30)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Phone number given for the contact by the organization (contains only digits)</title></a>
-<text x='1328' y='168' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;13&#41;</text>  <use id='nn' x='1074' y='173' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_email_address_dsc'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;email&#95;address&#95;dsc' x='1091' y='183'>email&#95;address&#95;dsc</text><title>&#10697;  email_address_dsc
+<text x='1328' y='168' text-anchor='end' style='fill:#B5A286;stroke:0;'>varchar&#40;30&#41;</text>  <use id='nn' x='1074' y='173' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_email_address_dsc'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;email&#95;address&#95;dsc' x='1091' y='183'>email&#95;address&#95;dsc</text><title>&#10697;  email_address_dsc
      * varchar(320)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       E-mail address given for the contact by the organization</title></a>
-<text x='1328' y='184' text-anchor='end' style='fill:#86A0B5;stroke:0;'>varchar&#40;320&#41;</text>  <use id='nn' x='1074' y='189' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_contacted_through_organization_id'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;contacted&#95;through&#95;organization&#95;id' x='1091' y='199' onmouseover="hghl(['dss_organization_contact_person_dss_organization_contact_person_fk_contacted_for','dss.dss_organization.organization_id'])" onmouseout="uhghl(['dss_organization_contact_person_dss_organization_contact_person_fk_contacted_for','dss.dss_organization.organization_id'])">contacted&#95;through&#95;organization&#95;id</text><title>&#10697;  contacted_through_organization_id
+<text x='1328' y='184' text-anchor='end' style='fill:#B5A286;stroke:0;'>varchar&#40;320&#41;</text>  <use id='nn' x='1074' y='189' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_contacted_through_organization_id'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;contacted&#95;through&#95;organization&#95;id' x='1091' y='199' onmouseover="hghl(['dss_organization_contact_person_dss_organization_contact_person_fk_contacted_for','dss.dss_organization.organization_id'])" onmouseout="uhghl(['dss_organization_contact_person_dss_organization_contact_person_fk_contacted_for','dss.dss_organization.organization_id'])">contacted&#95;through&#95;organization&#95;id</text><title>&#10697;  contacted_through_organization_id
      * bigint
  &#8599; dss_organization_contact_person( organization_id )
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Foreign key</title></a>
-<text x='1328' y='200' text-anchor='end' style='fill:#86A0B5;stroke:0;'>bigint</text><a xlink:href='#dss.dss_organization_contact_person.contacted_through_organization_id'><use id='fk' x='1332' y='188' xlink:href='#fk'/><title>&#x1F517;  References dss_organization ( contacted_through_organization_id -&gt; organization_id ) </title></a>
+<text x='1328' y='200' text-anchor='end' style='fill:#B5A286;stroke:0;'>bigint</text><a xlink:href='#dss.dss_organization_contact_person.contacted_through_organization_id'><use id='fk' x='1332' y='188' xlink:href='#fk'/><title>&#x1F517;  References dss_organization ( contacted_through_organization_id -&gt; organization_id ) </title></a>
   <use id='nn' x='1074' y='205' xlink:href='#nn'/><a xlink:href='#dss.dss_organization_contact_person_upd_dtm'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;upd&#95;dtm' x='1091' y='215'>upd&#95;dtm</text><title>&#10697;  upd_dtm
      * timestamptz
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Trigger-updated timestamp of last change</title></a>
-<text x='1328' y='216' text-anchor='end' style='fill:#86A0B5;stroke:0;'>timestamptz</text>  <a xlink:href='#dss.dss_organization_contact_person_upd_user_guid'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;upd&#95;user&#95;guid' x='1091' y='231'>upd&#95;user&#95;guid</text><title>&#10697;  upd_user_guid
+<text x='1328' y='216' text-anchor='end' style='fill:#B5A286;stroke:0;'>timestamptz</text>  <a xlink:href='#dss.dss_organization_contact_person_upd_user_guid'><text id='dss&#46;dss&#95;organization&#95;contact&#95;person&#46;upd&#95;user&#95;guid' x='1091' y='231'>upd&#95;user&#95;guid</text><title>&#10697;  upd_user_guid
      uuid
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       The globally unique identifier (assigned by the identity provider) for the most recent user to record a change</title></a>
-<text x='1328' y='232' text-anchor='end' style='fill:#86A0B5;stroke:0;'>uuid</text>
+<text x='1328' y='232' text-anchor='end' style='fill:#B5A286;stroke:0;'>uuid</text>
 <!-- == Table 'dss_organization_type' == -->
 <rect id='depict_dss&#46;dss&#95;organization&#95;type' class='entity' style='stroke:#769BB9' x='48' y='216' width='240' height='80' />
 <rect x='48' y='216' width='240' height='28' style='stroke-width:0; fill:#F1F6FA'/>
@@ -851,14 +831,14 @@ Referred by dss_user_identity ( represented_by_organization_id -&gt; organizatio
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       The full name of the contact person as inluded in the listing</title></a>
 <text x='1248' y='1192' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;50&#41;</text>  <a xlink:href='#dss.dss_rental_listing_contact_phone_no'><text id='dss&#46;dss&#95;rental&#95;listing&#95;contact&#46;phone&#95;no' x='1011' y='1207'>phone&#95;no</text><title>&#10697;  phone_no
-     varchar(13)
+     varchar(30)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Phone number given for the contact</title></a>
-<text x='1248' y='1208' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;13&#41;</text>  <a xlink:href='#dss.dss_rental_listing_contact_fax_no'><text id='dss&#46;dss&#95;rental&#95;listing&#95;contact&#46;fax&#95;no' x='1011' y='1223'>fax&#95;no</text><title>&#10697;  fax_no
-     varchar(13)
+<text x='1248' y='1208' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;30&#41;</text>  <a xlink:href='#dss.dss_rental_listing_contact_fax_no'><text id='dss&#46;dss&#95;rental&#95;listing&#95;contact&#46;fax&#95;no' x='1011' y='1223'>fax&#95;no</text><title>&#10697;  fax_no
+     varchar(30)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Facsimile numbrer given for the contact</title></a>
-<text x='1248' y='1224' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;13&#41;</text>  <a xlink:href='#dss.dss_rental_listing_contact_full_address_txt'><text id='dss&#46;dss&#95;rental&#95;listing&#95;contact&#46;full&#95;address&#95;txt' x='1011' y='1239'>full&#95;address&#95;txt</text><title>&#10697;  full_address_txt
+<text x='1248' y='1224' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;30&#41;</text>  <a xlink:href='#dss.dss_rental_listing_contact_full_address_txt'><text id='dss&#46;dss&#95;rental&#95;listing&#95;contact&#46;full&#95;address&#95;txt' x='1011' y='1239'>full&#95;address&#95;txt</text><title>&#10697;  full_address_txt
      varchar(250)
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Mailing address given for the contact</title></a>
@@ -881,44 +861,88 @@ Referred by dss_user_identity ( represented_by_organization_id -&gt; organizatio
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       The globally unique identifier (assigned by the identity provider) for the most recent user to record a change</title></a>
 <text x='1248' y='1304' text-anchor='end' style='fill:#92B586;stroke:0;'>uuid</text>
-<!-- == Table 'dss_rental_listing_report' == -->
-<rect id='depict_dss&#46;dss&#95;rental&#95;listing&#95;report' class='entity' style='stroke:#88B976' x='608' y='712' width='224' height='144' />
-<rect x='608' y='712' width='224' height='28' style='stroke-width:0; fill:#F3FAF1'/>
-<line class='topLine' style='stroke:#3A9817;' stroke-linecap='round' x1='608' y1='712' x2='832' y2='712'/>
-<a xlink:href='#dss.dss_rental_listing_report'><text x='648' y='731' >dss&#95;rental&#95;listing&#95;report</text><title>Table dss.dss_rental_listing_report
+<!-- == Table 'dss_rental_listing_line' == -->
+<rect id='depict_dss&#46;dss&#95;rental&#95;listing&#95;line' class='entity' style='stroke:#88B976' x='1072' y='808' width='272' height='176' />
+<rect x='1072' y='808' width='272' height='28' style='stroke-width:0; fill:#F3FAF1'/>
+<line class='topLine' style='stroke:#3A9817;' stroke-linecap='round' x1='1072' y1='808' x2='1344' y2='808'/>
+<a xlink:href='#dss.dss_rental_listing_line'><text x='1143' y='827' >dss&#95;rental&#95;listing&#95;line</text><title>Table dss.dss_rental_listing_line
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-      A delivery of rental listing information that is relevant to a specific month</title></a>
-  <use id='nn' x='610' y='749' xlink:href='#nn'/><use id='pk' x='610' y='748' xlink:href='#pk'><title>&#x1F511;  Pk dss_rental_listing_report_pk ( rental_listing_report_id ) </title></use><a xlink:href='#dss.dss_rental_listing_report_rental_listing_report_id'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;rental&#95;listing&#95;report&#95;id' x='627' y='759' onmouseover="hghl(['dss_rental_listing_dss_rental_listing_fk_included_in','dss.dss_rental_listing.including_rental_listing_report_id','dss_listing_line_error_dss_listing_line_error_fk_included_in','dss.dss_listing_line_error.including_rental_listing_report_id'])" onmouseout="uhghl(['dss_rental_listing_dss_rental_listing_fk_included_in','dss.dss_rental_listing.including_rental_listing_report_id','dss_listing_line_error_dss_listing_line_error_fk_included_in','dss.dss_listing_line_error.including_rental_listing_report_id'])">rental&#95;listing&#95;report&#95;id</text><title>&#10697;  rental_listing_report_id
+      A rental listing report line that has been extracted from the source</title></a>
+  <use id='nn' x='1074' y='845' xlink:href='#nn'/><use id='pk' x='1074' y='844' xlink:href='#pk'><title>&#x1F511;  Pk dss_rental_listing_line_pk ( rental_listing_line_id ) </title></use><a xlink:href='#dss.dss_rental_listing_line_rental_listing_line_id'><text id='dss&#46;dss&#95;rental&#95;listing&#95;line&#46;rental&#95;listing&#95;line&#95;id' x='1091' y='855'>rental&#95;listing&#95;line&#95;id</text><title>&#10697;  rental_listing_line_id
      * bigint
- &#8601; dss_rental_listing( rental_listing_report_id )
- &#8601; dss_listing_line_error( rental_listing_report_id )
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Unique generated key</title></a>
-<text x='816' y='760' text-anchor='end' style='fill:#92B586;stroke:0;'>bigint</text><a xlink:href='#dss.dss_rental_listing_report.rental_listing_report_id'><use id='ref' x='820' y='748' xlink:href='#ref'/><title>&#x1F517;  Referred by dss_rental_listing ( including_rental_listing_report_id -&gt; rental_listing_report_id ) 
-Referred by dss_listing_line_error ( including_rental_listing_report_id -&gt; rental_listing_report_id ) </title></a>
-  <use id='nn' x='610' y='765' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_report_report_period_ym'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;report&#95;period&#95;ym' x='627' y='775'>report&#95;period&#95;ym</text><title>&#10697;  report_period_ym
+<text x='1328' y='856' text-anchor='end' style='fill:#92B586;stroke:0;'>bigint</text>  <use id='nn' x='1074' y='861' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_line_is_validation_failure'><text id='dss&#46;dss&#95;rental&#95;listing&#95;line&#46;is&#95;validation&#95;failure' x='1091' y='871'>is&#95;validation&#95;failure</text><title>&#10697;  is_validation_failure
+     * boolean
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Indicates that there has been a validation problem that prevents successful ingestion of the rental listing</title></a>
+<text x='1328' y='872' text-anchor='end' style='fill:#92B586;stroke:0;'>boolean</text>  <use id='nn' x='1074' y='877' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_line_is_system_failure'><text id='dss&#46;dss&#95;rental&#95;listing&#95;line&#46;is&#95;system&#95;failure' x='1091' y='887'>is&#95;system&#95;failure</text><title>&#10697;  is_system_failure
+     * boolean
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Indicates that a system fault has prevented complete ingestion of the rental listing</title></a>
+<text x='1328' y='888' text-anchor='end' style='fill:#92B586;stroke:0;'>boolean</text>  <use id='nn' x='1074' y='893' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_line_organization_cd'><text id='dss&#46;dss&#95;rental&#95;listing&#95;line&#46;organization&#95;cd' x='1091' y='903'>organization&#95;cd</text><title>&#10697;  organization_cd
+     * varchar(25)
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      An immutable system code that identifies the listing organization (e.g. AIRBNB)</title></a>
+<text x='1328' y='904' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;25&#41;</text>  <use id='nn' x='1074' y='909' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_line_platform_listing_no'><text id='dss&#46;dss&#95;rental&#95;listing&#95;line&#46;platform&#95;listing&#95;no' x='1091' y='919'>platform&#95;listing&#95;no</text><title>&#10697;  platform_listing_no
+     * varchar(25)
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      The platform issued identification number for the listing</title></a>
+<text x='1328' y='920' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;25&#41;</text>  <use id='nn' x='1074' y='925' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_line_source_line_txt'><text id='dss&#46;dss&#95;rental&#95;listing&#95;line&#46;source&#95;line&#95;txt' x='1091' y='935'>source&#95;line&#95;txt</text><title>&#10697;  source_line_txt
+     * varchar(32000)
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Full text of the report line that could not be interpreted</title></a>
+<text x='1328' y='936' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;32000&#41;</text>  <a xlink:href='#dss.dss_rental_listing_line_error_txt'><text id='dss&#46;dss&#95;rental&#95;listing&#95;line&#46;error&#95;txt' x='1091' y='951'>error&#95;txt</text><title>&#10697;  error_txt
+     varchar(32000)
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Freeform description of the problem found while attempting to interpret the report line</title></a>
+<text x='1328' y='952' text-anchor='end' style='fill:#92B586;stroke:0;'>varchar&#40;32000&#41;</text>  <use id='nn' x='1074' y='957' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_line_including_rental_listing_report_id'><text id='dss&#46;dss&#95;rental&#95;listing&#95;line&#46;including&#95;rental&#95;listing&#95;report&#95;id' x='1091' y='967' onmouseover="hghl(['dss_rental_listing_line_dss_rental_listing_line_fk_included_in','dss.dss_rental_listing_report.rental_listing_report_id'])" onmouseout="uhghl(['dss_rental_listing_line_dss_rental_listing_line_fk_included_in','dss.dss_rental_listing_report.rental_listing_report_id'])">including&#95;rental&#95;listing&#95;report&#95;id</text><title>&#10697;  including_rental_listing_report_id
+     * bigint
+ &#8599; dss_rental_listing_line( rental_listing_report_id )
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Foreign key</title></a>
+<text x='1328' y='968' text-anchor='end' style='fill:#92B586;stroke:0;'>bigint</text><a xlink:href='#dss.dss_rental_listing_line.including_rental_listing_report_id'><use id='fk' x='1332' y='956' xlink:href='#fk'/><title>&#x1F517;  References dss_rental_listing_report ( including_rental_listing_report_id -&gt; rental_listing_report_id ) </title></a>
+
+<!-- == Table 'dss_rental_listing_report' == -->
+<rect id='depict_dss&#46;dss&#95;rental&#95;listing&#95;report' class='entity' style='stroke:#88B976' x='608' y='680' width='224' height='160' />
+<rect x='608' y='680' width='224' height='28' style='stroke-width:0; fill:#F3FAF1'/>
+<line class='topLine' style='stroke:#3A9817;' stroke-linecap='round' x1='608' y1='680' x2='832' y2='680'/>
+<a xlink:href='#dss.dss_rental_listing_report'><text x='648' y='699' >dss&#95;rental&#95;listing&#95;report</text><title>Table dss.dss_rental_listing_report
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      A delivery of rental listing information that is relevant to a specific month</title></a>
+  <use id='nn' x='610' y='717' xlink:href='#nn'/><use id='pk' x='610' y='716' xlink:href='#pk'><title>&#x1F511;  Pk dss_rental_listing_report_pk ( rental_listing_report_id ) </title></use><a xlink:href='#dss.dss_rental_listing_report_rental_listing_report_id'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;rental&#95;listing&#95;report&#95;id' x='627' y='727' onmouseover="hghl(['dss_rental_listing_line_dss_rental_listing_line_fk_included_in','dss.dss_rental_listing_line.including_rental_listing_report_id','dss_rental_listing_dss_rental_listing_fk_included_in','dss.dss_rental_listing.including_rental_listing_report_id'])" onmouseout="uhghl(['dss_rental_listing_line_dss_rental_listing_line_fk_included_in','dss.dss_rental_listing_line.including_rental_listing_report_id','dss_rental_listing_dss_rental_listing_fk_included_in','dss.dss_rental_listing.including_rental_listing_report_id'])">rental&#95;listing&#95;report&#95;id</text><title>&#10697;  rental_listing_report_id
+     * bigint
+ &#8601; dss_rental_listing_line( rental_listing_report_id )
+ &#8601; dss_rental_listing( rental_listing_report_id )
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Unique generated key</title></a>
+<text x='816' y='728' text-anchor='end' style='fill:#92B586;stroke:0;'>bigint</text><a xlink:href='#dss.dss_rental_listing_report.rental_listing_report_id'><use id='ref' x='820' y='716' xlink:href='#ref'/><title>&#x1F517;  Referred by dss_rental_listing_line ( including_rental_listing_report_id -&gt; rental_listing_report_id ) 
+Referred by dss_rental_listing ( including_rental_listing_report_id -&gt; rental_listing_report_id ) </title></a>
+  <use id='nn' x='610' y='733' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_report_is_processed'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;is&#95;processed' x='627' y='743'>is&#95;processed</text><title>&#10697;  is_processed
+     * boolean</title></a>
+<text x='816' y='744' text-anchor='end' style='fill:#92B586;stroke:0;'>boolean</text>  <use id='nn' x='610' y='749' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_report_report_period_ym'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;report&#95;period&#95;ym' x='627' y='759'>report&#95;period&#95;ym</text><title>&#10697;  report_period_ym
      * date
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       The month to which the listing information is relevant (always set to the first day of the month)</title></a>
-<text x='816' y='776' text-anchor='end' style='fill:#92B586;stroke:0;'>date</text>  <a xlink:href='#dss.dss_rental_listing_report_source_bin'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;source&#95;bin' x='627' y='791'>source&#95;bin</text><title>&#10697;  source_bin
+<text x='816' y='760' text-anchor='end' style='fill:#92B586;stroke:0;'>date</text>  <a xlink:href='#dss.dss_rental_listing_report_source_bin'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;source&#95;bin' x='627' y='775'>source&#95;bin</text><title>&#10697;  source_bin
      bytea
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       The binary image of the information that was uploaded</title></a>
-<text x='816' y='792' text-anchor='end' style='fill:#92B586;stroke:0;'>bytea</text>  <use id='nn' x='610' y='797' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_report_providing_organization_id'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;providing&#95;organization&#95;id' x='627' y='807' onmouseover="hghl(['dss_rental_listing_report_dss_rental_listing_report_fk_provided_by','dss.dss_organization.organization_id'])" onmouseout="uhghl(['dss_rental_listing_report_dss_rental_listing_report_fk_provided_by','dss.dss_organization.organization_id'])">providing&#95;organization&#95;id</text><title>&#10697;  providing_organization_id
+<text x='816' y='776' text-anchor='end' style='fill:#92B586;stroke:0;'>bytea</text>  <use id='nn' x='610' y='781' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_report_providing_organization_id'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;providing&#95;organization&#95;id' x='627' y='791' onmouseover="hghl(['dss_rental_listing_report_dss_rental_listing_report_fk_provided_by','dss.dss_organization.organization_id'])" onmouseout="uhghl(['dss_rental_listing_report_dss_rental_listing_report_fk_provided_by','dss.dss_organization.organization_id'])">providing&#95;organization&#95;id</text><title>&#10697;  providing_organization_id
      * bigint
  &#8599; dss_rental_listing_report( organization_id )
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Foreign key</title></a>
-<text x='816' y='808' text-anchor='end' style='fill:#92B586;stroke:0;'>bigint</text><a xlink:href='#dss.dss_rental_listing_report.providing_organization_id'><use id='fk' x='820' y='796' xlink:href='#fk'/><title>&#x1F517;  References dss_organization ( providing_organization_id -&gt; organization_id ) </title></a>
-  <use id='nn' x='610' y='813' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_report_upd_dtm'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;upd&#95;dtm' x='627' y='823'>upd&#95;dtm</text><title>&#10697;  upd_dtm
+<text x='816' y='792' text-anchor='end' style='fill:#92B586;stroke:0;'>bigint</text><a xlink:href='#dss.dss_rental_listing_report.providing_organization_id'><use id='fk' x='820' y='780' xlink:href='#fk'/><title>&#x1F517;  References dss_organization ( providing_organization_id -&gt; organization_id ) </title></a>
+  <use id='nn' x='610' y='797' xlink:href='#nn'/><a xlink:href='#dss.dss_rental_listing_report_upd_dtm'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;upd&#95;dtm' x='627' y='807'>upd&#95;dtm</text><title>&#10697;  upd_dtm
      * timestamptz
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       Trigger-updated timestamp of last change</title></a>
-<text x='816' y='824' text-anchor='end' style='fill:#92B586;stroke:0;'>timestamptz</text>  <a xlink:href='#dss.dss_rental_listing_report_upd_user_guid'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;upd&#95;user&#95;guid' x='627' y='839'>upd&#95;user&#95;guid</text><title>&#10697;  upd_user_guid
+<text x='816' y='808' text-anchor='end' style='fill:#92B586;stroke:0;'>timestamptz</text>  <a xlink:href='#dss.dss_rental_listing_report_upd_user_guid'><text id='dss&#46;dss&#95;rental&#95;listing&#95;report&#46;upd&#95;user&#95;guid' x='627' y='823'>upd&#95;user&#95;guid</text><title>&#10697;  upd_user_guid
      uuid
  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
       The globally unique identifier (assigned by the identity provider) for the most recent user to record a change</title></a>
-<text x='816' y='840' text-anchor='end' style='fill:#92B586;stroke:0;'>uuid</text>
+<text x='816' y='824' text-anchor='end' style='fill:#92B586;stroke:0;'>uuid</text>
 <!-- == Table 'dss_user_identity' == -->
 <rect id='depict_dss&#46;dss&#95;user&#95;identity' class='entity' style='stroke:#769BB9' x='1088' y='296' width='288' height='304' />
 <rect x='1088' y='296' width='288' height='28' style='stroke-width:0; fill:#F1F6FA'/>
@@ -1086,6 +1110,6 @@ Referred by dss_user_role_privilege ( user_role_cd ) </title></a>
     <tspan x='68.000000' dx='8' dy='20'>Short Term Rental Data Sharing</tspan>
     <tspan x='68.000000' dx='8' dy='20'>Physical Data Diagram &#40;Sprint 3&#41;</tspan>
     <tspan x='68.000000' dx='8' dy='20'>Leif Larsen&#44; DXC Technology</tspan>
-    <tspan x='68.000000' dx='8' dy='20'>March 26&#44; 2024</tspan>
+    <tspan x='68.000000' dx='8' dy='20'>April 5&#44; 2024</tspan>
 </text>
 </g></svg>

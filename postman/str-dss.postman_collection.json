@@ -548,6 +548,44 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "CreateRentalLisingReport",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "ReportPeriodYm",
+							"value": "2024-05",
+							"type": "text"
+						},
+						{
+							"key": "ProvidingOrganizationId",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "File",
+							"type": "file",
+							"src": "postman-cloud:///1eef467a-0ea4-42e0-a84e-fd7fbcdd20f7"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/api/rentallistingreports",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistingreports"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {

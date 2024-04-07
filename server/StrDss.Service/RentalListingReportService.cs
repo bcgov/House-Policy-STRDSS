@@ -6,35 +6,95 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data;
+using StrDss.Data.Entities;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service.CsvHelpers;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace StrDss.Service
 {
     public interface IRentalListingReportService
     {
         Task<Dictionary<string, List<string>>> ValidateAndParseUploadFileAsync(string reportPeriod, long orgId, TextReader textReader);
+        Task<Dictionary<string, List<string>>> CreateRentalListingReport(string reportPeriod, long orgId, Stream stream);
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
         private IOrganizationRepository _orgRepo;
+        private IRentalListingReportRepository _listingRepo;
         private IConfiguration _config;
         private ILogger<RentalListingReportService> _logger;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IOrganizationRepository orgRepo, IConfiguration config, ILogger<RentalListingReportService> logger)
+            IOrganizationRepository orgRepo, IRentalListingReportRepository listingRepo, IConfiguration config, ILogger<RentalListingReportService> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
         {
             _orgRepo = orgRepo;
+            _listingRepo = listingRepo;
             _config = config;
             _logger = logger;
+        }
+
+        public async Task<Dictionary<string, List<string>>> CreateRentalListingReport(string reportPeriod, long orgId, Stream stream)
+        {
+            byte[] sourceBin;
+            using (var memoryStream = new MemoryStream())
+            {
+                await stream.CopyToAsync(memoryStream);
+                sourceBin = memoryStream.ToArray();
+            }
+
+            //check if any non printable byte exists?
+
+            stream.Position = 0;
+            using TextReader textReader = new StreamReader(stream, Encoding.UTF8);
+
+            var errors = await ValidateAndParseUploadFileAsync(reportPeriod, orgId, textReader);
+
+            if (errors.Count > 0) return errors;
+
+            var entity = new DssRentalListingReport
+            {
+                IsProcessed = false,
+                ReportPeriodYm = new DateOnly(Convert.ToInt32(reportPeriod.Substring(0, 4)), Convert.ToInt32(reportPeriod.Substring(5, 2)), 1),
+                SourceBin = sourceBin,
+                ProvidingOrganizationId = orgId,
+            };
+
+            await _listingRepo.AddRentalLisitngReportAsync(entity);
+            
+            _unitOfWork.Commit();
+
+            return errors;
         }
 
         public async Task<Dictionary<string, List<string>>> ValidateAndParseUploadFileAsync(string reportPeriod, long orgId, TextReader textReader)
         {
             var errors = new Dictionary<string, List<string>>();
+
+            var regex = RegexDefs.GetRegexInfo(RegexDefs.YearMonth);
+            if (!Regex.IsMatch(reportPeriod, regex.Regex))
+            {
+                errors.AddItem("ReportPeriod", regex.ErrorMessage);
+            }
+
+            var platform = await _orgRepo.GetOrganizationByIdAsync(orgId);
+            if (platform == null)
+            {
+                errors.AddItem("OrganizationId", $"Organization ID [{orgId}] doesn't exist.");
+            }
+            else if (platform.OrganizationType != OrganizationTypes.Platform)
+            {
+                errors.AddItem("OrganizationId", $"Organization type of the organization [{orgId}] is not {OrganizationTypes.Platform}.");
+            }           
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
 
             var csvConfig = CsvHelperUtils.GetConfig(errors, false);
 

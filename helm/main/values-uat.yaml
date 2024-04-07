@@ -13,6 +13,7 @@ global:
     'SM_LOGOFF_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi/'
     'CHES_TOKEN_URL': 'https://test.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
     'CHES_URL': 'https://ches-test.api.gov.bc.ca'
+    'RENTAL_LISTING_REPORT_MAX_SIZE': '4'
 
 nameOverride: strdss-uat
 fullnameOverride: strdss-uat

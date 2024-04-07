@@ -25,6 +25,16 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssOrganizationType> DssOrganizationTypes { get; set; }
 
+    public virtual DbSet<DssPhysicalAddress> DssPhysicalAddresses { get; set; }
+
+    public virtual DbSet<DssRentalListing> DssRentalListings { get; set; }
+
+    public virtual DbSet<DssRentalListingContact> DssRentalListingContacts { get; set; }
+
+    public virtual DbSet<DssRentalListingLine> DssRentalListingLines { get; set; }
+
+    public virtual DbSet<DssRentalListingReport> DssRentalListingReports { get; set; }
+
     public virtual DbSet<DssUserIdentity> DssUserIdentities { get; set; }
 
     public virtual DbSet<DssUserIdentityView> DssUserIdentityViews { get; set; }
@@ -88,7 +98,7 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(320)
                 .HasColumnName("lg_email_address_dsc");
             entity.Property(e => e.LgPhoneNo)
-                .HasMaxLength(13)
+                .HasMaxLength(30)
                 .HasColumnName("lg_phone_no");
             entity.Property(e => e.LgStrBylawUrl)
                 .HasMaxLength(4000)
@@ -243,7 +253,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("Indicates whether the contact should receive all communications directed at the organization")
                 .HasColumnName("is_primary");
             entity.Property(e => e.PhoneNo)
-                .HasMaxLength(13)
+                .HasMaxLength(30)
                 .HasComment("Phone number given for the contact by the organization (contains only digits)")
                 .HasColumnName("phone_no");
             entity.Property(e => e.UpdDtm)
@@ -271,6 +281,260 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.OrganizationTypeNm)
                 .HasMaxLength(250)
                 .HasColumnName("organization_type_nm");
+        });
+
+        modelBuilder.Entity<DssPhysicalAddress>(entity =>
+        {
+            entity.HasKey(e => e.PhysicalAddressId).HasName("dss_physical_address_pk");
+
+            entity.ToTable("dss_physical_address", tb => tb.HasComment("A property address that includes any verifiable BC attributes"));
+
+            entity.Property(e => e.PhysicalAddressId)
+                .HasComment("Unique generated key")
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("physical_address_id");
+            entity.Property(e => e.BlockNo)
+                .HasMaxLength(50)
+                .HasComment("The blockID returned by the address match")
+                .HasColumnName("block_no");
+            entity.Property(e => e.ContainingOrganizationId)
+                .HasComment("Foreign key")
+                .HasColumnName("containing_organization_id");
+            entity.Property(e => e.IsExempt)
+                .HasComment("Indicates whether the address has been identified as exempt from Short Term Rental regulations")
+                .HasColumnName("is_exempt");
+            entity.Property(e => e.LocationGeometry)
+                .HasComment("The computed location point of the matched address")
+                .HasColumnName("location_geometry");
+            entity.Property(e => e.MatchAddressTxt)
+                .HasMaxLength(250)
+                .HasComment("The sanitized physical address that has been derived from the original")
+                .HasColumnName("match_address_txt");
+            entity.Property(e => e.MatchResultJson)
+                .HasComment("Full JSON result of the source address matching attempt")
+                .HasColumnType("json")
+                .HasColumnName("match_result_json");
+            entity.Property(e => e.MatchScoreAmt)
+                .HasComment("The relative score returned from the address matching attempt")
+                .HasColumnName("match_score_amt");
+            entity.Property(e => e.OriginalAddressTxt)
+                .HasMaxLength(250)
+                .HasComment("The source-provided address of a short-term rental offering")
+                .HasColumnName("original_address_txt");
+            entity.Property(e => e.SiteNo)
+                .HasMaxLength(50)
+                .HasComment("The siteID returned by the address match")
+                .HasColumnName("site_no");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
+
+            entity.HasOne(d => d.ContainingOrganization).WithMany(p => p.DssPhysicalAddresses)
+                .HasForeignKey(d => d.ContainingOrganizationId)
+                .HasConstraintName("dss_physical_address_fk_contained_in");
+        });
+
+        modelBuilder.Entity<DssRentalListing>(entity =>
+        {
+            entity.HasKey(e => e.RentalListingId).HasName("dss_rental_listing_pk");
+
+            entity.ToTable("dss_rental_listing", tb => tb.HasComment("A rental listing snapshot that is relevant to a specific month"));
+
+            entity.Property(e => e.RentalListingId)
+                .HasComment("Unique generated key")
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("rental_listing_id");
+            entity.Property(e => e.AvailableBedroomsQty)
+                .HasComment("The number of bedrooms in the dwelling unit that are available for short term rental")
+                .HasColumnName("available_bedrooms_qty");
+            entity.Property(e => e.BcRegistryNo)
+                .HasMaxLength(25)
+                .HasComment("The Short Term Registry issued permit number")
+                .HasColumnName("bc_registry_no");
+            entity.Property(e => e.BusinessLicenceNo)
+                .HasMaxLength(25)
+                .HasComment("The local government issued licence number that applies to the rental offering")
+                .HasColumnName("business_licence_no");
+            entity.Property(e => e.IncludingRentalListingReportId)
+                .HasComment("Foreign key")
+                .HasColumnName("including_rental_listing_report_id");
+            entity.Property(e => e.IsEntireUnit)
+                .HasComment("Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)")
+                .HasColumnName("is_entire_unit");
+            entity.Property(e => e.LocatingPhysicalAddressId)
+                .HasComment("Foreign key")
+                .HasColumnName("locating_physical_address_id");
+            entity.Property(e => e.NightsBookedQty)
+                .HasComment("The number of nights that short term rental accommodation services were provided during the reporting period")
+                .HasColumnName("nights_booked_qty");
+            entity.Property(e => e.OfferingOrganizationId)
+                .HasComment("Foreign key")
+                .HasColumnName("offering_organization_id");
+            entity.Property(e => e.PlatformListingNo)
+                .HasMaxLength(25)
+                .HasComment("The platform issued identification number for the listing")
+                .HasColumnName("platform_listing_no");
+            entity.Property(e => e.PlatformListingUrl)
+                .HasMaxLength(4000)
+                .HasComment("URL for the short-term rental platform listing")
+                .HasColumnName("platform_listing_url");
+            entity.Property(e => e.SeparateReservationsQty)
+                .HasComment("The number of separate reservations that were taken during the reporting period")
+                .HasColumnName("separate_reservations_qty");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
+
+            entity.HasOne(d => d.IncludingRentalListingReport).WithMany(p => p.DssRentalListings)
+                .HasForeignKey(d => d.IncludingRentalListingReportId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_rental_listing_fk_included_in");
+
+            entity.HasOne(d => d.LocatingPhysicalAddress).WithMany(p => p.DssRentalListings)
+                .HasForeignKey(d => d.LocatingPhysicalAddressId)
+                .HasConstraintName("dss_rental_listing_fk_located_at");
+
+            entity.HasOne(d => d.OfferingOrganization).WithMany(p => p.DssRentalListings)
+                .HasForeignKey(d => d.OfferingOrganizationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_rental_listing_fk_offered_by");
+        });
+
+        modelBuilder.Entity<DssRentalListingContact>(entity =>
+        {
+            entity.HasKey(e => e.RentalListingContactId).HasName("dss_rental_listing_contact_pk");
+
+            entity.ToTable("dss_rental_listing_contact", tb => tb.HasComment("A person who has been identified as a notable contact for a particular rental listing"));
+
+            entity.Property(e => e.RentalListingContactId)
+                .HasComment("Unique generated key")
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("rental_listing_contact_id");
+            entity.Property(e => e.ContactedThroughRentalListingId)
+                .HasComment("Foreign key")
+                .HasColumnName("contacted_through_rental_listing_id");
+            entity.Property(e => e.EmailAddressDsc)
+                .HasMaxLength(320)
+                .HasComment("E-mail address given for the contact")
+                .HasColumnName("email_address_dsc");
+            entity.Property(e => e.FaxNo)
+                .HasMaxLength(30)
+                .HasComment("Facsimile numbrer given for the contact")
+                .HasColumnName("fax_no");
+            entity.Property(e => e.FullAddressTxt)
+                .HasMaxLength(250)
+                .HasComment("Mailing address given for the contact")
+                .HasColumnName("full_address_txt");
+            entity.Property(e => e.FullNm)
+                .HasMaxLength(50)
+                .HasComment("The full name of the contact person as inluded in the listing")
+                .HasColumnName("full_nm");
+            entity.Property(e => e.IsPropertyOwner)
+                .HasComment("Indicates a person with the legal right to the unit being short-term rental")
+                .HasColumnName("is_property_owner");
+            entity.Property(e => e.ListingContactNbr)
+                .HasComment("Indicates which of the five possible supplier hosts is represented by this contact")
+                .HasColumnName("listing_contact_nbr");
+            entity.Property(e => e.PhoneNo)
+                .HasMaxLength(30)
+                .HasComment("Phone number given for the contact")
+                .HasColumnName("phone_no");
+            entity.Property(e => e.SupplierHostNo)
+                .HasMaxLength(25)
+                .HasComment("The platform identifier for the supplier host")
+                .HasColumnName("supplier_host_no");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
+
+            entity.HasOne(d => d.ContactedThroughRentalListing).WithMany(p => p.DssRentalListingContacts)
+                .HasForeignKey(d => d.ContactedThroughRentalListingId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_rental_listing_contact_fk_contacted_for");
+        });
+
+        modelBuilder.Entity<DssRentalListingLine>(entity =>
+        {
+            entity.HasKey(e => e.RentalListingLineId).HasName("dss_rental_listing_line_pk");
+
+            entity.ToTable("dss_rental_listing_line", tb => tb.HasComment("A rental listing report line that has been extracted from the source"));
+
+            entity.Property(e => e.RentalListingLineId)
+                .HasComment("Unique generated key")
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("rental_listing_line_id");
+            entity.Property(e => e.ErrorTxt)
+                .HasMaxLength(32000)
+                .HasComment("Freeform description of the problem found while attempting to interpret the report line")
+                .HasColumnName("error_txt");
+            entity.Property(e => e.IncludingRentalListingReportId)
+                .HasComment("Foreign key")
+                .HasColumnName("including_rental_listing_report_id");
+            entity.Property(e => e.IsSystemFailure)
+                .HasComment("Indicates that a system fault has prevented complete ingestion of the rental listing")
+                .HasColumnName("is_system_failure");
+            entity.Property(e => e.IsValidationFailure)
+                .HasComment("Indicates that there has been a validation problem that prevents successful ingestion of the rental listing")
+                .HasColumnName("is_validation_failure");
+            entity.Property(e => e.OrganizationCd)
+                .HasMaxLength(25)
+                .HasComment("An immutable system code that identifies the listing organization (e.g. AIRBNB)")
+                .HasColumnName("organization_cd");
+            entity.Property(e => e.PlatformListingNo)
+                .HasMaxLength(25)
+                .HasComment("The platform issued identification number for the listing")
+                .HasColumnName("platform_listing_no");
+            entity.Property(e => e.SourceLineTxt)
+                .HasMaxLength(32000)
+                .HasComment("Full text of the report line that could not be interpreted")
+                .HasColumnName("source_line_txt");
+
+            entity.HasOne(d => d.IncludingRentalListingReport).WithMany(p => p.DssRentalListingLines)
+                .HasForeignKey(d => d.IncludingRentalListingReportId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_rental_listing_line_fk_included_in");
+        });
+
+        modelBuilder.Entity<DssRentalListingReport>(entity =>
+        {
+            entity.HasKey(e => e.RentalListingReportId).HasName("dss_rental_listing_report_pk");
+
+            entity.ToTable("dss_rental_listing_report", tb => tb.HasComment("A delivery of rental listing information that is relevant to a specific month"));
+
+            entity.Property(e => e.RentalListingReportId)
+                .HasComment("Unique generated key")
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("rental_listing_report_id");
+            entity.Property(e => e.IsProcessed).HasColumnName("is_processed");
+            entity.Property(e => e.ProvidingOrganizationId)
+                .HasComment("Foreign key")
+                .HasColumnName("providing_organization_id");
+            entity.Property(e => e.ReportPeriodYm)
+                .HasComment("The month to which the listing information is relevant (always set to the first day of the month)")
+                .HasColumnName("report_period_ym");
+            entity.Property(e => e.SourceBin)
+                .HasComment("The binary image of the information that was uploaded")
+                .HasColumnName("source_bin");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
+
+            entity.HasOne(d => d.ProvidingOrganization).WithMany(p => p.DssRentalListingReports)
+                .HasForeignKey(d => d.ProvidingOrganizationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_rental_listing_report_fk_provided_by");
         });
 
         modelBuilder.Entity<DssUserIdentity>(entity =>

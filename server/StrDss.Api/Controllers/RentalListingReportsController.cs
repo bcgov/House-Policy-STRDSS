@@ -51,9 +51,8 @@ namespace StrDss.Api.Controllers
             }
 
             using var stream = dto.File.OpenReadStream();
-            using TextReader textReader = new StreamReader(stream, Encoding.UTF8);
 
-            errors = await _listingService.ValidateAndParseUploadFileAsync(dto.ReportPeriod, dto.OrganizationId, textReader);
+            errors = await _listingService.CreateRentalListingReport(dto.ReportPeriod, dto.OrganizationId, stream);
 
             if (errors.Count > 0)
             {

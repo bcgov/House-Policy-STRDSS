@@ -23,7 +23,7 @@ namespace StrDss.Test
             OrganizationDto platform,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             DelistingService sut)
@@ -47,7 +47,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -70,7 +70,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -93,7 +93,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -116,7 +116,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -140,7 +140,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -163,7 +163,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -186,7 +186,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -209,7 +209,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -232,7 +232,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -255,7 +255,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -278,7 +278,7 @@ namespace StrDss.Test
             string reason,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -300,7 +300,7 @@ namespace StrDss.Test
             OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -322,7 +322,7 @@ namespace StrDss.Test
             OrganizationDto platform,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -345,7 +345,7 @@ namespace StrDss.Test
             OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -368,7 +368,7 @@ namespace StrDss.Test
             OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -391,7 +391,7 @@ namespace StrDss.Test
             OrganizationDto lg,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<DelistingService>> loggerMock,
+            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange

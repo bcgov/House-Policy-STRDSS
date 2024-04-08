@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, CanActivateChildFn, CanActivateFn, Router, Rout
 import { UserDataService } from '../services/user-data.service';
 import { map } from 'rxjs';
 
-export const accessRequestTokenGuard: CanActivateFn = (route, state) => {
+export const accessRequestTokenGuard: CanActivateFn = (route, _state) => {
   const userDataService = inject(UserDataService)
   const router = inject(Router);
 

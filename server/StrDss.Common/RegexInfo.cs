@@ -26,6 +26,7 @@
         public const string Password = "Password";
         public const string PhoneNumber = "PhoneNumber";
         public const string Url = "Url";
+        public const string YearMonth = "YearMonth";
 
         private static readonly Dictionary<string, RegexInfo> _regexInfos;
 
@@ -61,6 +62,12 @@
             {
                 Regex = @"\b(?:[Hh][Tt][Tt][Pp][Ss]?):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]",
                 ErrorMessage = "Invalid Url"
+            });
+
+            _regexInfos.Add(YearMonth, new RegexInfo
+            {
+                Regex = @"^\d{4}-(0[1-9]|1[0-2])$",
+                ErrorMessage = "Invalid year-month format. Please use the yyyy-MM format (e.g., 2024-05)."
             });
         }
 

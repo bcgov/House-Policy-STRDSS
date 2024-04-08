@@ -53,6 +53,12 @@ public partial class DssOrganization
 
     public virtual ICollection<DssOrganizationContactPerson> DssOrganizationContactPeople { get; set; } = new List<DssOrganizationContactPerson>();
 
+    public virtual ICollection<DssPhysicalAddress> DssPhysicalAddresses { get; set; } = new List<DssPhysicalAddress>();
+
+    public virtual ICollection<DssRentalListingReport> DssRentalListingReports { get; set; } = new List<DssRentalListingReport>();
+
+    public virtual ICollection<DssRentalListing> DssRentalListings { get; set; } = new List<DssRentalListing>();
+
     public virtual ICollection<DssUserIdentity> DssUserIdentities { get; set; } = new List<DssUserIdentity>();
 
     public virtual ICollection<DssOrganization> InverseManagingOrganization { get; set; } = new List<DssOrganization>();

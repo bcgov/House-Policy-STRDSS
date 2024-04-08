@@ -27,11 +27,11 @@ namespace StrDss.Service
         private IEmailMessageService _emailService;
         private IOrganizationService _orgService;
         private IEmailMessageRepository _emailRepo;
-        private ILogger<DelistingService> _logger;
+        private ILogger<StrDssLogger> _logger;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, IEmailMessageRepository emailRepo, ILogger<DelistingService> logger)
-            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
+            IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, IEmailMessageRepository emailRepo, ILogger<StrDssLogger> logger)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _config = config;
             _emailService = emailService;

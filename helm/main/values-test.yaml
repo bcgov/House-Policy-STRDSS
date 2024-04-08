@@ -3,6 +3,7 @@ global:
     'Logging__LogLevel__Default': 'Information'
     'Logging__LogLevel__Microsoft.EntityFrameworkCore': 'Warning'
     'Logging__LogLevel__Microsoft.AspNetCore': 'Warning'
+    'Logging__LogLevel__StrDss.Common.StrDssLogger': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Test'
     'ENV_NAME': 'test'
     'AppBaseUrl': 'https://test-strdata.apps.silver.devops.gov.bc.ca'
@@ -13,6 +14,7 @@ global:
     'SM_LOGOFF_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi/'
     'CHES_TOKEN_URL': 'https://dev.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
     'CHES_URL': 'https://ches-dev.api.gov.bc.ca'
+    'RENTAL_LISTING_REPORT_MAX_SIZE': '4'
 
 nameOverride: strdss-test
 fullnameOverride: strdss-test

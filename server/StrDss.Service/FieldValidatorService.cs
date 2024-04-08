@@ -18,178 +18,13 @@ namespace StrDss.Service
         {
             _rules = new List<FieldValidationRule>();
 
-            LoadSystemUserEntityRules();
-            LoadStrApplicationEntityRules();
+            RentalListingReportValidationRule.LoadReportValidationRules(_rules);
         }
 
         public IEnumerable<FieldValidationRule> GetFieldValidationRules(string entityName)
         {
             return _rules.Where(x => x.EntityName.ToLowerInvariant() == entityName.ToLowerInvariant());
         }
-
-        private void LoadSystemUserEntityRules()
-        {
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.SystemUser,
-                FieldName = Fields.Username,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 1,
-                MaxLength = 10
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.SystemUser,
-                FieldName = Fields.Passwrod,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 8,
-                MaxLength = 255,
-                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Password)
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.SystemUser,
-                FieldName = Fields.LastName,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 1,
-                MaxLength = 30
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.SystemUser,
-                FieldName = Fields.StreetAddress,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 1,
-                MaxLength = 255
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.SystemUser,
-                FieldName = Fields.City,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 1,
-                MaxLength = 255
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.SystemUser,
-                FieldName = Fields.Province,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 1,
-                MaxLength = 255
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.SystemUser,
-                FieldName = Fields.PostalCode,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 6,
-                MaxLength = 6
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.SystemUser,
-                FieldName = Fields.PhoneNumber,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 14,
-                MaxLength = 14,
-                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.PhoneNumber)
-            });
-        }
-
-        private void LoadStrApplicationEntityRules()
-        {
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.StrApplication,
-                FieldName = Fields.StreetAddress,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 1,
-                MaxLength = 255
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.StrApplication,
-                FieldName = Fields.City,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 1,
-                MaxLength = 255
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.StrApplication,
-                FieldName = Fields.Province,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 1,
-                MaxLength = 255
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.StrApplication,
-                FieldName = Fields.PostalCode,
-                FieldType = FieldTypes.String,
-                Required = true,
-                MinLength = 6,
-                MaxLength = 6
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.StrApplication,
-                FieldName = Fields.SquareFootage,
-                FieldType = FieldTypes.String,
-                Required = true
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.StrApplication,
-                FieldName = Fields.ZoningTypeId,
-                FieldType = FieldTypes.String,
-                Required = true,
-                CodeSet = CodeSet.ZoneType
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.StrApplication,
-                FieldName = Fields.StrAffiliateId,
-                FieldType = FieldTypes.String,
-                Required = true,
-                CodeSet = CodeSet.StrAffiliate
-            });
-
-            _rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.StrApplication,
-                FieldName = Fields.ComplianceStatusId,
-                FieldType = FieldTypes.String,
-                Required = true,
-                CodeSet = CodeSet.ComplianceStatus
-            });
-        }
-
 
         public Dictionary<string, List<string>> Validate<T>(string entityName, T entity, Dictionary<string, List<string>> errors, int rowNum = 0, params string[] fieldsToSkip)
         {
@@ -222,6 +57,9 @@ namespace StrDss.Service
                     break;
                 case FieldTypes.Date:
                     messages.AddRange(ValidateDateField(rule, val));
+                    break;
+                case FieldTypes.Decimal:
+                    messages.AddRange(ValidateNumberField(rule, val));
                     break;
                 default:
                     throw new NotImplementedException($"Validation for {rule.FieldType} is not implemented.");
@@ -340,6 +178,46 @@ namespace StrDss.Service
                 {
                     messages.Add($"{rowNumPrefix}The length of {field} must be between {rule.MinDate} and {rule.MaxDate}.");
                 }
+            }
+
+            return messages;
+        }
+
+        private List<string> ValidateNumberField<T>(FieldValidationRule rule, T val, int rowNum = 0)
+        {
+            var messages = new List<string>();
+
+            var rowNumPrefix = rowNum == 0 ? "" : $"Row # {rowNum}: ";
+
+            var field = rule.FieldName.WordToWords();
+
+            if (rule.Required && val is null)
+            {
+                messages.Add($"{rowNumPrefix}{field} field is required.");
+                return messages;
+            }
+
+            if (!rule.Required && (val is null || val.ToString().IsEmpty()))
+                return messages;
+
+            string value = Convert.ToString(val) ?? ""; 
+
+            if (!value.IsNumeric())
+            {
+                messages.Add($"{{rowNumPrefix}}{{field}} field must be numeric.");
+                return messages;
+            }
+
+            decimal numVal = Convert.ToDecimal(value);
+
+            if (numVal < rule.MinValue)
+            {
+                messages.Add($"{{rowNumPrefix}}{{field}} field must be greater than or equal to {rule.MinValue}.");
+            }
+
+            if (numVal > rule.MaxValue)
+            {
+                messages.Add($"{{rowNumPrefix}}{{field}} field must be less than or equal to {rule.MinValue}.");
             }
 
             return messages;

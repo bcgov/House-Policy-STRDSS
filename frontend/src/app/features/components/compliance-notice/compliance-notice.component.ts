@@ -179,7 +179,7 @@ export class ComplianceNoticeComponent implements OnInit {
       listingId: [null],
       listingUrl: ['', [Validators.required, validateUrl()]],
       hostEmail: ['', [Validators.required, Validators.email]],
-      sentAlternatively: [false],
+      hostEmailSent: [false],
       reasonId: [0, Validators.required,],
       sendCopy: [true],
       ccList: ['', validateEmailListString()],

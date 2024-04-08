@@ -16,9 +16,9 @@ namespace StrDss.Api.Controllers
     {
         private IRentalListingReportService _listingService;
 
-        public RentalListingReportsController(ICurrentUser currentUser, IMapper mapper, IConfiguration config,
+        public RentalListingReportsController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
             IRentalListingReportService listingSeervice)
-            : base(currentUser, mapper, config)
+            : base(currentUser, mapper, config, logger)
         {
             _listingService = listingSeervice;
         }

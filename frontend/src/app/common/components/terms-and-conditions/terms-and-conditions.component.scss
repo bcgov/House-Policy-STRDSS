@@ -1,0 +1,51 @@
+:host {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0 10%;
+
+    p-card {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+
+        * {
+            font-family: 'BcSans-regular';
+        }
+
+        .bold-text {
+            font-family: 'BcSans-bold';
+        }
+
+        .header-container {
+            height: 51px;
+            background-color: #053662;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            color: white;
+            padding: 10px 25px;
+
+            font-size: 20px;
+            line-height: 27px;
+        }
+
+        .content-header {
+            .text-header {
+                padding-bottom: 12px;
+            }
+
+            .sub-header {
+                padding-bottom: 12px;
+            }
+        }
+
+        .checkbox-container {
+            padding: 8px 0 16px 0;
+
+            p-checkbox {
+                margin-right: 12px;
+            }
+        }
+    }
+}

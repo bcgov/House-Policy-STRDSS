@@ -37,4 +37,8 @@ export class UserDataService {
   getStatuses(): Observable<Array<DropdownOption>> {
     return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/users/accessrequeststatuses`);
   }
+
+  acceptTermsAndConditions(): Observable<unknown> {
+    return this.httpClient.put<void>(`${environment.API_HOST}/users/accepttermsconditions`, {});
+  }
 }

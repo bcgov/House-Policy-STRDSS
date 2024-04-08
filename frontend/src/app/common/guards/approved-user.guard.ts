@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, CanActivateChildFn, CanActivateFn, Router, Rout
 import { UserDataService } from '../services/user-data.service';
 import { Observable, map } from 'rxjs';
 
-export const approvedUserGuard: CanActivateFn = (route, state): Observable<boolean | UrlTree> | boolean | UrlTree => {
+export const approvedUserGuard: CanActivateFn = (_route, _state): Observable<boolean | UrlTree> | boolean | UrlTree => {
   const userDataService = inject(UserDataService)
   const router = inject(Router);
 
@@ -14,8 +14,7 @@ export const approvedUserGuard: CanActivateFn = (route, state): Observable<boole
       }
       return router.createUrlTree(['401']);
     })
-  )
-
+  );
 };
 
 export const canActivateChild: CanActivateChildFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => approvedUserGuard(route, state);

@@ -26,11 +26,11 @@ namespace StrDss.Service
         private IOrganizationRepository _orgRepo;
         private IRentalListingReportRepository _listingRepo;
         private IConfiguration _config;
-        private ILogger<RentalListingReportService> _logger;
+        private ILogger<StrDssLogger> _logger;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IOrganizationRepository orgRepo, IRentalListingReportRepository listingRepo, IConfiguration config, ILogger<RentalListingReportService> logger)
-            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
+            IOrganizationRepository orgRepo, IRentalListingReportRepository listingRepo, IConfiguration config, ILogger<StrDssLogger> logger)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _orgRepo = orgRepo;
             _listingRepo = listingRepo;

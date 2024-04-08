@@ -69,10 +69,9 @@
 
     <div class="form-group-row">
         <div class="form-group-row-col has-checkbox">
-            <p-checkbox formControlName="sentAlternatively" [binary]="true" id="sentAlternatively"
-                name="sentAlternatively" inputId="sentAlternativelyInput"
-                (onChange)="onAlternativeDeliveryChanged($event)"></p-checkbox>
-            <label for="sentAlternatively">A notice has been sent to the host through an alternate delivery
+            <p-checkbox formControlName="hostEmailSent" [binary]="true" id="hostEmailSent" name="hostEmailSent"
+                inputId="hostEmailSentInput" (onChange)="onAlternativeDeliveryChanged($event)"></p-checkbox>
+            <label for="hostEmailSent">A notice has been sent to the host through an alternate delivery
                 method.</label>
         </div>
     </div>

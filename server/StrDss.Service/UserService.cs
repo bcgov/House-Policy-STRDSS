@@ -73,6 +73,7 @@ namespace StrDss.Service
                     FamilyNm = _currentUser.LastName,
                     EmailAddressDsc = _currentUser.EmailAddress,
                     BusinessNm = _currentUser.BusinessNm,
+                    TermsAcceptanceDtm = _currentUser.IdentityProviderNm == StrDssIdProviders.Idir ? DateTime.UtcNow : null, // no need for the idir user to accept the term
                 };
 
                 await _userRepo.CreateUserAsync(userCreateDto);

@@ -1,0 +1,18 @@
+<p-card>
+    <ng-template pTemplate="header">
+        <div class="header-container bold-text">
+            Terms and Conditions
+        </div>
+    </ng-template>
+    <div class="content-header">
+        <div class="text-header bold-text"> Please read and accept our terms and conditions in order to proceed.</div>
+
+        <div class="checkbox-container">
+            <p-checkbox [binary]="true" name="accept" [(ngModel)]="accepted" inputId="accept-chb"></p-checkbox>
+            <label for="accept-chb">I have read and accepted the <a target="_blank" [href]="termsAndConditionsUrl">terms
+                    and
+                    conditions</a>.</label>
+        </div>
+    </div>
+    <button pButton label="Continue" [disabled]="!accepted" id="continue-btn" (click)="accept()"></button>
+</p-card>

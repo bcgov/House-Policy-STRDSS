@@ -18,6 +18,7 @@ using StrDss.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using StrDss.Api.Middlewares;
 using StrDss.Api;
+using StrDss.Service.Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -189,5 +190,8 @@ app.MapControllers();
 app.UseHangfireDashboard();
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+// make sure this is after app.UseHangfireDashboard()
+//RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReport(), "*/1 * * * *");
 
 app.Run();

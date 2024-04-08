@@ -52,8 +52,6 @@ namespace StrDss.Service
                 sourceBin = memoryStream.ToArray();
             }
 
-            //check if any non printable byte exists?
-
             stream.Position = 0;
             using TextReader textReader = new StreamReader(stream, Encoding.UTF8);
 
@@ -281,6 +279,8 @@ namespace StrDss.Service
                     //retry
                 }              
             }
+
+            //update the report flag and commit;
         }
 
         private async Task ProcessListingLine(DssRentalListingReport report, RentalListingRowUntyped row, string rawRecord)

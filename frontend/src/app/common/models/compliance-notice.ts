@@ -3,7 +3,7 @@ export interface ComplianceNotice {
     listingId?: number;
     listingUrl: string;
     hostEmail?: string;
-    sentAlternatively: boolean;
+    hostEmailSent: boolean;
     reasonId: number;
     sendCopy: boolean;
     ccList: Array<string>;

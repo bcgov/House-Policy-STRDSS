@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserDataService } from '../../services/user-data.service';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -13,10 +13,30 @@ import { CheckboxModule } from 'primeng/checkbox';
   templateUrl: './terms-and-conditions.component.html',
   styleUrl: './terms-and-conditions.component.scss'
 })
-export class TermsAndConditionsComponent {
+export class TermsAndConditionsComponent implements OnInit {
   accepted = false;
+  termsAndConditionsUrl = '';
 
   constructor(private userDataService: UserDataService) { }
+
+  ngOnInit(): void {
+    this.userDataService.getCurrentUser().subscribe({
+      next: (user) => {
+        switch (user.organizationType) {
+          case 'LG':
+            this.termsAndConditionsUrl = 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/data-toc-localgovernment';
+            break;
+
+          case 'Platform':
+            this.termsAndConditionsUrl = 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/data-toc-platforms';
+            break;
+
+          default:
+            break;
+        }
+      }
+    })
+  }
 
   accept(): void {
     this.userDataService.acceptTermsAndConditions().subscribe({

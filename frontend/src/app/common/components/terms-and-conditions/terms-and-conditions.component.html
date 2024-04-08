@@ -9,7 +9,8 @@
 
         <div class="checkbox-container">
             <p-checkbox [binary]="true" name="accept" [(ngModel)]="accepted" inputId="accept-chb"></p-checkbox>
-            <label for="accept-chb">I have read and accepted the <a target="_blank" href="https://google.com">terms and
+            <label for="accept-chb">I have read and accepted the <a target="_blank" [href]="termsAndConditionsUrl">terms
+                    and
                     conditions</a>.</label>
         </div>
     </div>

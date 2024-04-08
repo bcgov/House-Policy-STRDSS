@@ -15,7 +15,7 @@ namespace StrDss.Service
         public DateTime? MinDate { get; set; }
         public DateTime? MaxDate { get; set; }
         public RegexInfo? RegexInfo { get; set; }
-        public string CodeSet { get; set; } = "";
+        public string CodeSet { get; set; } = null!;
         public LookupItem LookupItem { get; set; }
 
         public FieldValidationRule()

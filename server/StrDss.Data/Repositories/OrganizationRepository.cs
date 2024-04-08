@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
@@ -15,8 +17,8 @@ namespace StrDss.Data.Repositories
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
-        public OrganizationRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser)
-            : base(dbContext, mapper, currentUser)
+        public OrganizationRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger)
+            : base(dbContext, mapper, currentUser, logger)
         {
         }
 

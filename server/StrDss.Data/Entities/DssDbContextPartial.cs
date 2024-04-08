@@ -2,15 +2,16 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using StrDss.Model;
 using Microsoft.Extensions.Logging;
+using StrDss.Common;
 
 namespace StrDss.Data.Entities
 {
     public partial class DssDbContext
     {
         private ICurrentUser _currentUser;
-        private ILogger<DssDbContext> _logger;
+        private ILogger<StrDssLogger> _logger;
 
-        public DssDbContext(DbContextOptions<DssDbContext> options, ICurrentUser currentUser, ILogger<DssDbContext> logger)
+        public DssDbContext(DbContextOptions<DssDbContext> options, ICurrentUser currentUser, ILogger<StrDssLogger> logger)
             : base(options)
         {
             _currentUser = currentUser;

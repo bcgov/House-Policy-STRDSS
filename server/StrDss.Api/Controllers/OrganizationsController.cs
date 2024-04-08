@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
+using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Service;
@@ -15,9 +16,9 @@ namespace StrDss.Api.Controllers
     {
         private IOrganizationService _orgService;
 
-        public OrganizationsController(ICurrentUser currentUser, IMapper mapper, IConfiguration config,
+        public OrganizationsController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
             IOrganizationService orgService) 
-            : base(currentUser, mapper, config)
+            : base(currentUser, mapper, config, logger)
         {
             _orgService = orgService;
         }

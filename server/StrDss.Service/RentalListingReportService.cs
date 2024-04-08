@@ -11,6 +11,7 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service.CsvHelpers;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -20,6 +21,7 @@ namespace StrDss.Service
     {
         Task<Dictionary<string, List<string>>> ValidateAndParseUploadFileAsync(string reportPeriod, long orgId, TextReader textReader);
         Task<Dictionary<string, List<string>>> CreateRentalListingReport(string reportPeriod, long orgId, Stream stream);
+        Task ProcessReportAsync();
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
@@ -65,7 +67,7 @@ namespace StrDss.Service
             };
 
             await _listingRepo.AddRentalLisitngReportAsync(entity);
-            
+
             _unitOfWork.Commit();
 
             return errors;
@@ -89,7 +91,7 @@ namespace StrDss.Service
             else if (platform.OrganizationType != OrganizationTypes.Platform)
             {
                 errors.AddItem("OrganizationId", $"Organization type of the organization [{orgId}] is not {OrganizationTypes.Platform}.");
-            }           
+            }
 
             if (errors.Count > 0)
             {
@@ -156,7 +158,7 @@ namespace StrDss.Service
                 }
                 catch (CsvHelper.MissingFieldException)
                 {
-                    break; 
+                    break;
                 }
                 catch (CsvHelper.ReaderException ex)
                 {
@@ -232,6 +234,47 @@ namespace StrDss.Service
                 errors.AddItem("File", "Please ensure the file headers are correct");
 
             return errors.Count == 0;
+        }
+
+        public async Task ProcessReportAsync()
+        {
+            var report = await _listingRepo.GetReportToProcessAsync();
+
+            if (report == null || report.SourceBin == null) return;
+
+            _logger.LogInformation($"Processing Rental Listing Report {report.ProvidingOrganizationId} - {report.ReportPeriodYm} - {report.ProvidingOrganization.OrganizationNm}");
+
+            var errors = new Dictionary<string, List<string>>();
+            var csvConfig = CsvHelperUtils.GetConfig(errors, false);
+
+            var memoryStream = new MemoryStream(report.SourceBin);
+            using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
+
+            using var csv = new CsvReader(textReader, csvConfig);
+
+            csv.Read();
+            var headerExists = csv.ReadHeader();
+
+            while (csv.Read())
+            {
+                var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
+                var listingLine = await _listingRepo.GetListingLineAsync(report.RentalListingReportId, row.OrgCd, row.ListingId);
+
+                if (listingLine == null)
+                {
+                    await ProcessListingLine(report, row, csv.Parser.RawRecord);
+                }
+
+                if (listingLine != null && listingLine.IsSystemFailure)
+                {
+                    //retry
+                }              
+            }
+        }
+
+        private async Task ProcessListingLine(DssRentalListingReport report, RentalListingRowUntyped row, string rawRecord)
+        {
+            await Task.CompletedTask;
         }
     }
 }

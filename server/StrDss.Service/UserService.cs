@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Entities;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.UserDtos;
+using StrDss.Service.Bceid;
 using StrDss.Service.EmailTemplates;
 
 namespace StrDss.Service
@@ -27,15 +29,17 @@ namespace StrDss.Service
         private IOrganizationRepository _orgRepo;
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
+        private IBceidApi _bceid;
 
-        public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo)
-            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
+        public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
+            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBceidApi bceid)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _userRepo = userRepo;
             _orgRepo = orgRepo;
             _emailService = emailService;
             _emailRepo = emailRepo;
+            _bceid = bceid;
         }
 
         public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction)
@@ -57,6 +61,22 @@ namespace StrDss.Service
                 return errors;
             }
 
+            //if (_currentUser.IdentityProviderNm == StrDssIdProviders.BceidBusiness)
+            //{
+            //    var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
+
+            //    if (account == null)
+            //    {
+            //        _logger.LogError($"BCeID call error: {error}");
+            //    }
+
+            //    if (account != null)
+            //    {
+            //        _currentUser.FirstName = account.FirstName;
+            //        _currentUser.LastName = account.LastName;
+            //    }
+            //}
+
             if (userDto == null)
             {
                 var userCreateDto = new UserCreateDto
@@ -72,6 +92,7 @@ namespace StrDss.Service
                     FamilyNm = _currentUser.LastName,
                     EmailAddressDsc = _currentUser.EmailAddress,
                     BusinessNm = _currentUser.BusinessNm,
+                    TermsAcceptanceDtm = _currentUser.IdentityProviderNm == StrDssIdProviders.Idir ? DateTime.UtcNow : null, // no need for the idir user to accept the term
                 };
 
                 await _userRepo.CreateUserAsync(userCreateDto);
@@ -106,7 +127,7 @@ namespace StrDss.Service
                 var template = new NewAccessRequest(_emailService)
                 {
                     Link = GetHostUrl(),
-                    To = emails,
+                    To = emails!,
                     Info = $"New Access Request email for {_currentUser.DisplayName}"
                 };
 
@@ -143,7 +164,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task<(Dictionary<string, List<string>> errors, UserDto user)> ValidateAccessRequestCreateDtoAsync(AccessRequestCreateDto dto)
+        private async Task<(Dictionary<string, List<string>> errors, UserDto? user)> ValidateAccessRequestCreateDtoAsync(AccessRequestCreateDto dto)
         {
             var errors = new Dictionary<string, List<string>>();
 

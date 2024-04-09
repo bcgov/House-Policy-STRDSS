@@ -231,7 +231,7 @@ export class UserManagementComponent implements OnInit {
       },
       error: (error: any) => {
         this.showErrorToast('Error', 'Unable to retrieve Organizations. Check console for additional details')
-        console.log(error);
+        console.error(error);
       }
     });
 

@@ -1,3 +1,48 @@
+/* Create all Sprint 2 DB Objects STR DSS */
+
+CREATE  TABLE dss_access_request_status ( 
+	access_request_status_cd         varchar(25)  NOT NULL  ,
+	access_request_status_nm         varchar(250)  NOT NULL  ,
+	CONSTRAINT dss_access_request_status_pk PRIMARY KEY ( access_request_status_cd )
+ );
+
+CREATE  TABLE dss_email_message_type ( 
+	email_message_type         varchar(50)  NOT NULL  ,
+	email_message_type_nm      varchar(250)  NOT NULL  ,
+	CONSTRAINT dss_email_message_type_pk PRIMARY KEY ( email_message_type )
+ );
+
+CREATE  TABLE dss_message_reason ( 
+	message_reason_id    bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
+	email_message_type    varchar(50)  NOT NULL  ,
+	message_reason_dsc   varchar(250)  NOT NULL  ,
+	CONSTRAINT dss_message_reason_pk PRIMARY KEY ( message_reason_id )
+ );
+
+CREATE  TABLE dss_organization_type ( 
+	organization_type         varchar(25)  NOT NULL  ,
+	organization_type_nm      varchar(250)  NOT NULL  ,
+	CONSTRAINT dss_organization_type_pk PRIMARY KEY ( organization_type )
+ );
+
+CREATE  TABLE dss_user_privilege ( 
+	user_privilege_cd         varchar(25)  NOT NULL  ,
+	user_privilege_nm         varchar(250)  NOT NULL  ,
+	CONSTRAINT dss_user_privilege_pk PRIMARY KEY ( user_privilege_cd )
+ );
+
+CREATE  TABLE dss_user_role ( 
+	user_role_cd         varchar(25)  NOT NULL  ,
+	user_role_nm         varchar(250)  NOT NULL  ,
+	CONSTRAINT dss_user_role_pk PRIMARY KEY ( user_role_cd )
+ );
+
+CREATE  TABLE dss_user_role_privilege ( 
+	user_privilege_cd    varchar(25)  NOT NULL  ,
+	user_role_cd         varchar(25)  NOT NULL  ,
+	CONSTRAINT dss_user_role_privilege_pk PRIMARY KEY ( user_privilege_cd, user_role_cd )
+ );
+
 CREATE  TABLE dss_organization ( 
 	organization_id      bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
 	organization_type    varchar(25)  NOT NULL  ,
@@ -8,12 +53,6 @@ CREATE  TABLE dss_organization (
 	upd_dtm              timestamptz  NOT NULL  ,
 	upd_user_guid        uuid    ,
 	CONSTRAINT dss_organization_pk PRIMARY KEY ( organization_id )
- );
-
-CREATE  TABLE dss_organization_type ( 
-	organization_type         varchar(25)  NOT NULL  ,
-	organization_type_nm      varchar(250)  NOT NULL  ,
-	CONSTRAINT dss_organization_type_pk PRIMARY KEY ( organization_type )
  );
 
 CREATE  TABLE dss_organization_contact_person ( 
@@ -49,34 +88,10 @@ CREATE  TABLE dss_user_identity (
 	CONSTRAINT dss_user_identity_pk PRIMARY KEY ( user_identity_id )
  );
 
-CREATE  TABLE dss_access_request_status ( 
-	access_request_status_cd         varchar(25)  NOT NULL  ,
-	access_request_status_nm         varchar(250)  NOT NULL  ,
-	CONSTRAINT dss_access_request_status_pk PRIMARY KEY ( access_request_status_cd )
- );
-
-CREATE  TABLE dss_user_privilege ( 
-	user_privilege_cd         varchar(25)  NOT NULL  ,
-	user_privilege_nm         varchar(250)  NOT NULL  ,
-	CONSTRAINT dss_user_privilege_pk PRIMARY KEY ( user_privilege_cd )
- );
-
-CREATE  TABLE dss_user_role ( 
-	user_role_cd         varchar(25)  NOT NULL  ,
-	user_role_nm         varchar(250)  NOT NULL  ,
-	CONSTRAINT dss_user_role_pk PRIMARY KEY ( user_role_cd )
- );
-
 CREATE  TABLE dss_user_role_assignment ( 
 	user_identity_id     bigint  NOT NULL  ,
 	user_role_cd         varchar(25)  NOT NULL  ,
 	CONSTRAINT dss_user_role_assignment_pk PRIMARY KEY ( user_identity_id, user_role_cd )
- );
-
-CREATE  TABLE dss_user_role_privilege ( 
-	user_privilege_cd    varchar(25)  NOT NULL  ,
-	user_role_cd         varchar(25)  NOT NULL  ,
-	CONSTRAINT dss_user_role_privilege_pk PRIMARY KEY ( user_privilege_cd, user_role_cd )
  );
 
 CREATE  TABLE dss_email_message ( 
@@ -98,19 +113,6 @@ CREATE  TABLE dss_email_message (
 	affected_by_user_identity_id bigint    ,
 	involved_in_organization_id bigint    ,
 	CONSTRAINT dss_email_message_pk PRIMARY KEY ( email_message_id )
- );
-
-CREATE  TABLE dss_email_message_type ( 
-	email_message_type         varchar(50)  NOT NULL  ,
-	email_message_type_nm      varchar(250)  NOT NULL  ,
-	CONSTRAINT dss_email_message_type_pk PRIMARY KEY ( email_message_type )
- );
-
-CREATE  TABLE dss_message_reason ( 
-	message_reason_id    bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
-	email_message_type    varchar(50)  NOT NULL  ,
-	message_reason_dsc   varchar(250)  NOT NULL  ,
-	CONSTRAINT dss_message_reason_pk PRIMARY KEY ( message_reason_id )
  );
 
 ALTER TABLE dss_email_message ADD CONSTRAINT dss_email_message_fk_initiated_by FOREIGN KEY ( initiating_user_identity_id ) REFERENCES dss_user_identity( user_identity_id );
@@ -142,6 +144,26 @@ ALTER TABLE dss_user_role_assignment ADD CONSTRAINT dss_user_role_assignment_fk_
 ALTER TABLE dss_user_role_privilege ADD CONSTRAINT dss_user_role_privilege_fk_conferred_by FOREIGN KEY ( user_role_cd ) REFERENCES dss_user_role( user_role_cd );
 
 ALTER TABLE dss_user_role_privilege ADD CONSTRAINT dss_user_role_privilege_fk_conferring FOREIGN KEY ( user_privilege_cd ) REFERENCES dss_user_privilege( user_privilege_cd );
+
+COMMENT ON COLUMN dss_message_reason.message_reason_dsc IS 'A description of the justification for initiating a message';
+
+COMMENT ON TABLE dss_user_privilege IS 'A granular access right or privilege within the application that may be granted to a role';
+
+COMMENT ON COLUMN dss_user_privilege.user_privilege_cd IS 'The immutable system code that identifies the privilege';
+
+COMMENT ON COLUMN dss_user_privilege.user_privilege_nm IS 'The human-readable name that is given for the role';
+
+COMMENT ON TABLE dss_user_role IS 'A set of access rights and privileges within the application that may be granted to users';
+
+COMMENT ON COLUMN dss_user_role.user_role_cd IS 'The immutable system code that identifies the role';
+
+COMMENT ON COLUMN dss_user_role.user_role_nm IS 'The human-readable name that is given for the role';
+
+COMMENT ON TABLE dss_user_role_privilege IS 'The association of a granular application privilege to a role';
+
+COMMENT ON COLUMN dss_user_role_privilege.user_privilege_cd IS 'Foreign key';
+
+COMMENT ON COLUMN dss_user_role_privilege.user_role_cd IS 'Foreign key';
 
 COMMENT ON TABLE dss_organization IS 'A private company or governing body that plays a role in short term rental reporting or enforcement';
 
@@ -215,29 +237,11 @@ COMMENT ON COLUMN dss_user_identity.upd_dtm IS 'Trigger-updated timestamp of las
 
 COMMENT ON COLUMN dss_user_identity.upd_user_guid IS 'The globally unique identifier (assigned by the identity provider) for the most recent user to record a change';
 
-COMMENT ON TABLE dss_user_privilege IS 'A granular access right or privilege within the application that may be granted to a role';
-
-COMMENT ON COLUMN dss_user_privilege.user_privilege_cd IS 'The immutable system code that identifies the privilege';
-
-COMMENT ON COLUMN dss_user_privilege.user_privilege_nm IS 'The human-readable name that is given for the role';
-
-COMMENT ON TABLE dss_user_role IS 'A set of access rights and privileges within the application that may be granted to users';
-
-COMMENT ON COLUMN dss_user_role.user_role_cd IS 'The immutable system code that identifies the role';
-
-COMMENT ON COLUMN dss_user_role.user_role_nm IS 'The human-readable name that is given for the role';
-
 COMMENT ON TABLE dss_user_role_assignment IS 'The association of a grantee credential to a role for the purpose of conveying application privileges';
-
-COMMENT ON COLUMN dss_user_role_assignment.user_identity_id IS 'Foreign key';
 
 COMMENT ON COLUMN dss_user_role_assignment.user_role_cd IS 'Foreign key';
 
-COMMENT ON TABLE dss_user_role_privilege IS 'The association of a granular application privilege to a role';
-
-COMMENT ON COLUMN dss_user_role_privilege.user_privilege_cd IS 'Foreign key';
-
-COMMENT ON COLUMN dss_user_role_privilege.user_role_cd IS 'Foreign key';
+COMMENT ON COLUMN dss_user_role_assignment.user_identity_id IS 'Foreign key';
 
 COMMENT ON TABLE dss_email_message IS 'A message that is sent to one or more recipients via email';
 
@@ -248,8 +252,6 @@ COMMENT ON COLUMN dss_email_message.email_message_type IS 'Business term for the
 COMMENT ON COLUMN dss_email_message.message_delivery_dtm IS 'A timestamp indicating when the message delivery was initiated';
 
 COMMENT ON COLUMN dss_email_message.message_template_dsc IS 'The full text or template for the message that is sent';
-
-COMMENT ON COLUMN dss_message_reason.message_reason_dsc IS 'A description of the justification for initiating a message';
 
 COMMENT ON COLUMN dss_email_message.unreported_listing_url IS 'User-provided URL for a short-term rental platform listing that is the subject of the message';
 

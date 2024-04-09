@@ -16,15 +16,12 @@ namespace StrDss.Api.Controllers
     public class DelistingController : BaseApiController
     {
         private IChesTokenApi _chesTokenApi;
-
-        private ILogger<DelistingController> _logger { get; }
         private IDelistingService _delistingService { get; }
-
         private IEmailMessageService _emailService;
 
-        public DelistingController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IChesTokenApi chesTokenApi, ILogger<DelistingController> logger,
+        public DelistingController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IChesTokenApi chesTokenApi, ILogger<StrDssLogger> logger,
             IDelistingService delistingService, IEmailMessageService emailService)
-            : base(currentUser, mapper, config)
+            : base(currentUser, mapper, config, logger)
         {
             _chesTokenApi = chesTokenApi;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

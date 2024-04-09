@@ -1,9 +1,10 @@
 name: Deploy Dev Environment
 
 on:
+  workflow_dispatch:
   push:
     branches:
-    - mmm
+    - dev
     paths-ignore:
     - database/**
     - package.json

@@ -33,15 +33,15 @@ jobs:
     - name: Authenticate and set context
       uses: redhat-actions/oc-login@v1.3
       with:
-        openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
-        openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
-        namespace: f4a30d-dev
+        openshift_server_url: ${{ secrets.OPENSHIFT_SERVER_AMS }}
+        openshift_token: ${{ secrets.OPENSHIFT_TOKEN_AMS }}
+        namespace: b07b69-dev
         insecure_skip_tls_verify: true
 
     - name: Deploy apps with Helm chart
       run: |
         make upgrade \
-        NAMESPACE=f4a30d-dev \
+        NAMESPACE=b07b69-dev \
         NAME=strdss-dev \
         ENV_NAME=dev \
         IMAGE_TAG_FRONTEND=latest \

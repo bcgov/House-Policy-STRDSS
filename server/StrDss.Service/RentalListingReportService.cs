@@ -11,10 +11,6 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service.CsvHelpers;
-using System.ComponentModel;
-using System.IO;
-using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -31,7 +27,6 @@ namespace StrDss.Service
         private IOrganizationRepository _orgRepo;
         private IRentalListingReportRepository _listingRepo;
         private IConfiguration _config;
-        private ILogger<StrDssLogger> _logger;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IRentalListingReportRepository listingRepo, IConfiguration config, ILogger<StrDssLogger> logger)
@@ -87,9 +82,9 @@ namespace StrDss.Service
             var firstDayOfReportMonth = new DateOnly(Convert.ToInt32(reportPeriod.Substring(0, 4)), Convert.ToInt32(reportPeriod.Substring(5, 2)), 1);
             var firstDayOfCurrentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
 
-            if (firstDayOfReportMonth > firstDayOfCurrentMonth)
+            if (firstDayOfReportMonth >= firstDayOfCurrentMonth)
             {
-                errors.AddItem("ReportPeriod", "Report period cannot be a futrue month.");
+                errors.AddItem("ReportPeriod", "Report period cannot be current or futrue month.");
             }
 
             var platform = await _orgRepo.GetOrganizationByIdAsync(orgId);

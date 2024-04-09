@@ -24,7 +24,6 @@ namespace StrDss.Service
         private readonly IEmailMessageRepository _emailRepo;
         private readonly IConfiguration _config;
         private readonly IChesTokenApi _chesTokenApi;
-        private readonly ILogger<StrDssLogger> _logger;
 
         public EmailMessageService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IEmailMessageRepository emailRepo, IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<StrDssLogger> logger)

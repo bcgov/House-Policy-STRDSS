@@ -82,9 +82,9 @@ namespace StrDss.Service
             var firstDayOfReportMonth = new DateOnly(Convert.ToInt32(reportPeriod.Substring(0, 4)), Convert.ToInt32(reportPeriod.Substring(5, 2)), 1);
             var firstDayOfCurrentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
 
-            if (firstDayOfReportMonth > firstDayOfCurrentMonth)
+            if (firstDayOfReportMonth >= firstDayOfCurrentMonth)
             {
-                errors.AddItem("ReportPeriod", "Report period cannot be a futrue month.");
+                errors.AddItem("ReportPeriod", "Report period cannot be current or futrue month.");
             }
 
             var platform = await _orgRepo.GetOrganizationByIdAsync(orgId);

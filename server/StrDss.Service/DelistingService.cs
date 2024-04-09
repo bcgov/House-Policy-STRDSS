@@ -27,7 +27,6 @@ namespace StrDss.Service
         private IEmailMessageService _emailService;
         private IOrganizationService _orgService;
         private IEmailMessageRepository _emailRepo;
-        private ILogger<StrDssLogger> _logger;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, IEmailMessageRepository emailRepo, ILogger<StrDssLogger> logger)

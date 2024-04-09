@@ -1375,7 +1375,7 @@ COPY hangfire.schema (version) FROM stdin;
 --
 
 COPY hangfire.server (id, data, lastheartbeat, updatecount) FROM stdin;
-cnd2214638-n:32592:1e50dbbf-6569-4730-9e9c-97b815426e07	{"Queues": ["default"], "StartedAt": "2024-03-26T19:45:32.3962059Z", "WorkerCount": 1}	2024-03-26 19:51:40.170381+00	0
+4d2380d0d7d1:1:defcd173-8102-45c2-829c-b36b67f46aee	{"Queues": ["default"], "StartedAt": "2024-04-05T14:36:11.1766488Z", "WorkerCount": 1}	2024-04-05 15:12:11.458717+00	0
 \.
 
 
@@ -1411,6 +1411,14 @@ Approved	Approved
 --
 
 COPY public.dss_email_message (email_message_id, email_message_type, message_delivery_dtm, message_template_dsc, is_host_contacted_externally, is_submitter_cc_required, message_reason_id, lg_phone_no, unreported_listing_no, host_email_address_dsc, lg_email_address_dsc, cc_email_address_dsc, unreported_listing_url, lg_str_bylaw_url, initiating_user_identity_id, affected_by_user_identity_id, involved_in_organization_id) FROM stdin;
+3	Notice of Takedown	2024-04-02 15:44:58.078067+00	Dear Short-term Rental Host,<br/><br/>Short-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>Short-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>The short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason:<b> Business Licence Denied</b><br/><br/>http://127.0.0.1:4200/compliance-notice<br/><br/>Listing ID Number: 1<br/><br/>Unless you are able to demonstrate compliance with the business licence requirement, this listing may be removed from the short-term rental platform after 5 days. The local government has 90 days to submit a request to takedown the listing to the platform. For more information, contact:<br/><br/>Email: young-jin.chung@gov.bc.ca<br/>Phone: 999-999-9999	f	t	3	999-999-9999	1	young-jin.chung@dxc.com	young-jin.chung@gov.bc.ca	young-jin.chung@gov.bc.ca	http://127.0.0.1:4200/compliance-notice		22	\N	2
+4	Takedown Request	2024-04-02 15:45:07.942663+00	<br/><br/>Request to platform service provider for takedown of non-compliant platform offering.<br/><br/>The following short-term rental listing is not in compliance with an applicable local government business licence requirement:<br/><br/>http://127.0.0.1:4200/compliance-notice<br/><br/>Listing ID Number: 1<br/><br/>In accordance, with 17(2) of the Short-term Rental Accommodations Act, please cease providing platform services in respect of the above platform offer within 3 days.<br/><br/>[Name]<br/>[Title]<br/>[Local government]<br/>[Contact Information]	f	t	\N	\N	1	\N	\N	young-jin.chung@gov.bc.ca	http://127.0.0.1:4200/compliance-notice	\N	22	\N	2
+5	Access Denied	2024-04-02 15:45:56.384181+00	Access to the STR Data Portal is restricted to authorized provincial and local government staff and short-term rental platforms. Please contact young-jin.chung@gov.bc.ca for more information.	f	f	\N	\N	\N	\N	\N	\N	\N	\N	22	14	\N
+6	Access Granted	2024-04-02 15:46:28.180801+00	You have been granted access to the Short Term Rental Data Portal. Please access the portal here: http://127.0.0.1:4200. If you have any issues accessing this link, please contact young-jin.chung@gov.bc.ca.	f	f	\N	\N	\N	\N	\N	\N	\N	\N	22	12	\N
+7	Notice of Takedown	2024-04-03 14:36:35.711403+00	\r\nDear Short-term Rental Host,<br/><br/>\r\nShort-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>\r\nShort-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>\r\nThe short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason: <b>Expired Business Licence</b><br/><br/>\r\nhttps://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab<br/><br/>\r\nListing ID Number: 1<br/><br/>\r\nUnless you are able to demonstrate compliance with the business licence requirement, this listing may be removed from the short-term rental platform after 5 days. The local government has 90 days to submit a request to takedown the listing to the platform.<br/><br/>\r\nFor more information, contact:<br/><br/>\r\n<b>lgcontact@lg.ca<br/><br/></b>\r\n<b>https://bylaw.ca<br/><br/></b>\r\n	f	t	1	123-456-7890	1	young-jin.chung@gov.bc.ca	lgcontact@lg.ca	young-jin.chung@dxcas.com; young-jin.chung@gov.bc.ca	https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab	https://bylaw.ca	22	\N	2
+8	Notice of Takedown	2024-04-03 14:55:44.333146+00	\r\nDear Short-term Rental Host,<br/><br/>\r\nShort-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>\r\nShort-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>\r\nThe short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason: <b>Expired Business Licence</b><br/><br/>\r\n<b>https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab</b><br/><br/>\r\nListing ID Number: <b>1</b><br/><br/>\r\nUnless you are able to demonstrate compliance with the business licence requirement, this listing may be removed from the short-term rental platform after 5 days. The local government has 90 days to submit a request to takedown the listing to the platform.<br/><br/>\r\nFor more information, contact:<br/><br/>\r\n<b>lgcontact@lg.ca<br/><br/></b>\r\n<b>https://bylaw.ca<br/><br/></b>\r\nTest comment<br/>\r\n	f	t	1	123-456-7890	1	young-jin.chung@gov.bc.ca	lgcontact@lg.ca	young-jin.chung@dxcas.com; young-jin.chung@gov.bc.ca	https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab	https://bylaw.ca	22	\N	2
+9	Notice of Takedown	2024-04-03 15:15:08.584425+00	\r\nDear Short-term Rental Host,<br/><br/>\r\nShort-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>\r\nShort-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>\r\nThe short-term rental listing below is not in compliance with an applicable local government business licence requirement for the following reason: <b>Expired Business Licence</b><br/><br/>\r\n<b>https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab</b><br/><br/>\r\nListing ID Number: <b>1</b><br/><br/>\r\nUnless you are able to demonstrate compliance with the business licence requirement, this listing may be removed from the short-term rental platform after 5 days. The local government has 90 days to submit a request to takedown the listing to the platform.<br/><br/>\r\nFor more information, contact:<br/><br/>\r\n<b>lgcontact@lg.ca<br/><br/></b>\r\n<b>https://bylaw.ca<br/><br/></b>\r\nTest comment<br/>\r\n	f	t	1	123-456-7890	1	young-jin.chung@gov.bc.ca	lgcontact@lg.ca	young-jin.chung@dxcas.com; young-jin.chung@gov.bc.ca	https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab	https://bylaw.ca	22	\N	2
+10	Takedown Request	2024-04-03 16:54:07.650935+00	\r\n<b>Request to platform service provider for takedown of non-compliant platform offering.</b><br/><br/>\r\nThe following short-term rental listing is not in compliance with an applicable local government business licence requirement:<br/><br/>\r\n<b>https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab</b><br/><br/>\r\nListing ID Number: <b>1</b><br/><br/>\r\nIn accordance, with 17(2) of the Short-term Rental Accommodations Act, please cease providing platform services in respect of the above platform offer within 3 days.<br/><br/>\r\n<b>Test Town</b><br/><br/>\r\n<b>fiona.zhou@gov.bc.ca</b>\r\n	f	t	\N	\N	1	\N	\N	young-jin.1.chung@gov.bc.ca; young-jin.chung@gov.bc.ca	https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab	\N	22	\N	2
 \.
 
 
@@ -1425,6 +1433,7 @@ Escalation Request	STR Escalation Request
 Takedown Request	Takedown Request
 Access Denied	Access Denied Notification
 Notice of Takedown	Notice of Takedown of Short Term Rental Platform Offer
+Access Requested	Access Requested Notification
 \.
 
 
@@ -1447,10 +1456,10 @@ COPY public.dss_message_reason (message_reason_id, email_message_type, message_r
 --
 
 COPY public.dss_organization (organization_id, organization_type, organization_cd, organization_nm, local_government_geometry, managing_organization_id, upd_dtm, upd_user_guid) FROM stdin;
-1	LG	LGTEST	Test Town	\N	\N	2024-03-25 16:21:48.115257+00	\N
-2	Platform	PLATFORMTEST	Test Platform	\N	\N	2024-03-25 16:21:48.115257+00	\N
-3	BCGov	BC	Other BC Government Components	\N	\N	2024-03-25 16:21:48.115257+00	\N
-4	BCGov	CEU	Compliance Enforcement Unit	\N	\N	2024-03-25 16:21:48.115257+00	\N
+1	LG	LGTEST	Test Town	\N	\N	2024-04-02 15:27:10.684045+00	\N
+2	Platform	PLATFORMTEST	Test Platform	\N	\N	2024-04-02 15:27:10.684045+00	\N
+3	BCGov	BC	Other BC Government Components	\N	\N	2024-04-02 15:27:10.684045+00	\N
+4	BCGov	CEU	Compliance Enforcement Unit	\N	\N	2024-04-02 15:27:10.684045+00	\N
 \.
 
 
@@ -1460,6 +1469,9 @@ COPY public.dss_organization (organization_id, organization_type, organization_c
 
 COPY public.dss_organization_contact_person (organization_contact_person_id, is_primary, given_nm, family_nm, phone_no, email_address_dsc, contacted_through_organization_id, upd_dtm, upd_user_guid) FROM stdin;
 1	t	John	Doe		young-jin.chung@dxcas.com	2	2024-03-25 16:25:03.665664+00	550e8400-e29b-41d4-a716-446655440014
+2	t	Test	Contact	123-456-7890	fiona.zhou@gov.bc.ca	1	2024-04-02 15:25:18.495859+00	\N
+3	t	Test	Contact	123-456-7890	fiona.zhou@gov.bc.ca	3	2024-04-02 15:25:18.495859+00	\N
+4	t	Test	Contact	123-456-7890	fiona.zhou@gov.bc.ca	4	2024-04-02 15:25:18.495859+00	\N
 \.
 
 
@@ -1479,23 +1491,17 @@ LG	Local Government
 --
 
 COPY public.dss_user_identity (user_identity_id, user_guid, display_nm, identity_provider_nm, is_enabled, access_request_status_cd, access_request_dtm, access_request_justification_txt, given_nm, family_nm, email_address_dsc, business_nm, terms_acceptance_dtm, represented_by_organization_id, upd_dtm, upd_user_guid) FROM stdin;
-1	550e8400-e29b-41d4-a716-446655440000	User1 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User1 Given Name	User1 Family Name	user1@example.com	User1 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-2	550e8400-e29b-41d4-a716-446655440001	User2 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User2 Given Name	User2 Family Name	user2@example.com	User2 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-3	550e8400-e29b-41d4-a716-446655440002	User3 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User3 Given Name	User3 Family Name	user3@example.com	User3 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-4	550e8400-e29b-41d4-a716-446655440003	User4 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User4 Given Name	User4 Family Name	user4@example.com	User4 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-5	550e8400-e29b-41d4-a716-446655440004	User5 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User5 Given Name	User5 Family Name	user5@example.com	User5 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-6	550e8400-e29b-41d4-a716-446655440005	User6 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User6 Given Name	User6 Family Name	user6@example.com	User6 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-7	550e8400-e29b-41d4-a716-446655440006	User7 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User7 Given Name	User7 Family Name	user7@example.com	User7 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-8	550e8400-e29b-41d4-a716-446655440007	User8 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User8 Given Name	User8 Family Name	user8@example.com	User8 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-9	550e8400-e29b-41d4-a716-446655440008	User9 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User9 Given Name	User9 Family Name	user9@example.com	User9 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-10	550e8400-e29b-41d4-a716-446655440009	User10 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User10 Given Name	User10 Family Name	user10@example.com	User10 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-11	550e8400-e29b-41d4-a716-446655440010	User11 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User11 Given Name	User11 Family Name	user11@example.com	User11 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-12	550e8400-e29b-41d4-a716-446655440011	User12 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User12 Given Name	User12 Family Name	user12@example.com	User12 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-13	550e8400-e29b-41d4-a716-446655440012	User13 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User13 Given Name	User13 Family Name	user13@example.com	User13 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-14	550e8400-e29b-41d4-a716-446655440013	User14 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User14 Given Name	User14 Family Name	user14@example.com	User14 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-15	550e8400-e29b-41d4-a716-446655440014	User15 Display Name	idir	f	Requested	\N	BCGov, Ministry of Housing	User15 Given Name	User15 Family Name	user15@example.com	User15 Business Name	\N	\N	2024-03-25 16:23:00.821534+00	\N
-22	bc3577d3-f3f8-4687-a093-4594fa43f679	Chung, Young-Jin MOTI:EX	idir	t	Approved	2024-03-26 17:22:24.042276+00	BCGov, Ministry of Housing	Young-Jin	Chung	young-jin.chung@gov.bc.ca		\N	4	2024-03-26 18:43:24.168405+00	bc3577d3-f3f8-4687-a093-4594fa43f679
-18	8494b7d6-1ccf-48ff-9004-eac34ea99b63	Chung, Young-Jin 1 HOUS:EX	idir	t	Approved	2024-03-25 21:06:25.133679+00	BCGov, Ministry of Housing	Young-Jin	Chung	young-jin.1.chung@gov.bc.ca		\N	4	2024-03-25 21:07:20.197502+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
+22	bc3577d3-f3f8-4687-a093-4594fa43f679	Chung, Young-Jin MOTI:EX	idir	t	Approved	2024-03-26 17:22:24.042276+00	BCGov, Ministry of Housing	Young-Jin	Chung	young-jin.chung@gov.bc.ca		2024-03-26 21:01:57.249773+00	4	2024-04-05 15:03:55.155152+00	bc3577d3-f3f8-4687-a093-4594fa43f679
+18	8494b7d6-1ccf-48ff-9004-eac34ea99b63	Chung, Young-Jin 1 HOUS:EX	idir	t	Approved	2024-03-25 21:06:25.133679+00	BCGov, Ministry of Housing	Young-Jin	Chung	young-jin.1.chung@gov.bc.ca		\N	4	2024-04-05 15:03:55.155152+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
+24	cce5179c-35e1-493c-8599-726b1e442616	Bet, Jeroen 1 HOUS:EX	idir	t	Approved	\N	\N	Jeroen	Bet	jeroen.1.bet@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
+25	27b60088-dbed-4bc5-90cc-29b6573083f6	Bohuslavskyi, Oleksandr HOUS:EX	idir	t	Approved	\N	\N	Oleksandr	Bohuslavskyi	oleksandr.bohuslavskyi@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
+26	90183f0d-a629-4529-8e52-16a42bc655ca	Dudin, Oleksii HOUS:EX	idir	t	Approved	\N	\N	Oleksii	Dudin	oleksii.dudin@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
+14	550e8400-e29b-41d4-a716-446655440013	User14 Display Name	idir	f	Denied	\N	BCGov, Ministry of Housing	User14 Given Name	User14 Family Name	user14@example.com	User14 Business Name	\N	\N	2024-04-02 15:45:56.165546+00	bc3577d3-f3f8-4687-a093-4594fa43f679
+12	550e8400-e29b-41d4-a716-446655440011	User12 Display Name	idir	t	Approved	\N	BCGov, Ministry of Housing	User12 Given Name	User12 Family Name	user12@example.com	User12 Business Name	\N	4	2024-04-02 15:46:27.931309+00	bc3577d3-f3f8-4687-a093-4594fa43f679
+27	a793bfc0-c461-4604-b1aa-0ee01e90537f	Larsen, Leif 1 HOUS:EX	idir	t	Approved	\N	\N	Leif	Larsen	leif.1.larsen@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
+28	cc8f41b9-619a-4c6b-a7e3-89740c2abd8c	Zhou, Fiona HOUS:EX	idir	t	Approved	\N	\N	Fiona	Zhou	fiona.zhou@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
+29	9a132c8d-aa0c-4410-8fb0-7cc753db071c	Anderson, Richard HOUS:EX	idir	t	Approved	\N	\N	Richard	Anderson	richard.anderson@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
+30	688661bc-a51a-4c3a-8bda-2d68e0b4d9dd	Forsyth, Lisa HOUS:EX	idir	t	Approved	\N	\N	Lisa	Forsyth	lisa.forsyth@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
 \.
 
 
@@ -1533,8 +1539,43 @@ platform_staff	Short Term Rental Platform
 --
 
 COPY public.dss_user_role_assignment (user_identity_id, user_role_cd) FROM stdin;
-18	ceu_admin
 22	ceu_staff
+12	ceu_staff
+24	ceu_admin
+25	ceu_admin
+26	ceu_admin
+24	lg_staff
+25	lg_staff
+26	lg_staff
+24	platform_staff
+25	platform_staff
+26	platform_staff
+18	ceu_staff
+24	ceu_staff
+25	ceu_staff
+26	ceu_staff
+27	lg_staff
+27	ceu_admin
+27	ceu_staff
+27	platform_staff
+18	ceu_admin
+18	lg_staff
+18	platform_staff
+28	ceu_admin
+29	ceu_admin
+22	ceu_admin
+28	ceu_staff
+29	ceu_staff
+28	lg_staff
+29	lg_staff
+22	lg_staff
+28	platform_staff
+29	platform_staff
+22	platform_staff
+30	ceu_admin
+30	ceu_staff
+30	lg_staff
+30	platform_staff
 \.
 
 
@@ -1637,7 +1678,7 @@ SELECT pg_catalog.setval('hangfire.state_id_seq', 1, false);
 -- Name: dss_email_message_email_message_id_seq; Type: SEQUENCE SET; Schema: public; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('public.dss_email_message_email_message_id_seq', 1, false);
+SELECT pg_catalog.setval('public.dss_email_message_email_message_id_seq', 10, true);
 
 
 --
@@ -1651,7 +1692,7 @@ SELECT pg_catalog.setval('public.dss_message_reason_message_reason_id_seq', 6, t
 -- Name: dss_organization_contact_pers_organization_contact_person_i_seq; Type: SEQUENCE SET; Schema: public; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('public.dss_organization_contact_pers_organization_contact_person_i_seq', 1, true);
+SELECT pg_catalog.setval('public.dss_organization_contact_pers_organization_contact_person_i_seq', 4, true);
 
 
 --
@@ -1665,7 +1706,7 @@ SELECT pg_catalog.setval('public.dss_organization_organization_id_seq', 4, true)
 -- Name: dss_user_identity_user_identity_id_seq; Type: SEQUENCE SET; Schema: public; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('public.dss_user_identity_user_identity_id_seq', 22, true);
+SELECT pg_catalog.setval('public.dss_user_identity_user_identity_id_seq', 30, true);
 
 
 --

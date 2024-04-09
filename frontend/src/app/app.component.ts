@@ -3,8 +3,7 @@ import { Component } from '@angular/core';
 import { LayoutComponent } from './common/layout/layout.component';
 import { CommonModule } from '@angular/common';
 import { KeycloakAngularModule } from 'keycloak-angular';
-import { KeycloakService } from 'keycloak-angular';
-import { BrowserModule } from '@angular/platform-browser';
+import { UserDataService } from './common/services/user-data.service';
 
 @Component({
     selector: 'app-root',
@@ -14,10 +13,5 @@ import { BrowserModule } from '@angular/platform-browser';
     styleUrl: './app.component.scss',
 })
 export class AppComponent {
-    // constructor(private keycloak: KeycloakService) {
-    //   if (!this.keycloak.isLoggedIn()) {
-    //     this.keycloak.login(
-    //   }
-    // }
-    title = 'str-dss-ui';
+    constructor(_userService: UserDataService) { }
 }

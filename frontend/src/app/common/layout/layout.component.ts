@@ -15,22 +15,38 @@ export class LayoutComponent {
   showHeaderMenu = true;
   items: MenuItem[] | undefined;
 
-  constructor(private router: Router) {
-  }
-
-  onHomeClicked(): void {
-    this.router.navigateByUrl('/');
-  }
-
-  onUserManagementClicked(): void {
-    this.router.navigateByUrl('/user-management');
-  }
+  constructor() { }
 
   ngOnInit() {
     this.items = [
       {
         label: 'Home',
         routerLink: '/',
+      },
+      {
+        label: 'Listings',
+        routerLink: '/',
+        disabled: true,
+      },
+      {
+        label: 'Alerts',
+        routerLink: '/',
+        disabled: true,
+      },
+      {
+        label: 'Upload',
+        items: [
+          {
+            label: 'Upload Listing Data',
+            routerLink: '',
+            disabled: true,
+          },
+          {
+            label: 'Platform Upload History',
+            routerLink: '',
+            disabled: true,
+          },
+        ]
       },
       {
         label: 'Admin tools',

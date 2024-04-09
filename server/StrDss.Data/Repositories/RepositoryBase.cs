@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 
@@ -16,17 +18,19 @@ namespace StrDss.Data.Repositories
         protected DbSet<TEntity> _dbSet { get; private set; }
 
         protected ICurrentUser _currentUser;
+        protected ILogger<StrDssLogger> _logger;
 
         protected DssDbContext _dbContext { get; private set; }
 
         protected IMapper _mapper { get; private set; }
 
-        public RepositoryBase(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser)
+        public RepositoryBase(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger)
         {
             _mapper = mapper;
             _dbContext = dbContext;
             _dbSet = _dbContext.Set<TEntity>();
             _currentUser = currentUser;
+            _logger = logger;
         }
 
         public async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "")

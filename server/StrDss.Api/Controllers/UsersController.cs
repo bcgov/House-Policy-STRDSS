@@ -16,9 +16,9 @@ namespace StrDss.Api.Controllers
     {
         private IUserService _userService;
 
-        public UsersController(ICurrentUser currentUser, IMapper mapper, IConfiguration config,
+        public UsersController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
             IUserService userService)
-            : base(currentUser, mapper, config)
+            : base(currentUser, mapper, config, logger)
         {
             _userService = userService;
         }

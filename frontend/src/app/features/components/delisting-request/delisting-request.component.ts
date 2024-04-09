@@ -144,7 +144,7 @@ export class DelistingRequestComponent implements OnInit {
     this.myForm = this.fb.group({
       lgId: [0, Validators.required],
       platformId: [0, Validators.required],
-      listingId: [null],
+      listingId: [''],
       listingUrl: ['', [Validators.required, validateUrl()]],
       sendCopy: [true],
       ccList: ['', validateEmailListString()],

@@ -7,7 +7,7 @@
         }
 
         public string Url { get; set; } = "";
-        public long? ListingId { get; set; }
+        public string? ListingId { get; set; }
         public string LgContactInfo { get; set; } = "";
         public string LgName { get; set; } = "";
         public override string GetContent()

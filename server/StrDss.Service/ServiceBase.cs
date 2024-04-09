@@ -14,7 +14,7 @@ namespace StrDss.Service
         protected IUnitOfWork _unitOfWork;
         protected IMapper _mapper;
         protected readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILogger<StrDssLogger> _logger;
+        protected ILogger<StrDssLogger> _logger;
 
         public ServiceBase(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger)
         {

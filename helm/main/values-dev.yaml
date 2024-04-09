@@ -15,7 +15,8 @@ global:
     'CHES_TOKEN_URL': 'https://dev.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
     'CHES_URL': 'https://ches-dev.api.gov.bc.ca'
     'RENTAL_LISTING_REPORT_MAX_SIZE': '4'
-
+    'BCEID_URL': 'https://gws1.development.bceid.ca/webservices/client/v10/bceidservice.asmx'
+    'BCEID_CACHE_LIFESPAN': '600'
 nameOverride: strdss-dev
 fullnameOverride: strdss-dev
 

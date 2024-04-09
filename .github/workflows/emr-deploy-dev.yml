@@ -1,4 +1,4 @@
-name: Deploy Dev Environment
+name: Deploy Dev AMS
 
 on:
   workflow_dispatch:

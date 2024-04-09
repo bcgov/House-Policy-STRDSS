@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Repositories;
 using StrDss.Model;
@@ -23,11 +24,10 @@ namespace StrDss.Service
         private readonly IEmailMessageRepository _emailRepo;
         private readonly IConfiguration _config;
         private readonly IChesTokenApi _chesTokenApi;
-        private readonly ILogger<EmailMessageService> _logger;
 
         public EmailMessageService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IEmailMessageRepository emailRepo, IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<EmailMessageService> logger)
-            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
+            IEmailMessageRepository emailRepo, IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<StrDssLogger> logger)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _emailRepo = emailRepo;
             _config = config;

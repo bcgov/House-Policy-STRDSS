@@ -46,8 +46,6 @@ spec:
               value: {{ $deploymentTime | quote }}
             - name: ASPNETCORE_URLS
               value: http://*:8080
-            - name: STYLE_NONCE
-              value: {{ $styleNonce | quote }}
             {{- $env := merge (.Values.global.env | default dict) (.Values.env | default dict) -}}
             {{ range $k, $v := $env }}
             - name: {{ $k | quote }}

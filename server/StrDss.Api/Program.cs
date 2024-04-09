@@ -18,6 +18,8 @@ using StrDss.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using StrDss.Api.Middlewares;
 using StrDss.Api;
+using StrDss.Service.Hangfire;
+using StrDss.Service.Bceid;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +86,7 @@ builder.Services.AddSingleton<IFieldValidatorService, FieldValidatorService>();
 
 builder.Services.AddScoped<IApi, Api>();
 builder.Services.AddHttpClients(builder.Configuration);
+builder.Services.AddBceidSoapClient(builder.Configuration);
 
 var mappingConfig = new MapperConfiguration(cfg =>
 {
@@ -189,5 +192,8 @@ app.MapControllers();
 app.UseHangfireDashboard();
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+// make sure this is after app.UseHangfireDashboard()
+//RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReport(), "*/1 * * * *");
 
 app.Run();

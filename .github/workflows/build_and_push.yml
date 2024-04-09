@@ -13,6 +13,11 @@ on:
       - .conventional-changelog.mjs
       - .release-it.json
 
+env:
+  JFROG_REGISTRY: artifacts.developer.gov.bc.ca
+  IMAGE_NAME_FRONTEND: sf4a-strdss/strdss-frontend-dev
+  IMAGE_NAME_BACKEND: sf4a-strdss/strdss-backend-dev
+
 jobs:
   build-backend:
     runs-on: ubuntu-22.04
@@ -150,3 +155,35 @@ jobs:
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend-dev:latest
+
+
+  deploy:
+    needs: [Docker-build-frontend, Docker-build-backend]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    environment:
+      name: dev
+      url: https://dev-strdata.apps.silver.devops.gov.bc.ca/
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Authenticate and set context
+      uses: redhat-actions/oc-login@v1.3
+      with:
+        openshift_server_url: ${{ secrets.OPENSHIFT_SERVER_AMS }}
+        openshift_token: ${{ secrets.OPENSHIFT_TOKEN_AMS }}
+        namespace: b07b69-dev
+        insecure_skip_tls_verify: true
+
+    - name: Deploy apps with Helm chart
+      run: |
+        make upgrade \
+        NAMESPACE=b07b69-dev \
+        NAME=strdss-dev \
+        ENV_NAME=dev \
+        IMAGE_TAG_FRONTEND=latest \
+        IMAGE_TAG_BACKEND=latest \
+      working-directory: ./helm/main

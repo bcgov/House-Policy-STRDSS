@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using StrDss.Api.Middlewares;
 using StrDss.Api;
 using StrDss.Service.Hangfire;
+using StrDss.Service.Bceid;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +86,7 @@ builder.Services.AddSingleton<IFieldValidatorService, FieldValidatorService>();
 
 builder.Services.AddScoped<IApi, Api>();
 builder.Services.AddHttpClients(builder.Configuration);
+builder.Services.AddBceidSoapClient(builder.Configuration);
 
 var mappingConfig = new MapperConfiguration(cfg =>
 {

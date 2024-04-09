@@ -18,7 +18,7 @@ namespace StrDss.Data.Repositories
         protected DbSet<TEntity> _dbSet { get; private set; }
 
         protected ICurrentUser _currentUser;
-        private ILogger<StrDssLogger> _logger;
+        protected ILogger<StrDssLogger> _logger;
 
         protected DssDbContext _dbContext { get; private set; }
 

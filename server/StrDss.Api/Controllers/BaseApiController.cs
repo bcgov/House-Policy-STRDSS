@@ -10,7 +10,7 @@ namespace StrDss.Api.Controllers
         protected ICurrentUser _currentUser;
         protected IMapper _mapper;
         protected IConfiguration _config;
-        private ILogger<StrDssLogger> _logger;
+        protected ILogger<StrDssLogger> _logger;
 
         public BaseApiController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger)
         {

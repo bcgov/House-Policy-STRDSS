@@ -16,10 +16,7 @@ namespace StrDss.Api.Controllers
     public class DelistingController : BaseApiController
     {
         private IChesTokenApi _chesTokenApi;
-
-        private ILogger<StrDssLogger> _logger { get; }
         private IDelistingService _delistingService { get; }
-
         private IEmailMessageService _emailService;
 
         public DelistingController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IChesTokenApi chesTokenApi, ILogger<StrDssLogger> logger,

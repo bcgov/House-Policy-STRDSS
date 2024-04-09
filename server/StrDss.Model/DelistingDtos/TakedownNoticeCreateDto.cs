@@ -5,7 +5,7 @@ namespace StrDss.Model.DelistingDtos
     public class TakedownNoticeCreateDto
     {
         public long PlatformId { get; set; }
-        public long? ListingId { get; set; }
+        public string? ListingId { get; set; }
         public string ListingUrl { get; set; } = "";
         public string HostEmail { get; set; } = "";
         public bool HostEmailSent { get; set; }

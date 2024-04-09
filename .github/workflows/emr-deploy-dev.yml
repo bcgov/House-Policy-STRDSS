@@ -2,16 +2,16 @@ name: Deploy Dev Environment
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-    - dev
-    paths-ignore:
-    - database/**
-    - package.json
-    - package-lock.json
-    - CHANGELOG.md
-    - .conventional-changelog.mjs
-    - .release-it.json
+  # push:
+  #   branches:
+  #   - dev
+  #   paths-ignore:
+  #   - database/**
+  #   - package.json
+  #   - package-lock.json
+  #   - CHANGELOG.md
+  #   - .conventional-changelog.mjs
+  #   - .release-it.json
 
 env:
   JFROG_REGISTRY: artifacts.developer.gov.bc.ca
@@ -20,6 +20,7 @@ env:
 
 jobs:
   deploy:
+    # needs: Build and Push
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     permissions:

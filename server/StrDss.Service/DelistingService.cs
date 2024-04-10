@@ -164,7 +164,7 @@ namespace StrDss.Service
                     MessageDeliveryDtm = DateTime.UtcNow,
                     MessageTemplateDsc = template.GetContent(),
                     IsHostContactedExternally = dto.HostEmailSent,
-                    IsSubmitterCcRequired = dto.SendCopy,
+                    IsSubmitterCcRequired = true,
                     MessageReasonId = reasonDto?.Id,
                     LgPhoneNo = dto.LgContactPhone,
                     UnreportedListingNo = dto.ListingId,
@@ -186,28 +186,23 @@ namespace StrDss.Service
 
         private TakedownNotice GetTakedownNoticeTemplate(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto, bool preview = false)
         {
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+            // To: [host] (optional), [Local Gov contact info email]
+            if (dto.HostEmail.IsNotEmpty()) dto.ToList.Add(dto.HostEmail);
+            dto.ToList.Add(dto.LgContactEmail);
 
-            dto.ToList.Add(contact.EmailAddressDsc);
-            if (dto.HostEmail.IsNotEmpty())
-            {
-                dto.ToList.Add(dto.HostEmail);
-            }
-
-            if (dto.SendCopy)
-            {
-                dto.CcList.Add(_currentUser.EmailAddress);
-            }
+            // BCC: [sender], [platform], [Additional CCs] (optional)
+            dto.CcList.Add(_currentUser.EmailAddress);
+            dto.CcList.Add(platform!.ContactPeople.FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty())!.EmailAddressDsc);
 
             var template = new TakedownNotice(_emailService)
             {
-                Reason = reasonDto.Description,
+                Reason = reasonDto!.Description,
                 Url = dto.ListingUrl,
                 ListingId = dto.ListingId,
                 LgContactInfo = dto.LgContactEmail,
                 LgStrBylawLink = dto.StrBylawUrl,
                 To = dto.ToList,
-                Cc = dto.CcList,
+                Bcc = dto.CcList,
                 Info = dto.ListingUrl,
                 Comment = dto.Comment,
                 Preview = preview

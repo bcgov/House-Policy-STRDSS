@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Timers;
 using BceidService;
+using Microsoft.Extensions.Logging;
 using StrDss.Common;
 
 namespace StrDss.Service.Bceid
@@ -16,8 +17,9 @@ namespace StrDss.Service.Bceid
         private readonly Dictionary<string, BceidAccount> _accountCache; //no need for ConcurrentDictionary
         private readonly System.Timers.Timer _timer;
         private static SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+        private ILogger<StrDssLogger> _logger;
 
-        public BceidApi(BCeIDServiceSoapClient client)
+        public BceidApi(BCeIDServiceSoapClient client, ILogger<StrDssLogger> logger)
         {
             _client = client;
             _accountCache = new Dictionary<string, BceidAccount>();
@@ -25,6 +27,7 @@ namespace StrDss.Service.Bceid
             _timer.Elapsed += new ElapsedEventHandler(RefreshCache!);
             _timer.Interval = TimeSpan.FromMinutes(_client.CacheLifespan).TotalMilliseconds;
             _timer.Enabled = true;
+            _logger = logger;
         }
 
         private void RefreshCache(object source, ElapsedEventArgs e)
@@ -90,6 +93,8 @@ namespace StrDss.Service.Bceid
             }
 
             request.onlineServiceId = _client.Osid;
+
+            _logger.LogInformation($"[Egress] Calling BCeID web service: {_client.Endpoint.Address}");
 
             var response = await _client.getAccountDetailAsync(request);
 

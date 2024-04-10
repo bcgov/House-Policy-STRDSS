@@ -23,7 +23,7 @@ namespace UITest.PageObjects
         private Button _ReturnHomeButton;
         private TextBox _StatusMessage;
 
-        private IDriver _EmbededDriver;
+        private IDriver _Driver;
 
         public DropDownList PlatformReceipientDropdown { get => _PlatformReceipientDropdown;  }
         public TextBox ListingIDNumberTextBox { get => _ListingIDNumberTextBox;  }
@@ -42,11 +42,11 @@ namespace UITest.PageObjects
         public Button ReviewButton { get => _ReviewButton; }
         public Button ReturnHomeButton { get => _ReturnHomeButton; }
         public TextBox StatusMessage { get => _StatusMessage; }
-        public IDriver EmbededDriver { get => _EmbededDriver; }
+        public IDriver Driver { get => _Driver; }
 
         public DelistingWarningPage(IDriver Driver)
         {
-            _EmbededDriver = Driver;
+            _Driver = Driver;
 
             _PlatformReceipientDropdown = new DropDownList(Driver, Enums.FINDBY.ID, DelistingWarningModel.PlatformReceipientDropDown);
             _ListingIDNumberTextBox = new TextBox(Driver, Enums.FINDBY.ID, DelistingWarningModel.ListingIDNumberTextBox);

@@ -11,10 +11,12 @@ namespace TestFrameWork.PageObjects
         private DropDownList _UserRoleDropDown;
         private TextBox _UserOrganizationTextBox;
         private Button _SubmitButton;
+        private string _URL = @"localhost:5002/access-request";
 
         public DropDownList UserRoleDropDown { get => _UserRoleDropDown; }
         public TextBox UserOrganizationTextBox { get => _UserOrganizationTextBox; }
         public Button SubmitButton { get => _SubmitButton;}
+        public string URL { get => _URL; set => _URL = value; }
 
         public RequestAccessPage(IDriver Driver)
         {

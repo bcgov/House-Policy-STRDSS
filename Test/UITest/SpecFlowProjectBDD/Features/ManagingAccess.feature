@@ -1,7 +1,7 @@
 ﻿Feature: ManagingAccess
 Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-54
 
-@Delisting
+@Access
 Scenario: ManagingAccess
 #User Authentication
 

@@ -190,7 +190,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void ThenIShouldReceiveAConfirmationMessage()
         {
             System.Threading.Thread.Sleep(3000);
-            ClassicAssert.IsTrue(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+            ClassicAssert.IsTrue(_DelistingRequestPage.Driver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
             _DelistingRequestPage.ReturnHomeButton.Click();
         }
 

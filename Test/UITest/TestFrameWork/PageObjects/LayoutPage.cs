@@ -14,6 +14,7 @@ namespace UITest.PageObjects
         public TextBox AddApplicationButton { get => _AddApplicationButton; }
         public string URL { get => _URL; set => _URL = value; }
         public Button LogoutButton { get => _LogoutButton;  }
+        public IDriver Driver { get => _Driver; }
 
         public LayoutPage(IDriver Driver)
         {

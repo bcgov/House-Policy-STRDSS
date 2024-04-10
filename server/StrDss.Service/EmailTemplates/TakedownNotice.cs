@@ -24,7 +24,6 @@ Short-term rental accommodations are also regulated by the Province of B.C. Unde
 <b>{Url}</b><br/><br/>
 Listing ID Number: <b>{ListingId}</b><br/><br/>
 Unless you are able to demonstrate compliance with the business licence requirement, this listing may be removed from the short-term rental platform after 5 days. The local government has 90 days to submit a request to takedown the listing to the platform.<br/><br/>
-For more information, contact:<br/><br/>
 {Comment}<br/>
 ";
         }

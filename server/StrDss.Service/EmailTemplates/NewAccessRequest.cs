@@ -1,10 +1,13 @@
-﻿namespace StrDss.Service.EmailTemplates
+﻿using StrDss.Common;
+
+namespace StrDss.Service.EmailTemplates
 {
     public class NewAccessRequest : EmailTemplateBase
     {
         public NewAccessRequest(IEmailMessageService emailService) 
             : base(emailService)
         {
+            EmailMessageType = EmailMessageTypes.AccessRequested;
         }
         public string Link { get; set; } = "";
         public override string GetContent()

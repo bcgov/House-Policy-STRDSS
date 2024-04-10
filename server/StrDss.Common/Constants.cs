@@ -188,9 +188,10 @@
         public const string AccessGranted = "Access Granted";
         public const string EscalationRequest = "Escalation Request";
         public const string TakedownRequest = "Takedown Request";
-        public const string AccessRequested = "Access Requested";
         public const string AccessDenied = "Access Denied";
         public const string NoticeOfTakedown = "Notice of Takedown";
+        public const string AccessRequested = "Access Requested";
+        public const string BatchTakedownRequest = "Batch Takedown Request";
     }
 
     public static class Permissions

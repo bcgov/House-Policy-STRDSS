@@ -1,9 +1,12 @@
-﻿namespace StrDss.Service.EmailTemplates
+﻿using StrDss.Common;
+
+namespace StrDss.Service.EmailTemplates
 {
     public class TakedownRequest : EmailTemplateBase
     {
         public TakedownRequest(IEmailMessageService emailService) : base(emailService)
         {
+            EmailMessageType = EmailMessageTypes.TakedownRequest;
         }
 
         public string Url { get; set; } = "";

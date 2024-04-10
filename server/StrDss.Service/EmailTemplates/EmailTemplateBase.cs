@@ -21,7 +21,10 @@ namespace StrDss.Service.EmailTemplates
 
         public string GetPreviewContent()
         {
-            return $@"To: {string.Join(";", To)}<br/>cc: {string.Join(";", Cc)}<br/><br/>";
+            return $@"To: {string.Join(";", To)}" 
+                + (Bcc.Count() > 0 ? $"<br/>Bcc: {string.Join(";", Bcc)}<br/><br/>" : "")
+                + (Cc.Count() > 0 ? $"<br/>Cc: {string.Join(";", Cc)}<br/><br/>" : "")
+                ;
         }
 
         public virtual string GetContent()

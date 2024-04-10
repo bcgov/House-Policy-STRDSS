@@ -133,7 +133,7 @@ namespace StrDss.Service
 
                 var emailEntity = new DssEmailMessage
                 {
-                    EmailMessageType = EmailMessageTypes.AccessRequested,
+                    EmailMessageType = template.EmailMessageType,
                     MessageDeliveryDtm = DateTime.UtcNow,
                     MessageTemplateDsc = template.GetContent(),
                     IsHostContactedExternally = false,
@@ -153,7 +153,7 @@ namespace StrDss.Service
 
                 await _emailRepo.AddEmailMessage(emailEntity);
 
-                await template.SendEmail();
+                emailEntity.ExternalMessageNo = await template.SendEmail();
 
                 _unitOfWork.Commit();
             }
@@ -246,7 +246,7 @@ namespace StrDss.Service
 
             var emailEntity = new DssEmailMessage
             {
-                EmailMessageType = EmailMessageTypes.AccessDenied,
+                EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = false,
@@ -266,7 +266,7 @@ namespace StrDss.Service
 
             await _emailRepo.AddEmailMessage(emailEntity);
 
-            await template.SendEmail();
+            emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
 
@@ -345,7 +345,7 @@ namespace StrDss.Service
 
             var emailEntity = new DssEmailMessage
             {
-                EmailMessageType = EmailMessageTypes.AccessGranted,
+                EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = false,
@@ -365,7 +365,7 @@ namespace StrDss.Service
 
             await _emailRepo.AddEmailMessage(emailEntity);
 
-            await template.SendEmail();
+            emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
 

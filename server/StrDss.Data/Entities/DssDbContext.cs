@@ -51,13 +51,15 @@ public partial class DssDbContext : DbContext
         {
             entity.HasKey(e => e.AccessRequestStatusCd).HasName("dss_access_request_status_pk");
 
-            entity.ToTable("dss_access_request_status");
+            entity.ToTable("dss_access_request_status", tb => tb.HasComment("A potential status for a user access request (e.g. Requested, Approved, or Denied)"));
 
             entity.Property(e => e.AccessRequestStatusCd)
                 .HasMaxLength(25)
+                .HasComment("System-consistent code for the request status")
                 .HasColumnName("access_request_status_cd");
             entity.Property(e => e.AccessRequestStatusNm)
                 .HasMaxLength(250)
+                .HasComment("Business term for the request status")
                 .HasColumnName("access_request_status_nm");
         });
 
@@ -74,14 +76,21 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.AffectedByUserIdentityId)
                 .HasComment("Foreign key")
                 .HasColumnName("affected_by_user_identity_id");
+            entity.Property(e => e.BatchingEmailMessageId)
+                .HasComment("Foreign key")
+                .HasColumnName("batching_email_message_id");
             entity.Property(e => e.CcEmailAddressDsc)
                 .HasMaxLength(4000)
                 .HasComment("E-mail address of a secondary message recipient (directly entered by the user)")
                 .HasColumnName("cc_email_address_dsc");
             entity.Property(e => e.EmailMessageType)
                 .HasMaxLength(50)
-                .HasComment("Business term for the type or purpose of the message (e.g. Notice of Takedown, Takedown Request, Delisting Warning, Delisting Request, Access Granted Notification, Access Denied Notification)")
+                .HasComment("Foreign key")
                 .HasColumnName("email_message_type");
+            entity.Property(e => e.ExternalMessageNo)
+                .HasMaxLength(50)
+                .HasComment("External identifier for tracking the message delivery progress")
+                .HasColumnName("external_message_no");
             entity.Property(e => e.HostEmailAddressDsc)
                 .HasMaxLength(320)
                 .HasComment("E-mail address of a short term rental host (directly entered by the user as a message recipient)")
@@ -92,36 +101,59 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.InvolvedInOrganizationId)
                 .HasComment("Foreign key")
                 .HasColumnName("involved_in_organization_id");
-            entity.Property(e => e.IsHostContactedExternally).HasColumnName("is_host_contacted_externally");
-            entity.Property(e => e.IsSubmitterCcRequired).HasColumnName("is_submitter_cc_required");
+            entity.Property(e => e.IsHostContactedExternally)
+                .HasComment("Indicates whether the the property host has already been contacted by external means")
+                .HasColumnName("is_host_contacted_externally");
+            entity.Property(e => e.IsSubmitterCcRequired)
+                .HasComment("Indicates whether the user initiating the message should receive a copy of the email")
+                .HasColumnName("is_submitter_cc_required");
             entity.Property(e => e.LgEmailAddressDsc)
                 .HasMaxLength(320)
+                .HasComment("E-mail address of a local government contact (directly entered by the user as a message recipient)")
                 .HasColumnName("lg_email_address_dsc");
             entity.Property(e => e.LgPhoneNo)
                 .HasMaxLength(30)
+                .HasComment("A phone number associated with a Local Government contact")
                 .HasColumnName("lg_phone_no");
             entity.Property(e => e.LgStrBylawUrl)
                 .HasMaxLength(4000)
+                .HasComment("User-provided URL for a local government bylaw that is the subject of the message")
                 .HasColumnName("lg_str_bylaw_url");
             entity.Property(e => e.MessageDeliveryDtm)
                 .HasComment("A timestamp indicating when the message delivery was initiated")
                 .HasColumnName("message_delivery_dtm");
-            entity.Property(e => e.MessageReasonId).HasColumnName("message_reason_id");
+            entity.Property(e => e.MessageReasonId)
+                .HasComment("Foreign key")
+                .HasColumnName("message_reason_id");
             entity.Property(e => e.MessageTemplateDsc)
                 .HasMaxLength(4000)
                 .HasComment("The full text or template for the message that is sent")
                 .HasColumnName("message_template_dsc");
+            entity.Property(e => e.RequestingOrganizationId)
+                .HasComment("Foreign key")
+                .HasColumnName("requesting_organization_id");
             entity.Property(e => e.UnreportedListingNo)
-                .HasMaxLength(25)
+                .HasMaxLength(50)
+                .HasComment("The platform issued identification number for the listing (if not included in a rental listing report)")
                 .HasColumnName("unreported_listing_no");
             entity.Property(e => e.UnreportedListingUrl)
                 .HasMaxLength(4000)
                 .HasComment("User-provided URL for a short-term rental platform listing that is the subject of the message")
                 .HasColumnName("unreported_listing_url");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
 
             entity.HasOne(d => d.AffectedByUserIdentity).WithMany(p => p.DssEmailMessageAffectedByUserIdentities)
                 .HasForeignKey(d => d.AffectedByUserIdentityId)
                 .HasConstraintName("dss_email_message_fk_affecting");
+
+            entity.HasOne(d => d.BatchingEmailMessage).WithMany(p => p.InverseBatchingEmailMessage)
+                .HasForeignKey(d => d.BatchingEmailMessageId)
+                .HasConstraintName("dss_email_message_fk_batched_in");
 
             entity.HasOne(d => d.EmailMessageTypeNavigation).WithMany(p => p.DssEmailMessages)
                 .HasForeignKey(d => d.EmailMessageType)
@@ -133,26 +165,32 @@ public partial class DssDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_email_message_fk_initiated_by");
 
-            entity.HasOne(d => d.InvolvedInOrganization).WithMany(p => p.DssEmailMessages)
+            entity.HasOne(d => d.InvolvedInOrganization).WithMany(p => p.DssEmailMessageInvolvedInOrganizations)
                 .HasForeignKey(d => d.InvolvedInOrganizationId)
                 .HasConstraintName("dss_email_message_fk_involving");
 
             entity.HasOne(d => d.MessageReason).WithMany(p => p.DssEmailMessages)
                 .HasForeignKey(d => d.MessageReasonId)
                 .HasConstraintName("dss_email_message_fk_justified_by");
+
+            entity.HasOne(d => d.RequestingOrganization).WithMany(p => p.DssEmailMessageRequestingOrganizations)
+                .HasForeignKey(d => d.RequestingOrganizationId)
+                .HasConstraintName("dss_email_message_fk_requested_by");
         });
 
         modelBuilder.Entity<DssEmailMessageType>(entity =>
         {
             entity.HasKey(e => e.EmailMessageType).HasName("dss_email_message_type_pk");
 
-            entity.ToTable("dss_email_message_type");
+            entity.ToTable("dss_email_message_type", tb => tb.HasComment("The type or purpose of a system generated message (e.g. Notice of Takedown, Takedown Request, Delisting Warning, Delisting Request, Access Granted Notification, Access Denied Notification)"));
 
             entity.Property(e => e.EmailMessageType)
                 .HasMaxLength(50)
+                .HasComment("System-consistent code for the type or purpose of the message (e.g. Notice of Takedown, Takedown Request, Delisting Warning, Delisting Request, Access Granted Notification, Access Denied Notification)")
                 .HasColumnName("email_message_type");
             entity.Property(e => e.EmailMessageTypeNm)
                 .HasMaxLength(250)
+                .HasComment("Business term for the type or purpose of the message (e.g. Notice of Takedown, Takedown Request, Delisting Warning, Delisting Request, Access Granted Notification, Access Denied Notification)")
                 .HasColumnName("email_message_type_nm");
         });
 
@@ -160,13 +198,15 @@ public partial class DssDbContext : DbContext
         {
             entity.HasKey(e => e.MessageReasonId).HasName("dss_message_reason_pk");
 
-            entity.ToTable("dss_message_reason");
+            entity.ToTable("dss_message_reason", tb => tb.HasComment("A description of the justification for initiating a message"));
 
             entity.Property(e => e.MessageReasonId)
+                .HasComment("Unique generated key")
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("message_reason_id");
             entity.Property(e => e.EmailMessageType)
                 .HasMaxLength(50)
+                .HasComment("Foreign key")
                 .HasColumnName("email_message_type");
             entity.Property(e => e.MessageReasonDsc)
                 .HasMaxLength(250)
@@ -205,7 +245,7 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("organization_nm");
             entity.Property(e => e.OrganizationType)
                 .HasMaxLength(25)
-                .HasComment("a level of government or business category")
+                .HasComment("Foreign key")
                 .HasColumnName("organization_type");
             entity.Property(e => e.UpdDtm)
                 .HasComment("Trigger-updated timestamp of last change")
@@ -241,6 +281,10 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(320)
                 .HasComment("E-mail address given for the contact by the organization")
                 .HasColumnName("email_address_dsc");
+            entity.Property(e => e.EmailMessageType)
+                .HasMaxLength(50)
+                .HasComment("Foreign key")
+                .HasColumnName("email_message_type");
             entity.Property(e => e.FamilyNm)
                 .HasMaxLength(25)
                 .HasComment("A name that is often shared amongst members of the same family (commonly known as a surname within some cultures)")
@@ -267,19 +311,25 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.ContactedThroughOrganizationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_organization_contact_person_fk_contacted_for");
+
+            entity.HasOne(d => d.EmailMessageTypeNavigation).WithMany(p => p.DssOrganizationContactPeople)
+                .HasForeignKey(d => d.EmailMessageType)
+                .HasConstraintName("dss_organization_contact_person_fk_subscribed_to");
         });
 
         modelBuilder.Entity<DssOrganizationType>(entity =>
         {
             entity.HasKey(e => e.OrganizationType).HasName("dss_organization_type_pk");
 
-            entity.ToTable("dss_organization_type");
+            entity.ToTable("dss_organization_type", tb => tb.HasComment("A level of government or business category"));
 
             entity.Property(e => e.OrganizationType)
                 .HasMaxLength(25)
+                .HasComment("System-consistent code for a level of government or business category")
                 .HasColumnName("organization_type");
             entity.Property(e => e.OrganizationTypeNm)
                 .HasMaxLength(250)
+                .HasComment("Business term for a level of government or business category")
                 .HasColumnName("organization_type_nm");
         });
 

@@ -18,6 +18,7 @@ namespace StrDss.Service.EmailTemplates
         public IEnumerable<string> Bcc { get; set; } = new List<string>();
         public string Info { get; set; } = "";
         public bool Preview { get; set; } = false;
+        public string EmailMessageType { get; set; } = "";
 
         public string GetPreviewContent()
         {
@@ -32,7 +33,7 @@ namespace StrDss.Service.EmailTemplates
             return "";
         }
 
-        public async Task SendEmail()
+        public async Task<string> SendEmail()
         {
             var emailContent = new EmailContent
             {
@@ -45,7 +46,7 @@ namespace StrDss.Service.EmailTemplates
                 Info = Info
             };
 
-            await _emailService.SendEmailAsync(emailContent);
+            return await _emailService.SendEmailAsync(emailContent);
         }
     }
 }

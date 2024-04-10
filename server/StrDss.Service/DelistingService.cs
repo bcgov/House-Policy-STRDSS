@@ -154,34 +154,31 @@ namespace StrDss.Service
         {
             var template = GetTakedownNoticeTemplate(dto, platform, reasonDto);
 
-            var sent = await template.SendEmail();
-
-            if (sent)
+            var emailEntity = new DssEmailMessage
             {
-                var emailEntity = new DssEmailMessage
-                {
-                    EmailMessageType = EmailMessageTypes.NoticeOfTakedown,
-                    MessageDeliveryDtm = DateTime.UtcNow,
-                    MessageTemplateDsc = template.GetContent(),
-                    IsHostContactedExternally = dto.HostEmailSent,
-                    IsSubmitterCcRequired = true,
-                    MessageReasonId = reasonDto?.Id,
-                    LgPhoneNo = dto.LgContactPhone,
-                    UnreportedListingNo = dto.ListingId,
-                    HostEmailAddressDsc = dto.HostEmail,
-                    LgEmailAddressDsc = dto.LgContactEmail,
-                    CcEmailAddressDsc = string.Join("; ", dto.CcList),
-                    UnreportedListingUrl = dto.ListingUrl,
-                    LgStrBylawUrl = dto.StrBylawUrl,
-                    InitiatingUserIdentityId = _currentUser.Id,
-                    AffectedByUserIdentityId = null,
-                    InvolvedInOrganizationId = dto.PlatformId
-                };
+                EmailMessageType = EmailMessageTypes.NoticeOfTakedown,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsHostContactedExternally = dto.HostEmailSent,
+                IsSubmitterCcRequired = true,
+                MessageReasonId = reasonDto?.Id,
+                LgPhoneNo = dto.LgContactPhone,
+                UnreportedListingNo = dto.ListingId,
+                HostEmailAddressDsc = dto.HostEmail,
+                LgEmailAddressDsc = dto.LgContactEmail,
+                CcEmailAddressDsc = string.Join("; ", dto.CcList),
+                UnreportedListingUrl = dto.ListingUrl,
+                LgStrBylawUrl = dto.StrBylawUrl,
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = null,
+                InvolvedInOrganizationId = dto.PlatformId
+            };
 
-                await _emailRepo.AddEmailMessage(emailEntity);
+            await _emailRepo.AddEmailMessage(emailEntity);
 
-                _unitOfWork.Commit();
-            }
+            await template.SendEmail();
+
+            _unitOfWork.Commit();
         }
 
         private TakedownNotice GetTakedownNoticeTemplate(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto, bool preview = false)
@@ -307,35 +304,32 @@ namespace StrDss.Service
         private async Task SendTakedownRequestAsync(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
         {
             var template = GetTakedownRequestTemplate(dto, platform, lg);
-    
-            var sent = await template.SendEmail();
 
-            if (sent)
+            var emailEntity = new DssEmailMessage
             {
-                var emailEntity = new DssEmailMessage
-                {
-                    EmailMessageType = EmailMessageTypes.TakedownRequest,
-                    MessageDeliveryDtm = DateTime.UtcNow,
-                    MessageTemplateDsc = template.GetContent(),
-                    IsHostContactedExternally = false,
-                    IsSubmitterCcRequired = dto.SendCopy,
-                    MessageReasonId = null,
-                    LgPhoneNo = null,
-                    UnreportedListingNo = dto.ListingId,
-                    HostEmailAddressDsc = null,
-                    LgEmailAddressDsc = null,
-                    CcEmailAddressDsc = string.Join("; ", dto.CcList),
-                    UnreportedListingUrl = dto.ListingUrl,
-                    LgStrBylawUrl = null,
-                    InitiatingUserIdentityId = _currentUser.Id,
-                    AffectedByUserIdentityId = null,
-                    InvolvedInOrganizationId = dto.PlatformId
-                };
+                EmailMessageType = EmailMessageTypes.TakedownRequest,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsHostContactedExternally = false,
+                IsSubmitterCcRequired = dto.SendCopy,
+                MessageReasonId = null,
+                LgPhoneNo = null,
+                UnreportedListingNo = dto.ListingId,
+                HostEmailAddressDsc = null,
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = string.Join("; ", dto.CcList),
+                UnreportedListingUrl = dto.ListingUrl,
+                LgStrBylawUrl = null,
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = null,
+                InvolvedInOrganizationId = dto.PlatformId
+            };
 
-                await _emailRepo.AddEmailMessage(emailEntity);
+            await _emailRepo.AddEmailMessage(emailEntity);
 
-                _unitOfWork.Commit();
-            }
+            await template.SendEmail();
+
+            _unitOfWork.Commit();
         }
         private TakedownRequest GetTakedownRequestTemplate(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg, bool preview = false)
         {

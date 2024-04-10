@@ -75,12 +75,12 @@ namespace SpecFlowProjectBDD.Features
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("ManagingAccess")]
-        [NUnit.Framework.CategoryAttribute("Delisting")]
+        [NUnit.Framework.CategoryAttribute("Access")]
         [NUnit.Framework.TestCaseAttribute("0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
         public void ManagingAccess(string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string govPhoneNumber, string takedownReason, string[] exampleTags)
         {
             string[] @__tags = new string[] {
-                    "Delisting"};
+                    "Access"};
             if ((exampleTags != null))
             {
                 @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));

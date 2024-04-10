@@ -217,7 +217,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             //Validate message and return to home page
             System.Threading.Thread.Sleep(3000);
-            ClassicAssert.IsTrue(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+            ClassicAssert.IsTrue(_DelistingWarningPage.Driver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
             _DelistingWarningPage.ReturnHomeButton.Click();
         }
 

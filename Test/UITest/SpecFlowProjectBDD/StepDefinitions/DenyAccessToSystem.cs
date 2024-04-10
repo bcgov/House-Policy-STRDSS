@@ -1,0 +1,78 @@
+﻿using NUnit.Framework;
+using UITest.PageObjects;
+using UITest.TestDriver;
+using TestFrameWork.Models;
+using Configuration;
+using NUnit.Framework.Legacy;
+using TechTalk.SpecFlow.CommonModels;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using System.Security.Policy;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using System;
+using System.Collections.Generic;
+
+namespace SpecFlowProjectBDD.StepDefinitions
+{
+    [Binding]
+    [Scope(Scenario = "DenyAccessToSystem")]
+    public sealed class DenyAccessToSystem
+    {
+        private IDriver _Driver;
+        private LayoutPage _LayoutPage;
+        private DelistingWarningPage _DelistingWarningPage;
+        private PathFinderPage _PathFinderPage;
+        private IDRLoginPage _IDRLoginPage;
+        private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
+        private string _TestUserName;
+        private string _TestPassword;
+        private bool _ExpectedResult = false;
+
+        public DenyAccessToSystem(SeleniumDriver Driver)
+        {
+            _Driver = Driver;
+            _LayoutPage = new LayoutPage(_Driver);
+            _PathFinderPage = new PathFinderPage(_Driver);
+            _IDRLoginPage = new IDRLoginPage(_Driver);
+
+            AppSettings appSettings = new AppSettings();
+            _TestUserName = appSettings.GetValue("TestUserName") ?? string.Empty;
+            _TestPassword = appSettings.GetValue("TestPassword") ?? string.Empty;
+        }
+
+        //User Authentication
+        [Given(@"that I am an authenticated LG, CEU, Provincial Gov or Platform user and the expected result is ""(.*)""")]
+        public void GivenIAmAauthenticatedGovernmentUseer(string ExpectedResult)
+        {
+            _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
+  
+            _Driver.Url = "http://127.0.0.1:4200/access-request";
+            _Driver.Navigate();
+
+            _PathFinderPage.IDRButton.Click();
+        }
+
+
+        [When(@"I attempt to access the Data Sharing System as ""(.*)""")]
+        public void IAttemptToAccessTheDataSharingSystem(string UserName)
+        {
+            _IDRLoginPage.UserNameTextBox.WaitFor(5);
+
+            _IDRLoginPage.UserNameTextBox.EnterText(UserName);
+            _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+
+            _IDRLoginPage.ContinueButton.Click();
+        }
+
+        [Then("I dont have the required access permissions")]
+        public void IDontHaveTheRequiredAccessPermissions()
+        {
+        }
+
+
+        [Then("I should see a specific message indicating that access is restricted")]
+        public void IShouldSeeASpecificMessageIndicatingThatAccessIsRestricted()
+        {
+           ClassicAssert.IsTrue(_LayoutPage.Driver.PageSource.Contains("401 Access Denied"));
+        }
+    }
+}

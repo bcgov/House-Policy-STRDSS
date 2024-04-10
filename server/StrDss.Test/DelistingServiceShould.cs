@@ -414,14 +414,13 @@ namespace StrDss.Test
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
-            [Frozen] Mock<IEmailMessageRepository> emailRepositoryMock,
             DelistingService sut)
         {
             // Arrange
             currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
-            emailRepositoryMock.Setup(x => x.AddEmailMessage(It.IsAny<DssEmailMessage>()));
+
             // Act
             await sut.CreateTakedownNoticeAsync(dto);
 

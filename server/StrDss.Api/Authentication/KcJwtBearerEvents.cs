@@ -9,11 +9,38 @@ namespace StrDss.Api.Authentication
     {
         private ICurrentUser _currentUser;
         private IUserService _userService;
+        private ILogger<StrDssLogger> _logger;
 
-        public KcJwtBearerEvents(ICurrentUser currentUser, IUserService userService) : base()
+        public KcJwtBearerEvents(ICurrentUser currentUser, IUserService userService, ILogger<StrDssLogger> logger) : base()
         {
             _currentUser = currentUser;
             _userService = userService;
+            _logger = logger;
+        }
+
+        public override Task Challenge(JwtBearerChallengeContext context)
+        {
+            var username = context.HttpContext.User?.Identity?.Name ?? "Unknown";
+            var ipAddress = context.HttpContext.Connection.RemoteIpAddress;
+            var ip = ipAddress == null ? "Unknown" : ipAddress.ToString();
+
+            if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                _logger.LogWarning($"[AUTH] Authentication failed for user '{username}' from IP address '{ip}'. Authorization header is missing.");
+            }
+
+            return base.Challenge(context);
+        }
+
+        public override Task AuthenticationFailed(AuthenticationFailedContext context)
+        {
+            var username = context.HttpContext.User?.Identity?.Name ?? "Unknown";
+            var ipAddress = context.HttpContext.Connection.RemoteIpAddress;
+            var ip = ipAddress == null ? "Unknown" : ipAddress.ToString();
+
+            _logger.LogInformation($"[AUTH] Authentication failed for user '{username}' from IP address '{ip}'.");
+
+            return base.AuthenticationFailed(context);
         }
 
         public override async Task TokenValidated(TokenValidatedContext context)

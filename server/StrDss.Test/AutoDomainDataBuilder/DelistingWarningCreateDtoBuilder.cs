@@ -39,9 +39,6 @@ namespace StrDss.Test.AutoDomainDataBuilder
                 case nameof(TakedownNoticeCreateDto.HostEmailSent):
                     return false;
 
-                case nameof(TakedownNoticeCreateDto.SendCopy):
-                    return true;
-
                 case nameof(TakedownNoticeCreateDto.CcList):
                     return new List<string> { "cc1@example.com", "cc2@example.com" };
 

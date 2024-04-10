@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
@@ -10,9 +9,5 @@ import { ButtonModule } from 'primeng/button';
   styleUrl: './unauthorized.component.scss'
 })
 export class UnauthorizedComponent {
-  constructor(private router: Router) { }
-
-  onBackHome(): void {
-    this.router.navigateByUrl('/');
-  }
+  constructor() { }
 }

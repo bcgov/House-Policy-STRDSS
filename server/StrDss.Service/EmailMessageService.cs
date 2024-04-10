@@ -13,7 +13,7 @@ namespace StrDss.Service
 {
     public interface IEmailMessageService
     {
-        Task<bool> SendEmailAsync(EmailContent emailContent);
+        Task SendEmailAsync(EmailContent emailContent);
         Task<List<DropdownNumDto>> GetMessageReasons(string messageType);
         Task<DropdownNumDto?> GetMessageReasonByMessageTypeAndId(string messageType, long id);
     }
@@ -36,7 +36,7 @@ namespace StrDss.Service
             _logger = logger;
         }
 
-        public async Task<bool> SendEmailAsync(EmailContent emailContent)
+        public async Task SendEmailAsync(EmailContent emailContent)
         {
             var env = _config.GetValue<string>("ENV_NAME") ?? "dev";
 
@@ -61,7 +61,6 @@ namespace StrDss.Service
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation($"Sent '{emailContent.Subject}' for {emailContent.Info} successfully");
-                    return true;
                 }
                 else
                 {

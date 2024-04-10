@@ -2,6 +2,7 @@
 using CsvHelper.Configuration;
 using StrDss.Common;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Service.CsvHelpers
@@ -59,6 +60,25 @@ namespace StrDss.Service.CsvHelpers
             }
 
             return fields;
+        }
+
+        public static string GetBase64CsvString<T>(List<T> records) where T : class
+        {
+            var csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)
+            {
+                HasHeaderRecord = true,
+                Delimiter = ",",
+                Encoding = Encoding.UTF8
+            };
+
+            using var ms = new MemoryStream();
+            using var sr = new StreamWriter(ms);
+            using var csvWriter = new CsvWriter(sr, csvConfig);
+
+            csvWriter.WriteRecords(records);
+            sr.Flush();
+
+            return Convert.ToBase64String(ms.ToArray());
         }
     }
 }

@@ -39,7 +39,7 @@ export const routes: Routes = [
     },
     {
         path: 'access-request',
-        canActivate: [accessRequestTokenGuard, activeUserGuard],
+        canActivate: [accessRequestTokenGuard],
         component: AccessRequestComponent,
     },
     {

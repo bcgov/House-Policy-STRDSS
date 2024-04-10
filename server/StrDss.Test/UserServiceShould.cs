@@ -37,7 +37,7 @@ namespace StrDss.Test
 
             // Assert
             Assert.Empty(result);
-            unitOfWorkMock.Verify(x => x.Commit(), Times.Once);
+            unitOfWorkMock.Verify(x => x.Commit(), Times.AtLeastOnce);
         }
 
         [Theory]

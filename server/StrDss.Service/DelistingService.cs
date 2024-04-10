@@ -156,7 +156,7 @@ namespace StrDss.Service
 
             var emailEntity = new DssEmailMessage
             {
-                EmailMessageType = EmailMessageTypes.NoticeOfTakedown,
+                EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = dto.HostEmailSent,
@@ -171,12 +171,12 @@ namespace StrDss.Service
                 LgStrBylawUrl = dto.StrBylawUrl,
                 InitiatingUserIdentityId = _currentUser.Id,
                 AffectedByUserIdentityId = null,
-                InvolvedInOrganizationId = dto.PlatformId
+                InvolvedInOrganizationId = dto.PlatformId,
             };
 
             await _emailRepo.AddEmailMessage(emailEntity);
 
-            await template.SendEmail();
+            emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
         }
@@ -307,7 +307,7 @@ namespace StrDss.Service
 
             var emailEntity = new DssEmailMessage
             {
-                EmailMessageType = EmailMessageTypes.TakedownRequest,
+                EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = false,
@@ -327,7 +327,7 @@ namespace StrDss.Service
 
             await _emailRepo.AddEmailMessage(emailEntity);
 
-            await template.SendEmail();
+            emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
         }

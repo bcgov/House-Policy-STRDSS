@@ -1,10 +1,13 @@
-﻿namespace StrDss.Service.EmailTemplates
+﻿using StrDss.Common;
+
+namespace StrDss.Service.EmailTemplates
 {
     public class TakedownNotice : EmailTemplateBase
     {
         public TakedownNotice(IEmailMessageService emailService) 
             : base(emailService)
         {
+            EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
         }
 
         public string Reason { get; set; } = "";

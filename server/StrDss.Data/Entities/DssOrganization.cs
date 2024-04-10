@@ -15,7 +15,7 @@ public partial class DssOrganization
     public long OrganizationId { get; set; }
 
     /// <summary>
-    /// a level of government or business category
+    /// Foreign key
     /// </summary>
     public string OrganizationType { get; set; } = null!;
 
@@ -49,7 +49,9 @@ public partial class DssOrganization
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
 
-    public virtual ICollection<DssEmailMessage> DssEmailMessages { get; set; } = new List<DssEmailMessage>();
+    public virtual ICollection<DssEmailMessage> DssEmailMessageInvolvedInOrganizations { get; set; } = new List<DssEmailMessage>();
+
+    public virtual ICollection<DssEmailMessage> DssEmailMessageRequestingOrganizations { get; set; } = new List<DssEmailMessage>();
 
     public virtual ICollection<DssOrganizationContactPerson> DssOrganizationContactPeople { get; set; } = new List<DssOrganizationContactPerson>();
 

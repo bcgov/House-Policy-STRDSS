@@ -5,6 +5,7 @@ namespace StrDss.Data
     public interface IUnitOfWork
     {
         bool Commit();
+        DssDbContext GetDbContext();
     }
 
     public class UnitOfWork : IUnitOfWork
@@ -19,6 +20,11 @@ namespace StrDss.Data
         public bool Commit()
         {
             return _dbContext.SaveChanges() >= 0;
+        }
+
+        public DssDbContext GetDbContext()
+        {
+            return _dbContext;
         }
     }
 }

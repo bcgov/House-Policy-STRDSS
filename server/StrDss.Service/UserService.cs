@@ -114,9 +114,13 @@ namespace StrDss.Service
                 await _userRepo.UpdateUserAsync(userDto);
             }
 
+            var dbContext = _unitOfWork.GetDbContext();
+
+            using var transaction = dbContext.Database.BeginTransaction();
+
             _unitOfWork.Commit();
 
-            var user = _userRepo.GetUserByGuid(_currentUser.UserGuid);
+            var user = await _userRepo.GetUserByGuid(_currentUser.UserGuid);
 
             var adminUsers = await _userRepo.GetAdminUsers();
 
@@ -133,7 +137,7 @@ namespace StrDss.Service
 
                 var emailEntity = new DssEmailMessage
                 {
-                    EmailMessageType = EmailMessageTypes.AccessRequested,
+                    EmailMessageType = template.EmailMessageType,
                     MessageDeliveryDtm = DateTime.UtcNow,
                     MessageTemplateDsc = template.GetContent(),
                     IsHostContactedExternally = false,
@@ -146,17 +150,19 @@ namespace StrDss.Service
                     CcEmailAddressDsc = null,
                     UnreportedListingUrl = null,
                     LgStrBylawUrl = null,
-                    InitiatingUserIdentityId = _currentUser.Id,
-                    AffectedByUserIdentityId = user.Id,
+                    InitiatingUserIdentityId = user!.UserIdentityId,
+                    AffectedByUserIdentityId = user!.UserIdentityId,
                     InvolvedInOrganizationId = null
                 };
 
                 await _emailRepo.AddEmailMessage(emailEntity);
 
-                await template.SendEmail();
+                emailEntity.ExternalMessageNo = await template.SendEmail();
 
                 _unitOfWork.Commit();
             }
+
+            transaction.Commit();
 
             return errors;
         }
@@ -246,7 +252,7 @@ namespace StrDss.Service
 
             var emailEntity = new DssEmailMessage
             {
-                EmailMessageType = EmailMessageTypes.AccessDenied,
+                EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = false,
@@ -266,7 +272,7 @@ namespace StrDss.Service
 
             await _emailRepo.AddEmailMessage(emailEntity);
 
-            await template.SendEmail();
+            emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
 
@@ -345,7 +351,7 @@ namespace StrDss.Service
 
             var emailEntity = new DssEmailMessage
             {
-                EmailMessageType = EmailMessageTypes.AccessGranted,
+                EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = false,
@@ -365,7 +371,7 @@ namespace StrDss.Service
 
             await _emailRepo.AddEmailMessage(emailEntity);
 
-            await template.SendEmail();
+            emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
 

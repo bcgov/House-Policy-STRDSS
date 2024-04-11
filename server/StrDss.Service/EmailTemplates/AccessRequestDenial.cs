@@ -1,9 +1,12 @@
-﻿namespace StrDss.Service.EmailTemplates
+﻿using StrDss.Common;
+
+namespace StrDss.Service.EmailTemplates
 {
     public class AccessRequestDenial : EmailTemplateBase
     {
         public AccessRequestDenial(IEmailMessageService emailService) : base(emailService)
         {
+            EmailMessageType = EmailMessageTypes.AccessDenied;
         }
 
         public string AdminEmail { get; set; } = "";

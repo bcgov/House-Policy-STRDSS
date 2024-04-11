@@ -1,9 +1,12 @@
-﻿namespace StrDss.Service.EmailTemplates
+﻿using StrDss.Common;
+
+namespace StrDss.Service.EmailTemplates
 {
     public class AccessRequestApproval : EmailTemplateBase
     {
         public AccessRequestApproval(IEmailMessageService emailService) : base(emailService)
         {
+            EmailMessageType = EmailMessageTypes.AccessGranted;
         }
 
         public string Link { get; set; } = "";

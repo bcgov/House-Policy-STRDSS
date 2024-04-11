@@ -114,9 +114,13 @@ namespace StrDss.Service
                 await _userRepo.UpdateUserAsync(userDto);
             }
 
+            var dbContext = _unitOfWork.GetDbContext();
+
+            using var transaction = dbContext.Database.BeginTransaction();
+
             _unitOfWork.Commit();
 
-            var user = _userRepo.GetUserByGuid(_currentUser.UserGuid);
+            var user = await _userRepo.GetUserByGuid(_currentUser.UserGuid);
 
             var adminUsers = await _userRepo.GetAdminUsers();
 
@@ -146,8 +150,8 @@ namespace StrDss.Service
                     CcEmailAddressDsc = null,
                     UnreportedListingUrl = null,
                     LgStrBylawUrl = null,
-                    InitiatingUserIdentityId = _currentUser.Id,
-                    AffectedByUserIdentityId = user.Id,
+                    InitiatingUserIdentityId = user!.UserIdentityId,
+                    AffectedByUserIdentityId = user!.UserIdentityId,
                     InvolvedInOrganizationId = null
                 };
 
@@ -157,6 +161,8 @@ namespace StrDss.Service
 
                 _unitOfWork.Commit();
             }
+
+            transaction.Commit();
 
             return errors;
         }

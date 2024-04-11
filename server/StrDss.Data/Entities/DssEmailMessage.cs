@@ -81,7 +81,7 @@ public partial class DssEmailMessage
     /// <summary>
     /// Foreign key
     /// </summary>
-    public long InitiatingUserIdentityId { get; set; }
+    public long? InitiatingUserIdentityId { get; set; }
 
     /// <summary>
     /// Foreign key
@@ -124,7 +124,7 @@ public partial class DssEmailMessage
 
     public virtual DssEmailMessageType EmailMessageTypeNavigation { get; set; } = null!;
 
-    public virtual DssUserIdentity InitiatingUserIdentity { get; set; } = null!;
+    public virtual DssUserIdentity? InitiatingUserIdentity { get; set; }
 
     public virtual ICollection<DssEmailMessage> InverseBatchingEmailMessage { get; set; } = new List<DssEmailMessage>();
 

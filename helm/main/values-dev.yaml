@@ -18,7 +18,7 @@ nameOverride: strdss-dev
 fullnameOverride: strdss-dev
 
 route:
-  host: https://dev-strdata.apps.advsol-ams.3j6z.p1.openshiftapps.com
+  host: dev-strdata.apps.advsol-ams.3j6z.p1.openshiftapps.com
   baseService: strdss-dev
 
 frontend:

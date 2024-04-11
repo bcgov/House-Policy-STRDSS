@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - dev
+      - aldudin
     paths-ignore:
       - database/**
       - package.json

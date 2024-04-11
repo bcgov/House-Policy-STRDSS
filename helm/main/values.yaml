@@ -1,4 +1,4 @@
 global:
   licensePlate: f4a30d
-  imagePullSecrets:
-  - name: gh-registry-config
+  # imagePullSecrets:
+  # - name: gh-registry-config

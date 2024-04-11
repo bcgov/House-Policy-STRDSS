@@ -87,7 +87,7 @@ namespace XUnitTests
 
                 //Wait for page source to load
                 System.Threading.Thread.Sleep(3000);
-                Assert.True(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+                Assert.True(_DelistingRequestPage.Driver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
                 _DelistingRequestPage.ReturnHomeButton.Click();
 
                 
@@ -172,7 +172,7 @@ namespace XUnitTests
 
                 //Wait for page source to load
                 System.Threading.Thread.Sleep(3000);
-                Assert.True(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+                Assert.True(_DelistingWarningPage.Driver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
 
                 //If submit is sucessful, then return  to home page
                 _DelistingWarningPage.ReturnHomeButton.Click();

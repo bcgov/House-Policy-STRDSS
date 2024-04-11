@@ -137,7 +137,7 @@ CREATE  TABLE dss_email_message (
 	cc_email_address_dsc varchar(4000)    ,
 	unreported_listing_url varchar(4000)    ,
 	lg_str_bylaw_url     varchar(4000)    ,
-	initiating_user_identity_id bigint  NOT NULL  ,
+	initiating_user_identity_id bigint    ,
 	affected_by_user_identity_id bigint    ,
 	involved_in_organization_id bigint    ,
 	batching_email_message_id bigint    ,

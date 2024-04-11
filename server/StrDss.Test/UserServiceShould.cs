@@ -10,38 +10,39 @@ using StrDss.Model.OrganizationDtos;
 using StrDss.Common;
 using Microsoft.EntityFrameworkCore;
 using StrDss.Data.Entities;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace StrDss.Test
 {
     public class UserServiceShould
     {
-        //[Theory]
-        //[AutoDomainData]
-        //public async Task CreateAccessRequestAsync_ValidDto_NoErrors(
-        //    AccessRequestCreateDto dto,
-        //    UserDto userDto,
-        //    OrganizationDto organizationDto,
-        //    [Frozen] Mock<IUserRepository> userRepoMock,
-        //    [Frozen] Mock<ICurrentUser> currentUserMock,
-        //    [Frozen] Mock<IUnitOfWork> unitOfWorkMock,
-        //    [Frozen] Mock<IOrganizationRepository> organizationRepoMock,
-        //    [Frozen] Mock<IEmailMessageService> emailServiceMock,
-        //    [Frozen] Mock<DssDbContext> dbContextMock,
-        //    UserService sut)
-        //{
-        //    // Arrange
-        //    SetupCurrentUser(currentUserMock);
-        //    SetupUserRepository(userRepoMock, (UserDto)null);
-        //    SetupUnitOfWork(unitOfWorkMock, dbContextMock);
-        //    SetupOrganizationRepository(organizationRepoMock, organizationDto);
+        [Theory]
+        [AutoDomainData]
+        public async Task CreateAccessRequestAsync_ValidDto_NoErrors(
+            AccessRequestCreateDto dto,
+            UserDto userDto,
+            OrganizationDto organizationDto,
+            [Frozen] Mock<IUserRepository> userRepoMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
+            [Frozen] Mock<IUnitOfWork> unitOfWorkMock,
+            [Frozen] Mock<IOrganizationRepository> organizationRepoMock,
+            [Frozen] Mock<IEmailMessageService> emailServiceMock,
+            UserService sut)
+        {
+            // Arrange
+            SetupCurrentUser(currentUserMock);
+            SetupUserRepository(userRepoMock, null, userDto);
+            SetupUnitOfWork(unitOfWorkMock);
+            SetupOrganizationRepository(organizationRepoMock, organizationDto);
 
-        //    // Act
-        //    var result = await sut.CreateAccessRequestAsync(dto);
+            // Act
+            var result = await sut.CreateAccessRequestAsync(dto);
 
-        //    // Assert
-        //    Assert.Empty(result);
-        //    unitOfWorkMock.Verify(x => x.Commit(), Times.AtLeastOnce);
-        //}
+            // Assert
+            Assert.Empty(result);
+            unitOfWorkMock.Verify(x => x.Commit(), Times.AtLeastOnce);
+        }
 
         [Theory]
         [AutoDomainData]
@@ -283,7 +284,7 @@ namespace StrDss.Test
             UserDto userDto,
             OrganizationDto orgDto,
             [Frozen] Mock<IUserRepository> userRepoMock,
-            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,            
             UserService sut)
         {
             // Arrange
@@ -302,7 +303,7 @@ namespace StrDss.Test
         }
 
 
-        public void SetupCurrentUser(Mock<ICurrentUser> currentUserMock)
+        private void SetupCurrentUser(Mock<ICurrentUser> currentUserMock)
         {
             currentUserMock.Setup(x => x.UserGuid).Returns(Guid.NewGuid());
             currentUserMock.Setup(x => x.DisplayName).Returns("Test User");
@@ -313,19 +314,27 @@ namespace StrDss.Test
             currentUserMock.Setup(x => x.BusinessNm).Returns("Test Business");
         }
 
-        public void SetupUserRepository(Mock<IUserRepository> userRepoMock, UserDto userDto)
+        private void SetupUserRepository(Mock<IUserRepository> userRepoMock, UserDto? userDto1, UserDto userDto2)
         {
-            userRepoMock.Setup(x => x.GetUserByGuid(It.IsAny<Guid>())).ReturnsAsync(userDto);
+            int callCount = 0;
+
+            userRepoMock.Setup(x => x.GetUserByGuid(It.IsAny<Guid>()))
+              .ReturnsAsync(() =>
+              {
+                  callCount++;
+                  return callCount == 1 ? userDto1 : userDto2;
+              });
+
             userRepoMock.Setup(x => x.CreateUserAsync(It.IsAny<UserCreateDto>())).Returns(Task.CompletedTask);
-            userRepoMock.Setup(x => x.GetAdminUsers()).ReturnsAsync(new List<UserDto> { userDto });
+            userRepoMock.Setup(x => x.GetAdminUsers()).ReturnsAsync(new List<UserDto> { userDto2 });
         }
 
-        public void SetupUnitOfWork(Mock<IUnitOfWork> unitOfWorkMock, Mock<DssDbContext> dbContextMock)
+        private void SetupUnitOfWork(Mock<IUnitOfWork> unitOfWorkMock)
         {
             unitOfWorkMock.Setup(x => x.Commit()).Verifiable();
         }
 
-        public void SetupOrganizationRepository(Mock<IOrganizationRepository> organizationRepoMock, OrganizationDto organizationDto)
+        private void SetupOrganizationRepository(Mock<IOrganizationRepository> organizationRepoMock, OrganizationDto organizationDto)
         {
             organizationRepoMock.Setup(x => x.GetOrganizationTypesAsnc()).ReturnsAsync(new List<OrganizationTypeDto>
             {

@@ -162,7 +162,6 @@ public partial class DssDbContext : DbContext
 
             entity.HasOne(d => d.InitiatingUserIdentity).WithMany(p => p.DssEmailMessageInitiatingUserIdentities)
                 .HasForeignKey(d => d.InitiatingUserIdentityId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_email_message_fk_initiated_by");
 
             entity.HasOne(d => d.InvolvedInOrganization).WithMany(p => p.DssEmailMessageInvolvedInOrganizations)

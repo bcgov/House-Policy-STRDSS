@@ -2,6 +2,7 @@
 using Hangfire.Common;
 using Hangfire.Server;
 using System.Text.Json;
+using Hangfire;
 
 namespace StrDss.Service.Hangfire
 {
@@ -18,8 +19,20 @@ namespace StrDss.Service.Hangfire
             var job = context.Job;
             var jobFingerprint = GetJobFingerprint(job);
 
+            //delete stalled jobs
             var monitor = context.Storage.GetMonitoringApi();
-            var fingerprints = monitor.ProcessingJobs(0, 999999999)
+            var allJobs = monitor.ProcessingJobs(0, 999999999);
+            var cutoffTime = DateTime.UtcNow.AddMinutes(-5);
+
+            foreach (var processingJob in allJobs)
+            {
+                if (processingJob.Value.StartedAt < cutoffTime)
+                {
+                    BackgroundJob.Delete(processingJob.Key);
+                }
+            }
+
+            var fingerprints = allJobs
                 .Select(x => GetJobFingerprint(x.Value.Job))
                 .ToList();
 
@@ -45,15 +58,22 @@ namespace StrDss.Service.Hangfire
 
             var timeout = TimeSpan.FromSeconds(_timeoutInSeconds);
 
-            var distributedLock = filterContext.Connection.AcquireDistributedLock(resource, timeout);
-            filterContext.Items["DistributedLock"] = distributedLock;
+            try
+            {
+                var distributedLock = filterContext.Connection.AcquireDistributedLock(resource, timeout);
+                filterContext.Items["DistributedLock"] = distributedLock;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         public void OnPerformed(PerformedContext filterContext)
         {
             if (!filterContext.Items.ContainsKey("DistributedLock"))
             {
-                throw new InvalidOperationException("Can not release a distributed lock: it was not acquired.");
+                return;
             }
 
             var distributedLock = (IDisposable)filterContext.Items["DistributedLock"];

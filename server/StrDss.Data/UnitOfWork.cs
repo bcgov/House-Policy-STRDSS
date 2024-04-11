@@ -1,11 +1,13 @@
-﻿using StrDss.Data.Entities;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using StrDss.Data.Entities;
 
 namespace StrDss.Data
 {
     public interface IUnitOfWork
     {
         bool Commit();
-        DssDbContext GetDbContext();
+        IDbContextTransaction BeginTransaction();
+        void CommitTransaction(IDbContextTransaction transaction);
     }
 
     public class UnitOfWork : IUnitOfWork
@@ -26,5 +28,16 @@ namespace StrDss.Data
         {
             return _dbContext;
         }
+
+        public IDbContextTransaction BeginTransaction()
+        {
+            return _dbContext.Database.BeginTransaction();
+        }
+
+        public void CommitTransaction(IDbContextTransaction transaction)
+        {
+            transaction.Commit();
+        }
+
     }
 }

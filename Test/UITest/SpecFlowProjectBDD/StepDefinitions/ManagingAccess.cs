@@ -76,7 +76,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
 
         [When("I navigate to the user access request section")]
-        public void InavigateToTheUserAccessRequestSection()
+        public void INavigateToTheUserAccessRequestSection()
         {
         }
 

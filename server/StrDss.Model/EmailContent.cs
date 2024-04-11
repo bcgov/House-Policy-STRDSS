@@ -26,6 +26,7 @@ namespace StrDss.Model
         public string Subject { get; set; } = "";
 
         public IEnumerable<string> To { get; set; }
+        public IEnumerable<EmailAttachment> Attachments { get; set; } = Array.Empty<EmailAttachment>();
 
         [JsonIgnore]
         public string Info { get; set; } = "";

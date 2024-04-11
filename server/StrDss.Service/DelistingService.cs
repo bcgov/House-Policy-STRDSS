@@ -11,6 +11,9 @@ using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
+using System;
+using System.Collections.Generic;
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Service
@@ -21,7 +24,7 @@ namespace StrDss.Service
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto);
         Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto);
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto);
-        Task ProcessTakedownRequestBatchEmailAsync();
+        Task ProcessTakedownRequestBatchEmailsAsync();
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -371,7 +374,7 @@ namespace StrDss.Service
 
         }
 
-        public async Task ProcessTakedownRequestBatchEmailAsync()
+        public async Task ProcessTakedownRequestBatchEmailsAsync()
         {
             var allEmails = await _emailRepo.GetTakedownRequestEmailsToBatch();
 
@@ -380,61 +383,89 @@ namespace StrDss.Service
             foreach(var platformId in platformIds)
             {
                 var platform = await _orgService.GetOrganizationByIdAsync(platformId);
-                var contact = platform.ContactPeople.FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest);
 
-                if (contact == null)
+                try
                 {
-                    _logger.LogError($"There's no primary '{EmailMessageTypes.BatchTakedownRequest}' contact email for {platform.OrganizationNm}");
-                    // send email to admin?
-                    continue;
+                    await ProcessTakedownRequestBatchEmailAsync(platform, allEmails);
                 }
-
-                var emails = allEmails.Where(x => x.InvolvedInOrganizationId == platformId).ToList();
-
-                var csvRecords = emails.Select(x => 
-                    new TakedownRequestCsvRecord { ListingId = x.UnreportedListingNo ?? "", Url = x.UnreportedListingUrl ?? "", RequestedBy = x.RequestingOrganization?.OrganizationNm ?? "" })
-                    .ToList();
-
-                var file = CsvHelperUtils.GetBase64CsvString(csvRecords);
-
-                var template = new BatchTakedownRequest(_emailService)
+                catch (Exception ex)
                 {
-                    To = new string[] { contact!.EmailAddressDsc },
-                    Info = $"{EmailMessageTypes.BatchTakedownRequest} for {platform.OrganizationNm}"
-                };
-
-                var emailEntity = new DssEmailMessage
-                {
-                    EmailMessageType = template.EmailMessageType,
-                    MessageDeliveryDtm = DateTime.UtcNow,
-                    MessageTemplateDsc = template.GetContent(),
-                    IsHostContactedExternally = false,
-                    IsSubmitterCcRequired = false,
-                    MessageReasonId = null,
-                    LgPhoneNo = null,
-                    UnreportedListingNo = null,
-                    HostEmailAddressDsc = null,
-                    LgEmailAddressDsc = null,
-                    CcEmailAddressDsc = null,
-                    UnreportedListingUrl = null,
-                    LgStrBylawUrl = null,
-                    InitiatingUserIdentityId = 0,
-                    AffectedByUserIdentityId = null,
-                    InvolvedInOrganizationId = platformId,
-                    RequestingOrganizationId = null
-                };
-
-                foreach (var email in emails)
-                {
-                    email.BatchingEmailMessageId = emailEntity.EmailMessageId;
-                }
-
-                await _emailRepo.AddEmailMessage(emailEntity);
-
-                emailEntity.ExternalMessageNo = await template.SendEmail();
-
-                _unitOfWork.Commit();
+                    _logger.LogError($"Error while processing '{EmailMessageTypes.BatchTakedownRequest}' email for {platform.OrganizationNm}");
+                    _logger.LogError(ex.ToString());
+                    //send email to admin?
+                } 
             }
+        }
+
+        private async Task ProcessTakedownRequestBatchEmailAsync(OrganizationDto platform, List<DssEmailMessage> allEmails)
+        {            
+            var contact = platform.ContactPeople.FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest);
+
+            if (contact == null)
+            {
+                throw new Exception($"There's no primary '{EmailMessageTypes.BatchTakedownRequest}' contact email for {platform.OrganizationNm}");
+            }
+
+            var emails = allEmails.Where(x => x.InvolvedInOrganizationId == platform.OrganizationId).ToList();
+
+            var csvRecords = emails.Select(x =>
+                new TakedownRequestCsvRecord { ListingId = x.UnreportedListingNo ?? "", Url = x.UnreportedListingUrl ?? "", RequestedBy = x.RequestingOrganization?.OrganizationNm ?? "" })
+                .ToList();
+
+            var content = CsvHelperUtils.GetBase64CsvString(csvRecords);
+            var date = DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm");
+
+            var template = new BatchTakedownRequest(_emailService)
+            {
+                To = new string[] { contact!.EmailAddressDsc },
+                Info = $"{EmailMessageTypes.BatchTakedownRequest} for {platform.OrganizationNm}",
+                Attachments = new EmailAttachment[] { new EmailAttachment {
+                    Content = content,
+                    ContentType = "text/csv",
+                    Encoding = "base64",
+                    Filename = $"{platform.OrganizationNm} - {date}.csv"
+                }},
+            };
+
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsHostContactedExternally = false,
+                IsSubmitterCcRequired = false,
+                MessageReasonId = null,
+                LgPhoneNo = null,
+                UnreportedListingNo = null,
+                HostEmailAddressDsc = null,
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = null,
+                UnreportedListingUrl = null,
+                LgStrBylawUrl = null,
+                InitiatingUserIdentityId = null,
+                AffectedByUserIdentityId = null,
+                InvolvedInOrganizationId = platform.OrganizationId,
+                RequestingOrganizationId = null
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            emailEntity.ExternalMessageNo = await template.SendEmail();
+
+            var dbContext = _unitOfWork.GetDbContext();
+
+            using var transaction = dbContext.Database.BeginTransaction();
+
+            _unitOfWork.Commit();
+
+            foreach (var email in emails)
+            {
+                email.BatchingEmailMessageId = emailEntity.EmailMessageId;
+            }
+
+            _unitOfWork.Commit();
+
+            transaction.Commit();
         }
     }
 }

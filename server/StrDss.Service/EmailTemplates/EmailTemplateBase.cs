@@ -19,6 +19,7 @@ namespace StrDss.Service.EmailTemplates
         public string Info { get; set; } = "";
         public bool Preview { get; set; } = false;
         public string EmailMessageType { get; set; } = "";
+        public IEnumerable<EmailAttachment> Attachments { get; set; }
 
         public string GetPreviewContent()
         {
@@ -43,7 +44,8 @@ namespace StrDss.Service.EmailTemplates
                 To = To,
                 Cc = Cc,
                 Bcc = Bcc,
-                Info = Info
+                Info = Info,
+                Attachments = Attachments,
             };
 
             return await _emailService.SendEmailAsync(emailContent);

@@ -178,6 +178,13 @@ jobs:
         namespace: f4a30d-dev
         insecure_skip_tls_verify: true
 
+    - name: Log in to JFrog Artifactory
+      uses: docker/login-action@v1
+      with:
+        registry: artifacts.developer.gov.bc.ca
+        username: ${{ secrets.JFROG_USERNAME }}
+        password: ${{ secrets.JFROG_PASSWORD }}
+
     - name: Deploy apps with Helm chart
       run: |
         make upgrade \

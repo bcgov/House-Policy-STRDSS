@@ -524,7 +524,7 @@ namespace StrDss.Test
 
         [Theory]
         [AutoDomainData]
-        public async Task SendDelistingRequestAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToCcList(
+        public async Task SendDelistingRequestAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToList(
             TakedownRequestCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
@@ -548,7 +548,7 @@ namespace StrDss.Test
             await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
-            Assert.Contains(currentUserEmail, dto.CcList);
+            Assert.Contains(currentUserEmail, dto.ToList);
         }
 
         [Theory]

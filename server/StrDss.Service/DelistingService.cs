@@ -343,7 +343,7 @@ namespace StrDss.Service
             dto.ToList.Add(platformContact.EmailAddressDsc);
 
             var lgContact = lg!.ContactPeople
-                .FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.TakedownRequest);
+                .FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
 
             if (dto.SendCopy)
             {

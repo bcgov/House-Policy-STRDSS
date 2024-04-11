@@ -187,6 +187,7 @@ jobs:
 
     - name: Deploy apps with Helm chart
       run: |
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         make upgrade \
         NAMESPACE=f4a30d-dev \
         NAME=strdss-dev \

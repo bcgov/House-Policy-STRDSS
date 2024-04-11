@@ -22,7 +22,7 @@ namespace StrDss.Service.Hangfire
             //delete stalled jobs
             var monitor = context.Storage.GetMonitoringApi();
             var allJobs = monitor.ProcessingJobs(0, 999999999);
-            var cutoffTime = DateTime.UtcNow.AddMinutes(-5);
+            var cutoffTime = DateTime.UtcNow.AddMinutes(-10);
 
             foreach (var processingJob in allJobs)
             {
@@ -32,7 +32,7 @@ namespace StrDss.Service.Hangfire
                 }
             }
 
-            var fingerprints = allJobs
+            var fingerprints = monitor.ProcessingJobs(0, 999999999)
                 .Select(x => GetJobFingerprint(x.Value.Job))
                 .ToList();
 

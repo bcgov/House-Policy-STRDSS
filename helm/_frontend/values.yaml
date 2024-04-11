@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: artifacts.developer.gov.bc.ca/artifactory/sf4a-strdss/strdss-frontend-dev
+  repository: artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend-dev
   tag: latest
   pullPolicy: Always
 

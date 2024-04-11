@@ -12,6 +12,7 @@ namespace StrDss.Data.Repositories
         Task<List<DropdownNumDto>> GetMessageReasons(string messageType);
         Task<DropdownNumDto?> GetMessageReasonByMessageTypeAndId(string messageType, long id);
         Task AddEmailMessage(DssEmailMessage message);
+        Task<List<DssEmailMessage>> GetTakedownRequestEmailsToBatch();
     }
     public class EmailMessageRepository : RepositoryBase<DssEmailMessage>, IEmailMessageRepository
     {
@@ -43,6 +44,14 @@ namespace StrDss.Data.Repositories
         public async Task AddEmailMessage(DssEmailMessage message)
         {
             await _dbSet.AddAsync(message);
+        }
+
+        public async Task<List<DssEmailMessage>> GetTakedownRequestEmailsToBatch()
+        {
+            return await _dbSet
+                .Where(x => x.EmailMessageType == EmailMessageTypes.TakedownRequest && x.BatchingEmailMessageId == null)
+                .Include(x => x.RequestingOrganization)
+                .ToListAsync();
         }
     }
 }

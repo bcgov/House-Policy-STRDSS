@@ -3,10 +3,19 @@ using System.Collections.Generic;
 
 namespace StrDss.Data.Entities;
 
+/// <summary>
+/// A description of the justification for initiating a message
+/// </summary>
 public partial class DssMessageReason
 {
+    /// <summary>
+    /// Unique generated key
+    /// </summary>
     public long MessageReasonId { get; set; }
 
+    /// <summary>
+    /// Foreign key
+    /// </summary>
     public string EmailMessageType { get; set; } = null!;
 
     /// <summary>

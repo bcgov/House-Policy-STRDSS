@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using StrDss.Api.Middlewares;
 using StrDss.Api;
 using StrDss.Service.Bceid;
+using StrDss.Service.Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,12 +101,14 @@ builder.Services.AddSingleton(mapper);
 builder.Services
     .AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
         .UsePostgreSqlStorage((option) =>
         {
             option.UseNpgsqlConnection(connString);
         }
+        
 ));
 
 builder.Services.AddHangfireServer(options =>
@@ -194,5 +197,6 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 // make sure this is after app.UseHangfireDashboard()
 //RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReport(), "*/1 * * * *");
+RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 15 * * *"); //UTC time 23:50
 
 app.Run();

@@ -9,6 +9,7 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
+using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
 using System.Text.RegularExpressions;
 
@@ -20,6 +21,7 @@ namespace StrDss.Service
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto);
         Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto);
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto);
+        Task ProcessTakedownRequestBatchEmailAsync();
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -305,9 +307,9 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendTakedownRequestAsync(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
+        private async Task SendTakedownRequestAsync(TakedownRequestCreateDto dto, OrganizationDto platform, OrganizationDto lg)
         {
-            var template = GetTakedownRequestTemplate(dto, platform, lg);
+            var template = GetTakedownRequestTemplate(dto);
 
             var emailEntity = new DssEmailMessage
             {
@@ -326,7 +328,8 @@ namespace StrDss.Service
                 LgStrBylawUrl = null,
                 InitiatingUserIdentityId = _currentUser.Id,
                 AffectedByUserIdentityId = null,
-                InvolvedInOrganizationId = dto.PlatformId
+                InvolvedInOrganizationId = dto.PlatformId,
+                RequestingOrganizationId = lg!.OrganizationId
             };
 
             await _emailRepo.AddEmailMessage(emailEntity);
@@ -335,27 +338,14 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
         }
-        private TakedownRequest GetTakedownRequestTemplate(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg, bool preview = false)
+        private TakedownRequest GetTakedownRequestTemplate(TakedownRequestCreateDto dto, bool preview = false)
         {
-            var platformContact = platform!.ContactPeople
-                .First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.TakedownRequest);
-
-            dto.ToList.Add(platformContact.EmailAddressDsc);
-
-            var lgContact = lg!.ContactPeople
-                .FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
-
-            if (dto.SendCopy)
-            {
-                dto.CcList.Add(_currentUser.EmailAddress);
-            }
+            dto.ToList.Add(_currentUser.EmailAddress);
 
             var template = new TakedownRequest(_emailService)
             {
                 Url = dto.ListingUrl,
                 ListingId = dto.ListingId,
-                LgContactInfo = lgContact!.EmailAddressDsc,
-                LgName = lg.OrganizationNm,
                 To = dto.ToList,
                 Cc = dto.CcList,
                 Info = dto.ListingUrl,
@@ -375,10 +365,76 @@ namespace StrDss.Service
                 return (errors, new EmailPreview());
             }
 
-            var template = GetTakedownRequestTemplate(dto, platform, lg, true);
+            var template = GetTakedownRequestTemplate(dto, true);
 
             return (errors, new EmailPreview { Content = template.GetContent().HtmlToPlainText() });
 
+        }
+
+        public async Task ProcessTakedownRequestBatchEmailAsync()
+        {
+            var allEmails = await _emailRepo.GetTakedownRequestEmailsToBatch();
+
+            var platformIds = allEmails.Select(x => x.InvolvedInOrganizationId ?? 0).Distinct().ToList();
+
+            foreach(var platformId in platformIds)
+            {
+                var platform = await _orgService.GetOrganizationByIdAsync(platformId);
+                var contact = platform.ContactPeople.FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest);
+
+                if (contact == null)
+                {
+                    _logger.LogError($"There's no primary '{EmailMessageTypes.BatchTakedownRequest}' contact email for {platform.OrganizationNm}");
+                    // send email to admin?
+                    continue;
+                }
+
+                var emails = allEmails.Where(x => x.InvolvedInOrganizationId == platformId).ToList();
+
+                var csvRecords = emails.Select(x => 
+                    new TakedownRequestCsvRecord { ListingId = x.UnreportedListingNo ?? "", Url = x.UnreportedListingUrl ?? "", RequestedBy = x.RequestingOrganization?.OrganizationNm ?? "" })
+                    .ToList();
+
+                var file = CsvHelperUtils.GetBase64CsvString(csvRecords);
+
+                var template = new BatchTakedownRequest(_emailService)
+                {
+                    To = new string[] { contact!.EmailAddressDsc },
+                    Info = $"{EmailMessageTypes.BatchTakedownRequest} for {platform.OrganizationNm}"
+                };
+
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = template.EmailMessageType,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = false,
+                    MessageReasonId = null,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = null,
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = null,
+                    UnreportedListingUrl = null,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = 0,
+                    AffectedByUserIdentityId = null,
+                    InvolvedInOrganizationId = platformId,
+                    RequestingOrganizationId = null
+                };
+
+                foreach (var email in emails)
+                {
+                    email.BatchingEmailMessageId = emailEntity.EmailMessageId;
+                }
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                emailEntity.ExternalMessageNo = await template.SendEmail();
+
+                _unitOfWork.Commit();
+            }
         }
     }
 }

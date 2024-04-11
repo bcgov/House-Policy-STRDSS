@@ -73,9 +73,10 @@ namespace StrDss.Service
                     errors.AddItem("platformId", $"Organization ({dto.PlatformId}) is not a platform");
                 }
 
-                if (platform.ContactPeople == null || !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty()))
+                if (platform.ContactPeople == null || 
+                    !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown))
                 {
-                    errors.AddItem("platformId", $"Platform ({dto.PlatformId}) does not have the primary contact info");
+                    errors.AddItem("platformId", $"Platform ({dto.PlatformId}) does not have the primary '{EmailMessageTypes.NoticeOfTakedown}' contact info");
                 }
             }
 
@@ -189,7 +190,9 @@ namespace StrDss.Service
 
             // BCC: [sender], [platform], [Additional CCs] (optional)
             dto.CcList.Add(_currentUser.EmailAddress);
-            dto.CcList.Add(platform!.ContactPeople.FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty())!.EmailAddressDsc);
+            dto.CcList.Add(platform!.ContactPeople
+                .FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown)!
+                .EmailAddressDsc);
 
             var template = new TakedownNotice(_emailService)
             {
@@ -257,7 +260,8 @@ namespace StrDss.Service
                     errors.AddItem("platformId", $"Organization ({dto.PlatformId}) is not a platform");
                 }
 
-                if (platform.ContactPeople == null || !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty()))
+                if (platform.ContactPeople == null 
+                    || !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.TakedownRequest))
                 {
                     errors.AddItem("platformId", $"Platform ({dto.PlatformId}) does not have the primary contact info");
                 }
@@ -333,11 +337,13 @@ namespace StrDss.Service
         }
         private TakedownRequest GetTakedownRequestTemplate(TakedownRequestCreateDto dto, OrganizationDto? platform, OrganizationDto? lg, bool preview = false)
         {
-            var platformContact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+            var platformContact = platform!.ContactPeople
+                .First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.TakedownRequest);
 
             dto.ToList.Add(platformContact.EmailAddressDsc);
 
-            var lgContact = lg.ContactPeople.FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty());
+            var lgContact = lg!.ContactPeople
+                .FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.TakedownRequest);
 
             if (dto.SendCopy)
             {
@@ -348,7 +354,7 @@ namespace StrDss.Service
             {
                 Url = dto.ListingUrl,
                 ListingId = dto.ListingId,
-                LgContactInfo = lgContact.EmailAddressDsc,
+                LgContactInfo = lgContact!.EmailAddressDsc,
                 LgName = lg.OrganizationNm,
                 To = dto.ToList,
                 Cc = dto.CcList,

@@ -93,8 +93,10 @@
     <p [innerText]="previewText">
     </p>
     <div class="actions">
-        <p-button label="Submit" id="submit-dialog-btn" (click)="onSubmit()"></p-button>
-        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPreviewClose()"></p-button>
+        <button pButton name="submit-dialog-btn" id="submit-dialog-btn" (click)="onSubmit()">Submit</button>
+        <button pButton name="cancel-dialog-btn" id="cancel-dialog-btn" class="outline-btn"
+            (click)="onPreviewClose()">Cancel</button>
     </div>
 </p-dialog>
-<p-button *ngIf="hideForm" label="Return Home" id="return-home-btn" (click)="onReturnHome()"></p-button>
+<button *ngIf="hideForm" pButton id="return-home-btn" name="return-home-btn" (click)="onReturnHome()">Return
+    Home</button>

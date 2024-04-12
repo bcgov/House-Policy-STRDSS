@@ -5,6 +5,7 @@ using Configuration;
 
 using Xunit.Abstractions;
 using TestFrameWork.PageObjects;
+using OpenQA.Selenium;
 
 namespace XUnitTests
 {
@@ -13,6 +14,7 @@ namespace XUnitTests
     {
         private ITestOutputHelper _Output;
         private LandingPage _HomePage;
+        private TermsAndConditionsPage _TermsAndConditionsPage;
         private DelistingRequestPage _DelistingRequestPage;
         private DelistingWarningPage _DelistingWarningPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
@@ -30,6 +32,7 @@ namespace XUnitTests
             this._Output = output;
             _Driver = new SeleniumDriver(SeleniumDriver.DRIVERTYPE.CHROME);
             _HomePage = new LandingPage(_Driver);
+            _TermsAndConditionsPage = new TermsAndConditionsPage(_Driver);
             _DelistingRequestPage = new DelistingRequestPage(_Driver);
             _DelistingWarningPage = new DelistingWarningPage(_Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
@@ -63,6 +66,22 @@ namespace XUnitTests
 
                 _IDRLoginPage.ContinueButton.WaitFor();
                 _IDRLoginPage.ContinueButton.Click();
+
+                //handle terms and conditions
+
+                try
+                {
+                    if (_DelistingRequestPage.Driver.PageSource.Contains("Terms and Conditions"))
+                    {
+                        //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
+                        _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                        _TermsAndConditionsPage.ContinueButton.Click();
+                    }
+                }
+                catch (NoSuchElementException ex)
+                {
+                    //No terms and conditions present. Continue
+                }
 
                 //Enter ListingID Number
                 _DelistingRequestPage.ListingIDNumberTextBox.EnterText("1");
@@ -120,6 +139,22 @@ namespace XUnitTests
 
                 _IDRLoginPage.ContinueButton.WaitFor();
                 _IDRLoginPage.ContinueButton.Click();
+
+
+                //Handle Terms and Conditions
+                try
+                {
+                    if (_DelistingWarningPage.Driver.PageSource.Contains("Terms and Conditions"))
+                    {
+                        //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
+                        _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                        _TermsAndConditionsPage.ContinueButton.Click();
+                    }
+                }
+                catch (NoSuchElementException ex)
+                {
+                    //No terms and conditions present. Continue
+                }
 
                 //Add Platform receipient
                 _DelistingWarningPage.PlatformReceipientDropdown.WaitFor();

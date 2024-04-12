@@ -10,6 +10,7 @@ using System.Security.Policy;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using System;
 using System.Collections.Generic;
+using OpenQA.Selenium;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -19,7 +20,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
     {
         private IDriver _Driver;
         private LandingPage _HomePage;
-        private DelistingWarningPage _DelistingWarningPage;
+        private TermsAndConditionsPage _TermsAndConditionsPage;
+        private ManagingAccessPage _ManagingAccessPage;
         private PathFinderPage _PathFinderPage;
         private IDRLoginPage _IDRLoginPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
@@ -31,7 +33,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _Driver = Driver;
             _HomePage = new LandingPage(_Driver);
-            _DelistingWarningPage = new DelistingWarningPage(_Driver);
+            _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
+            _ManagingAccessPage = new ManagingAccessPage(_Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDRLoginPage = new IDRLoginPage(_Driver);
@@ -59,6 +62,20 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
 
             _IDRLoginPage.ContinueButton.Click();
+
+            try
+            {
+                if (_ManagingAccessPage.Driver.PageSource.Contains("Terms and Conditions"))
+                {
+                    //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
+                    _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                    _TermsAndConditionsPage.ContinueButton.Click();
+                }
+            }
+            catch (NoSuchElementException ex)
+            {
+                //No terms and conditions present. Continue
+            }
         }
 
 

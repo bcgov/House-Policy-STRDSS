@@ -10,9 +10,7 @@
 
         public static string HostEmailAddressTextBox { get => "hostEmail"; }
 
-        //public static string AlternativeNoticeSentCheckbox { get => "sentAlternativelyInput"; }
-
-        public static string AlternativeNoticeSentCheckbox { get => "#sentAlternatively > div > div.p-checkbox-box"; }
+        public static string AlternativeNoticeSentCheckbox { get => "#hostEmailSent > div > div.p-checkbox-box"; }
 
         public static string ReasonDropdown { get => "reasonId"; }
 

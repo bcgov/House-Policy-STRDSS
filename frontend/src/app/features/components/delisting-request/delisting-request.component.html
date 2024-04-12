@@ -1,6 +1,13 @@
-<div class="title">Send Takedown Letter Form</div>
+<div class="title">Send Takedown Request</div>
 <p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
-<div *ngIf="!hideForm" class="sub-title">All fields are required except where stated</div>
+<div *ngIf="!hideForm" class="sub-title">Complete the following fields to send a Takedown Request to an STR Platform
+    representative.
+    <br>
+    <br>
+    Takedown Requests for each platform are aggregated into a CSV file and sent to the platform at 11:50pm PST each day.
+    You will receive an email confirmation of your request once the form is submitted. All fields are required except
+    where stated.
+</div>
 
 <form *ngIf="!hideForm" [formGroup]="myForm" (ngSubmit)="onPreview()">
     <div class="form-group-row">
@@ -8,8 +15,8 @@
             <label for="lgId">Request Initiated by</label>
         </div>
         <div class="form-group-row-col">
-            <p-dropdown [options]="initiatorsOptions" formControlName="lgId"
-                placeholder="Please Select Your Municipality..." id="lgId" name="lgId" [required]="true"></p-dropdown>
+            <p-dropdown [options]="initiatorsOptions" formControlName="lgId" placeholder="Select local government"
+                id="lgId" name="lgId" [required]="true"></p-dropdown>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!lgIdControl.pristine && lgIdControl.errors">
             <small id="requiredLgIdControl" *ngIf="lgIdControl.errors?.['required']">Request initiator is
@@ -19,10 +26,10 @@
 
     <div class="form-group-row">
         <div class="form-group-row-col">
-            <label for="platformId">Select Platform recipient</label>
+            <label for="platformId">Select a Platform Representative for</label>
         </div>
         <div class="form-group-row-col">
-            <p-dropdown [options]="platformOptions" formControlName="platformId" placeholder="Please Select..."
+            <p-dropdown [options]="platformOptions" formControlName="platformId" placeholder="Select platform"
                 id="platformId" name="platformId" [required]="true"></p-dropdown>
         </div>
         <div class="form-group-row-col validation-errors"
@@ -34,23 +41,13 @@
 
     <div class="form-group-row">
         <div class="form-group-row-col">
-            <label for="listingId">Add Listing ID if Known (Optional):</label>
+            <span class="info-tooltip"
+                pTooltip="Copy and paste the external URL of the STR listing from the platform website."
+                tooltipPosition="top" placeholder="Top"></span>
+            <label for="listingUrl">Add URL of the short-term rental listing</label>
         </div>
         <div class="form-group-row-col">
-            <input class="long-text-field" type="text" inputStyleClass="long-text-field" formControlName="listingId"
-                placeholder="Enter Value..." pInputText formControlName="listingId" [maxlength]="25" id="listingId"
-                name="listingId" />
-        </div>
-    </div>
-
-    <div class="form-group-row">
-        <div class="form-group-row-col">
-            <span class="info-tooltip" pTooltip="Copy and paste the external listing URL
-                from the STR platform website" tooltipPosition="top" placeholder="Top"></span>
-            <label for="listingUrl">Add listing URL</label>
-        </div>
-        <div class="form-group-row-col">
-            <input class="long-text-field" type="text" placeholder="HTTPS://..." pInputText formControlName="listingUrl"
+            <input class="long-text-field" type="text" placeholder="Enter URL" pInputText formControlName="listingUrl"
                 id="listingUrl" name="listingUrl" required />
         </div>
         <div class="form-group-row-col validation-errors"
@@ -62,21 +59,25 @@
     </div>
 
     <div class="form-group-row">
-        <div class="form-group-row-col has-checkbox">
-            <p-checkbox formControlName="sendCopy" [binary]="true" id="sendCopy" name="sendCopy"
-                inputId="binary"></p-checkbox>
-            <label for="sendCopy">Send me a copy of this request</label>
+        <div class="form-group-row-col">
+            <label for="listingId">Add the Listing ID of the short-term rental listing if known (optional)</label>
+        </div>
+        <div class="form-group-row-col">
+            <input class="long-text-field" type="text" inputStyleClass="long-text-field" formControlName="listingId"
+                placeholder="Enter Listing ID" pInputText formControlName="listingId" [maxlength]="25" id="listingId"
+                name="listingId" />
         </div>
     </div>
 
     <div class="form-group-row">
         <div class="form-group-row-col">
-            <span class="info-tooltip" pTooltip="Enter additional email addresses in the CC field separated by commas"
+            <span class="info-tooltip" pTooltip="Enter additional email addresses separated by commas."
                 tooltipPosition="top" placeholder="Top"></span>
-            <label for="ccList">Additional CCs (optional)</label>
+            <label for="ccList">Add any additional recipients to receive a confirmation of the request
+                (optional)</label>
         </div>
         <div class="form-group-row-col">
-            <textarea formControlName="ccList" placeholder="Enter Email(s)..." rows="1" cols="20" pInputTextarea
+            <textarea formControlName="ccList" placeholder="Enter email address" rows="1" cols="20" pInputTextarea
                 id="ccList" name="ccList"></textarea>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine && ccListControl.errors">
@@ -93,8 +94,10 @@
     <p [innerText]="previewText">
     </p>
     <div class="actions">
-        <p-button label="Submit" id="submit-dialog-btn" (click)="onSubmit()"></p-button>
-        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPreviewClose()"></p-button>
+        <button pButton name="submit-dialog-btn" id="submit-dialog-btn" (click)="onSubmit()">Submit</button>
+        <button pButton name="cancel-dialog-btn" id="cancel-dialog-btn" class="outline-btn"
+            (click)="onPreviewClose()">Cancel</button>
     </div>
 </p-dialog>
-<p-button *ngIf="hideForm" label="Return Home" id="return-home-btn" (click)="onReturnHome()"></p-button>
+<button *ngIf="hideForm" pButton id="return-home-btn" name="return-home-btn" (click)="onReturnHome()">Return
+    Home</button>

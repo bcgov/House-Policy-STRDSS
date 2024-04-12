@@ -5,6 +5,7 @@ using Configuration;
 
 using Xunit.Abstractions;
 using TestFrameWork.PageObjects;
+using OpenQA.Selenium;
 
 namespace XUnitTests
 {
@@ -12,7 +13,8 @@ namespace XUnitTests
     public class HousrSTRE2E
     {
         private ITestOutputHelper _Output;
-        private HomePage _HomePage;
+        private LandingPage _HomePage;
+        private TermsAndConditionsPage _TermsAndConditionsPage;
         private DelistingRequestPage _DelistingRequestPage;
         private DelistingWarningPage _DelistingWarningPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
@@ -29,7 +31,8 @@ namespace XUnitTests
         {
             this._Output = output;
             _Driver = new SeleniumDriver(SeleniumDriver.DRIVERTYPE.CHROME);
-            _HomePage = new HomePage(_Driver);
+            _HomePage = new LandingPage(_Driver);
+            _TermsAndConditionsPage = new TermsAndConditionsPage(_Driver);
             _DelistingRequestPage = new DelistingRequestPage(_Driver);
             _DelistingWarningPage = new DelistingWarningPage(_Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
@@ -42,7 +45,7 @@ namespace XUnitTests
         }
 
         [Fact]
-        public void TestLoginAndRequestDelisting()
+        public void SendTakeDownRequestWithoutADSSListing()
         {
 
             try
@@ -64,6 +67,22 @@ namespace XUnitTests
                 _IDRLoginPage.ContinueButton.WaitFor();
                 _IDRLoginPage.ContinueButton.Click();
 
+                //handle terms and conditions
+
+                try
+                {
+                    if (_DelistingRequestPage.Driver.PageSource.Contains("Terms and Conditions"))
+                    {
+                        //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
+                        _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                        _TermsAndConditionsPage.ContinueButton.Click();
+                    }
+                }
+                catch (NoSuchElementException ex)
+                {
+                    //No terms and conditions present. Continue
+                }
+
                 //Enter ListingID Number
                 _DelistingRequestPage.ListingIDNumberTextBox.EnterText("1");
 
@@ -77,7 +96,7 @@ namespace XUnitTests
 
                 _DelistingRequestPage.PlatformReceipientDropdown.Click();
                 _DelistingRequestPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-                Assert.Contains("AIRBNB", _DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper());
+                Assert.Contains("TEST PLATFORM", _DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper());
 
                 _DelistingRequestPage.ReviewButton.Click();
 
@@ -87,7 +106,7 @@ namespace XUnitTests
 
                 //Wait for page source to load
                 System.Threading.Thread.Sleep(3000);
-                Assert.True(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+                Assert.True(_DelistingRequestPage.Driver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
                 _DelistingRequestPage.ReturnHomeButton.Click();
 
                 
@@ -99,7 +118,7 @@ namespace XUnitTests
         }
 
         [Fact]
-        public void TestLoginAndSendWarningDelisting()
+        public void SendNoticeOfTakedownWithoutADSSlisting()
         {
 
             try
@@ -121,11 +140,27 @@ namespace XUnitTests
                 _IDRLoginPage.ContinueButton.WaitFor();
                 _IDRLoginPage.ContinueButton.Click();
 
+
+                //Handle Terms and Conditions
+                try
+                {
+                    if (_DelistingWarningPage.Driver.PageSource.Contains("Terms and Conditions"))
+                    {
+                        //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
+                        _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                        _TermsAndConditionsPage.ContinueButton.Click();
+                    }
+                }
+                catch (NoSuchElementException ex)
+                {
+                    //No terms and conditions present. Continue
+                }
+
                 //Add Platform receipient
                 _DelistingWarningPage.PlatformReceipientDropdown.WaitFor();
                 _DelistingWarningPage.PlatformReceipientDropdown.Click();
                 _DelistingWarningPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-                Assert.Contains("AIRBNB", _DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper());
+                Assert.Contains("TEST PLATFORM", _DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper());
 
                 //Click to deselect
                 _DelistingWarningPage.PlatformReceipientDropdown.Click();
@@ -172,7 +207,7 @@ namespace XUnitTests
 
                 //Wait for page source to load
                 System.Threading.Thread.Sleep(3000);
-                Assert.True(_DelistingWarningPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+                Assert.True(_DelistingWarningPage.Driver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
 
                 //If submit is sucessful, then return  to home page
                 _DelistingWarningPage.ReturnHomeButton.Click();

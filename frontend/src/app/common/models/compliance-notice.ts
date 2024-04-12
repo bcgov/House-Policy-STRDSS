@@ -1,9 +1,9 @@
 export interface ComplianceNotice {
     platformId: number;
-    listingId?: number;
+    listingId?: string;
     listingUrl: string;
     hostEmail?: string;
-    sentAlternatively: boolean;
+    hostEmailSent: boolean;
     reasonId: number;
     sendCopy: boolean;
     ccList: Array<string>;

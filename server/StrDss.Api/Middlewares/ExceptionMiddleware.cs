@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StrDss.Common;
 using System.Net;
 
 namespace StrDss.Api.Middlewares
@@ -9,7 +10,7 @@ namespace StrDss.Api.Middlewares
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<StrDssLogger> logger)
         {
             _logger = logger;
             _next = next;

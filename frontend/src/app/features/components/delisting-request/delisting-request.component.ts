@@ -76,6 +76,8 @@ export class DelistingRequestComponent implements OnInit {
   }
 
   onPreview(): void {
+    this.messages = [];
+
     if (this.myForm.valid) {
       this.delistingService.delistingRequestPreview(this.prepareFormModel(this.myForm))
         .subscribe(
@@ -96,6 +98,8 @@ export class DelistingRequestComponent implements OnInit {
   }
 
   onSubmit(): void {
+    this.messages = [];
+
     if (this.myForm.valid) {
       this.delistingService.createDelistingRequest(this.prepareFormModel(this.myForm))
         .subscribe({
@@ -128,7 +132,7 @@ export class DelistingRequestComponent implements OnInit {
   }
 
   private prepareFormModel(form: FormGroup): DelistingRequest {
-    const model: DelistingRequest = form.value;
+    const model: DelistingRequest = Object.assign({}, form.value);
     model.ccList = form.value['ccList'].prototype === Array
       ? form.value
       : (form.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
@@ -140,7 +144,7 @@ export class DelistingRequestComponent implements OnInit {
     this.myForm = this.fb.group({
       lgId: [0, Validators.required],
       platformId: [0, Validators.required],
-      listingId: [null],
+      listingId: [''],
       listingUrl: ['', [Validators.required, validateUrl()]],
       sendCopy: [true],
       ccList: ['', validateEmailListString()],

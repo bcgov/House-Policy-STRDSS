@@ -7,45 +7,36 @@ using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 using Gherkin.CucumberMessages.Types;
 using NUnit.Framework.Legacy;
+using OpenQA.Selenium;
+using System.Reflection.Metadata;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
-    [Scope(Scenario = "SendDelistingRequestWithoutADSSListing")]
+    [Scope(Scenario = "SendTakedownRequestWithoutADSSListing")]
     public sealed class SendTakeDownRequestWithoutADSSListing
     {
-        HomePage _HomePage;
-        DelistingRequestPage _DelistingRequestPage;
-        TakeDownRequestPage _TakeDownRequestPage;
-        PathFinderPage _PathFinderPage;
-        IDRLoginPage _IDRLoginPage;
-        string _TestUserName;
-        string _TestPassword;
-        int _CurrentRow = 0;
-        bool _ExpectedResult = false;
-        bool _ActualResult = false;
-        //IEnumerable<ScenarioParameters> _ScenarioParameters;
-        //private readonly ScenarioContext _scenarioContext;
-
-        IDriver _driver;
-
-        [AfterScenario]
-        public void AfterScenario()
-        {
-
-
-        }
-
-
+        private LandingPage _HomePage;
+        private TermsAndConditionsPage _TermsAndConditionsPage;
+        private DelistingRequestPage _DelistingRequestPage;
+        private TakeDownRequestPage _TakeDownRequestPage;
+        private PathFinderPage _PathFinderPage;
+        private IDRLoginPage _IDRLoginPage;
+        private string _TestUserName;
+        private string _TestPassword;
+        private int _CurrentRow = 0;
+        private bool _ExpectedResult = false;
+        private IDriver _Driver;
 
         public SendTakeDownRequestWithoutADSSListing(SeleniumDriver Driver)
         {
-            _driver = Driver;
-            _HomePage = new HomePage(_driver);
-            _DelistingRequestPage = new DelistingRequestPage(_driver);
-            _TakeDownRequestPage = new TakeDownRequestPage(_driver);
-            _PathFinderPage = new PathFinderPage(_driver);
-            _IDRLoginPage = new IDRLoginPage(_driver);
+            _Driver = Driver;
+            _HomePage = new LandingPage(_Driver);
+            _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
+            _DelistingRequestPage = new DelistingRequestPage(_Driver);
+            _TakeDownRequestPage = new TakeDownRequestPage(_Driver);
+            _PathFinderPage = new PathFinderPage(_Driver);
+            _IDRLoginPage = new IDRLoginPage(_Driver);
             AppSettings appSettings = new AppSettings();
             _TestUserName = appSettings.GetValue("TestUserName") ?? string.Empty;
             _TestPassword = appSettings.GetValue("TestPassword") ?? string.Empty;
@@ -55,31 +46,41 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Given(@"I am an authenticated LG staff member and the expected result is ""(.*)""")]
         public void GivenIAmAauthenticatedLGStaffMemberUser(string ExpectedResult)
         {
-            _ActualResult = true;
-            //var inputsTable = ScenarioContext.Current["table"] as Table;
-            //_ScenarioParameters = inputsTable.CreateSet<ScenarioParameters>().ToList<ScenarioParameters>();
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
-            _driver.Url = "http://127.0.0.1:4200/delisting-request";
-            _driver.Navigate();
+            _Driver.Url = "http://127.0.0.1:4200/delisting-request";
+            _Driver.Navigate();
 
             _PathFinderPage.IDRButton.Click();
 
-            _IDRLoginPage.UserNameTextBox.WaitFor();
+            _IDRLoginPage.UserNameTextBox.WaitFor(5);
+
             _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
             _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
 
             _IDRLoginPage.ContinueButton.Click();
-            _ActualResult = true;
 
+            try
+            {
+                if (_DelistingRequestPage.Driver.PageSource.Contains("Terms and Conditions"))
+                {
+                    //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
+                    _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                    _TermsAndConditionsPage.ContinueButton.Click();
+                }
+            }
+            catch (NoSuchElementException ex)
+            {
+                //No terms and conditions present. Continue
+            }
         }
 
 
         [When("I navigate to the delisting request feature")]
         public void WhenINavigateToTheDelistingRequestFeature()
         {
-            //_driver.Url = "http://127.0.0.1:4200/delisting-request";
-            //_driver.Navigate();
+            //_Driver.Url = "http://127.0.0.1:4200/delisting-request";
+            //_Driver.Navigate();
         }
 
         //Input Form
@@ -138,9 +139,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void SelectingTheLGForInitiatedBy()
         {
             _DelistingRequestPage.RequestInitiatedByDropDown.Click();
-            _DelistingRequestPage.RequestInitiatedByDropDown.ExecuteJavaScript(@"document.querySelector(""#lgId_0"").click()");
-            //ClassicAssert.IsTrue(_DelistingRequestPage.PlatformReceipientDropdown.Text.Contains("AIRBNB"));
-        }
+            _DelistingRequestPage.RequestInitiatedByDropDown.ExecuteJavaScript(@"document.querySelector(""#lgId_0"").click()");        }
 
         [Then("The system should present a list of available LG options to populate the field")]
         public void TheSystemShouldPresentAListOfLGOptions()
@@ -153,7 +152,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _DelistingRequestPage.PlatformReceipientDropdown.Click();
             _DelistingRequestPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-            ClassicAssert.IsTrue(_DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper().Contains("AIRBNB"));
+            ClassicAssert.IsTrue(_DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper().Contains("TEST PLATFORM"));
         }
 
         [Then("the system should present a list of available platform options to populate the field")]
@@ -170,17 +169,13 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I click the review button")]
         public void ThenIClickTheReviewButton()
         {
-            try
-            {
-                _DelistingRequestPage.ReviewButton.Click();
-                _ActualResult = true;
-            }
-            catch (Exception ex)
-            {
-                if (_ExpectedResult == true)
-                    Assert.Fail();
-            }
+            if (!_DelistingRequestPage.ReviewButton.IsEnabled())
+                if (_ExpectedResult == false)
+                    Assert.Pass("Expected result was false. Actual result is false. Review button was disabled");
+                else
+                    Assert.Fail("Expected result was true, but the review button is disabled");
 
+            _DelistingRequestPage.ReviewButton.Click();
         }
 
         [Then("I see a template delisting request message that will be sent to both the platform")]
@@ -192,9 +187,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("I submit the form with valid information")]
         public void WhenISubmitTheFormWithValidInformation()
         {
-            _ActualResult = false;
             _TakeDownRequestPage.SubmitButton.Click();
-            _ActualResult = true;
         }
 
         [Then("the system should send the delisting request message to the platform email addresses associated with the selected platform")]
@@ -212,11 +205,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should receive a confirmation message indicating that the delisting request has been sent")]
         public void ThenIShouldReceiveAConfirmationMessage()
         {
-            _ActualResult = false;
             System.Threading.Thread.Sleep(3000);
-            ClassicAssert.IsTrue(_DelistingRequestPage.EmbededDriver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+            ClassicAssert.IsTrue(_DelistingRequestPage.Driver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
             _DelistingRequestPage.ReturnHomeButton.Click();
-            _ActualResult = true;
         }
 
         [Then("I should be copied on the email")]
@@ -245,15 +236,5 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void ThenTheSystemShouldProvideClearErrorMessages()
         {
         }
-    }
-
-    public class ScenarioParameters
-    {
-        public string ListingID { get; set; }
-        public string Comment { get; set; }
-        public string LIDExpectedResult { get; set; }
-        public string ListingURL { get; set; }
-        public string LstExpectedResult { get; set; }
-
     }
 }

@@ -23,38 +23,35 @@ namespace StrDss.Test.AutoDomainDataBuilder
 
             switch (pi.Name)
             {
-                case nameof(DelistingWarningCreateDto.PlatformId):
+                case nameof(TakedownNoticeCreateDto.PlatformId):
                     return 1;
-                case nameof(DelistingWarningCreateDto.ListingId):
-                    return 1L;
-                case nameof(DelistingWarningCreateDto.ReasonId):
+                case nameof(TakedownNoticeCreateDto.ListingId):
+                    return "1";
+                case nameof(TakedownNoticeCreateDto.ReasonId):
                     return 1;
 
-                case nameof(DelistingWarningCreateDto.ListingUrl):
+                case nameof(TakedownNoticeCreateDto.ListingUrl):
                     return "https://example.com/listing";
 
-                case nameof(DelistingWarningCreateDto.HostEmail):
+                case nameof(TakedownNoticeCreateDto.HostEmail):
                     return "host@example.com";
 
-                case nameof(DelistingWarningCreateDto.HostEmailSent):
+                case nameof(TakedownNoticeCreateDto.HostEmailSent):
                     return false;
 
-                case nameof(DelistingWarningCreateDto.SendCopy):
-                    return true;
-
-                case nameof(DelistingWarningCreateDto.CcList):
+                case nameof(TakedownNoticeCreateDto.CcList):
                     return new List<string> { "cc1@example.com", "cc2@example.com" };
 
-                case nameof(DelistingWarningCreateDto.LgContactEmail):
+                case nameof(TakedownNoticeCreateDto.LgContactEmail):
                     return "lg@example.com";
 
-                case nameof(DelistingWarningCreateDto.LgContactPhone):
-                    return "(123) 456-7890";
+                case nameof(TakedownNoticeCreateDto.LgContactPhone):
+                    return "999-999-9999";
 
-                case nameof(DelistingWarningCreateDto.StrBylawUrl):
+                case nameof(TakedownNoticeCreateDto.StrBylawUrl):
                     return "https://example.com/bylaw";
 
-                case nameof(DelistingWarningCreateDto.Comment):
+                case nameof(TakedownNoticeCreateDto.Comment):
                     return "This is a comment.";
 
                 default:

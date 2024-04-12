@@ -16,14 +16,25 @@ namespace StrDss.Service.EmailTemplates
         public IEnumerable<string> To { get; set; } = new List<string>();
         public IEnumerable<string> Cc { get; set; } = new List<string>();   
         public IEnumerable<string> Bcc { get; set; } = new List<string>();
-        public string Info { get; set; }
+        public string Info { get; set; } = "";
+        public bool Preview { get; set; } = false;
+        public string EmailMessageType { get; set; } = "";
+        public IEnumerable<EmailAttachment> Attachments { get; set; }
+
+        public string GetPreviewContent()
+        {
+            return $@"To: {string.Join(";", To)}" 
+                + (Bcc.Count() > 0 ? $"<br/>Bcc: {string.Join(";", Bcc)}<br/><br/>" : "")
+                + (Cc.Count() > 0 ? $"<br/>Cc: {string.Join(";", Cc)}<br/><br/>" : "")
+                ;
+        }
 
         public virtual string GetContent()
         {
             return "";
         }
 
-        public async Task SendEmail()
+        public async Task<string> SendEmail()
         {
             var emailContent = new EmailContent
             {
@@ -33,10 +44,11 @@ namespace StrDss.Service.EmailTemplates
                 To = To,
                 Cc = Cc,
                 Bcc = Bcc,
-                Info = Info
+                Info = Info,
+                Attachments = Attachments,
             };
 
-            await _emailService.SendEmailAsync(emailContent);
+            return await _emailService.SendEmailAsync(emailContent);
         }
     }
 }

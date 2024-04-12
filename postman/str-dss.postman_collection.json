@@ -7,6 +7,24 @@
 	},
 	"item": [
 		{
+			"name": "Network Checker",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/networkchecker",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"networkchecker"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Current User",
 			"request": {
 				"method": "GET",
@@ -46,13 +64,13 @@
 			"response": []
 		},
 		{
-			"name": "CreateDelistingWarning",
+			"name": "CreateTakedownNotice",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"hostEmailSent\": false,  \r\n  \"reasonId\": 1,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"lgContactEmail\": \"lgcontact@lg.ca\",\r\n  \"lgContactPhone\": \"(123) 456-7890\",\r\n  \"strBylawUrl\": \"https://bylaw.ca\",\r\n  \"comment\": \"Test comment\"\r\n}",
+					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@gov.bc.ca\",\r\n  \"hostEmailSent\": false,  \r\n  \"reasonId\": 1,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"lgContactEmail\": \"lgcontact@lg.ca\",\r\n  \"lgContactPhone\": \"123-456-7890\",\r\n  \"strBylawUrl\": \"https://bylaw.ca\",\r\n  \"comment\": \"Test comment\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -74,13 +92,13 @@
 			"response": []
 		},
 		{
-			"name": "GetDelistingWarningPreview",
+			"name": "GetTakedownNoticePreview",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@dxc.com\",\r\n  \"hostEmailSent\": false,  \r\n  \"reasonId\": 5,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"lgContactEmail\": \"lgcontact@lg.ca\",\r\n  \"lgContactPhone\": \"(123) 456-7890\",\r\n  \"strBylawUrl\": \"https://bylaw.ca\",\r\n  \"comment\": \"Test comment\"\r\n}",
+					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": 1,\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"hostEmail\": \"young-jin.chung@dxc.com\",\r\n  \"hostEmailSent\": false,  \r\n  \"reasonId\": 5,\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.chung@dxcas.com\"\r\n  ],\r\n  \"lgContactEmail\": \"lgcontact@lg.ca\",\r\n  \"lgContactPhone\": \"123-456-7890\",\r\n  \"strBylawUrl\": \"https://bylaw.ca\",\r\n  \"comment\": \"Test comment\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -103,7 +121,7 @@
 			"response": []
 		},
 		{
-			"name": "CreateDelistingRequest",
+			"name": "CreateTakedownRequest",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -131,7 +149,7 @@
 			"response": []
 		},
 		{
-			"name": "GetDelistingRequestPreview",
+			"name": "GetTakedownRequestPreview",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -336,7 +354,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/users?status=&pageSize=20&pageNumber=1",
+					"raw": "{{host}}/api/users?status=&pageSize=20&pageNumber=1&orderby=organizationNm&organizationId=4",
 					"host": [
 						"{{host}}"
 					],
@@ -356,6 +374,14 @@
 						{
 							"key": "pageNumber",
 							"value": "1"
+						},
+						{
+							"key": "orderby",
+							"value": "organizationNm"
+						},
+						{
+							"key": "organizationId",
+							"value": "4"
 						}
 					]
 				}
@@ -368,27 +394,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/users?status=&pageSize=20&pageNumber=1",
+					"raw": "{{host}}/api/users/accessrequeststatuses",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"users"
-					],
-					"query": [
-						{
-							"key": "status",
-							"value": ""
-						},
-						{
-							"key": "pageSize",
-							"value": "20"
-						},
-						{
-							"key": "pageNumber",
-							"value": "1"
-						}
+						"users",
+						"accessrequeststatuses"
 					]
 				}
 			},
@@ -531,6 +544,44 @@
 						"api",
 						"users",
 						"accepttermsconditions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateRentalLisingReport",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "ReportPeriod",
+							"value": "2024-05",
+							"type": "text"
+						},
+						{
+							"key": "OrganizationId",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "File",
+							"type": "file",
+							"src": "postman-cloud:///1eef47cf-0716-4770-88ff-15d6dd59453f"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/api/rentallistingreports",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistingreports"
 					]
 				}
 			},

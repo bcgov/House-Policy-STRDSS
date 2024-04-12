@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
+using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.UserDtos;
 using StrDss.Service;
@@ -15,9 +16,9 @@ namespace StrDss.Api.Controllers
     {
         private IUserService _userService;
 
-        public UsersController(ICurrentUser currentUser, IMapper mapper, IConfiguration config,
+        public UsersController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
             IUserService userService)
-            : base(currentUser, mapper, config)
+            : base(currentUser, mapper, config, logger)
         {
             _userService = userService;
         }
@@ -29,11 +30,11 @@ namespace StrDss.Api.Controllers
             return Ok(_currentUser);
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.UserRead)]
         [HttpGet("", Name = "GetUserList")]
-        public async Task<ActionResult<PagedDto<UserListtDto>>> GetUserList(string? status, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
+        public async Task<ActionResult<PagedDto<UserListtDto>>> GetUserList(string? status, string? search, long? organizationId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
-            var list = await _userService.GetUserListAsync(status ?? "", pageSize, pageNumber, orderBy, direction);
+            var list = await _userService.GetUserListAsync(status ?? "", search ?? "", organizationId, pageSize, pageNumber, orderBy, direction);
             return Ok(list);
         }
 
@@ -51,7 +52,7 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.UserWrite)]
         [HttpPut("accessrequests/deny", Name = "DenyRequest")]
         public async Task<ActionResult> DenyRequest(AccessRequestDenyDto dto)
         {
@@ -65,7 +66,7 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.UserWrite)]
         [HttpPut("accessrequests/approve", Name = "ApproveRequest")]
         public async Task<ActionResult> ApproveRequest(AccessRequestApproveDto dto)
         {
@@ -79,7 +80,7 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.UserWrite)]
         [HttpPut("updateisenabled", Name = "UpdateIsEnabled")]
         public async Task<ActionResult> UpdateIsEnabled(UpdateIsEnabledDto dto)
         {
@@ -104,7 +105,13 @@ namespace StrDss.Api.Controllers
         [HttpPut("accepttermsconditions", Name = "AcceptTermsConditions")]
         public async Task<ActionResult> AcceptTermsConditions()
         {
-            await _userService.AcceptTermsConditions();
+            var errors = await _userService.AcceptTermsConditions();
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
             return Ok();
         }
     }

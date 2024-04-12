@@ -2,17 +2,19 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Service.HttpClients;
 using System.Text;
+using System.Text.Json;
 
 namespace StrDss.Service
 {
     public interface IEmailMessageService
     {
-        Task SendEmailAsync(EmailContent emailContent);
+        Task<string> SendEmailAsync(EmailContent emailContent);
         Task<List<DropdownNumDto>> GetMessageReasons(string messageType);
         Task<DropdownNumDto?> GetMessageReasonByMessageTypeAndId(string messageType, long id);
     }
@@ -23,11 +25,10 @@ namespace StrDss.Service
         private readonly IEmailMessageRepository _emailRepo;
         private readonly IConfiguration _config;
         private readonly IChesTokenApi _chesTokenApi;
-        private readonly ILogger<EmailMessageService> _logger;
 
         public EmailMessageService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IEmailMessageRepository emailRepo, IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<EmailMessageService> logger)
-            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
+            IEmailMessageRepository emailRepo, IConfiguration config, IChesTokenApi chesTokenApi, HttpClient httpClient, ILogger<StrDssLogger> logger)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _emailRepo = emailRepo;
             _config = config;
@@ -36,7 +37,7 @@ namespace StrDss.Service
             _logger = logger;
         }
 
-        public async Task SendEmailAsync(EmailContent emailContent)
+        public async Task<string> SendEmailAsync(EmailContent emailContent)
         {
             var env = _config.GetValue<string>("ENV_NAME") ?? "dev";
 
@@ -61,6 +62,8 @@ namespace StrDss.Service
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation($"Sent '{emailContent.Subject}' for {emailContent.Info} successfully");
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    return ParseMsgIdFromJson(jsonResponse);
                 }
                 else
                 {
@@ -76,6 +79,27 @@ namespace StrDss.Service
                 throw new Exception(error);
             }
         }
+        private string ParseMsgIdFromJson(string jsonResponse)
+        {
+            using var document = JsonDocument.Parse(jsonResponse);
+
+            var root = document.RootElement;
+
+            if (!root.TryGetProperty("messages", out JsonElement messages) || !messages.EnumerateArray().Any())
+            {
+                return string.Empty; 
+            }
+
+            var msgId = messages.EnumerateArray().First().GetProperty("msgId").GetString();
+
+            if (msgId == null)
+            {
+                return string.Empty; 
+            }
+
+            return msgId;
+        }
+
 
         public async Task<List<DropdownNumDto>> GetMessageReasons(string messageType)
         {

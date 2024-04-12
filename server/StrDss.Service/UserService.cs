@@ -1,43 +1,50 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data;
+using StrDss.Data.Entities;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.UserDtos;
+using StrDss.Service.Bceid;
 using StrDss.Service.EmailTemplates;
 
 namespace StrDss.Service
 {
     public interface IUserService
     {
-        Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid);
         Task<Dictionary<string, List<string>>> CreateAccessRequestAsync(AccessRequestCreateDto dto);
         Task<Dictionary<string, List<string>>> DenyAccessRequest(AccessRequestDenyDto dto);
         Task<Dictionary<string, List<string>>> ApproveAccessRequest(AccessRequestApproveDto dto);
         Task<Dictionary<string, List<string>>> UpdateIsEnabled(UpdateIsEnabledDto dto);
         Task<List<DropdownStrDto>> GetAccessRequestStatuses();
-        Task AcceptTermsConditions();
+        Task<Dictionary<string, List<string>>> AcceptTermsConditions();
     }
     public class UserService : ServiceBase, IUserService
     {
         private IUserRepository _userRepo;
         private IOrganizationRepository _orgRepo;
         private IEmailMessageService _emailService;
+        private IEmailMessageRepository _emailRepo;
+        private IBceidApi _bceid;
 
-        public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService)
-            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor)
+        public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
+            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBceidApi bceid)
+            : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _userRepo = userRepo;
             _orgRepo = orgRepo;
             _emailService = emailService;
+            _emailRepo = emailRepo;
+            _bceid = bceid;
         }
 
-        public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction)
         {
-            return await _userRepo.GetUserListAsync(status, pageSize, pageNumber, orderBy, direction);
+            return await _userRepo.GetUserListAsync(status, search, orgranizationId, pageSize, pageNumber, orderBy, direction);
         }
 
         public async Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid)
@@ -54,6 +61,22 @@ namespace StrDss.Service
                 return errors;
             }
 
+            //if (_currentUser.IdentityProviderNm == StrDssIdProviders.BceidBusiness)
+            //{
+            //    var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
+
+            //    if (account == null)
+            //    {
+            //        _logger.LogError($"BCeID call error: {error}");
+            //    }
+
+            //    if (account != null)
+            //    {
+            //        _currentUser.FirstName = account.FirstName;
+            //        _currentUser.LastName = account.LastName;
+            //    }
+            //}
+
             if (userDto == null)
             {
                 var userCreateDto = new UserCreateDto
@@ -69,6 +92,7 @@ namespace StrDss.Service
                     FamilyNm = _currentUser.LastName,
                     EmailAddressDsc = _currentUser.EmailAddress,
                     BusinessNm = _currentUser.BusinessNm,
+                    TermsAcceptanceDtm = _currentUser.IdentityProviderNm == StrDssIdProviders.Idir ? DateTime.UtcNow : null, // no need for the idir user to accept the term
                 };
 
                 await _userRepo.CreateUserAsync(userCreateDto);
@@ -90,7 +114,13 @@ namespace StrDss.Service
                 await _userRepo.UpdateUserAsync(userDto);
             }
 
+            var dbContext = _unitOfWork.GetDbContext();
+
+            using var transaction = dbContext.Database.BeginTransaction();
+
             _unitOfWork.Commit();
+
+            var user = await _userRepo.GetUserByGuid(_currentUser.UserGuid);
 
             var adminUsers = await _userRepo.GetAdminUsers();
 
@@ -101,17 +131,43 @@ namespace StrDss.Service
                 var template = new NewAccessRequest(_emailService)
                 {
                     Link = GetHostUrl(),
-                    To = emails,
+                    To = emails!,
                     Info = $"New Access Request email for {_currentUser.DisplayName}"
                 };
 
-                await template.SendEmail();
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = template.EmailMessageType,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = false,
+                    MessageReasonId = null,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = null,
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = null,
+                    UnreportedListingUrl = null,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = user!.UserIdentityId,
+                    AffectedByUserIdentityId = user!.UserIdentityId,
+                    InvolvedInOrganizationId = null
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                emailEntity.ExternalMessageNo = await template.SendEmail();
+
+                _unitOfWork.Commit();
             }
+
+            transaction.Commit();
 
             return errors;
         }
 
-        private async Task<(Dictionary<string, List<string>> errors, UserDto user)> ValidateAccessRequestCreateDtoAsync(AccessRequestCreateDto dto)
+        private async Task<(Dictionary<string, List<string>> errors, UserDto? user)> ValidateAccessRequestCreateDtoAsync(AccessRequestCreateDto dto)
         {
             var errors = new Dictionary<string, List<string>>();
 
@@ -181,7 +237,7 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            if (user.EmailAddressDsc.IsEmpty())
+            if (user.EmailAddressDsc!.IsEmpty())
             {
                 errors.AddItem("entity", $"The user doesn't have email address.");
                 return errors;
@@ -190,11 +246,35 @@ namespace StrDss.Service
             var template = new AccessRequestDenial(_emailService)
             {
                 AdminEmail = _currentUser.EmailAddress,
-                To = new string[] { user.EmailAddressDsc },
+                To = new string[] { user.EmailAddressDsc! },
                 Info = $"Denial email for {user.DisplayNm}"
             };
 
-            await template.SendEmail();
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsHostContactedExternally = false,
+                IsSubmitterCcRequired = false,
+                MessageReasonId = null,
+                LgPhoneNo = null,
+                UnreportedListingNo = null,
+                HostEmailAddressDsc = null,
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = null,
+                UnreportedListingUrl = null,
+                LgStrBylawUrl = null,
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = user.UserIdentityId,
+                InvolvedInOrganizationId = null
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            emailEntity.ExternalMessageNo = await template.SendEmail();
+
+            _unitOfWork.Commit();
 
             return errors;
         }
@@ -255,7 +335,7 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            if (user.EmailAddressDsc.IsEmpty())
+            if (user.EmailAddressDsc!.IsEmpty())
             {
                 errors.AddItem("entity", $"The user doesn't have email address.");
                 return errors;
@@ -265,11 +345,35 @@ namespace StrDss.Service
             {
                 Link = GetHostUrl(),
                 AdminEmail = _currentUser.EmailAddress,
-                To = new string[] { user.EmailAddressDsc },
+                To = new string[] { user.EmailAddressDsc! },
                 Info = $"Approval email for {user.DisplayNm}"
             };
 
-            await template.SendEmail();
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsHostContactedExternally = false,
+                IsSubmitterCcRequired = false,
+                MessageReasonId = null,
+                LgPhoneNo = null,
+                UnreportedListingNo = null,
+                HostEmailAddressDsc = null,
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = null,
+                UnreportedListingUrl = null,
+                LgStrBylawUrl = null,
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = user.UserIdentityId,
+                InvolvedInOrganizationId = null
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            emailEntity.ExternalMessageNo = await template.SendEmail();
+
+            _unitOfWork.Commit();
 
             return errors;
         }
@@ -303,10 +407,25 @@ namespace StrDss.Service
             return await _userRepo.GetAccessRequestStatuses();
         }
 
-        public async Task AcceptTermsConditions()
+        public async Task<Dictionary<string, List<string>>> AcceptTermsConditions()
         {
+            var errors = new Dictionary<string, List<string>>();
+
+            if (_currentUser.Id == 0)
+            {
+                errors.AddItem("entity", $"The user doesn't exist.");
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
             await _userRepo.AcceptTermsConditions();
+
             _unitOfWork.Commit();
+
+            return errors;
         }
     }
 }

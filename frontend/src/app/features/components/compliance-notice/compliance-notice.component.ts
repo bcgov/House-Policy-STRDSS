@@ -88,6 +88,8 @@ export class ComplianceNoticeComponent implements OnInit {
   }
 
   onPreview(): void {
+    this.messages = [];
+
     if (this.myForm.valid) {
       this.delistingService.complianceNoticePreview(this.prepareFormModel(this.myForm))
         .subscribe(
@@ -109,6 +111,7 @@ export class ComplianceNoticeComponent implements OnInit {
 
   onSubmit(comment: string, textAreaElement: HTMLTextAreaElement): void {
     this.messages = [];
+
     if (this.myForm.valid) {
       const model: ComplianceNotice = this.prepareFormModel(this.myForm);
       model.comment = comment;
@@ -161,8 +164,6 @@ export class ComplianceNoticeComponent implements OnInit {
   private prepareFormModel(form: FormGroup): ComplianceNotice {
     const model: ComplianceNotice = Object.assign({}, form.value);
 
-    model.listingId = Number.parseInt(model.listingId as any);
-
     model.ccList = form.value['ccList'].prototype === Array
       ? form.value
       : (form.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
@@ -173,10 +174,10 @@ export class ComplianceNoticeComponent implements OnInit {
   private initForm(): void {
     this.myForm = this.fb.group({
       platformId: [0, Validators.required],
-      listingId: [null],
+      listingId: [''],
       listingUrl: ['', [Validators.required, validateUrl()]],
       hostEmail: ['', [Validators.required, Validators.email]],
-      sentAlternatively: [false],
+      hostEmailSent: [false],
       reasonId: [0, Validators.required,],
       sendCopy: [true],
       ccList: ['', validateEmailListString()],

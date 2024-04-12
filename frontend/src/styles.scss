@@ -31,6 +31,13 @@
 body {
     margin: 0;
 
+    .spacer-hr {
+        height: 0px;
+        width: 100%;
+        border-bottom: 1px solid #D8D8D8;
+        margin: 12px 0;
+    }
+
     .p-chips {
         width: 760px;
     }
@@ -61,9 +68,18 @@ body {
                 width: 100%;
             }
         }
+
+        &.width340px {
+            width: 340px;
+
+            .p-inputtext,
+            .p-dropdown {
+                width: 340px;
+            }
+        }
     }
 
-    .p-ripple.p-element.p-button.p-component {
+    .p-element.p-button.p-component {
         border-radius: 4px;
 
         &:not(.p-button-link) {
@@ -89,6 +105,12 @@ body {
                 font-size: 16px;
             }
         }
+
+        &:disabled {
+            background-color: #EDEBE9;
+            color: #9F9D9C;
+            border-color: #EDEBE9;
+        }
     }
 
     p-button {
@@ -104,6 +126,18 @@ body {
         .p-inputswitch {
             transform: scale(.75);
 
+            &.p-disabled {
+                .p-inputswitch-slider {
+                    background-color: #9F9D9C;
+                }
+
+                &.p-inputswitch-checked {
+                    .p-inputswitch-slider {
+                        background-color: #9F9D9C;
+                    }
+                }
+            }
+
             .p-inputswitch-slider {
                 background-color: #CE3E39;
             }
@@ -113,7 +147,6 @@ body {
                     background-color: #42814A;
                 }
             }
-
         }
     }
 
@@ -134,6 +167,14 @@ body {
                 padding: 0;
                 font-family: 'BcSans-regular';
                 font-size: 16px;
+            }
+        }
+    }
+
+    .dashboard-card {
+        .p-card {
+            .p-card-body {
+                min-height: 200px;
             }
         }
     }
@@ -162,6 +203,17 @@ body {
         border: none;
         padding: 0;
 
+        .p-highlight.p-menuitem-active,
+        .p-focus {
+            background-color: #FFFFFF;
+            border-radius: 4px;
+
+            .p-menuitem-text,
+            .p-submenu-icon {
+                color: #053662;
+            }
+        }
+
         .p-menuitem-text,
         .p-submenu-icon {
             color: #FFFFFF;
@@ -172,8 +224,27 @@ body {
 
                 .p-menuitem-text,
                 .p-submenu-icon {
-                    // color: #FFFFFF;
                     color: #053662;
+                }
+            }
+        }
+    }
+
+    p-paginator {
+        &.users-paginator {
+            .p-paginator.p-component {
+                height: 50px;
+                padding: 0;
+            }
+
+            .p-paginator-element {
+
+                &.p-paginator-prev,
+                &.p-paginator-next {
+                    svg {
+                        width: 26px;
+                        height: 26px;
+                    }
                 }
             }
         }

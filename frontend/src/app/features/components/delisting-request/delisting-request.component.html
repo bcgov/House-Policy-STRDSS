@@ -8,7 +8,7 @@
             <label for="lgId">Request Initiated by</label>
         </div>
         <div class="form-group-row-col">
-            <p-dropdown [options]="initiatorsOptions" formControlName="lgId" [showClear]="true"
+            <p-dropdown [options]="initiatorsOptions" formControlName="lgId"
                 placeholder="Please Select Your Municipality..." id="lgId" name="lgId" [required]="true"></p-dropdown>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!lgIdControl.pristine && lgIdControl.errors">
@@ -22,8 +22,8 @@
             <label for="platformId">Select Platform recipient</label>
         </div>
         <div class="form-group-row-col">
-            <p-dropdown [options]="platformOptions" formControlName="platformId" [showClear]="true"
-                placeholder="Please Select..." id="platformId" name="platformId" [required]="true"></p-dropdown>
+            <p-dropdown [options]="platformOptions" formControlName="platformId" placeholder="Please Select..."
+                id="platformId" name="platformId" [required]="true"></p-dropdown>
         </div>
         <div class="form-group-row-col validation-errors"
             *ngIf="!platformIdControl.pristine && platformIdControl.errors">
@@ -34,12 +34,12 @@
 
     <div class="form-group-row">
         <div class="form-group-row-col">
-            <label for="listingId">Add Listing ID Number if Known (Optional):</label>
+            <label for="listingId">Add Listing ID if Known (Optional):</label>
         </div>
         <div class="form-group-row-col">
-            <p-inputNumber inputStyleClass="long-text-field" formControlName="listingId" placeholder="Enter Value..."
-                inputId="listingId" mode="decimal" [min]="0" [max]="9000000000000000000" [useGrouping]="false">
-            </p-inputNumber>
+            <input class="long-text-field" type="text" inputStyleClass="long-text-field" formControlName="listingId"
+                placeholder="Enter Value..." pInputText formControlName="listingId" [maxlength]="25" id="listingId"
+                name="listingId" />
         </div>
     </div>
 
@@ -85,17 +85,16 @@
         </div>
     </div>
 
-    <button type="submit" id="form-preview-btn" pButton pRipple [disabled]="!myForm.valid" label="Review"
-        class="p-button-success"></button>
+    <button type="submit" id="form-preview-btn" pButton pRipple [disabled]="!myForm.valid" label="Review"></button>
 </form>
 
-<p-dialog [modal]="true" id="preview-dialog" [closable]="false" header="Preview" [(visible)]="isPreviewVisible"
+<p-dialog [modal]="true" id="preview-dialog" [closable]="false" header="Takedown Request" [(visible)]="isPreviewVisible"
     [style]="{width: '50vw'}">
     <p [innerText]="previewText">
     </p>
     <div class="actions">
-        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPreviewClose()"></p-button>
         <p-button label="Submit" id="submit-dialog-btn" (click)="onSubmit()"></p-button>
+        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPreviewClose()"></p-button>
     </div>
 </p-dialog>
 <p-button *ngIf="hideForm" label="Return Home" id="return-home-btn" (click)="onReturnHome()"></p-button>

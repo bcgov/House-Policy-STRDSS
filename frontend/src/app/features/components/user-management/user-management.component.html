@@ -67,10 +67,14 @@
                                 <span [style]="{'color':'#CE3E39'}">Denied</span>
                             </ng-container>
                             <ng-container *ngSwitchCase="'Requested'">
-                                <p-button label="Approve" (click)="onApprovePopup(accessRequest)"
-                                    class="table-small-btn" id="form-approve-btn"></p-button>
-                                <p-button label="Deny" [outlined]="true" (click)="onRejectPopup(accessRequest)"
-                                    class="table-small-btn" id="form-reject-btn"></p-button>
+
+                                <button pButton name="form-approve-btn" id="form-approve-btn"
+                                    (click)="onApprovePopup(accessRequest)" class="table-small-btn">Approve</button>
+
+                                <button pButton name="form-reject-bt" id="form-reject-bt"
+                                    class="outline-btn table-small-btn"
+                                    (click)="onRejectPopup(accessRequest)">Deny</button>
+
                             </ng-container>
                         </ng-container>
                     </td>
@@ -124,9 +128,10 @@
         irreversible.</strong>
     <div class="spacer-hr"></div>
     <div class="actions">
-        <p-button label="Submit" id="submit-dialog-btn"
-            (click)="onApprove(approveOrgTypeElem,approveOrgNameElem)"></p-button>
-        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPopupClose()"></p-button>
+        <button pButton name="submit-dialog-btn" id="submit-dialog-btn"
+            (click)="onApprove(approveOrgTypeElem,approveOrgNameElem)">Submit</button>
+        <button pButton name="cancel-dialog-btn" id="cancel-dialog-btn" class="outline-btn"
+            (click)="onPopupClose()">Cancel</button>
     </div>
 </p-dialog>
 
@@ -143,7 +148,8 @@
     <div class="spacer-hr"></div>
     <div class="actions">
         <button pButton label="Deny request" id="submit-dialog-btn" class="p-button-red" (click)="onReject()"></button>
-        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPopupClose()"></p-button>
+        <button pButton name="cancel-dialog-btn" id="cancel-dialog-btn" class="outline-btn"
+            (click)="onPopupClose()">Cancel</button>
     </div>
 </p-dialog>
 

@@ -4,7 +4,7 @@ import { UserDataService } from '../services/user-data.service';
 import { map } from 'rxjs';
 
 export const accessRequestTokenGuard: CanActivateFn = (route, _state) => {
-  const userDataService = inject(UserDataService)
+  const userDataService = inject(UserDataService);
   const router = inject(Router);
 
   return userDataService.getCurrentUser().pipe(

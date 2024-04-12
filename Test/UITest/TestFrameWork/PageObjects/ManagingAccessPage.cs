@@ -27,6 +27,7 @@ namespace UITest.PageObjects
         public RowList RequestList { get => _RequestList; set => _RequestList = value; }
         public Button BackButton { get => _BackButton; }
         public Button ForwardButton { get => _ForwardButton; }
+        public IDriver Driver { get => _Driver; }
 
         public ManagingAccessPage(IDriver Driver)
         {

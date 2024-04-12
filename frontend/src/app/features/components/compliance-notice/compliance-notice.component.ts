@@ -178,7 +178,7 @@ export class ComplianceNoticeComponent implements OnInit {
       listingUrl: ['', [Validators.required, validateUrl()]],
       hostEmail: ['', [Validators.required, Validators.email]],
       hostEmailSent: [false],
-      reasonId: [0, Validators.required,],
+      reasonId: [1, Validators.required,],
       sendCopy: [true],
       ccList: ['', validateEmailListString()],
       LgContactEmail: ['', [Validators.required, Validators.email]],

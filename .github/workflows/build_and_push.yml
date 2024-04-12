@@ -157,41 +157,41 @@ jobs:
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend-dev:latest
 
 
-  deploy:
-    needs: [Docker-build-frontend, Docker-build-backend]
-    runs-on: ubuntu-22.04
-    timeout-minutes: 5
-    permissions:
-      contents: read
-    environment:
-      name: dev
-      url: https://dev-strdata.apps.advsol-ams.3j6z.p1.openshiftapps.com
+  # deploy:
+  #   needs: [Docker-build-frontend, Docker-build-backend]
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 5
+  #   permissions:
+  #     contents: read
+  #   environment:
+  #     name: dev
+  #     url: https://dev-strdata.apps.advsol-ams.3j6z.p1.openshiftapps.com
 
-    steps:
-    - uses: actions/checkout@v4
+  #   steps:
+  #   - uses: actions/checkout@v4
 
-    - name: Authenticate and set context
-      uses: redhat-actions/oc-login@v1.3
-      with:
-        openshift_server_url: ${{ secrets.OPENSHIFT_SERVER_AMS }}
-        openshift_token: ${{ secrets.OPENSHIFT_TOKEN_AMS }}
-        namespace: f4a30d-dev
-        insecure_skip_tls_verify: true
+  #   - name: Authenticate and set context
+  #     uses: redhat-actions/oc-login@v1.3
+  #     with:
+  #       openshift_server_url: ${{ secrets.OPENSHIFT_SERVER_AMS }}
+  #       openshift_token: ${{ secrets.OPENSHIFT_TOKEN_AMS }}
+  #       namespace: f4a30d-dev
+  #       insecure_skip_tls_verify: true
 
-    - name: Log in to JFrog Artifactory
-      uses: docker/login-action@v1
-      with:
-        registry: artifacts.developer.gov.bc.ca
-        username: ${{ secrets.JFROG_USERNAME }}
-        password: ${{ secrets.JFROG_PASSWORD }}
+  #   - name: Log in to JFrog Artifactory
+  #     uses: docker/login-action@v1
+  #     with:
+  #       registry: artifacts.developer.gov.bc.ca
+  #       username: ${{ secrets.JFROG_USERNAME }}
+  #       password: ${{ secrets.JFROG_PASSWORD }}
 
-    - name: Deploy apps with Helm chart
-      run: |
-        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        make upgrade \
-        NAMESPACE=f4a30d-dev \
-        NAME=strdss-dev \
-        ENV_NAME=dev \
-        IMAGE_TAG_FRONTEND=latest \
-        IMAGE_TAG_BACKEND=latest \
-      working-directory: ./helm/main
+  #   - name: Deploy apps with Helm chart
+  #     run: |
+  #       docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+  #       make upgrade \
+  #       NAMESPACE=f4a30d-dev \
+  #       NAME=strdss-dev \
+  #       ENV_NAME=dev \
+  #       IMAGE_TAG_FRONTEND=latest \
+  #       IMAGE_TAG_BACKEND=latest \
+  #     working-directory: ./helm/main

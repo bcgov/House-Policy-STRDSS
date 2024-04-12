@@ -88,6 +88,6 @@
         </ng-template>
     </p-messages>
 
-    <p-button *ngIf="!hideForm" label="Submit" (click)="onRequest()" id="form-submit-btn"
-        [disabled]="!myForm.valid"></p-button>
+    <button *ngIf="!hideForm" pButton (click)="onRequest()" id="form-submit-btn"
+        [disabled]="!myForm.valid">Submit</button>
 </p-card>

@@ -99,6 +99,11 @@ body {
             }
         }
 
+        &.outline-btn {
+            background-color: transparent;
+            color: #053662;
+        }
+
         &.p-button-link {
             .p-button-label {
                 color: #FFFFFF;
@@ -111,14 +116,10 @@ body {
             color: #9F9D9C;
             border-color: #EDEBE9;
         }
-    }
 
-    p-button {
         &.table-small-btn {
-            button {
-                padding: 5px 10px;
-                font-size: 14px;
-            }
+            padding: 5px 10px;
+            font-size: 14px;
         }
     }
 

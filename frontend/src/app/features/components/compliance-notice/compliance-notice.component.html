@@ -189,8 +189,9 @@
         </div>
     </div>
     <div class="actions">
-        <p-button label="Submit" id="submit-dialog-btn" (click)="onSubmit(textarea.value,textarea)"></p-button>
-        <p-button label="Cancel" id="cancel-dialog-btn" [outlined]="true" (click)="onPreviewClose()"></p-button>
+        <button pButton id="submit-dialog-btn" (click)="onSubmit(textarea.value,textarea)">Submit</button>
+        <button pButton id="cancel-dialog-btn" class="outline-btn" (click)="onPreviewClose()">Cancel</button>
     </div>
 </p-dialog>
-<p-button *ngIf="hideForm" label="Return Home" id="return-home-btn" (click)="onReturnHome()"></p-button>
+<button *ngIf="hideForm" pButton id="return-home-btn" name="return-home-btn" (click)="onReturnHome()">Return
+    Home</button>

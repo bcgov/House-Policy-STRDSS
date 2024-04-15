@@ -16,5 +16,4 @@ Scenario: DenyAccessToSystem
 #
 Examples:
 	| UserName | Description | ExpectedResult |
-	| CEUATST  | HappyPath   | pass           | 
-
+	| CEUATST  | HappyPath   | pass           |

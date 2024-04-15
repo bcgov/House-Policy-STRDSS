@@ -68,11 +68,12 @@ namespace StrDss.Service.Hangfire
             }
             catch (Exception ex)
             {
-                DeleteHangfireLock($"hangfire:{resource}");
-                var distributedLock = filterContext.Connection.AcquireDistributedLock(resource, timeout);
-                filterContext.Items["DistributedLock"] = distributedLock;
+                //DeleteHangfireLock($"hangfire:{resource}");
+                //var distributedLock = filterContext.Connection.AcquireDistributedLock(resource, timeout);
+                //filterContext.Items["DistributedLock"] = distributedLock;
 
                 Console.WriteLine(ex);
+                throw;
             }
         }
 

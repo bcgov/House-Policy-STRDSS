@@ -18,16 +18,19 @@ namespace StrDss.Service.EmailTemplates
         public string Comment { get; set; } = "";
         public override string GetContent()
         {
-            Subject = "Notice of Takedown of Short Term Rental Platform Offer";
+            Subject = "Notice of non-compliance with short-term rental business licence requirement";
 
             return (Preview ? GetPreviewContent() : "") + $@"
-Dear Short-term Rental Host,<br/><br/>
-Short-term rental accommodations in your community must obtain a short-term rental (STR) business licence from the local government in order to operate.<br/><br/>
-Short-term rental accommodations are also regulated by the Province of B.C. Under the Short-term Rental Accommodations Act, short-term rental hosts in communities with a short-term rental business licence requirement must include a valid business licence number on any short-term rental listings advertised on an online platform. Short-term rental platforms are required to remove listings that do not meet this requirement if requested by the local government.<br/><br/>
+Dear Host,<br/><br/>
+Short-term rental accommodations in your community are regulated by your local government.<br/><br/>
+The local government has determined that the following short-term rental listing is not in compliance with an applicable local government business licence requirement:<br/><br/>
 <b>{Url}</b><br/><br/>
 Listing ID Number: <b>{ListingId}</b><br/><br/>
-Unless you are able to demonstrate compliance with the business licence requirement, this listing may be removed from the short-term rental platform after 5 days. The local government has 90 days to submit a request to takedown the listing to the platform.<br/><br/>
-{Comment}<br/>
+Under the provincial <a href='https://www.bclaws.gov.bc.ca/civix/document/id/bills/billsprevious/4th42nd:gov35-1'>Short-Term Rental Accommodations Act</a> and its regulations, the local government may submit a request to the short-term rental platform to cease providing platform services (e.g., remove this listing from the platform) within a period of 5-90 days after the date of delivery of this Notice. Short-term rental platforms are required to comply with the local government’s request within 5 days of receiving the request.<br/><br/>
+For more information on this Notice, or local government short-term rental business licences, please contact your local government.<br/><br/>
+For more information on the Short-term Rental Accommodations Act, please visit: <a href='https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals'>New rules for short-term rentals - Province of British Columbia (gov.bc.ca)</a>.<br/><br/>
+{ Comment}<br/><br/>
+This email has been automatically generated. Please do not reply to this email. A copy of this Notice has been sent to the short-term rental platform.<br/><br/>
 ";
         }
     }

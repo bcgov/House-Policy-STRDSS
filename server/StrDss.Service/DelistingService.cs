@@ -452,9 +452,7 @@ namespace StrDss.Service
 
             emailEntity.ExternalMessageNo = await template.SendEmail();
 
-            var dbContext = _unitOfWork.GetDbContext();
-
-            using var transaction = dbContext.Database.BeginTransaction();
+            using var transaction = _unitOfWork.BeginTransaction();
 
             _unitOfWork.Commit();
 
@@ -465,7 +463,7 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            transaction.Commit();
+            _unitOfWork.CommitTransaction(transaction);
         }
     }
 }

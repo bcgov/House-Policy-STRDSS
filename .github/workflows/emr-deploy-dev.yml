@@ -2,9 +2,9 @@ name: Deploy Dev AMS
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #   - aldudin
+#   push:
+#     tags:
+#     - v*.*.*
 
 env:
   JFROG_REGISTRY: artifacts.developer.gov.bc.ca
@@ -19,7 +19,7 @@ jobs:
       contents: read
     environment:
       name: dev
-      url: https://dev-strdata.apps.advsol-ams.3j6z.p1.openshiftapps.com
+      url: https://dev-strdata.apps.silver.devops.gov.bc.ca/
 
     steps:
     - uses: actions/checkout@v4
@@ -27,8 +27,8 @@ jobs:
     - name: Authenticate and set context
       uses: redhat-actions/oc-login@v1.3
       with:
-        openshift_server_url: ${{ secrets.OPENSHIFT_SERVER_AMS }}
-        openshift_token: ${{ secrets.OPENSHIFT_TOKEN_AMS }}
+        openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
+        openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
         namespace: f4a30d-dev
         insecure_skip_tls_verify: true
 

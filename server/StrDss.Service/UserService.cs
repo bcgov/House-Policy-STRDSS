@@ -61,21 +61,21 @@ namespace StrDss.Service
                 return errors;
             }
 
-            //if (_currentUser.IdentityProviderNm == StrDssIdProviders.BceidBusiness)
-            //{
-            //    var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
+            if (_currentUser.IdentityProviderNm == StrDssIdProviders.BceidBusiness)
+            {
+                var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
 
-            //    if (account == null)
-            //    {
-            //        _logger.LogError($"BCeID call error: {error}");
-            //    }
+                if (account == null)
+                {
+                    _logger.LogError($"BCeID call error: {error}");
+                }
 
-            //    if (account != null)
-            //    {
-            //        _currentUser.FirstName = account.FirstName;
-            //        _currentUser.LastName = account.LastName;
-            //    }
-            //}
+                if (account != null)
+                {
+                    _currentUser.FirstName = account.FirstName;
+                    _currentUser.LastName = account.LastName;
+                }
+            }
 
             if (userDto == null)
             {

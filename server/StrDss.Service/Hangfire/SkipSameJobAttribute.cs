@@ -3,6 +3,8 @@ using Hangfire.Common;
 using Hangfire.Server;
 using System.Text.Json;
 using Hangfire;
+using Npgsql;
+using StrDss.Common;
 
 namespace StrDss.Service.Hangfire
 {
@@ -32,6 +34,7 @@ namespace StrDss.Service.Hangfire
                 }
             }
 
+            //skip same job
             var fingerprints = monitor.ProcessingJobs(0, 999999999)
                 .Select(x => GetJobFingerprint(x.Value.Job))
                 .ToList();
@@ -65,6 +68,10 @@ namespace StrDss.Service.Hangfire
             }
             catch (Exception ex)
             {
+                DeleteHangfireLock($"hangfire:{resource}");
+                var distributedLock = filterContext.Connection.AcquireDistributedLock(resource, timeout);
+                filterContext.Items["DistributedLock"] = distributedLock;
+
                 Console.WriteLine(ex);
             }
         }
@@ -90,6 +97,25 @@ namespace StrDss.Service.Hangfire
             }
 
             return $"{job.Type.FullName}-{job.Method.Name}{args}";
+        }
+
+        private void DeleteHangfireLock(string resourceName)
+        {
+            var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+            var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+            var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+            var dbPass = Environment.GetEnvironmentVariable("DB_PASS");
+            var dbPort = Environment.GetEnvironmentVariable("DB_PORT");
+            var connString = $"Host={dbHost!.GetStringBeforeFirstDot()};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
+
+            string sql = @"DELETE FROM Hangfire.Lock WHERE Resource = @ResourceName;";
+
+            using var connection = new NpgsqlConnection(connString);
+            connection.Open();
+
+            using var command = new NpgsqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@ResourceName", resourceName);
+            command.ExecuteNonQuery();
         }
     }
 }

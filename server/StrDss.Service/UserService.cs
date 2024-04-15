@@ -128,7 +128,7 @@ namespace StrDss.Service
 
                 var template = new NewAccessRequest(_emailService)
                 {
-                    Link = GetHostUrl(),
+                    Link = GetHostUrl() + "/user-management",
                     To = emails!,
                     Info = $"New Access Request email for {_currentUser.DisplayName}"
                 };

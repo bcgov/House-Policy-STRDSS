@@ -47,8 +47,20 @@ namespace StrDss.Test.AutoDomainDataBuilder
                             FamilyNm = "Doe",
                             PhoneNo = "999-999-9999",
                             EmailAddressDsc = "foo@foo.com",
-                            ContactedThroughOrganizationId = 0
-                        } 
+                            ContactedThroughOrganizationId = 0,
+                            EmailMessageType = EmailMessageTypes.TakedownRequest
+                        },
+                        new ContactPersonDto
+                        {
+                            OrganizationContactPersonId = 1,
+                            IsPrimary = true,
+                            GivenNm = "John",
+                            FamilyNm = "Doe",
+                            PhoneNo = "999-999-9999",
+                            EmailAddressDsc = "foo@foo.com",
+                            ContactedThroughOrganizationId = 0,
+                            EmailMessageType = EmailMessageTypes.BatchTakedownRequest
+                        }
                     };
                 default:
                     return new NoSpecimen();

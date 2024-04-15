@@ -12,8 +12,7 @@
     </div>
 
     <form *ngIf="!hideForm" [formGroup]="myForm">
-
-        <div class="form-group-row inline-block left-block">
+        <div class="form-group-row">
             <div class="form-group-row-col">
                 <label for="organizationType">What role best describes you?</label>
             </div>
@@ -22,9 +21,15 @@
                     id="organizationType" name="organizationType" [ngClass]="'full-width-text-field'"
                     [required]="true"></p-dropdown>
             </div>
+            <div class="validation-errors" *ngIf="!organizationTypeControl.pristine">
+
+                <small id="requiredOrganizationType" *ngIf="organizationTypeControl.errors?.['required']">Local
+                    Role is required
+                </small>
+            </div>
         </div>
 
-        <div class="form-group-row inline-block right-block">
+        <div class="form-group-row">
             <div class="form-group-row-col">
                 <label for="organizationName">Your Organization</label>
             </div>
@@ -32,16 +37,7 @@
                 <input placeholder="Enter Name..." [ngClass]="'full-width-text-field'" type="text" pInputText
                     formControlName="organizationName" id="organizationName" name="organizationName" />
             </div>
-        </div>
-
-        <div class="form-group-row inline-block form-spacer">
-            <div class="form-group-row-col validation-errors" *ngIf="!organizationTypeControl.pristine">
-
-                <small id="requiredOrganizationType" *ngIf="organizationTypeControl.errors?.['required']">Local
-                    Role is required
-                </small>
-            </div>
-            <div class="form-group-row-col validation-errors" *ngIf="!organizationNameControl.pristine">
+            <div class="validation-errors" *ngIf="!organizationNameControl.pristine">
 
                 <small id="requiredOrganizationName" *ngIf="organizationNameControl.errors?.['required']">Local
                     Organization name is
@@ -51,12 +47,7 @@
     </form>
 
     <div *ngIf="!hideForm" class="disclaimer">
-        <span class="bold-text">[Text coming soon - need to check with legal team, so this is just a place holder!]
-        </span>
-        <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Explicabo nobis molestiae in ducimus quasi qui et
-            maxime quaerat rerum mollitia, sunt itaque a, culpa, minima error. Impedit odio blanditiis ab dolorem
-            mollitia, dicta provident obcaecati corporis?
+        <p class="bold-text">[Text coming soon - need to check with legal team, so this is just a place holder!]
         </p>
     </div>
 

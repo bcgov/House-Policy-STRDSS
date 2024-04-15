@@ -15,7 +15,11 @@ namespace StrDss.Service.EmailTemplates
             Subject = "STR Data Portal - New Access Request";
 
             return
-$@"New access request has been raised and requires review. {Link}";
+$@"Hello,<br/><br/>
+A new access request is waiting for you to approve.<br/><br/>
+To approve or reject, please visit: {Link}<br/><br/>
+Thank you.
+";
         }
     }
 }

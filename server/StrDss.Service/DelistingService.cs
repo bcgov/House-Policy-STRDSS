@@ -268,7 +268,13 @@ namespace StrDss.Service
                 if (platform.ContactPeople == null 
                     || !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.TakedownRequest))
                 {
-                    errors.AddItem("platformId", $"Platform ({dto.PlatformId}) does not have the primary contact info");
+                    errors.AddItem("platformId", $"There's no primary '{EmailMessageTypes.TakedownRequest}' contact email for {platform.OrganizationNm}");
+                }
+
+                if (platform.ContactPeople == null
+                    || !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest))
+                {
+                    errors.AddItem("platformId", $"There's no primary '{EmailMessageTypes.BatchTakedownRequest}' contact email for {platform.OrganizationNm}");
                 }
             }
 
@@ -431,7 +437,7 @@ namespace StrDss.Service
             {
                 EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
-                MessageTemplateDsc = template.GetContent(),
+                MessageTemplateDsc = template.GetContent() + $"{Environment.NewLine}Attachments: {content}",
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
                 MessageReasonId = null,
@@ -452,9 +458,7 @@ namespace StrDss.Service
 
             emailEntity.ExternalMessageNo = await template.SendEmail();
 
-            var dbContext = _unitOfWork.GetDbContext();
-
-            using var transaction = dbContext.Database.BeginTransaction();
+            using var transaction = _unitOfWork.BeginTransaction();
 
             _unitOfWork.Commit();
 
@@ -465,7 +469,7 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            transaction.Commit();
+            _unitOfWork.CommitTransaction(transaction);
         }
     }
 }

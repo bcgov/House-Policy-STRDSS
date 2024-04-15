@@ -1,10 +1,10 @@
-name: Build
+name: Build and Push
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - dev
+      - main
     paths-ignore:
       - database/**
       - package.json
@@ -12,6 +12,11 @@ on:
       - CHANGELOG.md
       - .conventional-changelog.mjs
       - .release-it.json
+
+env:
+  JFROG_REGISTRY: artifacts.developer.gov.bc.ca
+  IMAGE_NAME_FRONTEND: sf4a-strdss/strdss-frontend-dev
+  IMAGE_NAME_BACKEND: sf4a-strdss/strdss-backend-dev
 
 jobs:
   build-backend:
@@ -50,7 +55,7 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_HOST_URL: https://sonarcloud.io
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
   build-frontend:
     runs-on: ubuntu-22.04
@@ -82,84 +87,67 @@ jobs:
         run: |
           cd ./frontend
           ng build --configuration=production
-      
+
       - name: Run frontend tests
         run: |
           cd ./frontend
-          ng test --watch=false --code-coverage=true
+          ng test --watch=false --progress=false --browsers=ChromeHeadless --code-coverage --source-map=false
         continue-on-error: true
+       
 
-      - name: Create test results directory
-        run: mkdir -p ./frontend/test-results
-
-      - name: Copy test results
-        run: cp -r ./coverage ./frontend/test-results
-        
-
-     # SonarQube integration for frontend
-      - name: SonarQube Scan Frontend
+     # SonarQube integration frontend
+      - name: SonarQube Scan
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_HOST_URL: https://sonarcloud.io
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
-  # Docker-build-backend:
-  #   needs: [build-backend]
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 10
-  #   permissions:
-  #     contents: read
-  #     packages: write
+  Docker-build-backend:
+    needs: [build-backend]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
 
-  #   steps:
-  #   - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-  #   - uses: actions/checkout@v4
+    steps:
+    - uses: actions/checkout@v4
 
-  #   - name: Setup Tools
-  #     uses: ./.github/actions/setup-tools
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
 
-  #   - name: Build and Push
-  #     uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
-  #     with:
-  #       registry-url: ${{ env.GITHUB_REGISTRY }}
-  #       registry-username: ${{ github.actor }}
-  #       registry-password: ${{ secrets.GITHUB_TOKEN }}
-  #       image-name: ${{ env.IMAGE_NAME_BACKEND }}
-  #       docker-context: server
-  #       docker-file: server/Dockerfile
-  #       metadata-tags: |
-  #         type=ref,event=branch
-  #         type=sha,format=long,prefix=,suffix=
+    - name: Build Docker image
+      run: cd server && docker build -t strdss-backend-dev -f Dockerfile .
 
-  # Docker-build-frontend:
-  #   needs: [build-frontend]
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 10
-  #   permissions:
-  #     contents: read
-  #     packages: write
+    - name: Tag Docker image
+      run: docker tag strdss-backend-dev artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend-dev:latest
 
-  #   steps:
-  #   - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-  #   - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+    - name: Push Docker image to Artifactory
+      run: |
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend-dev:latest
 
-  #   - name: Setup Tools
-  #     uses: ./.github/actions/setup-tools
+  Docker-build-frontend:
+    needs: [build-frontend]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
 
-  #   - name: Build and Push
-  #     uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
-  #     with:
-  #       registry-url: ${{ env.GITHUB_REGISTRY }}
-  #       registry-username: ${{ github.actor }}
-  #       registry-password: ${{ secrets.GITHUB_TOKEN }}
-  #       image-name: ${{ env.IMAGE_NAME_FRONTEND }}
-  #       docker-context: frontend
-  #       docker-file: frontend/Dockerfile
-  #       docker-args: |
-  #         generate_sourcemap=true
-  #       metadata-tags: |
-  #         type=ref,event=branch
-  #         type=sha,format=long,prefix=,suffix=
+    steps:
+    - uses: actions/checkout@v4
 
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
 
+    - name: Build Docker image
+      run: cd server && docker build -t strdss-frontend-dev -f Dockerfile .
 
+    - name: Tag Docker image
+      run: docker tag strdss-frontend-dev artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend-dev:latest
+
+    - name: Push Docker image to Artifactory
+      run: |
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend-dev:latest

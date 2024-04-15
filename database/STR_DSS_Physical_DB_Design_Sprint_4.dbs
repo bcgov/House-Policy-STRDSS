@@ -58,7 +58,7 @@
 			<column name="lg_str_bylaw_url" type="varchar" length="4000" jt="12" >
 				<comment><![CDATA[User-provided URL for a local government bylaw that is the subject of the message]]></comment>
 			</column>
-			<column name="initiating_user_identity_id" prior="user_identity_id" type="bigint" jt="-5" mandatory="y" >
+			<column name="initiating_user_identity_id" prior="user_identity_id" type="bigint" jt="-5" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
 			<column name="affected_by_user_identity_id" prior="user_role_id" type="bigint" jt="-5" >

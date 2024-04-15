@@ -2,6 +2,8 @@
 
 ALTER TABLE dss_email_message ALTER COLUMN unreported_listing_no TYPE varchar(50);
 
+ALTER TABLE dss_email_message ALTER COLUMN initiating_user_identity_id DROP NOT NULL;
+
 ALTER TABLE dss_organization_contact_person ALTER COLUMN is_primary DROP NOT NULL;
 
 ALTER TABLE dss_organization_contact_person ALTER COLUMN given_nm DROP NOT NULL;

@@ -1,4 +1,4 @@
-name: Deploy Dev AMS
+name: Deploy Dev
 
 on:
   workflow_dispatch:
@@ -8,8 +8,8 @@ on:
 
 env:
   JFROG_REGISTRY: artifacts.developer.gov.bc.ca
-  IMAGE_NAME_FRONTEND: sf4a-strdss/strdss-frontend-dev
-  IMAGE_NAME_BACKEND: sf4a-strdss/strdss-backend-dev
+  IMAGE_NAME_FRONTEND: sf4a-strdss/strdss-frontend
+  IMAGE_NAME_BACKEND: sf4a-strdss/strdss-backend
 
 jobs:
   deploy:

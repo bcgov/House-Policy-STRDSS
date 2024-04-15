@@ -1,169 +1,156 @@
-name: Build and Push
+# name: Build and Push
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - database/**
-      - package.json
-      - package-lock.json
-      - CHANGELOG.md
-      - .conventional-changelog.mjs
-      - .release-it.json
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches:
+#       - main
+#     paths-ignore:
+#       - database/**
+#       - package.json
+#       - package-lock.json
+#       - CHANGELOG.md
+#       - .conventional-changelog.mjs
+#       - .release-it.json
 
-env:
-  JFROG_REGISTRY: artifacts.developer.gov.bc.ca
-  IMAGE_NAME_FRONTEND: sf4a-strdss/strdss-frontend-dev
-  IMAGE_NAME_BACKEND: sf4a-strdss/strdss-backend-dev
+# env:
+#   JFROG_REGISTRY: artifacts.developer.gov.bc.ca
+#   IMAGE_NAME_FRONTEND: sf4a-strdss/strdss-frontend
+#   IMAGE_NAME_BACKEND: sf4a-strdss/strdss-backend
 
-jobs:
-  build-backend:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 10
+# jobs:
+#   build-backend:
+#     runs-on: ubuntu-22.04
+#     timeout-minutes: 10
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '7.0.400'
+#       - name: Setup .NET
+#         uses: actions/setup-dotnet@v3
+#         with:
+#           dotnet-version: '7.0.400'
 
-      - uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget
+#       - uses: actions/cache@v3
+#         with:
+#           path: ~/.nuget/packages
+#           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+#           restore-keys: |
+#             ${{ runner.os }}-nuget
 
-      - name: Setup Tools
-        uses: ./.github/actions/setup-tools
+#       - name: Setup Tools
+#         uses: ./.github/actions/setup-tools
 
-      - name: Build backend
-        run: |
-          pwd
-          dotnet build ./server/server.sln
+#       - name: Build backend
+#         run: |
+#           pwd
+#           dotnet build ./server/server.sln
 
-      - name: Test backend
-        run: dotnet test ./server/server.sln --no-build
+#       - name: Test backend
+#         run: dotnet test ./server/server.sln --no-build
 
-     # SonarQube integration for backend
-      - name: SonarQube Scan Backend
-        uses: sonarsource/sonarcloud-github-action@v2
-        env:
-          SONAR_HOST_URL: https://sonarcloud.io
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
+#      # SonarQube integration for backend
+#       - name: SonarQube Scan Backend
+#         uses: sonarsource/sonarcloud-github-action@v2
+#         env:
+#           SONAR_HOST_URL: https://sonarcloud.io
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
-  build-frontend:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      packages: write
+#   build-frontend:
+#     runs-on: ubuntu-22.04
+#     timeout-minutes: 10
+#     permissions:
+#       contents: read
+#       packages: write
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '18'
 
-      - name: Install Angular CLI
-        run: |
-          cd ./frontend
-          npm install -g @angular/cli
+#       - name: Install Angular CLI
+#         run: |
+#           cd ./frontend
+#           npm install -g @angular/cli
 
-      - name: Install project dependencies
-        run: |
-          cd ./frontend
-          npm install
-          
-      - name: Build frontend
-        run: |
-          cd ./frontend
-          ng build --configuration=production
+#       - name: Install project dependencies
+#         run: |
+#           cd ./frontend
+#           npm install
 
-      - name: Run frontend tests
-        run: |
-          cd ./frontend
-          ng test --watch=false --progress=false --browsers=ChromeHeadless --code-coverage --source-map=false
-        continue-on-error: true
-       
+#       - name: Build frontend
+#         run: |
+#           cd ./frontend
+#           ng build --configuration=production
 
-     # SonarQube integration frontend
-      - name: SonarQube Scan
-        uses: sonarsource/sonarcloud-github-action@v2
-        env:
-          SONAR_HOST_URL: https://sonarcloud.io
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
+#       - name: Run frontend tests
+#         run: |
+#           cd ./frontend
+#           ng test --watch=false --progress=false --browsers=ChromeHeadless --code-coverage --source-map=false
+#         continue-on-error: true
 
-  Docker-build-backend:
-    needs: [build-backend]
-    runs-on: ubuntu-22.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      packages: write
+#      # SonarQube integration frontend
+#       - name: SonarQube Scan
+#         uses: sonarsource/sonarcloud-github-action@v2
+#         env:
+#           SONAR_HOST_URL: https://sonarcloud.io
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
-    steps:
-    - uses: actions/checkout@v4
+#   Docker-build-backend:
+#     needs: [build-backend]
+#     runs-on: ubuntu-22.04
+#     timeout-minutes: 10
+#     permissions:
+#       contents: read
+#       packages: write
 
-    - name: Setup Tools
-      uses: ./.github/actions/setup-tools
+#     steps:
+#     - uses: actions/checkout@v4
 
-    - name: Read version from version.txt
-      id: read-version
-      run: echo "::set-output name=version::$(cat version.txt)"
+#     - name: Setup Tools
+#       uses: ./.github/actions/setup-tools
 
-    - name: Increment build number
-      id: increment-build
-      run: echo "::set-output name=build_number::${{ github.run_number }}"
+#     - name: Build Docker image
+#       run: cd server && docker build -t strdss-backend -f Dockerfile .
 
-    - name: Build Docker image
-      run: cd server && docker build -t strdss-backend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }} -f Dockerfile .
+#     - name: Tag Docker image
+#       run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
 
-    - name: Tag Docker image
-      run: docker tag strdss-backend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }} artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }}
+#     - name: Push Docker image to Artifactory
+#       run: |
+#         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+#         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
 
-    - name: Push Docker image to Artifactory
-      run: |
-        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }}
+#   Docker-build-frontend:
+#     needs: [build-frontend]
+#     runs-on: ubuntu-22.04
+#     timeout-minutes: 10
+#     permissions:
+#       contents: read
+#       packages: write
 
-  Docker-build-frontend:
-    needs: [build-frontend]
-    runs-on: ubuntu-22.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      packages: write
+#     steps:
+#     - uses: actions/checkout@v4
 
-    steps:
-    - uses: actions/checkout@v4
+#     - name: Setup Tools
+#       uses: ./.github/actions/setup-tools
 
-    - name: Setup Tools
-      uses: ./.github/actions/setup-tools
+#     - name: Render style_nonce
+#       id: render_style_nonce
+#       run: echo "::set-output name=style_nonce::$(echo -n ${{ github.sha }} | base64)"
 
-    - name: Read version from version.txt
-      id: read-version
-      run: echo "::set-output name=version::$(cat version.txt)"
+#     - name: Build Docker image
+#       run: cd server && docker build -t strdss-frontend -f Dockerfile .
 
-    - name: Increment build number
-      id: increment-build
-      run: echo "::set-output name=build_number::${{ github.run_number }}"
+#     - name: Tag Docker image
+#       run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
 
-    - name: Build Docker image
-      run: cd server && docker build -t strdss-frontend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }} -f Dockerfile .
-
-    - name: Tag Docker image
-      run: docker tag strdss-frontend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }} artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }}
-
-    - name: Push Docker image to Artifactory
-      run: |
-        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }}
+#     - name: Push Docker image to Artifactory
+#       run: |
+#         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+#         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest

@@ -116,16 +116,24 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
 
+    - name: Read version from version.txt
+      id: read-version
+      run: echo "::set-output name=version::$(cat version.txt)"
+
+    - name: Increment build number
+      id: increment-build
+      run: echo "::set-output name=build_number::${{ github.run_number }}"
+
     - name: Build Docker image
-      run: cd server && docker build -t strdss-backend-dev -f Dockerfile .
+      run: cd server && docker build -t strdss-backend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }} -f Dockerfile .
 
     - name: Tag Docker image
-      run: docker tag strdss-backend-dev artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend-dev:latest
+      run: docker tag strdss-backend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }} artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }}
 
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend-dev:latest
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }}
 
   Docker-build-frontend:
     needs: [build-frontend]
@@ -141,13 +149,21 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
 
+    - name: Read version from version.txt
+      id: read-version
+      run: echo "::set-output name=version::$(cat version.txt)"
+
+    - name: Increment build number
+      id: increment-build
+      run: echo "::set-output name=build_number::${{ github.run_number }}"
+
     - name: Build Docker image
-      run: cd server && docker build -t strdss-frontend-dev -f Dockerfile .
+      run: cd server && docker build -t strdss-frontend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }} -f Dockerfile .
 
     - name: Tag Docker image
-      run: docker tag strdss-frontend-dev artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend-dev:latest
+      run: docker tag strdss-frontend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }} artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }}
 
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend-dev:latest
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:${{ steps.read-version.outputs.version }}.${{ steps.increment-build.outputs.build_number }}

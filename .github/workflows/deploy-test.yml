@@ -5,13 +5,8 @@ on:
     tags:
     - v*.*.*
 
-env:
-  GITHUB_REGISTRY: ghcr.io
-  IMAGE_NAME_FRONTEND: bcgov/strdss-frontend
-  IMAGE_NAME_BACKEND: bcgov/strdss-backend
-
 jobs:
-  build-frontend:
+  docker-build-backend:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
@@ -19,28 +14,23 @@ jobs:
       packages: write
 
     steps:
-    - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-    - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+    - uses: actions/checkout@v4
 
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
 
-    - name: Build and Push
-      uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
-      with:
-        registry-url: ${{ env.GITHUB_REGISTRY }}
-        registry-username: ${{ github.actor }}
-        registry-password: ${{ secrets.GITHUB_TOKEN }}
-        image-name: ${{ env.IMAGE_NAME_FRONTEND }}
-        docker-context: frontend
-        docker-file: frontend/Dockerfile
-        metadata-tags: |
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
+    - name: Build Docker image
+      run: cd server && docker build -t strdss-backend -f Dockerfile .
 
+    - name: Tag Docker image
+      run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${vtag//v}
 
-  build-backend:
+    - name: Push Docker image to Artifactory
+      run: |
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${vtag//v}
+
+  docker-build-frontend:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
@@ -48,28 +38,24 @@ jobs:
       packages: write
 
     steps:
-    - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-    - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+    - uses: actions/checkout@v4
 
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
 
-    - name: Build and Push
-      uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
-      with:
-        registry-url: ${{ env.GITHUB_REGISTRY }}
-        registry-username: ${{ github.actor }}
-        registry-password: ${{ secrets.GITHUB_TOKEN }}
-        image-name: ${{ env.IMAGE_NAME_BACKEND }}
-        docker-context: server
-        docker-file: server/Dockerfile
-        metadata-tags: |
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
+    - name: Build Docker image
+      run: cd frontend && docker build -t strdss-frontend -f Dockerfile .
+
+    - name: Tag Docker image
+      run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:${vtag//v}
+
+    - name: Push Docker image to Artifactory
+      run: |
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:${vtag//v}
 
   deploy:
-    needs: [build-frontend, build-backend]
+    needs: [docker-build-frontend, docker-build-backend]
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     permissions:

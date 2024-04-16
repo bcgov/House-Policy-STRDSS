@@ -4,7 +4,6 @@ namespace StrDss.Model.DelistingDtos
 {
     public class TakedownRequestCreateDto
     {
-        public long LgId { get; set; }
         public long PlatformId { get; set; }
         public string? ListingId { get; set; }
         public string ListingUrl { get; set; } = "";

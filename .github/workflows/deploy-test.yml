@@ -23,10 +23,13 @@ jobs:
       run: cd server && docker build -t strdss-backend -f Dockerfile .
 
     - name: Tag Docker image
-      run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${vtag//v}
+      run: |
+        vtag=${{ github.ref_name }}
+        docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${vtag//v}
 
     - name: Push Docker image to Artifactory
       run: |
+        vtag=${{ github.ref_name }}
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${vtag//v}
 

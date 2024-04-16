@@ -2,8 +2,8 @@
 {
     public class RegexInfo
     {
-        public string Regex { get; set; }
-        public string ErrorMessage { get; set; }
+        public string Regex { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
     }
 
     public static class RegexDefs

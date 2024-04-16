@@ -63,7 +63,7 @@ Scenario: ManagingAccess
 #
 Examples:
 	| UserName | ListingID | Description          | ExpectedResult | ListingURL            | AdditionalCCsTextBox     | GovPhoneNumber | TakedownReason         |
-	| CEUATST  | 0         | ListingID - Boundary | pass           | http://listingURL.com | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| ricander  | 0         | ListingID - Boundary | pass           | http://listingURL.com | richard.anderson@dxc.com | 9991231234     | Get a business license |
 
 
 

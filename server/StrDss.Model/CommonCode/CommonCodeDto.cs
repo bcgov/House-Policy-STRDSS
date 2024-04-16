@@ -6,9 +6,9 @@ namespace StrDss.Model.CommonCode
     {
         [JsonPropertyName("value")]
         public int Id { get; set; }
-        public string CodeSet { get; set; }
+        public string CodeSet { get; set; } = "";
         [JsonPropertyName("label")]
-        public string CodeName { get; set; }
-        public string CodeValue { get; set; }
+        public string CodeName { get; set; } = "";
+        public string CodeValue { get; set; } = "";
     }
 }

@@ -28,9 +28,6 @@ namespace StrDss.Test.AutoDomainDataBuilder
                     return 1;
                 case nameof(TakedownRequestCreateDto.ListingId):
                     return 1;
-                case nameof(TakedownRequestCreateDto.LgId):
-                    return 2;
-
                 case nameof(TakedownRequestCreateDto.ListingUrl):
                     return "https://example.com/listing";
 

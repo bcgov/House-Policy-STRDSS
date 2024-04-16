@@ -18,8 +18,8 @@ using StrDss.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using StrDss.Api.Middlewares;
 using StrDss.Api;
-using StrDss.Service.Hangfire;
 using StrDss.Service.Bceid;
+using StrDss.Service.Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,12 +28,12 @@ builder.WebHost.ConfigureKestrel((context, options) =>
     options.AddServerHeader = false;
 });
 
-var dbHost = builder.Configuration.GetValue<string>("DB_HOST") ?? "";
+var dbHost = builder.Configuration.GetValue<string>("DB_HOST");
 var dbName = builder.Configuration.GetValue<string>("DB_NAME");
 var dbUser = builder.Configuration.GetValue<string>("DB_USER");
 var dbPass = builder.Configuration.GetValue<string>("DB_PASS");
 var dbPort = builder.Configuration.GetValue<string>("DB_PORT");
-var connString = $"Host={dbHost.GetStringBeforeFirstDot()};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
+var connString = $"Host={dbHost!.GetStringBeforeFirstDot()};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
 
 builder.Services.AddHttpContextAccessor();
 
@@ -101,12 +101,14 @@ builder.Services.AddSingleton(mapper);
 builder.Services
     .AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
         .UsePostgreSqlStorage((option) =>
         {
             option.UseNpgsqlConnection(connString);
         }
+        
 ));
 
 builder.Services.AddHangfireServer(options =>
@@ -195,5 +197,6 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 // make sure this is after app.UseHangfireDashboard()
 //RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReport(), "*/1 * * * *");
+//RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 15 * * *"); //UTC time 23:50
 
 app.Run();

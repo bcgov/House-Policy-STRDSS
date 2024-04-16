@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using StrDss.Common;
 using StrDss.Model;
 using System.Text.Json;
 
@@ -14,11 +16,14 @@ namespace StrDss.Service.HttpClients
         public IApi _api { get; }
         public IConfiguration _config { get; }
 
-        public ChesTokenApi(HttpClient client, IApi api, IConfiguration config)
+        private ILogger<StrDssLogger> _logger;
+
+        public ChesTokenApi(HttpClient client, IApi api, IConfiguration config, ILogger<StrDssLogger> logger)
         {
             _client = client;
             _api = api;
             _config = config;
+            _logger = logger;
         }
 
         public async Task<TokenResponse?> GetTokenAsync()
@@ -28,6 +33,8 @@ namespace StrDss.Service.HttpClients
             {
                 { "grant_type", "client_credentials" }
             });
+
+            _logger.LogInformation($"[Egress] Calling CHES API to send email: {_client.BaseAddress}");
 
             var response = await _client.SendAsync(request);
 

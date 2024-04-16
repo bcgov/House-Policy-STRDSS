@@ -3,8 +3,6 @@ using Castle.Core.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using StrDss.Common;
-using StrDss.Data.Entities;
-using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
@@ -323,10 +321,11 @@ namespace StrDss.Test
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
             [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {
             // Arrange
-            dto.LgId = 0;
+            currentUserMock.Setup(m => m.OrganizationId).Returns(0);
 
             // Act
             var result = await sut.CreateTakedownRequestAsync(dto);
@@ -334,7 +333,7 @@ namespace StrDss.Test
             // Assert
             Assert.Contains("lgId", result.Keys);
             Assert.Single(result["lgId"]);
-            Assert.Equal($"Local Government ID ({dto.LgId}) does not exist.", result["lgId"].First());
+            Assert.Equal($"Local Government ID (0) does not exist.", result["lgId"].First());
         }
 
         [Theory]
@@ -506,12 +505,14 @@ namespace StrDss.Test
             DelistingService sut)
         {
             // Arrange
+            dto.PlatformId = 2;
             currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
+            currentUserMock.Setup(m => m.OrganizationId).Returns(1);
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
             
             var lg = CommonUtils.CloneObject(platform);
             lg.OrganizationType = OrganizationTypes.LG;
-            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.LgId)).ReturnsAsync(lg);
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
 
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.TakedownRequest;
 
@@ -534,13 +535,15 @@ namespace StrDss.Test
         {
             // Arrange
             dto.SendCopy = true;
+            dto.PlatformId = 2;
             var currentUserEmail = "user@example.com";
             currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
+            currentUserMock.Setup(m => m.OrganizationId).Returns(1);
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
 
             var lg = CommonUtils.CloneObject(platform);
             lg.OrganizationType = OrganizationTypes.LG;
-            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.LgId)).ReturnsAsync(lg);
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
 
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.TakedownRequest;
 

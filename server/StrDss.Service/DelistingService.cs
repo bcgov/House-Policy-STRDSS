@@ -280,13 +280,13 @@ namespace StrDss.Service
 
             if (lg == null)
             {
-                errors.AddItem("lgId", $"Local Government ID ({_currentUser.OrganizationId}) does not exist.");
+                errors.AddItem("currentUser", $"User's organization ({_currentUser.OrganizationId}) does not exist.");
             }
             else
             {
                 if (lg.OrganizationType != OrganizationTypes.LG)
                 {
-                    errors.AddItem("platformId", $"Organization ({dto.PlatformId}) is not a local government");
+                    errors.AddItem("currentUser", $"User's organization ({_currentUser.OrganizationId}) is not a local government");
                 }
             }
 

@@ -16,7 +16,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
     [Scope(Scenario = "SendTakedownRequestWithoutADSSListing")]
     public sealed class SendTakeDownRequestWithoutADSSListing
     {
-        private LandingPage _HomePage;
+        private LandingPage _LandingPage;
         private TermsAndConditionsPage _TermsAndConditionsPage;
         private DelistingRequestPage _DelistingRequestPage;
         private TakeDownRequestPage _TakeDownRequestPage;
@@ -32,7 +32,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public SendTakeDownRequestWithoutADSSListing(SeleniumDriver Driver)
         {
             _Driver = Driver;
-            _HomePage = new LandingPage(_Driver);
+            _LandingPage = new LandingPage(_Driver);
             _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
             _DelistingRequestPage = new DelistingRequestPage(_Driver);
             _TakeDownRequestPage = new TakeDownRequestPage(_Driver);
@@ -49,7 +49,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _TestPassword = _AppSettings.GetValue(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
-            _Driver.Url = "http://127.0.0.1:4200/delisting-request";
+            _Driver.Url = "http://127.0.0.1:4200";
             _Driver.Navigate();
 
             _PathFinderPage.IDRButton.Click();
@@ -80,8 +80,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("I navigate to the delisting request feature")]
         public void WhenINavigateToTheDelistingRequestFeature()
         {
-            //_Driver.Url = "http://127.0.0.1:4200/delisting-request";
-            //_Driver.Navigate();
+            _LandingPage.SendTakedownLetterButton.Click();
         }
 
         //Input Form

@@ -1,54 +1,58 @@
 name: Deploy Dev Environment
 
 on:
+  workflow_dispatch:
   push:
     branches:
-    - main
+      - main
     paths-ignore:
-    - database/**
-    - package.json
-    - package-lock.json
-    - CHANGELOG.md
-    - .conventional-changelog.mjs
-    - .release-it.json
-
-env:
-  GITHUB_REGISTRY: ghcr.io
-  IMAGE_NAME_FRONTEND: bcgov/strdss-frontend
-  IMAGE_NAME_BACKEND: bcgov/strdss-backend
+      - database/**
+      - package.json
+      - package-lock.json
+      - CHANGELOG.md
+      - .conventional-changelog.mjs
+      - .release-it.json
 
 jobs:
-  test-backend:
+  build-backend:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '7.0.400'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.400'
 
-    - uses: actions/cache@v3
-      with:
-        path: ~/.nuget/packages
-        # Look to see if there is a cache hit for the corresponding requirements file
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget
+      - uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget
 
-    - name: Build
-      run: |
-        pwd
-        dotnet build ./server/server.sln
+      - name: Setup Tools
+        uses: ./.github/actions/setup-tools
 
-    - name: Test
-      run: dotnet test ./server/server.sln --no-build
+      - name: Build backend
+        run: |
+          pwd
+          dotnet build ./server/server.sln
+
+      - name: Test backend
+        run: dotnet test ./server/server.sln --no-build
+
+    #  # SonarQube integration for backend
+    #   - name: SonarQube Scan Backend
+    #     uses: sonarsource/sonarcloud-github-action@v2
+    #     env:
+    #       SONAR_HOST_URL: https://sonarcloud.io
+    #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
 
   build-frontend:
-    needs: [test-backend]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
@@ -56,29 +60,44 @@ jobs:
       packages: write
 
     steps:
-    - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-    - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Setup Tools
-      uses: ./.github/actions/setup-tools
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    - name: Build and Push
-      uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
-      with:
-        registry-url: ${{ env.GITHUB_REGISTRY }}
-        registry-username: ${{ github.actor }}
-        registry-password: ${{ secrets.GITHUB_TOKEN }}
-        image-name: ${{ env.IMAGE_NAME_FRONTEND }}
-        docker-context: frontend
-        docker-file: frontend/Dockerfile
-        docker-args: |
-          generate_sourcemap=true
-        metadata-tags: |
-          type=ref,event=branch
-          type=sha,format=long,prefix=,suffix=
+      - name: Install Angular CLI
+        run: |
+          cd ./frontend
+          npm install -g @angular/cli
 
-  build-backend:
-    needs: [test-backend]
+      - name: Install project dependencies
+        run: |
+          cd ./frontend
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd ./frontend
+          ng build --configuration=production
+
+      - name: Run frontend tests
+        run: |
+          cd ./frontend
+          ng test --watch=false --progress=false --browsers=ChromeHeadless --code-coverage --source-map=false
+        continue-on-error: true
+
+    #  # SonarQube integration frontend
+    #   - name: SonarQube Scan
+    #     uses: sonarsource/sonarcloud-github-action@v2
+    #     env:
+    #       SONAR_HOST_URL: https://sonarcloud.io
+    #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
+
+  docker-build-backend:
+    needs: [build-backend]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
@@ -86,27 +105,53 @@ jobs:
       packages: write
 
     steps:
-    - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-    - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+    - uses: actions/checkout@v4
 
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
 
-    - name: Build and Push
-      uses: egose/actions/docker-build-push@04830c07edee3c552f2c5a0330a674ff0d366c66
-      with:
-        registry-url: ${{ env.GITHUB_REGISTRY }}
-        registry-username: ${{ github.actor }}
-        registry-password: ${{ secrets.GITHUB_TOKEN }}
-        image-name: ${{ env.IMAGE_NAME_BACKEND }}
-        docker-context: server
-        docker-file: server/Dockerfile
-        metadata-tags: |
-          type=ref,event=branch
-          type=sha,format=long,prefix=,suffix=
+    - name: Build Docker image
+      run: cd server && docker build -t strdss-backend -f Dockerfile .
+
+    - name: Tag Docker image
+      run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
+
+    - name: Push Docker image to Artifactory
+      run: |
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
+
+  docker-build-frontend:
+    needs: [build-frontend]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
+
+    - name: Render style_nonce
+      id: render_style_nonce
+      run: echo "::set-output name=style_nonce::$(echo -n ${{ github.sha }} | base64)"
+
+    - name: Build Docker image
+      run: cd frontend && docker build -t strdss-frontend -f Dockerfile .
+
+    - name: Tag Docker image
+      run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
+
+    - name: Push Docker image to Artifactory
+      run: |
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
 
   deploy:
-    needs: [build-frontend, build-backend]
+    needs: [docker-build-frontend, docker-build-backend]
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     permissions:
@@ -116,11 +161,10 @@ jobs:
       url: https://dev-strdata.apps.silver.devops.gov.bc.ca/
 
     steps:
-    - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-    - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+    - uses: actions/checkout@v4
 
     - name: Authenticate and set context
-      uses: redhat-actions/oc-login@9b79eb6d8ec51bce42cb4e77f0a174fc80cf3cb9
+      uses: redhat-actions/oc-login@v1.3
       with:
         openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
         openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
@@ -133,6 +177,6 @@ jobs:
         NAMESPACE=f4a30d-dev \
         NAME=strdss-dev \
         ENV_NAME=dev \
-        IMAGE_TAG_FRONTEND=${{ github.sha }} \
-        IMAGE_TAG_BACKEND=${{ github.sha }} \
+        IMAGE_TAG_FRONTEND=latest \
+        IMAGE_TAG_BACKEND=latest \
       working-directory: ./helm/main

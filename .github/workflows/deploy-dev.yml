@@ -179,4 +179,4 @@ jobs:
         ENV_NAME=dev \
         IMAGE_TAG_FRONTEND=latest \
         IMAGE_TAG_BACKEND=latest \
-        working-directory: ./helm/main
+      working-directory: ./helm/main

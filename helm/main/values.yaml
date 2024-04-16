@@ -1,2 +1,4 @@
 global:
   licensePlate: f4a30d
+  imagePullSecrets:
+  - name: jf-rg-secret

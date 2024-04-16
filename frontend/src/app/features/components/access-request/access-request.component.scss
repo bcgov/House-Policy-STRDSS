@@ -45,34 +45,31 @@
             }
         }
 
-        .form-group-row {
-            width: 100%;
+        form {
+            display: flex;
+            justify-content: space-evenly;
 
-            .validation-errors {
-                small {
-                    color: #D32F2F;
-                }
-            }
-
-            label {
-                line-height: 26px;
-            }
-
-            &.form-spacer {
-                padding-top: 0;
-                margin-top: -14px;
-            }
-
-            &.inline-block {
+            .form-group-row {
+                display: inline-flex;
+                flex-direction: column;
                 width: 50%;
-                display: inline-block;
 
-                &.left-block {
+                &:first-of-type {
                     padding-right: 12px;
                 }
 
-                &.right-block {
+                &:last-of-type {
                     padding-left: 12px;
+                }
+
+                label {
+                    line-height: 26px;
+                }
+
+                .validation-errors {
+                    small {
+                        color: #D32F2F;
+                    }
                 }
             }
 
@@ -97,7 +94,7 @@
                 width: 100%;
 
                 &:last-of-type {
-                    padding: 8px 0 16px 0;
+                    padding: 8px 0 0 0;
                 }
             }
         }

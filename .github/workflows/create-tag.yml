@@ -1,0 +1,44 @@
+name: Create Version Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: Tag Version (exclude prefix; e.g. 1.2.3)
+        required: true
+
+jobs:
+  tag-changelog:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+    - name: Fail on tags
+      run: exit 1
+      if: ${{ !startsWith(github.ref, 'refs/heads/') }}
+
+    - name: Validate Tag Input
+      id: input
+      run: |
+        vtag=${{ github.event.inputs.tag }}
+        echo "tag=${vtag//v}" >> $GITHUB_OUTPUT
+
+    - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
+    - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+      with:
+        fetch-depth: 0 # fetch all history for all branches and tags
+        # https://medium.com/prompt/trigger-another-github-workflow-without-using-a-personal-access-token-f594c21373ef
+        ssh-key: "${{ secrets.COMMIT_KEY }}"
+
+    - name: Create Git Tag
+      run: |
+        git config user.name "$GITHUB_ACTOR"
+        git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+        git config commit.gpgsign false
+        git tag v${{ steps.input.outputs.tag }} -m "Release v${{ steps.input.outputs.tag }}"
+        git push --tags origin

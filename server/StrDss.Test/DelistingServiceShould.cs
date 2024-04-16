@@ -20,8 +20,6 @@ namespace StrDss.Test
             TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
             DelistingService sut)
@@ -42,10 +40,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_NullPlatform_ReturnsPlatformIdError(
             TakedownNoticeCreateDto dto,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -64,11 +58,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_EmptyListingUrl_ReturnsListingUrlError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -87,11 +76,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidListingUrl_ReturnsInvalidUrlError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -110,11 +94,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_HostEmailSentFalseAndEmptyHostEmail_ReturnsHostEmailRequiredError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -134,11 +113,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidHostEmail_ReturnsInvalidHostEmailError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -157,11 +131,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_NullReason_ReturnsReasonIdError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -180,11 +149,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidCcListEmail_ReturnsInvalidCcListEmailError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -203,11 +167,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_EmptyLgContactEmail_ReturnsLgContactEmailRequiredError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -226,11 +185,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidLgContactEmail_ReturnsInvalidLgContactEmailError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -249,11 +203,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidLgContactPhone_ReturnsInvalidLgContactPhoneError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -272,11 +221,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidStrBylawUrl_ReturnsStrBylawUrlRequiredError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -295,10 +239,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_NullPlatform_ReturnsPlatformIdError(
             TakedownRequestCreateDto dto,
-            OrganizationDto lg,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -317,10 +257,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_NullLocalGovernment_ReturnsLocalGovernmentIdError(
             TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {
@@ -340,11 +276,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_EmptyListingUrl_ReturnsListingUrlError(
             TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            OrganizationDto lg,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -363,11 +294,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_InvalidListingUrl_ReturnsInvalidUrlError(
             TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            OrganizationDto lg,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -386,11 +312,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_InvalidCcListEmail_ReturnsInvalidCcListEmailError(
             TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            OrganizationDto lg,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -434,7 +355,6 @@ namespace StrDss.Test
             TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
-            [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
         {
@@ -454,9 +374,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenHostEmailIsEmpty_DoesNotAddHostEmailToToList(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
-            [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {
             // Arrange
@@ -528,7 +446,6 @@ namespace StrDss.Test
         public async Task SendDelistingRequestAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToList(
             TakedownRequestCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
@@ -558,8 +475,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingRequestAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
             TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {

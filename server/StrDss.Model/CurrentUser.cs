@@ -22,6 +22,7 @@ namespace StrDss.Model
         public bool AccessRequestRequired { get; set; }
         public List<string> Permissions { get; set; }
         public string OrganizationType { get; set; }
+        public long OrganizationId { get; set; }
         public DateTime? TermsAcceptanceDtm { get; set; }
         void LoadUserSession(ClaimsPrincipal user);
         void AddClaim(ClaimsPrincipal user, string claimType, string value);
@@ -44,7 +45,8 @@ namespace StrDss.Model
         public string AccessRequestStatus { get; set; } = "";
         public bool AccessRequestRequired { get; set; }
         public List<string> Permissions { get; set; } = new List<string>();
-        public string OrganizationType { get; set; }
+        public string OrganizationType { get; set; } = "";
+        public long OrganizationId { get; set; }
         public DateTime? TermsAcceptanceDtm { get; set; }
 
         public void LoadUserSession(ClaimsPrincipal user)

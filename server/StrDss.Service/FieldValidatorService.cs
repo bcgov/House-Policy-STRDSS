@@ -90,12 +90,12 @@ namespace StrDss.Service
                 return messages;
             }
 
-            if (!rule.Required && (val is null || val.ToString().IsEmpty()))
+            if (!rule.Required && (val is null || val!.ToString()!.IsEmpty()))
                 return messages;
 
-            string value = Convert.ToString(val);
+            string value = Convert.ToString(val)!;
 
-            if (rule.Required && value.IsEmpty())
+            if (rule.Required && value!.IsEmpty())
             {
                 messages.Add($"{rowNumPrefix}The {field} field is required.");
                 return messages;
@@ -120,7 +120,7 @@ namespace StrDss.Service
             {
                 if (!Regex.IsMatch(value, rule.RegexInfo.Regex))
                 {
-                    var message = string.Format(rule.RegexInfo.ErrorMessage, val.ToString());
+                    var message = string.Format(rule.RegexInfo.ErrorMessage, val!.ToString());
                     messages.Add($"{rowNumPrefix}{message}.");
                 }
             }
@@ -159,14 +159,14 @@ namespace StrDss.Service
                 return messages;
             }
 
-            if (!rule.Required && (val is null || val.ToString().IsEmpty()))
+            if (!rule.Required && (val is null || val!.ToString()!.IsEmpty()))
                 return messages;
 
-            var (parsed, parsedDate) = DateUtils.ParseDate(val);
+            var (parsed, parsedDate) = DateUtils.ParseDate(val!);
 
             if (!parsed)
             {
-                messages.Add($"{rowNumPrefix}Invalid value. [{val.ToString()}] cannot be converted to a date");
+                messages.Add($"{rowNumPrefix}Invalid value. [{val!}] cannot be converted to a date");
                 return messages;
             }
 
@@ -197,7 +197,7 @@ namespace StrDss.Service
                 return messages;
             }
 
-            if (!rule.Required && (val is null || val.ToString().IsEmpty()))
+            if (!rule.Required && (val is null || val!.ToString()!.IsEmpty()))
                 return messages;
 
             string value = Convert.ToString(val) ?? ""; 

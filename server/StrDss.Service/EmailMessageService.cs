@@ -8,12 +8,13 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Service.HttpClients;
 using System.Text;
+using System.Text.Json;
 
 namespace StrDss.Service
 {
     public interface IEmailMessageService
     {
-        Task<bool> SendEmailAsync(EmailContent emailContent);
+        Task<string> SendEmailAsync(EmailContent emailContent);
         Task<List<DropdownNumDto>> GetMessageReasons(string messageType);
         Task<DropdownNumDto?> GetMessageReasonByMessageTypeAndId(string messageType, long id);
     }
@@ -36,7 +37,7 @@ namespace StrDss.Service
             _logger = logger;
         }
 
-        public async Task<bool> SendEmailAsync(EmailContent emailContent)
+        public async Task<string> SendEmailAsync(EmailContent emailContent)
         {
             var env = _config.GetValue<string>("ENV_NAME") ?? "dev";
 
@@ -61,7 +62,8 @@ namespace StrDss.Service
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation($"Sent '{emailContent.Subject}' for {emailContent.Info} successfully");
-                    return true;
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    return ParseMsgIdFromJson(jsonResponse);
                 }
                 else
                 {
@@ -77,6 +79,27 @@ namespace StrDss.Service
                 throw new Exception(error);
             }
         }
+        private string ParseMsgIdFromJson(string jsonResponse)
+        {
+            using var document = JsonDocument.Parse(jsonResponse);
+
+            var root = document.RootElement;
+
+            if (!root.TryGetProperty("messages", out JsonElement messages) || !messages.EnumerateArray().Any())
+            {
+                return string.Empty; 
+            }
+
+            var msgId = messages.EnumerateArray().First().GetProperty("msgId").GetString();
+
+            if (msgId == null)
+            {
+                return string.Empty; 
+            }
+
+            return msgId;
+        }
+
 
         public async Task<List<DropdownNumDto>> GetMessageReasons(string messageType)
         {

@@ -164,8 +164,6 @@ export class ComplianceNoticeComponent implements OnInit {
   private prepareFormModel(form: FormGroup): ComplianceNotice {
     const model: ComplianceNotice = Object.assign({}, form.value);
 
-    model.listingId = Number.parseInt(model.listingId as any);
-
     model.ccList = form.value['ccList'].prototype === Array
       ? form.value
       : (form.value['ccList'] as string).split(',').filter(x => !!x).map(x => x.trim())
@@ -176,11 +174,11 @@ export class ComplianceNoticeComponent implements OnInit {
   private initForm(): void {
     this.myForm = this.fb.group({
       platformId: [0, Validators.required],
-      listingId: [null],
+      listingId: [''],
       listingUrl: ['', [Validators.required, validateUrl()]],
       hostEmail: ['', [Validators.required, Validators.email]],
       hostEmailSent: [false],
-      reasonId: [0, Validators.required,],
+      reasonId: [1, Validators.required,],
       sendCopy: [true],
       ccList: ['', validateEmailListString()],
       LgContactEmail: ['', [Validators.required, Validators.email]],

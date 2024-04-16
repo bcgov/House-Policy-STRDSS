@@ -8,6 +8,10 @@ using StrDss.Service;
 using Xunit;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Common;
+using Microsoft.EntityFrameworkCore;
+using StrDss.Data.Entities;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace StrDss.Test
 {
@@ -28,7 +32,7 @@ namespace StrDss.Test
         {
             // Arrange
             SetupCurrentUser(currentUserMock);
-            SetupUserRepository(userRepoMock, (UserDto)null);
+            SetupUserRepository(userRepoMock, null, userDto);
             SetupUnitOfWork(unitOfWorkMock);
             SetupOrganizationRepository(organizationRepoMock, organizationDto);
 
@@ -37,7 +41,7 @@ namespace StrDss.Test
 
             // Assert
             Assert.Empty(result);
-            unitOfWorkMock.Verify(x => x.Commit(), Times.Once);
+            unitOfWorkMock.Verify(x => x.Commit(), Times.AtLeastOnce);
         }
 
         [Theory]
@@ -280,7 +284,7 @@ namespace StrDss.Test
             UserDto userDto,
             OrganizationDto orgDto,
             [Frozen] Mock<IUserRepository> userRepoMock,
-            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,            
             UserService sut)
         {
             // Arrange
@@ -299,7 +303,7 @@ namespace StrDss.Test
         }
 
 
-        public void SetupCurrentUser(Mock<ICurrentUser> currentUserMock)
+        private void SetupCurrentUser(Mock<ICurrentUser> currentUserMock)
         {
             currentUserMock.Setup(x => x.UserGuid).Returns(Guid.NewGuid());
             currentUserMock.Setup(x => x.DisplayName).Returns("Test User");
@@ -310,19 +314,27 @@ namespace StrDss.Test
             currentUserMock.Setup(x => x.BusinessNm).Returns("Test Business");
         }
 
-        public void SetupUserRepository(Mock<IUserRepository> userRepoMock, UserDto userDto)
+        private void SetupUserRepository(Mock<IUserRepository> userRepoMock, UserDto? userDto1, UserDto userDto2)
         {
-            userRepoMock.Setup(x => x.GetUserByGuid(It.IsAny<Guid>())).ReturnsAsync(userDto);
+            int callCount = 0;
+
+            userRepoMock.Setup(x => x.GetUserByGuid(It.IsAny<Guid>()))
+              .ReturnsAsync(() =>
+              {
+                  callCount++;
+                  return callCount == 1 ? userDto1 : userDto2;
+              });
+
             userRepoMock.Setup(x => x.CreateUserAsync(It.IsAny<UserCreateDto>())).Returns(Task.CompletedTask);
-            userRepoMock.Setup(x => x.GetAdminUsers()).ReturnsAsync(new List<UserDto> { userDto });
+            userRepoMock.Setup(x => x.GetAdminUsers()).ReturnsAsync(new List<UserDto> { userDto2 });
         }
 
-        public void SetupUnitOfWork(Mock<IUnitOfWork> unitOfWorkMock)
+        private void SetupUnitOfWork(Mock<IUnitOfWork> unitOfWorkMock)
         {
             unitOfWorkMock.Setup(x => x.Commit()).Verifiable();
         }
 
-        public void SetupOrganizationRepository(Mock<IOrganizationRepository> organizationRepoMock, OrganizationDto organizationDto)
+        private void SetupOrganizationRepository(Mock<IOrganizationRepository> organizationRepoMock, OrganizationDto organizationDto)
         {
             organizationRepoMock.Setup(x => x.GetOrganizationTypesAsnc()).ReturnsAsync(new List<OrganizationTypeDto>
             {

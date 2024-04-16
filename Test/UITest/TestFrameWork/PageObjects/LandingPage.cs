@@ -10,6 +10,7 @@ namespace UITest.PageObjects
         private Button _ViewPolicyGuidenceButton;
         private Button _SendNoticeButton;
         private Button _SendTakedownLetterButton;
+        private Button _ManageAccessRequestsButton;
         private Button _EscalateTakedownToCEUButton;
 
         private IDriver _Driver;
@@ -19,7 +20,7 @@ namespace UITest.PageObjects
         public Button SendNoticeButton { get => _SendNoticeButton;  }
         public Button SendTakedownLetterButton { get => _SendTakedownLetterButton; }
         public Button EscalateTakedownToCEUButto { get => _EscalateTakedownToCEUButton; }
-
+        public Button ManageAccessRequestsButton { get => _ManageAccessRequestsButton; }
 
         public LandingPage(IDriver Driver)
         {
@@ -27,6 +28,8 @@ namespace UITest.PageObjects
             _ViewPolicyGuidenceButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ViewPolicyGuidenceButton);
             _SendNoticeButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendNoticeButton);
             _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendTakeDownLetterButton);
+            _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendTakeDownLetterButton);
+            _ManageAccessRequestsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ManageAccessRequestsButton);
             _EscalateTakedownToCEUButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.EscalateTakedownToCEUButton);
         }
 

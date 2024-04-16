@@ -28,7 +28,7 @@ namespace StrDss.Api.Authorization
             var ipAddress = context.HttpContext.Connection.RemoteIpAddress;
             var ip = ipAddress == null ? "Unknown" : ipAddress.ToString();
 
-            if (!user.Identity.IsAuthenticated)
+            if (!user!.Identity!.IsAuthenticated)
             {
                 _logger.LogInformation($"[AUTH] Authentication failed for user '{username}' at {context.ActionDescriptor.DisplayName} from IP address '{ip}'.");
                 context.Result = new ForbidResult(); //403

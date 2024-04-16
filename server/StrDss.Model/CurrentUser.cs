@@ -89,7 +89,7 @@ namespace StrDss.Model
         {
             if (user == null || claimType.IsEmpty() || value.IsEmpty() || user.HasClaim(claimType, value)) return;
 
-            user.Identities.FirstOrDefault().AddClaim(new Claim(claimType, value));
+            user!.Identities!.FirstOrDefault()!.AddClaim(new Claim(claimType, value));
         }
     }
 }

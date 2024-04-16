@@ -331,9 +331,9 @@ namespace StrDss.Test
             var result = await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
-            Assert.Contains("lgId", result.Keys);
-            Assert.Single(result["lgId"]);
-            Assert.Equal($"Local Government ID (0) does not exist.", result["lgId"].First());
+            Assert.Contains("currentUser", result.Keys);
+            Assert.Single(result["currentUser"]);
+            Assert.Equal($"User's organization (0) does not exist.", result["currentUser"].First());
         }
 
         [Theory]

@@ -4,8 +4,7 @@ Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-71
 @Delisting
 Scenario: SendNoticeOfTakedownWithoutADSSlisting
 #User Authentication
-	Given I am an authenticated LG staff member and the expected result is "<ExpectedResult>"
-
+	Given that I am an authenticated LG staff member "<UserName>" and the expected result is "<ExpectedResult>"
 	When I navigate to the delisting warning feature
 
 #Input Form
@@ -84,18 +83,18 @@ Scenario: SendNoticeOfTakedownWithoutADSSlisting
 #
 #
 Examples:
-	| ListingID           | Description                      | ExpectedResult | ListingURL                                                   | AdditionalCCsTextBox     | GovPhoneNumber | TakedownReason         |
-	| 0                   | ListingID - Boundary             | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
-	| 9223372036854775807 | ListingID - Test for Max value   | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
-	| 0                   | ListingURL - Valid URL           | pass           | HTTP://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
-	| 0                   | ListingURL - Valid URL           | pass           | HTTPS://listingURL.com                                       | richard.anderson@dxc.com | 9991231234     | Get a business license |
-	| 0                   | ListingURL - Long URL SSL        | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com | 9991231234     | Get a business license |
-	| 0                   | Phone Number - Valid  '-'        | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com | 999-123-1234   | Get a business license |
-	| 0                   | Phone Number - Valid  '('        | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com | (999)1231234   | Get a business license |
-	| 0                   | Phone Number - Valid  '- and ('  | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com | (999)-123-1234 | Get a business license |
-	| -1                  | ListingID - Negative number test | Pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
-	| test                | ListingID - Test for string      | Pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
-	| e                   | ListingID - Test for exponential | Pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
-	| 0                   | ListingURL - Invalid URL         | fail           | http://listingURL                                            | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| UserName | ListingID           | Description                      | ExpectedResult | ListingURL                                                   | AdditionalCCsTextBox     | GovPhoneNumber | TakedownReason         |
+	| ricander  | 0                   | ListingID - Boundary             | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| ricander  | 9223372036854775807 | ListingID - Test for Max value   | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| ricander  | 0                   | ListingURL - Valid URL           | pass           | HTTP://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| CEUATST  | 0                   | ListingURL - Valid URL           | pass           | HTTPS://listingURL.com                                       | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| CEUATST  | 0                   | ListingURL - Long URL SSL        | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| CEUATST  | 0                   | Phone Number - Valid  '-'        | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com | 999-123-1234   | Get a business license |
+	| CEUATST  | 0                   | Phone Number - Valid  '('        | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com | (999)1231234   | Get a business license |
+	| CEUATST  | 0                   | Phone Number - Valid  '- and ('  | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com | (999)-123-1234 | Get a business license |
+	| CEUATST  | -1                  | ListingID - Negative number test | Pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| CEUATST  | test                | ListingID - Test for string      | Pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| CEUATST  | e                   | ListingID - Test for exponential | Pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| CEUATST  | 0                   | ListingURL - Invalid URL         | fail           | http://listingURL                                            | richard.anderson@dxc.com | 9991231234     | Get a business license |
 
 

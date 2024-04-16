@@ -6,11 +6,6 @@ on:
 #     tags:
 #     - v*.*.*
 
-env:
-  JFROG_REGISTRY: artifacts.developer.gov.bc.ca
-  IMAGE_NAME_FRONTEND: sf4a-strdss/strdss-frontend
-  IMAGE_NAME_BACKEND: sf4a-strdss/strdss-backend
-
 jobs:
   deploy:
     runs-on: ubuntu-22.04

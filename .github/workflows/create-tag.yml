@@ -1,4 +1,4 @@
-name: Create Version Tag with Changelog PR
+name: Create Version Tag
 
 on:
   workflow_dispatch:

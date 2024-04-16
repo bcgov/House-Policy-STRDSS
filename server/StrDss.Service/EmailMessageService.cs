@@ -53,7 +53,7 @@ namespace StrDss.Service
                 var token = await _chesTokenApi.GetTokenAsync();
                 var chesUrl = _config.GetValue<string>("CHES_URL") ?? "";
 
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.AccessToken}");
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token!.AccessToken}");
 
                 var jsonContent = emailContent.ToString();
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

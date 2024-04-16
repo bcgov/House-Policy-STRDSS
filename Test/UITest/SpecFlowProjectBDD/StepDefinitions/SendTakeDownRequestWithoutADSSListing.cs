@@ -27,6 +27,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private int _CurrentRow = 0;
         private bool _ExpectedResult = false;
         private IDriver _Driver;
+        private AppSettings _AppSettings;
 
         public SendTakeDownRequestWithoutADSSListing(SeleniumDriver Driver)
         {
@@ -37,15 +38,15 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _TakeDownRequestPage = new TakeDownRequestPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDRLoginPage = new IDRLoginPage(_Driver);
-            AppSettings appSettings = new AppSettings();
-            _TestUserName = appSettings.GetValue("TestUserName") ?? string.Empty;
-            _TestPassword = appSettings.GetValue("TestPassword") ?? string.Empty;
+            _AppSettings = new AppSettings();
         }
 
         //User Authentication
-        [Given(@"I am an authenticated LG staff member and the expected result is ""(.*)""")]
-        public void GivenIAmAauthenticatedLGStaffMemberUser(string ExpectedResult)
+        [Given(@"that I am an authenticated LG staff member ""(.*)"" and the expected result is ""(.*)""")]
+        public void GivenIAmAauthenticatedLGStaffMemberUser(string UserName, string ExpectedResult)
         {
+            _TestUserName = UserName;
+            _TestPassword = _AppSettings.GetValue(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
             _Driver.Url = "http://127.0.0.1:4200/delisting-request";

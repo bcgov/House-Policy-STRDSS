@@ -76,19 +76,19 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("SendNoticeOfTakedownWithoutADSSlisting")]
         [NUnit.Framework.CategoryAttribute("Delisting")]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("9223372036854775807", "ListingID - Test for Max value", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Valid URL", "pass", "HTTP://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Valid URL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Long URL SSL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "Phone Number - Valid  \'-\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "999-123-1234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "Phone Number - Valid  \'(\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "(999)1231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "Phone Number - Valid  \'- and (\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "(999)-123-1234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("-1", "ListingID - Negative number test", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("test", "ListingID - Test for string", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("e", "ListingID - Test for exponential", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        public void SendNoticeOfTakedownWithoutADSSlisting(string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string govPhoneNumber, string takedownReason, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "9223372036854775807", "ListingID - Test for Max value", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Valid URL", "pass", "HTTP://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingURL - Valid URL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingURL - Long URL SSL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "Phone Number - Valid  \'-\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "999-123-1234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "Phone Number - Valid  \'(\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "(999)1231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "Phone Number - Valid  \'- and (\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "(999)-123-1234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "-1", "ListingID - Negative number test", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "test", "ListingID - Test for string", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "e", "ListingID - Test for exponential", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        public void SendNoticeOfTakedownWithoutADSSlisting(string userName, string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string govPhoneNumber, string takedownReason, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "Delisting"};
@@ -98,6 +98,7 @@ namespace SpecFlowProjectBDD.Features
             }
             string[] tagsOfScenario = @__tags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("UserName", userName);
             argumentsOfScenario.Add("ListingID", listingID);
             argumentsOfScenario.Add("Description", description);
             argumentsOfScenario.Add("ExpectedResult", expectedResult);
@@ -117,104 +118,105 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 7
- testRunner.Given(string.Format("I am an authenticated LG staff member and the expected result is \"{0}\"", expectedResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given(string.Format("that I am an authenticated LG staff member \"{0}\" and the expected result is \"{1}\"" +
+                            "", userName, expectedResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 9
+#line 8
  testRunner.When("I navigate to the delisting warning feature", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 12
+#line 11
  testRunner.Then("I should be presented with an input form that includes fields for the listing URL" +
                         ", and an optional field for the host email address", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 14
+#line 13
  testRunner.And("I should be presented with a field to select which platform to send the warning t" +
                         "o", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 16
+#line 15
  testRunner.And("I should be presented with a dropdown menu to select reason for delisting", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 18
+#line 17
  testRunner.And("I should see an optional field for Listing ID \"ListingID\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 20
+#line 19
  testRunner.And("I should see an optional field for adding a LG staff user email address to be cop" +
                         "ied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 24
+#line 23
  testRunner.When(string.Format("Entering the listing URL \"{0}\"", listingURL), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 26
+#line 25
  testRunner.Then("The system should validate the URL format and ensure it is a valid link to the pr" +
                         "operty listing", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 29
+#line 28
  testRunner.When("selecting the platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 31
+#line 30
  testRunner.Then("the system should present a list of available platform options to populate the fi" +
                         "eld", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 34
+#line 33
  testRunner.When("entering the optional host email address", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 36
+#line 35
  testRunner.Then("the system should validate the email format", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 40
+#line 39
  testRunner.When("I select a reason for delisting", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 42
+#line 41
  testRunner.Then("the system should present a list of reasons for requesting delisting: No business" +
                         " licence provided, invalid business licence number, expired business licence, or" +
                         " suspended business license", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 46
+#line 45
  testRunner.When("submitting a notice", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 48
+#line 47
  testRunner.Then(string.Format("there should be checkboxes or fields to enable sending a copy of the request to m" +
                             "yself or adding additional CCs \"{0}\"", additionalCCsTextBox), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 52
+#line 51
  testRunner.Then("there should be fields to input email and phone number for the local government c" +
                         "ontact, with the latter being optional", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 56
+#line 55
  testRunner.When("all required fields are entered", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 58
+#line 57
  testRunner.Then("I see a template delisting warning message that will be sent to both the platform" +
                         " and host", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 62
+#line 61
  testRunner.When("I submit the form with valid information", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 64
+#line 63
  testRunner.Then("the system should send the delisting warning message to the provided platform and" +
                         " host email addresses", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 68
+#line 67
  testRunner.When("successful submission", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 70
+#line 69
  testRunner.Then("I should receive a confirmation message indicating that the delisting warning has" +
                         " been sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 72
+#line 71
  testRunner.Then("I should be copied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 75
+#line 74
  testRunner.When("the delisting warning is submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 77
+#line 76
  testRunner.Then("the platform and host should receive email notifications containing the delisting" +
                         " warning and instructions for compliance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 81
+#line 80
  testRunner.When("there are issues with the submission, such as invalid email addresses or a missin" +
                         "g URL", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 83
+#line 82
  testRunner.Then("the system should provide clear error messages guiding me on how to correct the i" +
                         "ssues", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

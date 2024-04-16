@@ -51,7 +51,7 @@ namespace StrDss.Test.AutoDomainDataBuilder
                 case nameof(UserDto.TermsAcceptanceDtm):
                     return DateTime.UtcNow;
                 case nameof(UserDto.RepresentedByOrganizationId):
-                    return null;
+                    return null!;
                 case nameof(UserDto.UpdDtm):
                     return DateTime.UtcNow;
                 case nameof(UserDto.UserRoleCds):

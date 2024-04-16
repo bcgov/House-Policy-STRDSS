@@ -8,8 +8,8 @@ namespace StrDss.Data.Entities
 {
     public partial class DssDbContext
     {
-        private ICurrentUser _currentUser;
-        private ILogger<StrDssLogger> _logger;
+        private ICurrentUser _currentUser = null!;
+        private ILogger<StrDssLogger> _logger = null!;
 
         public DssDbContext(DbContextOptions<DssDbContext> options, ICurrentUser currentUser, ILogger<StrDssLogger> logger)
             : base(options)
@@ -54,7 +54,7 @@ namespace StrDss.Data.Entities
             {
                 result = base.SaveChanges();
             }
-            catch (Exception e)
+            catch
             {
                 throw;
             }

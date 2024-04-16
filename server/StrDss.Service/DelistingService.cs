@@ -234,7 +234,7 @@ namespace StrDss.Service
         public async Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
-            var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
             var errors = await ValidateTakedownRequestAsync(dto, platform, lg);
             if (errors.Count > 0)
@@ -280,7 +280,7 @@ namespace StrDss.Service
 
             if (lg == null)
             {
-                errors.AddItem("lgId", $"Local Government ID ({dto.LgId}) does not exist.");
+                errors.AddItem("lgId", $"Local Government ID ({_currentUser.OrganizationId}) does not exist.");
             }
             else
             {
@@ -366,7 +366,7 @@ namespace StrDss.Service
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
-            var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
             var errors = await ValidateTakedownRequestAsync(dto, platform, lg);
             if (errors.Count > 0)

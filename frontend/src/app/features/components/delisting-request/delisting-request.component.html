@@ -42,13 +42,13 @@
     <div class="form-group-row">
         <div class="form-group-row-col">
             <span class="info-tooltip"
-                pTooltip="Copy and paste the external URL of the STR listing from the platform website."
+                pTooltip="Copy and paste the external URL of the STR listing from the platform listing. URL must begin with “https://”."
                 tooltipPosition="top" placeholder="Top"></span>
             <label for="listingUrl">Add URL of the short-term rental listing</label>
         </div>
         <div class="form-group-row-col">
-            <input class="long-text-field" type="text" placeholder="Enter URL" pInputText formControlName="listingUrl"
-                id="listingUrl" name="listingUrl" required />
+            <input class="long-text-field" type="text" placeholder="Enter URL beginning with http…" pInputText
+                formControlName="listingUrl" id="listingUrl" name="listingUrl" required />
         </div>
         <div class="form-group-row-col validation-errors"
             *ngIf="!listingUrlControl.pristine && listingUrlControl.errors">

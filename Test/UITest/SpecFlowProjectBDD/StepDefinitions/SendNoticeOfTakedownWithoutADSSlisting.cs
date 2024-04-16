@@ -17,7 +17,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
     public sealed class SendNoticeOfTakedownWithoutADSSlisting
     {
         private IDriver _Driver;
-        private LandingPage _HomePage;
+        private LandingPage _LandingPage;
         private DelistingWarningPage _DelistingWarningPage;
         private TermsAndConditionsPage _TermsAndConditionsPage;
         private PathFinderPage _PathFinderPage;
@@ -31,7 +31,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public SendNoticeOfTakedownWithoutADSSlisting(SeleniumDriver Driver)
         {
             _Driver = Driver;
-            _HomePage = new LandingPage(_Driver);
+            _LandingPage = new LandingPage(_Driver);
             _DelistingWarningPage = new DelistingWarningPage(_Driver);
             _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
@@ -48,7 +48,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _TestPassword = _AppSettings.GetValue(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
-            _Driver.Url = "http://127.0.0.1:4200/compliance-notice";
+            _Driver.Url = "http://127.0.0.1:4200";
             _Driver.Navigate();
 
             _PathFinderPage.IDRButton.Click();
@@ -78,8 +78,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             [When("I navigate to the delisting warning feature")]
             public void WhenINavigateToTheDelistingWarningFeature()
             {
-                //_Driver.Url = "http://127.0.0.1:4200/compliance-notice";
-                //_Driver.Navigate();
+            _LandingPage.SendNoticeButton.Click();
             }
 
             //Input Form

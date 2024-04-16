@@ -140,7 +140,7 @@ jobs:
       run: echo "::set-output name=style_nonce::$(echo -n ${{ github.sha }} | base64)"
 
     - name: Build Docker image
-      run: cd server && docker build -t strdss-frontend -f Dockerfile .
+      run: cd frontend && docker build -t strdss-frontend -f Dockerfile .
 
     - name: Tag Docker image
       run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest

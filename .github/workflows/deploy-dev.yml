@@ -111,15 +111,15 @@ jobs:
       uses: ./.github/actions/setup-tools
 
     - name: Build Docker image
-      run: cd server && docker build -t strdss-backend-dev -f Dockerfile .
+      run: cd server && docker build -t strdss-backend -f Dockerfile .
 
     - name: Tag Docker image
-      run: docker tag strdss-backend-dev artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend-dev:latest
+      run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
 
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend-dev:latest
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
 
   docker-build-frontend:
     needs: [build-frontend]
@@ -140,15 +140,15 @@ jobs:
       run: echo "::set-output name=style_nonce::$(echo -n ${{ github.sha }} | base64)"
 
     - name: Build Docker image
-      run: cd server && docker build -t strdss-frontend-dev -f Dockerfile .
+      run: cd server && docker build -t strdss-frontend -f Dockerfile .
 
     - name: Tag Docker image
-      run: docker tag strdss-frontend-dev artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend-dev:latest
+      run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
 
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend-dev:latest
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
 
   deploy:
     needs: [docker-build-frontend, docker-build-backend]

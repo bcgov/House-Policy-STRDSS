@@ -1,7 +1,17 @@
 <div class="header">
     <div class="header-top">
-        <div class="logo-container"></div>
-        <div class="main-title">Short-Term Rental Data Portal</div>
+        <div class="tile-container">
+            <div class="logo-container"></div>
+            <div class="main-title">Short-Term Rental Data Portal</div>
+        </div>
+        <div class="user-container">
+            {{userDataService.currentUser?.fullName}} <button pButton icon="pi pi-angle-down"
+                (click)="op.toggle($event)"></button>
+            <p-overlayPanel #op>
+                <button pButton [iconPos]="'right'" class="p-button-transparent" icon="pi pi-sign-out"
+                    (click)="logout()">Logout</button>
+            </p-overlayPanel>
+        </div>
     </div>
     <div class="header-menu">
         <div class="menu-container">

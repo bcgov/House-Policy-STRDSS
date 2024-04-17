@@ -3,8 +3,6 @@ using Castle.Core.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using StrDss.Common;
-using StrDss.Data.Entities;
-using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
@@ -22,16 +20,26 @@ namespace StrDss.Test
             TakedownNoticeCreateDto dto,
             OrganizationDto platform,
             [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {
             // Arrange
-            configMock.Setup(x => x.GetValue(typeof(string), "")).Returns("https://ches.example.com");
+
+            dto.PlatformId = 2;
+            var currentUserEmail = "user@example.com";
+            currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
+            currentUserMock.Setup(m => m.OrganizationId).Returns(1);
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
+
+            var lg = CommonUtils.CloneObject(platform);
+            lg.OrganizationType = OrganizationTypes.LG;
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
+
+            configMock.Setup(x => x.GetValue(typeof(string), "")).Returns("https://ches.example.com");
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
+
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
             // Act
             var result = await sut.CreateTakedownNoticeAsync(dto);;
@@ -44,10 +52,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_NullPlatform_ReturnsPlatformIdError(
             TakedownNoticeCreateDto dto,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -66,11 +70,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_EmptyListingUrl_ReturnsListingUrlError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -89,11 +88,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidListingUrl_ReturnsInvalidUrlError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -112,11 +106,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_HostEmailSentFalseAndEmptyHostEmail_ReturnsHostEmailRequiredError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -136,11 +125,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidHostEmail_ReturnsInvalidHostEmailError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -157,36 +141,8 @@ namespace StrDss.Test
 
         [Theory]
         [AutoDomainData]
-        public async Task ValidateDelistingWarning_NullReason_ReturnsReasonIdError(
-            TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
-            DelistingService sut)
-        {
-            // Arrange
-            dto.ReasonId = 0;
-
-            // Act
-            var result = await sut.CreateTakedownNoticeAsync(dto);;
-
-            // Assert
-            Assert.Contains("reasonId", result.Keys);
-            Assert.Single(result["reasonId"]);
-            Assert.Equal($"Reason ID ({dto.ReasonId}) does not exist.", result["reasonId"].First());
-        }
-
-        [Theory]
-        [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidCcListEmail_ReturnsInvalidCcListEmailError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -205,11 +161,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_EmptyLgContactEmail_ReturnsLgContactEmailRequiredError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -228,11 +179,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidLgContactEmail_ReturnsInvalidLgContactEmailError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -251,11 +197,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidLgContactPhone_ReturnsInvalidLgContactPhoneError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -274,11 +215,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingWarning_InvalidStrBylawUrl_ReturnsStrBylawUrlRequiredError(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
-            string reason,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -297,10 +233,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_NullPlatform_ReturnsPlatformIdError(
             TakedownRequestCreateDto dto,
-            OrganizationDto lg,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -319,33 +251,25 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_NullLocalGovernment_ReturnsLocalGovernmentIdError(
             TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
+            [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {
             // Arrange
-            dto.LgId = 0;
+            currentUserMock.Setup(m => m.OrganizationId).Returns(0);
 
             // Act
             var result = await sut.CreateTakedownRequestAsync(dto);
 
             // Assert
-            Assert.Contains("lgId", result.Keys);
-            Assert.Single(result["lgId"]);
-            Assert.Equal($"Local Government ID ({dto.LgId}) does not exist.", result["lgId"].First());
+            Assert.Contains("currentUser", result.Keys);
+            Assert.Single(result["currentUser"]);
+            Assert.Equal($"User's organization (0) does not exist.", result["currentUser"].First());
         }
 
         [Theory]
         [AutoDomainData]
         public async Task ValidateDelistingRequest_EmptyListingUrl_ReturnsListingUrlError(
             TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            OrganizationDto lg,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -364,11 +288,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_InvalidListingUrl_ReturnsInvalidUrlError(
             TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            OrganizationDto lg,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -387,11 +306,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateDelistingRequest_InvalidCcListEmail_ReturnsInvalidCcListEmailError(
             TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            OrganizationDto lg,
-            [Frozen] Mock<IConfiguration> configMock,
-            [Frozen] Mock<IChesTokenApi> chesTokenApiMock,
-            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
             DelistingService sut)
         {
             // Arrange
@@ -417,8 +331,16 @@ namespace StrDss.Test
             DelistingService sut)
         {
             // Arrange
-            currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
+            dto.PlatformId = 2;
+            var currentUserEmail = "user@example.com";
+            currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
+            currentUserMock.Setup(m => m.OrganizationId).Returns(1);
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
+
+            var lg = CommonUtils.CloneObject(platform);
+            lg.OrganizationType = OrganizationTypes.LG;
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
+
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
 
@@ -440,10 +362,21 @@ namespace StrDss.Test
             DelistingService sut)
         {
             // Arrange
-            dto.HostEmail = "host@example.com";
+            dto.PlatformId = 2;
+            var currentUserEmail = "user@example.com";
+            currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
+            currentUserMock.Setup(m => m.OrganizationId).Returns(1);
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
+
+            var lg = CommonUtils.CloneObject(platform);
+            lg.OrganizationType = OrganizationTypes.LG;
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
+
+            dto.HostEmail = "host@example.com";
+
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
+
             // Act
             await sut.CreateTakedownNoticeAsync(dto);
 
@@ -455,9 +388,7 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenHostEmailIsEmpty_DoesNotAddHostEmailToToList(
             TakedownNoticeCreateDto dto,
-            OrganizationDto platform,
             [Frozen] Mock<IEmailMessageService> emailServiceMock,
-            [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {
             // Arrange
@@ -482,12 +413,18 @@ namespace StrDss.Test
             DelistingService sut)
         {
             // Arrange
+            dto.PlatformId = 2;
             var currentUserEmail = "user@example.com";
             currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
+            currentUserMock.Setup(m => m.OrganizationId).Returns(1);
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
+            
+            var lg = CommonUtils.CloneObject(platform);
+            lg.OrganizationType = OrganizationTypes.LG;
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
+
             emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
-
             // Act
             await sut.CreateTakedownNoticeAsync(dto);
 
@@ -506,12 +443,14 @@ namespace StrDss.Test
             DelistingService sut)
         {
             // Arrange
+            dto.PlatformId = 2;
             currentUserMock.Setup(m => m.EmailAddress).Returns("currentUser@example.com");
+            currentUserMock.Setup(m => m.OrganizationId).Returns(1);
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
             
             var lg = CommonUtils.CloneObject(platform);
             lg.OrganizationType = OrganizationTypes.LG;
-            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.LgId)).ReturnsAsync(lg);
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
 
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.TakedownRequest;
 
@@ -527,20 +466,21 @@ namespace StrDss.Test
         public async Task SendDelistingRequestAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToList(
             TakedownRequestCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
         {
             // Arrange
             dto.SendCopy = true;
+            dto.PlatformId = 2;
             var currentUserEmail = "user@example.com";
             currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
+            currentUserMock.Setup(m => m.OrganizationId).Returns(1);
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
 
             var lg = CommonUtils.CloneObject(platform);
             lg.OrganizationType = OrganizationTypes.LG;
-            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.LgId)).ReturnsAsync(lg);
+            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
 
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.TakedownRequest;
 
@@ -555,8 +495,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingRequestAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
             TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {

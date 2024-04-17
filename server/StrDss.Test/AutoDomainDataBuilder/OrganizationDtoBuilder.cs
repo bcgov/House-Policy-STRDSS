@@ -25,7 +25,7 @@ namespace StrDss.Test.AutoDomainDataBuilder
             switch (pi.Name)
             {
                 case nameof(OrganizationDto.OrganizationId):
-                    return 1;
+                    return 2;
                 case nameof(OrganizationDto.OrganizationType):
                     return OrganizationTypes.Platform;
                 case nameof(OrganizationDto.OrganizationCd):
@@ -33,9 +33,9 @@ namespace StrDss.Test.AutoDomainDataBuilder
                 case nameof(OrganizationDto.OrganizationNm):
                     return "Test Platform";
                 case nameof(OrganizationDto.LocalGovernmentGeometry):
-                    return null;
+                    return null!;
                 case nameof(OrganizationDto.ManagingOrganizationId):
-                    return null;
+                    return null!;
                 case nameof(OrganizationDto.ContactPeople):
                     return new List<ContactPersonDto> 
                     { 

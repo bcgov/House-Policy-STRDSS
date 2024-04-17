@@ -45,7 +45,7 @@ namespace StrDss.Api.Authentication
 
         public override async Task TokenValidated(TokenValidatedContext context)
         {
-            _currentUser.LoadUserSession(context.Principal);
+            _currentUser.LoadUserSession(context!.Principal!);
 
             var (user, permissions) = await _userService.GetUserByGuidAsync(_currentUser.UserGuid);
 
@@ -62,6 +62,7 @@ namespace StrDss.Api.Authentication
                 _currentUser.AccessRequestStatus = user.AccessRequestStatusCd;
                 _currentUser.AccessRequestRequired = _currentUser.AccessRequestStatus == AccessRequestStatuses.Denied;
                 _currentUser.OrganizationType = user.RepresentedByOrganization?.OrganizationType ?? "";
+                _currentUser.OrganizationId = user.RepresentedByOrganizationId ?? 0;
                 _currentUser.TermsAcceptanceDtm = user.TermsAcceptanceDtm;
 
                 if (user.IsEnabled)
@@ -70,7 +71,7 @@ namespace StrDss.Api.Authentication
 
                     foreach (var permission in permissions)
                     {
-                        _currentUser.AddClaim(context.Principal, StrDssClaimTypes.Permission, permission);
+                        _currentUser.AddClaim(context!.Principal!, StrDssClaimTypes.Permission, permission);
                     }
                 }
             }

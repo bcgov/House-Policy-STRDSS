@@ -26,10 +26,9 @@ namespace UITest.PageObjects
         {
             _Driver = Driver;
             _ViewPolicyGuidenceButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ViewPolicyGuidenceButton);
-            _SendNoticeButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendNoticeButton);
-            _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendTakeDownLetterButton);
-            _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendTakeDownLetterButton);
-            _ManageAccessRequestsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ManageAccessRequestsButton);
+            _SendNoticeButton = new Button(Driver, Enums.FINDBY.XPATH, LandingPageModel.SendNoticeButton);
+            _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.XPATH, LandingPageModel.SendTakeDownLetterButton);
+            _ManageAccessRequestsButton = new Button(Driver, Enums.FINDBY.XPATH, LandingPageModel.ManageAccessRequestsButton);
             _EscalateTakedownToCEUButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.EscalateTakedownToCEUButton);
         }
 

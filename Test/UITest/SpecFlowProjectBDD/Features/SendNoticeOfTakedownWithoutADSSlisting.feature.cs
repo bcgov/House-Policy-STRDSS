@@ -79,15 +79,15 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
         [NUnit.Framework.TestCaseAttribute("ricander", "9223372036854775807", "ListingID - Test for Max value", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
         [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Valid URL", "pass", "HTTP://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingURL - Valid URL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingURL - Long URL SSL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "Phone Number - Valid  \'-\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "999-123-1234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "Phone Number - Valid  \'(\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "(999)1231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "Phone Number - Valid  \'- and (\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "(999)-123-1234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "-1", "ListingID - Negative number test", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "test", "ListingID - Test for string", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "e", "ListingID - Test for exponential", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Valid URL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Long URL SSL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "Phone Number - Valid  \'-\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "999-123-1234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "Phone Number - Valid  \'(\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "(999)1231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "Phone Number - Valid  \'- and (\'", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "(999)-123-1234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "-1", "ListingID - Negative number test", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "test", "ListingID - Test for string", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "e", "ListingID - Test for exponential", "Pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
         public void SendNoticeOfTakedownWithoutADSSlisting(string userName, string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string govPhoneNumber, string takedownReason, string[] exampleTags)
         {
             string[] @__tags = new string[] {
@@ -132,9 +132,6 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("I should be presented with a field to select which platform to send the warning t" +
                         "o", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 15
- testRunner.And("I should be presented with a dropdown menu to select reason for delisting", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
 #line 17
  testRunner.And("I should see an optional field for Listing ID \"ListingID\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -161,14 +158,6 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 35
  testRunner.Then("the system should validate the email format", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 39
- testRunner.When("I select a reason for delisting", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 41
- testRunner.Then("the system should present a list of reasons for requesting delisting: No business" +
-                        " licence provided, invalid business licence number, expired business licence, or" +
-                        " suspended business license", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 45
  testRunner.When("submitting a notice", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

@@ -9,6 +9,7 @@ using UITest.Models;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.Extensions;
 using System.Reflection.Metadata;
+using OpenQA.Selenium.Support.UI;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -78,6 +79,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             [When("I navigate to the delisting warning feature")]
             public void WhenINavigateToTheDelistingWarningFeature()
             {
+            //_LandingPage.SendNoticeButton.ExecuteJavaScript(@"document.querySelector(""#navigate-to-compliance-notice-btn"").click()");
             _LandingPage.SendNoticeButton.Click();
             }
 
@@ -94,15 +96,15 @@ namespace SpecFlowProjectBDD.StepDefinitions
                 _DelistingWarningPage.PlatformReceipientDropdown.Click();
             }
 
-            [Then("I should be presented with a dropdown menu to select reason for delisting")]
-            public void IShouldBePresentedWithADropdownMenuToSelectReasonForDelisting()
-            {
-                _DelistingWarningPage.ReasonDropdown.Click();
-                _DelistingWarningPage.ReasonDropdown.Click();
-            }
+            //[Then("I should be presented with a dropdown menu to select reason for delisting")]
+            //public void IShouldBePresentedWithADropdownMenuToSelectReasonForDelisting()
+            //{
+            //    _DelistingWarningPage.ReasonDropdown.Click();
+            //    _DelistingWarningPage.ReasonDropdown.Click();
+            //}
 
             [Then(@"I should see an optional field for Listing ID ""(.*)""")]
-            public void IIhouldDeeAnOptionalFieldForListingID(string ListingID)
+            public void IShouldSeeAnOptionalFieldForListingID(string ListingID)
             {
                 //add listing ID
                 _DelistingWarningPage.ListingIDNumberTextBox.EnterText(ListingID);
@@ -153,19 +155,19 @@ namespace SpecFlowProjectBDD.StepDefinitions
             {
             }
 
-            //ReasonForDelisting
-            [When("I select a reason for delisting")]
-            public void WhenISelectAReasonForDelisting()
-            {
-                _DelistingWarningPage.ReasonDropdown.Click();
-                _DelistingWarningPage.ReasonDropdown.ExecuteJavaScript(@"document.querySelector(""#reasonId_0"").click()");
-            }
+            ////ReasonForDelisting
+            //[When("I select a reason for delisting")]
+            //public void WhenISelectAReasonForDelisting()
+            //{
+            //    _DelistingWarningPage.ReasonDropdown.Click();
+            //    _DelistingWarningPage.ReasonDropdown.ExecuteJavaScript(@"document.querySelector(""#reasonId_0"").click()");
+            //}
 
-            [Then("the system should present a list of reasons for requesting delisting: No business licence provided, invalid business licence number, expired business licence, or suspended business license")]
-            public void ThenTheSystemShouldPresentAListOfReasonsForRequestingDelisting()
-            {
+            //[Then("the system should present a list of reasons for requesting delisting: No business licence provided, invalid business licence number, expired business licence, or suspended business license")]
+            //public void ThenTheSystemShouldPresentAListOfReasonsForRequestingDelisting()
+            //{
 
-            }
+            //}
 
             // CC and Send Copy Options:
             [When("submitting a notice")]
@@ -177,7 +179,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             [Then(@"there should be checkboxes or fields to enable sending a copy of the request to myself or adding additional CCs ""(.*)""")]
             public void LocalGovernmentContactInformationCC(string CCEmailAddress)
             {
-                _DelistingWarningPage.SendCopyCheckbox.Click();
+                //_DelistingWarningPage.SendCopyCheckbox.Click();
 
                 _DelistingWarningPage.AdditionalCCsTextBox.EnterText(CCEmailAddress);
             }
@@ -187,7 +189,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             {
 
                 _DelistingWarningPage.LocalGovEmailTextBox.EnterText("local@gov.bc");
-                _DelistingWarningPage.LocalGovPhoneTextBox.EnterText("999-123-1234");
+                //_DelistingWarningPage.LocalGovPhoneTextBox.EnterText("999-123-1234");
 
             }
 

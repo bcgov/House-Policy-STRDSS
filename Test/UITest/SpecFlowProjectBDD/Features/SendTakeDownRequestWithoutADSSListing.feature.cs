@@ -79,12 +79,12 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "", null)]
         [NUnit.Framework.TestCaseAttribute("ricander", "9223372036854775807", "ListingID - Test for Max value", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "", null)]
         [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Valid URL", "pass", "HTTP://listingURL.com", "richard.anderson@dxc.com", "", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingURL - Valid URL SSL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", "", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingURL - Long URL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "-1", "ListingID - Negative number test", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "Should pass because non-numberic values are ignored and Listing ID is optional", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "test", "ListingID - Test for string", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "should pass because non-numberic values are ignored and Listing ID is optional", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "e", "ListingID - Test for exponential", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "should pass because non-numberic values are ignored and Listing ID is optional", null)]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Valid URL SSL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Long URL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "-1", "ListingID - Negative number test", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "Should pass because non-numberic values are ignored and Listing ID is optional", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "test", "ListingID - Test for string", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "should pass because non-numberic values are ignored and Listing ID is optional", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "e", "ListingID - Test for exponential", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "should pass because non-numberic values are ignored and Listing ID is optional", null)]
+        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", "", null)]
         public void SendTakedownRequestWithoutADSSListing(string userName, string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string comment, string[] exampleTags)
         {
             string[] @__tags = new string[] {

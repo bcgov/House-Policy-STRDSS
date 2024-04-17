@@ -7,13 +7,13 @@ namespace StrDss.Model
     {
         private static JsonSerializerOptions _jsonOptions = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
-        public IEnumerable<string> Bcc { get; set; }
+        public IEnumerable<string> Bcc { get; set; } = new List<string>();
 
         public string BodyType { get; set; } = "html";
 
         public string Body { get; set; } = "";
 
-        public IEnumerable<string> Cc { get; set; }
+        public IEnumerable<string> Cc { get; set; } = new List<string>();
 
         public int DelayTS { get; set; } = 0;
 
@@ -25,7 +25,7 @@ namespace StrDss.Model
 
         public string Subject { get; set; } = "";
 
-        public IEnumerable<string> To { get; set; }
+        public IEnumerable<string> To { get; set; } = new List<string>();
         public IEnumerable<EmailAttachment> Attachments { get; set; } = Array.Empty<EmailAttachment>();
 
         [JsonIgnore]

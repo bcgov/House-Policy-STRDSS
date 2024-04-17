@@ -218,12 +218,7 @@ namespace StrDss.Common
 
         public static bool IsIdirUser(this string str)
         {
-            return str.ToUpperInvariant() == BceidUserTypes.Internal;
-        }
-
-        public static bool IsBusinessUser(this string str)
-        {
-            return str.ToUpperInvariant() == BceidUserTypes.Business;
+            return str.ToLowerInvariant() == StrDssIdProviders.Idir;
         }
     }
 }

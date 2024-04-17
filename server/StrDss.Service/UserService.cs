@@ -312,7 +312,7 @@ namespace StrDss.Service
             //only IDIR account can have BCGov org type
             if (user.IdentityProviderNm != StrDssIdProviders.Idir && org.OrganizationType == OrganizationTypes.BCGov)
             {
-                errors.AddItem("representedByOrganizationId", $"Not IDIR account cannot be associated with {OrganizationTypes.BCGov} type organization");
+                errors.AddItem("representedByOrganizationId", $"Non IDIR account cannot be associated with {OrganizationTypes.BCGov} type organization");
             }
 
             if (errors.Count > 0)

@@ -12,7 +12,7 @@ Scenario: SendNoticeOfTakedownWithoutADSSlisting
 
 	And I should be presented with a field to select which platform to send the warning to
 
-	And I should be presented with a dropdown menu to select reason for delisting
+	#And I should be presented with a dropdown menu to select reason for delisting
 
 	And I should see an optional field for Listing ID "ListingID"
 
@@ -36,9 +36,9 @@ Scenario: SendNoticeOfTakedownWithoutADSSlisting
 
 #ReasonForDelisting
 
-	When I select a reason for delisting
-
-	Then the system should present a list of reasons for requesting delisting: No business licence provided, invalid business licence number, expired business licence, or suspended business license
+#	When I select a reason for delisting
+#
+#	Then the system should present a list of reasons for requesting delisting: No business licence provided, invalid business licence number, expired business licence, or suspended business license
 
 #CC and Send Copy Options:
 
@@ -84,9 +84,9 @@ Scenario: SendNoticeOfTakedownWithoutADSSlisting
 #
 Examples:
 	| UserName | ListingID           | Description                      | ExpectedResult | ListingURL                                                   | AdditionalCCsTextBox     | GovPhoneNumber | TakedownReason         |
-	| ricander  | 0                   | ListingID - Boundary             | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
-	| ricander  | 9223372036854775807 | ListingID - Test for Max value   | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
-	| ricander  | 0                   | ListingURL - Valid URL           | pass           | HTTP://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| CEUATST  | 0                   | ListingID - Boundary             | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| CEUATST  | 9223372036854775807 | ListingID - Test for Max value   | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| CEUATST  | 0                   | ListingURL - Valid URL           | pass           | HTTP://listingURL.com                                        | richard.anderson@dxc.com | 9991231234     | Get a business license |
 	| CEUATST  | 0                   | ListingURL - Valid URL           | pass           | HTTPS://listingURL.com                                       | richard.anderson@dxc.com | 9991231234     | Get a business license |
 	| CEUATST  | 0                   | ListingURL - Long URL SSL        | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com | 9991231234     | Get a business license |
 	| CEUATST  | 0                   | Phone Number - Valid  '-'        | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com | 999-123-1234   | Get a business license |

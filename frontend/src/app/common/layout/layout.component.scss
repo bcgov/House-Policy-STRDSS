@@ -15,26 +15,47 @@
     .header-top {
         border-bottom: 2px solid #FCBA19;
         background-color: #003366;
-        display: flex;
-        grid-template-columns: 1fr auto 1fr;
-        grid-template-rows: auto 3fr auto;
         height: 66px;
         padding: 0 184px;
+        display: flex;
+        justify-content: space-between;
 
-        .logo-container {
-            background-image: url(../../../assets/images/main_logo.svg);
-            width: 166.4px;
-            height: 64px;
-            background-size: contain;
-            background-position: center center;
-            background-repeat: no-repeat;
-            grid-column: 1;
+        .tile-container {
+            display: flex;
+            grid-template-columns: 1fr auto 1fr;
+            grid-template-rows: auto 3fr auto;
+
+            .logo-container {
+                background-image: url(../../../assets/images/main_logo.svg);
+                width: 166.4px;
+                height: 64px;
+                background-size: contain;
+                background-position: center center;
+                background-repeat: no-repeat;
+                grid-column: 1;
+            }
+
+            .main-title {
+                align-self: center;
+                font-size: 24px;
+                color: #FFFFFF;
+            }
         }
 
-        .main-title {
-            align-self: center;
-            font-size: 24px;
+        .user-container {
+            width: 360px;
+            height: 100%;
+            font-size: 16px;
             color: #FFFFFF;
+            align-self: center;
+            display: flex;
+            align-items: center;
+            justify-content: end;
+
+            button {
+                padding: 12px;
+                margin-left: 12px;
+            }
         }
     }
 

@@ -197,6 +197,6 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 // make sure this is after app.UseHangfireDashboard()
 //RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReport(), "*/1 * * * *");
-//RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 15 * * *"); //UTC time 23:50
+RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 15 * * *"); //UTC time 23:50
 
 app.Run();

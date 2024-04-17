@@ -47,20 +47,20 @@ namespace StrDss.Service
         public async Task<Dictionary<string, List<string>>> CreateTakedownNoticeAsync(TakedownNoticeCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
-            var reasonDto = await _emailService.GetMessageReasonByMessageTypeAndId(EmailMessageTypes.NoticeOfTakedown, dto.ReasonId);
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
-            var errors = await ValidateTakedownNoticeAsync(dto, platform, reasonDto);
+            var errors = await ValidateTakedownNoticeAsync(dto, platform, lg);
             if (errors.Count > 0)
             {
                 return errors;
             }
 
-            await SendTakedownNoticeAsync(dto, platform, reasonDto);
+            await SendTakedownNoticeAsync(dto, platform, lg);
 
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidateTakedownNoticeAsync(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
+        private async Task<Dictionary<string, List<string>>> ValidateTakedownNoticeAsync(TakedownNoticeCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
         {
             await Task.CompletedTask;
 
@@ -114,9 +114,16 @@ namespace StrDss.Service
                 }
             }
 
-            if (reasonDto == null)
+            if (lg == null)
             {
-                errors.AddItem("reasonId", $"Reason ID ({dto.ReasonId}) does not exist.");
+                errors.AddItem("currentUser", $"User's organization ({_currentUser.OrganizationId}) does not exist.");
+            }
+            else
+            {
+                if (lg.OrganizationType != OrganizationTypes.LG)
+                {
+                    errors.AddItem("currentUser", $"User's organization ({_currentUser.OrganizationId}) is not a local government");
+                }
             }
 
             regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
@@ -156,9 +163,9 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendTakedownNoticeAsync(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto)
+        private async Task SendTakedownNoticeAsync(TakedownNoticeCreateDto dto, OrganizationDto? platform, OrganizationDto? lg)
         {
-            var template = GetTakedownNoticeTemplate(dto, platform, reasonDto);
+            var template = GetTakedownNoticeTemplate(dto, platform, lg);
 
             var emailEntity = new DssEmailMessage
             {
@@ -167,7 +174,7 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = dto.HostEmailSent,
                 IsSubmitterCcRequired = true,
-                MessageReasonId = reasonDto?.Id,
+                MessageReasonId = null,
                 LgPhoneNo = dto.LgContactPhone,
                 UnreportedListingNo = dto.ListingId,
                 HostEmailAddressDsc = dto.HostEmail,
@@ -187,7 +194,7 @@ namespace StrDss.Service
             _unitOfWork.Commit();
         }
 
-        private TakedownNotice GetTakedownNoticeTemplate(TakedownNoticeCreateDto dto, OrganizationDto? platform, DropdownNumDto? reasonDto, bool preview = false)
+        private TakedownNotice GetTakedownNoticeTemplate(TakedownNoticeCreateDto dto, OrganizationDto? platform, OrganizationDto? lg, bool preview = false)
         {
             // To: [host] (optional), [Local Gov contact info email]
             if (dto.HostEmail.IsNotEmpty()) dto.ToList.Add(dto.HostEmail);
@@ -201,11 +208,9 @@ namespace StrDss.Service
 
             var template = new TakedownNotice(_emailService)
             {
-                Reason = reasonDto!.Description,
                 Url = dto.ListingUrl,
                 ListingId = dto.ListingId,
-                LgContactInfo = dto.LgContactEmail,
-                LgStrBylawLink = dto.StrBylawUrl,
+                LgName = lg!.OrganizationNm,
                 To = dto.ToList,
                 Bcc = dto.CcList,
                 Info = dto.ListingUrl,
@@ -218,15 +223,15 @@ namespace StrDss.Service
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
-            var reasonDto = await _emailService.GetMessageReasonByMessageTypeAndId(EmailMessageTypes.NoticeOfTakedown, dto.ReasonId);
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
-            var errors = await ValidateTakedownNoticeAsync(dto, platform, reasonDto);
+            var errors = await ValidateTakedownNoticeAsync(dto, platform, lg);
             if (errors.Count > 0)
             {
                 return (errors, new EmailPreview());
             }
 
-            var template = GetTakedownNoticeTemplate(dto, platform, reasonDto, true);
+            var template = GetTakedownNoticeTemplate(dto, platform, lg, true);
 
             return (errors, new EmailPreview { Content = template.GetContent().HtmlToPlainText() });
         }
@@ -234,7 +239,7 @@ namespace StrDss.Service
         public async Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
-            var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
             var errors = await ValidateTakedownRequestAsync(dto, platform, lg);
             if (errors.Count > 0)
@@ -280,13 +285,13 @@ namespace StrDss.Service
 
             if (lg == null)
             {
-                errors.AddItem("lgId", $"Local Government ID ({dto.LgId}) does not exist.");
+                errors.AddItem("currentUser", $"User's organization ({_currentUser.OrganizationId}) does not exist.");
             }
             else
             {
                 if (lg.OrganizationType != OrganizationTypes.LG)
                 {
-                    errors.AddItem("platformId", $"Organization ({dto.PlatformId}) is not a local government");
+                    errors.AddItem("currentUser", $"User's organization ({_currentUser.OrganizationId}) is not a local government");
                 }
             }
 
@@ -366,7 +371,7 @@ namespace StrDss.Service
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
-            var lg = await _orgService.GetOrganizationByIdAsync(dto.LgId);
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
             var errors = await ValidateTakedownRequestAsync(dto, platform, lg);
             if (errors.Count > 0)

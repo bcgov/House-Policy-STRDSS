@@ -2,6 +2,6 @@
 {
     public class EmailPreview
     {
-        public string Content { get; set; }
+        public string Content { get; set; } = "";
     }
 }

@@ -3,11 +3,14 @@ import { Router, RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
+import { UserDataService } from '../services/user-data.service';
+import { AuthService } from '../services/auth.service';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, ButtonModule, MenubarModule],
+  imports: [RouterOutlet, ButtonModule, MenubarModule, OverlayPanelModule],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
@@ -15,7 +18,7 @@ export class LayoutComponent {
   showHeaderMenu = true;
   items: MenuItem[] | undefined;
 
-  constructor() { }
+  constructor(public userDataService: UserDataService, private authService: AuthService) { }
 
   ngOnInit() {
     this.items = [
@@ -58,5 +61,9 @@ export class LayoutComponent {
         ]
       },
     ];
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }

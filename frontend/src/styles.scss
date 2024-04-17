@@ -92,6 +92,16 @@ body {
                 color: #353433;
             }
 
+            &.p-button-transparent {
+                background-color: transparent;
+                border-color: transparent;
+                color: #353433;
+
+                &:hover {
+                    border-color: #353433;
+                }
+            }
+
             &.p-button-red {
                 background-color: #CE3E39;
                 border-color: #CE3E39;

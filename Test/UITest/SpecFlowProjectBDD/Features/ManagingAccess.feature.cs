@@ -76,7 +76,7 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("ManagingAccess")]
         [NUnit.Framework.CategoryAttribute("Access")]
-        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
         public void ManagingAccess(string userName, string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string govPhoneNumber, string takedownReason, string[] exampleTags)
         {
             string[] @__tags = new string[] {

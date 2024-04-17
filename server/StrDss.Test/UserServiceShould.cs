@@ -27,7 +27,6 @@ namespace StrDss.Test
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IUnitOfWork> unitOfWorkMock,
             [Frozen] Mock<IOrganizationRepository> organizationRepoMock,
-            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             UserService sut)
         {
             // Arrange
@@ -50,7 +49,6 @@ namespace StrDss.Test
             AccessRequestCreateDto dto,
             UserDto userDto,
             [Frozen] Mock<IUserRepository> userRepoMock,
-            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
             UserService sut)
         {
             // Arrange
@@ -72,7 +70,6 @@ namespace StrDss.Test
             AccessRequestCreateDto dto,
             UserDto userDto,
             [Frozen] Mock<IUserRepository> userRepoMock,
-            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
             UserService sut)
         {
             // Arrange
@@ -95,7 +92,6 @@ namespace StrDss.Test
             AccessRequestCreateDto dto,
             UserDto userDto,
             [Frozen] Mock<IUserRepository> userRepoMock,
-            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
             UserService sut)
         {
             // Arrange
@@ -116,7 +112,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateAccessRequestCreateDtoAsync_InvalidOrganizationType_ReturnsError(
             AccessRequestCreateDto dto,
-            UserDto userDto,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
             UserService sut)
         {
@@ -136,7 +131,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task ValidateAccessRequestCreateDtoAsync_EmptyOrganizationName_ReturnsError(
             AccessRequestCreateDto dto,
-            UserDto userDto,
             OrganizationDto organizationDto,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
             UserService sut)
@@ -162,7 +156,7 @@ namespace StrDss.Test
             UserService sut)
         {
             // Arrange
-            userRepoMock.Setup(x => x.GetUserById(It.IsAny<long>())).ReturnsAsync((UserDto)null);
+            userRepoMock.Setup(x => x.GetUserById(It.IsAny<long>())).ReturnsAsync((UserDto)null!);
 
             // Act
             var errors = await sut.DenyAccessRequest(dto);
@@ -223,7 +217,7 @@ namespace StrDss.Test
             UserService sut)
         {
             // Arrange
-            userRepoMock.Setup(x => x.GetUserById(It.IsAny<long>())).ReturnsAsync((UserDto)null);
+            userRepoMock.Setup(x => x.GetUserById(It.IsAny<long>())).ReturnsAsync((UserDto)null!);
 
             // Act
             var errors = await sut.ApproveAccessRequest(dto);
@@ -266,7 +260,7 @@ namespace StrDss.Test
         {
             // Arrange
             userRepoMock.Setup(x => x.GetUserById(It.IsAny<long>())).ReturnsAsync(userDto);
-            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(It.IsAny<long>())).ReturnsAsync((OrganizationDto)null);
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(It.IsAny<long>())).ReturnsAsync((OrganizationDto)null!);
 
             // Act
             var errors = await sut.ApproveAccessRequest(dto);

@@ -33,9 +33,9 @@ namespace StrDss.Test.AutoDomainDataBuilder
                 case nameof(OrganizationDto.OrganizationNm):
                     return "Test Platform";
                 case nameof(OrganizationDto.LocalGovernmentGeometry):
-                    return null;
+                    return null!;
                 case nameof(OrganizationDto.ManagingOrganizationId):
-                    return null;
+                    return null!;
                 case nameof(OrganizationDto.ContactPeople):
                     return new List<ContactPersonDto> 
                     { 

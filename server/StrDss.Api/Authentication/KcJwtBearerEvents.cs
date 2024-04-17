@@ -45,7 +45,7 @@ namespace StrDss.Api.Authentication
 
         public override async Task TokenValidated(TokenValidatedContext context)
         {
-            _currentUser.LoadUserSession(context.Principal);
+            _currentUser.LoadUserSession(context!.Principal!);
 
             var (user, permissions) = await _userService.GetUserByGuidAsync(_currentUser.UserGuid);
 
@@ -71,7 +71,7 @@ namespace StrDss.Api.Authentication
 
                     foreach (var permission in permissions)
                     {
-                        _currentUser.AddClaim(context.Principal, StrDssClaimTypes.Permission, permission);
+                        _currentUser.AddClaim(context!.Principal!, StrDssClaimTypes.Permission, permission);
                     }
                 }
             }

@@ -19,7 +19,7 @@ namespace StrDss.Service.EmailTemplates
         public string Info { get; set; } = "";
         public bool Preview { get; set; } = false;
         public string EmailMessageType { get; set; } = "";
-        public IEnumerable<EmailAttachment> Attachments { get; set; }
+        public IEnumerable<EmailAttachment> Attachments { get; set; } = Enumerable.Empty<EmailAttachment>();
 
         public string GetPreviewContent()
         {

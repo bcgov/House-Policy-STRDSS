@@ -40,7 +40,7 @@ Our CI/CD process is facilitated through GitHub Actions, ensuring seamless integ
    - Facilitates deployment of selected tag's images into the `Production` environment.
    - Triggered through the GitHub UI upon publishing a new release from a tag.
 
-1. [Create Version Tag with Changelog PR](./.github/workflows/create-tag-changelog-pr.yml):
+1. [Create Version Tag](./.github/workflows/create-tag.yml):
 
    - Supports for generating version tags.
    - Triggered through the GitHub UI, allowing specification of tag versions excluding prefixes.

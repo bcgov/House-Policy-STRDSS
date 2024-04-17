@@ -20,13 +20,13 @@
         public int PageCount => PageSize == 0 ? 1 : ((int)(TotalCount / PageSize) + (TotalCount % PageSize == 0 ? 0 : 1));
         public bool HasPreviousPage => PageNumber != 1;
         public bool HasNextPage => PageNumber < PageCount;
-        public string OrderBy { get; set; }
-        public string Direction { get; set; }
+        public string OrderBy { get; set; } = "";
+        public string Direction { get; set; } = "";
     }
 
     public class PagedDto<T>
     {
-        public IEnumerable<T> SourceList { get; set; }
-        public PageInfo PageInfo { get; set; }
+        public IEnumerable<T> SourceList { get; set; } = new List<T>();
+        public PageInfo PageInfo { get; set; } = null!;
     }
 }

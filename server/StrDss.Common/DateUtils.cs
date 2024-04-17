@@ -17,7 +17,7 @@ namespace StrDss.Common
             var formats = new string[] { "yyyyMMdd", "yyyy-MM-dd", "yyyy/MM/dd", "yyyy.MM.dd", "yyyyMd", "yyyy-M-d", "yyyy/M/dd", "yyyy.M.d" };
             var dateStr = val.ToString();
 
-            if (dateStr.IsEmpty())
+            if (dateStr!.IsEmpty())
                 return (true, null);
 
             return (DateTime.TryParseExact(dateStr, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate), parsedDate);

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data;
@@ -30,9 +31,10 @@ namespace StrDss.Service
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
         private IBceidApi _bceid;
+        private IConfiguration _config;
 
         public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBceidApi bceid)
+            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBceidApi bceid, IConfiguration config)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _userRepo = userRepo;
@@ -40,6 +42,7 @@ namespace StrDss.Service
             _emailService = emailService;
             _emailRepo = emailRepo;
             _bceid = bceid;
+            _config = config;
         }
 
         public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction)
@@ -61,21 +64,22 @@ namespace StrDss.Service
                 return errors;
             }
 
-            //if (_currentUser.IdentityProviderNm == StrDssIdProviders.BceidBusiness)
-            //{
-            //    var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
+            if (_currentUser.IdentityProviderNm == StrDssIdProviders.BceidBusiness)
+            {
+                var requestorGuid = new Guid(_config.GetValue<string>("SA_USER_GUID")!);
+                var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, requestorGuid, StrDssIdProviders.Idir);
 
-            //    if (account == null)
-            //    {
-            //        _logger.LogError($"BCeID call error: {error}");
-            //    }
+                if (account == null)
+                {
+                    _logger.LogError($"BCeID call error: {error}");
+                }
 
-            //    if (account != null)
-            //    {
-            //        _currentUser.FirstName = account.FirstName;
-            //        _currentUser.LastName = account.LastName;
-            //    }
-            //}
+                if (account != null)
+                {
+                    _currentUser.FirstName = account.FirstName;
+                    _currentUser.LastName = account.LastName;
+                }
+            }
 
             if (userDto == null)
             {

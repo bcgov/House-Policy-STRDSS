@@ -26,6 +26,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private string _TestUserName;
         private string _TestPassword;
         private bool _ExpectedResult = false;
+        AppSettings appSettings;
 
         public DenyAccessToSystem(SeleniumDriver Driver)
         {
@@ -34,9 +35,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDRLoginPage = new IDRLoginPage(_Driver);
 
-            AppSettings appSettings = new AppSettings();
-            _TestUserName = appSettings.GetValue("TestUserName") ?? string.Empty;
-            _TestPassword = appSettings.GetValue("TestPassword") ?? string.Empty;
+            appSettings = new AppSettings();
         }
 
         //User Authentication
@@ -55,9 +54,13 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When(@"I attempt to access the Data Sharing System as ""(.*)""")]
         public void IAttemptToAccessTheDataSharingSystem(string UserName)
         {
+            _TestUserName = UserName;
+            _TestPassword = appSettings.GetValue(_TestUserName) ?? string.Empty;
+
             _IDRLoginPage.UserNameTextBox.WaitFor(5);
 
-            _IDRLoginPage.UserNameTextBox.EnterText(UserName);
+            _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+
             _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
 
             _IDRLoginPage.ContinueButton.Click();
@@ -72,6 +75,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should see a specific message indicating that access is restricted")]
         public void IShouldSeeASpecificMessageIndicatingThatAccessIsRestricted()
         {
+            System.Threading.Thread.Sleep(1000);
            ClassicAssert.IsTrue(_LayoutPage.Driver.PageSource.Contains("401 Access Denied"));
         }
     }

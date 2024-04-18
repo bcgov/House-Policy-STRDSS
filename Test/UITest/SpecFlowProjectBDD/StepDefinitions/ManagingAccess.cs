@@ -19,7 +19,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
     public sealed class ManagingAccess
     {
         private IDriver _Driver;
-        private LandingPage _HomePage;
+        private LandingPage _LandingPage;
         private TermsAndConditionsPage _TermsAndConditionsPage;
         private ManagingAccessPage _ManagingAccessPage;
         private PathFinderPage _PathFinderPage;
@@ -28,30 +28,30 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private string _TestUserName;
         private string _TestPassword;
         private bool _ExpectedResult = false;
+        AppSettings _AppSettings;
 
         public ManagingAccess(SeleniumDriver Driver)
         {
             _Driver = Driver;
-            _HomePage = new LandingPage(_Driver);
+            _LandingPage = new LandingPage(_Driver);
             _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
             _ManagingAccessPage = new ManagingAccessPage(_Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDRLoginPage = new IDRLoginPage(_Driver);
-
-            AppSettings appSettings = new AppSettings();
-            _TestUserName = appSettings.GetValue("TestUserName") ?? string.Empty;
-            _TestPassword = appSettings.GetValue("TestPassword") ?? string.Empty;
+            _AppSettings = new AppSettings();
         }
 
         //User Authentication
         //[Given(@"I am an authenticated LG staff member and the expected result is ""(.*)""")]
-        [Given(@"that I am an authenticated government user and the expected result is ""(.*)""")]
-        public void GivenIAmAauthenticatedGovernmentUseer(string ExpectedResult)
+        [Given(@"that I am an authenticated government user ""(.*)"" and the expected result is ""(.*)""")]
+        public void GivenIAmAauthenticatedGovernmentUseer(string UserName, string ExpectedResult)
         {
+            _TestUserName = UserName;
+            _TestPassword = _AppSettings.GetValue(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
   
-            _Driver.Url = "http://127.0.0.1:4200/user-management";
+            _Driver.Url = "http://127.0.0.1:4200";
             _Driver.Navigate();
 
             _PathFinderPage.IDRButton.Click();
@@ -59,6 +59,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _IDRLoginPage.UserNameTextBox.WaitFor(5);
 
             _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+
             _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
 
             _IDRLoginPage.ContinueButton.Click();
@@ -82,6 +83,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("I access the administrative interface of the system")]
         public void IAccessTheAdministrativeInterfaceOfTheSystem()
         {
+            _LandingPage.ManageAccessRequestsButton.Click();
         }
 
         [Then("There should be a dedicated section for managing user access requests")]

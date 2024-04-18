@@ -5,30 +5,22 @@ namespace Configuration
 {
     public class AppSettings
     {
-        IConfiguration _Configuration;
+        IConfiguration configuration;
         string environment;
+        IConfigurationSection usersSection;
 
         public AppSettings()
         {
             environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Local";
-            _Configuration = new ConfigurationBuilder().AddJsonFile($"Appsettings.{environment}.json", optional: true, reloadOnChange: true).Build();
+            configuration = new ConfigurationBuilder().AddJsonFile($"Appsettings.{environment}.json", optional: true, reloadOnChange: true).Build();
+            usersSection = configuration.GetSection("Users");
         }
 
-        public string GetValue(string Variable)
+        public string GetValue(string Key)
         {
-            string variableValue = _Configuration[Variable];
-
-            if (variableValue != null)
-            {
-                return (variableValue);
-            }
-            else
-            {
-                return (null);
-            }
+            return (usersSection[Key]);
         }
 
     }
-
 }
 

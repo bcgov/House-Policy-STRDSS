@@ -28,8 +28,7 @@ namespace StrDss.Service
 
         protected string GetHostUrl()
         {
-            var request = _httpContextAccessor?.HttpContext?.Request;
-            return $"{request?.Scheme}://{request?.Host}";
+            return Environment.GetEnvironmentVariable("APP_BASE_URL") ?? "";
         }
     }
 }

@@ -8,10 +8,10 @@ USING ( SELECT * FROM (VALUES
 AS s (access_request_status_cd, access_request_status_nm)
 ) AS src
 ON (tgt.access_request_status_cd=src.access_request_status_cd)
-WHEN MATCHED
+WHEN MATCHED and tgt.access_request_status_nm!=src.access_request_status_nm
 THEN UPDATE SET
 access_request_status_nm=src.access_request_status_nm
-WHEN NOT MATCHED
+WHEN NOT matched
 THEN INSERT (access_request_status_cd, access_request_status_nm)
 VALUES (src.access_request_status_cd, src.access_request_status_nm);
 
@@ -28,7 +28,7 @@ USING ( SELECT * FROM (VALUES
 AS s (email_message_type, email_message_type_nm)
 ) AS src
 ON (tgt.email_message_type=src.email_message_type)
-WHEN MATCHED
+WHEN matched and tgt.email_message_type_nm!=src.email_message_type_nm
 THEN UPDATE SET
 email_message_type_nm=src.email_message_type_nm
 WHEN NOT MATCHED
@@ -52,13 +52,13 @@ VALUES (src.email_message_type, src.message_reason_dsc);
 
 MERGE INTO dss_organization_type AS tgt
 USING ( SELECT * FROM (VALUES
-('BCGov','BC Government Component'),
+('BCGov','BC Government Staff'),
 ('LG','Local Government'),
-('Platform','Short Term Rental Platform'))
+('Platform','Short-term Rental Platform'))
 AS s (organization_type, organization_type_nm)
 ) AS src
 ON (tgt.organization_type=src.organization_type)
-WHEN MATCHED
+WHEN matched and tgt.organization_type_nm!=src.organization_type_nm
 THEN UPDATE SET
 organization_type_nm=src.organization_type_nm
 WHEN NOT MATCHED
@@ -78,7 +78,7 @@ USING ( SELECT * FROM (VALUES
 AS s (user_privilege_cd, user_privilege_nm)
 ) AS src
 ON (tgt.user_privilege_cd=src.user_privilege_cd)
-WHEN MATCHED
+WHEN matched and tgt.user_privilege_nm!=src.user_privilege_nm
 THEN UPDATE SET
 user_privilege_nm=src.user_privilege_nm
 WHEN NOT MATCHED
@@ -95,7 +95,7 @@ USING ( SELECT * FROM (VALUES
 AS s (user_role_cd, user_role_nm)
 ) AS src
 ON (tgt.user_role_cd=src.user_role_cd)
-WHEN MATCHED
+WHEN matched and tgt.user_role_nm!=src.user_role_nm
 THEN UPDATE SET
 user_role_nm=src.user_role_nm
 WHEN NOT MATCHED
@@ -135,10 +135,13 @@ USING ( SELECT * FROM (VALUES
 ('Platform','PLATFORMTEST','Test Platform'))
 AS s (organization_type, organization_cd, organization_nm)
 ) AS src
-ON (tgt.organization_cd=src.organization_cd AND tgt.organization_type=src.organization_type)
-WHEN MATCHED
+ON (tgt.organization_cd=src.organization_cd)
+WHEN matched and (
+tgt.organization_nm!=src.organization_nm or
+tgt.organization_type!=src.organization_type)
 THEN UPDATE SET
-organization_nm=src.organization_nm
+organization_nm=src.organization_nm,
+organization_type=src.organization_type
 WHEN NOT MATCHED
 THEN INSERT (organization_type, organization_cd, organization_nm)
 VALUES (src.organization_type, src.organization_cd, src.organization_nm);

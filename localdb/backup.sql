@@ -2080,13 +2080,15 @@ ALTER TABLE ONLY hangfire.state ALTER COLUMN id SET DEFAULT nextval('hangfire.st
 --
 
 COPY hangfire.aggregatedcounter (id, key, value, expireat) FROM stdin;
-3	stats:deleted:2024-04-11-17	1	2024-04-12 17:55:13.604416+00
-1	stats:succeeded:2024-04-11-17	3	2024-04-12 17:58:44.623891+00
-15	stats:deleted:2024-04-11-18	2	2024-04-12 18:34:56.520382+00
+2	stats:deleted	11	\N
+30	stats:succeeded:2024-04-15	8	2024-05-15 17:44:09.884482+00
+42	stats:deleted:2024-04-15	8	2024-05-15 17:43:26.576377+00
+73	stats:succeeded:2024-04-16-21	1	2024-04-17 21:11:00.239769+00
+75	stats:succeeded:2024-04-16	1	2024-05-16 21:10:59.239769+00
+76	stats:succeeded:2024-04-17-16	1	2024-04-18 16:29:15.303124+00
+77	stats:succeeded:2024-04-17	1	2024-05-17 16:29:14.303124+00
+5	stats:succeeded	22	\N
 4	stats:deleted:2024-04-11	3	2024-05-11 18:34:55.520382+00
-10	stats:succeeded:2024-04-11-18	9	2024-04-12 18:36:16.0147+00
-2	stats:deleted	3	\N
-5	stats:succeeded	12	\N
 6	stats:succeeded:2024-04-11	12	2024-05-11 18:36:15.0147+00
 \.
 
@@ -2109,10 +2111,10 @@ COPY hangfire.hash (id, key, field, value, expireat, updatecount) FROM stdin;
 4	recurring-job:Process Takedown Request Batch Emails	Job	{"t":"StrDss.Service.Hangfire.HangfireJobs, StrDss.Service","m":"ProcessTakedownRequestBatchEmails"}	\N	0
 5	recurring-job:Process Takedown Request Batch Emails	CreatedAt	1712857641457	\N	0
 7	recurring-job:Process Takedown Request Batch Emails	V	2	\N	0
-8	recurring-job:Process Takedown Request Batch Emails	LastExecution	1712860571700	\N	0
-9	recurring-job:Process Takedown Request Batch Emails	LastJobId	15	\N	0
+8	recurring-job:Process Takedown Request Batch Emails	LastExecution	1713371353242	\N	0
+6	recurring-job:Process Takedown Request Batch Emails	NextExecution	1713455400000	\N	0
+9	recurring-job:Process Takedown Request Batch Emails	LastJobId	34	\N	0
 2	recurring-job:Process Takedown Request Batch Emails	Cron	50 15 * * *	\N	0
-6	recurring-job:Process Takedown Request Batch Emails	NextExecution	1712937000000	\N	0
 \.
 
 
@@ -2121,21 +2123,8 @@ COPY hangfire.hash (id, key, field, value, expireat, updatecount) FROM stdin;
 --
 
 COPY hangfire.job (id, stateid, statename, invocationdata, arguments, createdat, expireat, updatecount) FROM stdin;
-1	3	Deleted	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 17:47:54.028454+00	2024-04-12 17:55:13.604416+00	0
-12	36	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:22:43.45081+00	2024-04-12 18:23:06.485136+00	0
-14	42	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:35:11.598545+00	2024-04-12 18:35:26.301796+00	0
-2	6	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 17:55:15.59473+00	2024-04-12 17:55:17.338254+00	0
-13	39	Deleted	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:24:06.512758+00	2024-04-12 18:34:56.520382+00	0
-3	9	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 17:56:44.995052+00	2024-04-12 17:57:38.865219+00	0
-5	15	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:11:32.102007+00	2024-04-12 18:12:07.524536+00	0
-4	12	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 17:58:08.899444+00	2024-04-12 17:58:44.623891+00	0
-15	45	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:36:11.708779+00	2024-04-12 18:36:16.0147+00	0
-6	18	Deleted	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:12:14.720048+00	2024-04-12 18:18:06.681684+00	0
-7	21	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:18:46.365165+00	2024-04-12 18:18:51.404847+00	0
-8	24	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:19:08.495172+00	2024-04-12 18:19:10.194231+00	0
-9	27	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:21:17.663211+00	2024-04-12 18:21:18.780659+00	0
-10	30	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:21:34.679216+00	2024-04-12 18:21:35.03162+00	0
-11	33	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-11 18:22:02.779692+00	2024-04-12 18:22:02.978571+00	0
+33	98	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-16 21:10:59.1403+00	2024-04-17 21:11:00.239769+00	0
+34	101	Succeeded	{"Type": "StrDss.Service.Hangfire.HangfireJobs, StrDss.Service", "Method": "ProcessTakedownRequestBatchEmails", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2024-04-17 16:29:13.315985+00	2024-04-18 16:29:15.303124+00	0
 \.
 
 
@@ -2144,66 +2133,14 @@ COPY hangfire.job (id, stateid, statename, invocationdata, arguments, createdat,
 --
 
 COPY hangfire.jobparameter (id, jobid, name, value, updatecount) FROM stdin;
-1	1	RecurringJobId	"Process Takedown Request Batch Emails"	0
-2	1	Time	1712857656	0
-3	1	CurrentCulture	"en-CA"	0
-4	1	CurrentUICulture	"en-US"	0
-5	2	RecurringJobId	"Process Takedown Request Batch Emails"	0
-6	2	Time	1712858115	0
-7	2	CurrentCulture	"en-CA"	0
-8	2	CurrentUICulture	"en-US"	0
-9	3	RecurringJobId	"Process Takedown Request Batch Emails"	0
-10	3	Time	1712858204	0
-11	3	CurrentCulture	"en-CA"	0
-12	3	CurrentUICulture	"en-US"	0
-13	4	RecurringJobId	"Process Takedown Request Batch Emails"	0
-14	4	Time	1712858288	0
-15	4	CurrentCulture	"en-CA"	0
-16	4	CurrentUICulture	"en-US"	0
-17	5	RecurringJobId	"Process Takedown Request Batch Emails"	0
-18	5	Time	1712859092	0
-19	5	CurrentCulture	"en-CA"	0
-20	5	CurrentUICulture	"en-US"	0
-21	6	RecurringJobId	"Process Takedown Request Batch Emails"	0
-22	6	Time	1712859127	0
-23	6	CurrentCulture	"en-CA"	0
-24	6	CurrentUICulture	"en-US"	0
-25	7	RecurringJobId	"Process Takedown Request Batch Emails"	0
-26	7	Time	1712859526	0
-27	7	CurrentCulture	"en-CA"	0
-28	7	CurrentUICulture	"en-US"	0
-29	8	RecurringJobId	"Process Takedown Request Batch Emails"	0
-30	8	Time	1712859548	0
-31	8	CurrentCulture	"en-CA"	0
-32	8	CurrentUICulture	"en-US"	0
-33	9	RecurringJobId	"Process Takedown Request Batch Emails"	0
-34	9	Time	1712859677	0
-35	9	CurrentCulture	"en-CA"	0
-36	9	CurrentUICulture	"en-US"	0
-37	10	RecurringJobId	"Process Takedown Request Batch Emails"	0
-38	10	Time	1712859694	0
-39	10	CurrentCulture	"en-CA"	0
-40	10	CurrentUICulture	"en-US"	0
-41	11	RecurringJobId	"Process Takedown Request Batch Emails"	0
-42	11	Time	1712859722	0
-43	11	CurrentCulture	"en-CA"	0
-44	11	CurrentUICulture	"en-US"	0
-45	12	RecurringJobId	"Process Takedown Request Batch Emails"	0
-46	12	Time	1712859763	0
-47	12	CurrentCulture	"en-CA"	0
-48	12	CurrentUICulture	"en-US"	0
-49	13	RecurringJobId	"Process Takedown Request Batch Emails"	0
-50	13	Time	1712859846	0
-51	13	CurrentCulture	"en-CA"	0
-52	13	CurrentUICulture	"en-US"	0
-53	14	RecurringJobId	"Process Takedown Request Batch Emails"	0
-54	14	Time	1712860511	0
-55	14	CurrentCulture	"en-CA"	0
-56	14	CurrentUICulture	"en-US"	0
-57	15	RecurringJobId	"Process Takedown Request Batch Emails"	0
-58	15	Time	1712860571	0
-59	15	CurrentCulture	"en-CA"	0
-60	15	CurrentUICulture	"en-US"	0
+133	34	RecurringJobId	"Process Takedown Request Batch Emails"	0
+134	34	Time	1713371353	0
+135	34	CurrentCulture	"en-CA"	0
+136	34	CurrentUICulture	"en-US"	0
+129	33	RecurringJobId	"Process Takedown Request Batch Emails"	0
+130	33	Time	1713301859	0
+131	33	CurrentCulture	"en-CA"	0
+132	33	CurrentUICulture	"en-US"	0
 \.
 
 
@@ -2245,10 +2182,9 @@ COPY hangfire.schema (version) FROM stdin;
 --
 
 COPY hangfire.server (id, data, lastheartbeat, updatecount) FROM stdin;
-cnd2214638-n:54284:9109c3bb-a687-439a-9b64-614ed596711e	{"Queues": ["default"], "StartedAt": "2024-04-11T20:41:53.9151808Z", "WorkerCount": 1}	2024-04-11 20:45:26.655693+00	0
-cnd2214638-n:47476:0b807860-a2fd-4d2f-b917-91d0a39b20d6	{"Queues": ["default"], "StartedAt": "2024-04-11T20:47:00.5248304Z", "WorkerCount": 1}	2024-04-11 20:47:30.59592+00	0
-cnd2214638-n:19496:47e5f672-0c15-43a0-9824-70411d102158	{"Queues": ["default"], "StartedAt": "2024-04-11T20:48:06.2498245Z", "WorkerCount": 1}	2024-04-11 20:48:36.293226+00	0
-cnd2214638-n:13724:2681d550-5bef-4987-826b-ad61b8ddca74	{"Queues": ["default"], "StartedAt": "2024-04-11T20:50:08.7500549Z", "WorkerCount": 1}	2024-04-11 20:51:38.80277+00	0
+cnd2214638-n:46624:73474e68-e344-4a2a-8246-fe0066c70d40	{"Queues": ["default"], "StartedAt": "2024-04-17T19:40:06.0344352Z", "WorkerCount": 1}	2024-04-17 19:43:06.251044+00	0
+cnd2214638-n:25576:79e467ce-729c-4c68-b301-ff49baec0d54	{"Queues": ["default"], "StartedAt": "2024-04-17T19:43:36.8927863Z", "WorkerCount": 1}	2024-04-17 19:44:48.783287+00	0
+cnd2214638-n:20328:2aa4afc1-f927-4f79-8fda-5dfc90f06a0b	{"Queues": ["default"], "StartedAt": "2024-04-17T19:45:30.7018359Z", "WorkerCount": 1}	2024-04-17 19:48:03.62583+00	0
 \.
 
 
@@ -2257,7 +2193,7 @@ cnd2214638-n:13724:2681d550-5bef-4987-826b-ad61b8ddca74	{"Queues": ["default"], 
 --
 
 COPY hangfire.set (id, key, score, value, expireat, updatecount) FROM stdin;
-1	recurring-jobs	1712937000	Process Takedown Request Batch Emails	\N	0
+1	recurring-jobs	1713455400	Process Takedown Request Batch Emails	\N	0
 \.
 
 
@@ -2266,51 +2202,12 @@ COPY hangfire.set (id, key, score, value, expireat, updatecount) FROM stdin;
 --
 
 COPY hangfire.state (id, jobid, name, reason, createdat, data, updatecount) FROM stdin;
-1	1	Enqueued	Triggered using recurring job manager	2024-04-11 17:47:54.053058+00	{"Queue": "default", "EnqueuedAt": "1712857674046"}	0
-2	1	Processing	\N	2024-04-11 17:47:54.084465+00	{"ServerId": "cnd2214638-n:45932:c222be9f-867d-441f-85c8-eb700c2096bd", "WorkerId": "bebdee8b-8642-446f-8854-6f0d6f6b397a", "StartedAt": "1712857674069"}	0
-3	1	Deleted	\N	2024-04-11 17:55:13.60659+00	{"DeletedAt": "1712858113577"}	0
-4	2	Enqueued	Triggered by recurring job scheduler	2024-04-11 17:55:15.605703+00	{"Queue": "default", "EnqueuedAt": "1712858115604"}	0
-5	2	Processing	\N	2024-04-11 17:55:15.622546+00	{"ServerId": "cnd2214638-n:58272:012e7565-ce00-42b7-9753-6a2c53afd42d", "WorkerId": "a0581633-2519-4429-a216-e8b3bb9144e2", "StartedAt": "1712858115617"}	0
-6	2	Succeeded	\N	2024-04-11 17:55:17.339288+00	{"Latency": "34", "SucceededAt": "1712858117331", "PerformanceDuration": "1702"}	0
-7	3	Enqueued	Triggered by recurring job scheduler	2024-04-11 17:56:45.025508+00	{"Queue": "default", "EnqueuedAt": "1712858205018"}	0
-8	3	Processing	\N	2024-04-11 17:56:45.057353+00	{"ServerId": "cnd2214638-n:14340:0a897b2d-5acd-4fa0-9a9a-a19308405328", "WorkerId": "1768f50b-9979-48f5-97dc-b4fa05d55e2b", "StartedAt": "1712858205045"}	0
-9	3	Succeeded	\N	2024-04-11 17:57:38.866774+00	{"Latency": "68", "SucceededAt": "1712858258853", "PerformanceDuration": "53790"}	0
-10	4	Enqueued	Triggered by recurring job scheduler	2024-04-11 17:58:08.904988+00	{"Queue": "default", "EnqueuedAt": "1712858288904"}	0
-11	4	Processing	\N	2024-04-11 17:58:08.917531+00	{"ServerId": "cnd2214638-n:14340:0a897b2d-5acd-4fa0-9a9a-a19308405328", "WorkerId": "1768f50b-9979-48f5-97dc-b4fa05d55e2b", "StartedAt": "1712858288913"}	0
-12	4	Succeeded	\N	2024-04-11 17:58:44.625015+00	{"Latency": "23", "SucceededAt": "1712858324616", "PerformanceDuration": "35694"}	0
-13	5	Enqueued	Triggered by recurring job scheduler	2024-04-11 18:11:32.134153+00	{"Queue": "default", "EnqueuedAt": "1712859092123"}	0
-14	5	Processing	\N	2024-04-11 18:11:32.16724+00	{"ServerId": "cnd2214638-n:31608:2a8ed5bc-0846-48cc-965c-fe2309d42a52", "WorkerId": "2a59c132-78a3-456f-a201-3f790ceee400", "StartedAt": "1712859092155"}	0
-15	5	Succeeded	\N	2024-04-11 18:12:07.52609+00	{"Latency": "71", "SucceededAt": "1712859127514", "PerformanceDuration": "35341"}	0
-16	6	Enqueued	Triggered by recurring job scheduler	2024-04-11 18:12:14.725614+00	{"Queue": "default", "EnqueuedAt": "1712859134725"}	0
-17	6	Processing	\N	2024-04-11 18:12:14.739801+00	{"ServerId": "cnd2214638-n:31608:2a8ed5bc-0846-48cc-965c-fe2309d42a52", "WorkerId": "2a59c132-78a3-456f-a201-3f790ceee400", "StartedAt": "1712859134734"}	0
-18	6	Deleted	\N	2024-04-11 18:18:06.68313+00	{"DeletedAt": "1712859486666"}	0
-19	7	Enqueued	Triggered using recurring job manager	2024-04-11 18:18:46.375938+00	{"Queue": "default", "EnqueuedAt": "1712859526374"}	0
-20	7	Processing	\N	2024-04-11 18:18:46.390946+00	{"ServerId": "cnd2214638-n:45816:86076005-2808-45b6-bc53-ed3761ebdeab", "WorkerId": "84736896-ebcd-435b-9f91-c2cb5800452e", "StartedAt": "1712859526385"}	0
-21	7	Succeeded	\N	2024-04-11 18:18:51.405826+00	{"Latency": "32", "SucceededAt": "1712859531398", "PerformanceDuration": "5001"}	0
-22	8	Enqueued	Triggered by recurring job scheduler	2024-04-11 18:19:08.501165+00	{"Queue": "default", "EnqueuedAt": "1712859548500"}	0
-23	8	Processing	\N	2024-04-11 18:19:08.514392+00	{"ServerId": "cnd2214638-n:45816:86076005-2808-45b6-bc53-ed3761ebdeab", "WorkerId": "84736896-ebcd-435b-9f91-c2cb5800452e", "StartedAt": "1712859548510"}	0
-24	8	Succeeded	\N	2024-04-11 18:19:10.195233+00	{"Latency": "25", "SucceededAt": "1712859550188", "PerformanceDuration": "1668"}	0
-25	9	Enqueued	Triggered by recurring job scheduler	2024-04-11 18:21:17.697441+00	{"Queue": "default", "EnqueuedAt": "1712859677685"}	0
-26	9	Processing	\N	2024-04-11 18:21:17.73223+00	{"ServerId": "cnd2214638-n:56140:4017c3a8-3557-48d8-8cd4-942ca2f1caaa", "WorkerId": "79c5e716-4b0d-4fd5-b626-0ced4024183f", "StartedAt": "1712859677719"}	0
-27	9	Succeeded	\N	2024-04-11 18:21:18.78211+00	{"Latency": "75", "SucceededAt": "1712859678768", "PerformanceDuration": "1029"}	0
-28	10	Enqueued	Triggered using recurring job manager	2024-04-11 18:21:34.684951+00	{"Queue": "default", "EnqueuedAt": "1712859694684"}	0
-29	10	Processing	\N	2024-04-11 18:21:34.69889+00	{"ServerId": "cnd2214638-n:56140:4017c3a8-3557-48d8-8cd4-942ca2f1caaa", "WorkerId": "79c5e716-4b0d-4fd5-b626-0ced4024183f", "StartedAt": "1712859694694"}	0
-30	10	Succeeded	\N	2024-04-11 18:21:35.032614+00	{"Latency": "24", "SucceededAt": "1712859695025", "PerformanceDuration": "321"}	0
-31	11	Enqueued	Triggered by recurring job scheduler	2024-04-11 18:22:02.784144+00	{"Queue": "default", "EnqueuedAt": "1712859722783"}	0
-32	11	Processing	\N	2024-04-11 18:22:02.797339+00	{"ServerId": "cnd2214638-n:56140:4017c3a8-3557-48d8-8cd4-942ca2f1caaa", "WorkerId": "79c5e716-4b0d-4fd5-b626-0ced4024183f", "StartedAt": "1712859722793"}	0
-33	11	Succeeded	\N	2024-04-11 18:22:02.979277+00	{"Latency": "23", "SucceededAt": "1712859722973", "PerformanceDuration": "170"}	0
-34	12	Enqueued	Triggered using recurring job manager	2024-04-11 18:22:43.455547+00	{"Queue": "default", "EnqueuedAt": "1712859763455"}	0
-35	12	Processing	\N	2024-04-11 18:22:43.468876+00	{"ServerId": "cnd2214638-n:56140:4017c3a8-3557-48d8-8cd4-942ca2f1caaa", "WorkerId": "79c5e716-4b0d-4fd5-b626-0ced4024183f", "StartedAt": "1712859763463"}	0
-36	12	Succeeded	\N	2024-04-11 18:23:06.486009+00	{"Latency": "22", "SucceededAt": "1712859786465", "PerformanceDuration": "22991"}	0
-37	13	Enqueued	Triggered by recurring job scheduler	2024-04-11 18:24:06.517294+00	{"Queue": "default", "EnqueuedAt": "1712859846517"}	0
-38	13	Processing	\N	2024-04-11 18:24:06.529696+00	{"ServerId": "cnd2214638-n:56140:4017c3a8-3557-48d8-8cd4-942ca2f1caaa", "WorkerId": "79c5e716-4b0d-4fd5-b626-0ced4024183f", "StartedAt": "1712859846525"}	0
-39	13	Deleted	\N	2024-04-11 18:34:56.523032+00	{"DeletedAt": "1712860496488"}	0
-40	14	Enqueued	Triggered by recurring job scheduler	2024-04-11 18:35:11.609508+00	{"Queue": "default", "EnqueuedAt": "1712860511608"}	0
-41	14	Processing	\N	2024-04-11 18:35:11.62543+00	{"ServerId": "cnd2214638-n:14400:233720db-6c19-43a4-a1a5-09462d923257", "WorkerId": "569863a7-9c84-41ea-8b78-d5cc513b5e0a", "StartedAt": "1712860511620"}	0
-42	14	Succeeded	\N	2024-04-11 18:35:26.30269+00	{"Latency": "32", "SucceededAt": "1712860526295", "PerformanceDuration": "14663"}	0
-43	15	Enqueued	Triggered by recurring job scheduler	2024-04-11 18:36:11.715366+00	{"Queue": "default", "EnqueuedAt": "1712860571714"}	0
-44	15	Processing	\N	2024-04-11 18:36:11.731649+00	{"ServerId": "cnd2214638-n:14400:233720db-6c19-43a4-a1a5-09462d923257", "WorkerId": "569863a7-9c84-41ea-8b78-d5cc513b5e0a", "StartedAt": "1712860571726"}	0
-45	15	Succeeded	\N	2024-04-11 18:36:16.015644+00	{"Latency": "29", "SucceededAt": "1712860576008", "PerformanceDuration": "4270"}	0
+99	34	Enqueued	Triggered by recurring job scheduler	2024-04-17 16:29:13.355148+00	{"Queue": "default", "EnqueuedAt": "1713371353344"}	0
+101	34	Succeeded	\N	2024-04-17 16:29:15.306095+00	{"Latency": "80", "SucceededAt": "1713371355291", "PerformanceDuration": "1894"}	0
+100	34	Processing	\N	2024-04-17 16:29:13.390588+00	{"ServerId": "cnd2214638-n:33668:46358936-09f2-4c9a-bbd5-4298dc646511", "WorkerId": "f526f147-990f-4258-929a-bdc57e9827d9", "StartedAt": "1713371353377"}	0
+96	33	Enqueued	Triggered by recurring job scheduler	2024-04-16 21:10:59.180976+00	{"Queue": "default", "EnqueuedAt": "1713301859170"}	0
+97	33	Processing	\N	2024-04-16 21:10:59.216923+00	{"ServerId": "cnd2214638-n:32996:cb347de5-45bd-40d9-a346-87ab946a4947", "WorkerId": "fbb8026e-5018-4a29-8c06-41f046eb60c4", "StartedAt": "1713301859204"}	0
+98	33	Succeeded	\N	2024-04-16 21:11:00.242309+00	{"Latency": "82", "SucceededAt": "1713301860229", "PerformanceDuration": "1005"}	0
 \.
 
 
@@ -2330,7 +2227,26 @@ Approved	Approved
 --
 
 COPY public.dss_email_message (email_message_id, email_message_type, message_delivery_dtm, message_template_dsc, is_host_contacted_externally, is_submitter_cc_required, message_reason_id, lg_phone_no, unreported_listing_no, host_email_address_dsc, lg_email_address_dsc, cc_email_address_dsc, unreported_listing_url, lg_str_bylaw_url, initiating_user_identity_id, affected_by_user_identity_id, involved_in_organization_id, batching_email_message_id, requesting_organization_id, external_message_no, upd_dtm, upd_user_guid) FROM stdin;
-33	Access Requested	2024-04-11 20:51:36.645789+00	New access request has been raised and requires review. http://127.0.0.1:5174	f	f	\N	\N	\N	\N	\N	\N	\N	\N	41	41	\N	\N	\N	341a994e-8748-46ed-9dfe-6a781cfa9d5a	2024-04-11 20:51:36.583229+00	bc3577d3-f3f8-4687-a093-4594fa43f679
+34	Access Requested	2024-04-11 22:26:19.391757+00	New access request has been raised and requires review. http://127.0.0.1:5174	f	f	\N	\N	\N	\N	\N	\N	\N	\N	42	42	\N	\N	\N	a1514b5c-2db1-4188-a95e-37e3ff3f3b64	2024-04-11 22:26:19.325271+00	bc3577d3-f3f8-4687-a093-4594fa43f679
+53	Access Denied	2024-04-17 16:39:59.643702+00	Access to the STR Data Portal is restricted to authorized provincial and local government staff and short-term rental platforms. Please contact young-jin.1.chung@gov.bc.ca for more information.	f	f	\N	\N	\N	\N	\N	\N	\N	\N	18	47	\N	\N	\N	3837ff5b-b2bd-4fca-abce-5533e6880132	2024-04-17 16:39:59.73302+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
+39	Batch Takedown Request	2024-04-15 15:27:38.96863+00	\r\nThe short-term rental listings in the attached file are the subject of a request by a local government described under s. 18(3) of the Short-Term Rental Accommodations Act and s. 16 of the Short-Term Rental Accommodations Regulation. <br/><br/>\r\nA “takedown request” (a request for a platform to cease providing platform services, e.g., removing a listing) has been submitted for each of these listings by the respective local government via the Province of British Columbia’s Short-term Rental (STR) Data Portal.<br/><br/>\r\nIn accordance with s. 18(3) of the Short-Term Rental Accommodations Act and s. 16 (3) of the Short-Term Rental Accommodations Regulation, please cease providing platform services in respect of the attached platform offers within 5 days from the date of receipt of this request.<br/><br/>\r\nFailure to comply with this request could result in enforcement actions or penalties under the Short-Term Rental Accommodations Act.<br/><br/>\r\nFor more information on these requests, or local government short-term rental business licences, please contact the local government.<br/><br/>\r\nFor more information on the Short-term Rental Accommodations Act, please visit: <a href='https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals'>New rules for short-term rentals - Province of British Columbia (gov.bc.ca)</a><br/><br/>\r\nThis email has been automatically generated. Please do not reply to this email.\r\n	f	f	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2	\N	\N	43ae1eaa-5a2a-40d6-8b0e-279a08f8fb72	2024-04-15 15:27:39.537273+00	00000000-0000-0000-0000-000000000000
+37	Takedown Request	2024-04-15 15:17:15.798936+00	\r\n<b>A takedown request for the following short-term rental listing was submitted to the STR Data Portal and will be delivered to the respective short-term rental platform at 11:50pm PST tonight:</b><br/><br/>\r\n<b>https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab</b><br/><br/>\r\nListing ID Number: <b>1</b><br/><br/>\r\nUnder the Short-Term Rental Accommodations Act and its regulations, the platform is required to comply with the request within 5 days from the date of receipt of the request. If the platform fails to comply with the request (e.g., remove the listing), local governments can escalate the matter to the Director of the Provincial STR Compliance and Enforcement Unit at: <a href='mailto: CEUescalations@gov.bc.ca'>CEUescalations@gov.bc.ca</a>.<br/><br/>\r\nThis email has been automatically generated. Please do not reply to this email.\r\n	f	t	\N	\N	1	\N	\N	young-jin.1.chung@gov.bc.ca	https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab	\N	18	\N	2	39	1	1442b233-4795-49b8-9438-4b4c4276593c	2024-04-15 15:27:39.537273+00	00000000-0000-0000-0000-000000000000
+54	Access Granted	2024-04-17 16:40:19.725013+00	You have been granted access to the Short Term Rental Data Portal. Please access the portal here: http://127.0.0.1:4200. If you have any issues accessing this link, please contact young-jin.1.chung@gov.bc.ca.	f	f	\N	\N	\N	\N	\N	\N	\N	\N	18	42	\N	\N	\N	6909a946-e79b-43e6-b3d7-173faa0ce5be	2024-04-17 16:40:19.808691+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
+38	Takedown Request	2024-04-15 15:21:01.965741+00	\r\nA takedown request for the following short-term rental listing was submitted to the Province of B.C.’s Short-term Rental Data Portal and will be delivered to the platform at 11:50pm PST tonight:<br/><br/>\r\n<b>https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab</b><br/><br/>\r\nListing ID Number: <b>1</b><br/><br/>\r\nUnder the <a href='https://www.bclaws.gov.bc.ca/civix/document/id/bills/billsprevious/4th42nd:gov35-1'>Short-Term Rental Accommodations Act</a> and its regulations, the platform is required to comply with the request within 5 days from the date of receipt of the request. If the platform fails to comply with the request (e.g., remove the listing), local governments can escalate the matter to the Director of the Provincial STR Compliance and Enforcement Unit at: <a href='mailto: CEUescalations@gov.bc.ca'>CEUescalations@gov.bc.ca</a>.<br/><br/>\r\nThis email has been automatically generated. Please do not reply to this email.\r\n	f	t	\N	\N	1	\N	\N	young-jin.1.chung@gov.bc.ca	https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab	\N	18	\N	2	39	1	e2325ecf-cf12-4f33-bdd6-248ad2c4ac4e	2024-04-15 15:27:39.537273+00	00000000-0000-0000-0000-000000000000
+41	Batch Takedown Request	2024-04-15 15:55:58.243537+00	\r\nThe short-term rental listings in the attached file are the subject of a request by a local government described under s. 18(3) of the <i>Short-Term Rental Accommodations Act</i> and s. 16 of the <i>Short-Term Rental Accommodations Regulation</i>. <br/><br/>\r\nA “takedown request” (a request for a platform to cease providing platform services, e.g., removing a listing) has been submitted for each of these listings by the respective local government via the Province of British Columbia’s Short-term Rental (STR) Data Portal.<br/><br/>\r\nIn accordance with s. 18(3) of the <i>Short-Term Rental Accommodations Act</i> and s. 16 (3) of the <i>Short-Term Rental Accommodations Regulation</i>, please cease providing platform services in respect of the attached platform offers within 5 days from the date of receipt of this request.<br/><br/>\r\nFailure to comply with this request could result in enforcement actions or penalties under the <i>Short-Term Rental Accommodations Act</i>.<br/><br/>\r\nFor more information on these requests, or local government short-term rental business licences, please contact the local government.<br/><br/>\r\nFor more information on the <i>Short-term Rental Accommodations Act</i>, please visit: <a href='https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals'>New rules for short-term rentals - Province of British Columbia (gov.bc.ca)</a><br/><br/>\r\nThis email has been automatically generated. Please do not reply to this email.\r\n\r\nAttachments: VXJsLExpc3RpbmdJZCxSZXF1ZXN0ZWRCeQ0KaHR0cHM6Ly93d3cuYWlyYm5iLmNvbS9yb29tcy8xNjEyMDM4OD9jaGVja19pbj0yMDI0LTA0LTI1JmFtcDtjaGVja19vdXQ9MjAyNC0wNC0yNyZhbXA7Z3Vlc3RzPTEmYW1wO2FkdWx0cz0xJmFtcDtzPTY3JmFtcDt1bmlxdWVfc2hhcmVfaWQ9ZmExMDdkMjQtYjBkZi00OWJkLTkxZTQtNTc2ZGQ3ZDM2OGFiLDEsVGVzdCBUb3duDQo=	f	f	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2	\N	\N	e4ddde0d-c721-40a6-bb6f-3e2fe6678979	2024-04-15 15:55:58.33391+00	00000000-0000-0000-0000-000000000000
+40	Takedown Request	2024-04-15 15:55:28.485897+00	\r\nA takedown request for the following short-term rental listing was submitted to the Province of B.C.’s Short-term Rental Data Portal and will be delivered to the platform at 11:50pm PST tonight:<br/><br/>\r\n<b>https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab</b><br/><br/>\r\nListing ID Number: <b>1</b><br/><br/>\r\nUnder the <a href='https://www.bclaws.gov.bc.ca/civix/document/id/bills/billsprevious/4th42nd:gov35-1'>Short-Term Rental Accommodations Act</a> and its regulations, the platform is required to comply with the request within 5 days from the date of receipt of the request. If the platform fails to comply with the request (e.g., remove the listing), local governments can escalate the matter to the Director of the Provincial STR Compliance and Enforcement Unit at: <a href='mailto: CEUescalations@gov.bc.ca'>CEUescalations@gov.bc.ca</a>.<br/><br/>\r\nThis email has been automatically generated. Please do not reply to this email.\r\n	f	t	\N	\N	1	\N	\N	young-jin.1.chung@gov.bc.ca	https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab	\N	18	\N	2	41	1	be6534a0-59b9-461f-bcfa-f3944dc6b78f	2024-04-15 15:55:58.33391+00	00000000-0000-0000-0000-000000000000
+43	Access Requested	2024-04-16 21:17:52.796223+00	Hello,<br/><br/>\nA new access request is waiting for you to approve.<br/><br/>\nTo approve or reject, please visit: http://127.0.0.1:5174/user-management<br/><br/>\nThank you.\n	f	f	\N	\N	\N	\N	\N	\N	\N	\N	44	44	\N	\N	\N	4369117e-28d7-4999-9b7c-39a34295df0a	2024-04-16 21:17:52.756846+00	71449ab2-0d43-48c1-94a1-2f1211ff35a4
+44	Access Granted	2024-04-16 21:18:14.84659+00	You have been granted access to the Short Term Rental Data Portal. Please access the portal here: http://127.0.0.1:4200. If you have any issues accessing this link, please contact young-jin.1.chung@gov.bc.ca.	f	f	\N	\N	\N	\N	\N	\N	\N	\N	18	44	\N	\N	\N	2c38d90f-2995-430c-8bd0-26671dfaa2c4	2024-04-16 21:18:14.919887+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
+49	Access Requested	2024-04-17 14:30:33.505098+00	Hello,<br/><br/>\nA new access request is waiting for you to approve.<br/><br/>\nTo approve or reject, please visit: http://127.0.0.1:5174/user-management<br/><br/>\nThank you.\n	f	f	\N	\N	\N	\N	\N	\N	\N	\N	47	47	\N	\N	\N	072047ad-2739-4d1f-8a06-f8fc9be24254	2024-04-17 14:30:25.375565+00	8cabb9b0-2381-4615-ac8f-251d26b7fe72
+50	Access Denied	2024-04-17 14:31:31.268738+00	Access to the STR Data Portal is restricted to authorized provincial and local government staff and short-term rental platforms. Please contact young-jin.1.chung@gov.bc.ca for more information.	f	f	\N	\N	\N	\N	\N	\N	\N	\N	18	47	\N	\N	\N	15ba8b52-d39b-41b5-b5ef-7663bc1ed680	2024-04-17 14:31:31.450436+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
+51	Batch Takedown Request	2024-04-17 16:29:14.442063+00	\r\nThe short-term rental listings in the attached file are the subject of a request by a local government described under s. 18(3) of the <i>Short-Term Rental Accommodations Act</i> and s. 16 of the <i>Short-Term Rental Accommodations Regulation</i>. <br/><br/>\r\nA “takedown request” (a request for a platform to cease providing platform services, e.g., removing a listing) has been submitted for each of these listings by the respective local government via the Province of British Columbia’s Short-term Rental (STR) Data Portal.<br/><br/>\r\nIn accordance with s. 18(3) of the <i>Short-Term Rental Accommodations Act</i> and s. 16 (3) of the <i>Short-Term Rental Accommodations Regulation</i>, please cease providing platform services in respect of the attached platform offers within 5 days from the date of receipt of this request.<br/><br/>\r\nFailure to comply with this request could result in enforcement actions or penalties under the <i>Short-Term Rental Accommodations Act</i>.<br/><br/>\r\nFor more information on these requests, or local government short-term rental business licences, please contact the local government.<br/><br/>\r\nFor more information on the <i>Short-term Rental Accommodations Act</i>, please visit: <a href='https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals'>New rules for short-term rentals - Province of British Columbia (gov.bc.ca)</a><br/><br/>\r\nThis email has been automatically generated. Please do not reply to this email.\r\n\r\nAttachments: VXJsLExpc3RpbmdJZCxSZXF1ZXN0ZWRCeQ0KaHR0cHM6Ly93d3cuYWlyYm5iLmNvbS9yb29tcy8xNjEyMDM4OD9jaGVja19pbj0yMDI0LTA0LTI1JmFtcDtjaGVja19vdXQ9MjAyNC0wNC0yNyZhbXA7Z3Vlc3RzPTEmYW1wO2FkdWx0cz0xJmFtcDtzPTY3JmFtcDt1bmlxdWVfc2hhcmVfaWQ9ZmExMDdkMjQtYjBkZi00OWJkLTkxZTQtNTc2ZGQ3ZDM2OGFiLDEsVGVzdCBUb3duDQpodHRwOi8vZ29vZ2xlLmNhLDEsVGVzdCBUb3duDQo=	f	f	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2	\N	\N	eff6375c-d99e-4bad-9371-40a54fd3e75f	2024-04-17 16:29:15.22532+00	00000000-0000-0000-0000-000000000000
+45	Takedown Request	2024-04-16 21:18:30.527419+00	\r\nA takedown request for the following short-term rental listing was submitted to the Province of B.C.’s Short-term Rental Data Portal and will be delivered to the platform at 11:50pm PST tonight:<br/><br/>\r\n<b>https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab</b><br/><br/>\r\nListing ID Number: <b>1</b><br/><br/>\r\nUnder the <a href='https://www.bclaws.gov.bc.ca/civix/document/id/bills/billsprevious/4th42nd:gov35-1'>Short-Term Rental Accommodations Act</a> and its regulations, the platform is required to comply with the request within 5 days from the date of receipt of the request. If the platform fails to comply with the request (e.g., remove the listing), local governments can escalate the matter to the Director of the Provincial STR Compliance and Enforcement Unit at: <a href='mailto: CEUescalations@gov.bc.ca'>CEUescalations@gov.bc.ca</a>.<br/><br/>\r\nThis email has been automatically generated. Please do not reply to this email.\r\n	f	t	\N	\N	1	\N	\N	young-jin.1.chung@gov.bc.ca	https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab	\N	44	\N	2	51	1	b2eabf1d-dad1-4b62-9cf4-62f1615c11de	2024-04-17 16:29:15.22532+00	00000000-0000-0000-0000-000000000000
+46	Takedown Request	2024-04-16 21:23:37.113424+00	\r\nA takedown request for the following short-term rental listing was submitted to the Province of B.C.’s Short-term Rental Data Portal and will be delivered to the platform at 11:50pm PST tonight:<br/><br/>\r\n<b>http://google.ca</b><br/><br/>\r\nListing ID Number: <b>1</b><br/><br/>\r\nUnder the <a href='https://www.bclaws.gov.bc.ca/civix/document/id/bills/billsprevious/4th42nd:gov35-1'>Short-Term Rental Accommodations Act</a> and its regulations, the platform is required to comply with the request within 5 days from the date of receipt of the request. If the platform fails to comply with the request (e.g., remove the listing), local governments can escalate the matter to the Director of the Provincial STR Compliance and Enforcement Unit at: <a href='mailto: CEUescalations@gov.bc.ca'>CEUescalations@gov.bc.ca</a>.<br/><br/>\r\nThis email has been automatically generated. Please do not reply to this email.\r\n	f	t	\N	\N	1	\N	\N		http://google.ca	\N	44	\N	2	51	1	7b089bff-f8eb-4e60-93d2-8c1051bb4221	2024-04-17 16:29:15.22532+00	00000000-0000-0000-0000-000000000000
+52	Access Requested	2024-04-17 16:39:45.207135+00	Hello,<br/><br/>\nA new access request is waiting for you to approve.<br/><br/>\nTo approve or reject, please visit: http://127.0.0.1:5174/user-management<br/><br/>\nThank you.\n	f	f	\N	\N	\N	\N	\N	\N	\N	\N	47	47	\N	\N	\N	5651010f-d1f1-4af1-88c8-f7ced304733b	2024-04-17 16:39:45.172192+00	8cabb9b0-2381-4615-ac8f-251d26b7fe72
+55	Notice of Takedown	2024-04-17 16:41:33.046337+00	\nDear Host,<br/><br/>\nShort-term rental accommodations in your community are regulated by your local government. The Test Town has determined that the following short-term rental listing is not in compliance with an applicable local government business licence requirement:<br/><br/>\n<b>https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab</b><br/><br/>\nListing ID Number: <b>1</b><br/><br/>\nUnder the provincial <a href='https://www.bclaws.gov.bc.ca/civix/document/id/bills/billsprevious/4th42nd:gov35-1'>Short-Term Rental Accommodations Act</a> and its regulations, the local government may submit a request to the short-term rental platform to cease providing platform services (e.g., remove this listing from the platform and cancel all bookings) within a period of 5-90 days after the date of delivery of this Notice. Short-term rental platforms are required to comply with the local government’s request within 5 days of receiving the request.<br/><br/>\nThis Notice has been issued by Test Town.<br/><br/>\nTest comment<br/><br/>\nFor more information on this Notice, or local government short-term rental business licences, please contact your local government.<br/><br/>\nFor more information on the Short-term Rental Accommodations Act, please visit: <a href='https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals'>New rules for short-term rentals - Province of British Columbia (gov.bc.ca)</a>.<br/><br/>\r\n\nThis email has been automatically generated. Please do not reply to this email. A copy of this Notice has been sent to the short-term rental platform.<br/><br/>\n	f	t	\N	123-456-7890	1	young-jin.chung@gov.bc.ca	lgcontact@lg.ca	young-jin.chung@dxcas.com; fiona.zhou@gov.bc.ca; young-jin.chung@dxcas.com	https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab	https://bylaw.ca	44	\N	2	\N	\N	79394d7f-833c-4736-9861-11152cd01b1a	2024-04-17 16:41:33.241239+00	71449ab2-0d43-48c1-94a1-2f1211ff35a4
+56	Access Requested	2024-04-17 19:41:25.776953+00	Hello,<br/><br/>\nA new access request is waiting for you to approve.<br/><br/>\nTo approve or reject, please visit: http://127.0.0.1:5174/user-management<br/><br/>\nThank you.\n	f	f	\N	\N	\N	\N	\N	\N	\N	\N	48	48	\N	\N	\N	e32d017c-f4c1-4725-9d79-24eb97f99597	2024-04-17 19:41:25.712658+00	356de3e3-43eb-46e3-a376-e265be1c054d
+57	Access Denied	2024-04-17 19:42:39.854232+00	Access to the STR Data Portal is restricted to authorized provincial and local government staff and short-term rental platforms. Please contact young-jin.1.chung@gov.bc.ca for more information.	f	f	\N	\N	\N	\N	\N	\N	\N	\N	18	48	\N	\N	\N	7c60af8a-9777-4e78-b9ca-2fb9bdb01e15	2024-04-17 19:42:40.038209+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
+58	Access Requested	2024-04-17 19:46:15.418077+00	Hello,<br/><br/>\nA new access request is waiting for you to approve.<br/><br/>\nTo approve or reject, please visit: http://127.0.0.1:5174/user-management<br/><br/>\nThank you.\n	f	f	\N	\N	\N	\N	\N	\N	\N	\N	48	48	\N	\N	\N	c1294821-b9c8-468f-a8b1-234482fb7c38	2024-04-17 19:46:15.379812+00	356de3e3-43eb-46e3-a376-e265be1c054d
 \.
 
 
@@ -2453,15 +2369,18 @@ COPY public.dss_rental_listing_report (rental_listing_report_id, is_processed, r
 --
 
 COPY public.dss_user_identity (user_identity_id, user_guid, display_nm, identity_provider_nm, is_enabled, access_request_status_cd, access_request_dtm, access_request_justification_txt, given_nm, family_nm, email_address_dsc, business_nm, terms_acceptance_dtm, represented_by_organization_id, upd_dtm, upd_user_guid) FROM stdin;
-18	8494b7d6-1ccf-48ff-9004-eac34ea99b63	Chung, Young-Jin 1 HOUS:EX	idir	t	Approved	2024-03-25 21:06:25.133679+00	BCGov, Ministry of Housing	Young-Jin	Chung	young-jin.1.chung@gov.bc.ca		\N	4	2024-04-05 15:03:55.155152+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
 24	cce5179c-35e1-493c-8599-726b1e442616	Bet, Jeroen 1 HOUS:EX	idir	t	Approved	\N	\N	Jeroen	Bet	jeroen.1.bet@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
 25	27b60088-dbed-4bc5-90cc-29b6573083f6	Bohuslavskyi, Oleksandr HOUS:EX	idir	t	Approved	\N	\N	Oleksandr	Bohuslavskyi	oleksandr.bohuslavskyi@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
 26	90183f0d-a629-4529-8e52-16a42bc655ca	Dudin, Oleksii HOUS:EX	idir	t	Approved	\N	\N	Oleksii	Dudin	oleksii.dudin@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
 27	a793bfc0-c461-4604-b1aa-0ee01e90537f	Larsen, Leif 1 HOUS:EX	idir	t	Approved	\N	\N	Leif	Larsen	leif.1.larsen@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
 28	cc8f41b9-619a-4c6b-a7e3-89740c2abd8c	Zhou, Fiona HOUS:EX	idir	t	Approved	\N	\N	Fiona	Zhou	fiona.zhou@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
+47	8cabb9b0-2381-4615-ac8f-251d26b7fe72	ContactDev Airbnb	bceidbusiness	f	Denied	2024-04-17 16:39:45.058535+00	BCGov, Ministry of Housing	ContactDev	Airbnb	fiona.zhou@gov.bc.ca	Airbnb, ContactDev	\N	\N	2024-04-17 16:39:59.639963+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
+42	bc3577d3-f3f8-4687-a093-4594fa43f679	Chung, Young-Jin MOTI:EX	idir	t	Approved	2024-04-11 22:26:19.167586+00	BCGov, Ministry of Housing	Young-Jin	Chung	young-jin.chung@gov.bc.ca		2024-04-11 22:26:19.167867+00	4	2024-04-17 16:40:19.718366+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
+48	356de3e3-43eb-46e3-a376-e265be1c054d	ContactDev Victoria	bceidbusiness	f	Requested	2024-04-17 19:46:15.241178+00	BCGov, Ministry of Housing	ContactDev	Victoria	fiona.zhou@gov.bc.ca	City of Victoria	\N	\N	2024-04-17 19:46:15.379812+00	356de3e3-43eb-46e3-a376-e265be1c054d
 29	9a132c8d-aa0c-4410-8fb0-7cc753db071c	Anderson, Richard HOUS:EX	idir	t	Approved	\N	\N	Richard	Anderson	richard.anderson@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
 30	688661bc-a51a-4c3a-8bda-2d68e0b4d9dd	Forsyth, Lisa HOUS:EX	idir	t	Approved	\N	\N	Lisa	Forsyth	lisa.forsyth@gov.bc.ca	\N	\N	4	2024-04-05 15:03:55.155152+00	\N
-41	bc3577d3-f3f8-4687-a093-4594fa43f679	Chung, Young-Jin MOTI:EX	idir	f	Requested	2024-04-11 20:51:36.442079+00	BCGov, Ministry of Housing	Young-Jin	Chung	young-jin.chung@gov.bc.ca		2024-04-11 20:51:36.442386+00	\N	2024-04-11 20:51:36.583229+00	bc3577d3-f3f8-4687-a093-4594fa43f679
+18	8494b7d6-1ccf-48ff-9004-eac34ea99b63	Chung, Young-Jin 1 HOUS:EX	idir	t	Approved	2024-03-25 21:06:25.133679+00	BCGov, Ministry of Housing	Young-Jin	Chung	young-jin.1.chung@gov.bc.ca		2024-04-16 21:17:03.773409+00	4	2024-04-16 21:17:03.836845+00	8494b7d6-1ccf-48ff-9004-eac34ea99b63
+44	71449ab2-0d43-48c1-94a1-2f1211ff35a4	ContactDev Vancouver	bceidbusiness	t	Approved	2024-04-16 21:17:52.711636+00	BCGov, Ministry of Housing	Contactdev Vancouver		fiona.zhou@gov.bc.ca	City of Vancouver Dev	2024-04-16 21:23:13.828116+00	1	2024-04-16 21:23:13.879707+00	71449ab2-0d43-48c1-94a1-2f1211ff35a4
 \.
 
 
@@ -2531,6 +2450,8 @@ COPY public.dss_user_role_assignment (user_identity_id, user_role_cd) FROM stdin
 30	ceu_staff
 30	lg_staff
 30	platform_staff
+44	lg_staff
+42	ceu_staff
 \.
 
 
@@ -2570,14 +2491,14 @@ COPY public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM
 -- Name: aggregatedcounter_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('hangfire.aggregatedcounter_id_seq', 27, true);
+SELECT pg_catalog.setval('hangfire.aggregatedcounter_id_seq', 78, true);
 
 
 --
 -- Name: counter_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('hangfire.counter_id_seq', 48, true);
+SELECT pg_catalog.setval('hangfire.counter_id_seq', 108, true);
 
 
 --
@@ -2591,21 +2512,21 @@ SELECT pg_catalog.setval('hangfire.hash_id_seq', 9, true);
 -- Name: job_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('hangfire.job_id_seq', 15, true);
+SELECT pg_catalog.setval('hangfire.job_id_seq', 34, true);
 
 
 --
 -- Name: jobparameter_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('hangfire.jobparameter_id_seq', 60, true);
+SELECT pg_catalog.setval('hangfire.jobparameter_id_seq', 136, true);
 
 
 --
 -- Name: jobqueue_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('hangfire.jobqueue_id_seq', 15, true);
+SELECT pg_catalog.setval('hangfire.jobqueue_id_seq', 34, true);
 
 
 --
@@ -2619,21 +2540,21 @@ SELECT pg_catalog.setval('hangfire.list_id_seq', 1, false);
 -- Name: set_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('hangfire.set_id_seq', 28, true);
+SELECT pg_catalog.setval('hangfire.set_id_seq', 48, true);
 
 
 --
 -- Name: state_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('hangfire.state_id_seq', 45, true);
+SELECT pg_catalog.setval('hangfire.state_id_seq', 101, true);
 
 
 --
 -- Name: dss_email_message_email_message_id_seq; Type: SEQUENCE SET; Schema: public; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('public.dss_email_message_email_message_id_seq', 33, true);
+SELECT pg_catalog.setval('public.dss_email_message_email_message_id_seq', 58, true);
 
 
 --
@@ -2696,7 +2617,7 @@ SELECT pg_catalog.setval('public.dss_rental_listing_report_rental_listing_report
 -- Name: dss_user_identity_user_identity_id_seq; Type: SEQUENCE SET; Schema: public; Owner: strdssdev
 --
 
-SELECT pg_catalog.setval('public.dss_user_identity_user_identity_id_seq', 41, true);
+SELECT pg_catalog.setval('public.dss_user_identity_user_identity_id_seq', 48, true);
 
 
 --

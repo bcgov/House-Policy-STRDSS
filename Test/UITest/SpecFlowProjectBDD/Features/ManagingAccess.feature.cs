@@ -76,8 +76,8 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("ManagingAccess")]
         [NUnit.Framework.CategoryAttribute("Access")]
-        [NUnit.Framework.TestCaseAttribute("0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        public void ManagingAccess(string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string govPhoneNumber, string takedownReason, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        public void ManagingAccess(string userName, string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string govPhoneNumber, string takedownReason, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "Access"};
@@ -87,6 +87,7 @@ namespace SpecFlowProjectBDD.Features
             }
             string[] tagsOfScenario = @__tags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("UserName", userName);
             argumentsOfScenario.Add("ListingID", listingID);
             argumentsOfScenario.Add("Description", description);
             argumentsOfScenario.Add("ExpectedResult", expectedResult);
@@ -106,67 +107,68 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 8
-testRunner.Given(string.Format("that I am an authenticated government user and the expected result is \"{0}\"", expectedResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given(string.Format("that I am an authenticated government user \"{0}\" and the expected result is \"{1}\"" +
+                            "", userName, expectedResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 10
-testRunner.When("I access the administrative interface of the system", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I access the administrative interface of the system", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 12
-testRunner.Then("There should be a dedicated section for managing user access requests", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("There should be a dedicated section for managing user access requests", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 16
-testRunner.When("I navigate to the user access request section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I navigate to the user access request section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 18
-testRunner.Then("I should see a list displaying all user access requests, including relevant detai" +
+ testRunner.Then("I should see a list displaying all user access requests, including relevant detai" +
                         "ls such as the user\'s name, role request, and date of submission", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 22
-testRunner.When("Reviewing a specific access request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("Reviewing a specific access request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 24
-testRunner.Then("I should be able to view detailed information provided by the user, including the" +
+ testRunner.Then("I should be able to view detailed information provided by the user, including the" +
                         "ir role request and any justifications or additional comments", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 28
-testRunner.When("Reviewing an access request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("Reviewing an access request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 30
-testRunner.Then("There should be a Grant Access button allowing me to approve the user\'s request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("There should be a Grant Access button allowing me to approve the user\'s request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 34
-testRunner.When("Clicking the Grant Access button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("Clicking the Grant Access button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 36
-testRunner.Then("I should be prompted to assign the appropriate roles to the user based on their r" +
+ testRunner.Then("I should be prompted to assign the appropriate roles to the user based on their r" +
                         "equest and the system\'s role hierarchy", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 40
-testRunner.When("Reviewing an access request for denial", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("Reviewing an access request for denial", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 42
-testRunner.Then("There should be a Deny Access option allowing me to reject the user\'s request if " +
+ testRunner.Then("There should be a Deny Access option allowing me to reject the user\'s request if " +
                         "it is deemed inappropriate or unnecessary", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 46
-testRunner.When("Reviewing an access request that has been granted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("Reviewing an access request that has been granted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 48
-testRunner.Then("There should be a Remove Access option allowing me to remove the user\'s access if" +
+ testRunner.Then("There should be a Remove Access option allowing me to remove the user\'s access if" +
                         " it is deemed inappropriate or unnecessary", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 52
-testRunner.When("Granting or denying access", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("Granting or denying access", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 54
-testRunner.Then("I should receive a confirmation message indicating the success of the action take" +
+ testRunner.Then("I should receive a confirmation message indicating the success of the action take" +
                         "n, and the user should be notified accordingly", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 58
-testRunner.When("Managing user access requests", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("Managing user access requests", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 60
-testRunner.Then("The access request list should dynamically update to reflect the current status a" +
+ testRunner.Then("The access request list should dynamically update to reflect the current status a" +
                         "pproved or denied of each request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

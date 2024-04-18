@@ -113,7 +113,7 @@ namespace StrDss.Service.Bceid
             account.UserGuid = userGuid ?? new Guid(response.account.guid.value);
             account.UserType = userType;
 
-            if (account.UserType == "business")
+            if (account.UserType == "bceidbusiness")
             {
                 account.BusinessGuid = response.account.business.guid.value == "" ? Guid.Empty : new Guid(response.account.business.guid.value);
                 account.BusinessLegalName = response.account.business.legalName.value;

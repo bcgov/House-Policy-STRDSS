@@ -1,8 +1,21 @@
 name: SonarCloud
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
+    paths-ignore:
+      - database/**
+      - package.json
+      - package-lock.json
+      - CHANGELOG.md
+      - .conventional-changelog.mjs
+      - .release-it.json
+      - postman/**
+      - localdb/**
+      - postgres/**
+      - crunchydb/**
+
 jobs:
   dotnet-scan:
     name: dotnet build and scan

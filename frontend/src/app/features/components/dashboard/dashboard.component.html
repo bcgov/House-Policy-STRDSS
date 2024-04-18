@@ -1,11 +1,11 @@
 <h2>Home</h2>
 
 <div class="cards">
-    <p-card class="dashboard-card" *ngFor="let card of cardsToDisplay" [header]="card.title">
+    <p-card class="dashboard-card" *ngFor="let card of cardsToDisplay" [id]="card.boxId" [header]="card.title">
         <p class="m-0">
             {{card.description}}
         </p>
-        <button pButton [disabled]="card.isButtonDisabled" id="navigate-to-compliance-notice-btn"
+        <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
             (click)="navigateTo(card.route)">{{card.buttonText}}</button>
     </p-card>
 </div>

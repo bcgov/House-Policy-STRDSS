@@ -17,8 +17,8 @@ on:
       - crunchydb/**
 
 jobs:
-  dotnet-scan:
-    name: dotnet build and scan
+  backend-scan:
+    name: backend build and scan
     runs-on: windows-latest
     steps:
       - name: Set up JDK 17
@@ -58,13 +58,14 @@ jobs:
           dotnet build ./server/server.sln
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
-  basic-scan:
-    name: basic scan
+  frontend-scan:
+    name: frontend scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          path: 'frontend'  # Check out only the 'frontend' folder
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

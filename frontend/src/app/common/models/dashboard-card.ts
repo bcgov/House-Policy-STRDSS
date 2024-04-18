@@ -8,4 +8,7 @@ export interface DashboardCard {
     isItOrgTypeBased?: boolean;
     isButtonDisabled?: boolean;
     orgType?: string;
+    hidden?: boolean;
+    boxId?: string;
+    buttonId?: string;
 }

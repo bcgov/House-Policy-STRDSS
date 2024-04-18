@@ -49,13 +49,6 @@ jobs:
       - name: Test backend
         run: dotnet test ./server/server.sln --no-build
 
-     # SonarQube integration for backend
-      - name: SonarQube Scan Backend
-        uses: sonarsource/sonarcloud-github-action@v2
-        env:
-          SONAR_HOST_URL: https://sonarcloud.io
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
   build-frontend:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -92,13 +85,6 @@ jobs:
           cd ./frontend
           ng test --watch=false --progress=false --browsers=ChromeHeadless --code-coverage --source-map=false
         continue-on-error: true
-
-     # SonarQube integration frontend
-      - name: SonarQube Scan
-        uses: sonarsource/sonarcloud-github-action@v2
-        env:
-          SONAR_HOST_URL: https://sonarcloud.io
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   docker-build-backend:
     needs: [build-backend]

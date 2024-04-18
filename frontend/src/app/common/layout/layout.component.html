@@ -4,8 +4,8 @@
             <div class="logo-container"></div>
             <div class="main-title">Short-Term Rental Data Portal</div>
         </div>
-        <div class="user-container">
-            {{userDataService.currentUser?.fullName}} <button pButton icon="pi pi-angle-down"
+        <div *ngIf="userDataService.currentUser" class="user-container">
+            {{userDataService.currentUser.displayName || 'Unknown User'}} <button pButton icon="pi pi-angle-down"
                 (click)="op.toggle($event)"></button>
             <p-overlayPanel #op>
                 <button pButton [iconPos]="'right'" class="p-button-transparent" icon="pi pi-sign-out"

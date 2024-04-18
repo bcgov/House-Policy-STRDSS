@@ -31,10 +31,9 @@ namespace StrDss.Service
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
         private IBceidApi _bceid;
-        private IConfiguration _config;
 
         public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBceidApi bceid, IConfiguration config)
+            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBceidApi bceid)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _userRepo = userRepo;
@@ -42,7 +41,6 @@ namespace StrDss.Service
             _emailService = emailService;
             _emailRepo = emailRepo;
             _bceid = bceid;
-            _config = config;
         }
 
         public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction)
@@ -66,8 +64,7 @@ namespace StrDss.Service
 
             if (_currentUser.IdentityProviderNm == StrDssIdProviders.BceidBusiness)
             {
-                var requestorGuid = new Guid(_config.GetValue<string>("SA_USER_GUID")!);
-                var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, requestorGuid, StrDssIdProviders.Idir);
+                var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
 
                 if (account == null)
                 {
@@ -312,7 +309,7 @@ namespace StrDss.Service
             //only IDIR account can have BCGov org type
             if (user.IdentityProviderNm != StrDssIdProviders.Idir && org.OrganizationType == OrganizationTypes.BCGov)
             {
-                errors.AddItem("representedByOrganizationId", $"Not IDIR account cannot be associated with {OrganizationTypes.BCGov} type organization");
+                errors.AddItem("representedByOrganizationId", $"Non IDIR account cannot be associated with {OrganizationTypes.BCGov} type organization");
             }
 
             if (errors.Count > 0)

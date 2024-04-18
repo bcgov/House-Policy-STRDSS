@@ -6,11 +6,12 @@ import { MenubarModule } from 'primeng/menubar';
 import { UserDataService } from '../services/user-data.service';
 import { AuthService } from '../services/auth.service';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, ButtonModule, MenubarModule, OverlayPanelModule],
+  imports: [RouterOutlet, ButtonModule, MenubarModule, OverlayPanelModule, CommonModule],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })

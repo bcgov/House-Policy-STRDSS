@@ -293,7 +293,7 @@ namespace StrDss.Test
             // Assert
             Assert.Single(errors);
             Assert.True(errors.ContainsKey("representedByOrganizationId"));
-            Assert.Equal($"Not IDIR account cannot be associated with {OrganizationTypes.BCGov} type organization", errors["representedByOrganizationId"].First());
+            Assert.Equal($"Non IDIR account cannot be associated with {OrganizationTypes.BCGov} type organization", errors["representedByOrganizationId"].First());
         }
 
 

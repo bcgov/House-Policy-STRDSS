@@ -20,13 +20,15 @@ export class DashboardService {
     const cardsPerUser = new Array<DashboardCard>();
 
     this.cards.forEach((card) => {
-      if (card.isItOrgTypeBased) {
-        if (user.organizationType === card.orgType) {
-          cardsPerUser.push(card);
-        }
-      } else {
-        if (user.permissions.includes(card.accessPermission)) {
-          cardsPerUser.push(card);
+      if (!card.hidden) {
+        if (card.isItOrgTypeBased) {
+          if (user.organizationType === card.orgType) {
+            cardsPerUser.push(card);
+          }
+        } else {
+          if (user.permissions.includes(card.accessPermission)) {
+            cardsPerUser.push(card);
+          }
         }
       }
     });
@@ -44,6 +46,9 @@ export class DashboardService {
         buttonText: 'Platform Upload History',
         route: '',
         isButtonDisabled: true,
+        hidden: true,
+        boxId: 'platformUploadHistory_box',
+        buttonId: 'platformUploadHistory_btn',
       },
       {
         accessPermission: ceu_action,
@@ -53,6 +58,8 @@ export class DashboardService {
         route: '',
         title: 'View All Escalation Requests',
         isButtonDisabled: true,
+        boxId: 'viewAllEscalationRequests_box',
+        buttonId: 'viewAllEscalationRequests_btn',
       },
       {
         accessPermission: ceu_action,
@@ -62,6 +69,8 @@ export class DashboardService {
         route: '',
         title: 'Send Provincial Compliance Order',
         isButtonDisabled: true,
+        boxId: 'sendProvincialComplianceOrder_box',
+        buttonId: 'sendProvincialComplianceOrder_btn',
       },
       {
         accessPermission: user_write,
@@ -70,6 +79,8 @@ export class DashboardService {
         description: 'Process new requests for system access',
         route: '/user-management',
         title: 'Manage Access Requests',
+        boxId: 'manageAccessRequests_box',
+        buttonId: 'manageAccessRequests_btn',
       },
       {
         accessPermission: '',
@@ -79,7 +90,9 @@ export class DashboardService {
         route: 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/data-guidelines-localgovernment',
         title: 'Policy Guidance',
         isItOrgTypeBased: true,
-        orgType: 'LG'
+        orgType: 'LG',
+        boxId: 'viewPolicyGuidance_box',
+        buttonId: 'viewPolicyGuidance_btn',
       },
       {
         accessPermission: takedown_action,
@@ -89,6 +102,9 @@ export class DashboardService {
         route: '',
         title: 'Escalate to CEU',
         isButtonDisabled: true,
+        hidden: true,
+        boxId: 'escalateToCeu_box',
+        buttonId: 'escalateToCeu_btn',
       },
       {
         accessPermission: takedown_action,
@@ -97,6 +113,8 @@ export class DashboardService {
         description: 'Notify an STR host and platform that a listing is not compliant with a business licence requirement. A notice must be sent prior to sending a Takedown Request',
         route: '/compliance-notice',
         title: 'Send Notice of Non-Compliance',
+        boxId: 'sendNotice_box',
+        buttonId: 'sendNotice_btn',
       },
       {
         accessPermission: takedown_action,
@@ -105,6 +123,8 @@ export class DashboardService {
         description: 'Send a request to an STR platform to remove a non-compliant listing. A Request can be be initiated after a period of 8- 90 days after sending a Notice of Non-Compliance.',
         route: '/delisting-request',
         title: 'Send Takedown Request',
+        boxId: 'sendTakedownLetter_box',
+        buttonId: 'sendTakedownLetter_btn',
       },
       {
         accessPermission: '',
@@ -114,7 +134,9 @@ export class DashboardService {
         route: 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/data-guidelines-platforms',
         title: 'Guideline for Platforms',
         isItOrgTypeBased: true,
-        orgType: 'Platform'
+        orgType: 'Platform',
+        boxId: 'viewPolicyGuidanceForPlatforms_box',
+        buttonId: 'viewPolicyGuidanceForPlatforms_btn',
       },
       {
         accessPermission: listing_file_upload,
@@ -124,6 +146,8 @@ export class DashboardService {
         route: '',
         title: 'Upload Listing Data',
         isButtonDisabled: true,
+        boxId: 'uploadListingData_box',
+        buttonId: 'uploadListingData_btn',
       },
     ]
   }

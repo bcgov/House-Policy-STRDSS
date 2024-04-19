@@ -61,18 +61,23 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _IDRLoginPage.ContinueButton.Click();
 
+            IWebElement TOC = null;
+
             try
             {
-                if (_DelistingRequestPage.Driver.PageSource.Contains("Terms and Conditions"))
-                {
-                    //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
-                    _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
-                    _TermsAndConditionsPage.ContinueButton.Click();
-                }
+                TOC = _LandingPage.Driver.FindElement(Enums.FINDBY.CSSSELECTOR, TermsAndConditionsModel.TermsAndCondititionsCheckBox);
             }
             catch (NoSuchElementException ex)
             {
-                //No terms and conditions present. Continue
+                //no Terms and Conditions. Continue
+            }
+
+
+            if ((null != TOC) && (TOC.Displayed))
+            {
+                //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
+                _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                _TermsAndConditionsPage.ContinueButton.Click();
             }
         }
 
@@ -134,17 +139,19 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
         }
 
-        //RequestInitiaitedByField
-        [When("Selecting the LG for Initiated By")]
-        public void SelectingTheLGForInitiatedBy()
-        {
-            _DelistingRequestPage.RequestInitiatedByDropDown.Click();
-            _DelistingRequestPage.RequestInitiatedByDropDown.ExecuteJavaScript(@"document.querySelector(""#lgId_0"").click()");        }
+        //DSS-305 remove
 
-        [Then("The system should present a list of available LG options to populate the field")]
-        public void TheSystemShouldPresentAListOfLGOptions()
-        {
-        }
+        ////RequestInitiaitedByField
+        //[When("Selecting the LG for Initiated By")]
+        //public void SelectingTheLGForInitiatedBy()
+        //{
+        //    _DelistingRequestPage.RequestInitiatedByDropDown.Click();
+        //    _DelistingRequestPage.RequestInitiatedByDropDown.ExecuteJavaScript(@"document.querySelector(""#lgId_0"").click()");        }
+
+        //[Then("The system should present a list of available LG options to populate the field")]
+        //public void TheSystemShouldPresentAListOfLGOptions()
+        //{
+        //}
 
         //PlatformField
         [When("selecting the platform")]

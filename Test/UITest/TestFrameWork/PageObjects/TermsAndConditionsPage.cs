@@ -18,7 +18,7 @@ namespace UITest.PageObjects
         public TermsAndConditionsPage(IDriver Driver)
         {
             _Driver = Driver;
-            _TermsAndConditionsCheckBox = new CheckBox(Driver, Enums.FINDBY.CSSSELECTOR, TermsAndConditionsModel.TermsAndConditioinsCheckBox);
+            _TermsAndConditionsCheckBox = new CheckBox(Driver, Enums.FINDBY.CSSSELECTOR, TermsAndConditionsModel.TermsAndCondititionsCheckBox);
             _ContinueButton = new Button(Driver, Enums.FINDBY.ID, TermsAndConditionsModel.ContinueButton);
         }
     }

@@ -17,7 +17,7 @@ VALUES (src.access_request_status_cd, src.access_request_status_nm);
 
 MERGE INTO dss_email_message_type AS tgt
 USING ( SELECT * FROM (VALUES
-('Notice of Takedown','Notice of Takedown of Short Term Rental Platform Offer'),
+('Notice of Takedown','Notice of Non-Compliance'),
 ('Takedown Request','Takedown Request Confirmation'),
 ('Batch Takedown Request','Batch Takedown Request'),
 ('Escalation Request','STR Escalation Request'),
@@ -89,9 +89,9 @@ MERGE INTO dss_user_role AS tgt
 USING ( SELECT * FROM (VALUES
 ('ceu_admin','CEU Admin'),
 ('ceu_staff','CEU Staff'),
-('bc_staff','Other Provincial Government'),
+('bc_staff','BC Government Staff'),
 ('lg_staff','Local Government'),
-('platform_staff','Short Term Rental Platform'))
+('platform_staff','Short-term Rental Platform'))
 AS s (user_role_cd, user_role_nm)
 ) AS src
 ON (tgt.user_role_cd=src.user_role_cd)
@@ -129,10 +129,12 @@ VALUES (src.user_role_cd, src.user_privilege_cd);
 
 MERGE INTO dss_organization AS tgt
 USING ( SELECT * FROM (VALUES
-('BCGov','CEU','Compliance Enforcement Unit'),
-('BCGov','BC','Other BC Government Components'),
+('BCGov','CEU','Provincial Compliance and Enforcement Unit'),
+('BCGov','BC','BC Government Staff'),
 ('LG','LGTEST','Test Town'),
-('Platform','PLATFORMTEST','Test Platform'))
+('LG','LGTEST2','Test City'),
+('Platform','PLATFORMTEST2','Test Platform 2'),
+('Platform','PLATFORMTEST','Test Platform 1'))
 AS s (organization_type, organization_cd, organization_nm)
 ) AS src
 ON (tgt.organization_cd=src.organization_cd)
@@ -151,6 +153,7 @@ INSERT INTO dss_organization_contact_person
 SELECT true, emt.email_message_type, :quoted_tester_email, o.organization_id
 FROM dss_organization AS o, dss_email_message_type as emt
 where o.organization_type='Platform'
+and emt.email_message_type in ('Notice of Takedown','Batch Takedown Request')
 and NOT EXISTS (
 SELECT 1
 FROM dss_organization_contact_person AS ocp

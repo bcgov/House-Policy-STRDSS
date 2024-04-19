@@ -106,20 +106,21 @@
             Type: </strong>{{currentTableItem.accessRequestJustificationTxt}}</div>
     <div class="form-group-row inline-block left-block extra-space-bottom">
         <div class="form-group-row-col">
-            <label for="userIdentityId">What role best describes you?</label>
+            <label for="userIdentityId">Confirm the user type</label>
         </div>
         <div class="form-group-row-col">
-            <p-dropdown #approveOrgTypeElem [(ngModel)]="currentOrganizationTypeSelected" [options]="organizationTypes"
-                appendTo="body" placeholder="Please Select..." id="userIdentityId" name="userIdentityId"
+            <p-dropdown #approveOrgTypeElem [(ngModel)]="currentOrganizationTypeSelected"
+                (onChange)="orgTypeChanged($event.value)" [options]="organizationTypes" appendTo="body"
+                placeholder="Please Select..." id="userIdentityId" name="userIdentityId"
                 [ngClass]="'full-width-text-field'" [required]="true"></p-dropdown>
         </div>
     </div>
     <div class="form-group-row inline-block right-block extra-space-bottom">
         <div class="form-group-row-col">
-            <label for="representedByOrganizationId">What role best describes you?</label>
+            <label for="representedByOrganizationId">What organization does this user represent?</label>
         </div>
         <div class="form-group-row-col">
-            <p-dropdown #approveOrgNameElem [(ngModel)]="currentOrganizationSelected" [options]="organizations"
+            <p-dropdown #approveOrgNameElem [(ngModel)]="currentOrganizationSelected" [options]="filteredOrganizations"
                 appendTo="body" placeholder="Please Select..." id="representedByOrganizationId"
                 name="representedByOrganizationId" [ngClass]="'full-width-text-field'" [required]="true"></p-dropdown>
         </div>

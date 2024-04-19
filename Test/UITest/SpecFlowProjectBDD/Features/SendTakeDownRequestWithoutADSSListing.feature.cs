@@ -135,12 +135,6 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("I should see an optional field for adding a LG staff user email address to be cop" +
                         "ied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 22
- testRunner.When("Selecting the LG for Initiated By", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 24
- testRunner.Then("The system should present a list of available LG options to populate the field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
 #line 28
  testRunner.When(string.Format("Entering the listing ID \"{0}\"", listingID), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden

@@ -129,8 +129,10 @@
                 <label for="comment">Add Additional Comments to Email (Optional)</label>
             </div>
             <div class="form-group-row-col">
-                <textarea #textarea rows="5" cols="30" class="full-width-text-field" pInputTextarea id="comment"
-                    name="comment" placeholder="Enter Additional Comment Here..."></textarea>
+                <textarea #textarea rows="5" cols="30" maxlength="2000" class="full-width-text-field" pInputTextarea
+                    id="comment" name="comment" placeholder="Enter Additional Comment Here..."></textarea>
+                <span class="limit-text" [class.almost-limit-text]="textarea.value.length > 1950"
+                    [class.limited-text]="textarea.value.length > 1999">{{textarea.value.length}}/2000</span>
             </div>
         </div>
     </div>

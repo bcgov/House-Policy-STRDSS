@@ -85,4 +85,14 @@
             margin-left: 8px;
         }
     }
+
+    .limit-text {
+        &.almost-limit-text {
+            color: #FCBA19;
+        }
+
+        &.limited-text {
+            color: #CC0000;
+        }
+    }
 }

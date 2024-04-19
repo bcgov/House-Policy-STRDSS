@@ -49,9 +49,6 @@ spec:
             - name: {{ $k | quote }}
               value: {{ $v | quote }}
             {{- end }}
-          envFrom:
-            - secretRef:
-                name: {{ .Values.secretName }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

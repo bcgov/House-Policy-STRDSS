@@ -45,6 +45,7 @@ export class UserManagementComponent implements OnInit {
   statuses = new Array<DropdownOption>();
   organizationTypes = new Array<DropdownOption>();
   organizations = new Array<DropdownOption>();
+  filteredOrganizations = new Array<DropdownOption>();
   organizationDropdown = new Array<DropdownOption>();
 
   accessRequests = new Array<AccessRequestTableItem>();
@@ -94,6 +95,10 @@ export class UserManagementComponent implements OnInit {
 
   onPageChange(pagingEvent: any): void {
     this.getUsers(pagingEvent.page + 1);
+  }
+
+  orgTypeChanged(orgType: any): void {
+    this.filteredOrganizations = this.organizations.filter(org => (org as any)['organizationType'] === orgType);
   }
 
   onApprove(_orgTypeIdElem: Dropdown, orgId: Dropdown): void {
@@ -227,6 +232,7 @@ export class UserManagementComponent implements OnInit {
     this.requestAccessService.getOrganizations().subscribe({
       next: (data) => {
         this.organizations = data;
+        this.filteredOrganizations = data;
         this.organizationDropdown = [{ label: 'All', value: '' }, ...data];
       },
       error: (error: any) => {

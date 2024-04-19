@@ -6,7 +6,7 @@ global:
     'Logging__LogLevel__StrDss.Common.StrDssLogger': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Staging'
     'ENV_NAME': 'uat'
-    'AppBaseUrl': 'https://uat-strdata.apps.silver.devops.gov.bc.ca'
+    'APP_BASE_URL': 'https://uat.strdata.gov.bc.ca'
     'SSO_CLIENT': 'str-dss-5303'
     'SSO_HOST': 'https://dev.loginproxy.gov.bc.ca/auth'
     'SSO_REALM': 'standard'
@@ -15,7 +15,7 @@ global:
     'CHES_TOKEN_URL': 'https://test.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
     'CHES_URL': 'https://ches-test.api.gov.bc.ca'
     'RENTAL_LISTING_REPORT_MAX_SIZE': '4'
-    'BCEID_URL': 'https://gws1.test.bceid.ca/webservices/client/v10/bceidservice.asmx'
+    'BCEID_URL': 'https://gws1.development.bceid.ca/webservices/client/v10/bceidservice.asmx'
     'BCEID_CACHE_LIFESPAN': '600'
 
 nameOverride: strdss-uat

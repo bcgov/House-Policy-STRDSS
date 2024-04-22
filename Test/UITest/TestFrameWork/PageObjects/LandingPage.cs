@@ -21,14 +21,15 @@ namespace UITest.PageObjects
         public Button SendTakedownLetterButton { get => _SendTakedownLetterButton; }
         public Button EscalateTakedownToCEUButto { get => _EscalateTakedownToCEUButton; }
         public Button ManageAccessRequestsButton { get => _ManageAccessRequestsButton; }
+        public IDriver Driver { get => _Driver; }
 
         public LandingPage(IDriver Driver)
         {
             _Driver = Driver;
             _ViewPolicyGuidenceButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ViewPolicyGuidenceButton);
-            _SendNoticeButton = new Button(Driver, Enums.FINDBY.XPATH, LandingPageModel.SendNoticeButton);
-            _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.XPATH, LandingPageModel.SendTakeDownLetterButton);
-            _ManageAccessRequestsButton = new Button(Driver, Enums.FINDBY.XPATH, LandingPageModel.ManageAccessRequestsButton);
+            _SendNoticeButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendNoticeButton);
+            _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendTakeDownLetterButton);
+            _ManageAccessRequestsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ManageAccessRequestsButton);
             _EscalateTakedownToCEUButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.EscalateTakedownToCEUButton);
         }
 

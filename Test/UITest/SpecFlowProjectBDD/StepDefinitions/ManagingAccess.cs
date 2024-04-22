@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using System;
 using System.Collections.Generic;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.Extensions;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -50,7 +51,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _TestUserName = UserName;
             _TestPassword = _AppSettings.GetValue(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
-  
+
             _Driver.Url = "http://127.0.0.1:4200";
             _Driver.Navigate();
 
@@ -64,18 +65,24 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _IDRLoginPage.ContinueButton.Click();
 
+
+            IWebElement TOC = null;
+
             try
             {
-                if (_ManagingAccessPage.Driver.PageSource.Contains("Terms and Conditions"))
-                {
-                    //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
-                    _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
-                    _TermsAndConditionsPage.ContinueButton.Click();
-                }
+                TOC = _LandingPage.Driver.FindElement(Enums.FINDBY.CSSSELECTOR, TermsAndConditionsModel.TermsAndCondititionsCheckBox);
             }
             catch (NoSuchElementException ex)
             {
-                //No terms and conditions present. Continue
+                //no Terms and Conditions. Continue
+            }
+
+
+            if ((null != TOC) && (TOC.Displayed))
+            {
+                //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
+                _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                _TermsAndConditionsPage.ContinueButton.Click();
             }
         }
 

@@ -17,11 +17,12 @@ Scenario: SendTakedownRequestWithoutADSSListing
 
 	And I should see an optional field for adding a LG staff user email address to be copied on the email
 
-#Initiated By
-
-	When Selecting the LG for Initiated By
-
-	Then The system should present a list of available LG options to populate the field
+#DSS-305 remove
+##Initiated By
+#
+#	When Selecting the LG for Initiated By
+#
+#	Then The system should present a list of available LG options to populate the field
 
 #ListingIDField
 
@@ -75,12 +76,12 @@ Scenario: SendTakedownRequestWithoutADSSListing
 
 Examples:
 	| UserName | ListingID           | Description                      | ExpectedResult | ListingURL                                                   | AdditionalCCsTextBox     | Comment                                                                        |
-	| CEUATST  | 0                   | ListingID - Boundary             | pass           | http://listingURL.com                                        | richard.anderson@dxc.com |                                                                                |
-	| CEUATST  | 9223372036854775807 | ListingID - Test for Max value   | pass           | http://listingURL.com                                        | richard.anderson@dxc.com |                                                                                |
-	| CEUATST  | 0                   | ListingURL - Valid URL           | pass           | HTTP://listingURL.com                                        | richard.anderson@dxc.com |                                                                                |
-	| CEUATST  | 0                   | ListingURL - Valid URL SSL       | pass           | HTTPS://listingURL.com                                       | richard.anderson@dxc.com |                                                                                |
-	| CEUATST  | 0                   | ListingURL - Long URL            | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com |                                                                                |
-	| CEUATST  | -1                  | ListingID - Negative number test | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | Should pass because non-numberic values are ignored and Listing ID is optional |
-	| CEUATST  | test                | ListingID - Test for string      | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | should pass because non-numberic values are ignored and Listing ID is optional |
-	| CEUATST  | e                   | ListingID - Test for exponential | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | should pass because non-numberic values are ignored and Listing ID is optional |
-	| CEUATST  | 0                   | ListingURL - Invalid URL         | fail           | http://listingURL                                            | richard.anderson@dxc.com |                                                                                |
+	| ricander  | 0                   | ListingID - Boundary             | pass           | http://listingURL.com                                        | richard.anderson@dxc.com |                                                                                |
+	| ricander  | 9223372036854775807 | ListingID - Test for Max value   | pass           | http://listingURL.com                                        | richard.anderson@dxc.com |                                                                                |
+	| ricander  | 0                   | ListingURL - Valid URL           | pass           | HTTP://listingURL.com                                        | richard.anderson@dxc.com |                                                                                |
+	| ricander  | 0                   | ListingURL - Valid URL SSL       | pass           | HTTPS://listingURL.com                                       | richard.anderson@dxc.com |                                                                                |
+	| ricander  | 0                   | ListingURL - Long URL            | pass           | http://ReallylongURLstring123123123123123123123123123123.com | richard.anderson@dxc.com |                                                                                |
+	| ricander  | -1                  | ListingID - Negative number test | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | Should pass because non-numberic values are ignored and Listing ID is optional |
+	| ricander  | test                | ListingID - Test for string      | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | should pass because non-numberic values are ignored and Listing ID is optional |
+	| ricander  | e                   | ListingID - Test for exponential | pass           | http://listingURL.com                                        | richard.anderson@dxc.com | should pass because non-numberic values are ignored and Listing ID is optional |
+	| ricander  | 0                   | ListingURL - Invalid URL         | fail           | http://listingURL                                            | richard.anderson@dxc.com |                                                                                |

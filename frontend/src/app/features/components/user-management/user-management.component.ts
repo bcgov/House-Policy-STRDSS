@@ -57,6 +57,7 @@ export class UserManagementComponent implements OnInit {
     searchTerm: '',
   }
 
+  disableApproveButton = false;
   showApprovePopup = false;
   showRejectPopup = false;
 
@@ -84,6 +85,7 @@ export class UserManagementComponent implements OnInit {
   }
 
   onApprovePopup(accessRequest: AccessRequestTableItem): void {
+    this.disableApproveButton = false;
     this.currentTableItem = accessRequest;
     this.showApprovePopup = true;
   }
@@ -102,6 +104,8 @@ export class UserManagementComponent implements OnInit {
   }
 
   onApprove(_orgTypeIdElem: Dropdown, orgId: Dropdown): void {
+    this.disableApproveButton = true;
+
     const model = {
       userIdentityId: this.currentTableItem.userIdentityId,
       representedByOrganizationId: orgId.value,

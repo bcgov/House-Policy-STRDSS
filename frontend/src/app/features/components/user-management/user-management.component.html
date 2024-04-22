@@ -129,7 +129,7 @@
         irreversible.</strong>
     <div class="spacer-hr"></div>
     <div class="actions">
-        <button pButton name="submit-dialog-btn" id="submit-dialog-btn"
+        <button pButton [disabled]="disableApproveButton" name="submit-dialog-btn" id="submit-dialog-btn"
             (click)="onApprove(approveOrgTypeElem,approveOrgNameElem)">Submit</button>
         <button pButton name="cancel-dialog-btn" id="cancel-dialog-btn" class="outline-btn"
             (click)="onPopupClose()">Cancel</button>

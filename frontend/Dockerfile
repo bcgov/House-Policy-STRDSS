@@ -54,6 +54,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 COPY ./docker-entrypoint.sh /_docker-entrypoint.sh
 RUN chmod +x /_docker-entrypoint.sh
+RUN chmod -R 777 /nginx
 
 EXPOSE 3001
 ENV TZ America/Vancouver

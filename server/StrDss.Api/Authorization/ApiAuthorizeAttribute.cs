@@ -57,7 +57,7 @@ namespace StrDss.Api.Authorization
 
             if (_permissions.Length == 0)
             {
-                _logger.LogInformation($"[AUTH] User '{userGuid} - {displayName}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
+                _logger.LogInformation($"[AUTH] User '{userGuid}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
                 return;
             }
 
@@ -74,12 +74,12 @@ namespace StrDss.Api.Authorization
 
             if (!hasPermission)
             {
-                _logger.LogInformation($"[AUTH] User '{userGuid} - {displayName}' does not have permission to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
+                _logger.LogInformation($"[AUTH] User '{userGuid}' does not have permission to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
                 context.Result = new UnauthorizedResult(); //401
                 return;
             }
 
-            _logger.LogInformation($"[AUTH] User '{userGuid} - {displayName}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
+            _logger.LogInformation($"[AUTH] User '{userGuid}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
         }
     }
 }

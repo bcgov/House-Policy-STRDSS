@@ -442,7 +442,7 @@ namespace StrDss.Service
             {
                 EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
-                MessageTemplateDsc = template.GetContent() + $"{Environment.NewLine}Attachments: {content}",
+                MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
                 MessageReasonId = null,

@@ -4,9 +4,6 @@ set -e
 
 echo "hit entrypoint..."
 
-mkdir -p /nginx/html
-cp -R /usr/share/nginx/html/* /nginx/html
-
 target=/nginx/html/main.js
 sed -i "s~__SSO_HOST__~$SSO_HOST~g" "$target"
 sed -i "s~__ENV_NAME__~$ENV_NAME~g" "$target"

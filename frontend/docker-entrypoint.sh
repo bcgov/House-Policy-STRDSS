@@ -4,7 +4,7 @@ set -e
 
 echo "hit entrypoint..."
 
-mkdir -p /nginx/html
+# mkdir -p /nginx/html
 cp -R /usr/share/nginx/html/* /nginx/html
 
 target=/nginx/html/main.js

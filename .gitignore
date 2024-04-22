@@ -5,3 +5,4 @@ note
 secrets
 .terraform
 docker.env
+backup.sql

@@ -180,6 +180,7 @@ jobs:
       timeout-minutes: 5
 
   zap-scan:
+    needs: [deploy]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:

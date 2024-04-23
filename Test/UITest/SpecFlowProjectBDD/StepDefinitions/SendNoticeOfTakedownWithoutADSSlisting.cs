@@ -22,7 +22,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private DelistingWarningPage _DelistingWarningPage;
         private TermsAndConditionsPage _TermsAndConditionsPage;
         private PathFinderPage _PathFinderPage;
-        private IDRLoginPage _IDRLoginPage;
+        private BCIDPage _BCIDPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
         private string _TestUserName;
         private string _TestPassword;
@@ -37,7 +37,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
-            _IDRLoginPage = new IDRLoginPage(_Driver);
+            _BCIDPage = new BCIDPage(_Driver);
             _AppSettings = new AppSettings();
         }
 
@@ -46,21 +46,21 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void GivenIAmAauthenticatedLGStaffMemberUser(string UserName, string ExpectedResult)
         {
             _TestUserName = UserName;
-            _TestPassword = _AppSettings.GetValue(_TestUserName) ?? string.Empty;
+            _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
-            _Driver.Url = "http://127.0.0.1:4200";
+            _Driver.Url = _AppSettings.GetServer("uat");
             _Driver.Navigate();
 
-            _PathFinderPage.IDRButton.Click();
+            _PathFinderPage.BCIDButton.Click();
 
-            _IDRLoginPage.UserNameTextBox.WaitFor(5);
+            _BCIDPage.UserNameTextBox.WaitFor(5);
 
-            _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+            _BCIDPage.UserNameTextBox.EnterText(_TestUserName);
 
-            _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+            _BCIDPage.PasswordTextBox.EnterText(_TestPassword);
 
-            _IDRLoginPage.ContinueButton.Click();
+            _BCIDPage.ContinueButton.Click();
 
             IWebElement TOC = null;
 

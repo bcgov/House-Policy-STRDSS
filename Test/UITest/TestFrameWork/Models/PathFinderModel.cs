@@ -9,6 +9,6 @@ namespace TestFrameWork.Models
     public class PathFinderModel
     {
         public static string IDRButton { get => "social-idir"; }  
-        public static string BCIDButton { get => @"social-bceidbusiness"; }
+        public static string BCIDButton { get => "social-bceidbusiness"; }
     }
 }

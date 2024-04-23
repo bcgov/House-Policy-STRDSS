@@ -21,21 +21,21 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private LayoutPage _LayoutPage;
         private DelistingWarningPage _DelistingWarningPage;
         private PathFinderPage _PathFinderPage;
-        private IDRLoginPage _IDRLoginPage;
+        private IDirPage _IDirPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
         private string _TestUserName;
         private string _TestPassword;
         private bool _ExpectedResult = false;
-        AppSettings appSettings;
+        AppSettings _AppSettings;
 
         public DenyAccessToSystem(SeleniumDriver Driver)
         {
             _Driver = Driver;
             _LayoutPage = new LayoutPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
-            _IDRLoginPage = new IDRLoginPage(_Driver);
+            _IDirPage = new IDirPage(_Driver);
 
-            appSettings = new AppSettings();
+            _AppSettings = new AppSettings();
         }
 
         //User Authentication
@@ -43,8 +43,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void GivenIAmAauthenticatedGovernmentUseer(string ExpectedResult)
         {
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
-  
-            _Driver.Url = "http://127.0.0.1:4200/access-request";
+
+            _Driver.Url = _AppSettings.GetServer("uat");
             _Driver.Navigate();
 
             _PathFinderPage.IDRButton.Click();
@@ -55,15 +55,15 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void IAttemptToAccessTheDataSharingSystem(string UserName)
         {
             _TestUserName = UserName;
-            _TestPassword = appSettings.GetValue(_TestUserName) ?? string.Empty;
+            _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
 
-            _IDRLoginPage.UserNameTextBox.WaitFor(5);
+            _IDirPage.UserNameTextBox.WaitFor(5);
 
-            _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+            _IDirPage.UserNameTextBox.EnterText(_TestUserName);
 
-            _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+            _IDirPage.PasswordTextBox.EnterText(_TestPassword);
 
-            _IDRLoginPage.ContinueButton.Click();
+            _IDirPage.ContinueButton.Click();
         }
 
         [Then("I dont have the required access permissions")]

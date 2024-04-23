@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TestFrameWork.Models
 {
-    public  class IDirLogonModel
+    public  class IDirModel
     {
         public static string IDRUserName { get  => "user"; }
         public static string IDRPassword { get => "password"; }

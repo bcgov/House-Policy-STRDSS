@@ -2,6 +2,13 @@
 {
     public class ManagingAccessModel
     {
+        public static string ManageAccessSection
+        {
+            get
+            {
+                return @"/html/body/app-root/app-layout/div[2]/app-user-management/div[2]";
+            }
+        }
         public static string StatusDropDown
         {
             get

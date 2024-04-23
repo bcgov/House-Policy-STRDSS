@@ -20,7 +20,7 @@ namespace XUnitTests
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
         private TakeDownRequestPage _TakeDownRequestPage;
         private PathFinderPage _PathFinderPage;
-        private IDRLoginPage _IDRLoginPage;
+        private IDirPage _IDirPage;
         private RequestAccessPage _RequestAccessPage;
         private string _TestUserName;
         private string _TestPassword;
@@ -30,6 +30,8 @@ namespace XUnitTests
         public HousrSTRE2E(ITestOutputHelper output)
         {
             this._Output = output;
+
+            _TestUserName = "CEUATST";
             _Driver = new SeleniumDriver(SeleniumDriver.DRIVERTYPE.CHROME);
             _HomePage = new LandingPage(_Driver);
             _TermsAndConditionsPage = new TermsAndConditionsPage(_Driver);
@@ -38,10 +40,9 @@ namespace XUnitTests
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _TakeDownRequestPage = new TakeDownRequestPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
-            _IDRLoginPage = new IDRLoginPage(_Driver);
+            _IDirPage = new IDirPage(_Driver);
             AppSettings appSettings = new AppSettings();
-            _TestUserName = appSettings.GetValue("TestUserName") ?? string.Empty;
-            _TestPassword = appSettings.GetValue("TestPassword") ?? string.Empty;
+            _TestPassword = appSettings.GetUser(_TestUserName) ?? string.Empty;
         }
 
         [Fact]
@@ -58,14 +59,14 @@ namespace XUnitTests
                 _PathFinderPage.IDRButton.Click();
 
 
-                _IDRLoginPage.UserNameTextBox.WaitFor();
-                _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+                _IDirPage.UserNameTextBox.WaitFor();
+                _IDirPage.UserNameTextBox.EnterText(_TestUserName);
 
-                _IDRLoginPage.PasswordTextBox.WaitFor();
-                _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+                _IDirPage.PasswordTextBox.WaitFor();
+                _IDirPage.PasswordTextBox.EnterText(_TestPassword);
 
-                _IDRLoginPage.ContinueButton.WaitFor();
-                _IDRLoginPage.ContinueButton.Click();
+                _IDirPage.ContinueButton.WaitFor();
+                _IDirPage.ContinueButton.Click();
 
                 //handle terms and conditions
 
@@ -131,14 +132,14 @@ namespace XUnitTests
                 _PathFinderPage.IDRButton.Click();
 
 
-                _IDRLoginPage.UserNameTextBox.WaitFor();
-                _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+                _IDirPage.UserNameTextBox.WaitFor();
+                _IDirPage.UserNameTextBox.EnterText(_TestUserName);
 
-                _IDRLoginPage.PasswordTextBox.WaitFor();
-                _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+                _IDirPage.PasswordTextBox.WaitFor();
+                _IDirPage.PasswordTextBox.EnterText(_TestPassword);
 
-                _IDRLoginPage.ContinueButton.WaitFor();
-                _IDRLoginPage.ContinueButton.Click();
+                _IDirPage.ContinueButton.WaitFor();
+                _IDirPage.ContinueButton.Click();
 
 
                 //Handle Terms and Conditions
@@ -232,14 +233,14 @@ namespace XUnitTests
                 _PathFinderPage.IDRButton.Click();
 
 
-                _IDRLoginPage.UserNameTextBox.WaitFor();
-                _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+                _IDirPage.UserNameTextBox.WaitFor();
+                _IDirPage.UserNameTextBox.EnterText(_TestUserName);
 
-                _IDRLoginPage.PasswordTextBox.WaitFor();
-                _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+                _IDirPage.PasswordTextBox.WaitFor();
+                _IDirPage.PasswordTextBox.EnterText(_TestPassword);
 
-                _IDRLoginPage.ContinueButton.WaitFor();
-                _IDRLoginPage.ContinueButton.Click();
+                _IDirPage.ContinueButton.WaitFor();
+                _IDirPage.ContinueButton.Click();
 
                 _RequestAccessPage.UserRoleDropDown.Click();
                 _RequestAccessPage.UserRoleDropDown.WaitFor();

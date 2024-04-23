@@ -24,7 +24,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private TermsAndConditionsPage _TermsAndConditionsPage;
         private ManagingAccessPage _ManagingAccessPage;
         private PathFinderPage _PathFinderPage;
-        private IDRLoginPage _IDRLoginPage;
+        private IDirPage _IDirPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
         private string _TestUserName;
         private string _TestPassword;
@@ -39,7 +39,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _ManagingAccessPage = new ManagingAccessPage(_Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
-            _IDRLoginPage = new IDRLoginPage(_Driver);
+            _IDirPage = new IDirPage(_Driver);
             _AppSettings = new AppSettings();
         }
 
@@ -49,21 +49,21 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void GivenIAmAauthenticatedGovernmentUseer(string UserName, string ExpectedResult)
         {
             _TestUserName = UserName;
-            _TestPassword = _AppSettings.GetValue(_TestUserName) ?? string.Empty;
+            _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
-            _Driver.Url = "http://127.0.0.1:4200";
+            _Driver.Url = _AppSettings.GetServer("local");
             _Driver.Navigate();
 
             _PathFinderPage.IDRButton.Click();
 
-            _IDRLoginPage.UserNameTextBox.WaitFor(5);
+            _IDirPage.UserNameTextBox.WaitFor(5);
 
-            _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+            _IDirPage.UserNameTextBox.EnterText(_TestUserName);
 
-            _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+            _IDirPage.PasswordTextBox.EnterText(_TestPassword);
 
-            _IDRLoginPage.ContinueButton.Click();
+            _IDirPage.ContinueButton.Click();
 
 
             IWebElement TOC = null;
@@ -96,6 +96,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a dedicated section for managing user access requests")]
         public void ThereShouldBeADedicatedSectionForManagingUserAccessRequests()
         {
+           // _ManagingAccessPage.Driver.ExecuteJavaScript();
         }
 
         //#User Access Request List

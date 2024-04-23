@@ -21,7 +21,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private DelistingRequestPage _DelistingRequestPage;
         private TakeDownRequestPage _TakeDownRequestPage;
         private PathFinderPage _PathFinderPage;
-        private IDRLoginPage _IDRLoginPage;
+        private BCIDPage _BCIDPage;
         private string _TestUserName;
         private string _TestPassword;
         private int _CurrentRow = 0;
@@ -37,7 +37,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _DelistingRequestPage = new DelistingRequestPage(_Driver);
             _TakeDownRequestPage = new TakeDownRequestPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
-            _IDRLoginPage = new IDRLoginPage(_Driver);
+            _BCIDPage = new BCIDPage(_Driver);
             _AppSettings = new AppSettings();
         }
 
@@ -46,20 +46,22 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void GivenIAmAauthenticatedLGStaffMemberUser(string UserName, string ExpectedResult)
         {
             _TestUserName = UserName;
-            _TestPassword = _AppSettings.GetValue(_TestUserName) ?? string.Empty;
+            _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
-            _Driver.Url = "http://127.0.0.1:4200";
+            _Driver.Url = _AppSettings.GetServer("uat");
             _Driver.Navigate();
 
-            _PathFinderPage.IDRButton.Click();
 
-            _IDRLoginPage.UserNameTextBox.WaitFor(5);
+            _PathFinderPage.BCIDButton.Click();
 
-            _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
-            _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+            _BCIDPage.UserNameTextBox.WaitFor(5);
 
-            _IDRLoginPage.ContinueButton.Click();
+            _BCIDPage.UserNameTextBox.EnterText(_TestUserName);
+
+            _BCIDPage.PasswordTextBox.EnterText(_TestPassword);
+
+            _BCIDPage.ContinueButton.Click();
 
             IWebElement TOC = null;
 

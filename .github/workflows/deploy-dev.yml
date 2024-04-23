@@ -18,7 +18,7 @@ on:
       - crunchydb/**
 
 jobs:
-  build-backend:
+  test-backend:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
 
@@ -31,25 +31,10 @@ jobs:
         with:
           dotnet-version: '7.0.400'
 
-      - uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget
-
-      - name: Setup Tools
-        uses: ./.github/actions/setup-tools
-
-      - name: Build backend
-        run: |
-          pwd
-          dotnet build ./server/server.sln
-
       - name: Test backend
-        run: dotnet test ./server/server.sln --no-build
+        run: dotnet test ./server/server.sln
 
-  build-frontend:
+  test-frontend:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
@@ -65,29 +50,15 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install Angular CLI
-        run: |
+      - run: |
           cd ./frontend
           npm install -g @angular/cli
-
-      - name: Install project dependencies
-        run: |
-          cd ./frontend
           npm install
-
-      - name: Build frontend
-        run: |
-          cd ./frontend
           ng build --configuration=production
-
-      - name: Run frontend tests
-        run: |
-          cd ./frontend
           ng test --watch=false --progress=false --browsers=ChromeHeadless --code-coverage --source-map=false
         continue-on-error: true
 
   docker-build-backend:
-    needs: [build-backend]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
@@ -112,7 +83,6 @@ jobs:
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
 
   docker-build-frontend:
-    needs: [build-frontend]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
@@ -141,7 +111,7 @@ jobs:
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
 
   deploy:
-    needs: [docker-build-frontend, docker-build-backend]
+    needs: [test-frontend, test-backend, docker-build-frontend, docker-build-backend]
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     permissions:

@@ -153,7 +153,7 @@ INSERT INTO dss_organization_contact_person
 SELECT true, emt.email_message_type, :quoted_tester_email, o.organization_id
 FROM dss_organization AS o, dss_email_message_type as emt
 where o.organization_type='Platform'
-and emt.email_message_type in ('Notice of Takedown','Batch Takedown Request')
+and emt.email_message_type in ('Notice of Takedown','Takedown Request','Batch Takedown Request')
 and NOT EXISTS (
 SELECT 1
 FROM dss_organization_contact_person AS ocp

@@ -194,3 +194,4 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         target: https://dev-strdata.apps.silver.devops.gov.bc.ca/
+        rules_file_name: '.zap/rules.tsv'

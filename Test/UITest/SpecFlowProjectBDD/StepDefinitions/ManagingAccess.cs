@@ -12,6 +12,9 @@ using System;
 using System.Collections.Generic;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.Extensions;
+using System.Reflection.Metadata;
+using System.Xml.Linq;
+using OpenQA.Selenium.DevTools.V118.Debugger;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -96,7 +99,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a dedicated section for managing user access requests")]
         public void ThereShouldBeADedicatedSectionForManagingUserAccessRequests()
         {
-           // _ManagingAccessPage.Driver.ExecuteJavaScript();
+          bool result =   (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-user-management > div.table-card-container"").checkVisibility()");
+          ClassicAssert.IsTrue(result);
         }
 
         //#User Access Request List
@@ -110,6 +114,34 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should see a list displaying all user access requests, including relevant details such as the user's name, role request, and date of submission")]
         public void IShouldSeeAListDisplayingAllUserAccessRequestss()
         {
+            bool found = false;
+            bool result = false;
+
+            while (found == false)
+            {
+                //wait for element to become visable
+                try
+                {
+                    result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1)"").checkVisibility()");
+                    found = true;
+                }
+                catch(JavaScriptException ex) 
+                {
+                    System.Threading.Thread.Sleep(1000);
+                }
+
+            }
+            
+            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1)"").checkVisibility()");
+            ClassicAssert.IsTrue(result);
+            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > thead > tr > th:nth-child(3)"").textContent.toLowerCase().trim() === ""first name""");
+            ClassicAssert.IsTrue(result);
+            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > thead > tr > th:nth-child(4)"").textContent.toLowerCase().trim() === ""last name""");
+            ClassicAssert.IsTrue(result);
+            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > thead > tr > th:nth-child(5)"").textContent.toLowerCase().trim() === ""org""");
+            ClassicAssert.IsTrue(result);
+            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > thead > tr > th:nth-child(6)"").textContent.toLowerCase().trim() === ""email address""");
+            ClassicAssert.IsTrue(result);
         }
 
 
@@ -122,6 +154,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should be able to view detailed information provided by the user, including their role request and any justifications or additional comments")]
         public void ShouldBeAbleToViewDetailedInformationProvidedByTheUser()
         {
+            bool result =   (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1)"").checkVisibility()");
+            ClassicAssert.IsTrue(result);
         }
 
         //Grant Access Button
@@ -133,9 +167,11 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a Grant Access button allowing me to approve the user's request")]
         public void ThereShouldBeAGrantAccessButton()
         {
+            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div > span"").checkVisibility()");
+            ClassicAssert.IsTrue(result);
         }
 
-        //Role Assignment
+        //Role Assignment - NYI
         [When("Clicking the Grant Access button")]
         public void ClickingTheGrantAccessButton()
         {
@@ -149,7 +185,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
         //Deny Access Option
         [When("Reviewing an access request for denial")]
-        public void ReviewingAnAccessRequestForFenial()
+        public void ReviewingAnAccessRequestForDenial()
         {
         }
 
@@ -162,11 +198,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("Reviewing an access request that has been granted")]
         public void ReviewingAnAccessRequestThatHasBeenGranted()
         {
+            _ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div > span"").click()");
         }
 
         [Then("There should be a Remove Access option allowing me to remove the user's access if it is deemed inappropriate or unnecessary")]
         public void ThereShouldBeARemoveAccessOption()
         {
+            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div > span"").checkVisibility()");
+            ClassicAssert.IsTrue(result);
         }
 
         //Confirmation Message

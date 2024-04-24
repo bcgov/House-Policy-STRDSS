@@ -69,7 +69,7 @@ namespace UITest.SeleniumObjects
             return (true);
         }
 
-        public bool ExecuteJavaScript(string JavaScript)
+        public object ExecuteJavaScript(string JavaScript)
         {
             if (null == _Driver)
                 throw new ArgumentNullException("No driver defined");
@@ -81,6 +81,7 @@ namespace UITest.SeleniumObjects
 
             return (true);
         }
+
 
         /// <summary>
         /// Finds a Web Element of the current locator type (Use when a locator can change)

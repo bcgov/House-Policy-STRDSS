@@ -23,6 +23,7 @@ fullnameOverride: strdss-test
 
 route:
   host: test-strdata.apps.silver.devops.gov.bc.ca
+  bcgovHost: test.strdata.gov.bc.ca
   baseService: strdss-test
 
 frontend:

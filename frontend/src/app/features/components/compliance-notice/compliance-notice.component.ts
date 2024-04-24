@@ -158,7 +158,7 @@ export class ComplianceNoticeComponent implements OnInit {
 
   showSuccessMessage(): void {
     this.hideForm = true;
-    this.messages = [{ severity: 'success', summary: '', detail: 'Your Notice of Takedown was Successfully Submitted!' }];
+    this.messages = [{ severity: 'success', summary: '', detail: 'Your Notice of Non-Compliance was Successfully Submitted!' }];
   }
 
   private prepareFormModel(form: FormGroup): ComplianceNotice {

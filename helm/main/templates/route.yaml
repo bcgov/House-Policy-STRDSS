@@ -36,3 +36,42 @@ spec:
   to:
     kind: Service
     name: {{ .Values.route.baseService }}-backend
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "app.fullname" . }}-frontend-bcgov
+  annotations:
+    haproxy.router.openshift.io/balance: roundrobin
+    haproxy.router.openshift.io/disable_cookies: 'true'
+    haproxy.router.openshift.io/timeout: 180s
+spec:
+  {{- if .Values.route.bcgovHost }}
+  host: {{ .Values.route.bcgovHost }}
+  {{- end }}
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: {{ .Values.route.baseService }}-frontend
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "app.fullname" . }}-backend-bcgov
+  annotations:
+    haproxy.router.openshift.io/balance: roundrobin
+    haproxy.router.openshift.io/disable_cookies: 'true'
+    haproxy.router.openshift.io/timeout: 180s
+spec:
+  {{- if .Values.route.bcgovHost }}
+  host: {{ .Values.route.bcgovHost }}
+  {{- end }}
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  path: "/api"
+  to:
+    kind: Service
+    name: {{ .Values.route.baseService }}-backend

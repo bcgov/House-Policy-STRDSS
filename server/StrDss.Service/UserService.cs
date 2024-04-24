@@ -234,6 +234,8 @@ namespace StrDss.Service
 
             await _userRepo.DenyAccessRequest(dto);
 
+            using var transaction = _unitOfWork.BeginTransaction();
+
             _unitOfWork.Commit();
 
             if (user.EmailAddressDsc!.IsEmpty())
@@ -274,6 +276,8 @@ namespace StrDss.Service
             emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
+
+            _unitOfWork.CommitTransaction(transaction);
 
             return errors;
         }
@@ -332,6 +336,8 @@ namespace StrDss.Service
 
             await _userRepo.ApproveAccessRequest(dto, role);
 
+            using var transaction = _unitOfWork.BeginTransaction();
+
             _unitOfWork.Commit();
 
             if (user.EmailAddressDsc!.IsEmpty())
@@ -373,6 +379,8 @@ namespace StrDss.Service
             emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
+
+            _unitOfWork.CommitTransaction(transaction);
 
             return errors;
         }

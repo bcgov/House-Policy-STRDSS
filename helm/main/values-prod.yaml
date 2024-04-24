@@ -27,7 +27,7 @@ route:
 
 frontend:
   enabled: true
-  replicaCount: 3
+  replicaCount: 2
   nameOverride: strdss-prod-frontend
   fullnameOverride: strdss-prod-frontend
   secretName: strdss-secrets-prod
@@ -43,9 +43,18 @@ frontend:
   env:
     'API_HOST': '/api'
 
+  affinityTemplate: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchLabels: {{ include "app.selectorLabels" . | nindent 10 }}
+
 backend:
   enabled: true
-  replicaCount: 3
+  replicaCount: 2
   nameOverride: strdss-prod-backend
   fullnameOverride: strdss-prod-backend
   secretName: strdss-secrets-prod
@@ -54,11 +63,20 @@ backend:
 
   resources:
     limits:
-      cpu: 1500m
-      memory: 1500Mi
+      cpu: 200m
+      memory: 300Mi
     requests:
       cpu: 20m
-      memory: 1100Mi
+      memory: 200Mi
 
   env:
     'API_HOST': '/api'
+
+  affinityTemplate: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchLabels: {{ include "app.selectorLabels" . | nindent 10 }}

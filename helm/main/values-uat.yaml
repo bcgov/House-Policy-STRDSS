@@ -23,7 +23,6 @@ fullnameOverride: strdss-uat
 
 route:
   host: uat-strdata.apps.silver.devops.gov.bc.ca
-  bcgovHost: uat.strdata.gov.bc.ca
   baseService: strdss-uat
 
 frontend:

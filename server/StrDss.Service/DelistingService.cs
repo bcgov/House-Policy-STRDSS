@@ -424,7 +424,8 @@ namespace StrDss.Service
                 .ToList();
 
             var content = CsvHelperUtils.GetBase64CsvString(csvRecords);
-            var date = DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm");
+            var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyy-MM-dd-HH-mm");
+            var fileName = $"{platform.OrganizationNm} - {date}.csv";
 
             var template = new BatchTakedownRequest(_emailService)
             {
@@ -434,7 +435,7 @@ namespace StrDss.Service
                     Content = content,
                     ContentType = "text/csv",
                     Encoding = "base64",
-                    Filename = $"{platform.OrganizationNm} - {date}.csv"
+                    Filename = fileName
                 }},
             };
 
@@ -442,7 +443,7 @@ namespace StrDss.Service
             {
                 EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
-                MessageTemplateDsc = template.GetContent(),
+                MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName} ({csvRecords.Count})",
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
                 MessageReasonId = null,

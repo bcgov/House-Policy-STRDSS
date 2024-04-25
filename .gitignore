@@ -6,3 +6,6 @@ secrets
 .terraform
 docker.env
 backup.sql
+docker-compose.yml
+note.txt
+Scaffolding.txt

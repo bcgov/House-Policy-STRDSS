@@ -23,7 +23,6 @@ fullnameOverride: strdss-prod
 
 route:
   host: prod-strdata.apps.silver.devops.gov.bc.ca
-  bcgovHost: strdata.gov.bc.ca
   baseService: strdss-prod
 
 frontend:

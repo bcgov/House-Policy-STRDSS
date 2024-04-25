@@ -22,7 +22,6 @@ fullnameOverride: strdss-dev
 
 route:
   host: dev-strdata.apps.silver.devops.gov.bc.ca
-  bcgovHost: dev.strdata.gov.bc.ca
   baseService: strdss-dev
 
 frontend:

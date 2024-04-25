@@ -135,7 +135,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            ValidateIssuer = false,
             ValidateAudience = true,
             ValidAlgorithms = new List<string>() { "RS256" },
         };

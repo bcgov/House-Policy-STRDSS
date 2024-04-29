@@ -28,12 +28,17 @@ builder.WebHost.ConfigureKestrel((context, options) =>
     options.AddServerHeader = false;
 });
 
+
+
 var dbHost = builder.Configuration.GetValue<string>("DB_HOST");
 var dbName = builder.Configuration.GetValue<string>("DB_NAME");
 var dbUser = builder.Configuration.GetValue<string>("DB_USER");
 var dbPass = builder.Configuration.GetValue<string>("DB_PASS");
 var dbPort = builder.Configuration.GetValue<string>("DB_PORT");
-var connString = $"Host={dbHost!.GetStringBeforeFirstDot()};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
+
+Console.WriteLine($"Host: {dbHost}");
+
+var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
 
 builder.Services.AddHttpContextAccessor();
 

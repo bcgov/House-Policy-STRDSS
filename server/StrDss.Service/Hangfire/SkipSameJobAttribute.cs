@@ -107,7 +107,7 @@ namespace StrDss.Service.Hangfire
             var dbUser = Environment.GetEnvironmentVariable("DB_USER");
             var dbPass = Environment.GetEnvironmentVariable("DB_PASS");
             var dbPort = Environment.GetEnvironmentVariable("DB_PORT");
-            var connString = $"Host={dbHost!.GetStringBeforeFirstDot()};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
+            var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
 
             string sql = @"DELETE FROM Hangfire.Lock WHERE Resource = @ResourceName;";
 

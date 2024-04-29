@@ -1,4 +1,7 @@
 global:
+  vault:
+    role: f4a30d-prod
+    subPath: strdss-prod
   env:
     'Logging__LogLevel__Default': 'Information'
     'Logging__LogLevel__Microsoft.EntityFrameworkCore': 'Warning'

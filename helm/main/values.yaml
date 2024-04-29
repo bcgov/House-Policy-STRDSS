@@ -2,3 +2,22 @@ global:
   licensePlate: f4a30d
   imagePullSecrets:
   - name: jf-rg-secret
+
+  serviceAccountName: f4a30d-vault
+  vault:
+    # licensePlate-nonprod or licensePlate-prod
+    role:
+    # sub-path of the vault secret
+    subPath:
+    podAnnotations:
+      # See https://developer.hashicorp.com/vault/docs/platform/k8s/injector/annotations#agent-annotations
+      vault.hashicorp.com/auth-path: auth/k8s-silver
+      vault.hashicorp.com/namespace: platform-services
+      vault.hashicorp.com/agent-inject: "true"
+      vault.hashicorp.com/agent-inject-token: "false"
+      vault.hashicorp.com/agent-pre-populate: "true"
+      vault.hashicorp.com/agent-pre-populate-only: "true"
+      vault.hashicorp.com/agent-requests-cpu: 50m
+      vault.hashicorp.com/agent-limits-cpu: 100m
+      vault.hashicorp.com/agent-requests-mem: 32Mi
+      vault.hashicorp.com/agent-limits-mem: 64Mi

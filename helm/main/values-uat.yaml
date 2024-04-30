@@ -1,4 +1,7 @@
 global:
+  vault:
+    role: f4a30d-nonprod
+    subPath: strdss-uat
   env:
     'Logging__LogLevel__Default': 'Information'
     'Logging__LogLevel__Microsoft.EntityFrameworkCore': 'Warning'
@@ -34,8 +37,8 @@ frontend:
 
   resources:
     limits:
-      cpu: 50m
-      memory: 100Mi
+      cpu: 30m
+      memory: 70Mi
     requests:
       cpu: 20m
       memory: 50Mi
@@ -71,7 +74,7 @@ backend:
 
   resources:
     limits:
-      cpu: 200m
+      cpu: 100m
       memory: 300Mi
     requests:
       cpu: 20m

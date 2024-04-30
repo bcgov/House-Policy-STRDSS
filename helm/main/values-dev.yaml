@@ -1,4 +1,7 @@
 global:
+  vault:
+    role: f4a30d-nonprod
+    subPath: strdss-dev
   env:
     'Logging__LogLevel__Default': 'Information'
     'Logging__LogLevel__Microsoft.EntityFrameworkCore': 'Warning'
@@ -17,6 +20,7 @@ global:
     'RENTAL_LISTING_REPORT_MAX_SIZE': '4'
     'BCEID_URL': 'https://gws1.development.bceid.ca/webservices/client/v10/bceidservice.asmx'
     'BCEID_CACHE_LIFESPAN': '600'
+
 nameOverride: strdss-dev
 fullnameOverride: strdss-dev
 
@@ -29,13 +33,11 @@ frontend:
   replicaCount: 1
   nameOverride: strdss-dev-frontend
   fullnameOverride: strdss-dev-frontend
-  secretName: strdss-secrets-dev
-  crunchdb: false
 
   resources:
     limits:
-      cpu: 50m
-      memory: 100Mi
+      cpu: 30m
+      memory: 70Mi
     requests:
       cpu: 20m
       memory: 50Mi
@@ -48,9 +50,6 @@ backend:
   replicaCount: 1
   nameOverride: strdss-dev-backend
   fullnameOverride: strdss-dev-backend
-  secretName: strdss-secrets-dev
-  dbSecretName: strdssdev-pguser-strdssdev
-  crunchydb: false
 
   # resources:
   #   limits:
@@ -62,7 +61,7 @@ backend:
 
   resources:
     limits:
-      cpu: 200m
+      cpu: 100m
       memory: 300Mi
     requests:
       cpu: 20m

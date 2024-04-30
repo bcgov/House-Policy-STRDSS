@@ -13,8 +13,12 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
             return next(req.clone({ headers: headers })).pipe(
                 catchError((error: HttpErrorResponse) => {
                     if (error.status === 401) {
-                        if (error.error.title === 'Unauthorized') {
-                            router.navigateByUrl('/401');
+                        if (error.error?.title === 'Unauthorized' || error.statusText === 'Unauthorized') {
+                            if (keykloakService.isTokenExpired()) {
+                                window.location.reload();
+                            } else {
+                                router.navigateByUrl('/401');
+                            }
                         }
 
                         return EMPTY;

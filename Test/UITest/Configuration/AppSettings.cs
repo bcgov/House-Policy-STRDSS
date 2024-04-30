@@ -16,11 +16,10 @@ namespace Configuration
             usersSection = configuration.GetSection("Users");
         }
 
-        public string GetValue(string Key)
+        public string GetUserValue(string Key)
         {
             return (usersSection[Key]);
         }
-
     }
 }
 

@@ -55,7 +55,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void IAttemptToAccessTheDataSharingSystem(string UserName)
         {
             _TestUserName = UserName;
-            _TestPassword = appSettings.GetValue(_TestUserName) ?? string.Empty;
+            _TestPassword = appSettings.GetUserValue(_TestUserName) ?? string.Empty;
 
             _IDRLoginPage.UserNameTextBox.WaitFor(5);
 

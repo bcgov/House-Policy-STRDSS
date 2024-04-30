@@ -12,14 +12,43 @@
     }
 
     .cards {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-gap: 24px;
-        justify-items: space-between;
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
 
-        p-card {
-            &:first-child {
-                height: 195px;
+        .dashboard-card {
+            margin: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            padding: 18px;
+
+            width: 470px;
+            height: 225px;
+
+            display: flex;
+            justify-content: space-between;
+            flex-direction: column;
+            box-shadow: 0px 1px 5px 0px #00000033;
+
+            .card-header {
+                height: 24px;
+                margin-bottom: 4px;
+                font-family: 'BcSans-regular';
+                font-size: 16px;
+                font-weight: 700;
+                color: #004578;
+            }
+
+            .card-content {
+                height: calc(100% - 28px - 48px);
+                padding: 0;
+                font-family: 'BcSans-regular';
+                font-size: 16px;
+            }
+
+            .card-actions {
+                height: 48px;
             }
         }
     }

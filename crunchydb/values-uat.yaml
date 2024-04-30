@@ -7,14 +7,14 @@ crunchy-postgres:
       storage: 6Gi
       storageClassName: netapp-block-standard
     requests:
-      cpu: 1m
+      cpu: 20m
       memory: 256Mi
     limits:
       cpu: 100m
       memory: 512Mi
     replicaCertCopy:
       requests:
-        cpu: 1m
+        cpu: 20m
         memory: 32Mi
       limits:
         cpu: 50m

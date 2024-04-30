@@ -6,6 +6,7 @@ using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using static SpecFlowProjectBDD.SFEnums;
 using System.Reflection;
+using SpecFlowProjectBDD.Helpers;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -18,13 +19,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private DelistingWarningPage _DelistingWarningPage;
         private TermsAndConditionsPage _TermsAndConditionsPage;
         private PathFinderPage _PathFinderPage;
-        private IDRLoginPage _IDRLoginPage;
+        private IDirLoginPage _IDRLoginPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
         private string _TestUserName;
         private string _TestPassword;
         private bool _ExpectedResult = false;
         private AppSettings _AppSettings;
         private SFEnums.UserTypeEnum _UserType;
+        private BCIDPage _BCIDPage;
 
         public STRDSSLandingPage(SeleniumDriver Driver)
         {
@@ -34,31 +36,28 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
-            _IDRLoginPage = new IDRLoginPage(_Driver);
+            _IDRLoginPage = new IDirLoginPage(_Driver);
+            _BCIDPage = new BCIDPage(_Driver);
             _AppSettings = new AppSettings();
         }
 
         //User Authentication
-        [Given(@"that I am an authenticated User ""(.*)"" and the expected result is ""(.*)""")]
-        public void GivenIAmAauthenticatedLGStaffMemberUser(string UserName, string ExpectedResult)
+        //       that I am an authenticated User "<UserName>" and the expected result is "<ExpectedResult>" and I am a "<UserType>" user
+        [Given(@"that I am an authenticated User ""(.*)"" and the expected result is ""(.*)"" and I am a ""(.*)"" user")]
+        public void GivenIAmAauthenticatedLGStaffMemberUser(string UserName, string ExpectedResult, string UserType)
         {
             _TestUserName = UserName;
-            _TestPassword = _AppSettings.GetUserValue(_TestUserName) ?? string.Empty;
+            _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
-            _Driver.Url = "http://127.0.0.1:4200";
+            _Driver.Url = _AppSettings.GetServer("default");
             _Driver.Navigate();
 
-            _PathFinderPage.IDRButton.Click();
+            AuthHelper authHelper = new AuthHelper(_Driver);
 
-            _IDRLoginPage.UserNameTextBox.WaitFor(5);
-
-            _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
-
-            _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
-
-            _IDRLoginPage.ContinueButton.Click();
-
+            //Authenticate user using IDir or BCID depending on the user
+            _UserType = authHelper.Authenticate(UserName, UserType);
+            
             IWebElement TOC = null;
 
             try
@@ -79,24 +78,18 @@ namespace SpecFlowProjectBDD.StepDefinitions
             }
         }
 
-        [When("I navigate to the Landing Page")]
-        public void INavigateToTheLandingPage()
-        {
-        }
-
-
         //Landing Page for Government Users
-        [When(@"I am an authenticated government user ""(.*)"" and I access the Data Sharing System landing page")]
-        public void IAmAnAuthenticatedGovernmentUser(string UserType)
+        [When(@"I am an authenticated government user and I access the Data Sharing System landing page")]
+        public void IAmAnAuthenticatedGovernmentUser()
         {
-            _UserType = SetUserType(UserType);
+            //_UserType = SetUserType(UserType);
 
         }
 
         [Then("I should find where I can submit delisting warnings and requests to short-term rental platforms")]
         public void IShouldFindWhereICanSubmitDelistingWarningsAndRequests()
         {
-            if (_UserType == UserTypeEnum.GOVERNMENT)
+            if (_UserType == UserTypeEnum.BCGOVERNMENT)
             {
                 ClassicAssert.True(_LandingPage.SendNoticeButton.IsEnabled());
                 ClassicAssert.True(_LandingPage.SendTakedownLetterButton.IsEnabled());
@@ -107,17 +100,16 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When(@"I am an authenticated platform user ""(.*)"" and I access the Data Sharing System landing page")]
         public void WhenINavigateToTheDelistingWarningFeature(string UserType)
         {
-            _UserType = SetUserType(UserType);
+            //_UserType = SetUserType(UserType);
         }
 
 
         [Then("I should find where I can upload a CSV file")]
         public void IShouldFindWhereICanUploadACSVDile()
         {
-            if (_UserType == UserTypeEnum.GOVERNMENT)
+            if (_UserType == UserTypeEnum.PLATFORM)
             {
-                ClassicAssert.True(_LandingPage.SendNoticeButton.IsEnabled());
-                ClassicAssert.True(_LandingPage.SendTakedownLetterButton.IsEnabled());
+                ClassicAssert.True(_LandingPage.Upload_ListingsButton.IsEnabled());
             }
         }
 
@@ -125,7 +117,10 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should see some information about my obligations as a platform")]
         public void IShouldSeeSomeInformationAboutMyObligationsAsAPlatform()
         {
-
+            if (_UserType == UserTypeEnum.PLATFORM)
+            {
+                ClassicAssert.True(_LandingPage.ViewPolicyGuidenceButton.IsEnabled());
+            }
         }
 
         //Clear Navigation
@@ -153,26 +148,26 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
         /****************** Helper Methods **************************/
 
-        private UserTypeEnum SetUserType(string UserType)
-        {
-            switch (UserType.ToUpper())
-            {
-                case "CODEENFOREMENTSTAFF":
-                case "CODEENFORCEMENTADMIN":
-                case "LOCALGOVERNMENTUSER":
-                    {
-                        _UserType = SFEnums.UserTypeEnum.GOVERNMENT;
-                        break;
-                    }
-                case "PLATFORMUSER":
-                    {
-                        _UserType = SFEnums.UserTypeEnum.GOVERNMENT;
-                        break;
-                    }
-                default:
-                    throw new ArgumentException("Unknown User Type (" + UserType + ")");
-            }
-            return (_UserType);
-        }
+        //private UserTypeEnum SetUserType(string UserType)
+        //{
+        //    switch (UserType.ToUpper())
+        //    {
+        //        case "CODEENFOREMENTSTAFF":
+        //        case "CODEENFORCEMENTADMIN":
+        //        case "LOCALGOVERNMENTUSER":
+        //            {
+        //                _UserType = SFEnums.UserTypeEnum.BCGOVERNMENT;
+        //                break;
+        //            }
+        //        case "PLATFORMUSER":
+        //            {
+        //                _UserType = SFEnums.UserTypeEnum.BCGOVERNMENT;
+        //                break;
+        //            }
+        //        default:
+        //            throw new ArgumentException("Unknown User Type (" + UserType + ")");
+        //    }
+        //    return (_UserType);
+        //}
     }
 }

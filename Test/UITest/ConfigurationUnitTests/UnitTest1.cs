@@ -11,7 +11,7 @@ namespace ConfigurationUnitTests
             AppSettings appSettings = new AppSettings();
             
             //act
-            var result = appSettings.GetUserValue("TestPassword");
+            var result = appSettings.GetUser("TestPassword");
 
             //assert
 

@@ -76,7 +76,7 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("STRDSSLandingPage")]
         [NUnit.Framework.CategoryAttribute("LandingPage")]
-        [NUnit.Framework.TestCaseAttribute("CEUSTST", "CodeEnforementStaff", "all", "pass", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "CodeEnforementStaff", "all", "pass", null)]
         public void STRDSSLandingPage(string userName, string userType, string environment, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {
@@ -103,33 +103,31 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 7
- testRunner.Given(string.Format("that I am an authenticated User \"{0}\" and the expected result is \"{1}\"", userName, expectedResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given(string.Format("that I am an authenticated User \"{0}\" and the expected result is \"{1}\" and I am a" +
+                            " \"{2}\" user", userName, expectedResult, userType), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 8
- testRunner.When("I navigate to the Landing Page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 10
+ testRunner.When("I am an authenticated government user and I access the Data Sharing System landin" +
+                        "g page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 13
- testRunner.When(string.Format("I am an authenticated government user \"{0}\" and I access the Data Sharing System " +
-                            "landing page", userType), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 15
+#line 12
  testRunner.Then("I should find where I can submit delisting warnings and requests to short-term re" +
                         "ntal platforms", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 19
+#line 15
  testRunner.When(string.Format("I am an authenticated platform user \"{0}\" and I access the Data Sharing System la" +
                             "nding page", userType), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 23
+#line 19
  testRunner.Then("I should find where I can upload a CSV file", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 25
+#line 21
  testRunner.And("I should see some information about my obligations as a platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 29
+#line 24
  testRunner.When("I explore the landing page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 31
+#line 26
  testRunner.Then("there should be a clear and intuitive navigation menu that guides me to other rel" +
                         "evant sections of the application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

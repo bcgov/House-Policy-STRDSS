@@ -426,10 +426,12 @@ namespace StrDss.Service
             var content = CsvHelperUtils.GetBase64CsvString(csvRecords);
             var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyy-MM-dd-HH-mm");
             var fileName = $"{platform.OrganizationNm} - {date}.csv";
+            var adminEmail = _config.GetValue<string>("ADMIN_EMAIL") ?? throw new Exception($"There's no admin eamil.");
 
             var template = new BatchTakedownRequest(_emailService)
             {
                 To = new string[] { contact!.EmailAddressDsc },
+                Bcc = new string[] { adminEmail! },
                 Info = $"{EmailMessageTypes.BatchTakedownRequest} for {platform.OrganizationNm}",
                 Attachments = new EmailAttachment[] { new EmailAttachment {
                     Content = content,

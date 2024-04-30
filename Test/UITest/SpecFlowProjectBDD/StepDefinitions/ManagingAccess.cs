@@ -49,7 +49,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void GivenIAmAauthenticatedGovernmentUseer(string UserName, string ExpectedResult)
         {
             _TestUserName = UserName;
-            _TestPassword = _AppSettings.GetValue(_TestUserName) ?? string.Empty;
+            _TestPassword = _AppSettings.GetUserValue(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
             _Driver.Url = "http://127.0.0.1:4200";

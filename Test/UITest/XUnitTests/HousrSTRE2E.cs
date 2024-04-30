@@ -40,8 +40,8 @@ namespace XUnitTests
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDRLoginPage = new IDRLoginPage(_Driver);
             AppSettings appSettings = new AppSettings();
-            _TestUserName = appSettings.GetValue("TestUserName") ?? string.Empty;
-            _TestPassword = appSettings.GetValue("TestPassword") ?? string.Empty;
+            _TestUserName = appSettings.GetUserValue("TestUserName") ?? string.Empty;
+            _TestPassword = appSettings.GetUserValue("TestPassword") ?? string.Empty;
         }
 
         [Fact]

@@ -20,7 +20,7 @@ namespace XUnitTests
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
         private TakeDownRequestPage _TakeDownRequestPage;
         private PathFinderPage _PathFinderPage;
-        private IDRLoginPage _IDRLoginPage;
+        private IDirLoginPage _IDRLoginPage;
         private RequestAccessPage _RequestAccessPage;
         private string _TestUserName;
         private string _TestPassword;
@@ -38,10 +38,10 @@ namespace XUnitTests
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _TakeDownRequestPage = new TakeDownRequestPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
-            _IDRLoginPage = new IDRLoginPage(_Driver);
+            _IDRLoginPage = new IDirLoginPage(_Driver);
             AppSettings appSettings = new AppSettings();
-            _TestUserName = appSettings.GetUserValue("TestUserName") ?? string.Empty;
-            _TestPassword = appSettings.GetUserValue("TestPassword") ?? string.Empty;
+            _TestUserName = appSettings.GetUser("TestUserName") ?? string.Empty;
+            _TestPassword = appSettings.GetUser("TestPassword") ?? string.Empty;
         }
 
         [Fact]

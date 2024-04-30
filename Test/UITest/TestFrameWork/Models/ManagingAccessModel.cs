@@ -2,6 +2,18 @@
 {
     public class ManagingAccessModel
     {
+        public static string ManageAccessSection
+        {
+            get
+            {
+                return @"/html/body/app-root/app-layout/div[2]/app-user-management/div[2]";
+            }
+        }
+
+        public static string ActionButton
+        {
+            get { return @"/html/body/app-root/app-layout/div[2]/app-user-management/div[2]/div[2]/p-table/div/div/table/tbody/tr[1]/td[8]/span"; }
+        }
         public static string StatusDropDown
         {
             get

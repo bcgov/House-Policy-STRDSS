@@ -128,7 +128,7 @@ export class DelistingRequestComponent implements OnInit {
 
   showSuccessMessage(): void {
     this.hideForm = true;
-    this.messages = [{ severity: 'success', summary: '', detail: 'Your Notice of Takedown was Successfully Submitted!' }];
+    this.messages = [{ severity: 'success', summary: '', detail: 'Your Takedown Request was Successfully Submitted!' }];
   }
 
   private prepareFormModel(form: FormGroup): DelistingRequest {

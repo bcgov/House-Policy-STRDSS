@@ -6,7 +6,6 @@ using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Service;
-using StrDss.Service.HttpClients;
 
 namespace StrDss.Api.Controllers
 {
@@ -15,15 +14,13 @@ namespace StrDss.Api.Controllers
     [ApiController]
     public class DelistingController : BaseApiController
     {
-        private IChesTokenApi _chesTokenApi;
         private IDelistingService _delistingService { get; }
         private IEmailMessageService _emailService;
 
-        public DelistingController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IChesTokenApi chesTokenApi, ILogger<StrDssLogger> logger,
+        public DelistingController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
             IDelistingService delistingService, IEmailMessageService emailService)
             : base(currentUser, mapper, config, logger)
         {
-            _chesTokenApi = chesTokenApi;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _delistingService = delistingService;
             _emailService = emailService;

@@ -37,6 +37,7 @@ export class AccessRequestComponent implements OnInit {
   hideForm = false;
   showRequestedSuccessfullyMessage = false;
   showRequestedFailedMessage = false;
+  alreadyClicked = false;
 
   public get organizationTypeControl(): AbstractControl {
     return this.myForm.controls['organizationType'];
@@ -57,41 +58,45 @@ export class AccessRequestComponent implements OnInit {
   }
 
   onRequest(): void {
-    this.messages = [];
-    this.showRequestedFailedMessage = false;
-    this.showRequestedSuccessfullyMessage = false;
-    const model: AccessRequest = this.myForm.getRawValue();
-    this.requestAccessService.createAccessRequest(model).subscribe({
-      next: _ => {
-        this.hideForm = true;
-        this.showRequestedSuccessfullyMessage = true;
-        this.messages = [];
-      },
-      error: (error: {
-        error: {
-          errors: {
-            organizationType: string[],
-            organizationName: string[],
+    if (!this.alreadyClicked) {
 
-            entity: string[]
+      this.alreadyClicked = true;
+      this.messages = [];
+      this.showRequestedFailedMessage = false;
+      this.showRequestedSuccessfullyMessage = false;
+      const model: AccessRequest = this.myForm.getRawValue();
+
+      this.requestAccessService.createAccessRequest(model).subscribe({
+        next: _ => {
+          this.hideForm = true;
+          this.showRequestedSuccessfullyMessage = true;
+          this.messages = [];
+        },
+        error: (error: {
+          error: {
+            errors: {
+              organizationType: string[],
+              organizationName: string[],
+              entity: string[]
+            }
           }
-        }
-      }) => {
-        this.showRequestedFailedMessage = true;
-        if (error.error.errors.entity) {
-          this.messages = [{ severity: 'error', summary: 'Request cannot be sent!', detail: error.error.errors.entity[0] }];
-        }
-        if (error.error.errors.organizationType) {
-          this.messages.push({ severity: 'error', summary: 'Request failed!', detail: error.error.errors.organizationType[0] });
-        }
-        if (error.error.errors.organizationName) {
-          this.messages.push({ severity: 'error', summary: 'Request failed!', detail: error.error.errors.organizationName[0] });
-        }
-        if (!this.messages.length) {
-          this.messages.push({ severity: 'error', summary: 'Request failed!', detail: 'Unhandled error.' });
-        }
-      },
-    })
+        }) => {
+          this.showRequestedFailedMessage = true;
+          if (error.error.errors.entity) {
+            this.messages = [{ severity: 'error', summary: 'Request cannot be sent!', detail: error.error.errors.entity[0] }];
+          }
+          if (error.error.errors.organizationType) {
+            this.messages.push({ severity: 'error', summary: 'Request failed!', detail: error.error.errors.organizationType[0] });
+          }
+          if (error.error.errors.organizationName) {
+            this.messages.push({ severity: 'error', summary: 'Request failed!', detail: error.error.errors.organizationName[0] });
+          }
+          if (!this.messages.length) {
+            this.messages.push({ severity: 'error', summary: 'Request failed!', detail: 'Unhandled error.' });
+          }
+        },
+      })
+    }
   }
 
   private initData(): void {

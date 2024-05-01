@@ -43,7 +43,7 @@ namespace StrDss.Service.Bceid
 
             try
             {
-                var key = username + "||" + userType;
+                var key = userGuid?.ToString("N") + "||" + userType;
                 if (_accountCache.ContainsKey(key))
                 {
                     Debug.WriteLine($"BCeID cache hit: {key}");

@@ -22,6 +22,7 @@ namespace StrDss.Data.Repositories
         Task UpdateIsEnabled(UpdateIsEnabledDto dto);
         Task<List<DropdownStrDto>> GetAccessRequestStatuses();
         Task AcceptTermsConditions();
+        Task UpdateUserNamesAsync(long userId, string firstName, string lastName);
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
     {
@@ -157,6 +158,12 @@ namespace StrDss.Data.Repositories
 
             if(entity != null)
                 entity.TermsAcceptanceDtm = DateTime.UtcNow;
+        }
+        public async Task UpdateUserNamesAsync(long userId, string firstName, string lastName)
+        {
+            var entity = await _dbSet.FirstAsync(x => x.UserIdentityId == userId);
+            entity.FamilyNm = lastName;
+            entity.GivenNm = firstName;
         }
     }
 }

@@ -94,7 +94,10 @@ namespace StrDss.Api.Authentication
                             _currentUser.FirstName = account.FirstName;
                             _currentUser.LastName = account.LastName;
 
-                            await _userService.UpdateBceidUserInfo(user.UserIdentityId, account.FirstName, account.LastName);
+                            if (account.FirstName != user.GivenNm || account.LastName != user.FamilyNm)
+                            {
+                                await _userService.UpdateBceidUserInfo(user.UserIdentityId, account.FirstName, account.LastName);
+                            }
                         }
                     }
                     catch

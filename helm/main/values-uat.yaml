@@ -3,9 +3,7 @@ global:
     role: f4a30d-nonprod
     subPath: strdss-uat
   env:
-    'Logging__LogLevel__Default': 'Information'
-    'Logging__LogLevel__Microsoft.EntityFrameworkCore': 'Warning'
-    'Logging__LogLevel__Microsoft.AspNetCore': 'Warning'
+    'Logging__LogLevel__Default': 'Warning'
     'Logging__LogLevel__StrDss.Common.StrDssLogger': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Staging'
     'ENV_NAME': 'uat'

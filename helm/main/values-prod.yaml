@@ -30,7 +30,7 @@ route:
 
 frontend:
   enabled: true
-  replicaCount: 2
+  replicaCount: 3
   nameOverride: strdss-prod-frontend
   fullnameOverride: strdss-prod-frontend
   secretName: strdss-secrets-prod
@@ -57,7 +57,7 @@ frontend:
 
 backend:
   enabled: true
-  replicaCount: 2
+  replicaCount: 3
   nameOverride: strdss-prod-backend
   fullnameOverride: strdss-prod-backend
   secretName: strdss-secrets-prod

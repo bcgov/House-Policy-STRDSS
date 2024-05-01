@@ -47,5 +47,20 @@ namespace StrDss.Common
 
             return newObj;
         }
+
+        public static bool IsTextFile(string contentType)
+        {
+            return contentType == "text/plain" ||
+                   contentType == "text/csv" ||
+                   contentType == "application/octet-stream";
+        }
+
+        public static string StreamToBase64(Stream stream)
+        {
+            using var memoryStream = new MemoryStream();
+
+            stream.CopyTo(memoryStream);
+            return Convert.ToBase64String(memoryStream.ToArray());
+        }
     }
 }

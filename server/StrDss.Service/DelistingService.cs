@@ -200,9 +200,12 @@ namespace StrDss.Service
 
             // BCC: [sender], [platform], [Additional CCs] (optional)
             dto.CcList.Add(_currentUser.EmailAddress);
-            dto.CcList.Add(platform!.ContactPeople
+
+            var platformEmail = platform!.ContactPeople
                 .FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown)!
-                .EmailAddressDsc);
+                .EmailAddressDsc;
+
+            dto.CcList.Add(platformEmail);
 
             var template = new TakedownNotice(_emailService)
             {
@@ -211,6 +214,7 @@ namespace StrDss.Service
                 LgName = lg!.OrganizationNm,
                 To = dto.ToList,
                 Bcc = dto.CcList,
+                EmailsToHide = new List<string> { platformEmail! },
                 Info = dto.ListingUrl,
                 Comment = dto.Comment,
                 Preview = preview
@@ -524,7 +528,7 @@ namespace StrDss.Service
                 CcEmailAddressDsc = null,
                 UnreportedListingUrl = null,
                 LgStrBylawUrl = null,
-                InitiatingUserIdentityId = null,
+                InitiatingUserIdentityId = _currentUser.Id,
                 AffectedByUserIdentityId = null,
                 InvolvedInOrganizationId = platform.OrganizationId,
                 RequestingOrganizationId = null

@@ -11,9 +11,6 @@ using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
-using System;
-using System.Collections.Generic;
-using System.Net.Mail;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Service
@@ -25,6 +22,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto);
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto);
         Task ProcessTakedownRequestBatchEmailsAsync();
+        Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -202,9 +200,12 @@ namespace StrDss.Service
 
             // BCC: [sender], [platform], [Additional CCs] (optional)
             dto.CcList.Add(_currentUser.EmailAddress);
-            dto.CcList.Add(platform!.ContactPeople
+
+            var platformEmail = platform!.ContactPeople
                 .FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown)!
-                .EmailAddressDsc);
+                .EmailAddressDsc;
+
+            dto.CcList.Add(platformEmail);
 
             var template = new TakedownNotice(_emailService)
             {
@@ -213,6 +214,7 @@ namespace StrDss.Service
                 LgName = lg!.OrganizationNm,
                 To = dto.ToList,
                 Bcc = dto.CcList,
+                EmailsToHide = new List<string> { platformEmail! },
                 Info = dto.ListingUrl,
                 Comment = dto.Comment,
                 Preview = preview
@@ -478,6 +480,102 @@ namespace StrDss.Service
             _unitOfWork.Commit();
 
             _unitOfWork.CommitTransaction(transaction);
+        }
+
+        public async Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream)
+        {
+            var platform = await _orgService.GetOrganizationByIdAsync(platformId);
+
+            var errors = await ValidateBatchTakedownRequestAsync(platform, stream);
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            //the existence of the contact email has been validated above
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest);
+
+            var content = CommonUtils.StreamToBase64(stream);
+            var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyy-MM-dd-HH-mm");
+            var fileName = $"{platform.OrganizationNm} - {date}.csv";
+            var adminEmail = _config.GetValue<string>("ADMIN_EMAIL") ?? throw new Exception($"There's no admin eamil.");
+
+            var template = new BatchTakedownRequest(_emailService)
+            {
+                To = new string[] { contact!.EmailAddressDsc },
+                Bcc = new string[] { adminEmail! },
+                Info = $"{EmailMessageTypes.BatchTakedownRequest} for {platform.OrganizationNm}",
+                Attachments = new EmailAttachment[] { new EmailAttachment {
+                    Content = content,
+                    ContentType = "text/csv",
+                    Encoding = "base64",
+                    Filename = fileName
+                }},
+            };
+
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName}",
+                IsHostContactedExternally = false,
+                IsSubmitterCcRequired = false,
+                MessageReasonId = null,
+                LgPhoneNo = null,
+                UnreportedListingNo = null,
+                HostEmailAddressDsc = null,
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = null,
+                UnreportedListingUrl = null,
+                LgStrBylawUrl = null,
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = null,
+                InvolvedInOrganizationId = platform.OrganizationId,
+                RequestingOrganizationId = null
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            emailEntity.ExternalMessageNo = await template.SendEmail();
+
+            using var transaction = _unitOfWork.BeginTransaction();
+
+            _unitOfWork.Commit();
+
+            emailEntity.BatchingEmailMessageId = emailEntity.EmailMessageId;
+
+            _unitOfWork.Commit();
+
+            _unitOfWork.CommitTransaction(transaction);
+
+            return errors;
+        }
+
+        private async Task<Dictionary<string, List<string>>> ValidateBatchTakedownRequestAsync(OrganizationDto? platform, Stream stream)
+        {
+            await Task.CompletedTask;
+
+            var errors = new Dictionary<string, List<string>>();
+
+            if (platform == null)
+            {
+                errors.AddItem("platformId", $"Platform ID ({platform!.OrganizationId}) does not exist.");
+            }
+            else
+            {
+                if (platform.OrganizationType != OrganizationTypes.Platform)
+                {
+                    errors.AddItem("platformId", $"Organization ({platform!.OrganizationId}) is not a platform");
+                }
+
+                if (platform.ContactPeople == null ||
+                    !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest))
+                {
+                    errors.AddItem("platformId", $"Platform ({platform!.OrganizationId}) does not have the primary '{EmailMessageTypes.BatchTakedownRequest}' contact info");
+                }
+            }
+
+            return errors;
         }
     }
 }

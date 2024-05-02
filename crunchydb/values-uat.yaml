@@ -8,17 +8,17 @@ crunchy-postgres:
       storageClassName: netapp-block-standard
     requests:
       cpu: 20m
-      memory: 256Mi
+      memory: 512Mi
     limits:
       cpu: 100m
-      memory: 512Mi
+      memory: 768Mi
     replicaCertCopy:
       requests:
         cpu: 20m
-        memory: 32Mi
+        memory: 64Mi
       limits:
         cpu: 50m
-        memory: 64Mi
+        memory: 128Mi
 
   pgBackRest:
     retention: "10" # Ideally a larger number such as 30 backups/days

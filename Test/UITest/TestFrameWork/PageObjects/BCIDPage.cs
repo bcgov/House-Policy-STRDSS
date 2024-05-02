@@ -4,7 +4,7 @@ using UITest.TestDriver;
 
 namespace TestFrameWork.Models
 {
-    public class IDRLoginPage
+    public class BCIDPage
     {
         private IDriver _Driver;
         private TextBox _UserNameTextBox;
@@ -15,12 +15,12 @@ namespace TestFrameWork.Models
         public TextBox PasswordTextBox { get => _PasswordTextBox; set => _PasswordTextBox = value; }
         public Button ContinueButton { get => _ContinueButton; set => _ContinueButton = value; }
 
-        public IDRLoginPage(IDriver Driver)
+        public BCIDPage(IDriver Driver)
         {
             _Driver = Driver;
-            _UserNameTextBox = new TextBox(Driver, Enums.FINDBY.ID, IDirLogonModel.IDRUserName);
-            _PasswordTextBox = new TextBox(Driver, Enums.FINDBY.ID, IDirLogonModel.IDRPassword);
-            _ContinueButton = new(Driver, Enums.FINDBY.CSSSELECTOR, IDirLogonModel.ContinueButton);
+            _UserNameTextBox = new TextBox(Driver, Enums.FINDBY.ID, BCIDModel.UserName);
+            _PasswordTextBox = new TextBox(Driver, Enums.FINDBY.ID, BCIDModel.Password);
+            _ContinueButton = new(Driver, Enums.FINDBY.CSSSELECTOR, BCIDModel.ContinueButton);
         }
 
 

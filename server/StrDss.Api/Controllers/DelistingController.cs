@@ -153,7 +153,7 @@ namespace StrDss.Api.Controllers
 
             using var stream = dto.File.OpenReadStream();
 
-            errors = await _delistingService.SendBatchTakedownNoticeAsync(dto.PlatformId, dto.LgName, stream);
+            errors = await _delistingService.SendBatchTakedownNoticeAsync(dto.PlatformId, stream);
             if (errors.Count > 0)
             {
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);

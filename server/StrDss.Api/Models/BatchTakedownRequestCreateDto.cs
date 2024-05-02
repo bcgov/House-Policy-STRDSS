@@ -1,4 +1,4 @@
-﻿namespace StrDss.Model.DelistingDtos
+﻿namespace StrDss.Api.Models
 {
     public class BatchTakedownRequestCreateDto
     {

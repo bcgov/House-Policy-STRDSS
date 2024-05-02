@@ -36,10 +36,10 @@ frontend:
   resources:
     limits:
       cpu: 30m
-      memory: 70Mi
+      memory: 140Mi
     requests:
       cpu: 20m
-      memory: 50Mi
+      memory: 70Mi
 
   env:
     'API_HOST': '/api'
@@ -65,10 +65,10 @@ backend:
   resources:
     limits:
       cpu: 100m
-      memory: 300Mi
+      memory: 500Mi
     requests:
       cpu: 20m
-      memory: 200Mi
+      memory: 300Mi
 
   env:
     'API_HOST': '/api'

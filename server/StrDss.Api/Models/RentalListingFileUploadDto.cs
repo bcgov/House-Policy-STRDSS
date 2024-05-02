@@ -1,4 +1,4 @@
-﻿namespace StrDss.Api
+﻿namespace StrDss.Api.Models
 {
     public class RentalListingFileUploadDto
     {

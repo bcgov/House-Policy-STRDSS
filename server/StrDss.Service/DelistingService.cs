@@ -23,6 +23,7 @@ namespace StrDss.Service
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto);
         Task ProcessTakedownRequestBatchEmailsAsync();
         Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream);
+        Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, string lgName, Stream stream);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -486,7 +487,7 @@ namespace StrDss.Service
         {
             var platform = await _orgService.GetOrganizationByIdAsync(platformId);
 
-            var errors = await ValidateBatchTakedownRequestAsync(platform, stream);
+            var errors = await ValidateBatchTakedownRequestAsync(platform);
             if (errors.Count > 0)
             {
                 return errors;
@@ -551,7 +552,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidateBatchTakedownRequestAsync(OrganizationDto? platform, Stream stream)
+        private async Task<Dictionary<string, List<string>>> ValidateBatchTakedownRequestAsync(OrganizationDto? platform)
         {
             await Task.CompletedTask;
 
@@ -573,6 +574,109 @@ namespace StrDss.Service
                 {
                     errors.AddItem("platformId", $"Platform ({platform!.OrganizationId}) does not have the primary '{EmailMessageTypes.BatchTakedownRequest}' contact info");
                 }
+            }
+
+            return errors;
+        }
+
+        public async Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, string lgName, Stream stream)
+        {
+            var platform = await _orgService.GetOrganizationByIdAsync(platformId);
+
+            var errors = await ValidateBatchTakedownNoticeAsync(platform, lgName);
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            //the existence of the contact email has been validated above
+            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown);
+
+            var content = CommonUtils.StreamToBase64(stream);
+            var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyy-MM-dd-HH-mm");
+            var fileName = $"Notice of non-compliance - {platform.OrganizationNm} - {date}.csv";
+            var adminEmail = _config.GetValue<string>("ADMIN_EMAIL") ?? throw new Exception($"There's no admin eamil.");
+
+            var template = new BatchTakedownNotice(_emailService)
+            {
+                To = new string[] { contact!.EmailAddressDsc },
+                Bcc = new string[] { adminEmail! },
+                Info = $"{EmailMessageTypes.NoticeOfTakedown} for {platform.OrganizationNm}",
+                Comment = "",
+                LgName = lgName,
+                Attachments = new EmailAttachment[] { new EmailAttachment {
+                    Content = content,
+                    ContentType = "text/csv",
+                    Encoding = "base64",
+                    Filename = fileName
+                }},
+            };
+
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName}",
+                IsHostContactedExternally = false,
+                IsSubmitterCcRequired = false,
+                MessageReasonId = null,
+                LgPhoneNo = null,
+                UnreportedListingNo = null,
+                HostEmailAddressDsc = null,
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = null,
+                UnreportedListingUrl = null,
+                LgStrBylawUrl = null,
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = null,
+                InvolvedInOrganizationId = platform.OrganizationId,
+                RequestingOrganizationId = null
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            emailEntity.ExternalMessageNo = await template.SendEmail();
+
+            using var transaction = _unitOfWork.BeginTransaction();
+
+            _unitOfWork.Commit();
+
+            emailEntity.BatchingEmailMessageId = emailEntity.EmailMessageId;
+
+            _unitOfWork.Commit();
+
+            _unitOfWork.CommitTransaction(transaction);
+
+            return errors;
+        }
+
+        private async Task<Dictionary<string, List<string>>> ValidateBatchTakedownNoticeAsync(OrganizationDto? platform, string lgName)
+        {
+            await Task.CompletedTask;
+
+            var errors = new Dictionary<string, List<string>>();
+
+            if (platform == null)
+            {
+                errors.AddItem("platformId", $"Platform ID ({platform!.OrganizationId}) does not exist.");
+            }
+            else
+            {
+                if (platform.OrganizationType != OrganizationTypes.Platform)
+                {
+                    errors.AddItem("platformId", $"Organization ({platform!.OrganizationId}) is not a platform");
+                }
+
+                if (platform.ContactPeople == null ||
+                    !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest))
+                {
+                    errors.AddItem("platformId", $"Platform ({platform!.OrganizationId}) does not have the primary '{EmailMessageTypes.BatchTakedownRequest}' contact info");
+                }
+            }
+
+            if (lgName.IsEmpty())
+            {
+                errors.AddItem("lgName", $"Local government name is mandatory.");
             }
 
             return errors;

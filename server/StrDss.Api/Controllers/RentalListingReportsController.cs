@@ -3,6 +3,7 @@ using AutoMapper;
 using Hangfire.PostgreSql.Utils;
 using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
+using StrDss.Api.Models;
 using StrDss.Common;
 using StrDss.Model;
 using StrDss.Service;

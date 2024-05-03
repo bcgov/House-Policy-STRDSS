@@ -28,14 +28,11 @@
 			<column name="message_template_dsc" type="varchar" length="4000" jt="12" mandatory="y" >
 				<comment><![CDATA[The full text or template for the message that is sent]]></comment>
 			</column>
-			<column name="is_host_contacted_externally" type="boolean" jt="16" mandatory="y" >
-				<comment><![CDATA[Indicates whether the the property host has already been contacted by external means]]></comment>
-			</column>
 			<column name="is_submitter_cc_required" type="boolean" jt="16" mandatory="y" >
 				<comment><![CDATA[Indicates whether the user initiating the message should receive a copy of the email]]></comment>
 			</column>
-			<column name="message_reason_id" type="bigint" length="64" jt="-5" >
-				<comment><![CDATA[Foreign key]]></comment>
+			<column name="is_host_contacted_externally" type="boolean" jt="16" >
+				<comment><![CDATA[Indicates whether the the property host has already been contacted by external means]]></comment>
 			</column>
 			<column name="lg_phone_no" type="varchar" length="30" jt="12" >
 				<comment><![CDATA[A phone number associated with a Local Government contact]]></comment>
@@ -58,6 +55,9 @@
 			<column name="lg_str_bylaw_url" type="varchar" length="4000" jt="12" >
 				<comment><![CDATA[User-provided URL for a local government bylaw that is the subject of the message]]></comment>
 			</column>
+			<column name="concerned_with_rental_listing_id" type="bigint" jt="-5" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
 			<column name="initiating_user_identity_id" prior="user_identity_id" type="bigint" jt="-5" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
@@ -71,6 +71,9 @@
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
 			<column name="requesting_organization_id" type="bigint" jt="-5" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
+			<column name="message_reason_id" type="bigint" length="64" jt="-5" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
 			<column name="external_message_no" type="varchar" length="50" jt="12" >
@@ -105,6 +108,9 @@
 			</fk>
 			<fk name="dss_email_message_fk_requested_by" to_schema="dss" to_table="dss_organization" >
 				<fk_column name="requesting_organization_id" pk="organization_id" />
+			</fk>
+			<fk name="dss_email_message_fk_included_in" to_schema="dss" to_table="dss_rental_listing" >
+				<fk_column name="concerned_with_rental_listing_id" pk="rental_listing_id" />
 			</fk>
 		</table>
 		<table name="dss_email_message_type" spec="" >
@@ -243,10 +249,34 @@
 				<comment><![CDATA[Full JSON result of the source address matching attempt]]></comment>
 			</column>
 			<column name="match_address_txt" prior="full_address_txt" type="varchar" length="250" jt="12" >
-				<comment><![CDATA[The sanitized physical address that has been derived from the original]]></comment>
+				<comment><![CDATA[The sanitized physical address (returned as fullAddress) that has been derived from the original]]></comment>
 			</column>
 			<column name="match_score_amt" prior="address_match_score_amt" type="smallint" jt="5" >
 				<comment><![CDATA[The relative score returned from the address matching attempt]]></comment>
+			</column>
+			<column name="unit_no" type="varchar" length="50" jt="12" >
+				<comment><![CDATA[The unitNumber (suite) returned by the address match (e.g. 100)]]></comment>
+			</column>
+			<column name="civic_no" prior="civic no" type="varchar" length="50" jt="12" >
+				<comment><![CDATA[The civicNumber (building number) returned by the address match (e.g. 1285)]]></comment>
+			</column>
+			<column name="street_nm" prior="street nm" type="varchar" length="50" jt="12" >
+				<comment><![CDATA[The streetName returned by the address match (e.g. Pender)]]></comment>
+			</column>
+			<column name="street_type_dsc" type="varchar" length="50" jt="12" >
+				<comment><![CDATA[The streetType returned by the address match (e.g. St or Street)]]></comment>
+			</column>
+			<column name="street_direction_dsc" type="varchar" length="50" jt="12" >
+				<comment><![CDATA[The streetDirection returned by the address match (e.g. W or West)]]></comment>
+			</column>
+			<column name="locality_nm" type="varchar" length="50" jt="12" >
+				<comment><![CDATA[The localityName (community) returned by the address match (e.g. Vancouver)]]></comment>
+			</column>
+			<column name="locality_type_dsc" type="varchar" length="50" jt="12" >
+				<comment><![CDATA[The localityType returned by the address match (e.g. City)]]></comment>
+			</column>
+			<column name="province_cd" type="varchar" length="5" jt="12" >
+				<comment><![CDATA[The provinceCode returned by the address match]]></comment>
 			</column>
 			<column name="site_no" type="varchar" length="50" jt="12" >
 				<comment><![CDATA[The siteID returned by the address match]]></comment>
@@ -263,6 +293,9 @@
 			<column name="containing_organization_id" prior="contacted_through_rental_listing_id" type="bigint" jt="-5" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
+			<column name="replacing_physical_address_id" type="bigint" jt="-5" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
 			<column name="upd_dtm" type="timestamptz" jt="93" mandatory="y" >
 				<comment><![CDATA[Trigger-updated timestamp of last change]]></comment>
 			</column>
@@ -275,9 +308,12 @@
 			<fk name="dss_physical_address_fk_contained_in" to_schema="dss" to_table="dss_organization" >
 				<fk_column name="containing_organization_id" pk="organization_id" />
 			</fk>
+			<fk name="dss_physical_address_fk_replaced_by" to_schema="dss" to_table="dss_physical_address" >
+				<fk_column name="replacing_physical_address_id" pk="physical_address_id" />
+			</fk>
 		</table>
 		<table name="dss_rental_listing" prior="dss_rental_listing_report_0" >
-			<comment><![CDATA[A rental listing snapshot that is relevant to a specific month]]></comment>
+			<comment><![CDATA[A rental listing snapshot that is either relevant to a specific monthly report, or is the current, master version]]></comment>
 			<column name="rental_listing_id" prior="rental_listing_report_id" type="bigint" jt="-5" mandatory="y" >
 				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
 				<comment><![CDATA[Unique generated key]]></comment>
@@ -294,6 +330,12 @@
 			<column name="bc_registry_no" type="varchar" length="50" jt="12" >
 				<comment><![CDATA[The Short Term Registry issued permit number]]></comment>
 			</column>
+			<column name="is_current" type="boolean" jt="16" mandatory="y" >
+				<comment><![CDATA[Indicates whether the listing version is the most current one (within the same listing number for the same offering platform)]]></comment>
+			</column>
+			<column name="is_taken_down" type="boolean" jt="16" >
+				<comment><![CDATA[Indicates whether a current listing is no longer considered active]]></comment>
+			</column>
 			<column name="is_entire_unit" type="boolean" jt="16" >
 				<comment><![CDATA[Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)]]></comment>
 			</column>
@@ -306,10 +348,13 @@
 			<column name="separate_reservations_qty" prior="separate_reservation_qty" type="smallint" jt="5" >
 				<comment><![CDATA[The number of separate reservations that were taken during the reporting period]]></comment>
 			</column>
-			<column name="including_rental_listing_report_id" prior="report_period_ym" type="bigint" jt="-5" mandatory="y" >
+			<column name="offering_organization_id" prior="including_organization_id" type="bigint" jt="-5" mandatory="y" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
-			<column name="offering_organization_id" prior="including_organization_id" type="bigint" jt="-5" mandatory="y" >
+			<column name="including_rental_listing_report_id" prior="report_period_ym" type="bigint" jt="-5" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
+			<column name="derived_from_rental_listing_id" type="bigint" jt="-5" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
 			<column name="locating_physical_address_id" type="bigint" jt="-5" >
@@ -332,6 +377,9 @@
 			</fk>
 			<fk name="dss_rental_listing_fk_located_at" to_schema="dss" to_table="dss_physical_address" >
 				<fk_column name="locating_physical_address_id" pk="physical_address_id" />
+			</fk>
+			<fk name="dss_rental_listing_fk_generating" to_schema="dss" to_table="dss_rental_listing" >
+				<fk_column name="derived_from_rental_listing_id" pk="rental_listing_id" />
 			</fk>
 		</table>
 		<table name="dss_rental_listing_contact" prior="dss_organization_contact_person_0" >
@@ -417,7 +465,7 @@
 			<column name="upload_delivery_type" type="varchar" length="25" jt="12" mandatory="y" >
 				<comment><![CDATA[Identifies the treatment applied to ingesting the uploaded information]]></comment>
 			</column>
-			<column name="report_period_ym" type="date" jt="91" mandatory="y" >
+			<column name="report_period_ym" type="date" jt="91" >
 				<comment><![CDATA[The month to which the delivery batch is relevant (always set to the first day of the month)]]></comment>
 			</column>
 			<column name="source_hash_dsc" prior="is_processed" type="varchar" length="256" jt="12" mandatory="y" >
@@ -679,30 +727,30 @@ END;$function$
 	</schema>
 	<layout name="Physical Data Diagram (Sprint 5)" id="Layout-662" show_column_type="y" show_relation="name" >
 		<comment><![CDATA[Physical Data Diagram (Sprint 5)]]></comment>
-		<entity schema="dss" name="dss_access_request_status" color="C0C139" x="672" y="576" />
-		<entity schema="dss" name="dss_email_message" color="C0C139" x="1616" y="128" />
-		<entity schema="dss" name="dss_email_message_type" color="C0C139" x="512" y="128" />
-		<entity schema="dss" name="dss_message_reason" color="C0C139" x="1088" y="48" />
+		<entity schema="dss" name="dss_access_request_status" color="C0C139" x="688" y="576" />
+		<entity schema="dss" name="dss_email_message" color="C18A39" x="1648" y="128" />
+		<entity schema="dss" name="dss_email_message_type" color="C0C139" x="528" y="128" />
+		<entity schema="dss" name="dss_message_reason" color="C0C139" x="1104" y="48" />
 		<entity schema="dss" name="dss_organization" color="C0C139" x="496" y="352" />
-		<entity schema="dss" name="dss_organization_contact_person" color="C0C139" x="1088" y="192" />
+		<entity schema="dss" name="dss_organization_contact_person" color="C0C139" x="1104" y="192" />
 		<entity schema="dss" name="dss_organization_type" color="C0C139" x="48" y="352" />
-		<entity schema="dss" name="dss_physical_address" color="C0C139" x="304" y="768" />
-		<entity schema="dss" name="dss_rental_listing" color="C18A39" x="400" y="1312" />
-		<entity schema="dss" name="dss_rental_listing_contact" color="C18A39" x="944" y="1328" />
-		<entity schema="dss" name="dss_rental_listing_report" color="C18A39" x="576" y="960" />
-		<entity schema="dss" name="dss_upload_delivery" color="61C139" x="624" y="768" />
-		<entity schema="dss" name="dss_upload_line" color="61C139" x="688" y="1152" />
-		<entity schema="dss" name="dss_user_identity" color="C0C139" x="1104" y="464" />
-		<entity schema="dss" name="dss_user_privilege" color="C0C139" x="1200" y="880" />
-		<entity schema="dss" name="dss_user_role" color="C0C139" x="1232" y="784" />
-		<entity schema="dss" name="dss_user_role_assignment" color="C0C139" x="1680" y="752" />
-		<entity schema="dss" name="dss_user_role_privilege" color="C0C139" x="1680" y="848" />
-		<callout x="64" y="64" pointer="Round" >
+		<entity schema="dss" name="dss_physical_address" color="C18A39" x="288" y="768" />
+		<entity schema="dss" name="dss_rental_listing" color="61C139" x="416" y="1360" />
+		<entity schema="dss" name="dss_rental_listing_contact" color="C18A39" x="960" y="1344" />
+		<entity schema="dss" name="dss_rental_listing_report" color="C18A39" x="592" y="960" />
+		<entity schema="dss" name="dss_upload_delivery" color="61C139" x="640" y="768" />
+		<entity schema="dss" name="dss_upload_line" color="61C139" x="704" y="1152" />
+		<entity schema="dss" name="dss_user_identity" color="C0C139" x="1120" y="464" />
+		<entity schema="dss" name="dss_user_privilege" color="C0C139" x="1376" y="784" />
+		<entity schema="dss" name="dss_user_role" color="C0C139" x="1168" y="784" />
+		<entity schema="dss" name="dss_user_role_assignment" color="C0C139" x="1120" y="1120" />
+		<entity schema="dss" name="dss_user_role_privilege" color="C0C139" x="1312" y="1120" />
+		<callout x="64" y="48" pointer="Round" >
 			<comment><![CDATA[Ministry of Housing
 Short Term Rental Data Sharing
 Physical Data Diagram (Sprint 5)
 Leif Larsen, DXC Technology
-April 25, 2024]]></comment>
+May 2, 2024]]></comment>
 		</callout>
 	</layout>
 </project>

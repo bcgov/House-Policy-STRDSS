@@ -2,6 +2,7 @@
 using StrDss.Common;
 using StrDss.Model;
 using StrDss.Service;
+using StrDss.Service.Bceid;
 
 namespace StrDss.Api.Authentication
 {
@@ -9,12 +10,14 @@ namespace StrDss.Api.Authentication
     {
         private ICurrentUser _currentUser;
         private IUserService _userService;
+        private IBceidApi _bceid;
         private ILogger<StrDssLogger> _logger;
 
-        public KcJwtBearerEvents(ICurrentUser currentUser, IUserService userService, ILogger<StrDssLogger> logger) : base()
+        public KcJwtBearerEvents(ICurrentUser currentUser, IUserService userService, IBceidApi bceid, ILogger<StrDssLogger> logger) : base()
         {
             _currentUser = currentUser;
             _userService = userService;
+            _bceid = bceid;
             _logger = logger;
         }
 
@@ -72,6 +75,34 @@ namespace StrDss.Api.Authentication
                     foreach (var permission in permissions)
                     {
                         _currentUser.AddClaim(context!.Principal!, StrDssClaimTypes.Permission, permission);
+                    }
+                }
+
+                if (user.IdentityProviderNm == StrDssIdProviders.BceidBusiness && (int)(DateTime.UtcNow - user!.UpdDtm).TotalDays > 1)
+                {
+                    try
+                    {
+                        var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
+
+                        if (account == null)
+                        {
+                            _logger.LogError($"BCeID call error: {error}");
+                        }
+
+                        if (account != null)
+                        {
+                            _currentUser.FirstName = account.FirstName;
+                            _currentUser.LastName = account.LastName;
+
+                            if (account.FirstName != user.GivenNm || account.LastName != user.FamilyNm)
+                            {
+                                await _userService.UpdateBceidUserInfo(user.UserIdentityId, account.FirstName, account.LastName);
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        _logger.LogInformation("BCeID Web call failed - Skipping UpdateBceidUserInfo ");
                     }
                 }
             }

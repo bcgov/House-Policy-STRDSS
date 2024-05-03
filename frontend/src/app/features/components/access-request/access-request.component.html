@@ -75,5 +75,5 @@
     </p-messages>
 
     <button *ngIf="!hideForm" pButton (click)="onRequest()" id="form-submit-btn"
-        [disabled]="!myForm.valid">Submit</button>
+        [disabled]="!myForm.valid || alreadyClicked">Submit</button>
 </p-card>

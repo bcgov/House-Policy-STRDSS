@@ -26,6 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\StrDss.Api\StrDss.Api.csproj" />
 		<ProjectReference Include="..\StrDss.Model\StrDss.Model.csproj" />
 		<ProjectReference Include="..\StrDss.Service\StrDss.Service.csproj" />
 	</ItemGroup>

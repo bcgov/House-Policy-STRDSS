@@ -1,11 +1,13 @@
 <h2>Home</h2>
 
 <div class="cards">
-    <p-card class="dashboard-card" *ngFor="let card of cardsToDisplay" [id]="card.boxId" [header]="card.title">
-        <p class="m-0">
-            {{card.description}}
-        </p>
-        <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
-            (click)="navigateTo(card.route)">{{card.buttonText}}</button>
-    </p-card>
+
+    <div class="dashboard-card" *ngFor="let card of cardsToDisplay" [id]="card.boxId">
+        <div class="card-header">{{card.title}}</div>
+        <div class="card-content">{{card.description}}</div>
+        <div class="card-actions">
+            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
+                (click)="navigateTo(card.route)">{{card.buttonText}}</button>
+        </div>
+    </div>
 </div>

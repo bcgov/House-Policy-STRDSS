@@ -2,11 +2,11 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
+using StrDss.Api.Models;
 using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Service;
-using StrDss.Service.HttpClients;
 
 namespace StrDss.Api.Controllers
 {
@@ -15,15 +15,13 @@ namespace StrDss.Api.Controllers
     [ApiController]
     public class DelistingController : BaseApiController
     {
-        private IChesTokenApi _chesTokenApi;
         private IDelistingService _delistingService { get; }
         private IEmailMessageService _emailService;
 
-        public DelistingController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, IChesTokenApi chesTokenApi, ILogger<StrDssLogger> logger,
+        public DelistingController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
             IDelistingService delistingService, IEmailMessageService emailService)
             : base(currentUser, mapper, config, logger)
         {
-            _chesTokenApi = chesTokenApi;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _delistingService = delistingService;
             _emailService = emailService;
@@ -86,6 +84,82 @@ namespace StrDss.Api.Controllers
             }
 
             return preview;
+        }
+
+        [ApiAuthorize(Permissions.TakedownAction)]
+        [HttpPost("batchtakedownrequest", Name = "SendBatchTakedownRequest")]
+        public async Task<ActionResult> SendBatchTakedownRequest([FromForm] BatchTakedownRequestCreateDto dto)
+        {
+            Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+
+            if (dto.File == null || dto.File.Length == 0)
+            {
+                errors.AddItem("File", $"File is null or empty.");
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            var maxSizeInMb = _config.GetValue<int>("RENTAL_LISTING_REPORT_MAX_SIZE");
+            var maxSizeInB = (maxSizeInMb == 0 ? 2 : maxSizeInMb) * 1024 * 1024;
+
+            if (dto.File.Length > maxSizeInB)
+            {
+                errors.AddItem("File", $"The file size exceeds the maximum size {maxSizeInMb}MB.");
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            if (!CommonUtils.IsTextFile(dto.File.ContentType))
+            {
+                errors.AddItem("File", $"Uploaded file is not a text file.");
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            using var stream = dto.File.OpenReadStream();
+
+            errors = await _delistingService.SendBatchTakedownRequestAsync(dto.PlatformId, stream);
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return NoContent();
+        }
+
+        [ApiAuthorize(Permissions.TakedownAction)]
+        [HttpPost("batchtakedownnotice", Name = "SendBatchTakedownNotice")]
+        public async Task<ActionResult> SendBatchtakedownNotice([FromForm] BatchTakedownNoticeCreateDto dto)
+        {
+            Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+
+            if (dto.File == null || dto.File.Length == 0)
+            {
+                errors.AddItem("File", $"File is null or empty.");
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            var maxSizeInMb = _config.GetValue<int>("RENTAL_LISTING_REPORT_MAX_SIZE");
+            var maxSizeInB = (maxSizeInMb == 0 ? 2 : maxSizeInMb) * 1024 * 1024;
+
+            if (dto.File.Length > maxSizeInB)
+            {
+                errors.AddItem("File", $"The file size exceeds the maximum size {maxSizeInMb}MB.");
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            if (!CommonUtils.IsTextFile(dto.File.ContentType))
+            {
+                errors.AddItem("File", $"Uploaded file is not a text file.");
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            using var stream = dto.File.OpenReadStream();
+
+            errors = await _delistingService.SendBatchTakedownNoticeAsync(dto.PlatformId, dto.LgName, stream);
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return NoContent();
         }
     }
 }

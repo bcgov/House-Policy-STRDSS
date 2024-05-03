@@ -12,6 +12,8 @@ namespace UITest.PageObjects
         private Button _SendTakedownLetterButton;
         private Button _ManageAccessRequestsButton;
         private Button _EscalateTakedownToCEUButton;
+        private Button _Upload_ListingsButton;
+        private Button _ViewPolicyGuidelinesButton;
 
         private IDriver _Driver;
 
@@ -22,6 +24,8 @@ namespace UITest.PageObjects
         public Button EscalateTakedownToCEUButto { get => _EscalateTakedownToCEUButton; }
         public Button ManageAccessRequestsButton { get => _ManageAccessRequestsButton; }
         public IDriver Driver { get => _Driver; }
+        public Button Upload_ListingsButton { get => _Upload_ListingsButton; }
+        public Button ViewPolicyGuidelinesButton { get => _ViewPolicyGuidelinesButton;}
 
         public LandingPage(IDriver Driver)
         {
@@ -31,6 +35,9 @@ namespace UITest.PageObjects
             _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendTakeDownLetterButton);
             _ManageAccessRequestsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ManageAccessRequestsButton);
             _EscalateTakedownToCEUButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.EscalateTakedownToCEUButton);
+            _Upload_ListingsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.UploadListingsButton);
+            _ViewPolicyGuidelinesButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ViewPolicyGuidenceButton);
+
         }
 
         public bool Navigate()

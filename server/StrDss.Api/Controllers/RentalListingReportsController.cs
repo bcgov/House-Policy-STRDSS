@@ -1,7 +1,9 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
+using Hangfire.PostgreSql.Utils;
 using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
+using StrDss.Api.Models;
 using StrDss.Common;
 using StrDss.Model;
 using StrDss.Service;
@@ -44,7 +46,7 @@ namespace StrDss.Api.Controllers
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
             }
 
-            if (!IsTextFile(dto.File.ContentType))
+            if (!CommonUtils.IsTextFile(dto.File.ContentType))
             {
                 errors.AddItem("File", $"Uploaded file is not a text file.");
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
@@ -62,11 +64,5 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        private bool IsTextFile(string contentType)
-        {
-            return contentType == "text/plain" ||
-                   contentType == "text/csv" ||
-                   contentType == "application/octet-stream";
-        }
     }
 }

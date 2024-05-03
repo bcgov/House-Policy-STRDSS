@@ -8,10 +8,11 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './common/services/auth.interceptor';
 import { MessageService } from 'primeng/api';
+import { errorInterceptor } from './common/consts/error-interceptor.const';
 export const appConfig: ApplicationConfig = {
     providers: [
         provideAnimations(),
-        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
         provideRouter(routes),
         KeycloakService,
         {

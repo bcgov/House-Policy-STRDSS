@@ -76,15 +76,15 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("SendTakedownRequestWithoutADSSListing")]
         [NUnit.Framework.CategoryAttribute("Delisting")]
-        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "", null)]
-        [NUnit.Framework.TestCaseAttribute("ricander", "9223372036854775807", "ListingID - Test for Max value", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "", null)]
-        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Valid URL", "pass", "HTTP://listingURL.com", "richard.anderson@dxc.com", "", null)]
-        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Valid URL SSL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", "", null)]
-        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Long URL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "", null)]
-        [NUnit.Framework.TestCaseAttribute("ricander", "-1", "ListingID - Negative number test", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "Should pass because non-numberic values are ignored and Listing ID is optional", null)]
-        [NUnit.Framework.TestCaseAttribute("ricander", "test", "ListingID - Test for string", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "should pass because non-numberic values are ignored and Listing ID is optional", null)]
-        [NUnit.Framework.TestCaseAttribute("ricander", "e", "ListingID - Test for exponential", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "should pass because non-numberic values are ignored and Listing ID is optional", null)]
-        [NUnit.Framework.TestCaseAttribute("ricander", "0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Test", "0", "ListingID - Boundary", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Test", "9223372036854775807", "ListingID - Test for Max value", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Test", "0", "ListingURL - Valid URL", "pass", "HTTP://listingURL.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Test", "0", "ListingURL - Valid URL SSL", "pass", "HTTPS://listingURL.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Test", "0", "ListingURL - Long URL", "pass", "http://ReallylongURLstring123123123123123123123123123123.com", "richard.anderson@dxc.com", "", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Test", "-1", "ListingID - Negative number test", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "Should pass because non-numberic values are ignored and Listing ID is optional", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Test", "test", "ListingID - Test for string", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "should pass because non-numberic values are ignored and Listing ID is optional", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Test", "e", "ListingID - Test for exponential", "pass", "http://listingURL.com", "richard.anderson@dxc.com", "should pass because non-numberic values are ignored and Listing ID is optional", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Test", "0", "ListingURL - Invalid URL", "fail", "http://listingURL", "richard.anderson@dxc.com", "", null)]
         public void SendTakedownRequestWithoutADSSListing(string userName, string listingID, string description, string expectedResult, string listingURL, string additionalCCsTextBox, string comment, string[] exampleTags)
         {
             string[] @__tags = new string[] {
@@ -135,65 +135,65 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("I should see an optional field for adding a LG staff user email address to be cop" +
                         "ied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 28
+#line 29
  testRunner.When(string.Format("Entering the listing ID \"{0}\"", listingID), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 30
+#line 31
  testRunner.Then("The system should validate the ID is a number", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 34
+#line 35
  testRunner.When(string.Format("Entering the listing URL \"{0}\"", listingURL), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 36
+#line 37
  testRunner.Then("The system should validate the URL format and ensure it is a valid link to the pr" +
                         "operty listing", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 39
+#line 40
  testRunner.When("selecting the platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 41
+#line 42
  testRunner.Then("the system should present a list of available platform options to populate the fi" +
                         "eld", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 45
+#line 46
  testRunner.When("all required fields are entered", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 47
+#line 48
  testRunner.Then("I click the review button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 49
+#line 50
  testRunner.Then("I see a template delisting request message that will be sent to both the platform" +
                         "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 53
+#line 54
  testRunner.When("I submit the form with valid information", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 55
+#line 56
  testRunner.Then("the system should send the delisting request message to the platform email addres" +
                         "ses associated with the selected platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 59
+#line 60
  testRunner.When("successful submission", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 61
+#line 62
  testRunner.Then("I should receive a confirmation message indicating that the delisting request has" +
                         " been sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 63
+#line 64
  testRunner.Then("I should be copied on the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 66
+#line 67
  testRunner.When("the delisting request is submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 68
+#line 69
  testRunner.Then("the platform and host should receive email notifications containing the delisting" +
                         " request and instructions for compliance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 72
+#line 73
  testRunner.When("there are issues with the submission, such as invalid email addresses or a missin" +
                         "g URL", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 74
+#line 75
  testRunner.Then("the system should provide clear error messages guiding me on how to correct the i" +
                         "ssues", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

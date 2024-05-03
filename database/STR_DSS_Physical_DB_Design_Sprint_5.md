@@ -34,9 +34,8 @@ A message that is sent to one or more recipients via email
 | * &#11016; | email\_message\_type| varchar(50)  | Foreign key |
 | * | message\_delivery\_dtm| timestamptz  | A timestamp indicating when the message delivery was initiated |
 | * | message\_template\_dsc| varchar(4000)  | The full text or template for the message that is sent |
-| * | is\_host\_contacted\_externally| boolean  | Indicates whether the the property host has already been contacted by external means |
 | * | is\_submitter\_cc\_required| boolean  | Indicates whether the user initiating the message should receive a copy of the email |
-| &#11016; | message\_reason\_id| bigint  | Foreign key |
+|  | is\_host\_contacted\_externally| boolean  | Indicates whether the the property host has already been contacted by external means |
 |  | lg\_phone\_no| varchar(30)  | A phone number associated with a Local Government contact |
 |  | unreported\_listing\_no| varchar(50)  | The platform issued identification number for the listing (if not included in a rental listing report) |
 |  | host\_email\_address\_dsc| varchar(320)  | E-mail address of a short term rental host (directly entered by the user as a message recipient) |
@@ -44,11 +43,13 @@ A message that is sent to one or more recipients via email
 |  | cc\_email\_address\_dsc| varchar(4000)  | E-mail address of a secondary message recipient (directly entered by the user) |
 |  | unreported\_listing\_url| varchar(4000)  | User-provided URL for a short-term rental platform listing that is the subject of the message |
 |  | lg\_str\_bylaw\_url| varchar(4000)  | User-provided URL for a local government bylaw that is the subject of the message |
+| &#11016; | concerned\_with\_rental\_listing\_id| bigint  | Foreign key |
 | &#11016; | initiating\_user\_identity\_id| bigint  | Foreign key |
 | &#11016; | affected\_by\_user\_identity\_id| bigint  | Foreign key |
 | &#11016; | involved\_in\_organization\_id| bigint  | Foreign key |
 | &#11016; | batching\_email\_message\_id| bigint  | Foreign key |
 | &#11016; | requesting\_organization\_id| bigint  | Foreign key |
+| &#11016; | message\_reason\_id| bigint  | Foreign key |
 |  | external\_message\_no| varchar(50)  | External identifier for tracking the message delivery progress |
 |  | upd\_dtm| timestamptz  | Trigger-updated timestamp of last change |
 |  | upd\_user\_guid| uuid  | The globally unique identifier (assigned by the identity provider) for the most recent user to record a change |
@@ -69,6 +70,7 @@ A message that is sent to one or more recipients via email
 |  | dss_email_message_fk_justified_by | ( message\_reason\_id ) ref [dss.dss\_message\_reason](#dss\_message\_reason) (message\_reason\_id) |
 |  | dss_email_message_fk_batched_in | ( batching\_email\_message\_id ) ref [dss.dss\_email\_message](#dss\_email\_message) (email\_message\_id) |
 |  | dss_email_message_fk_requested_by | ( requesting\_organization\_id ) ref [dss.dss\_organization](#dss\_organization) (organization\_id) |
+|  | dss_email_message_fk_included_in | ( concerned\_with\_rental\_listing\_id ) ref [dss.dss\_rental\_listing](#dss\_rental\_listing) (rental\_listing\_id) |
 
 
 ##### Triggers
@@ -220,13 +222,22 @@ A property address that includes any verifiable BC attributes
 | * &#128273;  &#11019; | physical\_address\_id| bigint GENERATED ALWAYS AS IDENTITY  | Unique generated key |
 | * | original\_address\_txt| varchar(250)  | The source-provided address of a short-term rental offering |
 |  | match\_result\_json| json  | Full JSON result of the source address matching attempt |
-|  | match\_address\_txt| varchar(250)  | The sanitized physical address that has been derived from the original |
+|  | match\_address\_txt| varchar(250)  | The sanitized physical address (returned as fullAddress) that has been derived from the original |
 |  | match\_score\_amt| smallint  | The relative score returned from the address matching attempt |
+|  | unit\_no| varchar(50)  | The unitNumber (suite) returned by the address match (e.g. 100) |
+|  | civic\_no| varchar(50)  | The civicNumber (building number) returned by the address match (e.g. 1285) |
+|  | street\_nm| varchar(50)  | The streetName returned by the address match (e.g. Pender) |
+|  | street\_type\_dsc| varchar(50)  | The streetType returned by the address match (e.g. St or Street) |
+|  | street\_direction\_dsc| varchar(50)  | The streetDirection returned by the address match (e.g. W or West) |
+|  | locality\_nm| varchar(50)  | The localityName (community) returned by the address match (e.g. Vancouver) |
+|  | locality\_type\_dsc| varchar(50)  | The localityType returned by the address match (e.g. City) |
+|  | province\_cd| varchar(5)  | The provinceCode returned by the address match |
 |  | site\_no| varchar(50)  | The siteID returned by the address match |
 |  | block\_no| varchar(50)  | The blockID returned by the address match |
 |  | location\_geometry| geometry  | The computed location point of the matched address |
 |  | is\_exempt| boolean  | Indicates whether the address has been identified as exempt from Short Term Rental regulations |
 | &#11016; | containing\_organization\_id| bigint  | Foreign key |
+| &#11016; | replacing\_physical\_address\_id| bigint  | Foreign key |
 | * | upd\_dtm| timestamptz  | Trigger-updated timestamp of last change |
 |  | upd\_user\_guid| uuid  | The globally unique identifier (assigned by the identity provider) for the most recent user to record a change |
 
@@ -240,6 +251,7 @@ A property address that includes any verifiable BC attributes
 |Type |Name |On |
 |---|---|---|
 |  | dss_physical_address_fk_contained_in | ( containing\_organization\_id ) ref [dss.dss\_organization](#dss\_organization) (organization\_id) |
+|  | dss_physical_address_fk_replaced_by | ( replacing\_physical\_address\_id ) ref [dss.dss\_physical\_address](#dss\_physical\_address) (physical\_address\_id) |
 
 
 ##### Triggers
@@ -253,7 +265,7 @@ CREATE TRIGGER dss\_physical\_address\_br\_iu\_tr BEFORE INSERT OR UPDATE ON dss
 
 
 ### Table dss.dss_rental_listing 
-A rental listing snapshot that is relevant to a specific month
+A rental listing snapshot that is either relevant to a specific monthly report, or is the current, master version
 
 |Idx |Name |Data Type |Description |
 |---|---|---|---|
@@ -262,12 +274,15 @@ A rental listing snapshot that is relevant to a specific month
 |  | platform\_listing\_url| varchar(4000)  | URL for the short-term rental platform listing |
 |  | business\_licence\_no| varchar(50)  | The local government issued licence number that applies to the rental offering |
 |  | bc\_registry\_no| varchar(50)  | The Short Term Registry issued permit number |
+| * | is\_current| boolean  | Indicates whether the listing version is the most current one (within the same listing number for the same offering platform) |
+|  | is\_taken\_down| boolean  | Indicates whether a current listing is no longer considered active |
 |  | is\_entire\_unit| boolean  | Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom) |
 |  | available\_bedrooms\_qty| smallint  | The number of bedrooms in the dwelling unit that are available for short term rental |
 |  | nights\_booked\_qty| smallint  | The number of nights that short term rental accommodation services were provided during the reporting period |
 |  | separate\_reservations\_qty| smallint  | The number of separate reservations that were taken during the reporting period |
-| * &#11016; | including\_rental\_listing\_report\_id| bigint  | Foreign key |
 | * &#11016; | offering\_organization\_id| bigint  | Foreign key |
+| &#11016; | including\_rental\_listing\_report\_id| bigint  | Foreign key |
+| &#11016; | derived\_from\_rental\_listing\_id| bigint  | Foreign key |
 | &#11016; | locating\_physical\_address\_id| bigint  | Foreign key |
 | * | upd\_dtm| timestamptz  | Trigger-updated timestamp of last change |
 |  | upd\_user\_guid| uuid  | The globally unique identifier (assigned by the identity provider) for the most recent user to record a change |
@@ -284,6 +299,7 @@ A rental listing snapshot that is relevant to a specific month
 |  | dss_rental_listing_fk_offered_by | ( offering\_organization\_id ) ref [dss.dss\_organization](#dss\_organization) (organization\_id) |
 |  | dss_rental_listing_fk_included_in | ( including\_rental\_listing\_report\_id ) ref [dss.dss\_rental\_listing\_report](#dss\_rental\_listing\_report) (rental\_listing\_report\_id) |
 |  | dss_rental_listing_fk_located_at | ( locating\_physical\_address\_id ) ref [dss.dss\_physical\_address](#dss\_physical\_address) (physical\_address\_id) |
+|  | dss_rental_listing_fk_generating | ( derived\_from\_rental\_listing\_id ) ref [dss.dss\_rental\_listing](#dss\_rental\_listing) (rental\_listing\_id) |
 
 
 ##### Triggers
@@ -377,7 +393,7 @@ A delivery of uploaded information that is relevant to a specific month
 |---|---|---|---|
 | * &#128273;  &#11019; | upload\_delivery\_id| bigint GENERATED ALWAYS AS IDENTITY  | Unique generated key |
 | * | upload\_delivery\_type| varchar(25)  | Identifies the treatment applied to ingesting the uploaded information |
-| * | report\_period\_ym| date  | The month to which the delivery batch is relevant (always set to the first day of the month) |
+|  | report\_period\_ym| date  | The month to which the delivery batch is relevant (always set to the first day of the month) |
 | * | source\_hash\_dsc| varchar(256)  | The hash value of the information that was uploaded |
 |  | source\_bin| bytea  | The binary image of the information that was uploaded |
 | * &#11016; | providing\_organization\_id| bigint  | Foreign key |

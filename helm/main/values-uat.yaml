@@ -3,9 +3,7 @@ global:
     role: f4a30d-nonprod
     subPath: strdss-uat
   env:
-    'Logging__LogLevel__Default': 'Information'
-    'Logging__LogLevel__Microsoft.EntityFrameworkCore': 'Warning'
-    'Logging__LogLevel__Microsoft.AspNetCore': 'Warning'
+    'Logging__LogLevel__Default': 'Warning'
     'Logging__LogLevel__StrDss.Common.StrDssLogger': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Staging'
     'ENV_NAME': 'uat'
@@ -30,7 +28,7 @@ route:
 
 frontend:
   enabled: true
-  replicaCount: 2
+  replicaCount: 3
   nameOverride: strdss-uat-frontend
   fullnameOverride: strdss-uat-frontend
   secretName: strdss-secrets-uat
@@ -38,10 +36,10 @@ frontend:
   resources:
     limits:
       cpu: 30m
-      memory: 70Mi
+      memory: 140Mi
     requests:
       cpu: 20m
-      memory: 50Mi
+      memory: 70Mi
 
   env:
     'API_HOST': '/api'
@@ -57,7 +55,7 @@ frontend:
 
 backend:
   enabled: true
-  replicaCount: 2
+  replicaCount: 3
   nameOverride: strdss-uat-backend
   fullnameOverride: strdss-uat-backend
   secretName: strdss-secrets-uat
@@ -75,10 +73,10 @@ backend:
   resources:
     limits:
       cpu: 100m
-      memory: 300Mi
+      memory: 500Mi
     requests:
       cpu: 20m
-      memory: 200Mi
+      memory: 300Mi
 
   env:
     'API_HOST': '/api'

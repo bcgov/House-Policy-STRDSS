@@ -17,7 +17,7 @@ namespace UITest.PageObjects
         private RowList _RequestList;
         private Button _BackButton;
         private Button _ForwardButton;
-
+        private WebElement _ManageAccessSection;
 
 
         public string URL { get => _URL; set => _URL = value; }
@@ -27,6 +27,8 @@ namespace UITest.PageObjects
         public RowList RequestList { get => _RequestList; set => _RequestList = value; }
         public Button BackButton { get => _BackButton; }
         public Button ForwardButton { get => _ForwardButton; }
+
+        public WebElement ManageAccessSection { get => _ManageAccessSection; }
         public IDriver Driver { get => _Driver; }
 
         public ManagingAccessPage(IDriver Driver)
@@ -38,6 +40,7 @@ namespace UITest.PageObjects
             _RequestList = new RowList(Driver, Enums.FINDBY.ID, ManagingAccessModel.RequestList);
             _BackButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ManagingAccessModel.BackButton);
             _ForwardButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ManagingAccessModel.ForwardButton);
+            _ManageAccessSection = new WebElement(Driver, Enums.FINDBY.CSSSELECTOR, ManagingAccessModel.ManageAccessSection);
         }
     }
 }

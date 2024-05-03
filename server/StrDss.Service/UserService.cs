@@ -23,6 +23,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> UpdateIsEnabled(UpdateIsEnabledDto dto);
         Task<List<DropdownStrDto>> GetAccessRequestStatuses();
         Task<Dictionary<string, List<string>>> AcceptTermsConditions();
+        Task UpdateBceidUserInfo(long userId, string firstName, string LastName);
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -433,6 +434,13 @@ namespace StrDss.Service
             _unitOfWork.Commit();
 
             return errors;
+        }
+
+        public async Task UpdateBceidUserInfo(long userId, string firstName, string LastName)
+        {
+            await _userRepo.UpdateUserNamesAsync(userId, firstName, LastName);
+
+            _unitOfWork.Commit();
         }
     }
 }

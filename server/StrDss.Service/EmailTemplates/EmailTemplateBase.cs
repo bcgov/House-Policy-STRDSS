@@ -20,13 +20,20 @@ namespace StrDss.Service.EmailTemplates
         public bool Preview { get; set; } = false;
         public string EmailMessageType { get; set; } = "";
         public IEnumerable<EmailAttachment> Attachments { get; set; } = Enumerable.Empty<EmailAttachment>();
+        public List<string> EmailsToHide { get; set; } = new List<string>();
 
         public string GetPreviewContent()
         {
-            return $@"To: {string.Join(";", To)}" 
-                + (Bcc.Count() > 0 ? $"<br/>Bcc: {string.Join(";", Bcc)}<br/><br/>" : "")
-                + (Cc.Count() > 0 ? $"<br/>Cc: {string.Join(";", Cc)}<br/><br/>" : "")
+            return $@"To: {GetRecipentsForPreview(To)}" 
+                + (Bcc.Count() > 0 ? $"<br/>Bcc: {GetRecipentsForPreview(Bcc)}<br/><br/>" : "")
+                + (Cc.Count() > 0 ? $"<br/>Cc: {GetRecipentsForPreview(Cc)}<br/><br/>" : "")
                 ;
+        }
+
+        public string GetRecipentsForPreview(IEnumerable<string> list)
+        {
+            var filteredList = list.Except(EmailsToHide);
+            return string.Join(", ", filteredList);
         }
 
         public virtual string GetContent()

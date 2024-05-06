@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { LayoutComponent } from './common/layout/layout.component';
 import { CommonModule } from '@angular/common';
@@ -12,6 +12,12 @@ import { UserDataService } from './common/services/user-data.service';
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
 })
-export class AppComponent {
-    constructor(_userService: UserDataService) { }
+export class AppComponent implements OnInit {
+    currentUserLoaded = false;
+
+    constructor(private userService: UserDataService) { }
+
+    ngOnInit(): void {
+        this.userService.getCurrentUser().subscribe((user) => { this.currentUserLoaded = !!user })
+    }
 }

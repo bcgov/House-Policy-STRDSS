@@ -1,13 +1,11 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
-using Hangfire.PostgreSql.Utils;
 using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
 using StrDss.Api.Models;
 using StrDss.Common;
 using StrDss.Model;
 using StrDss.Service;
-using System.Text;
 
 namespace StrDss.Api.Controllers
 {
@@ -54,7 +52,7 @@ namespace StrDss.Api.Controllers
 
             using var stream = dto.File.OpenReadStream();
 
-            errors = await _listingService.CreateRentalListingReport(dto.ReportPeriod, dto.OrganizationId, stream);
+            errors = await _listingService.UploadRentalReport(dto.ReportPeriod, dto.OrganizationId, stream);
 
             if (errors.Count > 0)
             {

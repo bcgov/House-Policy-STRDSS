@@ -31,9 +31,11 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssRentalListingContact> DssRentalListingContacts { get; set; }
 
-    public virtual DbSet<DssRentalListingLine> DssRentalListingLines { get; set; }
-
     public virtual DbSet<DssRentalListingReport> DssRentalListingReports { get; set; }
+
+    public virtual DbSet<DssUploadDelivery> DssUploadDeliveries { get; set; }
+
+    public virtual DbSet<DssUploadLine> DssUploadLines { get; set; }
 
     public virtual DbSet<DssUserIdentity> DssUserIdentities { get; set; }
 
@@ -83,6 +85,9 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(4000)
                 .HasComment("E-mail address of a secondary message recipient (directly entered by the user)")
                 .HasColumnName("cc_email_address_dsc");
+            entity.Property(e => e.ConcernedWithRentalListingId)
+                .HasComment("Foreign key")
+                .HasColumnName("concerned_with_rental_listing_id");
             entity.Property(e => e.EmailMessageType)
                 .HasMaxLength(50)
                 .HasComment("Foreign key")
@@ -154,6 +159,10 @@ public partial class DssDbContext : DbContext
             entity.HasOne(d => d.BatchingEmailMessage).WithMany(p => p.InverseBatchingEmailMessage)
                 .HasForeignKey(d => d.BatchingEmailMessageId)
                 .HasConstraintName("dss_email_message_fk_batched_in");
+
+            entity.HasOne(d => d.ConcernedWithRentalListing).WithMany(p => p.DssEmailMessages)
+                .HasForeignKey(d => d.ConcernedWithRentalListingId)
+                .HasConstraintName("dss_email_message_fk_included_in");
 
             entity.HasOne(d => d.EmailMessageTypeNavigation).WithMany(p => p.DssEmailMessages)
                 .HasForeignKey(d => d.EmailMessageType)
@@ -346,18 +355,30 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(50)
                 .HasComment("The blockID returned by the address match")
                 .HasColumnName("block_no");
+            entity.Property(e => e.CivicNo)
+                .HasMaxLength(50)
+                .HasComment("The civicNumber (building number) returned by the address match (e.g. 1285)")
+                .HasColumnName("civic_no");
             entity.Property(e => e.ContainingOrganizationId)
                 .HasComment("Foreign key")
                 .HasColumnName("containing_organization_id");
             entity.Property(e => e.IsExempt)
                 .HasComment("Indicates whether the address has been identified as exempt from Short Term Rental regulations")
                 .HasColumnName("is_exempt");
+            entity.Property(e => e.LocalityNm)
+                .HasMaxLength(50)
+                .HasComment("The localityName (community) returned by the address match (e.g. Vancouver)")
+                .HasColumnName("locality_nm");
+            entity.Property(e => e.LocalityTypeDsc)
+                .HasMaxLength(50)
+                .HasComment("The localityType returned by the address match (e.g. City)")
+                .HasColumnName("locality_type_dsc");
             entity.Property(e => e.LocationGeometry)
                 .HasComment("The computed location point of the matched address")
                 .HasColumnName("location_geometry");
             entity.Property(e => e.MatchAddressTxt)
                 .HasMaxLength(250)
-                .HasComment("The sanitized physical address that has been derived from the original")
+                .HasComment("The sanitized physical address (returned as fullAddress) that has been derived from the original")
                 .HasColumnName("match_address_txt");
             entity.Property(e => e.MatchResultJson)
                 .HasComment("Full JSON result of the source address matching attempt")
@@ -370,10 +391,33 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(250)
                 .HasComment("The source-provided address of a short-term rental offering")
                 .HasColumnName("original_address_txt");
+            entity.Property(e => e.ProvinceCd)
+                .HasMaxLength(5)
+                .HasComment("The provinceCode returned by the address match")
+                .HasColumnName("province_cd");
+            entity.Property(e => e.ReplacingPhysicalAddressId)
+                .HasComment("Foreign key")
+                .HasColumnName("replacing_physical_address_id");
             entity.Property(e => e.SiteNo)
                 .HasMaxLength(50)
                 .HasComment("The siteID returned by the address match")
                 .HasColumnName("site_no");
+            entity.Property(e => e.StreetDirectionDsc)
+                .HasMaxLength(50)
+                .HasComment("The streetDirection returned by the address match (e.g. W or West)")
+                .HasColumnName("street_direction_dsc");
+            entity.Property(e => e.StreetNm)
+                .HasMaxLength(50)
+                .HasComment("The streetName returned by the address match (e.g. Pender)")
+                .HasColumnName("street_nm");
+            entity.Property(e => e.StreetTypeDsc)
+                .HasMaxLength(50)
+                .HasComment("The streetType returned by the address match (e.g. St or Street)")
+                .HasColumnName("street_type_dsc");
+            entity.Property(e => e.UnitNo)
+                .HasMaxLength(50)
+                .HasComment("The unitNumber (suite) returned by the address match (e.g. 100)")
+                .HasColumnName("unit_no");
             entity.Property(e => e.UpdDtm)
                 .HasComment("Trigger-updated timestamp of last change")
                 .HasColumnName("upd_dtm");
@@ -384,13 +428,17 @@ public partial class DssDbContext : DbContext
             entity.HasOne(d => d.ContainingOrganization).WithMany(p => p.DssPhysicalAddresses)
                 .HasForeignKey(d => d.ContainingOrganizationId)
                 .HasConstraintName("dss_physical_address_fk_contained_in");
+
+            entity.HasOne(d => d.ReplacingPhysicalAddress).WithMany(p => p.InverseReplacingPhysicalAddress)
+                .HasForeignKey(d => d.ReplacingPhysicalAddressId)
+                .HasConstraintName("dss_physical_address_fk_replaced_by");
         });
 
         modelBuilder.Entity<DssRentalListing>(entity =>
         {
             entity.HasKey(e => e.RentalListingId).HasName("dss_rental_listing_pk");
 
-            entity.ToTable("dss_rental_listing", tb => tb.HasComment("A rental listing snapshot that is relevant to a specific month"));
+            entity.ToTable("dss_rental_listing", tb => tb.HasComment("A rental listing snapshot that is either relevant to a specific monthly report, or is the current, master version"));
 
             entity.Property(e => e.RentalListingId)
                 .HasComment("Unique generated key")
@@ -400,19 +448,28 @@ public partial class DssDbContext : DbContext
                 .HasComment("The number of bedrooms in the dwelling unit that are available for short term rental")
                 .HasColumnName("available_bedrooms_qty");
             entity.Property(e => e.BcRegistryNo)
-                .HasMaxLength(25)
+                .HasMaxLength(50)
                 .HasComment("The Short Term Registry issued permit number")
                 .HasColumnName("bc_registry_no");
             entity.Property(e => e.BusinessLicenceNo)
-                .HasMaxLength(25)
+                .HasMaxLength(50)
                 .HasComment("The local government issued licence number that applies to the rental offering")
                 .HasColumnName("business_licence_no");
+            entity.Property(e => e.DerivedFromRentalListingId)
+                .HasComment("Foreign key")
+                .HasColumnName("derived_from_rental_listing_id");
             entity.Property(e => e.IncludingRentalListingReportId)
                 .HasComment("Foreign key")
                 .HasColumnName("including_rental_listing_report_id");
+            entity.Property(e => e.IsCurrent)
+                .HasComment("Indicates whether the listing version is the most current one (within the same listing number for the same offering platform)")
+                .HasColumnName("is_current");
             entity.Property(e => e.IsEntireUnit)
                 .HasComment("Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)")
                 .HasColumnName("is_entire_unit");
+            entity.Property(e => e.IsTakenDown)
+                .HasComment("Indicates whether a current listing is no longer considered active")
+                .HasColumnName("is_taken_down");
             entity.Property(e => e.LocatingPhysicalAddressId)
                 .HasComment("Foreign key")
                 .HasColumnName("locating_physical_address_id");
@@ -423,7 +480,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("Foreign key")
                 .HasColumnName("offering_organization_id");
             entity.Property(e => e.PlatformListingNo)
-                .HasMaxLength(25)
+                .HasMaxLength(50)
                 .HasComment("The platform issued identification number for the listing")
                 .HasColumnName("platform_listing_no");
             entity.Property(e => e.PlatformListingUrl)
@@ -440,9 +497,12 @@ public partial class DssDbContext : DbContext
                 .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
                 .HasColumnName("upd_user_guid");
 
+            entity.HasOne(d => d.DerivedFromRentalListing).WithMany(p => p.InverseDerivedFromRentalListing)
+                .HasForeignKey(d => d.DerivedFromRentalListingId)
+                .HasConstraintName("dss_rental_listing_fk_generating");
+
             entity.HasOne(d => d.IncludingRentalListingReport).WithMany(p => p.DssRentalListings)
                 .HasForeignKey(d => d.IncludingRentalListingReportId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_rental_listing_fk_included_in");
 
             entity.HasOne(d => d.LocatingPhysicalAddress).WithMany(p => p.DssRentalListings)
@@ -495,7 +555,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("Phone number given for the contact")
                 .HasColumnName("phone_no");
             entity.Property(e => e.SupplierHostNo)
-                .HasMaxLength(25)
+                .HasMaxLength(50)
                 .HasComment("The platform identifier for the supplier host")
                 .HasColumnName("supplier_host_no");
             entity.Property(e => e.UpdDtm)
@@ -511,68 +571,25 @@ public partial class DssDbContext : DbContext
                 .HasConstraintName("dss_rental_listing_contact_fk_contacted_for");
         });
 
-        modelBuilder.Entity<DssRentalListingLine>(entity =>
-        {
-            entity.HasKey(e => e.RentalListingLineId).HasName("dss_rental_listing_line_pk");
-
-            entity.ToTable("dss_rental_listing_line", tb => tb.HasComment("A rental listing report line that has been extracted from the source"));
-
-            entity.Property(e => e.RentalListingLineId)
-                .HasComment("Unique generated key")
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("rental_listing_line_id");
-            entity.Property(e => e.ErrorTxt)
-                .HasMaxLength(32000)
-                .HasComment("Freeform description of the problem found while attempting to interpret the report line")
-                .HasColumnName("error_txt");
-            entity.Property(e => e.IncludingRentalListingReportId)
-                .HasComment("Foreign key")
-                .HasColumnName("including_rental_listing_report_id");
-            entity.Property(e => e.IsSystemFailure)
-                .HasComment("Indicates that a system fault has prevented complete ingestion of the rental listing")
-                .HasColumnName("is_system_failure");
-            entity.Property(e => e.IsValidationFailure)
-                .HasComment("Indicates that there has been a validation problem that prevents successful ingestion of the rental listing")
-                .HasColumnName("is_validation_failure");
-            entity.Property(e => e.OrganizationCd)
-                .HasMaxLength(25)
-                .HasComment("An immutable system code that identifies the listing organization (e.g. AIRBNB)")
-                .HasColumnName("organization_cd");
-            entity.Property(e => e.PlatformListingNo)
-                .HasMaxLength(25)
-                .HasComment("The platform issued identification number for the listing")
-                .HasColumnName("platform_listing_no");
-            entity.Property(e => e.SourceLineTxt)
-                .HasMaxLength(32000)
-                .HasComment("Full text of the report line that could not be interpreted")
-                .HasColumnName("source_line_txt");
-
-            entity.HasOne(d => d.IncludingRentalListingReport).WithMany(p => p.DssRentalListingLines)
-                .HasForeignKey(d => d.IncludingRentalListingReportId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("dss_rental_listing_line_fk_included_in");
-        });
-
         modelBuilder.Entity<DssRentalListingReport>(entity =>
         {
             entity.HasKey(e => e.RentalListingReportId).HasName("dss_rental_listing_report_pk");
 
-            entity.ToTable("dss_rental_listing_report", tb => tb.HasComment("A delivery of rental listing information that is relevant to a specific month"));
+            entity.ToTable("dss_rental_listing_report", tb => tb.HasComment("A platform-specific collection of rental listing information that is relevant to a specific month"));
 
             entity.Property(e => e.RentalListingReportId)
                 .HasComment("Unique generated key")
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("rental_listing_report_id");
-            entity.Property(e => e.IsProcessed).HasColumnName("is_processed");
+            entity.Property(e => e.IsCurrent)
+                .HasComment("Indicates whether the rental listing version is the most recent one reported by the platform")
+                .HasColumnName("is_current");
             entity.Property(e => e.ProvidingOrganizationId)
                 .HasComment("Foreign key")
                 .HasColumnName("providing_organization_id");
             entity.Property(e => e.ReportPeriodYm)
                 .HasComment("The month to which the listing information is relevant (always set to the first day of the month)")
                 .HasColumnName("report_period_ym");
-            entity.Property(e => e.SourceBin)
-                .HasComment("The binary image of the information that was uploaded")
-                .HasColumnName("source_bin");
             entity.Property(e => e.UpdDtm)
                 .HasComment("Trigger-updated timestamp of last change")
                 .HasColumnName("upd_dtm");
@@ -584,6 +601,91 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.ProvidingOrganizationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_rental_listing_report_fk_provided_by");
+        });
+
+        modelBuilder.Entity<DssUploadDelivery>(entity =>
+        {
+            entity.HasKey(e => e.UploadDeliveryId).HasName("dss_upload_delivery_pk");
+
+            entity.ToTable("dss_upload_delivery", tb => tb.HasComment("A delivery of uploaded information that is relevant to a specific month"));
+
+            entity.Property(e => e.UploadDeliveryId)
+                .HasComment("Unique generated key")
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("upload_delivery_id");
+            entity.Property(e => e.ProvidingOrganizationId)
+                .HasComment("Foreign key")
+                .HasColumnName("providing_organization_id");
+            entity.Property(e => e.ReportPeriodYm)
+                .HasComment("The month to which the delivery batch is relevant (always set to the first day of the month)")
+                .HasColumnName("report_period_ym");
+            entity.Property(e => e.SourceBin)
+                .HasComment("The binary image of the information that was uploaded")
+                .HasColumnName("source_bin");
+            entity.Property(e => e.SourceHashDsc)
+                .HasMaxLength(256)
+                .HasComment("The hash value of the information that was uploaded")
+                .HasColumnName("source_hash_dsc");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
+            entity.Property(e => e.UploadDeliveryType)
+                .HasMaxLength(25)
+                .HasComment("Identifies the treatment applied to ingesting the uploaded information")
+                .HasColumnName("upload_delivery_type");
+
+            entity.HasOne(d => d.ProvidingOrganization).WithMany(p => p.DssUploadDeliveries)
+                .HasForeignKey(d => d.ProvidingOrganizationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_upload_delivery_fk_provided_by");
+        });
+
+        modelBuilder.Entity<DssUploadLine>(entity =>
+        {
+            entity.HasKey(e => e.UploadLineId).HasName("dss_upload_line_pk");
+
+            entity.ToTable("dss_upload_line", tb => tb.HasComment("An upload delivery line that has been extracted from the source"));
+
+            entity.Property(e => e.UploadLineId)
+                .HasComment("Unique generated key")
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("upload_line_id");
+            entity.Property(e => e.ErrorTxt)
+                .HasMaxLength(32000)
+                .HasComment("Freeform description of the problem found while attempting to interpret the report line")
+                .HasColumnName("error_txt");
+            entity.Property(e => e.IncludingUploadDeliveryId)
+                .HasComment("Foreign key")
+                .HasColumnName("including_upload_delivery_id");
+            entity.Property(e => e.IsProcessed)
+                .HasComment("Indicates that no further ingestion attempt is required for the upload line")
+                .HasColumnName("is_processed");
+            entity.Property(e => e.IsSystemFailure)
+                .HasComment("Indicates that a system fault has prevented complete ingestion of the upload line")
+                .HasColumnName("is_system_failure");
+            entity.Property(e => e.IsValidationFailure)
+                .HasComment("Indicates that there has been a validation problem that prevents successful ingestion of the upload line")
+                .HasColumnName("is_validation_failure");
+            entity.Property(e => e.SourceLineTxt)
+                .HasMaxLength(32000)
+                .HasComment("Full text of the uploaod line")
+                .HasColumnName("source_line_txt");
+            entity.Property(e => e.SourceOrganizationCd)
+                .HasMaxLength(25)
+                .HasComment("An immutable system code identifying the organization who created the information in the upload line (e.g. AIRBNB)")
+                .HasColumnName("source_organization_cd");
+            entity.Property(e => e.SourceRecordNo)
+                .HasMaxLength(50)
+                .HasComment("The immutable identification number for the source record, such as a rental listing number")
+                .HasColumnName("source_record_no");
+
+            entity.HasOne(d => d.IncludingUploadDelivery).WithMany(p => p.DssUploadLines)
+                .HasForeignKey(d => d.IncludingUploadDeliveryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_upload_line_fk_included_in");
         });
 
         modelBuilder.Entity<DssUserIdentity>(entity =>

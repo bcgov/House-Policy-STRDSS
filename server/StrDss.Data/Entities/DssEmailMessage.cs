@@ -29,19 +29,14 @@ public partial class DssEmailMessage
     public string MessageTemplateDsc { get; set; } = null!;
 
     /// <summary>
-    /// Indicates whether the the property host has already been contacted by external means
-    /// </summary>
-    public bool IsHostContactedExternally { get; set; }
-
-    /// <summary>
     /// Indicates whether the user initiating the message should receive a copy of the email
     /// </summary>
     public bool IsSubmitterCcRequired { get; set; }
 
     /// <summary>
-    /// Foreign key
+    /// Indicates whether the the property host has already been contacted by external means
     /// </summary>
-    public long? MessageReasonId { get; set; }
+    public bool? IsHostContactedExternally { get; set; }
 
     /// <summary>
     /// A phone number associated with a Local Government contact
@@ -81,6 +76,11 @@ public partial class DssEmailMessage
     /// <summary>
     /// Foreign key
     /// </summary>
+    public long? ConcernedWithRentalListingId { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
     public long? InitiatingUserIdentityId { get; set; }
 
     /// <summary>
@@ -104,6 +104,11 @@ public partial class DssEmailMessage
     public long? RequestingOrganizationId { get; set; }
 
     /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? MessageReasonId { get; set; }
+
+    /// <summary>
     /// External identifier for tracking the message delivery progress
     /// </summary>
     public string? ExternalMessageNo { get; set; }
@@ -121,6 +126,8 @@ public partial class DssEmailMessage
     public virtual DssUserIdentity? AffectedByUserIdentity { get; set; }
 
     public virtual DssEmailMessage? BatchingEmailMessage { get; set; }
+
+    public virtual DssRentalListing? ConcernedWithRentalListing { get; set; }
 
     public virtual DssEmailMessageType EmailMessageTypeNavigation { get; set; } = null!;
 

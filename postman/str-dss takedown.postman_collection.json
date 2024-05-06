@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "1b32b4a4-1b2d-45d9-86e3-c49a6ecae2d3",
-		"name": "str-dss takedown email with csv file",
+		"name": "str-dss takedown",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "3660367"
 	},
@@ -80,22 +80,22 @@
 		"oauth2": [
 			{
 				"key": "redirect_uri",
-				"value": "http://localhost:4200",
+				"value": "{{redirectUrl}}",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "{{authHost}}/auth/realms/standard/protocol/openid-connect/token",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "{{authHost}}/auth/realms/standard/protocol/openid-connect/auth",
 				"type": "string"
 			},
 			{
 				"key": "clientId",
 				"value": "str-dss-5303",
-				"type": "string"
-			},
-			{
-				"key": "accessTokenUrl",
-				"value": "https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/token",
-				"type": "string"
-			},
-			{
-				"key": "authUrl",
-				"value": "https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/auth",
 				"type": "string"
 			},
 			{

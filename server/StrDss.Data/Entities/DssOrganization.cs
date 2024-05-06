@@ -61,6 +61,8 @@ public partial class DssOrganization
 
     public virtual ICollection<DssRentalListing> DssRentalListings { get; set; } = new List<DssRentalListing>();
 
+    public virtual ICollection<DssUploadDelivery> DssUploadDeliveries { get; set; } = new List<DssUploadDelivery>();
+
     public virtual ICollection<DssUserIdentity> DssUserIdentities { get; set; } = new List<DssUserIdentity>();
 
     public virtual ICollection<DssOrganization> InverseManagingOrganization { get; set; } = new List<DssOrganization>();

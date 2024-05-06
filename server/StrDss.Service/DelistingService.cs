@@ -23,7 +23,7 @@ namespace StrDss.Service
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto);
         Task ProcessTakedownRequestBatchEmailsAsync();
         Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream);
-        Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, string lgName, Stream stream);
+        Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, Stream stream);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -579,11 +579,11 @@ namespace StrDss.Service
             return errors;
         }
 
-        public async Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, string lgName, Stream stream)
+        public async Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, Stream stream)
         {
             var platform = await _orgService.GetOrganizationByIdAsync(platformId);
 
-            var errors = await ValidateBatchTakedownNoticeAsync(platform, lgName);
+            var errors = await ValidateBatchTakedownNoticeAsync(platform);
             if (errors.Count > 0)
             {
                 return errors;
@@ -602,8 +602,6 @@ namespace StrDss.Service
                 To = new string[] { contact!.EmailAddressDsc },
                 Bcc = new string[] { adminEmail! },
                 Info = $"{EmailMessageTypes.NoticeOfTakedown} for {platform.OrganizationNm}",
-                Comment = "",
-                LgName = lgName,
                 Attachments = new EmailAttachment[] { new EmailAttachment {
                     Content = content,
                     ContentType = "text/csv",
@@ -650,7 +648,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidateBatchTakedownNoticeAsync(OrganizationDto? platform, string lgName)
+        private async Task<Dictionary<string, List<string>>> ValidateBatchTakedownNoticeAsync(OrganizationDto? platform)
         {
             await Task.CompletedTask;
 
@@ -672,11 +670,6 @@ namespace StrDss.Service
                 {
                     errors.AddItem("platformId", $"Platform ({platform!.OrganizationId}) does not have the primary '{EmailMessageTypes.BatchTakedownRequest}' contact info");
                 }
-            }
-
-            if (lgName.IsEmpty())
-            {
-                errors.AddItem("lgName", $"Local government name is mandatory.");
             }
 
             return errors;

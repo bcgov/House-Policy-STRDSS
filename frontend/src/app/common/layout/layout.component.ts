@@ -11,11 +11,13 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ErrorHandlingService } from '../services/error-handling.service';
 import { ErrorBackEnd } from '../models/errors';
+import { TopMenuService } from '../services/top-menu.service';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, ButtonModule, MenubarModule, OverlayPanelModule, CommonModule, ToastModule],
+  imports: [RouterOutlet, ButtonModule, MenubarModule, TooltipModule, OverlayPanelModule, CommonModule, ToastModule],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
@@ -23,7 +25,7 @@ export class LayoutComponent {
   showHeaderMenu = true;
   items: MenuItem[] | undefined;
 
-  constructor(public userDataService: UserDataService, private authService: AuthService, private messageService: MessageService, private errorHandlingService: ErrorHandlingService) { }
+  constructor(public userDataService: UserDataService, private topMenuService: TopMenuService, private authService: AuthService, private messageService: MessageService, private errorHandlingService: ErrorHandlingService) { }
 
   ngOnInit() {
     this.errorHandlingService.errorSubject.subscribe({
@@ -34,46 +36,56 @@ export class LayoutComponent {
 
     this.items = [
       {
-        label: 'Home',
-        routerLink: '/',
-      },
-      {
-        label: 'Listings',
-        routerLink: '/',
-        disabled: true,
-      },
-      {
-        label: 'Alerts',
-        routerLink: '/',
-        disabled: true,
+        label: 'Forms',
+        items: []
       },
       {
         label: 'Upload',
-        items: [
-          {
-            label: 'Upload Listing Data',
-            routerLink: '',
-            disabled: true,
-          },
-          {
-            label: 'Platform Upload History',
-            routerLink: '',
-            disabled: true,
-          },
-        ]
+        visible: false,
+        items: []
       },
       {
-        label: 'Admin tools',
-        items: [
-          {
-            label: 'User Management',
-            routerLink: '/user-management',
-          },
-        ]
+        label: 'Admin Tools',
+        items: []
+      },
+      {
+        label: 'Policy Guidance',
+        items: []
       },
     ];
+    this.initMenu();
   }
-  private showError(error: ErrorBackEnd) {
+
+  private initMenu(): void {
+
+    const usersMenuItems = this.topMenuService.getMenuItemsPerUserType(this.userDataService.currentUser);
+    this.items?.forEach((folder) => {
+      folder.items = usersMenuItems
+        .filter((mItem) => mItem.folderName === folder.label)
+        .map((mItem) => {
+          return {
+            id: mItem.buttonId,
+            visible: mItem.hidden,
+            disabled: mItem.disabled,
+            url: mItem.route.toLowerCase().startsWith('http') ? mItem.route : '',
+            target: mItem.route.toLowerCase().startsWith('http') ? '_blank' : '_self',
+            routerLink: mItem.route.toLowerCase().startsWith('/') ? mItem.route : '',
+            label: mItem.title,
+          } as MenuItem
+        });
+    })
+
+    this.items = this.items?.filter((item) => {
+      return !!item.items?.length;
+    });
+
+    this.items?.unshift({
+      label: 'Home',
+      routerLink: '/',
+    });
+  }
+
+  private showError(error: ErrorBackEnd): void {
     if (!!error.errors) {
       Object.keys(error.errors).forEach(oneError => {
         this.messageService.add({ severity: 'error', summary: error.title, detail: error.errors[oneError].join(' ') });

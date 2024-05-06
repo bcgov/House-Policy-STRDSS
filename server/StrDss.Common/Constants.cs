@@ -206,4 +206,9 @@
         public const string UserWrite = "user_write";
     }
 
+    public static class UploadDeliveryTypes
+    {
+        public const string RentalReport = "rental_report";
+    }
+
 }

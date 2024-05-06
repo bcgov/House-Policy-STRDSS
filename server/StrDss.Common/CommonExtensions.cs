@@ -220,5 +220,13 @@ namespace StrDss.Common
         {
             return str.ToLowerInvariant() == StrDssIdProviders.Idir;
         }
+        public static string GetSha256Hash(this byte[] bin)
+        {
+            if (bin.Length == 0) return "";
+
+            using var sha = SHA256.Create();
+            byte[] hash = sha.ComputeHash(bin);
+            return BitConverter.ToString(hash).Replace("-", string.Empty);
+        }
     }
 }

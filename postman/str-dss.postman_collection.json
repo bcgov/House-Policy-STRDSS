@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6be218e7-ea62-4a5e-8f20-7ced303c3e0e",
+		"_postman_id": "95fe42d4-6034-4bcb-b833-af1e7bcfc61f",
 		"name": "str-dss",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "3660367"
@@ -586,6 +586,74 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Send Batch Takedown Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "platformId",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/api/delisting/batchtakedownrequest",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"delisting",
+						"batchtakedownrequest"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Batch Takedown Notice",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "platformId",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/api/delisting/batchtakedownnotice",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"delisting",
+						"batchtakedownnotice"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -593,22 +661,22 @@
 		"oauth2": [
 			{
 				"key": "redirect_uri",
-				"value": "http://localhost:4200",
+				"value": "{{redirectUrl}}",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "{{authHost}}/auth/realms/standard/protocol/openid-connect/token",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "{{authHost}}/auth/realms/standard/protocol/openid-connect/auth",
 				"type": "string"
 			},
 			{
 				"key": "clientId",
 				"value": "str-dss-5303",
-				"type": "string"
-			},
-			{
-				"key": "accessTokenUrl",
-				"value": "https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/token",
-				"type": "string"
-			},
-			{
-				"key": "authUrl",
-				"value": "https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/auth",
 				"type": "string"
 			},
 			{

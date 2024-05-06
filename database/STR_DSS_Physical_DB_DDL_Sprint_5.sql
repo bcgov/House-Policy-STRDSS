@@ -293,10 +293,10 @@ CREATE OR REPLACE VIEW dss_user_identity_view AS SELECT u.user_identity_id,
     o.organization_cd,
     o.organization_nm,
     u.upd_dtm
-   FROM (dss.dss_user_identity u
-     LEFT JOIN dss.dss_organization o ON ((u.represented_by_organization_id = o.organization_id)));
+   FROM (dss_user_identity u
+     LEFT JOIN dss_organization o ON ((u.represented_by_organization_id = o.organization_id)));
 
-CREATE OR REPLACE FUNCTION dss.dss_update_audit_columns()
+CREATE OR REPLACE FUNCTION dss_update_audit_columns()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$BEGIN
@@ -304,23 +304,23 @@ AS $function$BEGIN
     RETURN NEW;
 END;$function$;
 
-CREATE TRIGGER dss_email_message_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_email_message FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns();
+CREATE TRIGGER dss_email_message_br_iu_tr BEFORE INSERT OR UPDATE ON dss_email_message FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
-CREATE TRIGGER dss_organization_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_organization FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns();
+CREATE TRIGGER dss_organization_br_iu_tr BEFORE INSERT OR UPDATE ON dss_organization FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
-CREATE TRIGGER dss_organization_contact_person_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_organization_contact_person FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns();
+CREATE TRIGGER dss_organization_contact_person_br_iu_tr BEFORE INSERT OR UPDATE ON dss_organization_contact_person FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
-CREATE TRIGGER dss_physical_address_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_physical_address FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns();
+CREATE TRIGGER dss_physical_address_br_iu_tr BEFORE INSERT OR UPDATE ON dss_physical_address FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
-CREATE TRIGGER dss_rental_listing_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_rental_listing FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns();
+CREATE TRIGGER dss_rental_listing_br_iu_tr BEFORE INSERT OR UPDATE ON dss_rental_listing FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
-CREATE TRIGGER dss_rental_listing_contact_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_rental_listing_contact FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns();
+CREATE TRIGGER dss_rental_listing_contact_br_iu_tr BEFORE INSERT OR UPDATE ON dss_rental_listing_contact FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
-CREATE TRIGGER dss_rental_listing_report_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_rental_listing_report FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns();
+CREATE TRIGGER dss_rental_listing_report_br_iu_tr BEFORE INSERT OR UPDATE ON dss_rental_listing_report FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
-CREATE TRIGGER dss_upload_delivery_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_upload_delivery FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns();
+CREATE TRIGGER dss_upload_delivery_br_iu_tr BEFORE INSERT OR UPDATE ON dss_upload_delivery FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
-CREATE TRIGGER dss_user_identity_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_user_identity FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns();
+CREATE TRIGGER dss_user_identity_br_iu_tr BEFORE INSERT OR UPDATE ON dss_user_identity FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
 COMMENT ON TABLE dss_access_request_status IS 'A potential status for a user access request (e.g. Requested, Approved, or Denied)';
 

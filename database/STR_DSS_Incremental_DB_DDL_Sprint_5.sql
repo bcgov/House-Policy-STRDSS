@@ -88,7 +88,7 @@ ALTER TABLE dss_upload_line ADD CONSTRAINT dss_upload_line_fk_included_in FOREIG
 
 ALTER TABLE dss_upload_delivery ADD CONSTRAINT dss_upload_delivery_fk_provided_by FOREIGN KEY ( providing_organization_id ) REFERENCES dss_organization( organization_id )   ;
 
-CREATE TRIGGER dss_upload_delivery_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_upload_delivery FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns();
+CREATE TRIGGER dss_upload_delivery_br_iu_tr BEFORE INSERT OR UPDATE ON dss_upload_delivery FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
 COMMENT ON COLUMN dss_email_message.concerned_with_rental_listing_id IS 'Foreign key';
 

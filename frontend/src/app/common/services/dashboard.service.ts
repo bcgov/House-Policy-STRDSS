@@ -8,6 +8,7 @@ import { User } from '../models/user';
 })
 export class DashboardService {
   private cards!: Array<DashboardCard>;
+
   constructor() {
     this.initCards();
   }
@@ -36,7 +37,7 @@ export class DashboardService {
     return cardsPerUser;
   }
 
-  private initCards() {
+  private initCards(): void {
     this.cards = [
       {
         title: 'Platform Upload History',

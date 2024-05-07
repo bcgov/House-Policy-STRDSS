@@ -13,13 +13,13 @@ namespace StrDss.Service.Hangfire
             _delistingService = delistingService;
         }
 
-        //[Queue("default")]
-        //[SkipSameJob]
-        //[AutomaticRetry(Attempts = 0)]
-        //public async Task ProcessRentalListingReport()
-        //{
-        //    await _linstingService.ProcessReportAsync();
-        //}
+        [Queue("default")]
+        [SkipSameJob]
+        [AutomaticRetry(Attempts = 0)]
+        public async Task ProcessRentalListingReports()
+        {
+            await _linstingService.ProcessRentalReportUploadsAsync();
+        }
 
         [Queue("default")]
         [SkipSameJob]

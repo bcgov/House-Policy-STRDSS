@@ -6,4 +6,5 @@ export const environment = {
     VERSION: '0.1',
     SM_LOGOFF_URL: '__SM_LOGOFF_URL__',
     API_HOST: '/api',
+    RENTAL_LISTING_REPORT_MAX_SIZE: '__RENTAL_LISTING_REPORT_MAX_SIZE__',
 };

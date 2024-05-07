@@ -6,6 +6,7 @@ using StrDss.Api.Models;
 using StrDss.Common;
 using StrDss.Model;
 using StrDss.Service;
+using StrDss.Service.HttpClients;
 
 namespace StrDss.Api.Controllers
 {
@@ -15,12 +16,14 @@ namespace StrDss.Api.Controllers
     public class RentalListingReportsController : BaseApiController
     {
         private IRentalListingReportService _listingService;
+        private IGeocoderApi _geocoderApi;
 
         public RentalListingReportsController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
-            IRentalListingReportService listingSeervice)
+            IRentalListingReportService listingService, IGeocoderApi geocoderApi)
             : base(currentUser, mapper, config, logger)
         {
-            _listingService = listingSeervice;
+            _listingService = listingService;
+            _geocoderApi = geocoderApi;
         }
 
         [ApiAuthorize(Permissions.ListingFileUpload)]
@@ -61,6 +64,14 @@ namespace StrDss.Api.Controllers
 
             return Ok();
         }
+
+        //[ApiAuthorize]
+        //[HttpGet("geocoder")]
+        //public async Task<ActionResult> CallGeocoder()
+        //{
+        //    await _geocoderApi.GetAddressAsync("");
+        //    return Ok();
+        //}
 
     }
 }

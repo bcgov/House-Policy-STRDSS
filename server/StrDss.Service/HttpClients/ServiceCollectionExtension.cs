@@ -27,6 +27,18 @@ namespace StrDss.Service.HttpClients
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Add("Authorization", $"Basic {base64Credentials}");
             });
+
+            services.AddHttpClient<IGeocoderApi, GeocoderApi>(client =>
+            {
+                var baseAddress = config.GetValue<string>("GEOCODER_URL") ?? "";
+                var apiKey = config.GetValue<string>("GEOCODER_API_KEY") ?? "";
+
+                client.BaseAddress = new Uri(baseAddress);
+                client.Timeout = new TimeSpan(0, 0, 10);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Add("apiKey", $"{apiKey}");
+            });
         }
     }
 }

@@ -18,22 +18,27 @@ namespace StrDss.Service
 {
     public interface IRentalListingReportService
     {
-        Task<Dictionary<string, List<string>>> ValidateAndParseUploadFileAsync(string reportPeriod, long orgId, string hashValue, TextReader textReader, List<DssUploadLine> lines);
+        Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string hashValue, TextReader textReader, List<DssUploadLine> lines);
         Task<Dictionary<string, List<string>>> UploadRentalReport(string reportPeriod, long orgId, Stream stream);
-        //Task ProcessReportAsync();
+        Task ProcessRentalReportUploadsAsync();
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
         private IOrganizationRepository _orgRepo;
         private IUploadDeliveryRepository _uploadRepo;
+        private IRentalListingReportRepository _reportRepo;
+        private IPhysicalAddressRepository _addressRepo;
         private IConfiguration _config;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IConfiguration config, ILogger<StrDssLogger> logger)
+            IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
+            IConfiguration config, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _orgRepo = orgRepo;
             _uploadRepo = uploadRepo;
+            _reportRepo = reportRepo;
+            _addressRepo = addressRepo;
             _config = config;
         }
 
@@ -51,9 +56,9 @@ namespace StrDss.Service
             stream.Position = 0;
             using TextReader textReader = new StreamReader(stream, Encoding.UTF8);
 
-            var lines = new List<DssUploadLine>();
+            var uploadLines = new List<DssUploadLine>();
 
-            var errors = await ValidateAndParseUploadFileAsync(reportPeriod, orgId, hashValue, textReader, lines);
+            var errors = await ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
 
             if (errors.Count > 0) return errors;
 
@@ -66,7 +71,7 @@ namespace StrDss.Service
                 ProvidingOrganizationId = orgId,
             };
 
-            foreach (var line in lines)
+            foreach (var line in uploadLines)
             {
                 entity.DssUploadLines.Add(line);
             }
@@ -78,7 +83,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        public async Task<Dictionary<string, List<string>>> ValidateAndParseUploadFileAsync(string reportPeriod, long orgId, string hashValue, TextReader textReader, List<DssUploadLine> lines)
+        public async Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string hashValue, TextReader textReader, List<DssUploadLine> uploadLines)
         {
             var errors = new Dictionary<string, List<string>>();
 
@@ -96,7 +101,7 @@ namespace StrDss.Service
                 errors.AddItem("ReportPeriod", "Report period cannot be current or futrue month.");
             }
 
-            var isDuplicate = await _uploadRepo.IsDuplicateRentalReport(firstDayOfReportMonth, orgId, hashValue);
+            var isDuplicate = await _uploadRepo.IsDuplicateRentalReportUploadAsnyc(firstDayOfReportMonth, orgId, hashValue);
             if (isDuplicate)
             {
                 errors.AddItem("File", "The file has already been uploaded");
@@ -165,7 +170,7 @@ namespace StrDss.Service
                     if (!listingIds.Contains($"{row.OrgCd}-{row.ListingId.ToLower()}"))
                     {
                         listingIds.Add($"{row.OrgCd}-{row.ListingId.ToLower()}");
-                        lines.Add(new DssUploadLine
+                        uploadLines.Add(new DssUploadLine
                         {
                             IsValidationFailure = false,
                             IsSystemFailure = false,
@@ -265,110 +270,158 @@ namespace StrDss.Service
             return errors.Count == 0;
         }
 
-        //public async Task ProcessReportAsync()
-        //{
-        //    var report = await _listingRepo.GetReportToProcessAsync();
+        public async Task ProcessRentalReportUploadsAsync()
+        {
+            var uploads = await _uploadRepo.GetRentalReportUploadsToProcessAsync();
 
-        //    if (report == null || report.SourceBin == null) return;
+            foreach (var upload in uploads)
+            {
+                await ProcessRentalReportUploadAsync(upload);
+            }
+        }
 
-        //    _logger.LogInformation($"Processing Rental Listing Report {report.ProvidingOrganizationId} - {report.ReportPeriodYm} - {report.ProvidingOrganization.OrganizationNm}");
+        private async Task ProcessRentalReportUploadAsync(DssUploadDelivery upload)
+        {
+            _logger.LogInformation($"Processing Rental Listing Report {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
 
-        //    var errors = new Dictionary<string, List<string>>();
-        //    var csvConfig = CsvHelperUtils.GetConfig(errors, false);
+            var reportPeriodYm = (DateOnly)upload.ReportPeriodYm!;
 
-        //    var memoryStream = new MemoryStream(report.SourceBin);
-        //    using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
+            var report = await _reportRepo.GetRentalListingReportAsync(upload.ProvidingOrganizationId, reportPeriodYm);
 
-        //    using var csv = new CsvReader(textReader, csvConfig);
+            if (report == null)
+            {
+                report = new DssRentalListingReport
+                {
+                    ReportPeriodYm = reportPeriodYm,
+                    IsCurrent = false,
+                    ProvidingOrganization = upload.ProvidingOrganization,
+                };
 
-        //    csv.Read();
-        //    var headerExists = csv.ReadHeader();
+                await _reportRepo.AddRentalListingReportAsync(report);
 
-        //    while (csv.Read())
-        //    {
-        //        var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
-        //        var listingLine = await _listingRepo.GetListingLineAsync(report.RentalListingReportId, row.OrgCd, row.ListingId);
+                _unitOfWork.Commit();
+            }
 
-        //        if (listingLine == null)
-        //        {
-        //            await ProcessListingLine(report, row, csv.Parser.RawRecord);
-        //        }
+            var errors = new Dictionary<string, List<string>>();
+            var csvConfig = CsvHelperUtils.GetConfig(errors, false);
 
-        //        if (listingLine != null && listingLine.IsSystemFailure)
-        //        {
-        //            //retry
-        //        }              
-        //    }
+            var memoryStream = new MemoryStream(upload.SourceBin!);
+            using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
 
-        //    //update the report flag and commit;
-        //}
+            using var csv = new CsvReader(textReader, csvConfig);
 
-        //private async Task ProcessListingLine(DssRentalListingReport report, RentalListingRowUntyped row, string rawRecord)
-        //{
-        //    await Task.CompletedTask;
+            csv.Read();
+            var headerExists = csv.ReadHeader();
 
-        //    var errors = new Dictionary<string, List<string>>();
+            while (csv.Read())
+            {
+                var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
+                var uploadLine = upload.DssUploadLines.FirstOrDefault(x => x.SourceOrganizationCd == row.OrgCd && x.SourceRecordNo == row.ListingId);
 
-        //    _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
+                if (uploadLine == null)
+                {
+                    continue; //already processed
+                }
 
-        //    var line = new DssRentalListingLine
-        //    {
-        //        IsValidationFailure = errors.Count > 0,
-        //        IsSystemFailure = false,
-        //        OrganizationCd = row.OrgCd,
-        //        PlatformListingNo = row.ListingId,
-        //        SourceLineTxt = rawRecord,
-        //        ErrorTxt = "",
-        //        IncludingRentalListingReportId = report.RentalListingReportId
-        //    };
+                await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord);
 
-        //    report.DssRentalListingLines.Add(line);
+                //if (listingLine != null && listingLine.IsSystemFailure)
+                //{
+                //    //retry
+                //}
+            }
 
-        //    if (errors.Count == 0)
-        //    {
-        //        var listing = _mapper.Map<DssRentalListing>(row);
-        //        listing.IncludingRentalListingReportId = report.RentalListingReportId;
-        //        listing.OfferingOrganizationId = report.ProvidingOrganizationId;               
+            //update the report flag and commit;
+        }
 
-        //        AddContact(listing, "", row.PropertyHostNm, row.PropertyHostEmail, row.PropertyHostPhone, row.PropertyHostFax, row.PropertyHostAddress, 1, true);
+        private async Task ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)
+        {
+            await Task.CompletedTask;
 
-        //        AddContact(listing, row.SupplierHost1Id, row.SupplierHost1Nm, row.SupplierHost1Email, row.SupplierHost1Phone, row.SupplierHost1Fax, row.SupplierHost1Address, 1, false);
-        //        AddContact(listing, row.SupplierHost2Id, row.SupplierHost2Nm, row.SupplierHost2Email, row.SupplierHost2Phone, row.SupplierHost2Fax, row.SupplierHost2Address, 2, false);
-        //        AddContact(listing, row.SupplierHost3Id, row.SupplierHost3Nm, row.SupplierHost3Email, row.SupplierHost3Phone, row.SupplierHost3Fax, row.SupplierHost3Address, 3, false);
-        //        AddContact(listing, row.SupplierHost4Id, row.SupplierHost4Nm, row.SupplierHost4Email, row.SupplierHost4Phone, row.SupplierHost4Fax, row.SupplierHost4Address, 4, false);
-        //        AddContact(listing, row.SupplierHost5Id, row.SupplierHost5Nm, row.SupplierHost5Email, row.SupplierHost5Phone, row.SupplierHost5Fax, row.SupplierHost5Address, 5, false);
+            var errors = new Dictionary<string, List<string>>();
 
-        //        listing.LocatingPhysicalAddress = new DssPhysicalAddress
-        //        {
-        //            OriginalAddressTxt = row.RentalAddress,
-        //        };
+            _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
 
-        //        //call geocoder
+            if (errors.Count > 0)
+            {
+                uploadLine.IsValidationFailure = true;
+                uploadLine.ErrorTxt = errors.ParseError();
+                uploadLine.IsProcessed = true;
 
-        //        //assign org Id using location
+                _unitOfWork.Commit();
+                return;
+            }
 
-        //        //add to database
+            var offeringOrg = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd); //already validated in the file upload
 
-        //        //commit;
-        //    }
-        //}
+            if (errors.Count == 0)
+            {
+                var listing = await _reportRepo.GetRentalListingAsync(report.RentalListingReportId, offeringOrg.OrganizationId, row.ListingId);
 
-        //private void AddContact(DssRentalListing listing, string hostNo, string name, string email, string phone, string fax, string address, short conatctNo, bool isOwner)
-        //{
-        //    if (name.IsNotEmpty() || hostNo.IsNotEmpty() || email.IsNotEmpty() || phone.IsNotEmpty() || fax.IsNotEmpty() || address.IsNotEmpty())
-        //    {
-        //        listing.DssRentalListingContacts.Add(new DssRentalListingContact
-        //        {
-        //            IsPropertyOwner = isOwner, 
-        //            ListingContactNbr = conatctNo,
-        //            SupplierHostNo = hostNo,
-        //            FullNm = name,
-        //            PhoneNo = phone,
-        //            FaxNo = fax,
-        //            FullAddressTxt = address,
-        //            EmailAddressDsc = email,
-        //        });
-        //    }
-        //}
+                if (listing == null)
+                {
+                    listing = _mapper.Map<DssRentalListing>(row);
+                    await _reportRepo.AddRentalListingAsync(listing);
+                }
+                else
+                {
+                    listing = _mapper.Map(row, listing);
+                }
+
+                listing.IncludingRentalListingReportId = report.RentalListingReportId;
+                listing.OfferingOrganizationId = offeringOrg!.OrganizationId;
+
+                AddContact(listing!, "", row.PropertyHostNm, row.PropertyHostEmail, row.PropertyHostPhone, row.PropertyHostFax, row.PropertyHostAddress, 1, true);
+                AddContact(listing!, row.SupplierHost1Id, row.SupplierHost1Nm, row.SupplierHost1Email, row.SupplierHost1Phone, row.SupplierHost1Fax, row.SupplierHost1Address, 1, false);
+                AddContact(listing!, row.SupplierHost2Id, row.SupplierHost2Nm, row.SupplierHost2Email, row.SupplierHost2Phone, row.SupplierHost2Fax, row.SupplierHost2Address, 2, false);
+                AddContact(listing!, row.SupplierHost3Id, row.SupplierHost3Nm, row.SupplierHost3Email, row.SupplierHost3Phone, row.SupplierHost3Fax, row.SupplierHost3Address, 3, false);
+                AddContact(listing!, row.SupplierHost4Id, row.SupplierHost4Nm, row.SupplierHost4Email, row.SupplierHost4Phone, row.SupplierHost4Fax, row.SupplierHost4Address, 4, false);
+                AddContact(listing!, row.SupplierHost5Id, row.SupplierHost5Nm, row.SupplierHost5Email, row.SupplierHost5Phone, row.SupplierHost5Fax, row.SupplierHost5Address, 5, false);
+
+                var address = row.RentalAddress.Trim();
+
+                var physicalAddress = await _addressRepo.GetPhysicalAdderssAsync(address);
+
+                if (physicalAddress == null)
+                {
+                    //geocoder call
+
+                    physicalAddress = new DssPhysicalAddress
+                    {
+                        OriginalAddressTxt = row.RentalAddress,
+                    };
+
+                    //add physical address                    
+                }
+
+                listing.LocatingPhysicalAddress = physicalAddress;
+
+                uploadLine.IsValidationFailure = true;
+                uploadLine.ErrorTxt = "";
+                uploadLine.IsProcessed = true;
+
+                //update master listing
+
+                _unitOfWork.Commit();
+            }
+        }
+
+        private void AddContact(DssRentalListing listing, string hostNo, string name, string email, string phone, string fax, string address, short conatctNo, bool isOwner)
+        {
+            if (name.IsNotEmpty() || hostNo.IsNotEmpty() || email.IsNotEmpty() || phone.IsNotEmpty() || fax.IsNotEmpty() || address.IsNotEmpty())
+            {
+                listing.DssRentalListingContacts.Add(new DssRentalListingContact
+                {
+                    IsPropertyOwner = isOwner,
+                    ListingContactNbr = conatctNo,
+                    SupplierHostNo = hostNo,
+                    FullNm = name,
+                    PhoneNo = phone,
+                    FaxNo = fax,
+                    FullAddressTxt = address,
+                    EmailAddressDsc = email,
+                });
+            }
+        }
     }
 }

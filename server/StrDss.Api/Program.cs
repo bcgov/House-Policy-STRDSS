@@ -89,7 +89,6 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 //FieldValidationService as Singleton
 builder.Services.AddSingleton<IFieldValidatorService, FieldValidatorService>();
 
-builder.Services.AddScoped<IApi, Api>();
 builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddBceidSoapClient(builder.Configuration);
 
@@ -200,7 +199,7 @@ app.UseHangfireDashboard();
 app.UseMiddleware<ExceptionMiddleware>();
 
 // make sure this is after app.UseHangfireDashboard()
-//RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReport(), "*/1 * * * *");
+//RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/1 * * * *");
 RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *"); 
 
 app.Run();

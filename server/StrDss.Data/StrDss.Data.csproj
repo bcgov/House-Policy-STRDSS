@@ -21,6 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\StrDss.Common\StrDss.Common.csproj" />
 	  <ProjectReference Include="..\StrDss.Model\StrDss.Model.csproj" />
 	</ItemGroup>
 </Project>

@@ -91,6 +91,17 @@ namespace StrDss.Common
             }
         }
 
+        public static string ParseError(this Dictionary<string, List<string>> errors)
+        {
+            var sb = new StringBuilder();
+            foreach (var key in errors.Keys)
+            {
+                sb.AppendLine($"{key}:");
+                sb.AppendLine($"{string.Join("\r\n  ", errors[key])}");
+            }
+            return sb.ToString();
+        }
+
         public static string SanitizeFileName(this string fileName)
         {
             var invalids = Path.GetInvalidFileNameChars();

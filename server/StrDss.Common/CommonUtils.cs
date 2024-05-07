@@ -62,5 +62,15 @@ namespace StrDss.Common
             stream.CopyTo(memoryStream);
             return Convert.ToBase64String(memoryStream.ToArray());
         }
+
+        public static short? StringToShort(string str)
+        {
+            if (str == null)
+            {
+                return null;
+            }
+
+            return Convert.ToInt16(str);
+        }
     }
 }

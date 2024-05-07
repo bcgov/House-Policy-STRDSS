@@ -13,15 +13,13 @@ namespace StrDss.Service.HttpClients
     public class ChesTokenApi : IChesTokenApi
     {
         public HttpClient _client { get; }
-        public IApi _api { get; }
         public IConfiguration _config { get; }
 
         private ILogger<StrDssLogger> _logger;
 
-        public ChesTokenApi(HttpClient client, IApi api, IConfiguration config, ILogger<StrDssLogger> logger)
+        public ChesTokenApi(HttpClient client, IConfiguration config, ILogger<StrDssLogger> logger)
         {
             _client = client;
-            _api = api;
             _config = config;
             _logger = logger;
         }

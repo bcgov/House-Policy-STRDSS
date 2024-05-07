@@ -7,6 +7,36 @@
 	},
 	"item": [
 		{
+			"name": "Get Organizations",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/organizations",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"organizations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Send Batch Takedown Request",
 			"request": {
 				"method": "POST",

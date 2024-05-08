@@ -13,6 +13,7 @@ namespace StrDss.Data.Repositories
         Task AddRentalListingReportAsync(DssRentalListingReport report);
         Task<DssRentalListing?> GetRentalListingAsync(long reportId, long offeringOrgId, string listingId);
         Task AddRentalListingAsync(DssRentalListing listing);
+        Task<DssRentalListing?> GetMasterListingAsync(long offeringOrgId, string listingId);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
     {
@@ -23,7 +24,8 @@ namespace StrDss.Data.Repositories
 
         public async Task<DssRentalListingReport?> GetRentalListingReportAsync(long orgId, DateOnly reportPeriodYm)
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.ProvidingOrganizationId == orgId && x.ReportPeriodYm == reportPeriodYm);
+            return await _dbSet
+                .FirstOrDefaultAsync(x => x.ProvidingOrganizationId == orgId && x.ReportPeriodYm == reportPeriodYm);
         }
 
         public async Task AddRentalListingReportAsync(DssRentalListingReport report)
@@ -34,11 +36,22 @@ namespace StrDss.Data.Repositories
         public async Task<DssRentalListing?> GetRentalListingAsync(long reportId, long offeringOrgId, string listingId)
         {
             return await _dbContext.DssRentalListings
+                .Include(x => x.DssRentalListingContacts)
                 .FirstOrDefaultAsync(x => x.IncludingRentalListingReportId == reportId && x.OfferingOrganizationId == offeringOrgId && x.PlatformListingNo == listingId);
         }
         public async Task AddRentalListingAsync(DssRentalListing listing)
         {
             await _dbContext.DssRentalListings.AddAsync(listing);
+        }
+
+        public async Task<DssRentalListing?> GetMasterListingAsync(long offeringOrgId, string listingId)
+        {
+            return await _dbContext.DssRentalListings
+                .Include(x => x.LocatingPhysicalAddress)
+                .Include(x => x.DssRentalListingContacts)
+                .FirstOrDefaultAsync(x => x.OfferingOrganizationId == offeringOrgId
+                    && x.PlatformListingNo == listingId
+                    && x.IncludingRentalListingReportId == null);
         }
     }
 }

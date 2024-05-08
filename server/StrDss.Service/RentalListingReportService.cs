@@ -11,6 +11,7 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service.CsvHelpers;
+using StrDss.Service.HttpClients;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -28,10 +29,12 @@ namespace StrDss.Service
         private IUploadDeliveryRepository _uploadRepo;
         private IRentalListingReportRepository _reportRepo;
         private IPhysicalAddressRepository _addressRepo;
+        private IGeocoderApi _geocoder;
         private IConfiguration _config;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
+            IGeocoderApi geocoder,
             IConfiguration config, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
@@ -39,6 +42,7 @@ namespace StrDss.Service
             _uploadRepo = uploadRepo;
             _reportRepo = reportRepo;
             _addressRepo = addressRepo;
+            _geocoder = geocoder;
             _config = config;
         }
 
@@ -324,20 +328,11 @@ namespace StrDss.Service
                 }
 
                 await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord);
-
-                //if (listingLine != null && listingLine.IsSystemFailure)
-                //{
-                //    //retry
-                //}
             }
-
-            //update the report flag and commit;
         }
 
         private async Task ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)
         {
-            await Task.CompletedTask;
-
             var errors = new Dictionary<string, List<string>>();
 
             _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
@@ -365,7 +360,11 @@ namespace StrDss.Service
                 }
                 else
                 {
-                    listing = _mapper.Map(row, listing);
+                    var listingId = listing.RentalListingId;
+                    _mapper.Map(row, listing);
+
+                    listing.RentalListingId = listingId;
+                    listing.DssRentalListingContacts.Clear();
                 }
 
                 listing.IncludingRentalListingReportId = report.RentalListingReportId;
@@ -378,29 +377,49 @@ namespace StrDss.Service
                 AddContact(listing!, row.SupplierHost4Id, row.SupplierHost4Nm, row.SupplierHost4Email, row.SupplierHost4Phone, row.SupplierHost4Fax, row.SupplierHost4Address, 4, false);
                 AddContact(listing!, row.SupplierHost5Id, row.SupplierHost5Nm, row.SupplierHost5Email, row.SupplierHost5Phone, row.SupplierHost5Fax, row.SupplierHost5Address, 5, false);
 
-                var address = row.RentalAddress.Trim();
+                var address = row.RentalAddress;
 
-                var physicalAddress = await _addressRepo.GetPhysicalAdderssAsync(address);
+                var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, address);
 
                 if (physicalAddress == null)
                 {
-                    //geocoder call
-
                     physicalAddress = new DssPhysicalAddress
                     {
                         OriginalAddressTxt = row.RentalAddress,
                     };
 
-                    //add physical address                    
+                    await _geocoder.GetAddressAsync(physicalAddress);
+
+                    await _addressRepo.AddPhysicalAddressAsync(physicalAddress);
                 }
 
                 listing.LocatingPhysicalAddress = physicalAddress;
+                listing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
 
                 uploadLine.IsValidationFailure = true;
                 uploadLine.ErrorTxt = "";
                 uploadLine.IsProcessed = true;
 
-                //update master listing
+                var masterListing = await _reportRepo.GetMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo);
+
+                if (masterListing == null)
+                {
+                    masterListing = _mapper.Map<DssRentalListing>(listing);
+                    await _reportRepo.AddRentalListingAsync(masterListing);
+                }
+                else
+                {
+                    var masterListingId = masterListing.RentalListingId;
+
+                    _mapper.Map(listing, masterListing);
+                    masterListing.RentalListingId = masterListingId;
+                }
+
+                masterListing.IncludingRentalListingReportId = null;
+                masterListing.DerivedFromRentalListingId = listing.RentalListingId;
+                masterListing.DssRentalListingContacts.Clear();
+
+                masterListing.DssRentalListingContacts = listing.DssRentalListingContacts;
 
                 _unitOfWork.Commit();
             }

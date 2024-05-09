@@ -15,6 +15,34 @@ export function validateUrl(): ValidatorFn {
     };
 }
 
+export function validateExtension(ext: 'text/csv'): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+
+        if (control.value) {
+            if (control.value.type.toLowerCase() === ext.toLowerCase()) {
+                return null;
+            } else {
+                return { invalidExtension: true };
+            }
+        }
+        return null;
+    }
+}
+
+export function validateFileSize(limit: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+
+        if (control.value) {
+            if (control.value.size <= limit) {
+                return null;
+            } else {
+                return { fileSizeExceeded: true };
+            }
+        }
+        return null;
+    }
+}
+
 export function validatePhone(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
         const phone: string = control.value;

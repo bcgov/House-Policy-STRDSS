@@ -88,8 +88,7 @@ export class TopMenuService {
       {
         accessPermission: listing_file_upload,
         buttonId: 'uploadListingData_mi_btn',
-        route: '',
-        disabled: true,
+        route: '/upload-listing-data',
         description: 'Upload listing data to the system',
         title: 'Upload Listings',
         folderName: 'Upload',

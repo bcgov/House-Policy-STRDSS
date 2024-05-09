@@ -1,5 +1,4 @@
-﻿using NetTopologySuite.Geometries;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace StrDss.Model.OrganizationDtos
 {

@@ -14,6 +14,7 @@ namespace StrDss.Data.Repositories
         Task<DssRentalListing?> GetRentalListingAsync(long reportId, long offeringOrgId, string listingId);
         Task AddRentalListingAsync(DssRentalListing listing);
         Task<DssRentalListing?> GetMasterListingAsync(long offeringOrgId, string listingId);
+        void DeleteListingContacts(long listingId);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
     {
@@ -36,7 +37,7 @@ namespace StrDss.Data.Repositories
         public async Task<DssRentalListing?> GetRentalListingAsync(long reportId, long offeringOrgId, string listingId)
         {
             return await _dbContext.DssRentalListings
-                .Include(x => x.DssRentalListingContacts)
+                .Include(x => x.LocatingPhysicalAddress)
                 .FirstOrDefaultAsync(x => x.IncludingRentalListingReportId == reportId && x.OfferingOrganizationId == offeringOrgId && x.PlatformListingNo == listingId);
         }
         public async Task AddRentalListingAsync(DssRentalListing listing)
@@ -48,10 +49,17 @@ namespace StrDss.Data.Repositories
         {
             return await _dbContext.DssRentalListings
                 .Include(x => x.LocatingPhysicalAddress)
-                .Include(x => x.DssRentalListingContacts)
                 .FirstOrDefaultAsync(x => x.OfferingOrganizationId == offeringOrgId
                     && x.PlatformListingNo == listingId
                     && x.IncludingRentalListingReportId == null);
+        }
+
+        public void DeleteListingContacts(long listingId)
+        {
+            var contactsToDelete = _dbContext.DssRentalListingContacts
+                .Where(c => c.ContactedThroughRentalListingId == listingId);
+
+            _dbContext.DssRentalListingContacts.RemoveRange(contactsToDelete);
         }
     }
 }

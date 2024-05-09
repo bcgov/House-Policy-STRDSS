@@ -351,6 +351,8 @@ namespace StrDss.Service
 
             if (errors.Count == 0)
             {
+                using var tran = _unitOfWork.BeginTransaction();
+
                 var listing = await _reportRepo.GetRentalListingAsync(report.RentalListingReportId, offeringOrg.OrganizationId, row.ListingId);
 
                 if (listing == null)
@@ -360,11 +362,10 @@ namespace StrDss.Service
                 }
                 else
                 {
-                    var listingId = listing.RentalListingId;
                     _mapper.Map(row, listing);
+                    _reportRepo.DeleteListingContacts(listing.RentalListingId);
 
-                    listing.RentalListingId = listingId;
-                    listing.DssRentalListingContacts.Clear();
+                    _unitOfWork.Commit();
                 }
 
                 listing.IncludingRentalListingReportId = report.RentalListingReportId;
@@ -394,34 +395,44 @@ namespace StrDss.Service
                 }
 
                 listing.LocatingPhysicalAddress = physicalAddress;
-                listing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
 
                 uploadLine.IsValidationFailure = true;
                 uploadLine.ErrorTxt = "";
                 uploadLine.IsProcessed = true;
 
+                _unitOfWork.Commit();
+
                 var masterListing = await _reportRepo.GetMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo);
 
                 if (masterListing == null)
                 {
-                    masterListing = _mapper.Map<DssRentalListing>(listing);
+                    masterListing = _mapper.Map<DssRentalListing>(row);
                     await _reportRepo.AddRentalListingAsync(masterListing);
                 }
                 else
                 {
-                    var masterListingId = masterListing.RentalListingId;
+                    _mapper.Map(row, masterListing);
+                    _reportRepo.DeleteListingContacts(masterListing.RentalListingId);
 
-                    _mapper.Map(listing, masterListing);
-                    masterListing.RentalListingId = masterListingId;
+                    _unitOfWork.Commit();
                 }
 
                 masterListing.IncludingRentalListingReportId = null;
-                //masterListing.DerivedFromRentalListingId = listing.RentalListingId;
-                masterListing.DssRentalListingContacts.Clear();
+                masterListing.OfferingOrganizationId = offeringOrg!.OrganizationId;
 
-                masterListing.DssRentalListingContacts = listing.DssRentalListingContacts;
+                masterListing.DerivedFromRentalListingId = listing.RentalListingId;
+                masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
+
+                AddContact(masterListing!, "", row.PropertyHostNm, row.PropertyHostEmail, row.PropertyHostPhone, row.PropertyHostFax, row.PropertyHostAddress, 1, true);
+                AddContact(masterListing!, row.SupplierHost1Id, row.SupplierHost1Nm, row.SupplierHost1Email, row.SupplierHost1Phone, row.SupplierHost1Fax, row.SupplierHost1Address, 1, false);
+                AddContact(masterListing!, row.SupplierHost2Id, row.SupplierHost2Nm, row.SupplierHost2Email, row.SupplierHost2Phone, row.SupplierHost2Fax, row.SupplierHost2Address, 2, false);
+                AddContact(masterListing!, row.SupplierHost3Id, row.SupplierHost3Nm, row.SupplierHost3Email, row.SupplierHost3Phone, row.SupplierHost3Fax, row.SupplierHost3Address, 3, false);
+                AddContact(masterListing!, row.SupplierHost4Id, row.SupplierHost4Nm, row.SupplierHost4Email, row.SupplierHost4Phone, row.SupplierHost4Fax, row.SupplierHost4Address, 4, false);
+                AddContact(masterListing!, row.SupplierHost5Id, row.SupplierHost5Nm, row.SupplierHost5Email, row.SupplierHost5Phone, row.SupplierHost5Fax, row.SupplierHost5Address, 5, false);
 
                 _unitOfWork.Commit();
+
+                tran.Commit();
             }
         }
 

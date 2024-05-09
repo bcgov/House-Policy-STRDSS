@@ -41,7 +41,6 @@ export class LayoutComponent {
       },
       {
         label: 'Upload',
-        visible: false,
         items: []
       },
       {

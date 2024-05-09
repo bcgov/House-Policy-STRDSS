@@ -9,6 +9,7 @@ using StrDss.Data;
 using StrDss.Data.Entities;
 using StrDss.Data.Repositories;
 using StrDss.Model;
+using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.HttpClients;
@@ -334,106 +335,120 @@ namespace StrDss.Service
         private async Task ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)
         {
             var errors = new Dictionary<string, List<string>>();
-
             _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
 
             if (errors.Count > 0)
             {
-                uploadLine.IsValidationFailure = true;
-                uploadLine.ErrorTxt = errors.ParseError();
-                uploadLine.IsProcessed = true;
-
+                SaveUploadLine(uploadLine, errors, true);
                 _unitOfWork.Commit();
                 return;
             }
 
             var offeringOrg = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd); //already validated in the file upload
 
-            if (errors.Count == 0)
+            using var tran = _unitOfWork.BeginTransaction();
+
+            var listing = await CreateOrUpdateRentalListing(report, offeringOrg, row);
+
+            AddContacts(listing, row);
+
+            var physicalAddress = await CreateOrGetPhysicalAddress(listing, row);
+
+            listing.LocatingPhysicalAddress = physicalAddress;
+
+            SaveUploadLine(uploadLine, errors, false);
+
+            _unitOfWork.Commit();
+
+            var masterListing = await CreateOrUpdateMasterListing(listing, offeringOrg, row, physicalAddress);
+
+            AddContacts(masterListing, row);
+
+            _unitOfWork.Commit();
+
+            tran.Commit();
+        }
+
+        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid)
+        {
+            uploadLine.IsValidationFailure = isValid;
+            uploadLine.ErrorTxt = errors.ParseError();
+            uploadLine.IsProcessed = true;
+        }
+
+        private async Task<DssRentalListing> CreateOrUpdateRentalListing(DssRentalListingReport report, OrganizationDto offeringOrg, RentalListingRowUntyped row)
+        {
+            var listing = await _reportRepo.GetRentalListingAsync(report.RentalListingReportId, offeringOrg.OrganizationId, row.ListingId);
+
+            if (listing == null)
             {
-                using var tran = _unitOfWork.BeginTransaction();
-
-                var listing = await _reportRepo.GetRentalListingAsync(report.RentalListingReportId, offeringOrg.OrganizationId, row.ListingId);
-
-                if (listing == null)
-                {
-                    listing = _mapper.Map<DssRentalListing>(row);
-                    await _reportRepo.AddRentalListingAsync(listing);
-                }
-                else
-                {
-                    _mapper.Map(row, listing);
-                    _reportRepo.DeleteListingContacts(listing.RentalListingId);
-
-                    _unitOfWork.Commit();
-                }
-
-                listing.IncludingRentalListingReportId = report.RentalListingReportId;
-                listing.OfferingOrganizationId = offeringOrg!.OrganizationId;
-
-                AddContact(listing!, "", row.PropertyHostNm, row.PropertyHostEmail, row.PropertyHostPhone, row.PropertyHostFax, row.PropertyHostAddress, 1, true);
-                AddContact(listing!, row.SupplierHost1Id, row.SupplierHost1Nm, row.SupplierHost1Email, row.SupplierHost1Phone, row.SupplierHost1Fax, row.SupplierHost1Address, 1, false);
-                AddContact(listing!, row.SupplierHost2Id, row.SupplierHost2Nm, row.SupplierHost2Email, row.SupplierHost2Phone, row.SupplierHost2Fax, row.SupplierHost2Address, 2, false);
-                AddContact(listing!, row.SupplierHost3Id, row.SupplierHost3Nm, row.SupplierHost3Email, row.SupplierHost3Phone, row.SupplierHost3Fax, row.SupplierHost3Address, 3, false);
-                AddContact(listing!, row.SupplierHost4Id, row.SupplierHost4Nm, row.SupplierHost4Email, row.SupplierHost4Phone, row.SupplierHost4Fax, row.SupplierHost4Address, 4, false);
-                AddContact(listing!, row.SupplierHost5Id, row.SupplierHost5Nm, row.SupplierHost5Email, row.SupplierHost5Phone, row.SupplierHost5Fax, row.SupplierHost5Address, 5, false);
-
-                var address = row.RentalAddress;
-
-                var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, address);
-
-                if (physicalAddress == null)
-                {
-                    physicalAddress = new DssPhysicalAddress
-                    {
-                        OriginalAddressTxt = row.RentalAddress,
-                    };
-
-                    await _geocoder.GetAddressAsync(physicalAddress);
-
-                    await _addressRepo.AddPhysicalAddressAsync(physicalAddress);
-                }
-
-                listing.LocatingPhysicalAddress = physicalAddress;
-
-                uploadLine.IsValidationFailure = true;
-                uploadLine.ErrorTxt = "";
-                uploadLine.IsProcessed = true;
-
-                _unitOfWork.Commit();
-
-                var masterListing = await _reportRepo.GetMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo);
-
-                if (masterListing == null)
-                {
-                    masterListing = _mapper.Map<DssRentalListing>(row);
-                    await _reportRepo.AddRentalListingAsync(masterListing);
-                }
-                else
-                {
-                    _mapper.Map(row, masterListing);
-                    _reportRepo.DeleteListingContacts(masterListing.RentalListingId);
-
-                    _unitOfWork.Commit();
-                }
-
-                masterListing.IncludingRentalListingReportId = null;
-                masterListing.OfferingOrganizationId = offeringOrg!.OrganizationId;
-
-                masterListing.DerivedFromRentalListingId = listing.RentalListingId;
-                masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
-
-                AddContact(masterListing!, "", row.PropertyHostNm, row.PropertyHostEmail, row.PropertyHostPhone, row.PropertyHostFax, row.PropertyHostAddress, 1, true);
-                AddContact(masterListing!, row.SupplierHost1Id, row.SupplierHost1Nm, row.SupplierHost1Email, row.SupplierHost1Phone, row.SupplierHost1Fax, row.SupplierHost1Address, 1, false);
-                AddContact(masterListing!, row.SupplierHost2Id, row.SupplierHost2Nm, row.SupplierHost2Email, row.SupplierHost2Phone, row.SupplierHost2Fax, row.SupplierHost2Address, 2, false);
-                AddContact(masterListing!, row.SupplierHost3Id, row.SupplierHost3Nm, row.SupplierHost3Email, row.SupplierHost3Phone, row.SupplierHost3Fax, row.SupplierHost3Address, 3, false);
-                AddContact(masterListing!, row.SupplierHost4Id, row.SupplierHost4Nm, row.SupplierHost4Email, row.SupplierHost4Phone, row.SupplierHost4Fax, row.SupplierHost4Address, 4, false);
-                AddContact(masterListing!, row.SupplierHost5Id, row.SupplierHost5Nm, row.SupplierHost5Email, row.SupplierHost5Phone, row.SupplierHost5Fax, row.SupplierHost5Address, 5, false);
-
-                _unitOfWork.Commit();
-
-                tran.Commit();
+                listing = _mapper.Map<DssRentalListing>(row);
+                await _reportRepo.AddRentalListingAsync(listing);
             }
+            else
+            {
+                _mapper.Map(row, listing);
+                _reportRepo.DeleteListingContacts(listing.RentalListingId);
+            }
+
+            listing.IncludingRentalListingReportId = report.RentalListingReportId;
+            listing.OfferingOrganizationId = offeringOrg.OrganizationId;
+
+            return listing;
+        }
+
+        private async Task<DssPhysicalAddress> CreateOrGetPhysicalAddress(DssRentalListing listing, RentalListingRowUntyped row)
+        {
+            var address = row.RentalAddress;
+
+            var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, address);
+
+            if (physicalAddress == null)
+            {
+                physicalAddress = new DssPhysicalAddress
+                {
+                    OriginalAddressTxt = row.RentalAddress,
+                };
+
+                await _geocoder.GetAddressAsync(physicalAddress);
+
+                await _addressRepo.AddPhysicalAddressAsync(physicalAddress);
+            }
+
+            return physicalAddress;
+        }
+
+        private async Task<DssRentalListing> CreateOrUpdateMasterListing(DssRentalListing listing, OrganizationDto offeringOrg, RentalListingRowUntyped row, DssPhysicalAddress physicalAddress)
+        {
+            var masterListing = await _reportRepo.GetMasterListingAsync(offeringOrg.OrganizationId, listing.PlatformListingNo);
+
+            if (masterListing == null)
+            {
+                masterListing = _mapper.Map<DssRentalListing>(row);
+                await _reportRepo.AddRentalListingAsync(masterListing);
+            }
+            else
+            {
+                _mapper.Map(row, masterListing);
+                _reportRepo.DeleteListingContacts(masterListing.RentalListingId);
+            }
+
+            masterListing.IncludingRentalListingReportId = null;
+            masterListing.OfferingOrganizationId = offeringOrg.OrganizationId;
+            masterListing.DerivedFromRentalListingId = listing.RentalListingId;
+            masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
+
+            return masterListing;
+        }
+
+        private void AddContacts(DssRentalListing listing, RentalListingRowUntyped row)
+        {
+            AddContact(listing, "", row.PropertyHostNm, row.PropertyHostEmail, row.PropertyHostPhone, row.PropertyHostFax, row.PropertyHostAddress, 1, true);
+            AddContact(listing, row.SupplierHost1Id, row.SupplierHost1Nm, row.SupplierHost1Email, row.SupplierHost1Phone, row.SupplierHost1Fax, row.SupplierHost1Address, 1, false);
+            AddContact(listing, row.SupplierHost2Id, row.SupplierHost2Nm, row.SupplierHost2Email, row.SupplierHost2Phone, row.SupplierHost2Fax, row.SupplierHost2Address, 2, false);
+            AddContact(listing, row.SupplierHost3Id, row.SupplierHost3Nm, row.SupplierHost3Email, row.SupplierHost3Phone, row.SupplierHost3Fax, row.SupplierHost3Address, 3, false);
+            AddContact(listing, row.SupplierHost4Id, row.SupplierHost4Nm, row.SupplierHost4Email, row.SupplierHost4Phone, row.SupplierHost4Fax, row.SupplierHost4Address, 4, false);
+            AddContact(listing, row.SupplierHost5Id, row.SupplierHost5Nm, row.SupplierHost5Email, row.SupplierHost5Phone, row.SupplierHost5Fax, row.SupplierHost5Address, 5, false);
         }
 
         private void AddContact(DssRentalListing listing, string hostNo, string name, string email, string phone, string fax, string address, short conatctNo, bool isOwner)
@@ -453,5 +468,6 @@ namespace StrDss.Service
                 });
             }
         }
+
     }
 }

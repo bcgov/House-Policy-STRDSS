@@ -360,11 +360,13 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            var masterListing = await CreateOrUpdateMasterListing(listing, offeringOrg, row, physicalAddress);
+            var (needUpdate, masterListing) = await CreateOrUpdateMasterListing(report.ReportPeriodYm, listing, offeringOrg, row, physicalAddress);
 
-            AddContacts(masterListing, row);
-
-            _unitOfWork.Commit();
+            if (needUpdate)
+            {
+                AddContacts(masterListing, row);
+                _unitOfWork.Commit();
+            }
 
             tran.Commit();
         }
@@ -418,9 +420,9 @@ namespace StrDss.Service
             return physicalAddress;
         }
 
-        private async Task<DssRentalListing> CreateOrUpdateMasterListing(DssRentalListing listing, OrganizationDto offeringOrg, RentalListingRowUntyped row, DssPhysicalAddress physicalAddress)
+        private async Task<(bool needUpdate, DssRentalListing masterListing)> CreateOrUpdateMasterListing(DateOnly reportPeriodYm, DssRentalListing listing, OrganizationDto offeringOrg, RentalListingRowUntyped row, DssPhysicalAddress physicalAddress)
         {
-            var masterListing = await _reportRepo.GetMasterListingAsync(offeringOrg.OrganizationId, listing.PlatformListingNo);
+            var masterListing = await _reportRepo.GetMasterListingAsync(offeringOrg.OrganizationId, listing.PlatformListingNo);            
 
             if (masterListing == null)
             {
@@ -429,6 +431,9 @@ namespace StrDss.Service
             }
             else
             {
+                if (reportPeriodYm < masterListing!.DerivedFromRentalListing!.IncludingRentalListingReport!.ReportPeriodYm)
+                    return (false, masterListing);
+
                 _mapper.Map(row, masterListing);
                 _reportRepo.DeleteListingContacts(masterListing.RentalListingId);
             }
@@ -438,7 +443,7 @@ namespace StrDss.Service
             masterListing.DerivedFromRentalListingId = listing.RentalListingId;
             masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
 
-            return masterListing;
+            return (true, masterListing);
         }
 
         private void AddContacts(DssRentalListing listing, RentalListingRowUntyped row)

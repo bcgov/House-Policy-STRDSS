@@ -49,6 +49,8 @@ namespace StrDss.Data.Repositories
         {
             return await _dbContext.DssRentalListings
                 .Include(x => x.LocatingPhysicalAddress)
+                .Include(x => x.DerivedFromRentalListing)
+                    .ThenInclude(x => x.IncludingRentalListingReport)
                 .FirstOrDefaultAsync(x => x.OfferingOrganizationId == offeringOrgId
                     && x.PlatformListingNo == listingId
                     && x.IncludingRentalListingReportId == null);

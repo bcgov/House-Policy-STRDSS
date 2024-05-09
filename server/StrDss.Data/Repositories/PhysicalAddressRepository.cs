@@ -10,7 +10,7 @@ namespace StrDss.Data.Repositories
     public interface IPhysicalAddressRepository
     {
         Task AddPhysicalAddressAsync(DssPhysicalAddress address);
-        Task<DssPhysicalAddress?> GetPhysicalAdderssAsync(string address);
+        Task<DssPhysicalAddress?> GetPhysicalAdderssFromMasterListingAsync(long offeringOrgId, string listingId, string address);
     }
     public class PhysicalAddressRepository : RepositoryBase<DssPhysicalAddress>, IPhysicalAddressRepository
     {
@@ -24,9 +24,21 @@ namespace StrDss.Data.Repositories
             await _dbSet.AddAsync(address);
         }
         
-        public async Task<DssPhysicalAddress?> GetPhysicalAdderssAsync(string address)
+        public async Task<DssPhysicalAddress?> GetPhysicalAdderssFromMasterListingAsync(long offeringOrgId, string listingId, string address)
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.OriginalAddressTxt.ToLowerInvariant() == address.ToLowerInvariant());
+            var listing = await _dbContext.DssRentalListings
+                .Include(x => x.LocatingPhysicalAddress)
+                .FirstOrDefaultAsync(x => x.IncludingRentalListingReportId == null
+                    && x.OfferingOrganizationId == offeringOrgId
+                    && x.PlatformListingNo == listingId);
+
+            if (listing == null) 
+                return null;
+
+            if (listing.LocatingPhysicalAddress!.OriginalAddressTxt.ToLower().Trim() != address.ToLower().Trim()) 
+                return null;
+
+            return listing.LocatingPhysicalAddress;
         }
     }
 }

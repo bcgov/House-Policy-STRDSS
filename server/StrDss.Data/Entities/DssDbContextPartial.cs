@@ -50,14 +50,7 @@ namespace StrDss.Data.Entities
 
             int result = 0;
 
-            try
-            {
-                result = base.SaveChanges();
-            }
-            catch
-            {
-                throw;
-            }
+            result = base.SaveChanges();
 
             return result;
         }

@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
 using Hangfire;
-using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -13,13 +12,13 @@ using StrDss.Model;
 using StrDss.Service;
 using StrDss.Service.HttpClients;
 using System.Reflection;
-using StrDss.Common;
 using StrDss.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using StrDss.Api.Middlewares;
 using StrDss.Api;
 using StrDss.Service.Bceid;
 using StrDss.Service.Hangfire;
+using Hangfire.PostgreSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,15 +27,11 @@ builder.WebHost.ConfigureKestrel((context, options) =>
     options.AddServerHeader = false;
 });
 
-
-
 var dbHost = builder.Configuration.GetValue<string>("DB_HOST");
 var dbName = builder.Configuration.GetValue<string>("DB_NAME");
 var dbUser = builder.Configuration.GetValue<string>("DB_USER");
 var dbPass = builder.Configuration.GetValue<string>("DB_PASS");
 var dbPort = builder.Configuration.GetValue<string>("DB_PORT");
-
-Console.WriteLine($"Host: {dbHost}");
 
 var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
 
@@ -95,6 +90,7 @@ builder.Services.AddBceidSoapClient(builder.Configuration);
 var mappingConfig = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile(new EntityToModelProfile());
+    cfg.AddProfile(new EntityToEntityProfile());
     cfg.AddProfile(new ModelToEntityProfile());
     cfg.AddProfile(new ModelToModelProfile());
 });
@@ -105,15 +101,9 @@ builder.Services.AddSingleton(mapper);
 builder.Services
     .AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-        
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
-        .UsePostgreSqlStorage((option) =>
-        {
-            option.UseNpgsqlConnection(connString);
-        }
-        
-));
+        .UsePostgreSqlStorage(connString));
 
 builder.Services.AddHangfireServer(options =>
 {
@@ -199,7 +189,7 @@ app.UseHangfireDashboard();
 app.UseMiddleware<ExceptionMiddleware>();
 
 // make sure this is after app.UseHangfireDashboard()
-//RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/1 * * * *");
-RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *"); 
+RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/10 * * * *");
+RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *");
 
 app.Run();

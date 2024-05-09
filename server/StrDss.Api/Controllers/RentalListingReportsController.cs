@@ -1,9 +1,11 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using StrDss.Api.Authorization;
 using StrDss.Api.Models;
 using StrDss.Common;
+using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Service;
 using StrDss.Service.HttpClients;
@@ -66,12 +68,12 @@ namespace StrDss.Api.Controllers
         }
 
         //[ApiAuthorize]
-        //[HttpGet("geocoder")]
-        //public async Task<ActionResult> CallGeocoder()
+        //[HttpGet("processreport")]
+        //public async Task<ActionResult> ProcessReport()
         //{
-        //    await _geocoderApi.GetAddressAsync("");
+        //    await _listingService.ProcessRentalReportUploadsAsync();
+
         //    return Ok();
         //}
-
     }
 }

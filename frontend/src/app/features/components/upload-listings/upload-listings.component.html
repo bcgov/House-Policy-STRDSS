@@ -1,0 +1,60 @@
+<div class="title">Upload Listing Data</div>
+<div class="sub-title">
+    All fields are required except where stated
+</div>
+<form [formGroup]="myForm">
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="platformId">Select Reporting Platform Name</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-dropdown [options]="platformOptions" formControlName="platformId" placeholder="Select platform"
+                id="platformId" name="platformId" [required]="true"></p-dropdown>
+        </div>
+        <div class="form-group-row-col validation-errors"
+            *ngIf="!platformIdControl.pristine && platformIdControl.errors">
+            <small id="requiredPlatformId" *ngIf="platformIdControl.errors?.['required']">Platform name is
+                required</small>
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="platformId">Select Reporting Month</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-dropdown [options]="monthsOptions" formControlName="month" placeholder="Select month" id="month"
+                name="month" [required]="true"></p-dropdown>
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!monthControl.pristine && monthControl.errors">
+            <small id="requiredPlatformId" *ngIf="monthControl.errors?.['required']">Platform recipient is
+                required</small>
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="platformId">Select Reporting Month</label>
+        </div>
+        <div class="form-group-row-col upload-container">
+            <p-fileUpload #uploadElem [chooseIcon]="'pi pi-paperclip'" [uploadIcon]="'pi pi-paperclip'" mode="basic"
+                id="fileSelect-btn" accept=".csv" [customUpload]="true" [multiple]="false"
+                (onSelect)="onFileSelected($event, uploadElem)" chooseLabel="Select File" />
+            <p-button *ngIf="!!uploadedFile" (onClick)="onClear()" class="clean-file-btn"
+                [icon]="'pi pi-times'"></p-button>
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!fileControl.pristine && fileControl.errors">
+            <small id="file-error-text" *ngIf="fileControl.errors?.['invalidExtension']">Wrong file type</small>
+            <small id="file-error-text" *ngIf="fileControl.errors?.['fileSizeExceeded']">File size should not be bigger
+                than {{maxFileSize}} bytes.</small>
+            <small id="file-error-text" *ngIf="fileControl.errors?.['required']">File is required</small>
+        </div>
+    </div>
+    {{fileControl.errors?.['fileSizeExceeded'] | json}}
+    <div class="form-group-row">
+        <button [disabled]="myForm.invalid" pButton id="upload-btn" name="upload-btn"
+            (click)="onUpload()">Upload</button>
+    </div>
+</form>
+
+<p-toast></p-toast>

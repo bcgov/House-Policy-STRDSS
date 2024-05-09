@@ -11,6 +11,7 @@ namespace StrDss.Data.Repositories
     {
         Task AddPhysicalAddressAsync(DssPhysicalAddress address);
         Task<DssPhysicalAddress?> GetPhysicalAdderssFromMasterListingAsync(long offeringOrgId, string listingId, string address);
+        void DeleteOrphanedAddresses();
     }
     public class PhysicalAddressRepository : RepositoryBase<DssPhysicalAddress>, IPhysicalAddressRepository
     {
@@ -39,6 +40,12 @@ namespace StrDss.Data.Repositories
                 return null;
 
             return listing.LocatingPhysicalAddress;
+        }
+
+        public void DeleteOrphanedAddresses()
+        {
+            var addressToDelete = _dbSet.Where(x => !x.DssRentalListings.Any());
+            _dbSet.RemoveRange(addressToDelete);
         }
     }
 }

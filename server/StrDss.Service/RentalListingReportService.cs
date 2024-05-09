@@ -365,8 +365,13 @@ namespace StrDss.Service
             if (needUpdate)
             {
                 AddContacts(masterListing, row);
-                _unitOfWork.Commit();
             }
+
+            _unitOfWork.Commit();
+
+            _addressRepo.DeleteOrphanedAddresses();
+
+            _unitOfWork.Commit();
 
             tran.Commit();
         }

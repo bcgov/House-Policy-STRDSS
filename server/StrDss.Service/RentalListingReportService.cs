@@ -416,7 +416,7 @@ namespace StrDss.Service
                 }
 
                 masterListing.IncludingRentalListingReportId = null;
-                masterListing.DerivedFromRentalListingId = listing.RentalListingId;
+                //masterListing.DerivedFromRentalListingId = listing.RentalListingId;
                 masterListing.DssRentalListingContacts.Clear();
 
                 masterListing.DssRentalListingContacts = listing.DssRentalListingContacts;

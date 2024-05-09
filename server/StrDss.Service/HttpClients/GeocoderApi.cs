@@ -5,7 +5,6 @@ using StrDss.Data.Entities;
 using System.Text.Json;
 using StrDss.Model;
 using NetTopologySuite.Geometries;
-using NetTopologySuite;
 using System.Text.Json.Serialization;
 
 namespace StrDss.Service.HttpClients
@@ -19,14 +18,12 @@ namespace StrDss.Service.HttpClients
         public HttpClient _client { get; }
         public IConfiguration _config { get; }
         private ILogger<StrDssLogger> _logger;
-        private readonly GeometryFactory _geometryFactory;
 
         public GeocoderApi(HttpClient client, IConfiguration config, ILogger<StrDssLogger> logger)
         {
             _client = client;
             _config = config;
             _logger = logger;
-            _geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
         }
 
         public async Task GetAddressAsync(DssPhysicalAddress address)
@@ -62,7 +59,7 @@ namespace StrDss.Service.HttpClients
                 address.ProvinceCd = properties.ProvinceCode;
                 address.SiteNo = properties.SiteId;
                 address.BlockNo = properties.BlockId;
-                address.LocationGeometry = _geometryFactory.CreatePoint(new Coordinate(feature.Geometry.Coordinates[0], feature.Geometry.Coordinates[1]));
+                address.LocationGeometry = new Point(feature.Geometry.Coordinates[0], feature.Geometry.Coordinates[1]) { SRID = 4326 };
             }
         }
     }

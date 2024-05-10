@@ -1,185 +1,256 @@
-﻿//using AutoFixture.Xunit2;
-//using CsvHelper.Configuration;
-//using CsvHelper;
-//using Microsoft.Extensions.Logging;
-//using Moq;
-//using StrDss.Common;
-//using StrDss.Data.Entities;
-//using StrDss.Data.Repositories;
-//using StrDss.Model.OrganizationDtos;
-//using StrDss.Model.RentalReportDtos;
-//using System.Globalization;
-//using Xunit;
-//using StrDss.Service;
+﻿using AutoFixture.Xunit2;
+using CsvHelper.Configuration;
+using Moq;
+using StrDss.Common;
+using StrDss.Data.Entities;
+using StrDss.Data.Repositories;
+using StrDss.Model.OrganizationDtos;
+using System.Globalization;
+using Xunit;
+using StrDss.Service;
 
-//namespace StrDss.Test
-//{
-//    public class RentalListingReportServiceShould
-//    {
-//        [Theory]
-//        [AutoDomainData]
-//        public async Task ValidateAndParseUploadAsync_InvalidReportPeriod_ReturnsError(
-//            string reportPeriod,
-//            long orgId,
-//            string hashValue,
-//            [Frozen] TextReader textReader,
-//            List<DssUploadLine> uploadLines,
-//            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
-//            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-//            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
-//            RentalListingReportService listingService)
-//        {
-//            // Arrange
-//            var regex = RegexDefs.GetRegexInfo(RegexDefs.YearMonth);
-//            var errors = new Dictionary<string, List<string>>();
+namespace StrDss.Test
+{
+    public class RentalListingReportServiceShould
+    {
+        private static StringReader GetCsvData(string reportPeriod)
+        {
+            var headerRecord = "rpt_period, org_cd, listing_id";
+            var record1 = $"{reportPeriod}, org1, 1";
+            var record2 = $"{reportPeriod}, org2, 2";
+            var csvData = headerRecord + Environment.NewLine + record1 + Environment.NewLine + record2;
+            var textReader = new StringReader(csvData);
+            return textReader;
+        }
 
-//            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(false);
-//            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(new OrganizationDto { OrganizationType = OrganizationTypes.Platform });
-//            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateAndParseUploadAsync_InvalidReportPeriod_ReturnsError(
+            long orgId,
+            string hashValue,
+            [Frozen] TextReader textReader,
+            List<DssUploadLine> uploadLines,
+            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            RentalListingReportService listingService)
+        {
+            // Arrange
+            var reportPeriod = "202403";
+            var regex = RegexDefs.GetRegexInfo(RegexDefs.YearMonth);
+            var errors = new Dictionary<string, List<string>>();
 
-//            // Act
-//            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(false);
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(new OrganizationDto { OrganizationType = OrganizationTypes.Platform });
+            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
-//            // Assert
-//            Assert.Contains("ReportPeriod", result.Keys);
-//            Assert.Single(result["ReportPeriod"]);
-//            Assert.Equal(regex.ErrorMessage, result["ReportPeriod"].First());
-//        }
+            // Act
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
 
-//        [Theory]
-//        [AutoDomainData]
-//        public async Task ValidateAndParseUploadAsync_DuplicateUpload_ReturnsError(
-//            string reportPeriod,
-//            long orgId,
-//            string hashValue,
-//            [Frozen] TextReader textReader,
-//            List<DssUploadLine> uploadLines,
-//            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
-//            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-//            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
-//            RentalListingReportService listingService)
-//        {
-//            // Arrange
-//            var errors = new Dictionary<string, List<string>>();
+            // Assert
+            Assert.Contains("ReportPeriod", result.Keys);
+            Assert.Single(result["ReportPeriod"]);
+            Assert.Equal(regex.ErrorMessage, result["ReportPeriod"].First());
+        }
 
-//            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(true);
-//            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(new OrganizationDto { OrganizationType = OrganizationTypes.Platform });
-//            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
-//            // Act
-//            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateAndParseUploadAsync_EmptyReportPeriod_ReturnsError(
+            long orgId,
+            string hashValue,
+            [Frozen] TextReader textReader,
+            List<DssUploadLine> uploadLines,
+            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            RentalListingReportService listingService)
+        {
+            // Arrange
+             var reportPeriod = "";
+            var regex = RegexDefs.GetRegexInfo(RegexDefs.YearMonth);
+            var errors = new Dictionary<string, List<string>>();
 
-//            // Assert
-//            Assert.Contains("File", result.Keys);
-//            Assert.Single(result["File"]);
-//            Assert.Equal("The file has already been uploaded", result["File"].First());
-//        }
+            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(false);
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(new OrganizationDto { OrganizationType = OrganizationTypes.Platform });
+            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
-//        [Theory]
-//        [AutoDomainData]
-//        public async Task ValidateAndParseUploadAsync_ValidInput_ReturnsNoErrors(
-//            string reportPeriod,
-//            long orgId,
-//            string hashValue,
-//            [Frozen] TextReader textReader,
-//            List<DssUploadLine> uploadLines,
-//            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
-//            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-//            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
-//            RentalListingReportService listingService)
-//        {
-//            // Arrange
-//            var platform = new OrganizationDto { OrganizationType = OrganizationTypes.Platform };
-//            var validOrgCds = new List<string> { "org1", "org2" };
-//            var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture);
+            // Act
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
 
-//            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(false);
-//            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(platform);
-//            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(validOrgCds);
+            // Assert
+            Assert.Contains("ReportPeriod", result.Keys);
+            Assert.Single(result["ReportPeriod"]);
+            Assert.Equal(regex.ErrorMessage, result["ReportPeriod"].First());
+        }
 
-//            var csvData = new List<string[]>
-//        {
-//            new string[] { "rpt_period", "org_cd", "listing_id" },
-//            new string[] { reportPeriod, "org1", "1" },
-//            new string[] { reportPeriod, "org2", "2" }
-//        };
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateAndParseUploadAsync_CurrentOrFutureReportPeriod_ReturnsError(
+            long orgId,
+            string hashValue,
+            [Frozen] TextReader textReader,
+            List<DssUploadLine> uploadLines,
+            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            RentalListingReportService listingService)
+        {
+            // Arrange
+            var reportPeriod = $"{DateTime.UtcNow.ToString("yyyy-MM")}";
+            var errors = new Dictionary<string, List<string>>();
 
-//            var csvReaderMock = new Mock<CsvReader>(textReader, csvConfig);
-//            csvReaderMock.SetupSequence(x => x.Read())
-//                .Returns(true)  // Read header
-//                .Returns(true)  // Read first record
-//                .Returns(true); // Read second record
+            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(false);
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(new OrganizationDto { OrganizationType = OrganizationTypes.Platform });
+            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
-//            csvReaderMock.Setup(x => x.ReadHeader()).Returns(true);
-//            csvReaderMock.Setup(x => x.GetRecord<RentalListingRowUntyped>())
-//                .Returns(new RentalListingRowUntyped { RptPeriod = reportPeriod, OrgCd = "org1", ListingId = "1" });
+            // Act
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
 
-//            var csvReader = csvReaderMock.Object;
+            // Assert
+            Assert.Contains("ReportPeriod", result.Keys);
+            Assert.Single(result["ReportPeriod"]);
+            Assert.Equal("Report period cannot be current or future month.", result["ReportPeriod"].First());
+        }
 
-//            // Act
-//            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateAndParseUploadAsync_DuplicateUpload_ReturnsError(
+            long orgId,
+            string hashValue,
+            [Frozen] TextReader textReader,
+            List<DssUploadLine> uploadLines,
+            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            RentalListingReportService listingService)
+        {
+            // Arrange
+            var reportPeriod = "2024-03";
+            var errors = new Dictionary<string, List<string>>();
 
-//            // Assert
-//            Assert.Empty(result);
-//        }
+            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(true);
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(new OrganizationDto { OrganizationType = OrganizationTypes.Platform });
+            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
-//        [Theory]
-//        [AutoDomainData]
-//        public async Task ValidateAndParseUploadAsync_CurrentOrFutureReportPeriod_ReturnsError(
-//            string reportPeriod,
-//            long orgId,
-//            string hashValue,
-//            [Frozen] TextReader textReader,
-//            List<DssUploadLine> uploadLines,
-//            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
-//            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-//            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
-//            RentalListingReportService listingService)
-//        {
-//            // Arrange
-//            var firstDayOfReportMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
-//            var errors = new Dictionary<string, List<string>>();
+            // Act
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
 
-//            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(false);
-//            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(new OrganizationDto { OrganizationType = OrganizationTypes.Platform });
-//            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
+            // Assert
+            Assert.Contains("File", result.Keys);
+            Assert.Single(result["File"]);
+            Assert.Equal("The file has already been uploaded", result["File"].First());
+        }
 
-//            // Act
-//            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateAndParseUploadAsync_ValidInput_ReturnsNoErrors(
+           long orgId,
+           string hashValue,
+           List<DssUploadLine> uploadLines,
+           [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
+           [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+           RentalListingReportService listingService)
+        {
+            // Arrange
+            var reportPeriod = "2024-03";
+            var platform = new OrganizationDto { OrganizationType = OrganizationTypes.Platform };
+            var validOrgCds = new List<string> { "ORG1", "ORG2" };
+            var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture);
 
-//            // Assert
-//            Assert.Contains("ReportPeriod", result.Keys);
-//            Assert.Single(result["ReportPeriod"]);
-//            Assert.Equal("Report period cannot be current or future month.", result["ReportPeriod"].First());
-//        }
+            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(false);
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(platform);
+            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(validOrgCds);
 
-//        [Theory]
-//        [AutoDomainData]
-//        public async Task ValidateAndParseUploadAsync_InvalidOrganizationId_ReturnsError(
-//            string reportPeriod,
-//            long orgId,
-//            string hashValue,
-//            [Frozen] TextReader textReader,
-//            List<DssUploadLine> uploadLines,
-//            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
-//            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-//            [Frozen] Mock<ILogger<StrDssLogger>> loggerMock,
-//            RentalListingReportService listingService)
-//        {
-//            // Arrange
-//            var errors = new Dictionary<string, List<string>>();
+            using StringReader textReader = GetCsvData(reportPeriod);
 
-//            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(false);
-//            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync((OrganizationDto)null);
+            // Act
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
 
-//            // Act
-//            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            // Assert
+            Assert.Empty(result);
+        }
 
-//            // Assert
-//            Assert.Contains("OrganizationId", result.Keys);
-//            Assert.Single(result["OrganizationId"]);
-//            Assert.Equal($"Organization ID [{orgId}] doesn't exist.", result["OrganizationId"].First());
-//        }
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateAndParseUploadAsync_InvalidOrgCd_ReturnsError(
+            long orgId,
+            string hashValue,
+            List<DssUploadLine> uploadLines,
+            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            RentalListingReportService listingService)
+        {
+            // Arrange
+            var reportPeriod = "2024-03";
+            var platform = new OrganizationDto { OrganizationType = OrganizationTypes.Platform };
+            var validOrgCds = new List<string> { "ORG1", "ORG3" };
+            var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture);
 
-//    }
-//}
+            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(false);
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(platform);
+            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(validOrgCds);
+
+            using StringReader textReader = GetCsvData(reportPeriod);
+
+            // Act
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+
+            // Assert
+            Assert.Contains("org_cd", result.Keys);
+            Assert.Single(result["org_cd"]);
+        }
+
+
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateAndParseUploadAsync_InvalidOrgId_ReturnsError(
+            long orgId,
+            string hashValue,
+            [Frozen] TextReader textReader,
+            List<DssUploadLine> uploadLines,
+            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            RentalListingReportService listingService)
+        {
+            // Arrange
+            var reportPeriod = "2024-03";
+            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), It.IsAny<long>(), hashValue)).ReturnsAsync(false);
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(It.IsAny<long>())).ReturnsAsync(null as OrganizationDto);
+
+            // Act
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+
+            // Assert
+            Assert.Contains("OrganizationId", result.Keys);
+            Assert.Single(result["OrganizationId"]);
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task ValidateAndParseUploadAsync_DuplicateListings_ReturnsError(
+            long orgId,
+            string hashValue,
+            [Frozen] TextReader textReader,
+            List<DssUploadLine> uploadLines,
+            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            RentalListingReportService listingService)
+        {
+            // Arrange
+            var reportPeriod = "2024-03";
+            var duplicateRecord = "202403, org1, 1";
+            var csvData = "rpt_period, org_cd, listing_id\n" + duplicateRecord + "\n" + duplicateRecord;
+            textReader = new StringReader(csvData);
+            var errors = new Dictionary<string, List<string>>();
+
+            uploadRepoMock.Setup(x => x.IsDuplicateRentalReportUploadAsnyc(It.IsAny<DateOnly>(), orgId, hashValue)).ReturnsAsync(false);
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(orgId)).ReturnsAsync(new OrganizationDto { OrganizationType = OrganizationTypes.Platform });
+            orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
+
+            // Act
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+
+            // Assert
+            Assert.Contains("listing_id", result.Keys);
+            Assert.Single(result["listing_id"]);
+            Assert.Equal("Duplicate listing ID(s) found: org1-1. Each listing ID must be unique within an organization code.", result["listing_id"].First());
+        }
+    }
+}

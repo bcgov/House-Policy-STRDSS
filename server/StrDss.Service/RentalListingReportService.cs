@@ -103,7 +103,7 @@ namespace StrDss.Service
             var firstDayOfCurrentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
             if (firstDayOfReportMonth >= firstDayOfCurrentMonth)
             {
-                errors.AddItem("ReportPeriod", "Report period cannot be current or futrue month.");
+                errors.AddItem("ReportPeriod", "Report period cannot be current or future month.");
             }
 
             var isDuplicate = await _uploadRepo.IsDuplicateRentalReportUploadAsnyc(firstDayOfReportMonth, orgId, hashValue);
@@ -365,8 +365,9 @@ namespace StrDss.Service
             if (needUpdate)
             {
                 AddContacts(masterListing, row);
-                _unitOfWork.Commit();
             }
+
+            _unitOfWork.Commit();
 
             tran.Commit();
         }

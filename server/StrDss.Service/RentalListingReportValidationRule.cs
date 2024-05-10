@@ -84,7 +84,6 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.BedroomsQty,
                 FieldType = FieldTypes.Decimal,
                 Required = false,
-                MaxValue = 255
             });
 
             rules.Add(new FieldValidationRule
@@ -93,7 +92,6 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.NightsBookedQty,
                 FieldType = FieldTypes.Decimal,
                 Required = false,
-                MaxValue = 255
             });
 
             rules.Add(new FieldValidationRule
@@ -102,7 +100,6 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.ReservationsQty,
                 FieldType = FieldTypes.Decimal,
                 Required = false,
-                MaxValue = 255
             });
 
             rules.Add(new FieldValidationRule

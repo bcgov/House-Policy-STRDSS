@@ -17,6 +17,7 @@ namespace StrDss.Test
                 .Customize(new OrganizationDtoCustomization())
                 .Customize(new UserDtoCustomization())
                 .Customize(new DssUploadLineCustomization())
+                .Customize (new RentalListingRowUntypedCustomization())
             )                
         {
         }

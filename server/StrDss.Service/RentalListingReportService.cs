@@ -369,10 +369,6 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            _addressRepo.DeleteOrphanedAddresses();
-
-            _unitOfWork.Commit();
-
             tran.Commit();
         }
 

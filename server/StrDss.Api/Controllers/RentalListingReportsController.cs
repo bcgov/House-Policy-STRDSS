@@ -67,13 +67,13 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        //[ApiAuthorize]
-        //[HttpGet("processreport")]
-        //public async Task<ActionResult> ProcessReport()
-        //{
-        //    await _listingService.ProcessRentalReportUploadsAsync();
+        [ApiAuthorize(Permissions.ListingFileUpload)]
+        [HttpGet("rentallistinghistory")]
+        public async Task<ActionResult> ProcessReport(int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
+        {
+            var history = await _listingService.GetRentalListingUploadHistory(pageSize, pageNumber, orderBy, direction);
 
-        //    return Ok();
-        //}
+            return Ok(history);
+        }
     }
 }

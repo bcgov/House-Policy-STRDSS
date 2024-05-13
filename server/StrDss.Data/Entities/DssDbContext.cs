@@ -33,6 +33,8 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssRentalListingReport> DssRentalListingReports { get; set; }
 
+    public virtual DbSet<DssRentalUploadHistoryView> DssRentalUploadHistoryViews { get; set; }
+
     public virtual DbSet<DssUploadDelivery> DssUploadDeliveries { get; set; }
 
     public virtual DbSet<DssUploadLine> DssUploadLines { get; set; }
@@ -601,6 +603,30 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.ProvidingOrganizationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_rental_listing_report_fk_provided_by");
+        });
+
+        modelBuilder.Entity<DssRentalUploadHistoryView>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("dss_rental_upload_history_view");
+
+            entity.Property(e => e.Errors).HasColumnName("errors");
+            entity.Property(e => e.FamilyNm)
+                .HasMaxLength(25)
+                .HasColumnName("family_nm");
+            entity.Property(e => e.GivenNm)
+                .HasMaxLength(25)
+                .HasColumnName("given_nm");
+            entity.Property(e => e.OrganizationNm)
+                .HasMaxLength(250)
+                .HasColumnName("organization_nm");
+            entity.Property(e => e.Processed).HasColumnName("processed");
+            entity.Property(e => e.ProvidingOrganizationId).HasColumnName("providing_organization_id");
+            entity.Property(e => e.ReportPeriodYm).HasColumnName("report_period_ym");
+            entity.Property(e => e.Total).HasColumnName("total");
+            entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
+            entity.Property(e => e.UploadDeliveryId).HasColumnName("upload_delivery_id");
         });
 
         modelBuilder.Entity<DssUploadDelivery>(entity =>

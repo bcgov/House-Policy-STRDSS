@@ -11,6 +11,7 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
+using StrDss.Model.UserDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.HttpClients;
 using System.Text;
@@ -23,6 +24,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string hashValue, TextReader textReader, List<DssUploadLine> lines);
         Task<Dictionary<string, List<string>>> UploadRentalReport(string reportPeriod, long orgId, Stream stream);
         Task ProcessRentalReportUploadsAsync();
+        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(int pageSize, int pageNumber, string orderBy, string direction);
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
@@ -473,6 +475,11 @@ namespace StrDss.Service
                     EmailAddressDsc = email,
                 });
             }
+        }
+
+        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            return await _reportRepo.GetRentalListingUploadHistory(pageSize, pageNumber, orderBy, direction);
         }
 
     }

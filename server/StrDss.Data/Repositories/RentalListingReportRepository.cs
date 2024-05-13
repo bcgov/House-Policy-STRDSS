@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using StrDss.Model.RentalReportDtos;
 
 namespace StrDss.Data.Repositories
 {
@@ -15,6 +16,7 @@ namespace StrDss.Data.Repositories
         Task AddRentalListingAsync(DssRentalListing listing);
         Task<DssRentalListing?> GetMasterListingAsync(long offeringOrgId, string listingId);
         void DeleteListingContacts(long listingId);
+        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(int pageSize, int pageNumber, string orderBy, string direction);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
     {
@@ -62,6 +64,19 @@ namespace StrDss.Data.Repositories
                 .Where(c => c.ContactedThroughRentalListingId == listingId);
 
             _dbContext.DssRentalListingContacts.RemoveRange(contactsToDelete);
+        }
+
+        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            var query = _dbContext.DssRentalUploadHistoryViews.AsNoTracking();
+
+            if (_currentUser.OrganizationType == OrganizationTypes.Platform)
+                query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
+
+
+            var history = await Page<DssRentalUploadHistoryView, RentalUploadHistoryViewDto>(query, pageSize, pageNumber, orderBy, direction);
+
+            return history;
         }
     }
 }

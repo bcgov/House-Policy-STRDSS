@@ -178,6 +178,36 @@
 			"response": []
 		},
 		{
+			"name": "Get Organizations",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/organizations",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"organizations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get Organization Types",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -203,36 +233,6 @@
 						"api",
 						"organizations",
 						"types"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Organizations",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/organizations",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"organizations"
 					]
 				}
 			},
@@ -550,44 +550,6 @@
 			"response": []
 		},
 		{
-			"name": "CreateRentalLisingReport",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "ReportPeriod",
-							"value": "2024-03",
-							"type": "text"
-						},
-						{
-							"key": "OrganizationId",
-							"value": "2",
-							"type": "text"
-						},
-						{
-							"key": "File",
-							"type": "file",
-							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing-valid2.csv"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{host}}/api/rentallistingreports",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"rentallistingreports"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Send Batch Takedown Request",
 			"request": {
 				"method": "POST",
@@ -650,6 +612,73 @@
 						"api",
 						"delisting",
 						"batchtakedownnotice"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateRentalLisingReport",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "ReportPeriod",
+							"value": "2024-04",
+							"type": "text"
+						},
+						{
+							"key": "OrganizationId",
+							"value": "5",
+							"type": "text"
+						},
+						{
+							"key": "File",
+							"type": "file",
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing-valid.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/api/rentallistingreports",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistingreports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Rental History",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistingreports/rentallistinghistory?pageSize=10&pageNumber=1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistingreports",
+						"rentallistinghistory"
+					],
+					"query": [
+						{
+							"key": "pageSize",
+							"value": "10"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						}
 					]
 				}
 			},

@@ -49,7 +49,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         //User Authentication
         //[Given(@"I am an authenticated LG staff member and the expected result is ""(.*)""")]
         [Given(@"that I am an authenticated government user ""(.*)"" and the expected result is ""(.*)""")]
-        public void GivenIAmAauthenticatedGovernmentUseer(string UserName, string ExpectedResult)
+        public void GivenIAmAauthenticatedGovernmentUser(string UserName, string ExpectedResult)
         {
             _TestUserName = UserName;
             _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;

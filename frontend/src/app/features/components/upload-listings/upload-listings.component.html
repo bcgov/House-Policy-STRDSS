@@ -50,7 +50,6 @@
             <small id="file-error-text" *ngIf="fileControl.errors?.['required']">File is required</small>
         </div>
     </div>
-    {{fileControl.errors?.['fileSizeExceeded'] | json}}
     <div class="form-group-row">
         <button [disabled]="myForm.invalid" pButton id="upload-btn" name="upload-btn"
             (click)="onUpload()">Upload</button>

@@ -1,0 +1,78 @@
+<h2>Platform Upload History</h2>
+<p-card>
+    <div class="form-group-row" *ngIf="!isSmall">
+        <div class="form-group-row-col">
+            <label for="platformId">Select Platform</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-dropdown [options]="platformOptions" [(ngModel)]="selectedPlatformId"
+                (onChange)="onPlatformSelected($event.value)" placeholder="Select platform" id="platformId"
+                name="platformId" [required]="true"></p-dropdown>
+        </div>
+
+    </div>
+    <p-table [value]="listings" styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Platform</th>
+                <th>Reported Month</th>
+                <th>Status</th>
+                <th>Total Records</th>
+                <th>Success</th>
+                <th>Errors</th>
+                <th>Upload Date</th>
+                <th>Uploaded By</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+            <tr>
+                <td>{{ row.platform }}</td>
+                <td>{{ row.reportedDate }}</td>
+                <td>
+                    <span *ngIf="row.status==='Processed'; then processed; else pending"></span>
+                    <ng-template #processed> <span class="state-processed">{{row.status}}</span></ng-template>
+                    <ng-template #pending><span class="state-pending">{{row.status}}</span></ng-template>
+                </td>
+                <td>
+                    <span *ngIf="row.totalRecords<0; then naRecords; else someRecords"></span>
+                    <ng-template #naRecords>N&#47;A </ng-template>
+                    <ng-template #someRecords>{{row.totalRecords}}</ng-template>
+                </td>
+                <td>
+                    <span *ngIf="row.totalSuccess<0; then naSuccess; else someSuccess"></span>
+                    <ng-template #naSuccess>N&#47;A </ng-template>
+                    <ng-template #someSuccess>{{row.totalSuccess}}</ng-template>
+                </td>
+                <td>
+                    <span *ngIf="row.totalErrors<1; then naErrors; else someErrors"></span>
+                    <ng-template #naErrors>{{row.totalErrors<0?'N&#47;A':0}} </ng-template>
+                            <ng-template #someErrors>
+                                <span [id]="'downloadErrors_'+row.id" class="link-span"
+                                    (click)="onDownloadErrors(row.id,row.platform,row.uploadedDate)">{{row.totalErrors}}<i
+                                        class="pi pi-download"></i>
+                                </span>
+                            </ng-template>
+                </td>
+                <td>{{ row.uploadedDate }}</td>
+                <td>{{ row.uploadedBy }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <div *ngIf="isSmall; then smallTable; else bigTable">
+    </div>
+
+    <ng-template #smallTable>
+        <div class="view-more-history-btn-container">
+            <button [routerLink]="'/upload-listing-history'" pButton id="view-more-history-btn"
+                class="p-button-link">View
+                More Platform Upload History</button>
+        </div>
+    </ng-template>
+
+    <ng-template #bigTable>
+        <p-paginator class="users-paginator" #paginator (onPageChange)="onPageChange($event)" [rows]="10"
+            [totalRecords]="15" [showPageLinks]="false" [showCurrentPageReport]="true" [showFirstLastIcon]="false"
+            [currentPageReportTemplate]="'Rows per page: 10 &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
+    </ng-template>
+
+</p-card>

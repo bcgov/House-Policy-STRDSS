@@ -14,6 +14,7 @@ import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 import { TermsAndConditionsComponent } from './common/components/terms-and-conditions/terms-and-conditions.component';
 import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
 import { UploadListingsComponent } from './features/components/upload-listings/upload-listings.component';
+import { ListingUploadHistoryComponent } from './features/components/listing-upload-history/listing-upload-history.component';
 
 export const routes: Routes = [
     {
@@ -25,6 +26,12 @@ export const routes: Routes = [
         path: 'upload-listing-data',
         canActivate: [approvedUserGuard, activeUserGuard, areTermsAceptedGuard, hasPermissionsGuard],
         component: UploadListingsComponent,
+        data: { permissions: [listing_file_upload] }
+    },
+    {
+        path: 'upload-listing-history',
+        canActivate: [approvedUserGuard, activeUserGuard, areTermsAceptedGuard, hasPermissionsGuard],
+        component: ListingUploadHistoryComponent,
         data: { permissions: [listing_file_upload] }
     },
     {

@@ -69,9 +69,9 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.ListingFileUpload)]
         [HttpGet("rentallistinghistory")]
-        public async Task<ActionResult> ProcessReport(int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
+        public async Task<ActionResult> ProcessReport(long? platformId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
-            var history = await _listingService.GetRentalListingUploadHistory(pageSize, pageNumber, orderBy, direction);
+            var history = await _listingService.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
 
             return Ok(history);
         }

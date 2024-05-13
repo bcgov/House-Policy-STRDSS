@@ -24,7 +24,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string hashValue, TextReader textReader, List<DssUploadLine> lines);
         Task<Dictionary<string, List<string>>> UploadRentalReport(string reportPeriod, long orgId, Stream stream);
         Task ProcessRentalReportUploadsAsync();
-        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
@@ -477,9 +477,9 @@ namespace StrDss.Service
             }
         }
 
-        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
         {
-            return await _reportRepo.GetRentalListingUploadHistory(pageSize, pageNumber, orderBy, direction);
+            return await _reportRepo.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
         }
 
     }

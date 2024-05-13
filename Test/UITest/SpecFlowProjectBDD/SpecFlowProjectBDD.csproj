@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Calculator - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\ManagingAccess - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\SendNoticeOfTakedownWithoutADSSlisting - Copy.feature.cs" />
   </ItemGroup>
 
@@ -46,6 +47,10 @@
 
   <ItemGroup>
     <SpecFlowFeatureFiles Update="Features\DenyAccessToSystem.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\TermsAndConditions.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>

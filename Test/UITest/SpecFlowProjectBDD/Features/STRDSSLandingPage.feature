@@ -35,7 +35,7 @@ Scenario: STRDSSLandingPage
 Examples:
 	| UserName      | UserType            | Environment | ExpectedResult |
 	| CEUATST       | CodeEnforementStaff | all         | pass           |
-	#| STRDSSVrboDev | PlatformUser        | dev         |                |
+	| STRDSSVrboDev | PlatformUser        | dev         | pass           |
 	#| CEUATST          | CodeEnforcementAdmin | all         |                |
 	#| STRDSSAitbnbtest | PlatformUser         | test        |                |
 	#| STRDSSVrboTest   | PlatformUser         | test        |                |

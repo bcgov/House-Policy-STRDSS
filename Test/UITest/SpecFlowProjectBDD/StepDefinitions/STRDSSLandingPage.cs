@@ -145,29 +145,5 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
 
         }
-
-        /****************** Helper Methods **************************/
-
-        //private UserTypeEnum SetUserType(string UserType)
-        //{
-        //    switch (UserType.ToUpper())
-        //    {
-        //        case "CODEENFOREMENTSTAFF":
-        //        case "CODEENFORCEMENTADMIN":
-        //        case "LOCALGOVERNMENTUSER":
-        //            {
-        //                _UserType = SFEnums.UserTypeEnum.BCGOVERNMENT;
-        //                break;
-        //            }
-        //        case "PLATFORMUSER":
-        //            {
-        //                _UserType = SFEnums.UserTypeEnum.BCGOVERNMENT;
-        //                break;
-        //            }
-        //        default:
-        //            throw new ArgumentException("Unknown User Type (" + UserType + ")");
-        //    }
-        //    return (_UserType);
-        //}
     }
 }

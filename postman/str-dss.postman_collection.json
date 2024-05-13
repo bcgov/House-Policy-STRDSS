@@ -661,7 +661,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistingreports/rentallistinghistory?pageSize=10&pageNumber=1",
+					"raw": "{{host}}/api/rentallistingreports/rentallistinghistory?pageSize=3&pageNumber=1",
 					"host": [
 						"{{host}}"
 					],
@@ -673,7 +673,7 @@
 					"query": [
 						{
 							"key": "pageSize",
-							"value": "10"
+							"value": "3"
 						},
 						{
 							"key": "pageNumber",

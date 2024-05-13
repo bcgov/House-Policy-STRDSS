@@ -10,6 +10,8 @@ import { DelistingService } from '../../../common/services/delisting.service';
 import { ToastModule } from 'primeng/toast';
 import { ListingDataService } from '../../../common/services/listing-data.service';
 import { YearMonthGenService } from '../../../common/services/year-month-gen.service';
+import { MessageService } from 'primeng/api';
+
 @Component({
   selector: 'app-upload-listings',
   standalone: true,
@@ -57,6 +59,7 @@ export class UploadListingsComponent implements OnInit {
     private delistingService: DelistingService,
     private listingDataService: ListingDataService,
     private yearMonthGenService: YearMonthGenService,
+    private messageService: MessageService,
   ) { }
 
   ngOnInit(): void {
@@ -85,7 +88,11 @@ export class UploadListingsComponent implements OnInit {
 
     this.listingDataService.uploadData(formResult.month || '', formResult.platformId || 0, this.uploadedFile)
       .subscribe({
-        next: (_res) => { },
+        next: (_res) => {
+          this.myForm.reset();
+          this.uploadedFile = null;
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File has been uploaded successfully' });
+        },
       });
   }
 }

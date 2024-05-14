@@ -20,7 +20,7 @@ BEGIN
     FROM
       dss_upload_delivery dud
       JOIN dss_upload_line dul ON dul.including_upload_delivery_id = dud.upload_delivery_id
-      JOIN dss_user_identity dui ON dud.upd_user_guid = dui.upd_user_guid
+      JOIN dss_user_identity dui ON dud.upd_user_guid = dui.user_guid
       JOIN dss_organization do2 ON dud.providing_organization_id = do2.organization_id 
     GROUP BY
       dud.upload_delivery_id,

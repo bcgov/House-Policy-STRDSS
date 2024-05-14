@@ -13,6 +13,7 @@ namespace StrDss.Data.Repositories
         Task AddPhysicalAddressAsync(DssPhysicalAddress address);
         Task<DssPhysicalAddress?> GetPhysicalAdderssFromMasterListingAsync(long offeringOrgId, string listingId, string address);
         Task InsertTestAddress();
+        Task<string> GetTestAddress();
     }
     public class PhysicalAddressRepository : RepositoryBase<DssPhysicalAddress>, IPhysicalAddressRepository
     {
@@ -56,6 +57,20 @@ namespace StrDss.Data.Repositories
 
             await _dbContext.DssPhysicalAddresses.AddAsync(address);
             _dbContext.SaveChanges();
+        }
+
+        public async Task<string> GetTestAddress()
+        {
+            var address = await _dbSet.AsNoTracking().FirstOrDefaultAsync();
+            var location = "";
+
+            if (address != null)
+            {
+                location = address.LocationGeometry?.ToString();
+                _logger.LogInformation(address.LocationGeometry?.ToString());
+            }
+
+            return location ?? "";
         }
     }
 }

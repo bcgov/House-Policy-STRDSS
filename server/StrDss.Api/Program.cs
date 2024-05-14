@@ -19,6 +19,7 @@ using StrDss.Api;
 using StrDss.Service.Bceid;
 using StrDss.Service.Hangfire;
 using Hangfire.PostgreSql;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,8 @@ builder.Services.AddDbContext<DssDbContext>(opt =>
         opt.EnableSensitiveDataLogging();
     }
 });
+
+NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
 
 builder.Services.AddApiVersioning(options =>
 {

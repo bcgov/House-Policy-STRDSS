@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Geometries;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
@@ -12,8 +11,6 @@ namespace StrDss.Data.Repositories
     {
         Task AddPhysicalAddressAsync(DssPhysicalAddress address);
         Task<DssPhysicalAddress?> GetPhysicalAdderssFromMasterListingAsync(long offeringOrgId, string listingId, string address);
-        Task InsertTestAddress();
-        Task<string> GetTestAddress();
     }
     public class PhysicalAddressRepository : RepositoryBase<DssPhysicalAddress>, IPhysicalAddressRepository
     {
@@ -42,35 +39,6 @@ namespace StrDss.Data.Repositories
                 return null;
 
             return listing.LocatingPhysicalAddress;
-        }
-
-        public async Task InsertTestAddress()
-        {
-            var address = new DssPhysicalAddress
-            {
-                OriginalAddressTxt = "Test",
-                MatchAddressTxt = "Test",
-                MatchScoreAmt = 30,
-                UpdDtm = DateTime.UtcNow,
-                LocationGeometry = new Point(-123.3709161, 48.4177006) { SRID = 4326 }
-            };
-
-            await _dbContext.DssPhysicalAddresses.AddAsync(address);
-            _dbContext.SaveChanges();
-        }
-
-        public async Task<string> GetTestAddress()
-        {
-            var address = await _dbSet.AsNoTracking().FirstOrDefaultAsync();
-            var location = "";
-
-            if (address != null)
-            {
-                location = address.LocationGeometry?.ToString();
-                _logger.LogInformation(address.LocationGeometry?.ToString());
-            }
-
-            return location ?? "";
         }
     }
 }

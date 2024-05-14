@@ -17,6 +17,7 @@ namespace StrDss.Data.Repositories
         Task<DssRentalListing?> GetMasterListingAsync(long offeringOrgId, string listingId);
         void DeleteListingContacts(long listingId);
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
     {
@@ -81,6 +82,14 @@ namespace StrDss.Data.Repositories
             var history = await Page<DssRentalUploadHistoryView, RentalUploadHistoryViewDto>(query, pageSize, pageNumber, orderBy, direction);
 
             return history;
+        }
+
+        public async Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId)
+        {
+            return await _dbContext
+                .DssRentalUploadHistoryViews
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UploadDeliveryId == deliveryId);
         }
     }
 }

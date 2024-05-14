@@ -20,5 +20,6 @@
         public int Total { get; set; }
         public int Processed { get; set; }
         public int Errors { get; set; }
+        public int Success => Processed - Errors;
     }
 }

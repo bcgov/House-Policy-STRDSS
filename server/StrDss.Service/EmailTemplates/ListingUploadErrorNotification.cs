@@ -7,14 +7,14 @@ namespace StrDss.Service.EmailTemplates
         public ListingUploadErrorNotification(IEmailMessageService emailService) 
             : base(emailService)
         {
-            EmailMessageType = EmailMessageTypes.AccessRequested;
+            EmailMessageType = EmailMessageTypes.ListingUploadError;
         }
         public string UserName { get; set; } = "";
-        public int NumErrors { get; set; }
+        public long NumErrors { get; set; }
         public string Link { get; set; } = "";
         public override string GetContent()
         {
-            Subject = "STR Data Portal - New Access Request";
+            Subject = "B.C. STR Data Portal: Upload error report";
 
             return
 $@"Dear {UserName},<br/><br/>

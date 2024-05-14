@@ -18,6 +18,7 @@
 		<PackageReference Include="System.ServiceModel.NetTcp" Version="4.10.*" />
 		<PackageReference Include="System.ServiceModel.Security" Version="4.10.*" />
 		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.32" />
+		<PackageReference Include="Hangfire.PostgreSql" Version="1.9.9" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\StrDss.Common\StrDss.Common.csproj" />

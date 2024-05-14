@@ -11,6 +11,7 @@ import { DropdownOption } from '../models/dropdown-option';
 import { DelistingService } from '../services/delisting.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { ReactiveFormsModule } from '@angular/forms';
+import { PagingRequest } from '../models/paging-request';
 
 @Component({
   selector: 'app-listing-upload-history-table',
@@ -33,8 +34,9 @@ export class ListingUploadHistoryTableComponent implements OnInit {
 
   listings = new Array<ListingUploadHistoryRecord>();
   platformOptions = new Array<DropdownOption>();
-
   selectedPlatformId = -1;
+
+  pagingOptions: PagingRequest = { pageNumber: 1, pageSize: 10 };
 
   constructor(
     private listingDataService: ListingDataService,
@@ -50,7 +52,7 @@ export class ListingUploadHistoryTableComponent implements OnInit {
     this.listingDataService.getListingUploadHistoryRecords().subscribe({
       next: (value) => {
         console.log('Listings', value);
-        this.listings = this.isSmall ? value.sourceList.slice(0, 3) : value.sourceList;
+        this.listings = this.extendData(this.isSmall ? value.sourceList.slice(0, 3) : value.sourceList);
       },
     })
   }
@@ -77,5 +79,17 @@ export class ListingUploadHistoryTableComponent implements OnInit {
     element.setAttribute('download', `errors_${platform}_${date}.csv`);
 
     element.click();
+  }
+
+  private extendData(data: Array<ListingUploadHistoryRecord>): Array<ListingUploadHistoryRecord> {
+    return data.map((record) => {
+      record.totalErrors = record.errors < 0 ? 'N/A' : record.errors;
+      record.totalRecords = record.total < 0 ? 'N/A' : record.total;
+      record.totalSuccess = (record.total - record.errors) < 0 ? 'N/A' : (record.total - record.errors);
+      record.status = record.total === record.processed ? 'Processed' : 'Pending';
+      record.uploadedBy = `${record.familyNm}, ${record.givenNm}`;
+
+      return record;
+    });
   }
 }

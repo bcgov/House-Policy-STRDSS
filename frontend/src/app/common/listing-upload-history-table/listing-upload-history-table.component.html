@@ -26,34 +26,26 @@
         </ng-template>
         <ng-template pTemplate="body" let-row>
             <tr>
-                <td>{{ row.platform }}</td>
-                <td>{{ row.reportedDate }}</td>
+                <td>{{ row.organizationNm }}</td>
+                <td>{{ row.reportPeriodYM }}</td>
                 <td>
                     <span *ngIf="row.status==='Processed'; then processed; else pending"></span>
                     <ng-template #processed> <span class="state-processed">{{row.status}}</span></ng-template>
                     <ng-template #pending><span class="state-pending">{{row.status}}</span></ng-template>
                 </td>
                 <td>
-                    <span *ngIf="row.totalRecords<0; then naRecords; else someRecords"></span>
-                    <ng-template #naRecords>N&#47;A </ng-template>
-                    <ng-template #someRecords>{{row.totalRecords}}</ng-template>
+                    {{row.totalRecords}}
                 </td>
                 <td>
-                    <span *ngIf="row.totalSuccess<0; then naSuccess; else someSuccess"></span>
-                    <ng-template #naSuccess>N&#47;A </ng-template>
-                    <ng-template #someSuccess>{{row.totalSuccess}}</ng-template>
+                    {{row.totalSuccess}}
                 </td>
                 <td>
-                    <span *ngIf="row.totalErrors<1; then naErrors; else someErrors"></span>
-                    <ng-template #naErrors>{{row.totalErrors<0?'N&#47;A':0}} </ng-template>
-                            <ng-template #someErrors>
-                                <span [id]="'downloadErrors_'+row.id" class="link-span"
-                                    (click)="onDownloadErrors(row.id,row.platform,row.uploadedDate)">{{row.totalErrors}}<i
-                                        class="pi pi-download"></i>
-                                </span>
-                            </ng-template>
+                    <span [id]="'downloadErrors_'+row.uploadDeliveryId" class="link-span"
+                        (click)="onDownloadErrors(row.uploadDeliveryId,row.organizationNm,row.reportPeriodYM)">{{row.totalErrors}}<i
+                            class="pi pi-download"></i>
+                    </span>
                 </td>
-                <td>{{ row.uploadedDate }}</td>
+                <td>{{ row.updDtm |date }}</td>
                 <td>{{ row.uploadedBy }}</td>
             </tr>
         </ng-template>

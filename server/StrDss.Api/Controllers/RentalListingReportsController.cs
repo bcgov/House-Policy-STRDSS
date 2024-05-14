@@ -73,5 +73,14 @@ namespace StrDss.Api.Controllers
 
             return Ok(history);
         }
+
+        [ApiAuthorize(Permissions.ListingFileUpload)]
+        [HttpGet("address")]
+        public async Task<ActionResult> InsertAddress()
+        {
+            await _listingService.InsertTestAddress();
+
+            return NoContent();
+        }
     }
 }

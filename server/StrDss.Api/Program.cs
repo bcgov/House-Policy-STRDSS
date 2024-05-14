@@ -98,17 +98,17 @@ var mappingConfig = new MapperConfiguration(cfg =>
 var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
-builder.Services
-    .AddHangfire(configuration => configuration
-        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-        .UseSimpleAssemblyNameTypeSerializer()
-        .UseRecommendedSerializerSettings()
-        .UsePostgreSqlStorage(connString));
+//builder.Services
+//    .AddHangfire(configuration => configuration
+//        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+//        .UseSimpleAssemblyNameTypeSerializer()
+//        .UseRecommendedSerializerSettings()
+//        .UsePostgreSqlStorage(connString));
 
-builder.Services.AddHangfireServer(options =>
-{
-    options.WorkerCount = 1;
-});
+//builder.Services.AddHangfireServer(options =>
+//{
+//    options.WorkerCount = 1;
+//});
 
 //Add logging
 builder.Services.AddLogging(builder => builder.AddConsole());
@@ -184,7 +184,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseHangfireDashboard();
+//app.UseHangfireDashboard();
 
 app.UseMiddleware<ExceptionMiddleware>();
 

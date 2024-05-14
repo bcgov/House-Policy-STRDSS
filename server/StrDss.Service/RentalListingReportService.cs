@@ -25,7 +25,6 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> UploadRentalReport(string reportPeriod, long orgId, Stream stream);
         Task ProcessRentalReportUploadsAsync();
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
-        Task InsertTestAddress();
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
@@ -333,6 +332,8 @@ namespace StrDss.Service
 
                 await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord);
             }
+
+            //send email
         }
 
         private async Task ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)
@@ -482,11 +483,5 @@ namespace StrDss.Service
         {
             return await _reportRepo.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
         }
-
-        public async Task InsertTestAddress()
-        {
-            await _addressRepo.InsertTestAddress();
-        }
-
     }
 }

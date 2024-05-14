@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DataBase.Entities;
 
-namespace DataBase
+namespace DataBase.UnitOfWork
 {
     public class UnitOfWork : IDisposable, IUnitOfWork
     {

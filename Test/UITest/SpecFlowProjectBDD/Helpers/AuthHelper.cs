@@ -44,7 +44,9 @@ namespace SpecFlowProjectBDD.Helpers
 
             switch (_UserType)
             {
-                case UserTypeEnum.BCGOVERNMENT:
+                case UserTypeEnum.CEUADMIN:
+                case UserTypeEnum.CEUSTAFF:
+                case UserTypeEnum.LG:
                     {
                         _PathFinderPage.IDRButton.Click();
                         _IDRLoginPage.UserNameTextBox.WaitFor(5);

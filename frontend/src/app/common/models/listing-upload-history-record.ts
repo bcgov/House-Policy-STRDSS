@@ -1,11 +1,18 @@
 export interface ListingUploadHistoryRecord {
-    id: number;
-    platform: string;
-    reportedDate: string;
-    status: 'Processed' | 'Pending';
-    totalRecords: number;
-    totalSuccess: number;
-    totalErrors: number;
-    uploadedDate: string;
-    uploadedBy: string;
+    totalSuccess?: number | 'N/A';
+    totalRecords?: number | 'N/A';
+    totalErrors?: number | 'N/A';
+    status?: 'Processed' | 'Pending';
+    uploadedBy?: string;
+
+    errors: number;
+    processed: number;
+    familyNm: string;
+    givenNm: string;
+    organizationNm: string;
+    providingOrganizationId: number;
+    reportPeriodYM: string;
+    total: number;
+    updDtm: string;
+    uploadDeliveryId: number;
 }

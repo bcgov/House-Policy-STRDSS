@@ -332,6 +332,8 @@ namespace StrDss.Service
 
                 await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord);
             }
+
+            //send email
         }
 
         private async Task ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)

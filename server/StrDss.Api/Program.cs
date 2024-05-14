@@ -52,6 +52,7 @@ builder.Services.AddDbContext<DssDbContext>(opt =>
     }
 });
 
+//https://github.com/npgsql/efcore.pg/issues/2736#issuecomment-1875391344
 NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
 
 builder.Services.AddApiVersioning(options =>

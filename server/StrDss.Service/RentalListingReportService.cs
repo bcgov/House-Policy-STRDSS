@@ -230,7 +230,7 @@ namespace StrDss.Service
 
             if (reportPeriodMismatch > 0)
             {
-                errors.AddItem("rpt_period", $"Report period mismatch found in {reportPeriodMismatch} record(s). The report period must be {reportPeriod}.");
+                errors.AddItem("rpt_period", $"Report period mismatch found in {reportPeriodMismatch} record(s). The file contains report period(s) other than the selected period of {reportPeriod}");
             }
 
             if (reportPeriodMissing > 0)

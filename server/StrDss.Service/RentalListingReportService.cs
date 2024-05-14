@@ -25,8 +25,6 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> UploadRentalReport(string reportPeriod, long orgId, Stream stream);
         Task ProcessRentalReportUploadsAsync();
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
-        Task InsertTestAddress();
-        Task<string> GetTestAddress();
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
@@ -483,17 +481,5 @@ namespace StrDss.Service
         {
             return await _reportRepo.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
         }
-
-        public async Task InsertTestAddress()
-        {
-            await _addressRepo.InsertTestAddress();
-        }
-
-        public async Task<string> GetTestAddress()
-        {
-            var address = await _addressRepo.GetTestAddress();
-            return address;
-        }
-
     }
 }

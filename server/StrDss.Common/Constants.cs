@@ -192,6 +192,7 @@
         public const string NoticeOfTakedown = "Notice of Takedown";
         public const string AccessRequested = "Access Requested";
         public const string BatchTakedownRequest = "Batch Takedown Request";
+        public const string ListingUploadError = "Listing Upload Error";
     }
 
     public static class Permissions

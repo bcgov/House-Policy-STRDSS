@@ -189,7 +189,7 @@ app.MapControllers();
 app.UseMiddleware<ExceptionMiddleware>();
 
 // make sure this is after app.UseHangfireDashboard()
-RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/10 * * * *");
-RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *");
+//RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/10 * * * *");
+//RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *");
 
 app.Run();

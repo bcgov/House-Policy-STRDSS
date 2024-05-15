@@ -11,7 +11,7 @@ import { DropdownOption } from '../models/dropdown-option';
 import { DelistingService } from '../services/delisting.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { ReactiveFormsModule } from '@angular/forms';
-import { PagingRequest } from '../models/paging-request';
+import { PagingResponse, PagingResponsePageInfo } from '../models/paging-response';
 
 @Component({
   selector: 'app-listing-upload-history-table',
@@ -34,9 +34,10 @@ export class ListingUploadHistoryTableComponent implements OnInit {
 
   listings = new Array<ListingUploadHistoryRecord>();
   platformOptions = new Array<DropdownOption>();
-  selectedPlatformId = -1;
+  selectedPlatformId = 0;
+  sort!: { prop: string, dir: 'asc' | 'desc' }
 
-  pagingOptions: PagingRequest = { pageNumber: 1, pageSize: 10 };
+  currentPage!: PagingResponsePageInfo;
 
   constructor(
     private listingDataService: ListingDataService,
@@ -45,25 +46,36 @@ export class ListingUploadHistoryTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.delistingService.getPlatforms().subscribe((platformOptions) => {
-      const options: Array<DropdownOption> = [{ label: 'All', value: -1 }, ...platformOptions]
+      const options: Array<DropdownOption> = [{ label: 'All', value: 0 }, ...platformOptions]
       this.platformOptions = options;
     });
 
-    this.listingDataService.getListingUploadHistoryRecords().subscribe({
-      next: (value) => {
-        console.log('Listings', value);
-        this.listings = this.extendData(this.isSmall ? value.sourceList.slice(0, 3) : value.sourceList);
-      },
-    })
+    this.getHistoryUploadRecords(1);
   }
 
-  onPlatformSelected(value: number): void {
-    console.log('onPlatformSelected Value', value);
-    // TODO: Perform search
+  onPlatformSelected(_value: number): void {
+    this.getHistoryUploadRecords(1);
+  }
+
+  onSort(property: string): void {
+    if (this.sort) {
+      if (this.sort.prop === property) {
+        this.sort.dir = this.sort.dir === 'asc' ? 'desc' : 'asc';
+      }
+      else {
+        this.sort.prop = property;
+        this.sort.dir = 'asc';
+      }
+    }
+    else {
+      this.sort = { prop: property, dir: 'asc' };
+    }
+
+    this.getHistoryUploadRecords(this.currentPage.pageNumber);
   }
 
   onPageChange(value: any): void {
-    console.log('onPageChange Value', value);
+    this.getHistoryUploadRecords(value.page + 1);
   }
 
   onDownloadErrors(_rowId: number, platform: string, date: string): void {
@@ -81,11 +93,24 @@ export class ListingUploadHistoryTableComponent implements OnInit {
     element.click();
   }
 
+  private getHistoryUploadRecords(selectedPageNumber?: number): void {
+    this.listingDataService.getListingUploadHistoryRecords(selectedPageNumber ?? (this.currentPage?.pageNumber || 0), this.currentPage?.pageSize || 10, this.selectedPlatformId, this.sort?.prop || '', this.sort?.dir || 'asc').subscribe({
+      next: (value) => {
+        this.processRecords(value);
+      },
+    })
+  }
+
+  private processRecords(raw: PagingResponse<ListingUploadHistoryRecord>): void {
+    this.currentPage = raw.pageInfo;
+    this.listings = this.extendData(this.isSmall ? raw.sourceList.slice(0, 3) : raw.sourceList);
+  }
+
   private extendData(data: Array<ListingUploadHistoryRecord>): Array<ListingUploadHistoryRecord> {
     return data.map((record) => {
-      record.totalErrors = record.errors < 0 ? 'N/A' : record.errors;
-      record.totalRecords = record.total < 0 ? 'N/A' : record.total;
-      record.totalSuccess = (record.total - record.errors) < 0 ? 'N/A' : (record.total - record.errors);
+      record.totalErrors = record.errors;
+      record.totalRecords = record.total;
+      record.totalSuccess = record.success;
       record.status = record.total === record.processed ? 'Processed' : 'Pending';
       record.uploadedBy = `${record.familyNm}, ${record.givenNm}`;
 

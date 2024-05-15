@@ -1,19 +1,13 @@
-﻿using UITest.PageObjects;
-using UITest.TestDriver;
-using TestFrameWork.Models;
-using Configuration;
+﻿using Configuration;
+using DataBase.Entities;
+using Microsoft.EntityFrameworkCore;
+using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using OpenQA.Selenium.DevTools.V118.Debugger;
 using SpecFlowProjectBDD.Helpers;
-using DataBase.UnitOfWork;
-using DataBase.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using OpenQA.Selenium.Interactions;
-using TechTalk.SpecFlow.CommonModels;
-using System.Security.AccessControl;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using TestFrameWork.Models;
+using UITest.PageObjects;
+using UITest.TestDriver;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -30,6 +24,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
         private string _TestUserName;
         private string _TestPassword;
+        private string _TestEmail;
         private string _TestUserType;
         private SFEnums.UserTypeEnum _UserType;
         private bool _ExpectedResult = false;
@@ -47,16 +42,20 @@ namespace SpecFlowProjectBDD.StepDefinitions
         }
 
         [Given(@"User ""(.*)"" is enabled, approved, has the correct roles ""(.*)"", but has not accepted TOC")]
-        public void TestSetup(string UserEmail, string RoleType)
+        public void TestSetup(string UserEmail, string UserType)
         {
+            _TestEmail = UserEmail;
+            _TestUserType = UserType;
+
+
             DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
             _DssDBContext = new DssDbContext(dbContextOptions);
 
             // Retrieve the role
-            DssUserRole cEUAdminUserRole = _DssDBContext.DssUserRoles.FirstOrDefault(p => p.UserRoleNm == RoleType);
+            DssUserRole userRole = _DssDBContext.DssUserRoles.FirstOrDefault(p => p.UserRoleNm == _TestUserType);
 
             // Retrieve the user identity
-            var identity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == UserEmail);
+            var identity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == _TestEmail);
 
             // Update properties of the identity
             identity.AccessRequestStatusCd = "Approved";
@@ -66,7 +65,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _DssDBContext.SaveChanges();
 
-            cEUAdminUserRole.UserIdentities.Add(identity);
+            userRole.UserIdentities.Add(identity);
 
             // Add the identity to the CEU Admin role
             try
@@ -166,6 +165,11 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("the system should record and display the date and time of my acceptance")]
         public void TheSystemShouldRecordAndDisplayTheDateAndTimeofMyAcceptance()
         {
+            var identity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == _TestEmail);
+            _DssDBContext.Entry<DssUserIdentity>(identity).Reload();
+
+            // DateTime stamp should have been updated
+            ClassicAssert.True(identity.TermsAcceptanceDtm != null);
         }
 
         //Access Restriction for Non-Acceptance
@@ -211,6 +215,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should be directed to the landing page for my role")]
         public void IShouldBeDirectedToTheLandingPageForMyRole()
         {
+
         }
 
         //Bypass Terms and Conditions for CEU users

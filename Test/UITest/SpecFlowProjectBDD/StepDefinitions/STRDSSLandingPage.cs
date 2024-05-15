@@ -1,12 +1,11 @@
-﻿using UITest.PageObjects;
-using UITest.TestDriver;
-using TestFrameWork.Models;
-using Configuration;
+﻿using Configuration;
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
-using static SpecFlowProjectBDD.SFEnums;
-using System.Reflection;
 using SpecFlowProjectBDD.Helpers;
+using TestFrameWork.Models;
+using UITest.PageObjects;
+using UITest.TestDriver;
+using static SpecFlowProjectBDD.SFEnums;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {

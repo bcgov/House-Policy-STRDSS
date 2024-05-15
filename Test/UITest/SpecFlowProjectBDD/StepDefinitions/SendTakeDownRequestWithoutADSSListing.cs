@@ -1,14 +1,10 @@
-﻿using NUnit.Framework;
-using UITest.PageObjects;
-using UITest.TestDriver;
-using Configuration;
-using TestFrameWork.Models;
-using TechTalk.SpecFlow;
-using TechTalk.SpecFlow.Assist;
-using Gherkin.CucumberMessages.Types;
+﻿using Configuration;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
-using System.Reflection.Metadata;
+using TestFrameWork.Models;
+using UITest.PageObjects;
+using UITest.TestDriver;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {

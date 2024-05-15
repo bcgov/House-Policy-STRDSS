@@ -1,20 +1,10 @@
-﻿using NUnit.Framework;
+﻿using Configuration;
+using NUnit.Framework.Legacy;
+using OpenQA.Selenium;
+using OpenQA.Selenium.DevTools.V118.Debugger;
+using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
-using TestFrameWork.Models;
-using Configuration;
-using NUnit.Framework.Legacy;
-using TechTalk.SpecFlow.CommonModels;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using System.Security.Policy;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using System;
-using System.Collections.Generic;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.Extensions;
-using System.Reflection.Metadata;
-using System.Xml.Linq;
-using OpenQA.Selenium.DevTools.V118.Debugger;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {

@@ -1,15 +1,10 @@
-﻿using NUnit.Framework;
+﻿using Configuration;
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
+using OpenQA.Selenium;
+using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
-using TestFrameWork.Models;
-using Configuration;
-using NUnit.Framework.Legacy;
-using System.Linq.Expressions;
-using UITest.Models;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.Extensions;
-using System.Reflection.Metadata;
-using OpenQA.Selenium.Support.UI;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {

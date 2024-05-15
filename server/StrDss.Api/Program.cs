@@ -19,6 +19,7 @@ using StrDss.Api;
 using StrDss.Service.Bceid;
 using StrDss.Service.Hangfire;
 using Hangfire.PostgreSql;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,9 @@ builder.Services.AddDbContext<DssDbContext>(opt =>
         opt.EnableSensitiveDataLogging();
     }
 });
+
+//https://github.com/npgsql/efcore.pg/issues/2736#issuecomment-1875391344
+NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
 
 builder.Services.AddApiVersioning(options =>
 {

@@ -159,7 +159,7 @@ jobs:
 
       - name: Package Helm Chart
         run: |
-          helm package helm -d ./emerald
+          helm package ../../helm -d ./emerald
 
       - name: Push Helm Chart to Repository
         run: |

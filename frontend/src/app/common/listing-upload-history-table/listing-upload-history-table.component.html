@@ -9,19 +9,63 @@
                 (onChange)="onPlatformSelected($event.value)" placeholder="Select platform" id="platformId"
                 name="platformId" [required]="true"></p-dropdown>
         </div>
-
     </div>
     <p-table [value]="listings" styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }">
         <ng-template pTemplate="header">
             <tr>
-                <th>Platform</th>
-                <th>Reported Month</th>
+                <th class="sortable-header" id="organizationNm_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'organizationNm'"
+                    (click)="onSort('organizationNm')">Platform
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'asc'"></i>
+                </th>
+
+                <th class="sortable-header" id="reportPeriodYM_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'reportPeriodYM'"
+                    (click)="onSort('reportPeriodYM')">Reported Month
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'reportPeriodYM' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'reportPeriodYM' && this.sort.dir === 'asc'"></i>
+                </th>
+
                 <th>Status</th>
-                <th>Total Records</th>
+
+                <th class="sortable-header" id="total_header" [class.sorted]="this.sort && this.sort.prop === 'total'"
+                    (click)="onSort('total')">Total Records
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'total' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'total' && this.sort.dir === 'asc'"></i>
+                </th>
+
                 <th>Success</th>
-                <th>Errors</th>
-                <th>Upload Date</th>
-                <th>Uploaded By</th>
+
+                <th class="sortable-header" id="errors_header" [class.sorted]="this.sort && this.sort.prop === 'errors'"
+                    (click)="onSort('errors')">Errors
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'errors' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'errors' && this.sort.dir === 'asc'"></i>
+                </th>
+
+                <th class="sortable-header" id="updDtm_header" [class.sorted]="this.sort && this.sort.prop === 'updDtm'"
+                    (click)="onSort('updDtm')">Upload Date
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'asc'"></i>
+                </th>
+
+                <th class="sortable-header" id="familyNm_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'familyNm'" (click)="onSort('familyNm')">Uploaded By
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'familyNm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'familyNm' && this.sort.dir === 'asc'"></i>
+                </th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-row>
@@ -34,14 +78,14 @@
                     <ng-template #pending><span class="state-pending">{{row.status}}</span></ng-template>
                 </td>
                 <td>
-                    {{row.totalRecords}}
+                    {{row.total}}
                 </td>
                 <td>
-                    {{row.totalSuccess}}
+                    {{row.success}}
                 </td>
                 <td>
                     <span [id]="'downloadErrors_'+row.uploadDeliveryId" class="link-span"
-                        (click)="onDownloadErrors(row.uploadDeliveryId,row.organizationNm,row.reportPeriodYM)">{{row.totalErrors}}<i
+                        (click)="onDownloadErrors(row.uploadDeliveryId,row.organizationNm,row.reportPeriodYM)">{{row.errors}}<i
                             class="pi pi-download"></i>
                     </span>
                 </td>
@@ -49,9 +93,15 @@
                 <td>{{ row.uploadedBy }}</td>
             </tr>
         </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="8">No records found</td>
+            </tr>
+        </ng-template>
     </p-table>
     <div *ngIf="isSmall; then smallTable; else bigTable">
     </div>
+
 
     <ng-template #smallTable>
         <div class="view-more-history-btn-container">
@@ -62,8 +112,9 @@
     </ng-template>
 
     <ng-template #bigTable>
-        <p-paginator class="users-paginator" #paginator (onPageChange)="onPageChange($event)" [rows]="10"
-            [totalRecords]="15" [showPageLinks]="false" [showCurrentPageReport]="true" [showFirstLastIcon]="false"
+        <p-paginator class="users-paginator" #paginator *ngIf="currentPage" (onPageChange)="onPageChange($event)"
+            [rows]="10" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
+            [showCurrentPageReport]="true" [showFirstLastIcon]="false"
             [currentPageReportTemplate]="'Rows per page: 10 &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
     </ng-template>
 

@@ -16,6 +16,21 @@
     p-table {
         th {
             font-weight: 600;
+
+            &.sortable-header {
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+
+                &:hover {
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+
+                i {
+                    vertical-align: middle;
+                }
+            }
         }
 
         td {

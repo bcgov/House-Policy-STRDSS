@@ -6,6 +6,7 @@ export interface ListingUploadHistoryRecord {
     uploadedBy?: string;
 
     errors: number;
+    success: number;
     processed: number;
     familyNm: string;
     givenNm: string;

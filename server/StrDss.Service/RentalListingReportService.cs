@@ -13,6 +13,7 @@ using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Model.UserDtos;
 using StrDss.Service.CsvHelpers;
+using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -33,11 +34,14 @@ namespace StrDss.Service
         private IRentalListingReportRepository _reportRepo;
         private IPhysicalAddressRepository _addressRepo;
         private IGeocoderApi _geocoder;
+        private IUserRepository _userRepo;
+        private IEmailMessageService _emailService;
+        private IEmailMessageRepository _emailRepo;
         private IConfiguration _config;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
-            IGeocoderApi geocoder,
+            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo,
             IConfiguration config, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
@@ -46,6 +50,9 @@ namespace StrDss.Service
             _reportRepo = reportRepo;
             _addressRepo = addressRepo;
             _geocoder = geocoder;
+            _userRepo = userRepo;
+            _emailService = emailService;
+            _emailRepo = emailRepo;
             _config = config;
         }
 
@@ -76,6 +83,7 @@ namespace StrDss.Service
                 SourceHashDsc = hashValue,
                 SourceBin = sourceBin,
                 ProvidingOrganizationId = orgId,
+                UpdUserGuid = _currentUser.UserGuid
             };
 
             foreach (var line in uploadLines)
@@ -230,7 +238,7 @@ namespace StrDss.Service
 
             if (reportPeriodMismatch > 0)
             {
-                errors.AddItem("rpt_period", $"Report period mismatch found in {reportPeriodMismatch} record(s). The report period must be {reportPeriod}.");
+                errors.AddItem("rpt_period", $"Report period mismatch found in {reportPeriodMismatch} record(s). The file contains report period(s) other than the selected period of {reportPeriod}");
             }
 
             if (reportPeriodMissing > 0)
@@ -319,6 +327,7 @@ namespace StrDss.Service
 
             csv.Read();
             var headerExists = csv.ReadHeader();
+            var hasError = false;
 
             while (csv.Read())
             {
@@ -330,13 +339,69 @@ namespace StrDss.Service
                     continue; //already processed
                 }
 
-                await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord);
+                if (await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord))
+                    hasError = true;
             }
 
-            //send email
+            if (hasError)
+            {
+                if (upload.UpdUserGuid == null) return;
+
+                var user = await _userRepo.GetUserByGuid((Guid)upload.UpdUserGuid!);
+
+                if (user == null) return;
+
+                var history = await _reportRepo.GetRentalListingUpload(upload.UploadDeliveryId);
+
+                if (history == null) return;
+
+                var adminEmail = _config.GetValue<string>("ADMIN_EMAIL");
+                if (adminEmail == null) return;
+
+                using var transaction = _unitOfWork.BeginTransaction();
+
+                //upload.UploadDeliveryId
+                var template = new ListingUploadErrorNotification(_emailService)
+                {
+                    UserName = $"{user!.GivenNm}",
+                    NumErrors = (long)history.Errors!,
+                    Link = "",
+                    To = new string[] { user!.EmailAddressDsc! },
+                    Info = $"{EmailMessageTypes.ListingUploadError} for {user.FamilyNm}, {user.GivenNm}",
+                    From = adminEmail
+                };
+
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = template.EmailMessageType,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = false,
+                    MessageReasonId = null,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = null,
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = null,
+                    UnreportedListingUrl = null,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = user.UserIdentityId,
+                    AffectedByUserIdentityId = user.UserIdentityId,
+                    InvolvedInOrganizationId = upload.ProvidingOrganizationId
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                emailEntity.ExternalMessageNo = await template.SendEmail(adminEmail);
+
+                _unitOfWork.Commit();
+
+                _unitOfWork.CommitTransaction(transaction);
+            }
         }
 
-        private async Task ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)
+        private async Task<bool> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)
         {
             var errors = new Dictionary<string, List<string>>();
             _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
@@ -345,7 +410,7 @@ namespace StrDss.Service
             {
                 SaveUploadLine(uploadLine, errors, true);
                 _unitOfWork.Commit();
-                return;
+                return true;
             }
 
             var offeringOrg = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd); //already validated in the file upload
@@ -374,6 +439,8 @@ namespace StrDss.Service
             _unitOfWork.Commit();
 
             tran.Commit();
+
+            return false;
         }
 
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid)

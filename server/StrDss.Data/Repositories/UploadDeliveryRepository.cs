@@ -12,7 +12,6 @@ namespace StrDss.Data.Repositories
         Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly periodYm, long orgId, string hashValue);
         Task AddUploadDeliveryAsync(DssUploadDelivery upload);
         Task<List<DssUploadDelivery>> GetRentalReportUploadsToProcessAsync();
-        //Task<DssRentalListingLine?> GetListingLineAsync(long reportId, string orgCd, string listingNo);
     }
 
     public class UploadDeliveryRepository : RepositoryBase<DssUploadDelivery>, IUploadDeliveryRepository
@@ -44,10 +43,5 @@ namespace StrDss.Data.Repositories
                         .ThenBy(x => x.UpdDtm) //Users can upload the same listing multiple times. The processing of these listings follows a first-come, first-served approach.
                 .ToListAsync();
         }
-
-        //public async Task<DssRentalListingLine?> GetListingLineAsync(long reportId, string orgCd, string listingNo)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 }

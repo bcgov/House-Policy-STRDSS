@@ -18,6 +18,7 @@ global:
     'RENTAL_LISTING_REPORT_MAX_SIZE': '4'
     'BCEID_URL': 'https://gws1.development.bceid.ca/webservices/client/v10/bceidservice.asmx'
     'BCEID_CACHE_LIFESPAN': '600'
+    'GEOCODER_URL': 'https://geocodertst.api.gov.bc.ca'
 
 nameOverride: strdss-dev
 fullnameOverride: strdss-dev

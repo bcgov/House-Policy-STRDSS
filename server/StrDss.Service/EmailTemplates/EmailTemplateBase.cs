@@ -41,12 +41,12 @@ namespace StrDss.Service.EmailTemplates
             return "";
         }
 
-        public async Task<string> SendEmail()
+        public async Task<string> SendEmail(string from = NoReply.Default)
         {
             var emailContent = new EmailContent
             {
                 Body = GetContent(),
-                From = NoReply.Default,
+                From = from,
                 Subject = Subject,
                 To = To,
                 Cc = Cc,

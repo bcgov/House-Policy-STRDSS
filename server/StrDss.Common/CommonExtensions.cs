@@ -102,6 +102,17 @@ namespace StrDss.Common
             return sb.ToString();
         }
 
+        public static string ParseErrorWithUnderScoredKeyName(this Dictionary<string, List<string>> errors)
+        {
+            var sb = new StringBuilder();
+            foreach (var key in errors.Keys)
+            {
+                sb.AppendLine($"{key.ConvertToUnderscore()}:");
+                sb.AppendLine($"{string.Join("\r\n  ", errors[key])}");
+            }
+            return sb.ToString();
+        }
+
         public static string SanitizeFileName(this string fileName)
         {
             var invalids = Path.GetInvalidFileNameChars();
@@ -245,6 +256,30 @@ namespace StrDss.Common
             if (str.IsEmpty()) return str;
 
             return str.TrimEnd('\r', '\n');
+        }
+        public static string ConvertToUnderscore(this string str)
+        {
+            if (str.IsEmpty()) return str;
+
+            StringBuilder result = new StringBuilder();
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                char currentChar = str[i];
+                if (char.IsUpper(currentChar))
+                {
+                    if (i > 0)
+                    {
+                        result.Append("_");
+                    }
+                    result.Append(char.ToLower(currentChar));
+                }
+                else
+                {
+                    result.Append(currentChar);
+                }
+            }
+            return result.ToString();
         }
     }
 }

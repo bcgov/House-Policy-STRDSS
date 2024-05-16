@@ -1,4 +1,5 @@
 ﻿using CsvHelper.Configuration.Attributes;
+using System.Reflection;
 
 namespace StrDss.Model.RentalReportDtos
 {

@@ -447,7 +447,7 @@ namespace StrDss.Service
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid)
         {
             uploadLine.IsValidationFailure = isValid;
-            uploadLine.ErrorTxt = errors.ParseError();
+            uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
             uploadLine.IsProcessed = true;
         }
 
@@ -575,6 +575,8 @@ namespace StrDss.Service
 
             foreach(var line in upload.DssUploadLines)
             {
+                if (!line.IsValidationFailure) continue;
+
                 contents.AppendLine(line.SourceLineTxt.TrimEndNewLine() + $",\"{line.ErrorTxt}\"");
             }
 

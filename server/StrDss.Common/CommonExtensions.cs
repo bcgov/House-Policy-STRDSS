@@ -239,5 +239,12 @@ namespace StrDss.Common
             byte[] hash = sha.ComputeHash(bin);
             return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
+
+        public static string TrimEndNewLine(this string str)
+        {
+            if (str.IsEmpty()) return str;
+
+            return str.TrimEnd('\r', '\n');
+        }
     }
 }

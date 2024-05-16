@@ -2,9 +2,9 @@
 
 namespace StrDss.Service.EmailTemplates
 {
-    public class ListingUploadErrorNotification : EmailTemplateBase
+    public class ListingUploadError : EmailTemplateBase
     {
-        public ListingUploadErrorNotification(IEmailMessageService emailService) 
+        public ListingUploadError(IEmailMessageService emailService) 
             : base(emailService)
         {
             EmailMessageType = EmailMessageTypes.ListingUploadError;

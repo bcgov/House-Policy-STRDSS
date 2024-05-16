@@ -78,19 +78,16 @@ export class ListingUploadHistoryTableComponent implements OnInit {
     this.getHistoryUploadRecords(value.page + 1);
   }
 
-  onDownloadErrors(_rowId: number, platform: string, date: string): void {
-    //TODO: Get errors by rowId
+  onDownloadErrors(rowId: number, platform: string, date: string): void {
+    this.listingDataService.getUploadHistoryErrors(rowId).subscribe({
+      next: (content) => {
+        const element = document.createElement('a');
+        element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(content)}`);
+        element.setAttribute('download', `errors_${platform}_${date}.csv`);
 
-    //NOTE: MOCK data. Remove before release
-    const content =
-      `Header1,Header2,Header3\r\nc1,b1,a4\r\nc2,b2,a5\r\nc3,b3,a6\r\nc4,b4,a7\r\nc5,b5,a8\r\nc6,b6,a9\r\nc7,b7,a10\r\nc8,b8,a11`;
-    //NOTE:MOCK end  
-
-    const element = document.createElement('a');
-    element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(content)}`);
-    element.setAttribute('download', `errors_${platform}_${date}.csv`);
-
-    element.click();
+        element.click();
+      }
+    })
   }
 
   private getHistoryUploadRecords(selectedPageNumber?: number): void {

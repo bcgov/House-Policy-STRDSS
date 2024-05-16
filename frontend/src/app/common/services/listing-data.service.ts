@@ -15,6 +15,9 @@ export class ListingDataService {
       "Content-Type": "multipart/form-data",
     })
   };
+
+  textHeaders = new HttpHeaders().set('Content-Type', 'text/plain; charset=utf-8');
+
   constructor(private httpClient: HttpClient) { }
 
   uploadData(reportPeriod: string, organizationId: number, file: any): Observable<unknown> {
@@ -47,6 +50,9 @@ export class ListingDataService {
     }
 
     return this.httpClient.get<PagingResponse<ListingUploadHistoryRecord>>(url);
+  }
 
+  getUploadHistoryErrors(id: number): Observable<any> {
+    return this.httpClient.get<any>(`${environment.API_HOST}/rentallistingreports/uploads/${id}/errorfile`, { headers: this.textHeaders, responseType: 'text' as 'json' });
   }
 }

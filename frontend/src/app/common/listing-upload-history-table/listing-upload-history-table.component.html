@@ -96,9 +96,9 @@
                     {{row.success}}
                 </td>
                 <td>
-                    <span [id]="'downloadErrors_'+row.uploadDeliveryId" [class.link-span]="row.errors.length>0"
+                    <span [id]="'downloadErrors_'+row.uploadDeliveryId" [class.link-span]="row.errors>0"
                         (click)="onDownloadErrors(row.uploadDeliveryId,row.organizationNm,row.reportPeriodYM)">{{row.errors}}<i
-                            class="pi pi-download" *ngIf="row.errors.length>0"></i>
+                            class="pi pi-download" *ngIf="row.errors>0"></i>
                     </span>
                 </td>
                 <td>{{ row.updDtm |date }}</td>

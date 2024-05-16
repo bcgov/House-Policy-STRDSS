@@ -31,7 +31,13 @@
                         *ngIf="this.sort && this.sort.prop === 'reportPeriodYM' && this.sort.dir === 'asc'"></i>
                 </th>
 
-                <th>Status</th>
+                <th class="sortable-header" id="status_header" [class.sorted]="this.sort && this.sort.prop === 'status'"
+                    (click)="onSort('status')">Status
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'status' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'status' && this.sort.dir === 'asc'"></i>
+                </th>
 
                 <th class="sortable-header" id="total_header" [class.sorted]="this.sort && this.sort.prop === 'total'"
                     (click)="onSort('total')">Total Records
@@ -41,7 +47,13 @@
                         *ngIf="this.sort && this.sort.prop === 'total' && this.sort.dir === 'asc'"></i>
                 </th>
 
-                <th>Success</th>
+                <th class="sortable-header" id="success_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'success'" (click)="onSort('success')">Success
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'success' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'success' && this.sort.dir === 'asc'"></i>
+                </th>
 
                 <th class="sortable-header" id="errors_header" [class.sorted]="this.sort && this.sort.prop === 'errors'"
                     (click)="onSort('errors')">Errors
@@ -84,9 +96,9 @@
                     {{row.success}}
                 </td>
                 <td>
-                    <span [id]="'downloadErrors_'+row.uploadDeliveryId" class="link-span"
+                    <span [id]="'downloadErrors_'+row.uploadDeliveryId" [class.link-span]="row.errors.length>0"
                         (click)="onDownloadErrors(row.uploadDeliveryId,row.organizationNm,row.reportPeriodYM)">{{row.errors}}<i
-                            class="pi pi-download"></i>
+                            class="pi pi-download" *ngIf="row.errors.length>0"></i>
                     </span>
                 </td>
                 <td>{{ row.updDtm |date }}</td>

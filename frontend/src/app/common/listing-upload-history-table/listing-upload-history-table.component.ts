@@ -108,10 +108,6 @@ export class ListingUploadHistoryTableComponent implements OnInit {
 
   private extendData(data: Array<ListingUploadHistoryRecord>): Array<ListingUploadHistoryRecord> {
     return data.map((record) => {
-      record.totalErrors = record.errors;
-      record.totalRecords = record.total;
-      record.totalSuccess = record.success;
-      record.status = record.total === record.processed ? 'Processed' : 'Pending';
       record.uploadedBy = `${record.familyNm}, ${record.givenNm}`;
 
       return record;

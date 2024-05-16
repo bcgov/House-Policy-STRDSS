@@ -1,10 +1,7 @@
 export interface ListingUploadHistoryRecord {
-    totalSuccess?: number | 'N/A';
-    totalRecords?: number | 'N/A';
-    totalErrors?: number | 'N/A';
-    status?: 'Processed' | 'Pending';
     uploadedBy?: string;
 
+    status?: 'Processed' | 'Pending';
     errors: number;
     success: number;
     processed: number;

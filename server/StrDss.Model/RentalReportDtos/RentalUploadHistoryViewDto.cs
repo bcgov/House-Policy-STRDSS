@@ -8,6 +8,7 @@
             OrganizationNm = "";
             GivenNm = "";
             FamilyNm = "";
+            Status = "";
         }
 
         public long UploadDeliveryId { get; set; }
@@ -20,6 +21,7 @@
         public int Total { get; set; }
         public int Processed { get; set; }
         public int Errors { get; set; }
-        public int Success => Processed - Errors;
+        public int Success { get; set; }
+        public string Status { get; set; }
     }
 }

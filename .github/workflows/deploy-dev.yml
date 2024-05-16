@@ -164,6 +164,7 @@ jobs:
       - name: Push Helm Chart to Repository
         run: |
           helm repo add tenant-gitops-b0471a https://github.com/bcgov-c/tenant-gitops-b0471a
+          helm repo index
           helm repo update
           helm push ./emerald tenant-gitops-b0471a --username richand --password ${{ secrets.GitOps }}
         env:

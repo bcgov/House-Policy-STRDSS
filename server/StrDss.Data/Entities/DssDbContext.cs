@@ -624,6 +624,8 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.Processed).HasColumnName("processed");
             entity.Property(e => e.ProvidingOrganizationId).HasColumnName("providing_organization_id");
             entity.Property(e => e.ReportPeriodYm).HasColumnName("report_period_ym");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.Success).HasColumnName("success");
             entity.Property(e => e.Total).HasColumnName("total");
             entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
             entity.Property(e => e.UploadDeliveryId).HasColumnName("upload_delivery_id");

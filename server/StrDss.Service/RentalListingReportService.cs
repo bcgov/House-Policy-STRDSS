@@ -26,6 +26,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> UploadRentalReport(string reportPeriod, long orgId, Stream stream);
         Task ProcessRentalReportUploadsAsync();
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<byte[]?> GetRentalListingErrorFile(long uploadId);
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
@@ -361,11 +362,11 @@ namespace StrDss.Service
                 using var transaction = _unitOfWork.BeginTransaction();
 
                 //upload.UploadDeliveryId
-                var template = new ListingUploadErrorNotification(_emailService)
+                var template = new ListingUploadError(_emailService)
                 {
                     UserName = $"{user!.GivenNm}",
                     NumErrors = (long)history.Errors!,
-                    Link = "",
+                    Link = GetHostUrl() + "/upload-listing-history",
                     To = new string[] { user!.EmailAddressDsc! },
                     Info = $"{EmailMessageTypes.ListingUploadError} for {user.FamilyNm}, {user.GivenNm}",
                     From = adminEmail
@@ -446,7 +447,7 @@ namespace StrDss.Service
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid)
         {
             uploadLine.IsValidationFailure = isValid;
-            uploadLine.ErrorTxt = errors.ParseError();
+            uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
             uploadLine.IsProcessed = true;
         }
 
@@ -549,6 +550,37 @@ namespace StrDss.Service
         public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
         {
             return await _reportRepo.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
+        }
+
+        public async Task<byte[]?> GetRentalListingErrorFile(long uploadId)
+        {
+            var upload = await _uploadRepo.GetRentalListingErrorLines(uploadId);
+
+            if (upload == null) return null;
+
+            var memoryStream = new MemoryStream(upload.SourceBin!);
+            using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
+
+            var errors = new Dictionary<string, List<string>>();
+            var csvConfig = CsvHelperUtils.GetConfig(errors, false);
+
+            using var csv = new CsvReader(textReader, csvConfig);
+
+            var contents = new StringBuilder();
+
+            csv.Read();
+            var header = csv.Parser.RawRecord.TrimEndNewLine() + ",errors";
+
+            contents.AppendLine(header);
+
+            foreach(var line in upload.DssUploadLines)
+            {
+                if (!line.IsValidationFailure) continue;
+
+                contents.AppendLine(line.SourceLineTxt.TrimEndNewLine() + $",\"{line.ErrorTxt}\"");
+            }
+
+            return Encoding.UTF8.GetBytes(contents.ToString());
         }
     }
 }

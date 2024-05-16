@@ -632,13 +632,13 @@
 						},
 						{
 							"key": "OrganizationId",
-							"value": "5",
+							"value": "2",
 							"type": "text"
 						},
 						{
 							"key": "File",
 							"type": "file",
-							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing-valid.csv"
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/listing-valid-2024-04-04.csv"
 						}
 					]
 				},
@@ -661,7 +661,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistingreports/rentallistinghistory?pageSize=3&pageNumber=1",
+					"raw": "{{host}}/api/rentallistingreports/rentallistinghistory?platformId=&pageSize=10&pageNumber=1",
 					"host": [
 						"{{host}}"
 					],
@@ -672,8 +672,12 @@
 					],
 					"query": [
 						{
+							"key": "platformId",
+							"value": ""
+						},
+						{
 							"key": "pageSize",
-							"value": "3"
+							"value": "10"
 						},
 						{
 							"key": "pageNumber",
@@ -690,24 +694,16 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistingreports/rentallistinghistory?pageSize=3&pageNumber=1",
+					"raw": "{{host}}/api/rentallistingreports/uploads/17/errorfile",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
 						"rentallistingreports",
-						"rentallistinghistory"
-					],
-					"query": [
-						{
-							"key": "pageSize",
-							"value": "3"
-						},
-						{
-							"key": "pageNumber",
-							"value": "1"
-						}
+						"uploads",
+						"17",
+						"errorfile"
 					]
 				}
 			},

@@ -7,6 +7,8 @@ import { CommonModule } from '@angular/common';
 import { User } from '../../../common/models/user';
 import { DashboardService } from '../../../common/services/dashboard.service';
 import { DashboardCard } from '../../../common/models/dashboard-card';
+import { ListingUploadHistoryTableComponent } from '../../../common/listing-upload-history-table/listing-upload-history-table.component';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -16,6 +18,7 @@ import { DashboardCard } from '../../../common/models/dashboard-card';
     CardModule,
     ButtonModule,
     CommonModule,
+    ListingUploadHistoryTableComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'

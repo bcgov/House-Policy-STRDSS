@@ -50,8 +50,8 @@ namespace StrDss.Data.Repositories
             //todo: data control
 
             return await _dbSet.AsNoTracking()
-                .Include(x => x.DssUploadLines.Where(y => y.IsValidationFailure))
-                .FirstOrDefaultAsync();
+                .Include(x => x.DssUploadLines)
+                .FirstOrDefaultAsync(x => x.UploadDeliveryId == uploadId);
         }
     }
 }

@@ -1,7 +1,5 @@
 <h2>Home</h2>
-
 <div class="cards">
-
     <div class="dashboard-card" *ngFor="let card of cardsToDisplay" [id]="card.boxId">
         <div class="card-header">{{card.title}}</div>
         <div class="card-content">{{card.description}}</div>
@@ -10,4 +8,9 @@
                 (click)="navigateTo(card.route)">{{card.buttonText}}</button>
         </div>
     </div>
+</div>
+<br>
+
+<div class="listings-upload-history">
+    <app-listing-upload-history-table [isSmall]="true"></app-listing-upload-history-table>
 </div>

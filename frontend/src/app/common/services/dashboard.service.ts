@@ -41,13 +41,11 @@ export class DashboardService {
     this.cards = [
       {
         title: 'Platform Upload History',
-        accessPermission: listing_read,
+        accessPermission: listing_file_upload,
         description: 'View all platform upload history here',
         buttonIcon: '',
         buttonText: 'Platform Upload History',
-        route: '',
-        isButtonDisabled: true,
-        hidden: true,
+        route: '/upload-listing-history',
         boxId: 'platformUploadHistory_box',
         buttonId: 'platformUploadHistory_btn',
       },

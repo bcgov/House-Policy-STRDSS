@@ -96,8 +96,7 @@ export class TopMenuService {
       {
         accessPermission: listing_read,
         buttonId: 'platformUploadHistory_mi_btn',
-        route: '',
-        disabled: true,
+        route: '/upload-listing-history',
         description: 'View all platform upload history here',
         title: 'Upload History',
         folderName: 'Upload',

@@ -24,4 +24,8 @@ public partial class DssRentalUploadHistoryView
     public long? Processed { get; set; }
 
     public long? Errors { get; set; }
+
+    public long? Success { get; set; }
+
+    public string? Status { get; set; }
 }

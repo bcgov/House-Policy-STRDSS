@@ -159,7 +159,7 @@ jobs:
 
       - name: Package Helm Chart
         run: |
-          helm repo index ./helm
+          helm repo index ./helm/_backend
           helm package ./helm/_backend -d ./emerald
 
       - name: Push Helm Chart to Repository

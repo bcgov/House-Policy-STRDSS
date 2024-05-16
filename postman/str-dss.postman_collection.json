@@ -683,6 +683,35 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Get Error File",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistingreports/rentallistinghistory?pageSize=3&pageNumber=1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistingreports",
+						"rentallistinghistory"
+					],
+					"query": [
+						{
+							"key": "pageSize",
+							"value": "3"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {

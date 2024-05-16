@@ -73,5 +73,17 @@ namespace StrDss.Api.Controllers
 
             return Ok(history);
         }
+
+        [ApiAuthorize(Permissions.ListingFileUpload)]
+        [HttpGet("uploads/{uploadId}/errorfile")]
+        public async Task<ActionResult> GetRentalListingErrorFile(long uploadId)
+        {
+            var bytes = await _listingService.GetRentalListingErrorFile(uploadId);
+
+            if (bytes == null)
+                return NotFound();
+
+            return File(bytes!, "text/csv", $"errors-{uploadId}.csv");
+        }
     }
 }

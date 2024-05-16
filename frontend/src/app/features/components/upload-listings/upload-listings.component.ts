@@ -90,7 +90,8 @@ export class UploadListingsComponent implements OnInit {
       .subscribe({
         next: (_res) => {
           this.myForm.reset();
-          this.uploadedFile = null;
+          this.onClear();
+
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File has been uploaded successfully' });
         },
       });

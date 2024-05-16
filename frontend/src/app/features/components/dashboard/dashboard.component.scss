@@ -5,6 +5,7 @@
 
     h2 {
         padding: 0;
+        padding-left: 12px;
         font-size: 24px;
         font-weight: 700;
         margin-top: 0;
@@ -52,5 +53,9 @@
                 height: 48px;
             }
         }
+    }
+
+    .listings-upload-history {
+        padding: 12px;
     }
 }

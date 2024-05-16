@@ -165,7 +165,7 @@ jobs:
         run: |
           helm repo add tenant-gitops-b0471a https://github.com/bcgov-c/tenant-gitops-b0471a
           helm repo update
-          helm push ./emerald tenant-gitops-b0471a
+          helm push ./emerald tenant-gitops-b0471a --username richand --password ${{ secrets.GitOps }}
         env:
           HELM_EXPERIMENTAL_OCI: 1
           HELM_OCI_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}

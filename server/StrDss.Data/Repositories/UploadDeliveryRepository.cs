@@ -47,6 +47,8 @@ namespace StrDss.Data.Repositories
 
         public async Task<DssUploadDelivery?> GetRentalListingErrorLines(long uploadId)
         {
+            //todo: data control
+
             return await _dbSet.AsNoTracking()
                 .Include(x => x.DssUploadLines.Where(y => y.IsValidationFailure))
                 .FirstOrDefaultAsync();

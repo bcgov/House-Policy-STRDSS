@@ -134,7 +134,7 @@ jobs:
         if: github.ref != 'refs/heads/test' || github.ref != 'refs/heads/emerald' || github.ref != 'refs/heads/main'
         with:
           push: false
-          context: ./src
+          context: ./server
           tags: ${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }}
           labels: ${{ steps.meta.outputs.labels || steps.meta-test.outputs.labels || steps.meta-prod.outputs.labels }}
 

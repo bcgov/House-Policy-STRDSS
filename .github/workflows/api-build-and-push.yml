@@ -123,7 +123,7 @@ jobs:
         if: steps.meta.outcome == 'success' || steps.meta-prod.outcome == 'success' || steps.meta-test.outcome == 'success'
         with:
           push: true
-          context: ./src
+          context: ./server
           tags: ${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }}
           labels: ${{ steps.meta.outputs.labels || steps.meta-test.outputs.labels || steps.meta-prod.outputs.labels }}
           #platforms: linux/amd64,linux/arm64

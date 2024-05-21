@@ -1,20 +1,19 @@
 name: "STRDSS Server"
 
-on: workflow_dispatch
-# on:
-#   push:
-#     branches:
-#        - develop
-#       # - test
-#       # - main
-#     tags:
-#       - "*"
-
-#   pull_request:
-#     branches:
-#        - develop
-#       # - test 
-#       # - main
+# on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      # - main
+      - develop
+    paths-ignore:
+      - database/**
+      - package.json
+      - package-lock.json
+      - CHANGELOG.md
+      - .conventional-changelog.mjs
+      - .release-it.json
 
 jobs:
   server-build-and-push:

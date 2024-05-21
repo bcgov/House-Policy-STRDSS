@@ -1,0 +1,243 @@
+name: "STRDSS Server"
+
+on: workflow_dispatch
+# on:
+#   push:
+#     branches:
+#        - develop
+#       # - test
+#       # - main
+#     tags:
+#       - "*"
+
+#   pull_request:
+#     branches:
+#        - develop
+#       # - test 
+#       # - main
+
+jobs:
+  server-build-and-push:
+    name: strdss-server
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # working-directory: ./src/server
+      working-directory: ./server
+      GITHUB_TOKEN: ${{ secrets.GITOPS }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.400'
+
+      - uses: azure/setup-helm@v3
+        with:
+          version: "latest " # default is latest (stable)
+          token: ${{ secrets.GITOPS }} # only needed if version is 'latest'
+        id: install
+
+      - name: Install dependencies
+        run: dotnet restore
+        working-directory: ${{env.working-directory}}
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ${{env.working-directory}}
+
+      - name: Test
+        run: dotnet test --no-restore --verbosity normal
+        working-directory: ${{env.working-directory}}
+
+      # Release
+      - name: Changelog
+        id: changelog
+        uses: scottbrenner/generate-changelog-action@master
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          REPO: ${{ github.repository }}
+
+      # GitHub Release
+      - name: Create GitHub release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          repo_token: "${{ secrets.GITOPS }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            LICENSE.txt
+            *.jar
+
+      # Docker
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Artifactory
+        uses: docker/login-action@v1
+        with:
+          registry: artifacts.developer.gov.bc.ca
+          username: ${{ secrets.JFROG_USERNAME }}
+          password: ${{ secrets.JFROG_PASSWORD }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v3
+        if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/')
+        with:
+          images: |
+            artifacts.developer.gov.bc.ca/sf4a-strdss/server
+          tags: |
+            type=sha,format=short,prefix=dev-
+            
+      - name: Extract metadata for Docker
+        id: meta-test
+        uses: docker/metadata-action@v3
+        if: github.ref == 'refs/heads/test' || startsWith(github.ref, 'refs/tags/')
+        with:
+          images: |
+            artifacts.developer.gov.bc.ca/sf4a-strdss/server
+          tags: |
+            type=sha,format=short,prefix=test-
+
+      - name: Extract metadata for Docker
+        id: meta-prod
+        uses: docker/metadata-action@v3
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+        with:
+          images: |
+            artifacts.developer.gov.bc.ca/sf4a-strdss/server
+          tags: |
+            type=sha,format=short,prefix=prod-
+            
+      - name: Build and Push to registries
+        id: publish
+        uses: docker/build-push-action@v2
+        if: steps.meta.outcome == 'success' || steps.meta-prod.outcome == 'success' || steps.meta-test.outcome == 'success'
+        with:
+          push: true
+          context: ./src
+          tags: ${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }}
+          labels: ${{ steps.meta.outputs.labels || steps.meta-test.outputs.labels || steps.meta-prod.outputs.labels }}
+          #platforms: linux/amd64,linux/arm64
+
+      - name: Build CI
+        id: ci
+        uses: docker/build-push-action@v2
+        if: github.ref != 'refs/heads/test' || github.ref != 'refs/heads/develop' || github.ref != 'refs/heads/main'
+        with:
+          push: false
+          context: ./src
+          tags: ${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }}
+          labels: ${{ steps.meta.outputs.labels || steps.meta-test.outputs.labels || steps.meta-prod.outputs.labels }}
+
+      - name: Checkout ArgoCD Repo
+        id: gitops
+        if: steps.publish.outcome == 'success'
+        uses: actions/checkout@v4
+        with:
+          repository: bcgov-c/tenant-gitops-b0471a
+          ref: develop
+          token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+          path: gitops
+
+      - name: Update Helm Values and Commit
+        id: helm
+        if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
+        run: |
+
+          ls -A gitops/
+          # Navigate to the directory containing your Helm values file for the environment develop -> DEV, test -> test and 
+          cd gitops/charts/server
+
+          IMAGE="${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }} "
+          IMAGE_TAG=$(echo "$IMAGE" | awk -F':' '{print $NF}')
+
+          echo $IMAGE_TAG
+
+          # Update the Helm values file with the new image tag or (SHA)
+          DATETIME=$(date +'%Y-%m-%d %H:%M:%S')  # Get current date and time
+          # check if branch is dev update dev_values with sed if branch is test update test value if branch is main update prod values 
+          
+          if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+             echo "This is the main branch"
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/prod_values.yaml
+          elif [[ "$GITHUB_REF" == "refs/heads/develop" ]]; then
+             echo "This is the develop branch"
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/dev_values.yaml
+          elif [[ "$GITHUB_REF" == "refs/heads/test" ]]; then
+             echo "This is the test branch"
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/test_values.yaml
+          else
+            echo updating dev values for CIs
+            sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/dev_values.yaml
+          fi
+         
+
+
+          # Commit and push the changes
+          git config --global user.email "richand101@github.com"
+          git config --global user.name "Rick Anderson"
+
+          git add ../../deploy/dev_values.yaml
+          git add ../../deploy/prod_values.yaml
+          git add ../../deploy/test_values.yaml
+
+
+          # Repackage Helm Chart
+          cd ../gitops/charts          
+
+          helm package ../../backend/
+
+          git add .
+
+          git commit -m "Update image tag to $IMAGE_TAG on $DATETIME"
+          git push origin develop  # Update the branch name as needed
+
+        # Update API Specification in the service registry - RBA skip for initial implmentation
+      # - name: Publish API Specification
+      #   if: steps.helm.outcome == 'success'
+      #   run: |
+      #     set -e  # Exit on error
+
+      #     IMAGE="${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }} "
+      #     IMAGE_TAG=$(echo "$IMAGE" | awk -F':' '{print $NF}')
+
+      #     echo $IMAGE_TAG
+
+      #     # Get access token from auth endpoint 
+
+      #     export TOKEN=$(curl -X POST \
+      #       ${{ secrets.AUTH_TOKEN_ENDPOINT }} \
+      #       -H 'Content-Type: application/x-www-form-urlencoded' \
+      #       -d grant_type=client_credentials \
+      #       -d client_id=${{ secrets.REGISTRY_CLIENT_ID }} \
+      #       -d client_secret=${{ secrets.REGISTRY_CLIENT_SECRET }} | jq -r '.access_token')
+      #     echo "Access Token: $TOKEN"
+
+      #     http_response=$(curl -s -o response.txt -w "%{http_code}" -X POST \
+      #       -H "Authorization: Bearer $TOKEN" \
+      #       -H "Content-type: application/json; artifactType=OPENAPI" \
+      #       -H "Authorization: Bearer $TOKEN" \
+      #       -H "X-Registry-ArtifactId: justin-claim" \
+      #       -d @CustomClaimApiSpec.json  \
+      #       ${{ secrets.SERVICE_REGISTRY_HOST_URL }}/apis/registry/v2/groups/JUSTIN/artifacts?ifExists=UPDATE)
+      #       if [ $http_response != "200" ]; then
+      #           echo "Error: Failed to publish artifacts"
+                
+      #           echo "Server returned:"
+      #           cat response.txt  
+      #           exit 1
+      #       else
+      #           echo "Server returned:"
+      #           cat response.txt    
+      #       fi
+      #   working-directory: ${{env.working-directory}}

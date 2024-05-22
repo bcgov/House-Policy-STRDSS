@@ -199,7 +199,7 @@ jobs:
           git add .
 
           git commit -m "Update image tag to $IMAGE_TAG on $DATETIME"
-          git push origin emerald  # Update the branch name as needed
+          git push origin develop  # Update the branch name as needed
 
         # Update API Specification in the service registry - RBA skip for initial implmentation
       # - name: Publish API Specification

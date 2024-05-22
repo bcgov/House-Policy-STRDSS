@@ -18,6 +18,7 @@ namespace StrDss.Data.Repositories
         void DeleteListingContacts(long listingId);
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
+        Task UpdateIsCurrent(long providingPlatformId);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
     {
@@ -90,6 +91,24 @@ namespace StrDss.Data.Repositories
                 .DssRentalUploadHistoryViews
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UploadDeliveryId == deliveryId);
+        }
+
+        public async Task UpdateIsCurrent(long providingPlatformId)
+        {
+            var latestPeriodYm = _dbSet.AsNoTracking()
+                .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
+                .Max(x => x.ReportPeriodYm);
+
+            var masterListings = await _dbContext.DssRentalListings
+                .Include(x => x.DerivedFromRentalListing)
+                    .ThenInclude(x => x.IncludingRentalListingReport)
+                .Where(x => x.DerivedFromRentalListing != null && x.DerivedFromRentalListing.IncludingRentalListingReport!.ProvidingOrganizationId == providingPlatformId)
+                .ToArrayAsync();
+
+            foreach (var listing in masterListings)
+            {
+                listing.IsCurrent = listing.DerivedFromRentalListing!.IncludingRentalListingReport!.ReportPeriodYm == latestPeriodYm;
+            }
         }
     }
 }

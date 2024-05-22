@@ -152,11 +152,11 @@ jobs:
         id: helm
         if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
         run: |
-
-          ls -AR gitops/
+          pwd
+          ls -ARl gitops/
           # Navigate to the directory containing your Helm values file for the environment develop -> DEV, test -> test and 
-          cd gitops/deploy
-          # cd gitops/charts/justin-custom-claim-api
+          #cd gitops
+          cd gitops/charts/webapi-core
 
           IMAGE="${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }} "
           IMAGE_TAG=$(echo "$IMAGE" | awk -F':' '{print $NF}')
@@ -170,16 +170,16 @@ jobs:
 
           if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
              echo "This is the main branch"
-             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/prod_values.yaml
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/prod_values.yaml
           elif [[ "$GITHUB_REF" == "refs/heads/emerald" ]]; then
              echo "This is the emerald branch"
-             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/dev_values.yaml
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/dev_values.yaml
           elif [[ "$GITHUB_REF" == "refs/heads/test" ]]; then
              echo "This is the test branch"
-             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/test_values.yaml
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/test_values.yaml
           else
             echo updating dev values for CIs
-            sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/dev_values.yaml
+            sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/dev_values.yaml
           fi
          
 
@@ -188,15 +188,15 @@ jobs:
           git config --global user.email "richand101@github.com"
           git config --global user.name "Rick Anderson"
 
-          git add deploy/dev_values.yaml
-          git add deploy/prod_values.yaml
-          git add deploy/test_values.yaml
+          git add ../../deploy/dev_values.yaml
+          git add ../../deploy/prod_values.yaml
+          git add ../../deploy/test_values.yaml
 
 
           # Repackage Helm Chart
-          cd ../gitops/charts          
+          cd charts          
 
-          helm package ../../backend/
+          helm package ../../webapi-core/
 
           git add .
 

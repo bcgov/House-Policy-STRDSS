@@ -169,16 +169,16 @@ jobs:
           
           if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
              echo "This is the main branch"
-             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/prod_values.yaml
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/prod_values.yaml
           elif [[ "$GITHUB_REF" == "refs/heads/emerald" ]]; then
              echo "This is the emerald branch"
-             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/dev_values.yaml
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/dev_values.yaml
           elif [[ "$GITHUB_REF" == "refs/heads/test" ]]; then
              echo "This is the test branch"
-             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/test_values.yaml
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/test_values.yaml
           else
             echo updating dev values for CIs
-            sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/dev_values.yaml
+            sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/dev_values.yaml
           fi
          
 

@@ -155,7 +155,7 @@ jobs:
 
           ls -A gitops/
           # Navigate to the directory containing your Helm values file for the environment develop -> DEV, test -> test and 
-          cd gitops/charts/server
+          cd deploy
 
           IMAGE="${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }} "
           IMAGE_TAG=$(echo "$IMAGE" | awk -F':' '{print $NF}')

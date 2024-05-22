@@ -400,7 +400,7 @@ namespace StrDss.Service
                 _unitOfWork.CommitTransaction(transaction);
             }
 
-            await _reportRepo.UpdateIsCurrent(report.ProvidingOrganizationId);
+            await _reportRepo.UpdateListingStatus(report.ProvidingOrganizationId);
 
             _unitOfWork.Commit();
         }

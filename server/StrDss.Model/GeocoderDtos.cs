@@ -33,6 +33,7 @@ namespace StrDss.Model
         [JsonConverter(typeof(Int32ToStringJsonConverter))]
         public string CivicNumber { get; set; } = "";
         public string CivicNumberSuffix { get; set; } = "";
+        [JsonConverter(typeof(Int32ToStringJsonConverter))]
         public string StreetName { get; set; } = "";
         public string StreetType { get; set; } = "";
         public string IsStreetTypePrefix { get; set; } = "";

@@ -194,7 +194,7 @@ jobs:
 
           pwd
           # Repackage Helm Chart
-          cd ../charts/gitops/charts         
+          cd ../gitops/charts         
 
           helm package ../../webapi-core/
 

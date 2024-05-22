@@ -46,7 +46,7 @@ export class TopMenuService {
         title: 'Listings',
         disabled: true,
         hidden: true,
-        folderName: '',
+        folderName: 'Listings',
       },
       {
         accessPermission: takedown_action,

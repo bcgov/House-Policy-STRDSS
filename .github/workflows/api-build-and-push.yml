@@ -153,7 +153,7 @@ jobs:
         if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
         run: |
 
-          ls -A gitops/
+          ls -AR gitops/
           # Navigate to the directory containing your Helm values file for the environment develop -> DEV, test -> test and 
           cd gitops/deploy
           # cd gitops/charts/justin-custom-claim-api
@@ -167,7 +167,6 @@ jobs:
           DATETIME=$(date +'%Y-%m-%d %H:%M:%S')  # Get current date and time
           # check if branch is dev update dev_values with sed if branch is test update test value if branch is main update prod values 
           
-          ls -A gitops/deploy
 
           if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
              echo "This is the main branch"

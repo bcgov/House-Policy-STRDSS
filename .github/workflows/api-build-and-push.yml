@@ -160,7 +160,7 @@ jobs:
 
           IMAGE="${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }} "
           IMAGE_TAG=$(echo "$IMAGE" | awk -F':' '{print $NF}')
-
+          echo "Image Tag:"
           echo $IMAGE_TAG
 
           # Update the Helm values file with the new image tag or (SHA)

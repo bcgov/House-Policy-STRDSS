@@ -144,7 +144,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: bcgov-c/tenant-gitops-b0471a
-          ref: emerald
+          ref: develop
           token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
           path: gitops
 

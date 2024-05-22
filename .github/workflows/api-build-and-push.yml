@@ -173,7 +173,6 @@ jobs:
              sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/prod_values.yaml
           elif [[ "$GITHUB_REF" == "refs/heads/emerald" ]]; then
              echo "This is the emerald branch"
-             pwd
              sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/dev_values.yaml
           elif [[ "$GITHUB_REF" == "refs/heads/test" ]]; then
              echo "This is the test branch"
@@ -195,7 +194,7 @@ jobs:
 
           pwd
           # Repackage Helm Chart
-          cd charts          
+          cd ../charts/gitops/charts         
 
           helm package ../../webapi-core/
 

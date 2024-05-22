@@ -444,7 +444,7 @@ namespace StrDss.Service
 
             tran.Commit();
 
-            return false;
+            return systemError.IsEmpty();
         }
 
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid, string systemError)
@@ -594,7 +594,7 @@ namespace StrDss.Service
 
             foreach(var line in upload.DssUploadLines)
             {
-                if (!line.IsValidationFailure) continue;
+                if (!line.IsValidationFailure && !line.IsSystemFailure) continue;
 
                 contents.AppendLine(line.SourceLineTxt.TrimEndNewLine() + $",\"{line.ErrorTxt}\"");
             }

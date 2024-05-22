@@ -70,7 +70,7 @@ namespace StrDss.Service.HttpClients
             catch (Exception ex)
             {
                 address.MatchScoreAmt = 0;
-                return ex.ToString();
+                return ex.Message;
             }
 
         }

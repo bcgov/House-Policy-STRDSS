@@ -79,6 +79,11 @@ export class LayoutComponent {
     });
 
     this.items?.unshift({
+      label: 'Listings',
+      routerLink: '/listings',
+    });
+
+    this.items?.unshift({
       label: 'Home',
       routerLink: '/',
     });

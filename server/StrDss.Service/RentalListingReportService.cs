@@ -379,7 +379,6 @@ namespace StrDss.Service
                     MessageTemplateDsc = template.GetContent(),
                     IsHostContactedExternally = false,
                     IsSubmitterCcRequired = false,
-                    MessageReasonId = null,
                     LgPhoneNo = null,
                     UnreportedListingNo = null,
                     HostEmailAddressDsc = null,

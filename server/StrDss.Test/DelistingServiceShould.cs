@@ -38,7 +38,6 @@ namespace StrDss.Test
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
 
             configMock.Setup(x => x.GetValue(typeof(string), "")).Returns("https://ches.example.com");
-            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
             // Act
@@ -341,7 +340,6 @@ namespace StrDss.Test
             lg.OrganizationType = OrganizationTypes.LG;
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
 
-            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
 
             // Act
@@ -374,7 +372,6 @@ namespace StrDss.Test
 
             dto.HostEmail = "host@example.com";
 
-            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
 
             // Act
@@ -396,7 +393,6 @@ namespace StrDss.Test
 
             // Act
             await sut.CreateTakedownNoticeAsync(dto);
-            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Assert
             Assert.DoesNotContain(dto.HostEmail, dto.ToList);
@@ -423,7 +419,6 @@ namespace StrDss.Test
             lg.OrganizationType = OrganizationTypes.LG;
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
 
-            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
             // Act
             await sut.CreateTakedownNoticeAsync(dto);

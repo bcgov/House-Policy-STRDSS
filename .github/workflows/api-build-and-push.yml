@@ -187,9 +187,9 @@ jobs:
           git config --global user.email "richand101@github.com"
           git config --global user.name "Rick Anderson"
 
-          git add ../../deploy/dev_values.yaml
-          git add ../../deploy/prod_values.yaml
-          git add ../../deploy/test_values.yaml
+          git add deploy/dev_values.yaml
+          git add deploy/prod_values.yaml
+          git add deploy/test_values.yaml
 
 
           # Repackage Helm Chart

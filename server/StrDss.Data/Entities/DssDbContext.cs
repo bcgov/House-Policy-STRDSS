@@ -17,8 +17,6 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssEmailMessageType> DssEmailMessageTypes { get; set; }
 
-    public virtual DbSet<DssMessageReason> DssMessageReasons { get; set; }
-
     public virtual DbSet<DssOrganization> DssOrganizations { get; set; }
 
     public virtual DbSet<DssOrganizationContactPerson> DssOrganizationContactPeople { get; set; }
@@ -90,6 +88,10 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.ConcernedWithRentalListingId)
                 .HasComment("Foreign key")
                 .HasColumnName("concerned_with_rental_listing_id");
+            entity.Property(e => e.CustomDetailTxt)
+                .HasMaxLength(4000)
+                .HasComment("Free form text that should be included in the message body")
+                .HasColumnName("custom_detail_txt");
             entity.Property(e => e.EmailMessageType)
                 .HasMaxLength(50)
                 .HasComment("Foreign key")
@@ -114,6 +116,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsSubmitterCcRequired)
                 .HasComment("Indicates whether the user initiating the message should receive a copy of the email")
                 .HasColumnName("is_submitter_cc_required");
+            entity.Property(e => e.IsWithStandardDetail)
+                .HasComment("Indicates whether message body should include text a block of detail text that is standard for the message type")
+                .HasColumnName("is_with_standard_detail");
             entity.Property(e => e.LgEmailAddressDsc)
                 .HasMaxLength(320)
                 .HasComment("E-mail address of a local government contact (directly entered by the user as a message recipient)")
@@ -129,9 +134,6 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.MessageDeliveryDtm)
                 .HasComment("A timestamp indicating when the message delivery was initiated")
                 .HasColumnName("message_delivery_dtm");
-            entity.Property(e => e.MessageReasonId)
-                .HasComment("Foreign key")
-                .HasColumnName("message_reason_id");
             entity.Property(e => e.MessageTemplateDsc)
                 .HasMaxLength(4000)
                 .HasComment("The full text or template for the message that is sent")
@@ -179,10 +181,6 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.InvolvedInOrganizationId)
                 .HasConstraintName("dss_email_message_fk_involving");
 
-            entity.HasOne(d => d.MessageReason).WithMany(p => p.DssEmailMessages)
-                .HasForeignKey(d => d.MessageReasonId)
-                .HasConstraintName("dss_email_message_fk_justified_by");
-
             entity.HasOne(d => d.RequestingOrganization).WithMany(p => p.DssEmailMessageRequestingOrganizations)
                 .HasForeignKey(d => d.RequestingOrganizationId)
                 .HasConstraintName("dss_email_message_fk_requested_by");
@@ -204,44 +202,28 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("email_message_type_nm");
         });
 
-        modelBuilder.Entity<DssMessageReason>(entity =>
-        {
-            entity.HasKey(e => e.MessageReasonId).HasName("dss_message_reason_pk");
-
-            entity.ToTable("dss_message_reason", tb => tb.HasComment("A description of the justification for initiating a message"));
-
-            entity.Property(e => e.MessageReasonId)
-                .HasComment("Unique generated key")
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("message_reason_id");
-            entity.Property(e => e.EmailMessageType)
-                .HasMaxLength(50)
-                .HasComment("Foreign key")
-                .HasColumnName("email_message_type");
-            entity.Property(e => e.MessageReasonDsc)
-                .HasMaxLength(250)
-                .HasComment("A description of the justification for initiating a message")
-                .HasColumnName("message_reason_dsc");
-
-            entity.HasOne(d => d.EmailMessageTypeNavigation).WithMany(p => p.DssMessageReasons)
-                .HasForeignKey(d => d.EmailMessageType)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("dss_message_reason_fk_justifying");
-        });
-
         modelBuilder.Entity<DssOrganization>(entity =>
         {
             entity.HasKey(e => e.OrganizationId).HasName("dss_organization_pk");
 
-            entity.ToTable("dss_organization", tb => tb.HasComment("A private company or governing body that plays a role in short term rental reporting or enforcement"));
+            entity.ToTable("dss_organization", tb => tb.HasComment("A private company or governing body component that plays a role in short term rental reporting or enforcement"));
 
             entity.Property(e => e.OrganizationId)
                 .HasComment("Unique generated key")
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("organization_id");
-            entity.Property(e => e.LocalGovernmentGeometry)
-                .HasComment("the shape identifying the boundaries of a local government")
-                .HasColumnName("local_government_geometry");
+            entity.Property(e => e.AreaGeometry)
+                .HasComment("the multipolygon shape identifying the boundaries of a local government subdivision")
+                .HasColumnName("area_geometry");
+            entity.Property(e => e.IsBusinessLicenceRequired)
+                .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION requires a business licence for Short Term Rental operation")
+                .HasColumnName("is_business_licence_required");
+            entity.Property(e => e.IsLgParticipating)
+                .HasComment("Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing")
+                .HasColumnName("is_lg_participating");
+            entity.Property(e => e.IsPrincipalResidenceRequired)
+                .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions")
+                .HasColumnName("is_principal_residence_required");
             entity.Property(e => e.ManagingOrganizationId)
                 .HasComment("Self-referential hierarchical foreign key")
                 .HasColumnName("managing_organization_id");
@@ -463,14 +445,20 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IncludingRentalListingReportId)
                 .HasComment("Foreign key")
                 .HasColumnName("including_rental_listing_report_id");
+            entity.Property(e => e.IsActive)
+                .HasComment("Indicates whether a CURRENT RENTAL LISTING was included in the most recent RENTAL LISTING REPORT")
+                .HasColumnName("is_active");
             entity.Property(e => e.IsCurrent)
-                .HasComment("Indicates whether the listing version is the most current one (within the same listing number for the same offering platform)")
+                .HasComment("Indicates whether the RENTAL LISTING VERSION is a CURRENT RENTAL LISTING (if it is a copy of the most current REPORTED RENTAL LISTING (having the same listing number for the same offering platform)")
                 .HasColumnName("is_current");
             entity.Property(e => e.IsEntireUnit)
                 .HasComment("Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)")
                 .HasColumnName("is_entire_unit");
+            entity.Property(e => e.IsNew)
+                .HasComment("Indicates whether a CURRENT RENTAL LISTING appeared for the first time in the last reporting period")
+                .HasColumnName("is_new");
             entity.Property(e => e.IsTakenDown)
-                .HasComment("Indicates whether a current listing is no longer considered active")
+                .HasComment("Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform")
                 .HasColumnName("is_taken_down");
             entity.Property(e => e.LocatingPhysicalAddressId)
                 .HasComment("Foreign key")

@@ -1,4 +1,4 @@
-/* STR DSS Sprint 5 Mandatory Data Seeding */
+/* STR DSS Sprint 6 Mandatory Data Seeding */
 
 MERGE INTO dss_access_request_status AS tgt
 USING ( SELECT * FROM (VALUES

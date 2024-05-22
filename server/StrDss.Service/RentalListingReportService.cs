@@ -400,6 +400,10 @@ namespace StrDss.Service
 
                 _unitOfWork.CommitTransaction(transaction);
             }
+
+            await _reportRepo.UpdateIsCurrent(report.ProvidingOrganizationId);
+
+            _unitOfWork.Commit();
         }
 
         private async Task<bool> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)
@@ -557,6 +561,14 @@ namespace StrDss.Service
             var upload = await _uploadRepo.GetRentalListingErrorLines(uploadId);
 
             if (upload == null) return null;
+
+            if (_currentUser.OrganizationType == OrganizationTypes.Platform)
+            {
+                if (upload.ProvidingOrganizationId != _currentUser.OrganizationId)
+                {
+                    return null;
+                }
+            }                
 
             var memoryStream = new MemoryStream(upload.SourceBin!);
             using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);

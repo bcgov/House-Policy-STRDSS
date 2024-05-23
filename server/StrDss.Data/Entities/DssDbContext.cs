@@ -31,6 +31,8 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssRentalListingReport> DssRentalListingReports { get; set; }
 
+    public virtual DbSet<DssRentalListingVw> DssRentalListingVws { get; set; }
+
     public virtual DbSet<DssRentalUploadHistoryView> DssRentalUploadHistoryViews { get; set; }
 
     public virtual DbSet<DssUploadDelivery> DssUploadDeliveries { get; set; }
@@ -591,6 +593,83 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.ProvidingOrganizationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_rental_listing_report_fk_provided_by");
+        });
+
+        modelBuilder.Entity<DssRentalListingVw>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("dss_rental_listing_vw");
+
+            entity.Property(e => e.AddressSort1ProvinceCd)
+                .HasMaxLength(5)
+                .HasColumnName("address_sort_1_province_cd");
+            entity.Property(e => e.AddressSort2LocalityNm)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_2_locality_nm");
+            entity.Property(e => e.AddressSort3LocalityTypeDsc)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_3_locality_type_dsc");
+            entity.Property(e => e.AddressSort4StreetNm)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_4_street_nm");
+            entity.Property(e => e.AddressSort5StreetTypeDsc)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_5_street_type_dsc");
+            entity.Property(e => e.AddressSort6StreetDirectionDsc)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_6_street_direction_dsc");
+            entity.Property(e => e.AddressSort7CivicNo)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_7_civic_no");
+            entity.Property(e => e.AddressSort8UnitNo)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_8_unit_no");
+            entity.Property(e => e.AvailableBedroomsQty).HasColumnName("available_bedrooms_qty");
+            entity.Property(e => e.BcRegistryNo)
+                .HasMaxLength(50)
+                .HasColumnName("bc_registry_no");
+            entity.Property(e => e.BusinessLicenceNo)
+                .HasMaxLength(50)
+                .HasColumnName("business_licence_no");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.IsBusinessLicenceRequired).HasColumnName("is_business_licence_required");
+            entity.Property(e => e.IsEntireUnit).HasColumnName("is_entire_unit");
+            entity.Property(e => e.IsNew).HasColumnName("is_new");
+            entity.Property(e => e.IsPrincipalResidenceRequired).HasColumnName("is_principal_residence_required");
+            entity.Property(e => e.IsTakenDown).HasColumnName("is_taken_down");
+            entity.Property(e => e.LastActionDtm).HasColumnName("last_action_dtm");
+            entity.Property(e => e.LastActionNm)
+                .HasMaxLength(250)
+                .HasColumnName("last_action_nm");
+            entity.Property(e => e.LatestReportPeriodYm).HasColumnName("latest_report_period_ym");
+            entity.Property(e => e.ListingContactNamesTxt).HasColumnName("listing_contact_names_txt");
+            entity.Property(e => e.ListingStatusSortNo).HasColumnName("listing_status_sort_no");
+            entity.Property(e => e.ListingStatusType).HasColumnName("listing_status_type");
+            entity.Property(e => e.ManagingOrganizationId).HasColumnName("managing_organization_id");
+            entity.Property(e => e.ManagingOrganizationNm)
+                .HasMaxLength(250)
+                .HasColumnName("managing_organization_nm");
+            entity.Property(e => e.MatchAddressTxt)
+                .HasMaxLength(250)
+                .HasColumnName("match_address_txt");
+            entity.Property(e => e.MatchScoreAmt).HasColumnName("match_score_amt");
+            entity.Property(e => e.NightsBookedYtdQty).HasColumnName("nights_booked_ytd_qty");
+            entity.Property(e => e.OfferingOrganizationId).HasColumnName("offering_organization_id");
+            entity.Property(e => e.OfferingOrganizationNm)
+                .HasMaxLength(250)
+                .HasColumnName("offering_organization_nm");
+            entity.Property(e => e.OriginalAddressTxt)
+                .HasMaxLength(250)
+                .HasColumnName("original_address_txt");
+            entity.Property(e => e.PlatformListingNo)
+                .HasMaxLength(50)
+                .HasColumnName("platform_listing_no");
+            entity.Property(e => e.PlatformListingUrl)
+                .HasMaxLength(4000)
+                .HasColumnName("platform_listing_url");
+            entity.Property(e => e.RentalListingId).HasColumnName("rental_listing_id");
+            entity.Property(e => e.SeparateReservationsYtdQty).HasColumnName("separate_reservations_ytd_qty");
         });
 
         modelBuilder.Entity<DssRentalUploadHistoryView>(entity =>

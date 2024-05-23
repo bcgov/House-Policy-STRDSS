@@ -15,8 +15,6 @@ namespace StrDss.Service
     public interface IEmailMessageService
     {
         Task<string> SendEmailAsync(EmailContent emailContent);
-        Task<List<DropdownNumDto>> GetMessageReasons(string messageType);
-        Task<DropdownNumDto?> GetMessageReasonByMessageTypeAndId(string messageType, long id);
     }
 
     public class EmailMessageService : ServiceBase, IEmailMessageService
@@ -107,17 +105,5 @@ namespace StrDss.Service
 
             return msgId;
         }
-
-
-        public async Task<List<DropdownNumDto>> GetMessageReasons(string messageType)
-        {
-            return await _emailRepo.GetMessageReasons(messageType);
-        }
-
-        public async Task<DropdownNumDto?> GetMessageReasonByMessageTypeAndId(string messageType, long id)
-        {
-            return await _emailRepo.GetMessageReasonByMessageTypeAndId(messageType, id);
-        }
     }
-
 }

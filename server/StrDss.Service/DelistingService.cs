@@ -173,7 +173,6 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = dto.HostEmailSent,
                 IsSubmitterCcRequired = true,
-                MessageReasonId = null,
                 LgPhoneNo = dto.LgContactPhone,
                 UnreportedListingNo = dto.ListingId,
                 HostEmailAddressDsc = dto.HostEmail,
@@ -334,8 +333,6 @@ namespace StrDss.Service
                 MessageDeliveryDtm = DateTime.UtcNow,
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = false,
-                IsSubmitterCcRequired = dto.SendCopy,
-                MessageReasonId = null,
                 LgPhoneNo = null,
                 UnreportedListingNo = dto.ListingId,
                 HostEmailAddressDsc = null,
@@ -346,7 +343,9 @@ namespace StrDss.Service
                 InitiatingUserIdentityId = _currentUser.Id,
                 AffectedByUserIdentityId = null,
                 InvolvedInOrganizationId = dto.PlatformId,
-                RequestingOrganizationId = lg!.OrganizationId
+                RequestingOrganizationId = lg!.OrganizationId,
+                IsWithStandardDetail = dto.IsWithStandardDetail,
+                CustomDetailTxt = dto.CustomDetailTxt,
             };
 
             await _emailRepo.AddEmailMessage(emailEntity);
@@ -423,7 +422,14 @@ namespace StrDss.Service
             var emails = allEmails.Where(x => x.InvolvedInOrganizationId == platform.OrganizationId).ToList();
 
             var csvRecords = emails.Select(x =>
-                new TakedownRequestCsvRecord { ListingId = x.UnreportedListingNo ?? "", Url = x.UnreportedListingUrl ?? "", RequestedBy = x.RequestingOrganization?.OrganizationNm ?? "" })
+                new TakedownRequestCsvRecord 
+                { 
+                    ListingId = x.UnreportedListingNo ?? "", 
+                    Url = x.UnreportedListingUrl ?? "", 
+                    RequestedBy = x.RequestingOrganization?.OrganizationNm ?? "",
+                    TakedownRequest = (x.IsWithStandardDetail ?? false) ? "Remove the listing from the platform, do not allow transactions for payments associated with the listing, and cancel all booking associated with the listing." : "",
+                    TakedownRequestDetail = x.CustomDetailTxt ?? ""
+                })
                 .ToList();
 
             var content = CsvHelperUtils.GetBase64CsvString(csvRecords);
@@ -451,7 +457,6 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName} ({csvRecords.Count})",
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
-                MessageReasonId = null,
                 LgPhoneNo = null,
                 UnreportedListingNo = null,
                 HostEmailAddressDsc = null,
@@ -521,7 +526,6 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName}",
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
-                MessageReasonId = null,
                 LgPhoneNo = null,
                 UnreportedListingNo = null,
                 HostEmailAddressDsc = null,
@@ -617,7 +621,6 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName}",
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
-                MessageReasonId = null,
                 LgPhoneNo = null,
                 UnreportedListingNo = null,
                 HostEmailAddressDsc = null,

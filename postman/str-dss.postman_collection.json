@@ -44,26 +44,6 @@
 			"response": []
 		},
 		{
-			"name": "GetReqeustReasonDrowdown",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/api/delisting/reasons/dropdown",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"delisting",
-						"reasons",
-						"dropdown"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "CreateTakedownNotice",
 			"request": {
 				"method": "POST",
@@ -127,7 +107,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": \"1\",\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ]\r\n}",
+					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": \"1\",\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"isWithStandardDetail\": true,\r\n  \"customDetailTxt\": \"Please remove it\",\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -638,7 +618,7 @@
 						{
 							"key": "File",
 							"type": "file",
-							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/listing-valid-2024-04-04.csv"
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/listing-valid-2024-04.csv"
 						}
 					]
 				},
@@ -694,7 +674,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistingreports/uploads/17/errorfile",
+					"raw": "{{host}}/api/rentallistingreports/uploads/19/errorfile",
 					"host": [
 						"{{host}}"
 					],
@@ -702,7 +682,7 @@
 						"api",
 						"rentallistingreports",
 						"uploads",
-						"17",
+						"19",
 						"errorfile"
 					]
 				}

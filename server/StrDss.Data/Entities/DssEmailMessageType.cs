@@ -20,7 +20,5 @@ public partial class DssEmailMessageType
 
     public virtual ICollection<DssEmailMessage> DssEmailMessages { get; set; } = new List<DssEmailMessage>();
 
-    public virtual ICollection<DssMessageReason> DssMessageReasons { get; set; } = new List<DssMessageReason>();
-
     public virtual ICollection<DssOrganizationContactPerson> DssOrganizationContactPeople { get; set; } = new List<DssOrganizationContactPerson>();
 }

@@ -167,6 +167,7 @@
         public const string BCGov = "BCGov";
         public const string Platform = "Platform";
         public const string LG = "LG";
+        public const string LGSub = "LGSub";
     }
 
     public static class Roles

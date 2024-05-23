@@ -3,7 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validator
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
-import { CheckboxModule } from 'primeng/checkbox';
+import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { CommonModule } from '@angular/common';
 import { ChipsModule } from 'primeng/chips';
 import { DelistingService } from '../../../common/services/delisting.service';
@@ -64,6 +64,12 @@ export class DelistingRequestComponent implements OnInit {
   }
   public get ccListControl(): AbstractControl {
     return this.myForm.controls['ccList'];
+  }
+  public get isWithStandardDetailControl(): AbstractControl {
+    return this.myForm.controls['isWithStandardDetail'];
+  }
+  public get customDetailTxtControl(): AbstractControl {
+    return this.myForm.controls['customDetailTxt'];
   }
 
   constructor(private fb: FormBuilder, private delistingService: DelistingService, private router: Router) { }
@@ -131,6 +137,16 @@ export class DelistingRequestComponent implements OnInit {
     this.messages = [{ severity: 'success', summary: '', detail: 'Your Takedown Request was Successfully Submitted!' }];
   }
 
+  onWithStandardDetailChanged(value: CheckboxChangeEvent): void {
+    if (value.checked)
+      this.customDetailTxtControl.removeValidators([Validators.required]);
+    else
+      this.customDetailTxtControl.addValidators([Validators.required]);
+
+    this.customDetailTxtControl.updateValueAndValidity();
+    this.myForm.updateValueAndValidity();
+  }
+
   private prepareFormModel(form: FormGroup): DelistingRequest {
     const model: DelistingRequest = Object.assign({}, form.value);
     model.ccList = form.value['ccList'].prototype === Array
@@ -147,6 +163,8 @@ export class DelistingRequestComponent implements OnInit {
       listingUrl: ['', [Validators.required, validateUrl()]],
       sendCopy: [true],
       ccList: ['', validateEmailListString()],
+      isWithStandardDetail: [true],
+      customDetailTxt: [''],
     });
   }
 

@@ -39,3 +39,5 @@ left join dss_organization lg on lgs.managing_organization_id=lg.organization_id
 LEFT JOIN dss_email_message dem on dem.concerned_with_rental_listing_id=drl.rental_listing_id
 LEFT JOIN dss_email_message_type demt on dem.email_message_type=demt.email_message_type
 where drl.including_rental_listing_report_id is null;
+
+select * from dss_rental_listing_vw;

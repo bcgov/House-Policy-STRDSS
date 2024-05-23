@@ -1,4 +1,4 @@
-select drl.rental_listing_id
+CREATE OR REPLACE VIEW dss_rental_listing_vw AS select drl.rental_listing_id
 	, case drl.is_taken_down when 'Y' then 'R' else 'A' end as listing_status_type
 	, (select max(drlr.report_period_ym)
 		from dss_rental_listing drl2
@@ -39,5 +39,3 @@ left join dss_organization lg on lgs.managing_organization_id=lg.organization_id
 LEFT JOIN dss_email_message dem on dem.concerned_with_rental_listing_id=drl.rental_listing_id
 LEFT JOIN dss_email_message_type demt on dem.email_message_type=demt.email_message_type
 where drl.including_rental_listing_report_id is null;
-
-select * from dss_rental_listing_vw;

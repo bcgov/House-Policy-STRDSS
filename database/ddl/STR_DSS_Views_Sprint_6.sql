@@ -1,10 +1,19 @@
+drop view if exists dss_rental_listing_vw;
+
 CREATE OR REPLACE VIEW dss_rental_listing_vw AS select drl.rental_listing_id
-	, case drl.is_taken_down when 'Y' then 'R' else 'A' end as listing_status_type
+	, CASE
+		when drl.is_taken_down then 'R'
+		when drl.is_new        then 'N'
+		when drl.is_active     then 'A'
+		else 'I'
+		end as listing_status_type
 	, (select max(drlr.report_period_ym)
 		from dss_rental_listing drl2
 		join dss_rental_listing_report drlr on drlr.rental_listing_report_id=drl2.including_rental_listing_report_id
 		where drl2.offering_organization_id=drl.offering_organization_id and drl2.platform_listing_no=drl.platform_listing_no
 		) as latest_report_period_ym
+	, drl.is_active
+	, drl.is_new
 	, drl.is_taken_down
 	, drl.offering_organization_id
 	, org.organization_nm as offering_organization_nm
@@ -23,6 +32,8 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS select drl.rental_listing_id
 	, dpa.unit_no as address_sort_8_unit_no
 	, lgs.managing_organization_id
 	, lg.organization_nm as managing_organization_nm
+	, lgs.is_principal_residence_required
+	, lgs.is_business_licence_required
 	, drl.is_entire_unit
 	, drl.available_bedrooms_qty
 	, (select sum(drl2.nights_booked_qty) from dss_rental_listing drl2 where drl2.offering_organization_id=drl.offering_organization_id and drl2.platform_listing_no=drl.platform_listing_no) as nights_booked_ytd_qty

@@ -4,4 +4,6 @@ export interface DelistingRequest {
     listingUrl: string;
     sendCopy: boolean;
     ccList: Array<string>;
+    isWithStandardDetail: boolean;
+    customDetailTxt: string;
 }

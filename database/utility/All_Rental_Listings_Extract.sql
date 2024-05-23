@@ -5,6 +5,12 @@ select drl.rental_listing_id
 		when drl.is_active     then 'A'
 		else 'I'
 		end as listing_status_type
+	, CASE
+		when drl.is_taken_down then 4
+		when drl.is_new        then 1
+		when drl.is_active     then 2
+		else 3
+		end as listing_status_sort_no
 	, (select max(drlr.report_period_ym)
 		from dss_rental_listing drl2
 		join dss_rental_listing_report drlr on drlr.rental_listing_report_id=drl2.including_rental_listing_report_id
@@ -28,6 +34,7 @@ select drl.rental_listing_id
 	, dpa.street_direction_dsc as address_sort_6_street_direction_dsc
 	, dpa.civic_no as address_sort_7_civic_no
 	, dpa.unit_no as address_sort_8_unit_no
+	, (select string_agg(full_nm,' ; ') from dss_rental_listing_contact drlc where drlc.contacted_through_rental_listing_id=drl.rental_listing_id) as listing_contact_names_txt
 	, lgs.managing_organization_id
 	, lg.organization_nm as managing_organization_nm
 	, lgs.is_principal_residence_required

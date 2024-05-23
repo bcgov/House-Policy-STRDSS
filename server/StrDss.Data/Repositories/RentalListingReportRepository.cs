@@ -18,7 +18,7 @@ namespace StrDss.Data.Repositories
         void DeleteListingContacts(long listingId);
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
-        Task UpdateIsCurrent(long providingPlatformId);
+        Task UpdateListingStatus(long providingPlatformId);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
     {
@@ -93,7 +93,7 @@ namespace StrDss.Data.Repositories
                 .FirstOrDefaultAsync(x => x.UploadDeliveryId == deliveryId);
         }
 
-        public async Task UpdateIsCurrent(long providingPlatformId)
+        public async Task UpdateListingStatus(long providingPlatformId)
         {
             var latestPeriodYm = _dbSet.AsNoTracking()
                 .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
@@ -107,7 +107,12 @@ namespace StrDss.Data.Repositories
 
             foreach (var listing in masterListings)
             {
-                listing.IsCurrent = listing.DerivedFromRentalListing!.IncludingRentalListingReport!.ReportPeriodYm == latestPeriodYm;
+                var isActive = listing.DerivedFromRentalListing!.IncludingRentalListingReport!.ReportPeriodYm == latestPeriodYm;
+                var count = _dbContext.DssRentalListings
+                    .Count(x => x.OfferingOrganizationId == listing.OfferingOrganizationId && x.PlatformListingNo == listing.PlatformListingNo && x.DerivedFromRentalListing == null);
+
+                listing.IsActive = isActive;
+                listing.IsNew = isActive && count == 1;
             }
         }
     }

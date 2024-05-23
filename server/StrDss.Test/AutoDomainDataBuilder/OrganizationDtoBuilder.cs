@@ -32,7 +32,7 @@ namespace StrDss.Test.AutoDomainDataBuilder
                     return "PLATFORMTEST";
                 case nameof(OrganizationDto.OrganizationNm):
                     return "Test Platform";
-                case nameof(OrganizationDto.LocalGovernmentGeometry):
+                case nameof(OrganizationDto.AreaGeometry):
                     return null!;
                 case nameof(OrganizationDto.ManagingOrganizationId):
                     return null!;

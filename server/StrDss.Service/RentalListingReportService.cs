@@ -379,7 +379,6 @@ namespace StrDss.Service
                     MessageTemplateDsc = template.GetContent(),
                     IsHostContactedExternally = false,
                     IsSubmitterCcRequired = false,
-                    MessageReasonId = null,
                     LgPhoneNo = null,
                     UnreportedListingNo = null,
                     HostEmailAddressDsc = null,
@@ -401,7 +400,7 @@ namespace StrDss.Service
                 _unitOfWork.CommitTransaction(transaction);
             }
 
-            await _reportRepo.UpdateIsCurrent(report.ProvidingOrganizationId);
+            await _reportRepo.UpdateListingStatus(report.ProvidingOrganizationId);
 
             _unitOfWork.Commit();
         }
@@ -413,7 +412,7 @@ namespace StrDss.Service
 
             if (errors.Count > 0)
             {
-                SaveUploadLine(uploadLine, errors, true);
+                SaveUploadLine(uploadLine, errors, true, "");
                 _unitOfWork.Commit();
                 return true;
             }
@@ -426,11 +425,11 @@ namespace StrDss.Service
 
             AddContacts(listing, row);
 
-            var physicalAddress = await CreateOrGetPhysicalAddress(listing, row);
+            var (physicalAddress, systemError) = await CreateOrGetPhysicalAddress(listing, row);
 
             listing.LocatingPhysicalAddress = physicalAddress;
 
-            SaveUploadLine(uploadLine, errors, false);
+            SaveUploadLine(uploadLine, errors, false, systemError);
 
             _unitOfWork.Commit();
 
@@ -445,13 +444,20 @@ namespace StrDss.Service
 
             tran.Commit();
 
-            return false;
+            return systemError.IsEmpty();
         }
 
-        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid)
+        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid, string systemError)
         {
             uploadLine.IsValidationFailure = isValid;
             uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
+
+            uploadLine.IsSystemFailure = systemError.IsNotEmpty();
+            if (uploadLine.IsSystemFailure)
+            {
+                uploadLine.ErrorTxt = systemError;
+            }
+
             uploadLine.IsProcessed = true;
         }
 
@@ -476,12 +482,13 @@ namespace StrDss.Service
             return listing;
         }
 
-        private async Task<DssPhysicalAddress> CreateOrGetPhysicalAddress(DssRentalListing listing, RentalListingRowUntyped row)
+        private async Task<(DssPhysicalAddress, string)> CreateOrGetPhysicalAddress(DssRentalListing listing, RentalListingRowUntyped row)
         {
             var address = row.RentalAddress;
 
             var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, address);
 
+            var error = "";
             if (physicalAddress == null)
             {
                 physicalAddress = new DssPhysicalAddress
@@ -489,12 +496,12 @@ namespace StrDss.Service
                     OriginalAddressTxt = row.RentalAddress,
                 };
 
-                await _geocoder.GetAddressAsync(physicalAddress);
+                error = await _geocoder.GetAddressAsync(physicalAddress);
 
                 await _addressRepo.AddPhysicalAddressAsync(physicalAddress);
             }
 
-            return physicalAddress;
+            return (physicalAddress, error);
         }
 
         private async Task<(bool needUpdate, DssRentalListing masterListing)> CreateOrUpdateMasterListing(DateOnly reportPeriodYm, DssRentalListing listing, OrganizationDto offeringOrg, RentalListingRowUntyped row, DssPhysicalAddress physicalAddress)
@@ -587,7 +594,7 @@ namespace StrDss.Service
 
             foreach(var line in upload.DssUploadLines)
             {
-                if (!line.IsValidationFailure) continue;
+                if (!line.IsValidationFailure && !line.IsSystemFailure) continue;
 
                 contents.AppendLine(line.SourceLineTxt.TrimEndNewLine() + $",\"{line.ErrorTxt}\"");
             }

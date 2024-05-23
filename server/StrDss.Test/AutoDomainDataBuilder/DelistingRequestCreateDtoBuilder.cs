@@ -30,13 +30,8 @@ namespace StrDss.Test.AutoDomainDataBuilder
                     return 1;
                 case nameof(TakedownRequestCreateDto.ListingUrl):
                     return "https://example.com/listing";
-
-                case nameof(TakedownRequestCreateDto.SendCopy):
-                    return true;
-
                 case nameof(TakedownRequestCreateDto.CcList):
                     return new List<string> { "cc1@example.com", "cc2@example.com" };
-
                 default:
                     return new NoSpecimen();
             }

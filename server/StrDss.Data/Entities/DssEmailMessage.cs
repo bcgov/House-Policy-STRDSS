@@ -104,11 +104,6 @@ public partial class DssEmailMessage
     public long? RequestingOrganizationId { get; set; }
 
     /// <summary>
-    /// Foreign key
-    /// </summary>
-    public long? MessageReasonId { get; set; }
-
-    /// <summary>
     /// External identifier for tracking the message delivery progress
     /// </summary>
     public string? ExternalMessageNo { get; set; }
@@ -123,6 +118,16 @@ public partial class DssEmailMessage
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
 
+    /// <summary>
+    /// Indicates whether message body should include text a block of detail text that is standard for the message type
+    /// </summary>
+    public bool? IsWithStandardDetail { get; set; }
+
+    /// <summary>
+    /// Free form text that should be included in the message body
+    /// </summary>
+    public string? CustomDetailTxt { get; set; }
+
     public virtual DssUserIdentity? AffectedByUserIdentity { get; set; }
 
     public virtual DssEmailMessage? BatchingEmailMessage { get; set; }
@@ -136,8 +141,6 @@ public partial class DssEmailMessage
     public virtual ICollection<DssEmailMessage> InverseBatchingEmailMessage { get; set; } = new List<DssEmailMessage>();
 
     public virtual DssOrganization? InvolvedInOrganization { get; set; }
-
-    public virtual DssMessageReason? MessageReason { get; set; }
 
     public virtual DssOrganization? RequestingOrganization { get; set; }
 }

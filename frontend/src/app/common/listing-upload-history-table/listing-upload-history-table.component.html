@@ -114,7 +114,6 @@
     <div *ngIf="isSmall; then smallTable; else bigTable">
     </div>
 
-
     <ng-template #smallTable>
         <div class="view-more-history-btn-container">
             <button [routerLink]="'/upload-listing-history'" pButton id="view-more-history-btn"
@@ -124,9 +123,9 @@
     </ng-template>
 
     <ng-template #bigTable>
-        <p-paginator class="users-paginator" #paginator *ngIf="currentPage" (onPageChange)="onPageChange($event)"
-            [rows]="10" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
-            [showCurrentPageReport]="true" [showFirstLastIcon]="false"
+        <p-paginator class="upload-history-paginator" #paginator *ngIf="currentPage"
+            (onPageChange)="onPageChange($event)" [rows]="10" [totalRecords]="currentPage.totalCount || 0"
+            [showPageLinks]="false" [showCurrentPageReport]="true" [showFirstLastIcon]="false"
             [currentPageReportTemplate]="'Rows per page: 10 &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
     </ng-template>
 

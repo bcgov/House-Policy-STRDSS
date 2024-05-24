@@ -100,8 +100,9 @@ namespace StrDss.Api.Authentication
                             }
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        _logger.LogError($"BCeID Web call failed - {ex.Message}", ex);
                         _logger.LogInformation("BCeID Web call failed - Skipping UpdateBceidUserInfo ");
                     }
                 }

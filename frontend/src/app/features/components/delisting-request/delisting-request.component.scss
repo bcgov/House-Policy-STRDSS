@@ -16,6 +16,10 @@
         margin-bottom: 18px;
     }
 
+    h4 {
+        font-weight: 600;
+    }
+
     .form-group-row {
         width: 100%;
 
@@ -27,6 +31,7 @@
 
         label {
             line-height: 26px;
+            width: 760px;
         }
 
         &.form-spacer {
@@ -41,6 +46,26 @@
 
             &:last-of-type {
                 margin-right: 0;
+            }
+        }
+
+        textarea.customDetail-txa {
+            width: 760px;
+
+            &::placeholder {
+                font-style: italic;
+            }
+        }
+
+        .limit-text {
+            display: block;
+
+            &.almost-limit-text {
+                color: #FCBA19;
+            }
+
+            &.limited-text {
+                color: #CC0000;
             }
         }
 
@@ -60,8 +85,15 @@
             font-size: 16px;
 
             &.has-checkbox {
+                display: flex;
+                align-items: start;
+
                 :first-child {
                     margin-right: 8px;
+                }
+
+                label {
+                    width: 750px;
                 }
 
                 padding-bottom: 16px;

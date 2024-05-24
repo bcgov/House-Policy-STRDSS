@@ -228,7 +228,7 @@ namespace StrDss.Service
                 }
             }
 
-            var validOrgCds = await _orgRepo.GetManagingOrgCdsAsync(orgId);
+            var validOrgCds = (await _orgRepo.GetManagingOrgCdsAsync(orgId)).Select(x => x.ToUpper());
 
             foreach (var org in orgCds)
             {

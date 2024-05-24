@@ -1,12 +1,13 @@
 <div class="top-block">
     <h2 class="title">Listings</h2>
     <div class="search-container">
-        <p-dropdown [options]="searchColumns" id="search-by-drd" [(ngModel)]="searchColumn"
-            class="search-by-select"></p-dropdown>
+        <p-dropdown [disabled]="isNotImplemented" [options]="searchColumns" id="search-by-drd"
+            [(ngModel)]="searchColumn" class="search-by-select"></p-dropdown>
         <span class="p-input-icon-right search-input-container">
-            <button pButton id="search-submit-btn" (click)="onSearch()"> <i class="pi pi-search"></i></button>
-            <input type="text" id="search-term-inp" class="search-input" placeholder="Search" pInputText
-                [(ngModel)]="searchTerm" />
+            <button [disabled]="isNotImplemented" pButton id="search-submit-btn" (click)="onSearch()"> <i
+                    class="pi pi-search"></i></button>
+            <input [disabled]="isNotImplemented" type="text" id="search-term-inp" class="search-input"
+                placeholder="Search" pInputText [(ngModel)]="searchTerm" />
         </span>
     </div>
     <div class="legend-container">
@@ -16,8 +17,10 @@
     </div>
 </div>
 <div class="actions" *ngIf="!isCEU">
-    <button pButton [disabled]="!selectedListings.length" id="send_delisting_notice_btn">Send Delisting Notice</button>
-    <button pButton [disabled]="!selectedListings.length" id="send_takedown_request_btn">Send Takedown Request</button>
+    <button pButton [disabled]="!selectedListings.length || isNotImplemented" id="send_delisting_notice_btn">Send
+        Delisting Notice</button>
+    <button pButton [disabled]="!selectedListings.length || isNotImplemented" id="send_takedown_request_btn">Send
+        Takedown Request</button>
 </div>
 <div class="content">
 

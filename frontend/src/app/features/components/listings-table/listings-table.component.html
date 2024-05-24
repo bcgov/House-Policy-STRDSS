@@ -26,7 +26,8 @@
 
     <p-panel class="listing-table-panel">
         <ng-template pTemplate="header">
-            <span class="panel-header-small">{{listingsSummary}}</span></ng-template>
+            <span class="panel-header-small" *ngIf="currentPage">Showing {{currentPage.pageSize || 25}} of
+                {{currentPage.totalCount || 0}} listings</span></ng-template>
 
         <p-table [value]="listings" [scrollable]="true" scrollHeight="{{isCEU?'500px':'450px'}}"
             [(selection)]="selectedListings" styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }">
@@ -37,87 +38,92 @@
                         <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                     </th>
                     <th class="sortable-header" id="status_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'status'" (click)="onSort('status')">Status
+                        [class.sorted]="this.sort && this.sort.prop === 'listingStatusType'"
+                        (click)="onSort('listingStatusType')">Status
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'status' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'listingStatusType' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'status' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'listingStatusType' && this.sort.dir === 'asc'"></i>
                     </th>
 
                     <th class="sortable-header" id="platformName_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'platformName'"
-                        (click)="onSort('platformName')">Platform
+                        [class.sorted]="this.sort && this.sort.prop === 'offeringOrganizationNm'"
+                        (click)="onSort('offeringOrganizationNm')">Platform
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'platformName' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'offeringOrganizationNm' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'platformName' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'offeringOrganizationNm' && this.sort.dir === 'asc'"></i>
                     </th>
 
                     <th class="sortable-header" id="listingId_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'listingId'" (click)="onSort('listingId')">
+                        [class.sorted]="this.sort && this.sort.prop === 'platformListingNo'"
+                        (click)="onSort('platformListingNo')">
                         Listing ID
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'listingId' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'listingId' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'asc'"></i>
                     </th>
 
                     <th>Listing Details</th>
 
                     <th class="sortable-header" id="addressNormalized_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'addressNormalized'"
-                        (click)="onSort('addressNormalized')">Address (Best Match)
+                        [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"
+                        (click)="onSort('matchAddressTxt')">Address (Best Match)
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'addressNormalized' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'addressNormalized' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'asc'"></i>
                     </th>
 
                     <th class="sortable-header" id="entireUnit_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'entireUnit'" (click)="onSort('entireUnit')">
+                        [class.sorted]="this.sort && this.sort.prop === 'isEntireUnit'"
+                        (click)="onSort('isEntireUnit')">
                         Entire Unit?
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'entireUnit' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'isEntireUnit' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'entireUnit' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'isEntireUnit' && this.sort.dir === 'asc'"></i>
                     </th>
 
                     <th class="sortable-header" id="nightsStayed_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'nightsStayed'"
-                        (click)="onSort('nightsStayed')">Nights Stayed (YTD)
+                        [class.sorted]="this.sort && this.sort.prop === 'nightsBookedYtdQty'"
+                        (click)="onSort('nightsBookedYtdQty')">Nights Stayed (YTD)
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'nightsStayed' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'nightsBookedYtdQty' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'nightsStayed' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'nightsBookedYtdQty' && this.sort.dir === 'asc'"></i>
                     </th>
 
                     <th class="sortable-header" id="license_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'license'" (click)="onSort('license')">Business
+                        [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNo'"
+                        (click)="onSort('businessLicenceNo')">Business
                         Licence
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'license' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'businessLicenceNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'license' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'businessLicenceNo' && this.sort.dir === 'asc'"></i>
                     </th>
 
                     <th class="sortable-header" id="lastAction_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'lastAction'" (click)="onSort('lastAction')">
+                        [class.sorted]="this.sort && this.sort.prop === 'lastActionNm'"
+                        (click)="onSort('lastActionNm')">
                         Last
                         Action
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'lastAction' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'lastActionNm' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'lastAction' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'lastActionNm' && this.sort.dir === 'asc'"></i>
                     </th>
 
                     <th class="sortable-header" id="lastActionDate_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'lastActionDate'"
-                        (click)="onSort('lastActionDate')">
+                        [class.sorted]="this.sort && this.sort.prop === 'lastActionDtm'"
+                        (click)="onSort('lastActionDtm')">
                         Last Action Date
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'lastActionDate' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'lastActionDtm' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'lastActionDate' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'lastActionDtm' && this.sort.dir === 'asc'"></i>
                     </th>
                 </tr>
             </ng-template>
@@ -127,30 +133,32 @@
                     <td>
                         <p-tableCheckbox [value]="row"></p-tableCheckbox>
                     </td>
-                    <td [ngSwitch]="row.status" class="align-center">
-                        <div *ngSwitchCase="'new'" class="status-circle status-new">
+                    <td [ngSwitch]="row.listingStatusType" class="align-center">
+                        <div *ngSwitchCase="'N'" class="status-circle status-new">
                             N
                         </div>
-                        <div *ngSwitchCase="'active'" class="status-circle status-active">
+                        <div *ngSwitchCase="'A'" class="status-circle status-active">
                             A
                         </div>
-                        <div *ngSwitchCase="'inactive'" class="status-circle status-inactive">
+                        <div *ngSwitchCase="'I'" class="status-circle status-inactive">
                             I
                         </div>
-                        <div *ngSwitchCase="'removed'" class="status-circle status-removed">
+                        <div *ngSwitchCase="'R'" class="status-circle status-removed">
                             R
                         </div>
                     </td>
-                    <td>{{ row.platformName }}</td>
-                    <td>{{ row.listingId }}</td>
+                    <td>{{ row.offeringOrganizationNm }}</td>
+                    <td>
+                        <a target="_blank" [href]="row.platformListingUrl">{{ row.platformListingNo }}</a>
+                    </td>
                     <td class="align-center"><button pButton class="details-button-with-icon" [disabled]="true"><i
                                 class="pi pi-list"></i></button></td>
-                    <td>{{ row.addressNormalized }}</td>
-                    <td>{{ row.entireUnit?'Yes':'No' }}</td>
-                    <td>{{ row.nightsStayed }}</td>
-                    <td>{{ row.license }}</td>
-                    <td>{{ row.lastAction }}</td>
-                    <td>{{ row.lastActionDate |date }}</td>
+                    <td>{{ row.matchAddressTxt }}</td>
+                    <td>{{ row.isEntireUnit?'Yes':'No' }}</td>
+                    <td>{{ row.nightsBookedYtdQty }}</td>
+                    <td>{{ row.businessLicenceNo }}</td>
+                    <td>{{ row.lastActionNm }}</td>
+                    <td>{{ row.lastActionDtm |date }}</td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
@@ -159,10 +167,11 @@
                 </tr>
             </ng-template>
         </p-table>
-        <p-paginator class="listings-paginator" #paginator *ngIf="currentPage" (onPageChange)="onPageChange($event)"
-            [rows]="10" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
+        <p-paginator class="listings-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
+            [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
             [showCurrentPageReport]="true" [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
             [currentPageReportTemplate]="'Rows per page: 10 &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
+
     </p-panel>
 
     <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">

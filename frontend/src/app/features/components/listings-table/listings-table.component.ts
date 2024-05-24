@@ -34,33 +34,26 @@ import { ceu_action } from '../../../common/consts/permissions.const';
   styleUrl: './listings-table.component.scss'
 })
 export class ListingsTableComponent implements OnInit {
-  listingsSummary = 'Showing 4096 Out of 4096 Listings'
   selectedListings = []
   listings = new Array<ListingTableRow>();
   sort!: { prop: string, dir: 'asc' | 'desc' }
   currentPage!: PagingResponsePageInfo;
   searchTerm!: string;
-  searchColumn: '' | 'platformName' | 'listingId' | 'addressNormalized' | 'nightsStayed' | 'license' = '';
+  searchColumn: '' | 'offeringOrganizationNm' | 'platformListingNo' | 'matchAddressTxt' | 'nightsBookedYtdQty' | 'businessLicenceNo' = '';
   searchColumns = new Array<DropdownOption>();
   isCEU = false;
   isLegendShown = false;
+
   // MOCK: 
   isNotImplemented = true;
 
   constructor(private listingService: ListingDataService, private userService: UserDataService) { }
 
   ngOnInit(): void {
-    this.searchColumns = [
-      { label: 'All Categories', value: '' },
-      { label: 'Platform', value: 'platformName' },
-      { label: 'Listing Id', value: 'listingId' },
-      { label: 'Address', value: 'addressNormalized' },
-      { label: 'Nights Stayed', value: 'nightsStayed' },
-      { label: 'Business Licence', value: 'license' },
-    ]
+
     this.userService.getCurrentUser().subscribe({
       next: (currentUser: User) => {
-        // this.isCEU = currentUser.permissions.includes(ceu_action);
+        this.isCEU = currentUser.permissions.includes(ceu_action);
         this.getListings(1);
       }
     })
@@ -83,20 +76,23 @@ export class ListingsTableComponent implements OnInit {
     this.getListings(this.currentPage.pageNumber);
   }
 
-  onPageChange(pageObj: any): void {
-    console.log('pageObj', pageObj);
+  onPageChange(value: any): void {
+    this.currentPage.pageSize = value.rows;
+    this.currentPage.pageNumber = value.page + 1;
+
+    this.getListings(this.currentPage.pageNumber);
   }
 
   showLegend(): void {
     this.isLegendShown = true;
   }
+
   onSearch(): void {
 
   }
 
-  private getListings(selectedPageNumber?: number): void {
-    // this.listingService.getListings(selectedPageNumber ?? (this.currentPage?.pageNumber || 0), this.currentPage?.pageSize || 10, this.sort?.prop || '', this.sort?.dir || 'asc', this.searchTerm, this.searchColumn)
-    this.listingService.getListings().subscribe({
+  private getListings(selectedPageNumber: number = 1): void {
+    this.listingService.getListings(selectedPageNumber ?? (this.currentPage?.pageNumber || 0), this.currentPage?.pageSize || 25, this.sort?.prop || '', this.sort?.dir || 'asc').subscribe({
       next: (res: PagingResponse<ListingTableRow>) => {
         this.currentPage = res.pageInfo;
         this.listings = res.sourceList;

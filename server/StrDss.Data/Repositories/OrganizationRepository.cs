@@ -81,7 +81,7 @@ namespace StrDss.Data.Repositories
         public async Task<OrganizationDto> GetOrganizationByOrgCdAsync(string orgCd)
         {
             var org = await _dbSet.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.OrganizationCd == orgCd);
+                .FirstOrDefaultAsync(x => x.OrganizationCd == orgCd.ToUpper());
 
             return _mapper.Map<OrganizationDto>(org);
         }

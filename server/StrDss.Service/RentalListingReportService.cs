@@ -228,7 +228,7 @@ namespace StrDss.Service
                 }
             }
 
-            var validOrgCds = (await _orgRepo.GetManagingOrgCdsAsync(orgId)).Select(x => x.ToUpper());
+            var validOrgCds = await _orgRepo.GetManagingOrgCdsAsync(orgId);
 
             foreach (var org in orgCds)
             {
@@ -464,6 +464,8 @@ namespace StrDss.Service
 
         private async Task<DssRentalListing> CreateOrUpdateRentalListing(DssRentalListingReport report, OrganizationDto offeringOrg, RentalListingRowUntyped row)
         {
+            _logger.LogInformation($"{report.RentalListingReportId}, {offeringOrg.OrganizationId}, {row.ListingId}");
+
             var listing = await _reportRepo.GetRentalListingAsync(report.RentalListingReportId, offeringOrg.OrganizationId, row.ListingId);
 
             if (listing == null)

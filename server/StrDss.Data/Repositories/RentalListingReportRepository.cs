@@ -95,9 +95,9 @@ namespace StrDss.Data.Repositories
 
         public async Task UpdateListingStatus(long providingPlatformId)
         {
-            var latestPeriodYm = _dbSet.AsNoTracking()
+            var reports = await _dbSet.AsNoTracking()
                 .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
-                .Max(x => x.ReportPeriodYm);
+                .ToListAsync();
 
             var masterListings = await _dbContext.DssRentalListings
                 .Include(x => x.DerivedFromRentalListing)
@@ -105,14 +105,27 @@ namespace StrDss.Data.Repositories
                 .Where(x => x.DerivedFromRentalListing != null && x.DerivedFromRentalListing.IncludingRentalListingReport!.ProvidingOrganizationId == providingPlatformId)
                 .ToArrayAsync();
 
-            foreach (var listing in masterListings)
+            if (reports.Count == 0)
             {
-                var isActive = listing.DerivedFromRentalListing!.IncludingRentalListingReport!.ReportPeriodYm == latestPeriodYm;
-                var count = _dbContext.DssRentalListings
-                    .Count(x => x.OfferingOrganizationId == listing.OfferingOrganizationId && x.PlatformListingNo == listing.PlatformListingNo && x.DerivedFromRentalListing == null);
+                foreach (var listing in masterListings)
+                {
+                    listing.IsActive = true;
+                    listing.IsNew = true;
+                }
+            }
+            else
+            {
+                var latestPeriodYm = reports.Max(x => x.ReportPeriodYm);
 
-                listing.IsActive = isActive;
-                listing.IsNew = isActive && count == 1;
+                foreach (var listing in masterListings)
+                {
+                    var isActive = listing.DerivedFromRentalListing!.IncludingRentalListingReport!.ReportPeriodYm == latestPeriodYm;
+                    var count = _dbContext.DssRentalListings
+                        .Count(x => x.OfferingOrganizationId == listing.OfferingOrganizationId && x.PlatformListingNo == listing.PlatformListingNo && x.DerivedFromRentalListing == null);
+
+                    listing.IsActive = isActive;
+                    listing.IsNew = isActive && count == 1;
+                }
             }
         }
     }

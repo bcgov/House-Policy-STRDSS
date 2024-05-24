@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Repositories;
@@ -15,6 +16,7 @@ namespace StrDss.Service
         Task<List<OrganizationDto>> GetOrganizationsAsync(string? type);
         Task<List<DropdownNumDto>> GetOrganizationsDropdownAsync(string? type);
         Task<OrganizationDto?> GetOrganizationByIdAsync(long id);
+        Task<long?> GetContainingOrganizationId(Point point);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -47,6 +49,9 @@ namespace StrDss.Service
         {
             return await _orgRepo.GetOrganizationByIdAsync(id);
         }
-
+        public async Task<long?> GetContainingOrganizationId(Point point)
+        {
+            return await _orgRepo.GetContainingOrganizationId(point);
+        }
     }
 }

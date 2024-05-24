@@ -1,6 +1,7 @@
-/* STR DSS Sprint 6 Organization Data Seeding */
+/* STR DSS Sprint 6 Local Governments Data Seeding */
 
-delete from dss_organization where organization_cd in ('LGNILTA-Denman','LGNILTA-Executive','LGNILTA-Gabriola','LGNILTA-Galiano','LGNILTA-Gambier','LGNILTA-Hornby','LGNILTA-Lasqueti','LGNILTA-Mayne','LGNILTA-North-Pender','LGNILTA-Saturna','LGNILTA-South-Pender','LGNILTA-Thetis');
+delete from dss_organization
+where organization_cd in ('LGNILTA-Denman','LGNILTA-Executive','LGNILTA-Gabriola','LGNILTA-Galiano','LGNILTA-Gambier','LGNILTA-Hornby','LGNILTA-Lasqueti','LGNILTA-Mayne','LGNILTA-North-Pender','LGNILTA-Saturna','LGNILTA-South-Pender','LGNILTA-Thetis');
 
 UPDATE dss_organization set organization_cd='LGMD-Tofino' where organization_cd='LGMV-Tofino';
 
@@ -388,10 +389,7 @@ USING ( SELECT * FROM (VALUES
 ('LG','LGXFN-Yakweakwioose'      ,'Yakweakwioose First Nation'                           ),
 ('LG','LGXFN-Yale'               ,'Yale First Nation'                                    ),
 ('LG','LGXFN-Yekooche'           ,'Yekooche First Nation'                                ),
-('LG','LGXFN-Yunesit-in'         ,'Yunesit''in First Nation'                             ),
-('Platform','PLAT-Airbnb','Airbnb'),
-('Platform','PLAT-Booking','Booking.com'),
-('Platform','PLAT-Expedia','Expedia'))
+('LG','LGXFN-Yunesit-in'         ,'Yunesit''in First Nation'                             ))
 AS s (organization_type, organization_cd, organization_nm)
 ) AS src
 ON (tgt.organization_cd=src.organization_cd)

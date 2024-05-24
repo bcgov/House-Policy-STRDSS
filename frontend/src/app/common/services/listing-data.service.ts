@@ -2,9 +2,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { PagingRequest } from '../models/paging-request';
 import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
+import { ListingTableRow } from '../models/listing-table-row';
 
 @Injectable({
   providedIn: 'root'
@@ -54,5 +54,20 @@ export class ListingDataService {
 
   getUploadHistoryErrors(id: number): Observable<any> {
     return this.httpClient.get<any>(`${environment.API_HOST}/rentallistingreports/uploads/${id}/errorfile`, { headers: this.textHeaders, responseType: 'text' as 'json' });
+  }
+
+  getListings(
+    pageNumber: number = 1,
+    pageSize: number = 10,
+    orderBy: string = '',
+    direction: 'asc' | 'desc' = 'asc'
+  ): Observable<PagingResponse<ListingTableRow>> {
+    let url = `${environment.API_HOST}/rentallistings?pageSize=${pageSize}&pageNumber=${pageNumber}`;
+
+    if (orderBy) {
+      url += `&orderBy=${orderBy}&direction=${direction}`;
+    }
+
+    return this.httpClient.get<PagingResponse<ListingTableRow>>(url);
   }
 }

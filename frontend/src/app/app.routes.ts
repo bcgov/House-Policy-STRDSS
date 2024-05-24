@@ -9,12 +9,13 @@ import { PageNotFoundComponent } from './common/components/page-not-found/page-n
 import { approvedUserGuard } from './common/guards/approved-user.guard';
 import { activeUserGuard } from './common/guards/active-user.guard';
 import { accessRequestTokenGuard } from './common/guards/access-request-token.guard';
-import { listing_file_upload, takedown_action, user_write } from './common/consts/permissions.const';
+import { listing_file_upload, listing_read, takedown_action, user_write } from './common/consts/permissions.const';
 import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 import { TermsAndConditionsComponent } from './common/components/terms-and-conditions/terms-and-conditions.component';
 import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
 import { UploadListingsComponent } from './features/components/upload-listings/upload-listings.component';
 import { ListingUploadHistoryComponent } from './features/components/listing-upload-history/listing-upload-history.component';
+import { ListingsTableComponent } from './features/components/listings-table/listings-table.component';
 
 export const routes: Routes = [
     {
@@ -50,6 +51,12 @@ export const routes: Routes = [
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: DelistingRequestComponent,
         data: { permissions: [takedown_action] }
+    },
+    {
+        path: 'listings',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: ListingsTableComponent,
+        data: { permissions: [listing_read] }
     },
     {
         path: 'access-request',

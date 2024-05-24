@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
+using Npgsql;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
@@ -15,12 +18,17 @@ namespace StrDss.Data.Repositories
         Task<OrganizationDto?> GetOrganizationByIdAsync(long orgId);
         Task<List<string>> GetManagingOrgCdsAsync(long orgId);
         Task<OrganizationDto> GetOrganizationByOrgCdAsync(string orgCd);
+        Task<long?> GetContainingOrganizationId(Point point);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
-        public OrganizationRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger)
+        private IConfiguration _config;
+
+        public OrganizationRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger,
+            IConfiguration config)
             : base(dbContext, mapper, currentUser, logger)
         {
+            _config = config;
         }
 
         public async Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc()
@@ -73,9 +81,32 @@ namespace StrDss.Data.Repositories
         public async Task<OrganizationDto> GetOrganizationByOrgCdAsync(string orgCd)
         {
             var org = await _dbSet.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.OrganizationCd == orgCd);
+                .FirstOrDefaultAsync(x => x.OrganizationCd == orgCd.ToUpper());
 
             return _mapper.Map<OrganizationDto>(org);
+        }
+
+        public async Task<long?> GetContainingOrganizationId(Point point)
+        {
+            var dbHost = _config.GetValue<string>("DB_HOST");
+            var dbName = _config.GetValue<string>("DB_NAME");
+            var dbUser = _config.GetValue<string>("DB_USER");
+            var dbPass = _config.GetValue<string>("DB_PASS");
+            var dbPort = _config.GetValue<string>("DB_PORT");
+
+            var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
+
+            using var connection = new NpgsqlConnection(connString);
+
+            await connection.OpenAsync();
+
+            using var command = new NpgsqlCommand("SELECT dss_containing_organization_id(@p_point)", connection);
+
+            command.Parameters.AddWithValue("@p_point", point);
+
+            var result = await command.ExecuteScalarAsync();
+
+            return result == DBNull.Value ? null : (long)result!;
         }
     }
 }

@@ -4,6 +4,7 @@ using CsvHelper.TypeConversion;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Entities;
@@ -463,6 +464,8 @@ namespace StrDss.Service
 
         private async Task<DssRentalListing> CreateOrUpdateRentalListing(DssRentalListingReport report, OrganizationDto offeringOrg, RentalListingRowUntyped row)
         {
+            _logger.LogInformation($"{report.RentalListingReportId}, {offeringOrg.OrganizationId}, {row.ListingId}");
+
             var listing = await _reportRepo.GetRentalListingAsync(report.RentalListingReportId, offeringOrg.OrganizationId, row.ListingId);
 
             if (listing == null)
@@ -497,6 +500,11 @@ namespace StrDss.Service
                 };
 
                 error = await _geocoder.GetAddressAsync(physicalAddress);
+
+                if (error.IsEmpty() && physicalAddress.LocationGeometry is not null && physicalAddress.LocationGeometry is Point point)
+                {
+                    physicalAddress.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+                }
 
                 await _addressRepo.AddPhysicalAddressAsync(physicalAddress);
             }

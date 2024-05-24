@@ -14,7 +14,8 @@ namespace StrDss.Model.OrganizationDtos
         [JsonPropertyName("label")]
         public string OrganizationNm { get; set; } = null!;
 
-        public Geometry? AreaGeometry { get; set; }
+        [JsonIgnore]
+        public NetTopologySuite.Geometries.Geometry? AreaGeometry { get; set; }
 
         public long? ManagingOrganizationId { get; set; }
 

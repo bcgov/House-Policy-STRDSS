@@ -25,7 +25,10 @@ namespace StrDss.Data.Repositories
 
         public async Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc()
         {
-            var types = _mapper.Map<List<OrganizationTypeDto>>(await _dbContext.DssOrganizationTypes.AsNoTracking().ToListAsync());
+            var types = _mapper.Map<List<OrganizationTypeDto>>(
+                await _dbContext.DssOrganizationTypes.AsNoTracking()
+                .Where(x => x.OrganizationType != OrganizationTypes.LGSub)
+                .ToListAsync());
 
             return types;
         }
@@ -37,6 +40,10 @@ namespace StrDss.Data.Repositories
             if (type != null && type != "All")
             {
                 query = query.Where(x => x.OrganizationType == type);
+            }
+            else
+            {
+                query = query.Where(x => x.OrganizationType != OrganizationTypes.LGSub);
             }
 
             query = query.Include(x => x.DssOrganizationContactPeople);

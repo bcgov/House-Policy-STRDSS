@@ -44,6 +44,8 @@ export class ListingsTableComponent implements OnInit {
   searchColumns = new Array<DropdownOption>();
   isCEU = false;
   isLegendShown = false;
+  // MOCK: 
+  isNotImplemented = true;
 
   constructor(private listingService: ListingDataService, private userService: UserDataService) { }
 

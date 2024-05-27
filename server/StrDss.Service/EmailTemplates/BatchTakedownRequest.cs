@@ -4,9 +4,11 @@ namespace StrDss.Service.EmailTemplates
 {
     public class BatchTakedownRequest : EmailTemplateBase
     {
-        public BatchTakedownRequest(IEmailMessageService emailService) : base(emailService)
+        public BatchTakedownRequest(IEmailMessageService emailService)
+            : base(emailService)
         {
             EmailMessageType = EmailMessageTypes.BatchTakedownRequest;
+            From = Environment.GetEnvironmentVariable("STR_DATA_EMAIL") ?? From;
         }
 
         public override string GetContent()

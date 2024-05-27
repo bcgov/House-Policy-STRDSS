@@ -394,7 +394,7 @@ namespace StrDss.Service
 
                 await _emailRepo.AddEmailMessage(emailEntity);
 
-                emailEntity.ExternalMessageNo = await template.SendEmail(adminEmail);
+                emailEntity.ExternalMessageNo = await template.SendEmail();
 
                 _unitOfWork.Commit();
 

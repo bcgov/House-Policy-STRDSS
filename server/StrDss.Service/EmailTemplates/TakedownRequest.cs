@@ -4,9 +4,11 @@ namespace StrDss.Service.EmailTemplates
 {
     public class TakedownRequest : EmailTemplateBase
     {
-        public TakedownRequest(IEmailMessageService emailService) : base(emailService)
+        public TakedownRequest(IEmailMessageService emailService)
+            : base(emailService)
         {
             EmailMessageType = EmailMessageTypes.TakedownRequest;
+            From = Environment.GetEnvironmentVariable("STR_DATA_EMAIL") ?? From;
         }
 
         public string Url { get; set; } = "";

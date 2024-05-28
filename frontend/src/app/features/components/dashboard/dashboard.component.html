@@ -11,6 +11,6 @@
 </div>
 <br>
 
-<div class="listings-upload-history">
+<div class="listings-upload-history" *ngIf="showListingHistory">
     <app-listing-upload-history-table [isSmall]="true"></app-listing-upload-history-table>
 </div>

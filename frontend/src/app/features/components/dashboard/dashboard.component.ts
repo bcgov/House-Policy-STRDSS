@@ -8,6 +8,7 @@ import { User } from '../../../common/models/user';
 import { DashboardService } from '../../../common/services/dashboard.service';
 import { DashboardCard } from '../../../common/models/dashboard-card';
 import { ListingUploadHistoryTableComponent } from '../../../common/listing-upload-history-table/listing-upload-history-table.component';
+import { listing_file_upload } from '../../../common/consts/permissions.const';
 
 
 @Component({
@@ -26,6 +27,7 @@ import { ListingUploadHistoryTableComponent } from '../../../common/listing-uplo
 export class DashboardComponent implements OnInit {
   userType = '' || 'BCGov' || 'Platform' || 'LG' || 'Admin';
   currentUser!: User;
+  showListingHistory = false;
 
   cardsToDisplay = new Array<DashboardCard>();
 
@@ -40,6 +42,7 @@ export class DashboardComponent implements OnInit {
       next: (value: User) => {
         this.currentUser = value;
         this.cardsToDisplay = this.dashboardService.getCardsPerUserType(this.currentUser);
+        this.showListingHistory = this.currentUser.permissions.includes(listing_file_upload);
       },
     })
   }

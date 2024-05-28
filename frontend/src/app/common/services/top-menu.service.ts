@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TopMenuItem } from '../models/top-menu-item';
-import { ceu_action, listing_file_upload, listing_read, takedown_action, user_write } from '../consts/permissions.const';
+import { ceu_action, licence_file_upload, listing_file_upload, listing_read, takedown_action, user_write } from '../consts/permissions.const';
 import { User } from '../models/user';
 
 @Injectable({
@@ -94,7 +94,7 @@ export class TopMenuService {
         folderName: 'Upload',
       },
       {
-        accessPermission: listing_read,
+        accessPermission: listing_file_upload,
         buttonId: 'platformUploadHistory_mi_btn',
         route: '/upload-listing-history',
         description: 'View all platform upload history here',
@@ -102,7 +102,7 @@ export class TopMenuService {
         folderName: 'Upload',
       },
       {
-        accessPermission: listing_read,
+        accessPermission: licence_file_upload,
         buttonId: 'businessLicenses_mi_btn',
         route: '',
         disabled: true,

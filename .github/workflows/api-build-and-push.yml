@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      # working-directory: ./server
+      # working-directory:  ./server
       working-directory: ./server
       GITHUB_TOKEN: ${{ secrets.GITOPS }}
 

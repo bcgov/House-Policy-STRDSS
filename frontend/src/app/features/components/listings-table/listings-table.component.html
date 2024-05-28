@@ -170,7 +170,7 @@
         <p-paginator class="listings-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
             [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
             [showCurrentPageReport]="true" [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
-            [currentPageReportTemplate]="'Rows per page: 10 &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
+            [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
 
     </p-panel>
 

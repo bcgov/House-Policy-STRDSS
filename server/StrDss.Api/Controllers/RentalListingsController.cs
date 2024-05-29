@@ -24,9 +24,10 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet]
-        public async Task<ActionResult> GetRentalListings(int pageSize, int pageNumber, string orderBy = "ListingStatusSortNo", string direction = "asc")
+        public async Task<ActionResult> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+            int pageSize, int pageNumber, string orderBy = "ListingStatusSortNo", string direction = "asc")
         {
-            var listings = await _listingService.GetRentalListings(pageSize, pageNumber, orderBy, direction);
+            var listings = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicense, pageSize, pageNumber, orderBy, direction);
 
             return Ok(listings);
         }

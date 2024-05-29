@@ -2,8 +2,8 @@
 <div class="sub-title">
     All fields are required except where stated
 </div>
-<form [formGroup]="myForm">
-    <div class="form-group-row">
+<form [formGroup]="myForm" *ngIf="currentUser">
+    <div class="form-group-row" *ngIf="currentUser.organizationType !== 'Platform'">
         <div class="form-group-row-col">
             <label for="platformId">Select Reporting Platform Name</label>
         </div>

@@ -78,12 +78,13 @@ export class LayoutComponent {
     this.items = this.items?.filter((item) => {
       return !!item.items?.length;
     });
-    if (this.userDataService.currentUser.permissions.includes(listing_read)) {
-      this.items?.unshift({
-        label: 'Listings',
-        routerLink: '/listings',
-      });
-    }
+
+    // if (this.userDataService.currentUser.permissions.includes(listing_read)) {
+    //   this.items?.unshift({
+    //     label: 'Listings',
+    //     routerLink: '/listings',
+    //   });
+    // }
 
     this.items?.unshift({
       label: 'Home',

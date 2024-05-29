@@ -9,7 +9,8 @@ image:
   tag: latest
   pullPolicy: Always
 
-imagePullSecrets: []
+imagePullSecrets:
+ - name: jf-rg-secret
 nameOverride: "strdss-backend"
 fullnameOverride: "strdss-backend"
 

@@ -72,6 +72,7 @@
 
         public DateTime? LastActionDtm { get; set; }
 
-        public virtual ICollection<RentalListingContactDto> RentalListingContacts { get; set; } = new List<RentalListingContactDto>();
+        public virtual ICollection<RentalListingContactDto> Hosts { get; set; } = new List<RentalListingContactDto>();
+        public virtual ICollection<ListingHistoryDto> ListingHistory { get; set; } = new List<ListingHistoryDto>();
     }
 }

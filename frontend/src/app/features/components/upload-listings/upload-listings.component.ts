@@ -68,8 +68,8 @@ export class UploadListingsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const getCurrentUser = this.userDataService.getCurrentUser()
     this.monthsOptions = this.yearMonthGenService.getPreviousMonths(10);
+    const getCurrentUser = this.userDataService.getCurrentUser()
     const getPlatforms = this.delistingService.getPlatforms();
 
     forkJoin([getCurrentUser, getPlatforms]).subscribe({
@@ -81,7 +81,7 @@ export class UploadListingsComponent implements OnInit {
           this.myForm.controls['platformId'].setValue(currentUser.organizationId);
         }
       }
-    })
+    });
   }
 
   onFileSelected(event: any, uploadElem: FileUpload): void {

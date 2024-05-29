@@ -1,11 +1,11 @@
 <h2>Platform Upload History</h2>
 <p-card>
-    <div class="form-group-row" *ngIf="!isSmall">
+    <div class="form-group-row" *ngIf="!isSmall && currentUser.organizationType !== 'Platform'">
         <div class="form-group-row-col">
             <label for="platformId">Select Platform</label>
         </div>
         <div class="form-group-row-col">
-            <p-dropdown [options]="platformOptions" [(ngModel)]="selectedPlatformId"
+            <p-dropdown [options]=" platformOptions" [(ngModel)]="selectedPlatformId"
                 (onChange)="onPlatformSelected($event.value)" placeholder="Select platform" id="platformId"
                 name="platformId" [required]="true"></p-dropdown>
         </div>

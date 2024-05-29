@@ -11,6 +11,9 @@ import { ToastModule } from 'primeng/toast';
 import { ListingDataService } from '../../../common/services/listing-data.service';
 import { YearMonthGenService } from '../../../common/services/year-month-gen.service';
 import { MessageService } from 'primeng/api';
+import { UserDataService } from '../../../common/services/user-data.service';
+import { Observable, forkJoin } from 'rxjs';
+import { User } from '../../../common/models/user';
 
 @Component({
   selector: 'app-upload-listings',
@@ -33,6 +36,7 @@ export class UploadListingsComponent implements OnInit {
   maxFileSize = 4000000;
   uploadedFile: any;
   uploadElem!: FileUpload;
+  currentUser!: User;
 
   myForm = this.fb.group({
     platformId: [0, Validators.required],
@@ -60,11 +64,24 @@ export class UploadListingsComponent implements OnInit {
     private listingDataService: ListingDataService,
     private yearMonthGenService: YearMonthGenService,
     private messageService: MessageService,
+    private userDataService: UserDataService,
   ) { }
 
   ngOnInit(): void {
     this.monthsOptions = this.yearMonthGenService.getPreviousMonths(10);
-    this.delistingService.getPlatforms().subscribe((platformOptions) => this.platformOptions = platformOptions);
+    const getCurrentUser = this.userDataService.getCurrentUser()
+    const getPlatforms = this.delistingService.getPlatforms();
+
+    forkJoin([getCurrentUser, getPlatforms]).subscribe({
+      next: ([currentUser, platforms]) => {
+        this.currentUser = currentUser;
+        if (currentUser.organizationType !== "Platform") {
+          this.platformOptions = platforms;
+        } else {
+          this.myForm.controls['platformId'].setValue(currentUser.organizationId);
+        }
+      }
+    });
   }
 
   onFileSelected(event: any, uploadElem: FileUpload): void {

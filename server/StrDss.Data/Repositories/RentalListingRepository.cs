@@ -10,7 +10,7 @@ namespace StrDss.Data.Repositories
 {
     public interface IRentalListingRepository
     {
-        Task<PagedDto<RentalListingViewDto>> GetRentalListings(int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -18,13 +18,54 @@ namespace StrDss.Data.Repositories
             : base(dbContext, mapper, currentUser, logger)
         {
         }
-        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, 
+            int pageSize, int pageNumber, string orderBy, string direction)
         {
             var query = _dbSet.AsNoTracking();
 
             if (_currentUser.OrganizationType == OrganizationTypes.LG)
             {
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            if (all != null && all.IsNotEmpty())
+            {
+                var allLower = all.ToLower();
+                query = query.Where(x => (x.MatchAddressTxt != null && x.MatchAddressTxt.ToLower().Contains(allLower)) ||
+                                         (x.PlatformListingUrl != null && x.PlatformListingUrl.ToLower().Contains(allLower)) ||
+                                         (x.PlatformListingNo != null && x.PlatformListingNo.ToLower().Contains(allLower)) ||
+                                         (x.ListingContactNamesTxt != null && x.ListingContactNamesTxt.ToLower().Contains(allLower)) ||
+                                         (x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(allLower)));
+            }
+
+            if (address != null && address.IsNotEmpty())
+            {
+                var addressLower = address.ToLower();
+                query = query.Where(x => x.MatchAddressTxt != null && x.MatchAddressTxt.ToLower().Contains(addressLower));
+            }
+
+            if (url != null && url.IsNotEmpty())
+            {
+                var urlLower = url.ToLower();
+                query = query.Where(x => x.PlatformListingUrl != null && x.PlatformListingUrl.ToLower().Contains(urlLower));
+            }
+
+            if (listingId != null && listingId.IsNotEmpty())
+            {
+                var listingIdLower = listingId.ToLower();
+                query = query.Where(x => x.PlatformListingNo != null && x.PlatformListingNo.ToLower().Contains(listingIdLower));
+            }
+
+            if (hostName != null && hostName.IsNotEmpty())
+            {
+                var hostNameLower = hostName.ToLower();
+                query = query.Where(x => x.ListingContactNamesTxt != null && x.ListingContactNamesTxt.ToLower().Contains(hostNameLower));
+            }
+
+            if (businessLicense != null && businessLicense.IsNotEmpty())
+            {
+                var businessLicenseLower = businessLicense.ToLower();
+                query = query.Where(x => x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(businessLicenseLower));
             }
 
             var extraSort 

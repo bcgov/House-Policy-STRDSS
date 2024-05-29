@@ -11,7 +11,7 @@ namespace StrDss.Service
 {
     public interface IRentalListingService
     {
-        Task<PagedDto<RentalListingViewDto>> GetRentalListings(int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
@@ -24,9 +24,9 @@ namespace StrDss.Service
             _listingRepo = listingRep;
         }
 
-        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction)
         {
-            return await _listingRepo.GetRentalListings(pageSize, pageNumber, orderBy, direction);
+            return await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicense, pageSize, pageNumber, orderBy, direction);
         }
     }
 }

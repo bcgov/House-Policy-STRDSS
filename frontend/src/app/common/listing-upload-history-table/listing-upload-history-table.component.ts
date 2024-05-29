@@ -12,6 +12,9 @@ import { DelistingService } from '../services/delisting.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PagingResponse, PagingResponsePageInfo } from '../models/paging-response';
+import { UserDataService } from '../services/user-data.service';
+import { forkJoin } from 'rxjs';
+import { User } from '../models/user';
 
 @Component({
   selector: 'app-listing-upload-history-table',
@@ -36,15 +39,31 @@ export class ListingUploadHistoryTableComponent implements OnInit {
   platformOptions = new Array<DropdownOption>();
   selectedPlatformId = 0;
   sort!: { prop: string, dir: 'asc' | 'desc' }
+  currentUser!: User;
 
   currentPage!: PagingResponsePageInfo;
 
   constructor(
     private listingDataService: ListingDataService,
     private delistingService: DelistingService,
+    private userDataService: UserDataService,
   ) { }
 
   ngOnInit(): void {
+
+    const getCurrentUser = this.userDataService.getCurrentUser()
+    const getPlatforms = this.delistingService.getPlatforms();
+
+    forkJoin([getCurrentUser, getPlatforms]).subscribe({
+      next: ([currentUser, platforms]) => {
+        this.currentUser = currentUser;
+        if (currentUser.organizationType !== "Platform") {
+          const options: Array<DropdownOption> = [{ label: 'All', value: 0 }, ...platforms]
+          this.platformOptions = options;
+        }
+      }
+    });
+
     this.delistingService.getPlatforms().subscribe((platformOptions) => {
       const options: Array<DropdownOption> = [{ label: 'All', value: 0 }, ...platformOptions]
       this.platformOptions = options;

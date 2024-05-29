@@ -13,6 +13,7 @@ import { ErrorHandlingService } from '../services/error-handling.service';
 import { ErrorBackEnd } from '../models/errors';
 import { TopMenuService } from '../services/top-menu.service';
 import { TooltipModule } from 'primeng/tooltip';
+import { listing_read } from '../consts/permissions.const';
 
 @Component({
   selector: 'app-layout',
@@ -77,11 +78,12 @@ export class LayoutComponent {
     this.items = this.items?.filter((item) => {
       return !!item.items?.length;
     });
-
-    this.items?.unshift({
-      label: 'Listings',
-      routerLink: '/listings',
-    });
+    if (this.userDataService.currentUser.permissions.includes(listing_read)) {
+      this.items?.unshift({
+        label: 'Listings',
+        routerLink: '/listings',
+      });
+    }
 
     this.items?.unshift({
       label: 'Home',

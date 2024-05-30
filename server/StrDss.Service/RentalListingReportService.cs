@@ -401,9 +401,13 @@ namespace StrDss.Service
                 _unitOfWork.CommitTransaction(transaction);
             }
 
+            _logger.LogInformation($"Updating Status: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
+
             await _reportRepo.UpdateListingStatus(report.ProvidingOrganizationId);
 
             _unitOfWork.Commit();
+
+            _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
         }
 
         private async Task<bool> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)
@@ -464,7 +468,7 @@ namespace StrDss.Service
 
         private async Task<DssRentalListing> CreateOrUpdateRentalListing(DssRentalListingReport report, OrganizationDto offeringOrg, RentalListingRowUntyped row)
         {
-            _logger.LogInformation($"{report.RentalListingReportId}, {offeringOrg.OrganizationId}, {row.ListingId}");
+            _logger.LogInformation($"Processing listing: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}, {offeringOrg.OrganizationNm}, {row.ListingId}");
 
             var listing = await _reportRepo.GetRentalListingAsync(report.RentalListingReportId, offeringOrg.OrganizationId, row.ListingId);
 

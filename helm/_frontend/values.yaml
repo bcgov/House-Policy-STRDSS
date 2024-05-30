@@ -9,7 +9,8 @@ image:
   tag: latest
   pullPolicy: Always
 
-imagePullSecrets: []
+imagePullSecrets: 
+- name: jf-rg-secret # CD integration setting
 nameOverride: "strdss-frontend"
 fullnameOverride: "strdss-frontend"
 

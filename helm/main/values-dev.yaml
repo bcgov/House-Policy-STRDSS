@@ -50,13 +50,22 @@ backend:
   nameOverride: strdss-dev-backend
   fullnameOverride: strdss-dev-backend
 
-  # resources:
-  #   limits:
-  #     cpu: 1500m
-  #     memory: 1500Mi
-  #   requests:
-  #     cpu: 20m
-  #     memory: 1100Mi
+  resources:
+    limits:
+      cpu: 100m
+      memory: 300Mi
+    requests:
+      cpu: 20m
+      memory: 200Mi
+
+  env:
+    'API_HOST': '/api'
+
+hangfire:
+  enabled: true
+  replicaCount: 1
+  nameOverride: strdss-dev-hangfire
+  fullnameOverride: strdss-dev-hangfire
 
   resources:
     limits:

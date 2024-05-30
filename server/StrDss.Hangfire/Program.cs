@@ -1,10 +1,7 @@
 using Asp.Versioning;
 using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
+using Hangfire;
 using NetCore.AutoRegisterDi;
-using StrDss.Api.Authentication;
 using StrDss.Data;
 using StrDss.Data.Mappings;
 using StrDss.Model;
@@ -13,10 +10,11 @@ using StrDss.Service.HttpClients;
 using System.Reflection;
 using StrDss.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using StrDss.Api.Middlewares;
-using StrDss.Api;
 using StrDss.Service.Bceid;
+using StrDss.Service.Hangfire;
+using Hangfire.PostgreSql;
 using Npgsql;
+using StrDss.Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,39 +97,20 @@ var mappingConfig = new MapperConfiguration(cfg =>
 var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
+builder.Services
+    .AddHangfire(configuration => configuration
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UsePostgreSqlStorage(connString));
+
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = 1;
+});
+
 //Add logging
 builder.Services.AddLogging(builder => builder.AddConsole());
-
-builder.Services.AddScoped<KcJwtBearerEvents>();
-
-//var strDssAuthScheme = "str_dss";
-
-//Authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = builder.Configuration.GetValue<string>("SSO_AUTHORITY");
-        options.Audience = builder.Configuration.GetValue<string>("SSO_CLIENT");
-        options.IncludeErrorDetails = true;
-        options.EventsType = typeof(KcJwtBearerEvents);
-        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            ValidateAudience = true,
-            ValidAlgorithms = new List<string>() { "RS256" },
-        };
-    })
-;
-
-builder.Services.AddAuthorization(options =>
-{
-    var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
-        JwtBearerDefaults.AuthenticationScheme);
-    defaultAuthorizationPolicyBuilder =
-        defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
-    options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
-});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -173,6 +152,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseHangfireDashboard();
+
+// make sure this is after app.UseHangfireDashboard()
+RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/10 * * * *");
+RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *");
 
 app.Run();

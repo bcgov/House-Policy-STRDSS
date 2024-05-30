@@ -5,12 +5,15 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
+using System;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace StrDss.Data.Repositories
 {
     public interface IRentalListingRepository
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<RentalListingViewDto?> GetRentalListing(long listingId);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -75,7 +78,7 @@ namespace StrDss.Data.Repositories
 
             //foreach (var listing in listings.SourceList)
             //{
-            //    listing.RentalListingContacts =
+            //    listing.Hosts =
             //        _mapper.Map<List<RentalListingContactDto>>(await
             //            _dbContext.DssRentalListingContacts
             //                .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
@@ -83,6 +86,64 @@ namespace StrDss.Data.Repositories
             //}
 
             return listings;
+        }
+
+        public async Task<RentalListingViewDto?> GetRentalListing(long listingId)
+        {
+            var listing = _mapper.Map<RentalListingViewDto>(await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.RentalListingId == listingId));
+
+            if (listing == null) return listing;
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG && listing.ManagingOrganizationId != _currentUser.OrganizationId)
+            {
+                return null;
+            }
+
+            if (listing.LastActionDtm != null)
+            {
+                listing.LastActionDtm = DateUtils.ConvertUtcToPacificTime((DateTime)listing.LastActionDtm!);
+            }
+
+            listing.Hosts = _mapper.Map<List<RentalListingContactDto>>(await
+                _dbContext.DssRentalListingContacts.AsNoTracking()
+                .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
+                .ToListAsync());
+
+            listing.ListingHistory = (await
+                _dbContext.DssRentalListings.AsNoTracking()
+                .Include(x => x.IncludingRentalListingReport)
+                .Where(x => x.PlatformListingNo == listing.PlatformListingNo && x.OfferingOrganizationId == listing.OfferingOrganizationId && x.DerivedFromRentalListingId == null)
+                .Select(x => new ListingHistoryDto {
+                    ReportPeriodYM = x.IncludingRentalListingReport!.ReportPeriodYm!.ToString("yyyy-MM"),
+                    NightsBookedQty = x.NightsBookedQty,
+                    SeparateReservationsQty = x.SeparateReservationsQty
+                }).ToListAsync())
+                .OrderByDescending(x => x.ReportPeriodYM)
+                .ToList();
+
+            listing.ActionHistory = (await
+                _dbContext.DssEmailMessages.AsNoTracking()
+                    .Include(x => x.EmailMessageTypeNavigation)
+                    .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
+                    .OrderByDescending(x => x.MessageDeliveryDtm)
+                    .Select(x => new ActionHistoryDto
+                    {
+                        Action = x.EmailMessageTypeNavigation.EmailMessageTypeNm,
+                        Date = DateUtils.ConvertUtcToPacificTime((DateTime)x.MessageDeliveryDtm!),
+                        UserGuid = x.UpdUserGuid
+                    })
+                    .ToListAsync());
+
+            foreach(var action in listing.ActionHistory)
+            {
+                var user = await _dbContext.DssUserIdentities.FirstOrDefaultAsync(x => x.UserGuid == x.UpdUserGuid);
+
+                if (user == null) continue;
+
+                action.User = CommonUtils.GetFullName(user!.GivenNm ?? "", user!.FamilyNm ?? "");
+            }
+
+            return listing;
         }
     }
 }

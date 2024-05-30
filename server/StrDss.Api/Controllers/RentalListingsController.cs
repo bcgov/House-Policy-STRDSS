@@ -31,5 +31,19 @@ namespace StrDss.Api.Controllers
 
             return Ok(listings);
         }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("{listingId}")]
+        public async Task<ActionResult> GetRentalListing(long listingId)
+        {
+            var listing = await _listingService.GetRentalListing(listingId);
+
+            if(listing == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(listing);
+        }
     }
 }

@@ -334,7 +334,7 @@ namespace StrDss.Service
             while (csv.Read())
             {
                 var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
-                var uploadLine = upload.DssUploadLines.FirstOrDefault(x => x.SourceOrganizationCd == row.OrgCd && x.SourceRecordNo == row.ListingId);
+                var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.ListingId);
 
                 if (uploadLine == null)
                 {

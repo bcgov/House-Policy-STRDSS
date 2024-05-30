@@ -1,0 +1,117 @@
+{{- $deploymentTag := .Values.image.tag | default .Chart.AppVersion -}}
+{{- $deploymentTime := now | date "2006-01-02 15:04:05.000000" -}}
+{{- $styleNonce := $deploymentTag | b64enc -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  updateStrategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- $podAnnotations := merge (.Values.podAnnotations | default dict) (.Values.global.vault.podAnnotations | default dict) -}}
+      {{- with $podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        vault.hashicorp.com/role: {{ .Values.global.vault.role }}
+        vault.hashicorp.com/agent-inject-secret-secrets.env: {{ .Values.global.vault.role }}/{{ .Values.global.vault.subPath }}
+        vault.hashicorp.com/agent-inject-template-secrets.env: |
+          {{`{{ with secret "`}}{{ .Values.global.vault.role }}/{{ .Values.global.vault.subPath }}{{`" }}
+            export BCEID_OSID="{{ .Data.data.BCEID_OSID }}"
+            export CHES_ID="{{ .Data.data.CHES_ID }}"
+            export CHES_SECRET="{{ .Data.data.CHES_SECRET }}"
+            export DB_HOST="{{ .Data.data.DB_HOST }}"
+            export DB_NAME="{{ .Data.data.DB_NAME }}"
+            export DB_PASS="{{ .Data.data.DB_PASS }}"
+            export DB_PORT="{{ .Data.data.DB_PORT }}"
+            export DB_USER="{{ .Data.data.DB_USER }}"
+            export GEOCODER_API_KEY="{{ .Data.data.GEOCODER_API_KEY }}"
+            export GEOCODER_CLIENT_ID="{{ .Data.data.GEOCODER_CLIENT_ID }}"
+            export SA_PASS="{{ .Data.data.SA_PASS }}"
+            export SA_USER="{{ .Data.data.SA_USER }}"
+            export ADMIN_EMAIL="{{ .Data.data.ADMIN_EMAIL }}"
+            export STR_NOTICE_EMAIL="{{ .Data.data.STR_NOTICE_EMAIL }}"
+            export STR_DATA_EMAIL="{{ .Data.data.STR_DATA_EMAIL }}"
+          {{- end }}`}}
+      labels:
+        {{- include "app.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- $imagePullSecrets := concat (.Values.imagePullSecrets | default list) (.Values.global.imagePullSecrets | default list) -}}
+      {{- with $imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ default .Values.global.serviceAccountName .Values.serviceAccountName }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "app.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ $deploymentTag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            ['sh', '-c']
+          args:
+            ['. /vault/secrets/secrets.env && dotnet StrDss.Api.dll']
+          env:
+            - name: DEPLOYMENT_TAG
+              value: {{ $deploymentTag | quote }}
+            - name: DEPLOYMENT_TIME
+              value: {{ $deploymentTime | quote }}
+            - name: ASPNETCORE_URLS
+              value: http://*:8080
+            {{- $env := merge (.Values.global.env | default dict) (.Values.env | default dict) -}}
+            {{ range $k, $v := $env }}
+            - name: {{ $k | quote }}
+              value: {{ $v | quote }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /api/networkchecker
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

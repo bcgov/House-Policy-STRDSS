@@ -14,6 +14,7 @@ import { MessageService } from 'primeng/api';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { Observable, forkJoin } from 'rxjs';
 import { User } from '../../../common/models/user';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-upload-listings',
@@ -33,7 +34,7 @@ import { User } from '../../../common/models/user';
 export class UploadListingsComponent implements OnInit {
   platformOptions = new Array<DropdownOption>();
   monthsOptions = new Array<DropdownOption>();
-  maxFileSize = 4000000;
+  maxFileSize = Number(environment.RENTAL_LISTING_REPORT_MAX_SIZE) * 1024 * 1024;
   uploadedFile: any;
   uploadElem!: FileUpload;
   currentUser!: User;

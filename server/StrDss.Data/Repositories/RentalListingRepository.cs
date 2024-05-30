@@ -5,8 +5,6 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
-using System;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace StrDss.Data.Repositories
 {

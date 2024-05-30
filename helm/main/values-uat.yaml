@@ -15,7 +15,7 @@ global:
     'SM_LOGOFF_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi/'
     'CHES_TOKEN_URL': 'https://test.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
     'CHES_URL': 'https://ches-test.api.gov.bc.ca'
-    'RENTAL_LISTING_REPORT_MAX_SIZE': '4'
+    'RENTAL_LISTING_REPORT_MAX_SIZE': '10'
     'BCEID_URL': 'https://gws1.test.bceid.ca/webservices/client/v10/bceidservice.asmx'
     'BCEID_CACHE_LIFESPAN': '600'
     'GEOCODER_URL': 'https://geocodertst.api.gov.bc.ca'

@@ -99,6 +99,11 @@ namespace StrDss.Data.Repositories
                 return null;
             }
 
+            if (listing.LastActionDtm != null)
+            {
+                listing.LastActionDtm = DateUtils.ConvertUtcToPacificTime((DateTime)listing.LastActionDtm!);
+            }
+
             listing.Hosts = _mapper.Map<List<RentalListingContactDto>>(await
                 _dbContext.DssRentalListingContacts.AsNoTracking()
                 .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
@@ -118,11 +123,12 @@ namespace StrDss.Data.Repositories
 
             listing.ActionHistory = (await
                 _dbContext.DssEmailMessages.AsNoTracking()
+                    .Include(x => x.EmailMessageTypeNavigation)
                     .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
                     .OrderByDescending(x => x.UpdDtm)
                     .Select(x => new ActionHistoryDto
                     {
-                        Action = x.EmailMessageType,
+                        Action = x.EmailMessageTypeNavigation.EmailMessageTypeNm,
                         Date = DateUtils.ConvertUtcToPacificTime((DateTime)x.UpdDtm!),
                         UserGuid = x.UpdUserGuid
                     })

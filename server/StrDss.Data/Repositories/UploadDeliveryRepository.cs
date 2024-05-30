@@ -13,6 +13,7 @@ namespace StrDss.Data.Repositories
         Task AddUploadDeliveryAsync(DssUploadDelivery upload);
         Task<List<DssUploadDelivery>> GetRentalReportUploadsToProcessAsync();
         Task<DssUploadDelivery?> GetRentalListingErrorLines(long uploadId);
+        Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId);
     }
 
     public class UploadDeliveryRepository : RepositoryBase<DssUploadDelivery>, IUploadDeliveryRepository
@@ -36,13 +37,21 @@ namespace StrDss.Data.Repositories
         public async Task<List<DssUploadDelivery>> GetRentalReportUploadsToProcessAsync()
         {
             return await _dbSet
-                .Include(x => x.DssUploadLines.Where(line => !line.IsProcessed))
+                //.Include(x => x.DssUploadLines.Where(line => !line.IsProcessed))
                 .Include(x => x.ProvidingOrganization)
                 .Where(x => x.DssUploadLines.Any(line => !line.IsProcessed))
                 .OrderBy(x => x.ProvidingOrganizationId) 
                     .ThenBy(x => x.ReportPeriodYm)
                         .ThenBy(x => x.UpdDtm) //Users can upload the same listing multiple times. The processing of these listings follows a first-come, first-served approach.
                 .ToListAsync();
+        }
+
+        public async Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId)
+        {
+            return await _dbContext.DssUploadLines.FirstOrDefaultAsync(x => 
+                x.IncludingUploadDeliveryId ==  uploadId && 
+                x.SourceOrganizationCd == orgCd && 
+                x.SourceRecordNo == listingId);
         }
 
         public async Task<DssUploadDelivery?> GetRentalListingErrorLines(long uploadId)

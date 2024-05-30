@@ -29,7 +29,7 @@ route:
 
 frontend:
   enabled: true
-  replicaCount: 3
+  replicaCount: 2
   nameOverride: strdss-uat-frontend
   fullnameOverride: strdss-uat-frontend
   secretName: strdss-secrets-uat
@@ -56,20 +56,41 @@ frontend:
 
 backend:
   enabled: true
-  replicaCount: 3
+  replicaCount: 2
   nameOverride: strdss-uat-backend
   fullnameOverride: strdss-uat-backend
   secretName: strdss-secrets-uat
   dbSecretName: strdssuat-pguser-strdssuat
   crunchydb: true
 
-  # resources:
-  #   limits:
-  #     cpu: 1500m
-  #     memory: 1500Mi
-  #   requests:
-  #     cpu: 20m
-  #     memory: 1100Mi
+  resources:
+    limits:
+      cpu: 100m
+      memory: 500Mi
+    requests:
+      cpu: 20m
+      memory: 300Mi
+
+  env:
+    'API_HOST': '/api'
+    
+  affinityTemplate: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchLabels: {{ include "app.selectorLabels" . | nindent 10 }}    
+
+hangfire:
+  enabled: true
+  replicaCount: 1
+  nameOverride: strdss-uat-hangfire
+  fullnameOverride: strdss-uat-hangfire
+  secretName: strdss-secrets-uat
+  dbSecretName: strdssuat-pguser-strdssuat
+  crunchydb: true
 
   resources:
     limits:

@@ -64,3 +64,23 @@ backend:
 
   env:
     'API_HOST': '/api'
+
+hangfire:
+  enabled: true
+  replicaCount: 1
+  nameOverride: strdss-test-hangfire
+  fullnameOverride: strdss-test-hangfire
+  secretName: strdss-secrets-test
+  dbSecretName: strdsstest-pguser-strdsstest
+  crunchydb: false
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 300Mi
+    requests:
+      cpu: 20m
+      memory: 200Mi
+
+  env:
+    'API_HOST': '/api'

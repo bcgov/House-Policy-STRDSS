@@ -33,6 +33,33 @@ jobs:
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${vtag//v}
 
+  docker-build-hangfire:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
+
+    - name: Build Docker image
+      run: cd server && docker build -t strdss-hangfire -f Dockerfile.hangfire .
+
+    - name: Tag Docker image
+      run: |
+        vtag=${{ github.ref_name }}
+        docker tag strdss-hangfire artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-hangfire:${vtag//v}
+
+    - name: Push Docker image to Artifactory
+      run: |
+        vtag=${{ github.ref_name }}
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-hangfire:${vtag//v}
+      
   docker-build-frontend:
     runs-on: ubuntu-22.04
     timeout-minutes: 10

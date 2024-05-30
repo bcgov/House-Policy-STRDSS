@@ -116,6 +116,27 @@ namespace StrDss.Data.Repositories
                 .OrderByDescending(x => x.ReportPeriodYM)
                 .ToList();
 
+            listing.ActionHistory = (await
+                _dbContext.DssEmailMessages.AsNoTracking()
+                    .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
+                    .OrderByDescending(x => x.UpdDtm)
+                    .Select(x => new ActionHistoryDto
+                    {
+                        Action = x.EmailMessageType,
+                        Date = DateUtils.ConvertUtcToPacificTime((DateTime)x.UpdDtm!),
+                        UserGuid = x.UpdUserGuid
+                    })
+                    .ToListAsync());
+
+            foreach(var action in listing.ActionHistory)
+            {
+                var user = await _dbContext.DssUserIdentities.FirstOrDefaultAsync(x => x.UserGuid == x.UpdUserGuid);
+
+                if (user == null) continue;
+
+                action.User = CommonUtils.GetFullName(user!.GivenNm ?? "", user!.FamilyNm ?? "");
+            }
+
             return listing;
         }
     }

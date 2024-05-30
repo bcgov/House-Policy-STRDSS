@@ -33,6 +33,8 @@ var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={d
 
 builder.Services.AddHttpContextAccessor();
 
+Console.WriteLine("Hangfire");
+
 // Add services to the container.
 builder.Services.AddControllers();
 

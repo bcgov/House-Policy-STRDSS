@@ -17,7 +17,7 @@ BEGIN
       COUNT(*) AS total,
       SUM(CASE WHEN dul.is_processed = true THEN 1 ELSE 0 END) AS processed,
       SUM(CASE WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1 ELSE 0 END) AS errors,
-      SUM(CASE WHEN dul.is_validation_failure = false AND dul.is_system_failure = false THEN 1 ELSE 0 END) AS success,
+      SUM(CASE WHEN dul.is_processed = true AND dul.is_validation_failure = false AND dul.is_system_failure = false THEN 1 ELSE 0 END) AS success,
       CASE WHEN COUNT(*) = SUM(CASE WHEN dul.is_processed = true THEN 1 ELSE 0 END) THEN ''Processed'' ELSE ''Pending'' END AS status
     FROM
       dss_upload_delivery dud

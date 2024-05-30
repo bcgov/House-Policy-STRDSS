@@ -13,7 +13,7 @@ namespace StrDss.Hangfire.Controllers
         [HttpGet]
         public IActionResult GetNetworkStatus()
         {
-            return Ok(new { status = true });
+            return Ok(new { status = true, server = "hangfire" });
         }
     }
 }

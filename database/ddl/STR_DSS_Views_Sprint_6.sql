@@ -43,8 +43,8 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS select drl.rental_listing_id
 	, lgs.is_business_licence_required
 	, drl.is_entire_unit
 	, drl.available_bedrooms_qty
-	, (select sum(drl2.nights_booked_qty) from dss_rental_listing drl2 where drl2.derived_from_rental_listing_id = null and drl2.offering_organization_id=drl.offering_organization_id and drl2.platform_listing_no=drl.platform_listing_no) as nights_booked_ytd_qty
-	, (select sum(drl2.separate_reservations_qty) from dss_rental_listing drl2 where drl2.derived_from_rental_listing_id = null and drl2.offering_organization_id=drl.offering_organization_id and drl2.platform_listing_no=drl.platform_listing_no) as separate_reservations_ytd_qty
+	, (select sum(drl2.nights_booked_qty) from dss_rental_listing drl2 where drl2.derived_from_rental_listing_id is null and drl2.offering_organization_id=drl.offering_organization_id and drl2.platform_listing_no=drl.platform_listing_no) as nights_booked_ytd_qty
+	, (select sum(drl2.separate_reservations_qty) from dss_rental_listing drl2 where drl2.derived_from_rental_listing_id is null and drl2.offering_organization_id=drl.offering_organization_id and drl2.platform_listing_no=drl.platform_listing_no) as separate_reservations_ytd_qty
 	, drl.business_licence_no
 	, drl.bc_registry_no
 	, demt.email_message_type_nm as last_action_nm

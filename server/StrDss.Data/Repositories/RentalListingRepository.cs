@@ -125,11 +125,11 @@ namespace StrDss.Data.Repositories
                 _dbContext.DssEmailMessages.AsNoTracking()
                     .Include(x => x.EmailMessageTypeNavigation)
                     .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
-                    .OrderByDescending(x => x.UpdDtm)
+                    .OrderByDescending(x => x.MessageDeliveryDtm)
                     .Select(x => new ActionHistoryDto
                     {
                         Action = x.EmailMessageTypeNavigation.EmailMessageTypeNm,
-                        Date = DateUtils.ConvertUtcToPacificTime((DateTime)x.UpdDtm!),
+                        Date = DateUtils.ConvertUtcToPacificTime((DateTime)x.MessageDeliveryDtm!),
                         UserGuid = x.UpdUserGuid
                     })
                     .ToListAsync());

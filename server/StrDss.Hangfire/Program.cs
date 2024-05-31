@@ -104,7 +104,11 @@ builder.Services
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
-        .UsePostgreSqlStorage(connString));
+        .UsePostgreSqlStorage((option) =>
+        {
+            option.UseNpgsqlConnection(connString);
+        }
+));
 
 builder.Services.AddHangfireServer(options =>
 {

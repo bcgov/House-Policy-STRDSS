@@ -341,15 +341,16 @@ namespace StrDss.Service
 
                 if (uploadLine == null || uploadLine.IsProcessed)
                 {
-                    _logger.LogInformation($"Skipping listing - already processed: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");)
-                    continue; //already processed
+                    _logger.LogInformation($"Skipping listing - already processed: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
+
+                    continue; 
                 }
 
-                _logger.LogInformation($"Processing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");)
+                _logger.LogInformation($"Processing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
 
                 hasError = !await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord);
 
-                _logger.LogInformation($"Finishing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");)
+                _logger.LogInformation($"Finishing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
             }
 
             if (hasError)

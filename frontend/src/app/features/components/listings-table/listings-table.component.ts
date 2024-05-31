@@ -31,6 +31,7 @@ import { ListingSearchRequest } from '../../../common/models/listing-search-requ
     DialogModule,
     InputTextModule,
     PanelModule,
+    ListingDetailsComponent
   ],
   templateUrl: './listings-table.component.html',
   styleUrl: './listings-table.component.scss'
@@ -85,6 +86,16 @@ export class ListingsTableComponent implements OnInit {
     }
 
     this.getListings(this.currentPage.pageNumber);
+  }
+
+  onDetailsOpen(row: ListingTableRow): void {
+    this.isDetailsShown = true;
+    this.selectedListing = row;
+  }
+
+  onDetailsClose(reason: 'close' | 'back'): void {
+    this.isDetailsShown = false;
+    this.selectedListing = null;
   }
 
   onPageChange(value: any): void {

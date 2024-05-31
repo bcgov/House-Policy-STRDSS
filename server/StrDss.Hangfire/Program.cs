@@ -108,7 +108,7 @@ builder.Services
 
 builder.Services.AddHangfireServer(options =>
 {
-    options.WorkerCount = 1;
+    options.WorkerCount = 5;
 });
 
 //Add logging

@@ -341,8 +341,9 @@ namespace StrDss.Service
                     continue; //already processed
                 }
 
-                if (await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord))
-                    hasError = true;
+                _logger.LogInformation($"Processing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
+
+                hasError = !await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord);
             }
 
             if (hasError)
@@ -419,7 +420,7 @@ namespace StrDss.Service
             {
                 SaveUploadLine(uploadLine, errors, true, "");
                 _unitOfWork.Commit();
-                return true;
+                return false;
             }
 
             var offeringOrg = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd); //already validated in the file upload
@@ -468,8 +469,6 @@ namespace StrDss.Service
 
         private async Task<DssRentalListing> CreateOrUpdateRentalListing(DssRentalListingReport report, OrganizationDto offeringOrg, RentalListingRowUntyped row)
         {
-            _logger.LogInformation($"Processing listing: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}, {offeringOrg.OrganizationNm}, {row.ListingId}");
-
             var listing = await _reportRepo.GetRentalListingAsync(report.RentalListingReportId, offeringOrg.OrganizationId, row.ListingId);
 
             if (listing == null)

@@ -24,12 +24,13 @@ namespace StrDss.Service.Hangfire
             //delete stalled jobs
             var monitor = context.Storage.GetMonitoringApi();
             var allJobs = monitor.ProcessingJobs(0, 999999999);
-            var cutoffTime = DateTime.UtcNow.AddMinutes(-10);
+            var cutoffTime = DateTime.UtcNow.AddHours(-12);
 
             foreach (var processingJob in allJobs)
             {
                 if (processingJob.Value.StartedAt < cutoffTime)
                 {
+                    Console.WriteLine($"[Hangfire] Deleting stalled job: {processingJob.Key} {processingJob.Value.InProcessingState} ");
                     BackgroundJob.Delete(processingJob.Key);
                 }
             }

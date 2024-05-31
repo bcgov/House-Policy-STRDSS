@@ -64,7 +64,7 @@ spec:
           command:
             ['sh', '-c']
           args:
-            ['. /vault/secrets/secrets.env && dotnet StrDss.Api.dll']
+            ['. /vault/secrets/secrets.env && dotnet StrDss.Hangfire.dll']
           env:
             - name: DEPLOYMENT_TAG
               value: {{ $deploymentTag | quote }}

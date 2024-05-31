@@ -15,8 +15,6 @@ namespace StrDss.Hangfire
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            Console.WriteLine("healthcheck");
-
             try
             {
                 using (var connection = new NpgsqlConnection(_connectionString))

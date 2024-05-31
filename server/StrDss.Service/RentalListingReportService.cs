@@ -446,6 +446,11 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
+            if (systemError.IsNotEmpty())
+            {
+                return false;
+            }
+
             var (needUpdate, masterListing) = await CreateOrUpdateMasterListing(report.ReportPeriodYm, listing, offeringOrg, row, physicalAddress);
 
             if (needUpdate)
@@ -457,7 +462,7 @@ namespace StrDss.Service
 
             tran.Commit();
 
-            return systemError.IsEmpty();
+            return true;
         }
 
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid, string systemError)

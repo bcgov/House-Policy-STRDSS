@@ -88,7 +88,7 @@ jobs:
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:${vtag//v}
 
   deploy:
-    needs: [docker-build-frontend, docker-build-backend]
+    needs: [docker-build-frontend, docker-build-backend, docker-build-hangfire]
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     permissions:

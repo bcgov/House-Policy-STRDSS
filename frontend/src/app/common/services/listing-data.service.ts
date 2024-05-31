@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
 import { ListingTableRow } from '../models/listing-table-row';
+import { ListingSearchRequest } from '../models/listing-search-request';
 
 @Injectable({
   providedIn: 'root'
@@ -60,14 +61,34 @@ export class ListingDataService {
     pageNumber: number = 1,
     pageSize: number = 10,
     orderBy: string = '',
-    direction: 'asc' | 'desc' = 'asc'
+    direction: 'asc' | 'desc' = 'asc',
+    searchReq: ListingSearchRequest = {}
   ): Observable<PagingResponse<ListingTableRow>> {
-    let url = `${environment.API_HOST}/rentallistings?pageSize=${pageSize}&pageNumber=${pageNumber}`;
+    let endpointUrl = `${environment.API_HOST}/rentallistings?pageSize=${pageSize}&pageNumber=${pageNumber}`;
 
     if (orderBy) {
-      url += `&orderBy=${orderBy}&direction=${direction}`;
+      endpointUrl += `&orderBy=${orderBy}&direction=${direction}`;
     }
 
-    return this.httpClient.get<PagingResponse<ListingTableRow>>(url);
+    if (searchReq.all) {
+      endpointUrl += `&all=${searchReq.all}`;
+    }
+    if (searchReq.address) {
+      endpointUrl += `&address=${searchReq.address}`;
+    }
+    if (searchReq.url) {
+      endpointUrl += `&url=${searchReq.url}`;
+    }
+    if (searchReq.listingId) {
+      endpointUrl += `&listingId=${searchReq.listingId}`;
+    }
+    if (searchReq.hostName) {
+      endpointUrl += `&hostName=${searchReq.hostName}`;
+    }
+    if (searchReq.businessLicense) {
+      endpointUrl += `&businessLicense=${searchReq.businessLicense}`;
+    }
+
+    return this.httpClient.get<PagingResponse<ListingTableRow>>(endpointUrl);
   }
 }

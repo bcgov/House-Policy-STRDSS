@@ -21,19 +21,19 @@ namespace StrDss.Service.Hangfire
             var job = context.Job;
             var jobFingerprint = GetJobFingerprint(job);
 
-            //delete stalled jobs
             var monitor = context.Storage.GetMonitoringApi();
-            var allJobs = monitor.ProcessingJobs(0, 999999999);
-            var cutoffTime = DateTime.UtcNow.AddHours(-12);
 
-            foreach (var processingJob in allJobs)
-            {
-                if (processingJob.Value.StartedAt < cutoffTime)
-                {
-                    Console.WriteLine($"[Hangfire] Deleting stalled job: {processingJob.Key} {processingJob.Value.InProcessingState} ");
-                    BackgroundJob.Delete(processingJob.Key);
-                }
-            }
+            //delete stalled jobs
+            //var allJobs = monitor.ProcessingJobs(0, 999999999);
+            //var cutoffTime = DateTime.UtcNow.AddHours(-12);
+            //foreach (var processingJob in allJobs)
+            //{
+            //    if (processingJob.Value.StartedAt < cutoffTime)
+            //    {
+            //        Console.WriteLine($"[Hangfire] Deleting stalled job: {processingJob.Key} {processingJob.Value.InProcessingState} ");
+            //        BackgroundJob.Delete(processingJob.Key);
+            //    }
+            //}
 
             //skip same job
             var fingerprints = monitor.ProcessingJobs(0, 999999999)

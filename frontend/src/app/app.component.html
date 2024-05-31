@@ -1,2 +1,13 @@
 <app-layout *ngIf="currentUserLoaded"></app-layout>
 <div *ngIf="!currentUserLoaded">Loading...</div>
+<div class="loader" *ngIf="isLoading">
+    <div class="spinner">
+        <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <div class="title">{{loaderTitle}}</div>
+</div>

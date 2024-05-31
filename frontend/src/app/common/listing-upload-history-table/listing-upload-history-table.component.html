@@ -1,5 +1,5 @@
 <h2>Platform Upload History</h2>
-<p-card>
+<p-card *ngIf="currentUser">
     <div class="form-group-row" *ngIf="!isSmall && currentUser.organizationType !== 'Platform'">
         <div class="form-group-row-col">
             <label for="platformId">Select Platform</label>

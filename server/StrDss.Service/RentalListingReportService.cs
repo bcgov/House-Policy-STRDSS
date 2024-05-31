@@ -334,16 +334,22 @@ namespace StrDss.Service
             while (csv.Read())
             {
                 var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
+
+                _logger.LogInformation($"Fetching listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
+
                 var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.ListingId);
 
-                if (uploadLine == null)
+                if (uploadLine == null || uploadLine.IsProcessed)
                 {
+                    _logger.LogInformation($"Skipping listing - already processed: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");)
                     continue; //already processed
                 }
 
-                _logger.LogInformation($"Processing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
+                _logger.LogInformation($"Processing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");)
 
                 hasError = !await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord);
+
+                _logger.LogInformation($"Finishing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");)
             }
 
             if (hasError)

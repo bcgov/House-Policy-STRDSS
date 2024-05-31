@@ -94,10 +94,10 @@ hangfire:
 
   resources:
     limits:
-      cpu: 300m
+      cpu: 400m
       memory: 600Mi
     requests:
-      cpu: 150m
+      cpu: 200m
       memory: 400Mi
 
   env:

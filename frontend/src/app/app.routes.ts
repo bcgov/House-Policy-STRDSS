@@ -52,12 +52,12 @@ export const routes: Routes = [
         component: DelistingRequestComponent,
         data: { permissions: [takedown_action] }
     },
-    // {
-    //     path: 'listings',
-    //     canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
-    //     component: ListingsTableComponent,
-    //     data: { permissions: [listing_read] }
-    // },
+    {
+        path: 'listings',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: ListingsTableComponent,
+        data: { permissions: [listing_read] }
+    },
     {
         path: 'access-request',
         canActivate: [accessRequestTokenGuard],

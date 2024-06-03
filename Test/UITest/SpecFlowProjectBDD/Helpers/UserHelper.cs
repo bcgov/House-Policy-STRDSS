@@ -14,30 +14,30 @@ namespace SpecFlowProjectBDD.Helpers
         {
             UserTypeEnum _UserType;
             switch (UserType.ToUpper())
-            {                
-                case "CEU ADMIN":
+            {
+                case "CEU_STAFF":
                     {
-                        _UserType = SFEnums.UserTypeEnum.CEUADMIN;
+                        _UserType = UserTypeEnum.CEUSTAFF;
                         break;
                     }
-                case "CEU STAFF":
+                case "CEU_ADMIN":
                     {
-                        _UserType = SFEnums.UserTypeEnum.CEUSTAFF;
+                        _UserType = UserTypeEnum.CEUADMIN;
                         break;
                     }
-                case "BC GOVERNMENT STAFF":
+                case "LG_STAFF":
                     {
-                        _UserType = SFEnums.UserTypeEnum.BCGOVERNMENT;
+                        _UserType = UserTypeEnum.LOCALGOVERNMENT;
                         break;
                     }
-                case "LOCAL GOVERNMENT":
+                case "PLATFORM_STAFF":
                     {
-                        _UserType = SFEnums.UserTypeEnum.LG;
+                        _UserType = UserTypeEnum.SHORTTERMRENTALPLATFORM;
                         break;
                     }
-                case "SHORT-TERM RENTAL PLATFORM":
+                case "bC_STAFF":
                     {
-                        _UserType = SFEnums.UserTypeEnum.PLATFORM;
+                        _UserType = UserTypeEnum.BCGOVERNMENTSTAFF;
                         break;
                     }
                 default:
@@ -50,7 +50,8 @@ namespace SpecFlowProjectBDD.Helpers
         {
             DssUserRole dssUserRole = DBContext.DssUserRoles.FirstOrDefault(p => p.UserRoleNm == RoleName);
 
-            return (dssUserRole);            
+            return (dssUserRole);
         }
     }
 }
+

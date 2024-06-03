@@ -33,16 +33,17 @@ Scenario: STRDSSLandingPage
 
 
 Examples:
-	| UserName      | UserType            | Environment | ExpectedResult |
-	| CEUATST       | CodeEnforementStaff | all         | pass           |
-	| STRDSSVrboDev | PlatformUser        | dev         | pass           |
-	#| CEUATST          | CodeEnforcementAdmin | all         |                |
-	#| STRDSSAitbnbtest | PlatformUser         | test        |                |
-	#| STRDSSVrboTest   | PlatformUser         | test        |                |
-	#| STRDSSLg1Test    | LocalGovernmentUser  | test        |                |
-	#| STRDSSLg2Test    | LocalGovernmentUser  | test        |                |
-	#| STRDSSLg1Dev     |                      | dev         |                |
-	#| STRDSSLg2T       |                      |             |                |
+	| UserName         | UserType       | Environment | ExpectedResult |
+	| CEUATST          | ceu_admin      | all         | pass           |
+	| CEUSTST          | ceu_staff      | all         | pass           |
+	| STRDSSLg1Dev     | lg_staff       | dev         | pass           |
+	#| STRDSSLg2Dev     | lg_staff       | dev         | pass           |
+	| STRDSSVrboDev    | platform_staff | dev         | pass           |
+	| STRDSSAirbnbDev | platform_staff | test        | pass           |
+	#| STRDSSVrboTest   | platform_staff | test        | pass           |
+	#| STRDSSLg1Test    | lg_staff       | test        | pass           |
+	#| STRDSSLg2Test    | lg_staff       | test        | Pass           |
+
 
 
 

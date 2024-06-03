@@ -76,8 +76,11 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("STRDSSLandingPage")]
         [NUnit.Framework.CategoryAttribute("LandingPage")]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "CodeEnforementStaff", "all", "pass", null)]
-        [NUnit.Framework.TestCaseAttribute("STRDSSVrboDev", "PlatformUser", "dev", "pass", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "ceu_admin", "all", "pass", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUSTST", "ceu_staff", "all", "pass", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Dev", "lg_staff", "dev", "pass", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSVrboDev", "platform_staff", "dev", "pass", null)]
+        [NUnit.Framework.TestCaseAttribute("STRDSSAirbnbDev", "platform_staff", "test", "pass", null)]
         public void STRDSSLandingPage(string userName, string userType, string environment, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {

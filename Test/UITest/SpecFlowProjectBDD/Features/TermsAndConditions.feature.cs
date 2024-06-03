@@ -76,7 +76,7 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("TermsAndConditions")]
         [NUnit.Framework.CategoryAttribute("TermsAndConditions")]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "CEU Admin", "ceuatst@gov.bc.ca", "all", "pass", null)]
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "ceu_admin", "ceuatst@gov.bc.ca", "all", "pass", null)]
         public void TermsAndConditions(string userName, string roleName, string email, string environment, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {

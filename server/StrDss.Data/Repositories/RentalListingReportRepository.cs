@@ -18,7 +18,9 @@ namespace StrDss.Data.Repositories
         void DeleteListingContacts(long listingId);
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
-        Task UpdateListingStatus(long providingPlatformId);
+        Task UpdateInactiveListings(long providingPlatformId);
+        Task UpdateListingStatus(long providingPlatformId, long listingId);
+        Task<int> GetTotalNumberOfUploadLines(long uploadId);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
     {
@@ -93,40 +95,62 @@ namespace StrDss.Data.Repositories
                 .FirstOrDefaultAsync(x => x.UploadDeliveryId == deliveryId);
         }
 
-        public async Task UpdateListingStatus(long providingPlatformId)
+        public async Task UpdateInactiveListings(long providingPlatformId)
         {
             var reports = await _dbSet.AsNoTracking()
                 .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
                 .ToListAsync();
 
-            var masterListings = await _dbContext.DssRentalListings
+            var latestPeriodYm = reports.Max(x => x.ReportPeriodYm);
+            var lastestReport = reports.First(x => x.ReportPeriodYm == latestPeriodYm);
+
+            var inactiveListings = await _dbContext.DssRentalListings
                 .Include(x => x.DerivedFromRentalListing)
                     .ThenInclude(x => x.IncludingRentalListingReport)
-                .Where(x => x.DerivedFromRentalListing != null && x.DerivedFromRentalListing.IncludingRentalListingReport!.ProvidingOrganizationId == providingPlatformId)
+                .Where(x => x.DerivedFromRentalListing != null && 
+                    x.DerivedFromRentalListing.IncludingRentalListingReport!.ProvidingOrganizationId == providingPlatformId &&
+                    x.DerivedFromRentalListing.IncludingRentalListingReport!.RentalListingReportId != lastestReport.RentalListingReportId)
                 .ToArrayAsync();
 
+            foreach (var listing in inactiveListings)
+            {
+                listing.IsActive = false;
+                listing.IsNew = false;
+            }
+        }
+
+        public async Task UpdateListingStatus(long providingPlatformId, long listingId)
+        {
+            var reports = await _dbSet.AsNoTracking()
+                .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
+                .ToListAsync();
+
+            var listing = await _dbContext.DssRentalListings
+                .Include(x => x.DerivedFromRentalListing)
+                    .ThenInclude(x => x.IncludingRentalListingReport)
+                .FirstAsync(x => x.RentalListingId == listingId);
+    
             if (reports.Count == 0)
             {
-                foreach (var listing in masterListings)
-                {
-                    listing.IsActive = true;
-                    listing.IsNew = true;
-                }
+                listing.IsActive = true;
+                listing.IsNew = true;
             }
             else
             {
                 var latestPeriodYm = reports.Max(x => x.ReportPeriodYm);
 
-                foreach (var listing in masterListings)
-                {
-                    var isActive = listing.DerivedFromRentalListing!.IncludingRentalListingReport!.ReportPeriodYm == latestPeriodYm;
-                    var count = _dbContext.DssRentalListings
-                        .Count(x => x.OfferingOrganizationId == listing.OfferingOrganizationId && x.PlatformListingNo == listing.PlatformListingNo && x.DerivedFromRentalListing == null);
+                var isActive = listing.DerivedFromRentalListing!.IncludingRentalListingReport!.ReportPeriodYm == latestPeriodYm;
+                var count = _dbContext.DssRentalListings
+                    .Count(x => x.OfferingOrganizationId == listing.OfferingOrganizationId && x.PlatformListingNo == listing.PlatformListingNo && x.DerivedFromRentalListing == null);
 
-                    listing.IsActive = isActive;
-                    listing.IsNew = isActive && count == 1;
-                }
+                listing.IsActive = isActive;
+                listing.IsNew = isActive && count == 1;
             }
+        }
+
+        public async Task<int> GetTotalNumberOfUploadLines(long uploadId)
+        {
+            return await _dbContext.DssUploadLines.Where(x => x.IncludingUploadDeliveryId == uploadId).CountAsync();
         }
     }
 }

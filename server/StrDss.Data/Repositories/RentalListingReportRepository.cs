@@ -108,6 +108,7 @@ namespace StrDss.Data.Repositories
                 .Include(x => x.DerivedFromRentalListing)
                     .ThenInclude(x => x.IncludingRentalListingReport)
                 .Where(x => x.DerivedFromRentalListing != null && 
+                    x.IsActive == true &&
                     x.DerivedFromRentalListing.IncludingRentalListingReport!.ProvidingOrganizationId == providingPlatformId &&
                     x.DerivedFromRentalListing.IncludingRentalListingReport!.RentalListingReportId != lastestReport.RentalListingReportId)
                 .ToArrayAsync();

@@ -302,6 +302,8 @@ namespace StrDss.Service
             _logger.LogInformation($"Processing Rental Listing Report {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
 
             var reportPeriodYm = (DateOnly)upload.ReportPeriodYm!;
+            var lineCount = await _reportRepo.GetTotalNumberOfUploadLines(upload.UploadDeliveryId);
+            var count = 0;
 
             var report = await _reportRepo.GetRentalListingReportAsync(upload.ProvidingOrganizationId, reportPeriodYm);
 
@@ -330,9 +332,13 @@ namespace StrDss.Service
             csv.Read();
             var headerExists = csv.ReadHeader();
             var hasError = false;
+            var isLastLine = false;
 
             while (csv.Read())
             {
+                count++;
+                isLastLine = count == lineCount;
+
                 var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
 
                 _logger.LogInformation($"Fetching listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
@@ -348,7 +354,7 @@ namespace StrDss.Service
 
                 _logger.LogInformation($"Processing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
 
-                hasError = !await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord);
+                hasError = !await ProcessUploadLine(report, upload, uploadLine, row, isLastLine);
 
                 _logger.LogInformation($"Finishing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
             }
@@ -409,23 +415,24 @@ namespace StrDss.Service
                 _unitOfWork.CommitTransaction(transaction);
             }
 
-            _logger.LogInformation($"Updating Status: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
-
-            await _reportRepo.UpdateListingStatus(report.ProvidingOrganizationId);
-
-            _unitOfWork.Commit();
-
             _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
         }
 
-        private async Task<bool> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)
+        private async Task<bool> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, bool isLastLine)
         {
             var errors = new Dictionary<string, List<string>>();
+            
             _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
 
             if (errors.Count > 0)
             {
                 SaveUploadLine(uploadLine, errors, true, "");
+
+                if (isLastLine)
+                {
+                    await UpdateInactiveListings(upload.ProvidingOrganizationId);
+                }
+
                 _unitOfWork.Commit();
                 return false;
             }
@@ -448,6 +455,12 @@ namespace StrDss.Service
 
             if (systemError.IsNotEmpty())
             {
+                if (isLastLine)
+                {
+                    await UpdateInactiveListings(upload.ProvidingOrganizationId);
+                }
+
+                tran.Commit();
                 return false;
             }
 
@@ -460,9 +473,23 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            tran.Commit();
+            await _reportRepo.UpdateListingStatus(upload.ProvidingOrganizationId, masterListing.RentalListingId);
 
+            _unitOfWork.Commit();
+
+            if (isLastLine)
+            {
+                await UpdateInactiveListings(upload.ProvidingOrganizationId);
+            }
+
+            tran.Commit();
             return true;
+        }
+
+        private async Task UpdateInactiveListings(long providingOrganizationId)
+        {
+            await _reportRepo.UpdateInactiveListings(providingOrganizationId);
+            _unitOfWork.Commit();
         }
 
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid, string systemError)

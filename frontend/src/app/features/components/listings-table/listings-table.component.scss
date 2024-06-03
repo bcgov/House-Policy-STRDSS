@@ -4,14 +4,37 @@
     padding: 0 24px 24px 24px;
     background-color: #FFFFFF;
 
+    .takedown-notice-wrapper {
+        position: absolute;
+        top: 118px;
+        left: 184px;
+        background-color: #FFFFFF;
+        width: calc(100% - 368px);
+        height: calc(100% - 157px);
+        z-index: 2;
+
+        padding: 24px;
+        padding-top: 0;
+        overflow: hidden;
+
+        .header {
+            height: 60px;
+            width: 100%;
+        }
+
+        .content {
+            overflow: auto;
+            width: 100%;
+            height: calc(100% - 60px);
+        }
+    }
+
     .top-block {
         width: 100%;
         display: flex;
         justify-content: space-between;
         line-height: 32px;
         align-items: center;
-
-        .title {}
 
         .search-container {
             display: flex;

@@ -20,7 +20,7 @@ namespace StrDss.Service.EmailTemplates
         public bool Preview { get; set; } = false;
         public string EmailMessageType { get; set; } = "";
         public IEnumerable<EmailAttachment> Attachments { get; set; } = Enumerable.Empty<EmailAttachment>();
-        public List<string> EmailsToHide { get; set; } = new List<string>();
+        public IEnumerable<string> EmailsToHide { get; set; } = new List<string>();
 
         public string GetPreviewContent()
         {

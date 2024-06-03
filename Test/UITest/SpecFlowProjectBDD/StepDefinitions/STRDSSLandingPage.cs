@@ -25,6 +25,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private bool _ExpectedResult = false;
         private AppSettings _AppSettings;
         private SFEnums.UserTypeEnum _UserType;
+        private SFEnums.LogonTypeEnum _LogonType;
         private BCIDPage _BCIDPage;
 
         public STRDSSLandingPage(SeleniumDriver Driver)
@@ -53,9 +54,11 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _Driver.Navigate();
 
             AuthHelper authHelper = new AuthHelper(_Driver);
+            UserHelper userHelper = new UserHelper();
 
+            _UserType = userHelper.SetUserType(UserType);
             //Authenticate user using IDir or BCID depending on the user
-            _UserType = authHelper.Authenticate(UserName, UserType);
+            _LogonType = authHelper.Authenticate(UserName, _UserType);
             
             IWebElement TOC = null;
 
@@ -88,7 +91,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should find where I can submit delisting warnings and requests to short-term rental platforms")]
         public void IShouldFindWhereICanSubmitDelistingWarningsAndRequests()
         {
-            if (_UserType == UserTypeEnum.BCGOVERNMENT)
+            if (_UserType == UserTypeEnum.LOCALGOVERNMENT)
             {
                 ClassicAssert.True(_LandingPage.SendNoticeButton.IsEnabled());
                 ClassicAssert.True(_LandingPage.SendTakedownLetterButton.IsEnabled());
@@ -106,7 +109,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should find where I can upload a CSV file")]
         public void IShouldFindWhereICanUploadACSVDile()
         {
-            if (_UserType == UserTypeEnum.PLATFORM)
+            if (_UserType == UserTypeEnum.SHORTTERMRENTALPLATFORM)
             {
                 ClassicAssert.True(_LandingPage.Upload_ListingsButton.IsEnabled());
             }
@@ -116,7 +119,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should see some information about my obligations as a platform")]
         public void IShouldSeeSomeInformationAboutMyObligationsAsAPlatform()
         {
-            if (_UserType == UserTypeEnum.PLATFORM)
+            if (_UserType == UserTypeEnum.SHORTTERMRENTALPLATFORM)
             {
                 ClassicAssert.True(_LandingPage.ViewPolicyGuidenceButton.IsEnabled());
             }

@@ -2,9 +2,12 @@
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using OpenQA.Selenium.DevTools.V118.Debugger;
+using SpecFlowProjectBDD.Helpers;
+using System.Reflection.Metadata;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
+using static SpecFlowProjectBDD.SFEnums;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -49,14 +52,10 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _Driver.Navigate();
 
             _PathFinderPage.IDRButton.Click();
+            AuthHelper authHelper = new AuthHelper(_Driver);
 
-            _IDirPage.UserNameTextBox.WaitFor(5);
-
-            _IDirPage.UserNameTextBox.EnterText(_TestUserName);
-
-            _IDirPage.PasswordTextBox.EnterText(_TestPassword);
-
-            _IDirPage.ContinueButton.Click();
+            //Authenticate user using IDir or BCID depending on the user
+            authHelper.Authenticate(_TestUserName, UserTypeEnum.BCGOVERNMENTSTAFF);
 
 
             IWebElement TOC = null;
@@ -112,7 +111,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
                 //wait for element to become visable
                 try
                 {
-                    result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1)"").checkVisibility()");
+                    result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table"").checkVisibility()");
                     found = true;
                 }
                 catch (JavaScriptException ex)
@@ -121,16 +120,16 @@ namespace SpecFlowProjectBDD.StepDefinitions
                 }
 
             }
-
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1)"").checkVisibility()");
+            
+            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody"").checkVisibility()");
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > thead > tr > th:nth-child(3)"").textContent.toLowerCase().trim() === ""first name""");
+            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(3)"").textContent.toLowerCase().trim() === ""first name""");
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > thead > tr > th:nth-child(4)"").textContent.toLowerCase().trim() === ""last name""");
+            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(4)"").textContent.toLowerCase().trim() === ""last name""");
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > thead > tr > th:nth-child(5)"").textContent.toLowerCase().trim() === ""org""");
+            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(7)"").textContent.toLowerCase().trim() === ""organization""");
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > thead > tr > th:nth-child(6)"").textContent.toLowerCase().trim() === ""email address""");
+            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(6)"").textContent.toLowerCase().trim() === ""email address""");
             ClassicAssert.IsTrue(result);
         }
 
@@ -144,7 +143,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should be able to view detailed information provided by the user, including their role request and any justifications or additional comments")]
         public void ShouldBeAbleToViewDetailedInformationProvidedByTheUser()
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1)"").checkVisibility()");
+            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody > tr:nth-child(1)"").checkVisibility()");
             ClassicAssert.IsTrue(result);
         }
 
@@ -157,7 +156,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a Grant Access button allowing me to approve the user's request")]
         public void ThereShouldBeAGrantAccessButton()
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div > span"").checkVisibility()");
+            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div"").checkVisibility()");
             ClassicAssert.IsTrue(result);
         }
 
@@ -188,13 +187,12 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("Reviewing an access request that has been granted")]
         public void ReviewingAnAccessRequestThatHasBeenGranted()
         {
-            _ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div > span"").click()");
         }
 
         [Then("There should be a Remove Access option allowing me to remove the user's access if it is deemed inappropriate or unnecessary")]
         public void ThereShouldBeARemoveAccessOption()
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_10-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div > span"").checkVisibility()");
+            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div"").checkVisibility()");
             ClassicAssert.IsTrue(result);
         }
 

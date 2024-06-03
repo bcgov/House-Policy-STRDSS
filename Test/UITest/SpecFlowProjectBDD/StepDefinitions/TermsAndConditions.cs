@@ -27,6 +27,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private string _TestEmail;
         private string _TestUserType;
         private SFEnums.UserTypeEnum _UserType;
+        private SFEnums.LogonTypeEnum _LogonType;
         private bool _ExpectedResult = false;
         private AppSettings _AppSettings;
         private DssDbContext _DssDBContext;
@@ -52,7 +53,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _DssDBContext = new DssDbContext(dbContextOptions);
 
             // Retrieve the role
-            DssUserRole userRole = _DssDBContext.DssUserRoles.FirstOrDefault(p => p.UserRoleNm == _TestUserType);
+            DssUserRole userRole = _DssDBContext.DssUserRoles.FirstOrDefault(p => p.UserRoleCd == _TestUserType);
 
             // Retrieve the user identity
             var identity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == _TestEmail);
@@ -83,12 +84,16 @@ namespace SpecFlowProjectBDD.StepDefinitions
         //User Authentication
         //[Given(@"that I am an authenticated user ""(.*)"" and the expected result is ""(.*)""")]
         [Given(@"that I am an authenticated User ""(.*)"" and the expected result is ""(.*)"" and I am a ""(.*)"" user")]
-        public void GivenIAmAauthenticatedGovernmentUseer(string UserName, string ExpectedResult, string UserType)
+        public void GivenIAmAauthenticatedGovernmentUser(string UserName, string ExpectedResult, string UserType)
         {
             _TestUserName = UserName;
             _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
-            _TestUserType = UserType;
+
+            UserHelper userHelper = new UserHelper();
+
+            _UserType = userHelper.SetUserType(UserType);
+
         }
 
         [When("I log in or access the system")]
@@ -100,7 +105,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             AuthHelper authHelper = new AuthHelper(_Driver);
 
             //Authenticate user using IDir or BCID depending on the user
-            _UserType = authHelper.Authenticate(_TestUserName, _TestUserType);
+            _LogonType = authHelper.Authenticate(_TestUserName, _UserType);
 
             //TODO: Validate that the login was sucessfull
         }

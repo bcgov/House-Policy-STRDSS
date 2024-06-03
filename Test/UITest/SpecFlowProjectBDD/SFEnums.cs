@@ -8,6 +8,7 @@ namespace SpecFlowProjectBDD
 {
     public static class SFEnums
     {
-        public enum UserTypeEnum {BCGOVERNMENT, PLATFORM, LG, CEUADMIN, CEUSTAFF }
+        public enum UserTypeEnum { CEUSTAFF, CEUADMIN, LOCALGOVERNMENT, BCGOVERNMENTSTAFF, SHORTTERMRENTALPLATFORM }
+        public enum LogonTypeEnum { IDIR, BCID }
     }
 }

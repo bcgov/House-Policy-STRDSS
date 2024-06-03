@@ -65,10 +65,10 @@ Then TOC flag will be set to true
 
 Then I will not have to accept the TOC in order to access the system
 
-
+#RoleName is the value for user_role_cd in the public.dss_user_role DB table
 Examples:
 	| UserName     | RoleName  | Email             | Environment | ExpectedResult |
-	| CEUATST      | CEU Admin | ceuatst@gov.bc.ca | all         | pass           |
+	| CEUATST      | ceu_admin | ceuatst@gov.bc.ca | all         | pass           |
 	#| STRDSSLg1Dev | lg_staff  | ceuatst@gov.bc.ca | all         | pass           |
 
 

@@ -20,12 +20,10 @@ namespace SpecFlowProjectBDD.Helpers
             DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
 
             _DssDBContext = new DssDbContext(dbContextOptions);
-
         }
 
         public List<DssUserIdentity> GetIdentities()
         {
-
             return (_DssDBContext.DssUserIdentities.ToList());
         }
 

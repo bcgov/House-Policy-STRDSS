@@ -607,18 +607,18 @@
 					"formdata": [
 						{
 							"key": "ReportPeriod",
-							"value": "2024-04",
+							"value": "2024-02",
 							"type": "text"
 						},
 						{
 							"key": "OrganizationId",
-							"value": "2",
+							"value": "590",
 							"type": "text"
 						},
 						{
 							"key": "File",
 							"type": "file",
-							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/listing-valid-2024-04.csv"
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/listing-valid-2024-02.csv"
 						}
 					]
 				},
@@ -695,7 +695,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistings?pageSize=10&pageNumber=1",
+					"raw": "{{host}}/api/rentallistings?pageSize=10&pageNumber=1&orderBy=platformListingNo&direction=desc",
 					"host": [
 						"{{host}}"
 					],
@@ -711,7 +711,34 @@
 						{
 							"key": "pageNumber",
 							"value": "1"
+						},
+						{
+							"key": "orderBy",
+							"value": "platformListingNo"
+						},
+						{
+							"key": "direction",
+							"value": "desc"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Listing",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistings/450",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"450"
 					]
 				}
 			},

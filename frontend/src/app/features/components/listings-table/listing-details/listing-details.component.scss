@@ -1,12 +1,80 @@
 :host {
-    .legend-container {
-        width: 100px;
+    width: 100%;
+    padding: 0 24px 24px 24px;
+    background-color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
 
-        button {
-            font-size: 16px;
+    .header-container {
+        display: flex;
+        justify-content: space-between;
 
-            .pi {
-                font-size: 14px;
+        .legend-container {
+            padding-top: 12px;
+
+            button {
+                font-size: 16px;
+
+                .pi {
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+
+    .subtitle {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+
+        .last-updated-container,
+        .platform-container {
+            min-width: 350px;
+        }
+    }
+
+    .content {
+        width: 100%;
+        display: flex;
+
+        .main-block {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+            padding: 12px 12px 0 0;
+            width: calc(100% - 420px);
+
+        }
+
+        .sidebar {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+            padding: 12px 0 0 12px;
+            width: 420px;
+        }
+
+        p-panel {
+
+            .row {
+                &:not(:last-of-type) {
+                    margin-bottom: 6px;
+                }
+
+                button {
+                    i {
+                        margin-right: 6px;
+                    }
+                }
+
+                .label {
+                    font-weight: 600;
+                }
+
+                .value {
+                    padding-left: 8px;
+                }
+
             }
         }
     }

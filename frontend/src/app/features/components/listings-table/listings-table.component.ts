@@ -17,6 +17,7 @@ import { User } from '../../../common/models/user';
 import { ceu_action } from '../../../common/consts/permissions.const';
 import { ListingDetailsComponent } from './listing-details/listing-details.component';
 import { ListingSearchRequest } from '../../../common/models/listing-search-request';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-listings-table',
@@ -31,6 +32,7 @@ import { ListingSearchRequest } from '../../../common/models/listing-search-requ
     DialogModule,
     InputTextModule,
     PanelModule,
+    RouterModule,
     ListingDetailsComponent
   ],
   templateUrl: './listings-table.component.html',
@@ -51,7 +53,11 @@ export class ListingsTableComponent implements OnInit {
   // MOCK: 
   isNotImplemented = true;
 
-  constructor(private listingService: ListingDataService, private userService: UserDataService) { }
+  constructor(
+    private listingService: ListingDataService,
+    private userService: UserDataService,
+    private router: Router,
+  ) { }
 
   ngOnInit(): void {
     this.searchColumns = [
@@ -89,8 +95,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   onDetailsOpen(row: ListingTableRow): void {
-    this.isDetailsShown = true;
-    this.selectedListing = row;
+    this.router.navigateByUrl(`/listings/${row.rentalListingId}`);
   }
 
   onDetailsClose(reason: 'close' | 'back'): void {

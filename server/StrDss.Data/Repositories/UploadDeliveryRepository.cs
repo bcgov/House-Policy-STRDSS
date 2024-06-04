@@ -15,6 +15,7 @@ namespace StrDss.Data.Repositories
         Task<DssUploadDelivery?> GetRentalReportUploadToProcessAsync();
         Task<DssUploadDelivery?> GetRentalListingErrorLines(long uploadId);
         Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId);
+        Task<List<UploadLineToProcess>> GetUploadLinesToProcessAsync(long uploadId);
     }
 
     public class UploadDeliveryRepository : RepositoryBase<DssUploadDelivery>, IUploadDeliveryRepository
@@ -61,6 +62,14 @@ namespace StrDss.Data.Repositories
             _logger.LogInformation($"Fetched listing ({orgCd} - {listingId}) - {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
 
             return line;
+        }
+
+        public async Task<List<UploadLineToProcess>> GetUploadLinesToProcessAsync(long uploadId)
+        {
+            return await _dbContext.DssUploadLines.AsNoTracking()
+                .Where(x => x.IncludingUploadDeliveryId == uploadId && x.IsProcessed == false)
+                .Select(x => new UploadLineToProcess { ListingId = x.SourceRecordNo, OrgCd = x.SourceOrganizationCd })
+                .ToListAsync();
         }
 
         public async Task<DssUploadDelivery?> GetRentalListingErrorLines(long uploadId)

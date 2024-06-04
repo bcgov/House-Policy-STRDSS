@@ -156,6 +156,14 @@ body {
                 font-size: 16px;
             }
 
+            &.zero-padding {
+                padding: 0;
+            }
+
+            &:disabled {
+                background-color: transparent;
+            }
+
             &:hover {
                 text-decoration-line: underline;
             }

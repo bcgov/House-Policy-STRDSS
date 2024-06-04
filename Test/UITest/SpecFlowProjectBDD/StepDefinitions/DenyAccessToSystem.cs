@@ -1,5 +1,10 @@
 ﻿using Configuration;
+using DataBase.Entities;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using SpecFlowProjectBDD.Helpers;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
@@ -18,8 +23,22 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
         private string _TestUserName;
         private string _TestPassword;
+        private string _TestEmail;
         private bool _ExpectedResult = false;
+        private SFEnums.UserTypeEnum _UserType;
+        private DssDbContext _DssDBContext;
+        private DssUserIdentity _UserIdentity;
+        private bool _OriginalEnabledValue;
         AppSettings _AppSettings;
+
+
+        [BeforeScenario]
+        public void TestSetup()
+        {
+            DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
+            _DssDBContext = new DssDbContext(dbContextOptions);
+        }
+
 
         public DenyAccessToSystem(SeleniumDriver Driver)
         {
@@ -33,30 +52,59 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
         //User Authentication
         [Given(@"that I am an authenticated LG, CEU, Provincial Gov or Platform user and the expected result is ""(.*)""")]
-        public void GivenIAmAauthenticatedGovernmentUseer(string ExpectedResult)
+        public void GivenIAmAauthenticatedGovernmentUser(string ExpectedResult)
         {
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
             _Driver.Url = _AppSettings.GetServer("default");
             _Driver.Navigate();
 
-            _PathFinderPage.IDRButton.Click();
+            //_PathFinderPage.IDRButton.Click();
         }
 
-
-        [When(@"I attempt to access the Data Sharing System as ""(.*)""")]
-        public void IAttemptToAccessTheDataSharingSystem(string UserName)
+              //I attempt to access the Data Sharing System as "<UserName>" with email "<Email>" and RoleName "<RoleName>"
+        //[When(@"I attempt to access the Data Sharing System as ""(.*)"" with email ""(.*)"" and Role ""(.*)""")]
+        [When(@"I attempt to access the Data Sharing System as ""(.*)"" with email ""(.*)"" and Role ""(.*)""")]
+        public void IAttemptToAccessTheDataSharingSystem(string UserName, string Email, string RoleName)
         {
+            if (string.IsNullOrWhiteSpace(UserName))
+            {
+                throw new ArgumentException("UserName cannot be empty");
+            }
+
+            if ((string.IsNullOrWhiteSpace(Email)))
+            {
+                throw new ArgumentException("Email cannot be empty");
+            }
+
+            if ((string.IsNullOrWhiteSpace(RoleName)))
+            {
+                throw new ArgumentException("Rolename cannot be empty");
+            }
+
             _TestUserName = UserName;
             _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
+            _TestEmail = Email;
+            //////////////////// DB Setup ////////////////////////////////////////
+            // Retrieve the user identity
+            _UserIdentity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == _TestEmail);
+            _OriginalEnabledValue = _UserIdentity.IsEnabled;
 
-            _IDirPage.UserNameTextBox.WaitFor(5);
+            // Update properties of the identity
+            _UserIdentity.IsEnabled = false;
 
-            _IDirPage.UserNameTextBox.EnterText(_TestUserName);
+            _DssDBContext.SaveChanges();
+            /////////////////////////////////////////////////////////////
+            
+            UserHelper userHelper = new UserHelper();
 
-            _IDirPage.PasswordTextBox.EnterText(_TestPassword);
+            _UserType = userHelper.SetUserType(RoleName);
 
-            _IDirPage.ContinueButton.Click();
+            AuthHelper authHelper = new AuthHelper(_Driver);
+
+            //Authenticate user using IDir or BCID depending on the user
+            authHelper.Authenticate(_TestUserName, _UserType);
+
         }
 
         [Then("I dont have the required access permissions")]
@@ -70,6 +118,16 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             System.Threading.Thread.Sleep(1000);
             ClassicAssert.IsTrue(_LayoutPage.Driver.PageSource.Contains("401 Access Denied"));
+        }
+
+        [AfterScenario]
+        public void TestTearDown()
+        {
+            //restore original User value
+
+            _UserIdentity.IsEnabled = _OriginalEnabledValue;
+
+            _DssDBContext.SaveChanges();
         }
     }
 }

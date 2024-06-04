@@ -37,12 +37,12 @@ namespace SpecFlowProjectBDD.Helpers
             switch (UserType)
             {
                 case UserTypeEnum.BCGOVERNMENTSTAFF:
+                case UserTypeEnum.CEUSTAFF:
+                case UserTypeEnum.CEUADMIN:
                     {
                         _LogonType = SFEnums.LogonTypeEnum.IDIR;
                         break;
                     }
-                case UserTypeEnum.CEUSTAFF:
-                case UserTypeEnum.CEUADMIN:
                 case UserTypeEnum.LOCALGOVERNMENT:
                 case UserTypeEnum.SHORTTERMRENTALPLATFORM:
                     {

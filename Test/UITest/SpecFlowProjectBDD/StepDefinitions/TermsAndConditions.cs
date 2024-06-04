@@ -1,6 +1,7 @@
 ﻿using Configuration;
 using DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using OpenQA.Selenium.DevTools.V118.Debugger;
@@ -31,6 +32,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private bool _ExpectedResult = false;
         private AppSettings _AppSettings;
         private DssDbContext _DssDBContext;
+        private DssUserIdentity _UserIdentity;
+        private DssUserIdentity _OriginalUserIdentity;
 
         public TermsAndConditions(SeleniumDriver Driver)
         {
@@ -42,31 +45,34 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _AppSettings = new AppSettings();
         }
 
+        [SetUp]
+        public void TestSetUp()
+        {
+            DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
+            _DssDBContext = new DssDbContext(dbContextOptions);
+        }
+
         [Given(@"User ""(.*)"" is enabled, approved, has the correct roles ""(.*)"", but has not accepted TOC")]
-        public void TestSetup(string UserEmail, string UserType)
+        public void UserIsEnabledApprovedAndHasCorrectRoles(string UserEmail, string UserType)
         {
             _TestEmail = UserEmail;
             _TestUserType = UserType;
-
-
-            DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
-            _DssDBContext = new DssDbContext(dbContextOptions);
 
             // Retrieve the role
             DssUserRole userRole = _DssDBContext.DssUserRoles.FirstOrDefault(p => p.UserRoleCd == _TestUserType);
 
             // Retrieve the user identity
-            var identity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == _TestEmail);
+            _UserIdentity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == _TestEmail);
 
             // Update properties of the identity
-            identity.AccessRequestStatusCd = "Approved";
-            identity.IsEnabled = true;
-            identity.TermsAcceptanceDtm = null;
-            identity.RepresentedByOrganizationId = 1;
+            _UserIdentity.AccessRequestStatusCd = "Approved";
+            _UserIdentity.IsEnabled = true;
+            _UserIdentity.TermsAcceptanceDtm = null;
+            _UserIdentity.RepresentedByOrganizationId = 1;
 
             _DssDBContext.SaveChanges();
 
-            userRole.UserIdentities.Add(identity);
+            userRole.UserIdentities.Add(_UserIdentity);
 
             // Add the identity to the CEU Admin role
             try
@@ -84,7 +90,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         //User Authentication
         //[Given(@"that I am an authenticated user ""(.*)"" and the expected result is ""(.*)""")]
         [Given(@"that I am an authenticated User ""(.*)"" and the expected result is ""(.*)"" and I am a ""(.*)"" user")]
-        public void GivenIAmAauthenticatedGovernmentUser(string UserName, string ExpectedResult, string UserType)
+        public void GivenIAmAauthenticatedGovernmentUser(string UserName, string ExpectedResult, string RoleName)
         {
             _TestUserName = UserName;
             _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
@@ -92,7 +98,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             UserHelper userHelper = new UserHelper();
 
-            _UserType = userHelper.SetUserType(UserType);
+            _UserType = userHelper.SetUserType(RoleName);
 
         }
 
@@ -238,6 +244,16 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I will not have to accept the TOC in order to access the system")]
         public void IWillNotHaveToAcceptTheTOC()
         {
+        }
+
+        [TearDown]
+        public void TestTearDown()
+        {
+            //restore original User Identity
+
+            _UserIdentity = _OriginalUserIdentity;
+
+            _DssDBContext.SaveChanges();
         }
     }
 }

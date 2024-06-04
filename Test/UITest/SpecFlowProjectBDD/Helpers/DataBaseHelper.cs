@@ -31,11 +31,30 @@ namespace SpecFlowProjectBDD.Helpers
         {
             if (null == email)
             {
-                throw new ArgumentNullException("email");
+                throw new ArgumentNullException("Email cannot be null");
             }
-            var identity = _DssDBContext.DssUserIdentities.Where(p => p.EmailAddressDsc == email).FirstOrDefault<DssUserIdentity>();
+            DssUserIdentity? identity = _DssDBContext.DssUserIdentities.Where(p => p.EmailAddressDsc == email).FirstOrDefault<DssUserIdentity>();
 
             return (identity);
         }
+
+
+        public DssUserRole? GetUserRole(string TestUserType)
+        {
+            if (null == TestUserType)
+            {
+                throw new ArgumentNullException("UserType cannot be null");
+            }
+
+            DssUserRole? userRole = _DssDBContext.DssUserRoles.FirstOrDefault(p => p.UserRoleCd == TestUserType);
+
+            return (userRole);
+        }
+
+        public void SaveChanges()
+        {
+            _DssDBContext.SaveChanges();
+        }
+
     }
 }

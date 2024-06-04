@@ -18,6 +18,7 @@ namespace StrDss.Data.Repositories
         Task<List<UploadLineToProcess>> GetUploadLinesToProcessAsync(long uploadId);
         Task<long[]> GetUploadLineIdsWithErrors(long uploadId);
         Task<UploadLineError> GetUploadLineWithError(long lineId);
+        Task<bool> UploadHasErrors(long uploadId);
     }
 
     public class UploadDeliveryRepository : RepositoryBase<DssUploadDelivery>, IUploadDeliveryRepository
@@ -101,6 +102,12 @@ namespace StrDss.Data.Repositories
                 .Where(x => x.UploadLineId == lineId)
                 .Select(x => new UploadLineError { LineText = x.SourceLineTxt, ErrorText = x.ErrorTxt })
                 .FirstAsync();
+        }
+
+        public async Task<bool> UploadHasErrors(long uploadId)
+        {
+            return await _dbContext.DssUploadLines.AsNoTracking()
+                .AnyAsync(x => x.IncludingUploadDeliveryId == uploadId && (x.IsValidationFailure || x.IsSystemFailure));
         }
     }
 }

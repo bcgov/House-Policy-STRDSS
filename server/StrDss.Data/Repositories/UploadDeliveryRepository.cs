@@ -13,9 +13,11 @@ namespace StrDss.Data.Repositories
         Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly periodYm, long orgId, string hashValue);
         Task AddUploadDeliveryAsync(DssUploadDelivery upload);
         Task<DssUploadDelivery?> GetRentalReportUploadToProcessAsync();
-        Task<DssUploadDelivery?> GetRentalListingErrorLines(long uploadId);
+        Task<DssUploadDelivery?> GetRentalListingUploadWithErrors(long uploadId);
         Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId);
         Task<List<UploadLineToProcess>> GetUploadLinesToProcessAsync(long uploadId);
+        Task<long[]> GetUploadLineIdsWithErrors(long uploadId);
+        Task<UploadLineError> GetUploadLineWithError(long lineId);
     }
 
     public class UploadDeliveryRepository : RepositoryBase<DssUploadDelivery>, IUploadDeliveryRepository
@@ -72,13 +74,33 @@ namespace StrDss.Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<DssUploadDelivery?> GetRentalListingErrorLines(long uploadId)
+        public async Task<DssUploadDelivery?> GetRentalListingUploadWithErrors(long uploadId)
         {
-            //todo: data control
+            var query = _dbSet.AsNoTracking()
+                .Where(x => x.UploadDeliveryId == uploadId && x.DssUploadLines.Any(x => x.IsSystemFailure || x.IsValidationFailure));
+                
+            if (_currentUser.OrganizationType == OrganizationTypes.Platform)
+            {
+                query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
+            }
 
-            return await _dbSet.AsNoTracking()
-                .Include(x => x.DssUploadLines)
-                .FirstOrDefaultAsync(x => x.UploadDeliveryId == uploadId);
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<long[]> GetUploadLineIdsWithErrors(long uploadId)
+        {
+            return await _dbContext.DssUploadLines.AsNoTracking()
+                .Where(x => x.IncludingUploadDeliveryId == uploadId && (x.IsValidationFailure || x.IsSystemFailure))
+                .Select(x => x.UploadLineId)
+                .ToArrayAsync();
+        }
+
+        public async Task<UploadLineError> GetUploadLineWithError(long lineId)
+        {
+            return await _dbContext.DssUploadLines.AsNoTracking()
+                .Where(x => x.UploadLineId == lineId)
+                .Select(x => new UploadLineError { LineText = x.SourceLineTxt, ErrorText = x.ErrorTxt })
+                .FirstAsync();
         }
     }
 }

@@ -619,17 +619,11 @@ namespace StrDss.Service
 
         public async Task<byte[]?> GetRentalListingErrorFile(long uploadId)
         {
-            var upload = await _uploadRepo.GetRentalListingErrorLines(uploadId);
+            var upload = await _uploadRepo.GetRentalListingUploadWithErrors(uploadId);
 
             if (upload == null) return null;
 
-            if (_currentUser.OrganizationType == OrganizationTypes.Platform)
-            {
-                if (upload.ProvidingOrganizationId != _currentUser.OrganizationId)
-                {
-                    return null;
-                }
-            }                
+            var linesWithError = await _uploadRepo.GetUploadLineIdsWithErrors(uploadId);
 
             var memoryStream = new MemoryStream(upload.SourceBin!);
             using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
@@ -646,11 +640,10 @@ namespace StrDss.Service
 
             contents.AppendLine(header);
 
-            foreach(var line in upload.DssUploadLines)
+            foreach (var lineId in linesWithError)
             {
-                if (!line.IsValidationFailure && !line.IsSystemFailure) continue;
-
-                contents.AppendLine(line.SourceLineTxt.TrimEndNewLine() + $",\"{line.ErrorTxt}\"");
+                var line = await _uploadRepo.GetUploadLineWithError(lineId);
+                contents.AppendLine(line.LineText.TrimEndNewLine() + $",\"{line.ErrorText ?? ""}\"");
             }
 
             return Encoding.UTF8.GetBytes(contents.ToString());

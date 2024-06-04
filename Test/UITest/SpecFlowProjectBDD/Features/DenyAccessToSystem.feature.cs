@@ -76,8 +76,8 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("DenyAccessToSystem")]
         [NUnit.Framework.CategoryAttribute("Access")]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "HappyPath", "pass", null)]
-        public void DenyAccessToSystem(string userName, string description, string expectedResult, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "ceuatst@gov.bc.ca", "ceu_admin", "HappyPath", "pass", null)]
+        public void DenyAccessToSystem(string userName, string email, string roleName, string description, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "Access"};
@@ -88,6 +88,8 @@ namespace SpecFlowProjectBDD.Features
             string[] tagsOfScenario = @__tags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("UserName", userName);
+            argumentsOfScenario.Add("Email", email);
+            argumentsOfScenario.Add("RoleName", roleName);
             argumentsOfScenario.Add("Description", description);
             argumentsOfScenario.Add("ExpectedResult", expectedResult);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DenyAccessToSystem", null, tagsOfScenario, argumentsOfScenario, featureTags);
@@ -105,13 +107,14 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given(string.Format("that I am an authenticated LG, CEU, Provincial Gov or Platform user and the expec" +
                             "ted result is \"{0}\"", expectedResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 10
- testRunner.When(string.Format("I attempt to access the Data Sharing System as \"{0}\"", userName), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 11
+ testRunner.When(string.Format("I attempt to access the Data Sharing System as \"{0}\" with email \"{1}\" and Role \"{" +
+                            "2}\"", userName, email, roleName), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 12
+#line 13
  testRunner.Then("I dont have the required access permissions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 14
+#line 15
  testRunner.Then("I should see a specific message indicating that access is restricted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

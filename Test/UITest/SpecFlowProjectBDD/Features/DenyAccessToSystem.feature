@@ -7,7 +7,8 @@ Scenario: DenyAccessToSystem
 
 	Given that I am an authenticated LG, CEU, Provincial Gov or Platform user and the expected result is "<ExpectedResult>"
 
-	When I attempt to access the Data Sharing System as "<UserName>"
+	#When I attempt to access the Data Sharing System as "<UserName>" with email "<Email>" and Role "<RoleName>"
+	When I attempt to access the Data Sharing System as "<UserName>" with email "<Email>" and Role "<RoleName>"
 
 	Then I dont have the required access permissions
 
@@ -15,5 +16,5 @@ Scenario: DenyAccessToSystem
 #
 #
 Examples:
-	| UserName | Description | ExpectedResult |
-	| CEUATST  | HappyPath   | pass           |
+	| UserName | Email             | RoleName  | Description | ExpectedResult |
+	| CEUATST  | ceuatst@gov.bc.ca | ceu_admin | HappyPath   | pass           |

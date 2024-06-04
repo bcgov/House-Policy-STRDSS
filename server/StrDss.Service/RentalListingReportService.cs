@@ -375,7 +375,13 @@ namespace StrDss.Service
                 _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
             }
 
-            if (hasError)
+            if (!isLastLine)
+            {
+                _logger.LogInformation($"Processed {processedCount} lines: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
+                return;
+            }
+
+            if (hasError || (await _uploadRepo.UploadHasErrors(upload.UploadDeliveryId)))
             {
                 if (upload.UpdUserGuid == null) return;
 

@@ -26,7 +26,7 @@ namespace StrDss.Service
     {
         Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string hashValue, TextReader textReader, List<DssUploadLine> lines);
         Task<Dictionary<string, List<string>>> UploadRentalReport(string reportPeriod, long orgId, Stream stream);
-        Task ProcessRentalReportUploadsAsync();
+        Task ProcessRentalReportUploadAsync();
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<byte[]?> GetRentalListingErrorFile(long uploadId);
     }
@@ -288,11 +288,11 @@ namespace StrDss.Service
             return errors.Count == 0;
         }
 
-        public async Task ProcessRentalReportUploadsAsync()
+        public async Task ProcessRentalReportUploadAsync()
         {
-            var uploads = await _uploadRepo.GetRentalReportUploadsToProcessAsync();
+            var upload = await _uploadRepo.GetRentalReportUploadToProcessAsync();
 
-            foreach (var upload in uploads)
+            if (upload != null)
             {
                 await ProcessRentalReportUploadAsync(upload);
             }

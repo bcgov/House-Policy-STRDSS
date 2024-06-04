@@ -16,6 +16,7 @@ using StrDss.Model.UserDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -341,22 +342,21 @@ namespace StrDss.Service
 
                 var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
 
-                _logger.LogInformation($"Fetching listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
-
                 var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.ListingId);
 
                 if (uploadLine == null || uploadLine.IsProcessed)
                 {
-                    _logger.LogInformation($"Skipping listing - already processed: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
-
-                    continue; 
+                    _logger.LogInformation($"Skipping listing - ({row.OrgCd} - {row.ListingId})");
+                    continue;
                 }
 
-                _logger.LogInformation($"Processing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
+                _logger.LogInformation($"Processing listing ({row.OrgCd} - {row.ListingId})");
 
+                var stopwatch = Stopwatch.StartNew();
                 hasError = !await ProcessUploadLine(report, upload, uploadLine, row, isLastLine);
+                stopwatch.Stop();
 
-                _logger.LogInformation($"Finishing listing: {report.ProvidingOrganization.OrganizationNm}, {row.ListingId}");
+                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
             }
 
             if (hasError)
@@ -430,7 +430,7 @@ namespace StrDss.Service
 
                 if (isLastLine)
                 {
-                    await UpdateInactiveListings(upload.ProvidingOrganizationId);
+                    await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
                 }
 
                 _unitOfWork.Commit();
@@ -457,7 +457,7 @@ namespace StrDss.Service
             {
                 if (isLastLine)
                 {
-                    await UpdateInactiveListings(upload.ProvidingOrganizationId);
+                    await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
                 }
 
                 tran.Commit();
@@ -479,17 +479,11 @@ namespace StrDss.Service
 
             if (isLastLine)
             {
-                await UpdateInactiveListings(upload.ProvidingOrganizationId);
+                await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
             }
 
             tran.Commit();
             return true;
-        }
-
-        private async Task UpdateInactiveListings(long providingOrganizationId)
-        {
-            await _reportRepo.UpdateInactiveListings(providingOrganizationId);
-            _unitOfWork.Commit();
         }
 
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid, string systemError)

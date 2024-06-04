@@ -322,6 +322,8 @@ namespace StrDss.Service
                 _unitOfWork.Commit();
             }
 
+            var linesToProcess = await _uploadRepo.GetUploadLinesToProcessAsync(upload.UploadDeliveryId);
+
             var errors = new Dictionary<string, List<string>>();
             var csvConfig = CsvHelperUtils.GetConfig(errors, false);
 
@@ -341,6 +343,14 @@ namespace StrDss.Service
                 isLastLine = count == lineCount;
 
                 var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
+
+                var exists = linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.ListingId == row.ListingId);
+
+                if (!exists)
+                {
+                    _logger.LogInformation($"Skipping listing - ({row.OrgCd} - {row.ListingId})");
+                    continue;
+                }
 
                 var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.ListingId);
 

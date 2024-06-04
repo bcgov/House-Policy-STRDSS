@@ -341,7 +341,7 @@ namespace StrDss.Service
 
             while (csv.Read())
             {
-                if (processedCount > 100) break; //To process 100 lines per job
+                if (processedCount >= 100) break; //To process 100 lines per job
 
                 count++;
                 isLastLine = count == lineCount;

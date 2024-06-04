@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Index.Quadtree;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Entities;
@@ -336,9 +337,12 @@ namespace StrDss.Service
             var headerExists = csv.ReadHeader();
             var hasError = false;
             var isLastLine = false;
+            var processedCount = 0;
 
             while (csv.Read())
             {
+                if (processedCount > 100) break; //To process 100 lines per job
+
                 count++;
                 isLastLine = count == lineCount;
 
@@ -365,6 +369,8 @@ namespace StrDss.Service
                 var stopwatch = Stopwatch.StartNew();
                 hasError = !await ProcessUploadLine(report, upload, uploadLine, row, isLastLine);
                 stopwatch.Stop();
+
+                processedCount++;
 
                 _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
             }

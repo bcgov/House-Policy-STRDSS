@@ -50,6 +50,7 @@ namespace StrDss.Service.Hangfire
                 if (jobFingerprint != fingerprint)
                     continue;
 
+                Console.WriteLine($"Cancelling {fingerprint} at {DateTime.UtcNow}");
                 context.Canceled = true;
 
                 return;

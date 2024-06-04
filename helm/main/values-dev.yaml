@@ -4,7 +4,7 @@ global:
     subPath: strdss-dev
   env:
     'Logging__LogLevel__Default': 'Warning'
-    'Logging__LogLevel__StrDss.Common.StrDssLogger': 'Information'
+    'Logging__LogLevel__StrDss.Common.StrDssLogger': 'Debug'
     'ASPNETCORE_ENVIRONMENT': 'Development'
     'ENV_NAME': 'dev'
     'APP_BASE_URL': 'https://dev.strdata.gov.bc.ca'

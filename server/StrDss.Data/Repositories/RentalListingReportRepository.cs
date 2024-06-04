@@ -5,6 +5,7 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
+using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
 {
@@ -42,9 +43,16 @@ namespace StrDss.Data.Repositories
 
         public async Task<DssRentalListing?> GetRentalListingAsync(long reportId, long offeringOrgId, string listingId)
         {
-            return await _dbContext.DssRentalListings
+            var stopwatch = Stopwatch.StartNew();
+
+            var listing = await _dbContext.DssRentalListings
                 .Include(x => x.LocatingPhysicalAddress)
                 .FirstOrDefaultAsync(x => x.IncludingRentalListingReportId == reportId && x.OfferingOrganizationId == offeringOrgId && x.PlatformListingNo == listingId);
+
+            stopwatch.Stop();
+            _logger.LogDebug($"GetRentalListingAsync = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+
+            return listing;
         }
         public async Task AddRentalListingAsync(DssRentalListing listing)
         {
@@ -53,21 +61,33 @@ namespace StrDss.Data.Repositories
 
         public async Task<DssRentalListing?> GetMasterListingAsync(long offeringOrgId, string listingId)
         {
-            return await _dbContext.DssRentalListings
+            var stopwatch = Stopwatch.StartNew();
+
+            var listing = await _dbContext.DssRentalListings
                 .Include(x => x.LocatingPhysicalAddress)
                 .Include(x => x.DerivedFromRentalListing)
                     .ThenInclude(x => x.IncludingRentalListingReport)
                 .FirstOrDefaultAsync(x => x.OfferingOrganizationId == offeringOrgId
                     && x.PlatformListingNo == listingId
                     && x.IncludingRentalListingReportId == null);
+
+            stopwatch.Stop();
+            _logger.LogDebug($"GetRentalListingAsync = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+
+            return listing;
         }
 
         public void DeleteListingContacts(long listingId)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var contactsToDelete = _dbContext.DssRentalListingContacts
                 .Where(c => c.ContactedThroughRentalListingId == listingId);
 
             _dbContext.DssRentalListingContacts.RemoveRange(contactsToDelete);
+
+            stopwatch.Stop();
+            _logger.LogDebug($"GetRentalListingAsync = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
         }
 
         public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
@@ -89,14 +109,23 @@ namespace StrDss.Data.Repositories
 
         public async Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId)
         {
-            return await _dbContext
+            var stopwatch = Stopwatch.StartNew();
+
+            var history = await _dbContext
                 .DssRentalUploadHistoryViews
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UploadDeliveryId == deliveryId);
+
+            stopwatch.Stop();
+            _logger.LogDebug($"GetRentalListingUpload = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+
+            return history;
         }
 
         public async Task UpdateInactiveListings(long providingPlatformId)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var reports = await _dbSet.AsNoTracking()
                 .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
                 .ToListAsync();
@@ -117,6 +146,10 @@ namespace StrDss.Data.Repositories
                 await _dbContext.Database.ExecuteSqlAsync(
                     $"UPDATE dss_rental_listing SET is_active = false, is_new = false WHERE rental_listing_id = {listingId}");
             }
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"UpdateInactiveListings = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
         }
 
         public async Task UpdateListingStatus(long providingPlatformId, long listingId)

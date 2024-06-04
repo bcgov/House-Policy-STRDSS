@@ -62,7 +62,7 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Stop();
 
-            _logger.LogInformation($"Fetched listing ({orgCd} - {listingId}) - {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+            _logger.LogDebug($"Fetched listing ({orgCd} - {listingId}) - {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
 
             return line;
         }

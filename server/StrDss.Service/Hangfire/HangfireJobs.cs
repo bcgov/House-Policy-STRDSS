@@ -14,7 +14,7 @@ namespace StrDss.Service.Hangfire
         }
 
         [Queue("default")]
-        [DisableConcurrentExecution(timeoutInSeconds: 259200)]
+        [SkipSameJob]
         [AutomaticRetry(Attempts = 0)]
         public async Task ProcessRentalListingReports()
         {
@@ -22,7 +22,7 @@ namespace StrDss.Service.Hangfire
         }
 
         [Queue("default")]
-        [DisableConcurrentExecution(timeoutInSeconds: 259200)]
+        [SkipSameJob]
         [AutomaticRetry(Attempts = 0)]
         public async Task ProcessTakedownRequestBatchEmails()
         {

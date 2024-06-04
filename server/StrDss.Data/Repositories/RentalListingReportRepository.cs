@@ -104,19 +104,18 @@ namespace StrDss.Data.Repositories
             var latestPeriodYm = reports.Max(x => x.ReportPeriodYm);
             var lastestReport = reports.First(x => x.ReportPeriodYm == latestPeriodYm);
 
-            var inactiveListings = await _dbContext.DssRentalListings
-                .Include(x => x.DerivedFromRentalListing)
-                    .ThenInclude(x => x.IncludingRentalListingReport)
-                .Where(x => x.DerivedFromRentalListing != null && 
+            var inactiveListingIds = await _dbContext.DssRentalListings
+                .Where(x => x.DerivedFromRentalListing != null &&
                     x.IsActive == true &&
                     x.DerivedFromRentalListing.IncludingRentalListingReport!.ProvidingOrganizationId == providingPlatformId &&
                     x.DerivedFromRentalListing.IncludingRentalListingReport!.RentalListingReportId != lastestReport.RentalListingReportId)
+                .Select(x => x.RentalListingId)
                 .ToArrayAsync();
 
-            foreach (var listing in inactiveListings)
+            foreach (var listingId in inactiveListingIds)
             {
-                listing.IsActive = false;
-                listing.IsNew = false;
+                await _dbContext.Database.ExecuteSqlAsync(
+                    $"UPDATE dss_rental_listing SET is_active = false, is_new = false WHERE rental_listing_id = {listingId}");
             }
         }
 

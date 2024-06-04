@@ -430,7 +430,7 @@ namespace StrDss.Service
 
                 if (isLastLine)
                 {
-                    await UpdateInactiveListings(upload.ProvidingOrganizationId);
+                    await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
                 }
 
                 _unitOfWork.Commit();
@@ -457,7 +457,7 @@ namespace StrDss.Service
             {
                 if (isLastLine)
                 {
-                    await UpdateInactiveListings(upload.ProvidingOrganizationId);
+                    await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
                 }
 
                 tran.Commit();
@@ -479,17 +479,11 @@ namespace StrDss.Service
 
             if (isLastLine)
             {
-                await UpdateInactiveListings(upload.ProvidingOrganizationId);
+                await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
             }
 
             tran.Commit();
             return true;
-        }
-
-        private async Task UpdateInactiveListings(long providingOrganizationId)
-        {
-            await _reportRepo.UpdateInactiveListings(providingOrganizationId);
-            _unitOfWork.Commit();
         }
 
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid, string systemError)

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
 {
@@ -48,10 +49,19 @@ namespace StrDss.Data.Repositories
 
         public async Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId)
         {
-            return await _dbContext.DssUploadLines.FirstOrDefaultAsync(x => 
+            var stopwatch = Stopwatch.StartNew();
+
+            var line = await _dbContext.DssUploadLines.FirstOrDefaultAsync(x => 
                 x.IncludingUploadDeliveryId ==  uploadId && 
                 x.SourceOrganizationCd == orgCd && 
-                x.SourceRecordNo == listingId);
+                x.SourceRecordNo == listingId &&
+                x.IsProcessed == false);
+
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Fetched listing ({orgCd} - {listingId}) - {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+
+            return line;
         }
 
         public async Task<DssUploadDelivery?> GetRentalListingErrorLines(long uploadId)

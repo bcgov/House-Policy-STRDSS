@@ -1,10 +1,86 @@
-<div class="header">
-    <h2 class="title">Detailed Listing Information for</h2>
-    <button pButton (click)="onBack()">Return to Listings</button>
+<div class="header-container" *ngIf="listing">
+    <div class="title">
+        <h2>Detailed Listing Information for</h2>
+
+        <a class="listing-url-lnk" [href]="listing.platformListingUrl">{{listing.platformListingNo}}</a>&nbsp; <i
+            class="pi pi-external-link"></i>
+    </div>
     <div class="legend-container">
         <button pButton id="view-more-history-btn" class="p-button-link" (click)="showLegend()">
             <i class="pi pi-question-circle"></i>&nbsp;Legend
         </button>
     </div>
 </div>
-<div class="content"></div>
+<div class="subtitle" *ngIf="listing">
+    <div class="last-updated-container">
+        <strong>Last Updated: </strong>{{listing.lastActionDtm}}
+    </div>
+    <div class="platform-container">
+        <strong>Platform: </strong>{{listing.offeringOrganizationNm}}
+    </div>
+</div>
+<div class="content" *ngIf="listing">
+    <div class="main-block">
+        <p-panel class="details-block" header="Property Information">
+            <div class="row">
+                <span class="label">Address (Best Match):</span>
+                <span class="value">{{listing.matchAddressTxt}}</span>
+            </div>
+            <div class="row">
+                <span class="label">Address (Platform Listing):</span>
+                <span class="value">{{listing.originalAddressTxt}}</span>
+            </div>
+            <div class="row">
+                <span class="label">Entire Unit? (Platform Listing):</span>
+                <span class="value">{{listing.isEntireUnit?'Yes':'No'}}</span>
+            </div>
+            <div class="row">
+                <span class="label">Number of Bedrooms (Platform Listing):</span>
+                <span class="value">{{listing.availableBedroomsQty}}</span>
+            </div>
+        </p-panel>
+        <p-panel class="details-block" header="Business Licence Information">
+            <div class="row">
+                <span class="label">BL (Platform Listing):</span>
+                <span class="value">{{listing.businessLicenceNo}}</span>
+            </div>
+        </p-panel>
+        <p-panel class="details-block" header="Hosts">
+            <div class="row">
+                <span class="label">Ipsum dolor sit.</span>
+                <span class="value">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nemo, iste?</span>
+            </div>
+            <div class="row">
+                <span class="label">Ipsum dolor sit.</span>
+                <span class="value">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nemo, iste?</span>
+            </div>
+            <div class="row">
+                <span class="label">Ipsum dolor sit.</span>
+                <span class="value">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nemo, iste?</span>
+            </div>
+            <div class="row">
+                <span class="label">Ipsum dolor sit.</span>
+                <span class="value">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nemo, iste?</span>
+            </div>
+        </p-panel>
+        <p-panel class="details-block" header="Listing History (for This Listing ID)">
+            <div class="row">
+                <span class="label">Night Stayed YTD:</span>
+                <span class="value">{{listing.nightsBookedYtdQty}}</span>
+            </div>
+        </p-panel>
+    </div>
+    <div class="sidebar">
+        <p-panel class="details-block" header="Actions">
+            <div class="row">
+                <button pButton> Send Notice Of Non-Compliance </button>
+            </div>
+            <div class="row">
+                <button pButton> Send Takedown Request</button>
+            </div>
+        </p-panel>
+        <p-panel class="details-block" header="Action History">
+            Not implemented yet
+        </p-panel>
+    </div>
+</div>

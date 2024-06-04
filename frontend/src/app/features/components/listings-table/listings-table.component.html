@@ -150,8 +150,10 @@
                     <td>
                         <a target="_blank" [href]="row.platformListingUrl">{{ row.platformListingNo }}</a>
                     </td>
-                    <td class="align-center"><button pButton class="details-button-with-icon"
-                            (click)="onDetailsOpen(row)" [disabled]="true"><i class="pi pi-list"></i></button></td>
+                    <td class="align-center">
+                        <a class="details-button-with-icon" [routerLink]="'/listing/'+row.rentalListingId"><i
+                                class="pi pi-list"></i></a>
+                    </td>
                     <td>{{ row.matchAddressTxt }}</td>
                     <td>{{ row.isEntireUnit?'Yes':'No' }}</td>
                     <td>{{ row.nightsBookedYtdQty }}</td>
@@ -227,8 +229,4 @@
         </p>
     </p-dialog>
 
-    <!--  <div class="takedown-notice-wrapper" *ngIf="isDetailsShown">
-        <app-listing-details *ngIf="selectedListing" (closeEvent)="onDetailsClose($event)"
-            [listing]="selectedListing"></app-listing-details> 
-    </div>-->
 </div>

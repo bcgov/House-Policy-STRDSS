@@ -85,6 +85,15 @@ body {
                 padding: .6rem 1.2rem;
             }
         }
+
+        &.details-block {
+            .p-panel-header {
+                .p-panel-title {
+                    font-family: 'BcSans-bold';
+                    font-size: large;
+                }
+            }
+        }
     }
 
     p-dropdown {

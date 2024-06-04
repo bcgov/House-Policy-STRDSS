@@ -16,6 +16,7 @@ import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
 import { UploadListingsComponent } from './features/components/upload-listings/upload-listings.component';
 import { ListingUploadHistoryComponent } from './features/components/listing-upload-history/listing-upload-history.component';
 import { ListingsTableComponent } from './features/components/listings-table/listings-table.component';
+import { ListingDetailsComponent } from './features/components/listings-table/listing-details/listing-details.component';
 
 export const routes: Routes = [
     {
@@ -54,9 +55,14 @@ export const routes: Routes = [
     },
     {
         path: 'listings',
-        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: ListingsTableComponent,
-        data: { permissions: [listing_read] }
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        data: { permissions: [listing_read] },
+    },
+    {
+        path: 'listing/:id', component: ListingDetailsComponent,
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        data: { permissions: [listing_read] },
     },
     {
         path: 'access-request',

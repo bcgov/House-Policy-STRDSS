@@ -102,7 +102,7 @@
         </p-panel>
     </div>
     <div class="sidebar">
-        <p-panel class="details-block" header="Actions">
+        <p-panel class="details-block" header="Actions" *ngIf="!isCEU">
             <div class="row">
                 <button disabled pButton (click)="sendNoticeOfNonCompliance()" class="p-button-link"> Send Notice Of
                     Non-Compliance </button>

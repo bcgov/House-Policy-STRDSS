@@ -97,6 +97,7 @@ USING ( SELECT * FROM (VALUES
 ('ceu_admin','licence_file_upload'),
 ('ceu_admin','listing_file_upload'),
 ('ceu_admin','ceu_action'),
+('ceu_staff','listing_file_upload'),
 ('ceu_staff','listing_read'),
 ('ceu_staff','audit_read'),
 ('ceu_staff','ceu_action'),

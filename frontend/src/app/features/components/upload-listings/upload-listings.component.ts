@@ -15,6 +15,7 @@ import { UserDataService } from '../../../common/services/user-data.service';
 import { Observable, forkJoin } from 'rxjs';
 import { User } from '../../../common/models/user';
 import { environment } from '../../../../environments/environment';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-upload-listings',
@@ -38,6 +39,7 @@ export class UploadListingsComponent implements OnInit {
   uploadedFile: any;
   uploadElem!: FileUpload;
   currentUser!: User;
+  isUploadStarted = false;
 
   myForm = this.fb.group({
     platformId: [0, Validators.required],
@@ -66,6 +68,7 @@ export class UploadListingsComponent implements OnInit {
     private yearMonthGenService: YearMonthGenService,
     private messageService: MessageService,
     private userDataService: UserDataService,
+    private loaderService: GlobalLoaderService
   ) { }
 
   ngOnInit(): void {
@@ -81,7 +84,7 @@ export class UploadListingsComponent implements OnInit {
         } else {
           this.myForm.controls['platformId'].setValue(currentUser.organizationId);
         }
-      }
+      },
     });
   }
 
@@ -94,6 +97,7 @@ export class UploadListingsComponent implements OnInit {
       this.uploadElem.disabled = true;
     }
   }
+
   onClear(): void {
     this.uploadElem.clear();
     this.myForm.controls['file'].setValue(null);
@@ -102,7 +106,9 @@ export class UploadListingsComponent implements OnInit {
   }
 
   onUpload(): void {
+    this.isUploadStarted = true;
     const formResult = this.myForm.value;
+    this.loaderService.loadingStart('Uploading');
 
     this.listingDataService.uploadData(formResult.month || '', formResult.platformId || 0, this.uploadedFile)
       .subscribe({
@@ -112,6 +118,12 @@ export class UploadListingsComponent implements OnInit {
 
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File has been uploaded successfully' });
         },
+        complete: () => {
+          this.loaderService.loadingEnd();
+          setTimeout(() => {
+            this.isUploadStarted = false;
+          }, 300);
+        }
       });
   }
 }

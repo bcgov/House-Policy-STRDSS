@@ -45,7 +45,6 @@ export class ComplianceNoticeComponent implements OnInit {
   myForm!: FormGroup;
 
   platformOptions = new Array<DropdownOption>();
-  reasonOptions = new Array<DropdownOption>();
 
   isPreviewVisible = false;
   hideForm = false;
@@ -84,7 +83,6 @@ export class ComplianceNoticeComponent implements OnInit {
     this.initForm();
 
     this.delistingService.getPlatforms().subscribe((platformOptions) => this.platformOptions = platformOptions);
-    this.delistingService.getReasons().subscribe((reasonOptions) => this.reasonOptions = reasonOptions);
   }
 
   onPreview(): void {

@@ -51,7 +51,7 @@
         </div>
     </div>
     <div class="form-group-row">
-        <button [disabled]="myForm.invalid" pButton id="upload-btn" name="upload-btn"
+        <button [disabled]="myForm.invalid || isUploadStarted" pButton id="upload-btn" name="upload-btn"
             (click)="onUpload()">Upload</button>
     </div>
 </form>

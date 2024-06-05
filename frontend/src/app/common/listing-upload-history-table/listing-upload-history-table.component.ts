@@ -108,8 +108,10 @@ export class ListingUploadHistoryTableComponent implements OnInit {
         element.setAttribute('download', `errors_${platform}_${date}.csv`);
 
         element.click();
+      },
+      complete: () => {
         this.loaderService.loadingEnd();
-      }
+      },
     })
   }
 

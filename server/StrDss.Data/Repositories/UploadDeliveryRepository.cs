@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
 {
@@ -11,9 +12,13 @@ namespace StrDss.Data.Repositories
     {
         Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly periodYm, long orgId, string hashValue);
         Task AddUploadDeliveryAsync(DssUploadDelivery upload);
-        Task<List<DssUploadDelivery>> GetRentalReportUploadsToProcessAsync();
-        Task<DssUploadDelivery?> GetRentalListingErrorLines(long uploadId);
+        Task<DssUploadDelivery?> GetRentalReportUploadToProcessAsync();
+        Task<DssUploadDelivery?> GetRentalListingUploadWithErrors(long uploadId);
         Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId);
+        Task<List<UploadLineToProcess>> GetUploadLinesToProcessAsync(long uploadId);
+        Task<long[]> GetUploadLineIdsWithErrors(long uploadId);
+        Task<UploadLineError> GetUploadLineWithError(long lineId);
+        Task<bool> UploadHasErrors(long uploadId);
     }
 
     public class UploadDeliveryRepository : RepositoryBase<DssUploadDelivery>, IUploadDeliveryRepository
@@ -34,33 +39,75 @@ namespace StrDss.Data.Repositories
                 .AnyAsync(x => x.ReportPeriodYm == periodYm && x.ProvidingOrganizationId == orgId && x.SourceHashDsc == hashValue);
         }
 
-        public async Task<List<DssUploadDelivery>> GetRentalReportUploadsToProcessAsync()
+        public async Task<DssUploadDelivery?> GetRentalReportUploadToProcessAsync()
         {
             return await _dbSet
-                //.Include(x => x.DssUploadLines.Where(line => !line.IsProcessed))
                 .Include(x => x.ProvidingOrganization)
                 .Where(x => x.DssUploadLines.Any(line => !line.IsProcessed))
                 .OrderBy(x => x.ProvidingOrganizationId) 
                     .ThenBy(x => x.ReportPeriodYm)
                         .ThenBy(x => x.UpdDtm) //Users can upload the same listing multiple times. The processing of these listings follows a first-come, first-served approach.
-                .ToListAsync();
+                .FirstOrDefaultAsync();
         }
 
         public async Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId)
         {
-            return await _dbContext.DssUploadLines.FirstOrDefaultAsync(x => 
+            var stopwatch = Stopwatch.StartNew();
+
+            var line = await _dbContext.DssUploadLines.FirstOrDefaultAsync(x => 
                 x.IncludingUploadDeliveryId ==  uploadId && 
                 x.SourceOrganizationCd == orgCd && 
-                x.SourceRecordNo == listingId);
+                x.SourceRecordNo == listingId &&
+                x.IsProcessed == false);
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"Fetched listing ({orgCd} - {listingId}) - {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+
+            return line;
         }
 
-        public async Task<DssUploadDelivery?> GetRentalListingErrorLines(long uploadId)
+        public async Task<List<UploadLineToProcess>> GetUploadLinesToProcessAsync(long uploadId)
         {
-            //todo: data control
+            return await _dbContext.DssUploadLines.AsNoTracking()
+                .Where(x => x.IncludingUploadDeliveryId == uploadId && x.IsProcessed == false)
+                .Select(x => new UploadLineToProcess { ListingId = x.SourceRecordNo, OrgCd = x.SourceOrganizationCd })
+                .ToListAsync();
+        }
 
-            return await _dbSet.AsNoTracking()
-                .Include(x => x.DssUploadLines)
-                .FirstOrDefaultAsync(x => x.UploadDeliveryId == uploadId);
+        public async Task<DssUploadDelivery?> GetRentalListingUploadWithErrors(long uploadId)
+        {
+            var query = _dbSet.AsNoTracking()
+                .Where(x => x.UploadDeliveryId == uploadId && x.DssUploadLines.Any(x => x.IsSystemFailure || x.IsValidationFailure));
+                
+            if (_currentUser.OrganizationType == OrganizationTypes.Platform)
+            {
+                query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<long[]> GetUploadLineIdsWithErrors(long uploadId)
+        {
+            return await _dbContext.DssUploadLines.AsNoTracking()
+                .Where(x => x.IncludingUploadDeliveryId == uploadId && (x.IsValidationFailure || x.IsSystemFailure))
+                .Select(x => x.UploadLineId)
+                .ToArrayAsync();
+        }
+
+        public async Task<UploadLineError> GetUploadLineWithError(long lineId)
+        {
+            return await _dbContext.DssUploadLines.AsNoTracking()
+                .Where(x => x.UploadLineId == lineId)
+                .Select(x => new UploadLineError { LineText = x.SourceLineTxt, ErrorText = x.ErrorTxt })
+                .FirstAsync();
+        }
+
+        public async Task<bool> UploadHasErrors(long uploadId)
+        {
+            return await _dbContext.DssUploadLines.AsNoTracking()
+                .AnyAsync(x => x.IncludingUploadDeliveryId == uploadId && (x.IsValidationFailure || x.IsSystemFailure));
         }
     }
 }

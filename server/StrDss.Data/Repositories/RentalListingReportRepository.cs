@@ -5,6 +5,7 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
+using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
 {
@@ -18,7 +19,9 @@ namespace StrDss.Data.Repositories
         void DeleteListingContacts(long listingId);
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
-        Task UpdateListingStatus(long providingPlatformId);
+        Task UpdateInactiveListings(long providingPlatformId);
+        Task UpdateListingStatus(long providingPlatformId, long listingId);
+        Task<int> GetTotalNumberOfUploadLines(long uploadId);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
     {
@@ -40,9 +43,16 @@ namespace StrDss.Data.Repositories
 
         public async Task<DssRentalListing?> GetRentalListingAsync(long reportId, long offeringOrgId, string listingId)
         {
-            return await _dbContext.DssRentalListings
+            var stopwatch = Stopwatch.StartNew();
+
+            var listing = await _dbContext.DssRentalListings
                 .Include(x => x.LocatingPhysicalAddress)
                 .FirstOrDefaultAsync(x => x.IncludingRentalListingReportId == reportId && x.OfferingOrganizationId == offeringOrgId && x.PlatformListingNo == listingId);
+
+            stopwatch.Stop();
+            _logger.LogDebug($"GetRentalListingAsync = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+
+            return listing;
         }
         public async Task AddRentalListingAsync(DssRentalListing listing)
         {
@@ -51,21 +61,33 @@ namespace StrDss.Data.Repositories
 
         public async Task<DssRentalListing?> GetMasterListingAsync(long offeringOrgId, string listingId)
         {
-            return await _dbContext.DssRentalListings
+            var stopwatch = Stopwatch.StartNew();
+
+            var listing = await _dbContext.DssRentalListings
                 .Include(x => x.LocatingPhysicalAddress)
                 .Include(x => x.DerivedFromRentalListing)
                     .ThenInclude(x => x.IncludingRentalListingReport)
                 .FirstOrDefaultAsync(x => x.OfferingOrganizationId == offeringOrgId
                     && x.PlatformListingNo == listingId
                     && x.IncludingRentalListingReportId == null);
+
+            stopwatch.Stop();
+            _logger.LogDebug($"GetRentalListingAsync = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+
+            return listing;
         }
 
         public void DeleteListingContacts(long listingId)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var contactsToDelete = _dbContext.DssRentalListingContacts
                 .Where(c => c.ContactedThroughRentalListingId == listingId);
 
             _dbContext.DssRentalListingContacts.RemoveRange(contactsToDelete);
+
+            stopwatch.Stop();
+            _logger.LogDebug($"GetRentalListingAsync = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
         }
 
         public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
@@ -87,46 +109,81 @@ namespace StrDss.Data.Repositories
 
         public async Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId)
         {
-            return await _dbContext
+            var stopwatch = Stopwatch.StartNew();
+
+            var history = await _dbContext
                 .DssRentalUploadHistoryViews
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UploadDeliveryId == deliveryId);
+
+            stopwatch.Stop();
+            _logger.LogDebug($"GetRentalListingUpload = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+
+            return history;
         }
 
-        public async Task UpdateListingStatus(long providingPlatformId)
+        public async Task UpdateInactiveListings(long providingPlatformId)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var reports = await _dbSet.AsNoTracking()
+                .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
+                .ToListAsync();
+
+            var latestPeriodYm = reports.Max(x => x.ReportPeriodYm);
+            var lastestReport = reports.First(x => x.ReportPeriodYm == latestPeriodYm);
+
+            var inactiveListingIds = await _dbContext.DssRentalListings
+                .Where(x => x.DerivedFromRentalListing != null &&
+                    x.IsActive == true &&
+                    x.DerivedFromRentalListing.IncludingRentalListingReport!.ProvidingOrganizationId == providingPlatformId &&
+                    x.DerivedFromRentalListing.IncludingRentalListingReport!.RentalListingReportId != lastestReport.RentalListingReportId)
+                .Select(x => x.RentalListingId)
+                .ToArrayAsync();
+
+            foreach (var listingId in inactiveListingIds)
+            {
+                await _dbContext.Database.ExecuteSqlAsync(
+                    $"UPDATE dss_rental_listing SET is_active = false, is_new = false WHERE rental_listing_id = {listingId}");
+            }
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"UpdateInactiveListings = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+        }
+
+        public async Task UpdateListingStatus(long providingPlatformId, long listingId)
         {
             var reports = await _dbSet.AsNoTracking()
                 .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
                 .ToListAsync();
 
-            var masterListings = await _dbContext.DssRentalListings
+            var listing = await _dbContext.DssRentalListings
                 .Include(x => x.DerivedFromRentalListing)
                     .ThenInclude(x => x.IncludingRentalListingReport)
-                .Where(x => x.DerivedFromRentalListing != null && x.DerivedFromRentalListing.IncludingRentalListingReport!.ProvidingOrganizationId == providingPlatformId)
-                .ToArrayAsync();
-
+                .FirstAsync(x => x.RentalListingId == listingId);
+    
             if (reports.Count == 0)
             {
-                foreach (var listing in masterListings)
-                {
-                    listing.IsActive = true;
-                    listing.IsNew = true;
-                }
+                listing.IsActive = true;
+                listing.IsNew = true;
             }
             else
             {
                 var latestPeriodYm = reports.Max(x => x.ReportPeriodYm);
 
-                foreach (var listing in masterListings)
-                {
-                    var isActive = listing.DerivedFromRentalListing!.IncludingRentalListingReport!.ReportPeriodYm == latestPeriodYm;
-                    var count = _dbContext.DssRentalListings
-                        .Count(x => x.OfferingOrganizationId == listing.OfferingOrganizationId && x.PlatformListingNo == listing.PlatformListingNo && x.DerivedFromRentalListing == null);
+                var isActive = listing.DerivedFromRentalListing!.IncludingRentalListingReport!.ReportPeriodYm == latestPeriodYm;
+                var count = _dbContext.DssRentalListings
+                    .Count(x => x.OfferingOrganizationId == listing.OfferingOrganizationId && x.PlatformListingNo == listing.PlatformListingNo && x.DerivedFromRentalListing == null);
 
-                    listing.IsActive = isActive;
-                    listing.IsNew = isActive && count == 1;
-                }
+                listing.IsActive = isActive;
+                listing.IsNew = isActive && count == 1;
             }
+        }
+
+        public async Task<int> GetTotalNumberOfUploadLines(long uploadId)
+        {
+            return await _dbContext.DssUploadLines.Where(x => x.IncludingUploadDeliveryId == uploadId).CountAsync();
         }
     }
 }

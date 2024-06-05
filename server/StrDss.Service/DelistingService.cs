@@ -201,11 +201,12 @@ namespace StrDss.Service
             // BCC: [sender], [platform], [Additional CCs] (optional)
             dto.CcList.Add(_currentUser.EmailAddress);
 
-            var platformEmail = platform!.ContactPeople
-                .FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown)!
-                .EmailAddressDsc;
+            var platformEmails = platform!.ContactPeople
+                .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown)
+                .Select(x => x.EmailAddressDsc)
+                .ToArray();
 
-            dto.CcList.Add(platformEmail);
+            dto.CcList.AddRange(platformEmails);
 
             var template = new TakedownNotice(_emailService)
             {
@@ -214,7 +215,7 @@ namespace StrDss.Service
                 LgName = lg!.OrganizationNm,
                 To = dto.ToList,
                 Bcc = dto.CcList,
-                EmailsToHide = new List<string> { platformEmail! },
+                EmailsToHide = platformEmails,
                 Info = dto.ListingUrl,
                 Comment = dto.Comment,
                 Preview = preview
@@ -412,9 +413,12 @@ namespace StrDss.Service
 
         private async Task ProcessTakedownRequestBatchEmailAsync(OrganizationDto platform, List<DssEmailMessage> allEmails)
         {            
-            var contact = platform.ContactPeople.FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest);
+            var contacts = platform.ContactPeople
+                .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest)
+                .Select(x => x.EmailAddressDsc)
+                .ToArray();
 
-            if (contact == null)
+            if (contacts.Length == 0)
             {
                 throw new Exception($"There's no primary '{EmailMessageTypes.BatchTakedownRequest}' contact email for {platform.OrganizationNm}");
             }
@@ -439,7 +443,7 @@ namespace StrDss.Service
 
             var template = new BatchTakedownRequest(_emailService)
             {
-                To = new string[] { contact!.EmailAddressDsc },
+                To = contacts,
                 Bcc = new string[] { adminEmail! },
                 Info = $"{EmailMessageTypes.BatchTakedownRequest} for {platform.OrganizationNm}",
                 Attachments = new EmailAttachment[] { new EmailAttachment {
@@ -499,7 +503,10 @@ namespace StrDss.Service
             }
 
             //the existence of the contact email has been validated above
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest);
+            var contacts = platform.ContactPeople
+                .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest)
+                .Select(x => x.EmailAddressDsc)
+                .ToArray();
 
             var content = CommonUtils.StreamToBase64(stream);
             var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyy-MM-dd-HH-mm");
@@ -508,7 +515,7 @@ namespace StrDss.Service
 
             var template = new BatchTakedownRequest(_emailService)
             {
-                To = new string[] { contact!.EmailAddressDsc },
+                To = contacts,
                 Bcc = new string[] { adminEmail! },
                 Info = $"{EmailMessageTypes.BatchTakedownRequest} for {platform.OrganizationNm}",
                 Attachments = new EmailAttachment[] { new EmailAttachment {
@@ -594,7 +601,10 @@ namespace StrDss.Service
             }
 
             //the existence of the contact email has been validated above
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown);
+            var contacts = platform!.ContactPeople
+                .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown)
+                .Select(x => x.EmailAddressDsc)
+                .ToArray();
 
             var content = CommonUtils.StreamToBase64(stream);
             var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyy-MM-dd-HH-mm");
@@ -603,7 +613,7 @@ namespace StrDss.Service
 
             var template = new BatchTakedownNotice(_emailService)
             {
-                To = new string[] { contact!.EmailAddressDsc },
+                To = contacts,
                 Bcc = new string[] { adminEmail! },
                 Info = $"{EmailMessageTypes.NoticeOfTakedown} for {platform.OrganizationNm}",
                 Attachments = new EmailAttachment[] { new EmailAttachment {

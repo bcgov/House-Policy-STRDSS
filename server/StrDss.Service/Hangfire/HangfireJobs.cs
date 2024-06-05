@@ -18,7 +18,7 @@ namespace StrDss.Service.Hangfire
         [AutomaticRetry(Attempts = 0)]
         public async Task ProcessRentalListingReports()
         {
-            await _linstingService.ProcessRentalReportUploadsAsync();
+            await _linstingService.ProcessRentalReportUploadAsync();
         }
 
         [Queue("default")]

@@ -1,5 +1,5 @@
 <h2>Platform Upload History</h2>
-<p-card>
+<p-card *ngIf="currentUser">
     <div class="form-group-row" *ngIf="!isSmall && currentUser.organizationType !== 'Platform'">
         <div class="form-group-row-col">
             <label for="platformId">Select Platform</label>
@@ -96,10 +96,11 @@
                     {{row.success}}
                 </td>
                 <td>
-                    <span [id]="'downloadErrors_'+row.uploadDeliveryId" [class.link-span]="row.errors>0"
-                        (click)="onDownloadErrors(row.uploadDeliveryId,row.organizationNm,row.reportPeriodYM)">{{row.errors}}<i
-                            class="pi pi-download" *ngIf="row.errors>0"></i>
-                    </span>
+                    <button *ngIf="row.errors>0; else zero" [id]="'downloadErrors_'+row.uploadDeliveryId" pButton
+                        [disabled]="row.status!=='Processed'" class="p-button-link zero-padding"
+                        (click)="onDownloadErrors(row.uploadDeliveryId,row.organizationNm,row.reportPeriodYM)">{{row.errors}}&nbsp;
+                        <i class="pi pi-download" *ngIf="row.errors>0"></i></button>
+                    <ng-template #zero>{{0}}</ng-template>
                 </td>
                 <td>{{ row.updDtm |date }}</td>
                 <td>{{ row.uploadedBy }}</td>

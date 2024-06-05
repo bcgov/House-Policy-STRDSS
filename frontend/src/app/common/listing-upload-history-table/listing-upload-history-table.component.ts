@@ -15,6 +15,7 @@ import { PagingResponse, PagingResponsePageInfo } from '../models/paging-respons
 import { UserDataService } from '../services/user-data.service';
 import { forkJoin } from 'rxjs';
 import { User } from '../models/user';
+import { GlobalLoaderService } from '../services/global-loader.service';
 
 @Component({
   selector: 'app-listing-upload-history-table',
@@ -47,6 +48,7 @@ export class ListingUploadHistoryTableComponent implements OnInit {
     private listingDataService: ListingDataService,
     private delistingService: DelistingService,
     private userDataService: UserDataService,
+    private loaderService: GlobalLoaderService,
   ) { }
 
   ngOnInit(): void {
@@ -98,6 +100,7 @@ export class ListingUploadHistoryTableComponent implements OnInit {
   }
 
   onDownloadErrors(rowId: number, platform: string, date: string): void {
+    this.loaderService.loadingStart(' It may take several minutes to prepare your download file. Please do not close this tab until your download is complete.');
     this.listingDataService.getUploadHistoryErrors(rowId).subscribe({
       next: (content) => {
         const element = document.createElement('a');
@@ -105,7 +108,10 @@ export class ListingUploadHistoryTableComponent implements OnInit {
         element.setAttribute('download', `errors_${platform}_${date}.csv`);
 
         element.click();
-      }
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+      },
     })
   }
 

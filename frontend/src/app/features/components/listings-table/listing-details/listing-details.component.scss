@@ -1,6 +1,6 @@
 :host {
     width: 100%;
-    padding: 0 24px 24px 24px;
+    padding: 0 0 24px 24px;
     background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
@@ -8,12 +8,14 @@
     .header-container {
         display: flex;
         justify-content: space-between;
+        margin-bottom: 12px;
 
         .legend-container {
             padding-top: 12px;
 
             button {
                 font-size: 16px;
+                margin-right: 12px;
 
                 .pi {
                     font-size: 14px;
@@ -34,27 +36,39 @@
     }
 
     .content {
+        padding-right: 24px;
         width: 100%;
         display: flex;
 
         .main-block {
             display: flex;
-            gap: 10px;
+            gap: 24px;
             flex-direction: column;
             padding: 12px 12px 0 0;
-            width: calc(100% - 420px);
-
+            width: calc(100% - 500px);
         }
 
         .sidebar {
             display: flex;
-            gap: 10px;
+            gap: 24px;
             flex-direction: column;
             padding: 12px 0 0 12px;
-            width: 420px;
+            width: 500px;
         }
 
         p-panel {
+            tr {
+                .small-text {
+                    font-size: small;
+                }
+
+                th {
+                    i {
+                        font-weight: 600;
+                        color: #053662;
+                    }
+                }
+            }
 
             .row {
                 &:not(:last-of-type) {
@@ -62,17 +76,30 @@
                 }
 
                 button {
+                    &.p-button-link {
+                        font-family: 'BcSans-bold';
+                    }
+
                     i {
                         margin-right: 6px;
                     }
                 }
 
                 .label {
-                    font-weight: 600;
+                    font-family: 'BcSans-bold';
                 }
 
                 .value {
                     padding-left: 8px;
+
+                    &.warning {
+                        color: #CE3E39;
+
+                        i {
+                            font-weight: 600;
+                            color: #CE3E39;
+                        }
+                    }
                 }
 
             }

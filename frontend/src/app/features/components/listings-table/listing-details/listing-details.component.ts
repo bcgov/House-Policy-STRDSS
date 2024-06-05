@@ -1,5 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ListingTableRow } from '../../../../common/models/listing-table-row';
+import { Component, OnInit } from '@angular/core';
 import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -7,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ListingDataService } from '../../../../common/services/listing-data.service';
 import { ListingDetails } from '../../../../common/models/listing-details';
+import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-listing-details',
@@ -15,6 +16,9 @@ import { ListingDetails } from '../../../../common/models/listing-details';
     CommonModule,
     ButtonModule,
     PanelModule,
+    TableModule,
+    DialogModule,
+    TooltipModule,
   ],
   templateUrl: './listing-details.component.html',
   styleUrl: './listing-details.component.scss'
@@ -22,6 +26,8 @@ import { ListingDetails } from '../../../../common/models/listing-details';
 export class ListingDetailsComponent implements OnInit {
   id!: number;
   listing!: ListingDetails;
+  isLegendShown = false;
+  addressWarningScoreLimit = 75;
 
   constructor(private route: ActivatedRoute, private listingService: ListingDataService) {
   }
@@ -33,6 +39,15 @@ export class ListingDetailsComponent implements OnInit {
   }
 
   showLegend(): void {
+    this.isLegendShown = true;
+  }
+
+  sendTakedownRequest(): void {
+
+  }
+
+  sendNoticeOfNonCompliance(): void {
+
   }
 
   private getListingDetailsById(id: number): void {

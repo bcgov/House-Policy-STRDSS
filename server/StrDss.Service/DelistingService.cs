@@ -24,18 +24,22 @@ namespace StrDss.Service
         Task ProcessTakedownRequestBatchEmailsAsync();
         Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream);
         Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, Stream stream);
+        Task<Dictionary<string, List<string>>> CreateBulkTakedownNoticesAsync(BulkTakedownNoticesDto[] listings);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
+        private IRentalListingRepository _listingRepo;
         private IConfiguration _config;
         private IEmailMessageService _emailService;
         private IOrganizationService _orgService;
         private IEmailMessageRepository _emailRepo;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
+            IRentalListingRepository listingRepo,
             IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, IEmailMessageRepository emailRepo, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
+            _listingRepo = listingRepo;
             _config = config;
             _emailService = emailService;
             _orgService = orgService;
@@ -190,6 +194,124 @@ namespace StrDss.Service
             emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
+        }
+
+        public async Task<Dictionary<string, List<string>>> CreateBulkTakedownNoticesAsync(BulkTakedownNoticesDto[] listings)
+        {
+            var errors = new Dictionary<string, List<string>>();
+            var regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+            var templates = new List<TakedownNotice>();
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
+
+            if (lg == null)
+            {
+                errors.AddItem("organization", $"No organization found for the user");
+                return errors;
+            }
+
+            var lgEmails = lg.ContactPeople
+                .Where(x => x.EmailAddressDsc != null)
+                .Select(x => x.EmailAddressDsc)
+                .ToList();
+
+            //if (lgEmails.Count == 0)
+            //{
+            //    errors.AddItem("organization", $"No organization email found for the organization {lg.OrganizationNm}");
+            //    return errors;
+            //}
+
+            foreach (var listing in listings)
+            {
+                var rentalListing = await _listingRepo.GetRentalLisgingForTakedownNotice(listing.RentalListingId);                
+
+                if (rentalListing == null) continue; //error message
+
+                listing.ProvidingPlatformId = rentalListing.ProvidingPlatformId;
+
+                var template = new TakedownNotice(_emailService)
+                {
+                    RentalListingId = listing.RentalListingId,
+                    Url = rentalListing!.PlatformListingUrl ?? "",
+                    ListingId = rentalListing!.PlatformListingNo,
+                    Comment = listing.Comment,
+                    LgName = _currentUser.OrganizationName,
+                    Info = rentalListing!.PlatformListingUrl ?? "",
+                };
+
+                templates.Add(template);
+
+                //To
+                if (!listing.HostEmailSent)
+                {
+                    var hostEmails = new List<string>();
+
+                    foreach (var email in rentalListing!.HostEmails)
+                    {
+                        if (email == null) continue;
+
+                        if (Regex.IsMatch(email, regex.Regex))
+                        {
+                            hostEmails.Add(email);
+                        }
+                    }
+                    
+                    if (!hostEmails.Any())
+                    {
+                        errors.AddItem("hostEmail", $"No valid host email for the listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo}");
+                    }
+                    else
+                    {
+                        listing.HostEmails = hostEmails;
+                        template.To = hostEmails.Concat(lgEmails);
+                    }
+                }
+                else
+                {
+                    template.To = lgEmails;
+                }
+
+                //Bcc
+                rentalListing.PlatformEmails.Add(_currentUser.EmailAddress);
+                template.Bcc = rentalListing.PlatformEmails;
+                template.EmailsToHide = template.Bcc;                
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            foreach (var template in templates)
+            {
+                var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
+
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = template.EmailMessageType,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = listing.HostEmailSent,
+                    IsSubmitterCcRequired = true,
+                    LgPhoneNo = "",
+                    UnreportedListingNo = template.ListingId,
+                    HostEmailAddressDsc = listing.HostEmails.FirstOrDefault(),
+                    LgEmailAddressDsc = lgEmails.FirstOrDefault(),
+                    CcEmailAddressDsc = string.Join("; ", template.Bcc),
+                    UnreportedListingUrl = template.Url,
+                    LgStrBylawUrl = "",
+                    InitiatingUserIdentityId = _currentUser.Id,
+                    AffectedByUserIdentityId = null,
+                    InvolvedInOrganizationId = listing.ProvidingPlatformId,
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                emailEntity.ExternalMessageNo = await template.SendEmail();
+
+                _unitOfWork.Commit();
+            }
+
+            return errors;
         }
 
         private TakedownNotice GetTakedownNoticeTemplate(TakedownNoticeCreateDto dto, OrganizationDto? platform, OrganizationDto? lg, bool preview = false)

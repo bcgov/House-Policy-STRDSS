@@ -54,6 +54,20 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.TakedownAction)]
+        [HttpPost("bulkwarnings", Name = "CreateBulkTakedownNotices")]
+        public async Task<ActionResult> CreateBulkTakedownNotices(BulkTakedownNoticesDto[] notices)
+        {
+            var errors = await _delistingService.CreateBulkTakedownNoticesAsync(notices);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return NoContent();
+        }
+
+       [ApiAuthorize(Permissions.TakedownAction)]
         [HttpPost("requests", Name = "CreateTakedownRequest")]
         public async Task<ActionResult> CreateTakedownRequest(TakedownRequestCreateDto dto)
         {
@@ -154,5 +168,7 @@ namespace StrDss.Api.Controllers
 
             return NoContent();
         }
+
+
     }
 }

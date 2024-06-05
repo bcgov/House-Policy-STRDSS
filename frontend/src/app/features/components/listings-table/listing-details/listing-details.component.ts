@@ -8,6 +8,7 @@ import { ListingDataService } from '../../../../common/services/listing-data.ser
 import { ListingDetails } from '../../../../common/models/listing-details';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { UserDataService } from '../../../../common/services/user-data.service';
 
 @Component({
   selector: 'app-listing-details',
@@ -28,12 +29,18 @@ export class ListingDetailsComponent implements OnInit {
   listing!: ListingDetails;
   isLegendShown = false;
   addressWarningScoreLimit = 75;
+  isCEU = false;
 
-  constructor(private route: ActivatedRoute, private listingService: ListingDataService) {
+  constructor(private route: ActivatedRoute, private listingService: ListingDataService, private userDataService: UserDataService) {
   }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.params['id'];
+    this.userDataService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.isCEU = user.permissions.includes('ceu_action');
+      }
+    });
 
     this.getListingDetailsById(this.id);
   }

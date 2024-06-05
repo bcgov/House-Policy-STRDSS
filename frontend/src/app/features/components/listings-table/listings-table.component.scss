@@ -104,7 +104,7 @@
         tr {
             th {
                 font-size: 14px;
-                font-weight: 600;
+                font-family: 'BcSans-bold';
 
                 &.sortable-header {
                     -webkit-user-select: none;
@@ -143,7 +143,7 @@
                     border-radius: 50%;
                     line-height: 20px;
                     color: #FFFFFF;
-                    font-weight: 600;
+                    font-family: 'BcSans-bold';
 
                     &.status-new {
                         background-color: #F8BB47;

@@ -25,6 +25,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream);
         Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, Stream stream);
         Task<Dictionary<string, List<string>>> CreateBulkTakedownNoticesAsync(BulkTakedownNoticesDto[] listings);
+        Task<Dictionary<string, List<string>>> CreateBulkTakedownReqeustsAsync(BulkTakedownRequestsDto[] listings);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -226,6 +227,11 @@ namespace StrDss.Service
 
                 if (rentalListing == null) continue; //error message
 
+                if (rentalListing.LocalGovernmentId != _currentUser.OrganizationId)
+                {
+                    errors.AddItem("No access", $"The listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo} does not belong to {lg.OrganizationNm}");
+                }
+
                 listing.ProvidingPlatformId = rentalListing.ProvidingPlatformId;
 
                 var template = new TakedownNotice(_emailService)
@@ -358,17 +364,28 @@ namespace StrDss.Service
             return template;
         }
 
-        public async Task<Dictionary<string, List<string>>> CreateBulkTakedownReqeustAsync(BulkTakedownRequestsDto[] listings)
+        public async Task<Dictionary<string, List<string>>> CreateBulkTakedownReqeustsAsync(BulkTakedownRequestsDto[] listings)
         {
             var errors = new Dictionary<string, List<string>>();
-
             var templates = new List<TakedownRequest>();
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
+
+            if (lg == null)
+            {
+                errors.AddItem("organization", $"No organization found for the user");
+                return errors;
+            }
 
             foreach (var listing in listings)
             {
                 var rentalListing = await _listingRepo.GetRentalLisgingForTakedownAction(listing.RentalListingId, false);
 
                 if (rentalListing == null) continue; //error message
+
+                if (rentalListing.LocalGovernmentId != _currentUser.OrganizationId)
+                {
+                    errors.AddItem("No access", $"The listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo} does not belong to {lg.OrganizationNm}");
+                }
 
                 listing.ProvidingPlatformId = rentalListing.ProvidingPlatformId;
 

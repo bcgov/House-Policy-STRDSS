@@ -156,6 +156,9 @@ namespace StrDss.Data.Repositories
                 listing.HostEmails = await GetHostEmailsAsync(listingId);
             }
 
+            var listingView = await _dbContext.DssRentalListingVws.FirstAsync(x => x.RentalListingId == listingId);
+            listing.LocalGovernmentId = listingView.ManagingOrganizationId ?? 0;
+
             (listing.PlatformEmails, listing.ProvidingPlatformId) = await GetPlatformEmailsAsync(listing.OfferingPlatformId);
 
             return listing;

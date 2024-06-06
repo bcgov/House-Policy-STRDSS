@@ -59,8 +59,8 @@ export class ListingDetailsComponent implements OnInit {
 
   private getListingDetailsById(id: number): void {
     this.listingService.getListingDetailsById(id).subscribe({
-      next: (resposne: ListingDetails) => {
-        this.listing = resposne;
+      next: (response: ListingDetails) => {
+        this.listing = response;
       }
     });
   }

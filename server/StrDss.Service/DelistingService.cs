@@ -232,6 +232,7 @@ namespace StrDss.Service
                 {
                     RentalListingId = listing.RentalListingId,
                     Url = rentalListing!.PlatformListingUrl ?? "",
+                    OrgCd = rentalListing!.OrganizationCd,
                     ListingId = rentalListing!.PlatformListingNo,
                     Comment = listing.Comment,
                     LgName = _currentUser.OrganizationName,
@@ -283,35 +284,48 @@ namespace StrDss.Service
 
             foreach (var template in templates)
             {
-                var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
-
-                var emailEntity = new DssEmailMessage
+                try
                 {
-                    EmailMessageType = template.EmailMessageType,
-                    MessageDeliveryDtm = DateTime.UtcNow,
-                    MessageTemplateDsc = template.GetContent(),
-                    IsHostContactedExternally = listing.HostEmailSent,
-                    IsSubmitterCcRequired = true,
-                    LgPhoneNo = "",
-                    UnreportedListingNo = template.ListingId,
-                    HostEmailAddressDsc = listing.HostEmails.FirstOrDefault(),
-                    LgEmailAddressDsc = lgEmails.FirstOrDefault(),
-                    CcEmailAddressDsc = string.Join("; ", template.Bcc),
-                    UnreportedListingUrl = template.Url,
-                    LgStrBylawUrl = "",
-                    InitiatingUserIdentityId = _currentUser.Id,
-                    AffectedByUserIdentityId = null,
-                    InvolvedInOrganizationId = listing.ProvidingPlatformId,
-                };
-
-                await _emailRepo.AddEmailMessage(emailEntity);
-
-                emailEntity.ExternalMessageNo = await template.SendEmail();
-
-                _unitOfWork.Commit();
+                    await SendTakedownNoticeEmail(listings, lgEmails, template);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
+                    errors.AddItem($"{template.OrgCd}-{template.ListingId}", "Failed to send email for the listing.");
+                }
             }
 
             return errors;
+        }
+
+        private async Task SendTakedownNoticeEmail(BulkTakedownNoticesDto[] listings, List<string> lgEmails, TakedownNotice template)
+        {
+            var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
+
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsHostContactedExternally = listing.HostEmailSent,
+                IsSubmitterCcRequired = true,
+                LgPhoneNo = "",
+                UnreportedListingNo = template.ListingId,
+                HostEmailAddressDsc = listing.HostEmails.FirstOrDefault(),
+                LgEmailAddressDsc = lgEmails.FirstOrDefault(),
+                CcEmailAddressDsc = string.Join("; ", template.Bcc),
+                UnreportedListingUrl = template.Url,
+                LgStrBylawUrl = "",
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = null,
+                InvolvedInOrganizationId = listing.ProvidingPlatformId,
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            emailEntity.ExternalMessageNo = await template.SendEmail();
+
+            _unitOfWork.Commit();
         }
 
         private TakedownNotice GetTakedownNoticeTemplate(TakedownNoticeCreateDto dto, OrganizationDto? platform, OrganizationDto? lg, bool preview = false)

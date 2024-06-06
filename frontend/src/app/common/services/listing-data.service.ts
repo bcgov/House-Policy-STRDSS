@@ -6,6 +6,7 @@ import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
 import { ListingTableRow } from '../models/listing-table-row';
 import { ListingSearchRequest } from '../models/listing-search-request';
+import { ListingDetails } from '../models/listing-details';
 
 @Injectable({
   providedIn: 'root'
@@ -90,5 +91,9 @@ export class ListingDataService {
     }
 
     return this.httpClient.get<PagingResponse<ListingTableRow>>(endpointUrl);
+  }
+
+  getListingDetailsById(id: number): Observable<ListingDetails> {
+    return this.httpClient.get<ListingDetails>(`${environment.API_HOST}/rentallistings/${id}`)
   }
 }

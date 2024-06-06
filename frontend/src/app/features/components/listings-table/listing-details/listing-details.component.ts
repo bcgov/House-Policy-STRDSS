@@ -1,9 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ListingTableRow } from '../../../../common/models/listing-table-row';
+import { Component, OnInit } from '@angular/core';
 import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { ListingDataService } from '../../../../common/services/listing-data.service';
+import { ListingDetails } from '../../../../common/models/listing-details';
+import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
+import { UserDataService } from '../../../../common/services/user-data.service';
 
 @Component({
   selector: 'app-listing-details',
@@ -12,30 +17,51 @@ import { CommonModule } from '@angular/common';
     CommonModule,
     ButtonModule,
     PanelModule,
+    TableModule,
+    DialogModule,
+    TooltipModule,
   ],
   templateUrl: './listing-details.component.html',
   styleUrl: './listing-details.component.scss'
 })
 export class ListingDetailsComponent implements OnInit {
-  @Input() listing!: ListingTableRow;
-  @Output() closeEvent = new EventEmitter<'back' | 'close'>()
+  id!: number;
+  listing!: ListingDetails;
+  isLegendShown = false;
+  addressWarningScoreLimit = 75;
+  isCEU = false;
+
+  constructor(private route: ActivatedRoute, private listingService: ListingDataService, private userDataService: UserDataService) {
+  }
 
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    this.id = this.route.snapshot.params['id'];
+    this.userDataService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.isCEU = user.permissions.includes('ceu_action');
+      }
+    });
+
+    this.getListingDetailsById(this.id);
   }
 
-  constructor() {
-
-  }
-
-  onClose(): void {
-    this.closeEvent.emit('close');
-  }
-
-  onBack(): void {
-    this.closeEvent.emit('back');
-  }
   showLegend(): void {
+    this.isLegendShown = true;
+  }
 
+  sendTakedownRequest(): void {
+
+  }
+
+  sendNoticeOfNonCompliance(): void {
+
+  }
+
+  private getListingDetailsById(id: number): void {
+    this.listingService.getListingDetailsById(id).subscribe({
+      next: (response: ListingDetails) => {
+        this.listing = response;
+      }
+    });
   }
 }

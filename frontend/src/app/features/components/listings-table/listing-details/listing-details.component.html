@@ -1,10 +1,205 @@
-<div class="header">
-    <h2 class="title">Detailed Listing Information for</h2>
-    <button pButton (click)="onBack()">Return to Listings</button>
+<div class="header-container" *ngIf="listing">
+    <div class="title">
+        <h2>Detailed Listing Information for</h2>
+
+        <a class="listing-url-lnk" [href]="listing.platformListingUrl">{{listing.platformListingNo}}</a>&nbsp; <i
+            class="pi pi-external-link"></i>
+    </div>
     <div class="legend-container">
         <button pButton id="view-more-history-btn" class="p-button-link" (click)="showLegend()">
             <i class="pi pi-question-circle"></i>&nbsp;Legend
         </button>
     </div>
 </div>
-<div class="content"></div>
+<div class="subtitle" *ngIf="listing">
+    <div class="last-updated-container">
+        <strong>Last Updated: </strong>{{listing.lastActionDtm}}
+    </div>
+    <div class="platform-container">
+        <strong>Platform: </strong>{{listing.offeringOrganizationNm}}
+    </div>
+</div>
+<div class="content" *ngIf="listing">
+    <div class="main-block">
+        <p-panel class="details-block" header="Property Information">
+            <div class="row">
+                <span class="label">Address (Best Match):</span>
+                <span class="value" [class.warning]="listing.matchScoreAmt<=addressWarningScoreLimit">
+                    {{listing.matchAddressTxt}}&nbsp; <i class="pi pi-info-circle"
+                        pTooltip="Low Address Match Confidence"
+                        *ngIf="listing.matchScoreAmt<=addressWarningScoreLimit"></i>
+                </span>
+            </div>
+            <div class="row">
+                <span class="label">Address (Platform Listing):</span>
+                <span class="value">{{listing.originalAddressTxt}}</span>
+            </div>
+            <div class="row">
+                <span class="label">Entire Unit? (Platform Listing):</span>
+                <span class="value">{{listing.isEntireUnit?'Yes':'No'}}</span>
+            </div>
+            <div class="row">
+                <span class="label">Number of Bedrooms (Platform Listing):</span>
+                <span class="value">{{listing.availableBedroomsQty}}</span>
+            </div>
+        </p-panel>
+        <p-panel class="details-block" header="Business Licence Information">
+            <div class="row">
+                <span class="label">BL (Platform Listing):</span>
+                <span class="value">{{listing.businessLicenceNo}}</span>
+            </div>
+        </p-panel>
+        <p-panel class="details-block" header="Hosts" *ngIf="listing.hosts">
+            <ng-template ngFor let-host [ngForOf]="listing.hosts" let-i="index">
+                <div class="row">
+                    <span class="label">{{host.isPropertyOwner?'Property':'STR'}} Host (Platform Listing):</span>
+                    <span class="value">{{host.fullNm}}</span>
+                </div>
+                <div class="row">
+                    <span class="label">{{host.isPropertyOwner?'Property':'STR'}} Host Address:</span>
+                    <span class="value">{{host.fullAddressTxt}}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Email:</span>
+                    <span class="value">{{host.emailAddressDsc}}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Phone</span>
+                    <span class="value">{{host.phoneNo}}</span>
+                </div>
+                <ng-template [ngIf]="i !== (listing.hosts.length-1)">
+                    <br>
+                </ng-template>
+            </ng-template>
+        </p-panel>
+        <p-panel class="details-block" header="Listing History (for This Listing ID)">
+            <div class="row">
+                <span class="label">Night Stayed YTD:</span>
+                <span class="value">{{listing.nightsBookedYtdQty}}</span>
+            </div>
+            <div class="row">
+                <p-table [value]="listing.listingHistory" [paginator]="listing.listingHistory.length>12"
+                    [showPageLinks]="false" currentPageReportTemplate="{first}-{last} of {totalRecords}"
+                    [showFirstLastIcon]="false" [showCurrentPageReport]="true" paginatorStyleClass="paging-right"
+                    [rows]="12" styleClass="p-datatable-sm" class="table-paging-right">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Month</th>
+                            <th>Nights Stayed</th>
+                            <th><i class="pi pi-info-circle"
+                                    pTooltip="Includes reservations that completed within the month"
+                                    tooltipPosition="top"></i> Separate
+                                Reservations
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-listingHistory>
+                        <tr>
+                            <td>{{ listingHistory.reportPeriodYM }}</td>
+                            <td>{{ listingHistory.nightsBookedQty }}</td>
+                            <td>{{ listingHistory.separateReservationsQty }}</td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-panel>
+    </div>
+    <div class="sidebar">
+        <p-panel class="details-block" header="Actions" *ngIf="!isCEU">
+            <div class="row">
+                <button disabled pButton (click)="sendNoticeOfNonCompliance()" class="p-button-link"> Send Notice Of
+                    Non-Compliance </button>
+            </div>
+            <div class="row">
+                <button disabled pButton (click)="sendTakedownRequest()" class="p-button-link"> Send Takedown
+                    Request</button>
+            </div>
+        </p-panel>
+        <p-panel class="details-block" header="Action History">
+            <p-table [value]="listing.actionHistory" styleClass="p-datatable-sm">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Action</th>
+                        <th>Date</th>
+                        <th>User</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-actionHistory>
+                    <tr class="small-text">
+                        <td>{{ actionHistory.action }}</td>
+                        <td>{{ actionHistory.date |date}}</td>
+                        <td>{{ actionHistory.user }}</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-panel>
+    </div>
+</div>
+
+<p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
+    <span>
+        <strong>Status:</strong> Status of the listing using the following categories:
+        <ul>
+            <li>New (N): Listing reported for the first time in current monthly data</li>
+            <li>Active (A): Listing appeared in previous and current monthly data</li>
+            <li>Inactive (I): Listing appeared in previous but not current monthly data</li>
+            <li>Removed (R): Platform confirmed takedown of the listing</li>
+        </ul>
+    </span>
+    <p>
+        <strong>Listing ID:</strong> Platform ID number for the listing.
+    </p>
+
+    <p>
+        <strong>Address (Best Match):</strong> Best physical address match provided by the BC Address Geocoder based
+        on the address from the platform listing (accuracy of % or above).
+    </p>
+
+    <p>
+        <strong>Address (from platform listing):</strong> Property address of the short-term rental accommodation
+        provided to the platform by the host. May be incomplete or inaccurate.
+    </p>
+    <p>
+        <strong>Entire Unit:</strong> Is the listing for an entire dwelling unit or a bedroom within the dwelling
+        unit.
+    </p>
+    <p>
+        <strong>Nights Stayed:</strong> The number of nights short-term rental services were provided in the
+        reporting month.
+    </p>
+    <p>
+        <strong>Separate Reservations:</strong> The number of separate reservations that were "completed" in the
+        reporting month (ie. where the guest has checked out within the month). Reservations that span more than one
+        month will be reported in the month the guest checks out.
+    </p>
+    <p>
+        <strong>Business licence:</strong> Business licence number provided by the host on the listing, if
+        applicable.
+    </p>
+    <p>
+        <strong>Property Host:</strong> A person who is legally entitled to possession of the property where STR
+        accommodation is provided and acts as the STR operator responsible for arranging the short term rental
+        services.
+        <i>See Short-term Rental Accommodations Act</i> for definition.
+    </p>
+    <p>
+        <strong>STR Host:</strong> Any person who acts as the STR operator, including the property host and any
+        other persons who act on their behalf to arrange the short-term rental services (e.g., host, co-host,
+        property manager).
+        <i>See Short-term Rental Accommodations Act</i> for definition.
+    </p>
+</p-dialog>

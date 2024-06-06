@@ -209,10 +209,10 @@ namespace StrDss.Service
                 return errors;
             }
 
-            var lgEmails = lg.ContactPeople
-                .Where(x => x.EmailAddressDsc != null)
-                .Select(x => x.EmailAddressDsc)
-                .ToList();
+            //var lgEmails = lg.ContactPeople
+            //    .Where(x => x.EmailAddressDsc != null)
+            //    .Select(x => x.EmailAddressDsc)
+            //    .ToList();
 
             //if (lgEmails.Count == 0)
             //{
@@ -263,12 +263,8 @@ namespace StrDss.Service
                     else
                     {
                         listing.HostEmails = hostEmails;
-                        template.To = hostEmails.Concat(lgEmails);
+                        template.To = hostEmails;
                     }
-                }
-                else
-                {
-                    template.To = lgEmails;
                 }
 
                 //Bcc
@@ -289,7 +285,7 @@ namespace StrDss.Service
             {
                 try
                 {
-                    await SendTakedownNoticeEmail(listings, lgEmails, template);
+                    await SendTakedownNoticeEmail(listings, template);
                 }
                 catch (Exception ex)
                 {
@@ -301,7 +297,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendTakedownNoticeEmail(BulkTakedownNoticesDto[] listings, List<string> lgEmails, TakedownNotice template)
+        private async Task SendTakedownNoticeEmail(BulkTakedownNoticesDto[] listings, TakedownNotice template)
         {
             var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
 
@@ -315,7 +311,7 @@ namespace StrDss.Service
                 LgPhoneNo = "",
                 UnreportedListingNo = template.ListingId,
                 HostEmailAddressDsc = listing.HostEmails.FirstOrDefault(),
-                LgEmailAddressDsc = lgEmails.FirstOrDefault(),
+                LgEmailAddressDsc = null,
                 CcEmailAddressDsc = string.Join("; ", template.Bcc),
                 UnreportedListingUrl = template.Url,
                 LgStrBylawUrl = "",

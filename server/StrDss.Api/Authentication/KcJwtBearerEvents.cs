@@ -67,6 +67,7 @@ namespace StrDss.Api.Authentication
                 _currentUser.AccessRequestRequired = _currentUser.AccessRequestStatus == AccessRequestStatuses.Denied;
                 _currentUser.OrganizationType = user.RepresentedByOrganization?.OrganizationType ?? "";
                 _currentUser.OrganizationId = user.RepresentedByOrganizationId ?? 0;
+                _currentUser.OrganizationName = user.RepresentedByOrganization?.OrganizationNm ?? "";
                 _currentUser.TermsAcceptanceDtm = user.TermsAcceptanceDtm;
 
                 if (user.IsEnabled)

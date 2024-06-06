@@ -72,6 +72,62 @@
 			"response": []
 		},
 		{
+			"name": "CreateBulkTakedownNotices",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"rentalListingId\": 570,\r\n    \"hostEmailSent\": false,\r\n    \"ccList\": [],\r\n    \"comment\": \"Testing\"\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/delisting/bulkwarnings",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"delisting",
+						"bulkwarnings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateBulkTakedownRequests",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"rentalListingId\": 570,\r\n    \"ccList\": [],\r\n    \"isWithStandardDetail\": true,\r\n    \"customDetailTxt\": \"string\"\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/delisting/bulkrequests",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"delisting",
+						"bulkrequests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "GetTakedownNoticePreview",
 			"request": {
 				"method": "POST",

@@ -8,7 +8,7 @@ namespace StrDss.Service.EmailTemplates
             : base(emailService)
         {
             EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
-            From = From = Environment.GetEnvironmentVariable("STR_NOTICE_EMAIL") ?? From;
+            From = Environment.GetEnvironmentVariable("STR_NOTICE_EMAIL") ?? From;
 
         }
 

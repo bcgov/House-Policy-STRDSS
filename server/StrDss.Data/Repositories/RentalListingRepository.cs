@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using StrDss.Model.DelistingDtos;
 using StrDss.Model.RentalReportDtos;
 
 namespace StrDss.Data.Repositories
@@ -12,6 +13,7 @@ namespace StrDss.Data.Repositories
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long listingId);
+        Task<RentalListingForTakedownDto?> GetRentalLisgingForTakedownAction(long listingId, bool includeHostEmails);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -143,5 +145,79 @@ namespace StrDss.Data.Repositories
 
             return listing;
         }
+
+        public async Task<RentalListingForTakedownDto?> GetRentalLisgingForTakedownAction(long listingId, bool includeHostEmail)
+        {
+            var listing = await GetRentalListingAsync(listingId);
+            if (listing == null) return null;
+
+            if (includeHostEmail)
+            {
+                listing.HostEmails = await GetHostEmailsAsync(listingId);
+            }
+
+            var listingView = await _dbContext.DssRentalListingVws.FirstAsync(x => x.RentalListingId == listingId);
+            listing.LocalGovernmentId = listingView.ManagingOrganizationId ?? 0;
+
+            (listing.PlatformEmails, listing.ProvidingPlatformId) = await GetPlatformEmailsAsync(listing.OfferingPlatformId);
+
+            return listing;
+        }
+
+        private async Task<RentalListingForTakedownDto?> GetRentalListingAsync(long listingId)
+        {
+            return await _dbContext.DssRentalListings
+                .Select(x => new RentalListingForTakedownDto
+                {
+                    RentalListingId = listingId,
+                    PlatformListingNo = x.PlatformListingNo,
+                    PlatformListingUrl = x.PlatformListingUrl,
+                    OrganizationCd = x.OfferingOrganization.OrganizationCd,
+                    OfferingPlatformId = x.OfferingOrganizationId
+                })
+                .FirstOrDefaultAsync(x => x.RentalListingId == listingId);
+        }
+
+        private async Task<List<string>> GetHostEmailsAsync(long listingId)
+        {
+            var emails = await _dbContext.DssRentalListingContacts
+                .Where(x => x.ContactedThroughRentalListingId == listingId && x.EmailAddressDsc != null)
+                .Select(x => x.EmailAddressDsc)
+                .ToListAsync();
+
+            var hostEmails = new List<string>();
+            
+            foreach (var email in emails)
+            {
+                if (email != null)
+                {
+                    hostEmails.Add(email);
+                }
+            }
+
+            return hostEmails;
+        }
+
+        private async Task<(List<string>, long)> GetPlatformEmailsAsync(long platformId)
+        {
+            var platform = await _dbContext.DssOrganizations
+                .Include(x => x.DssOrganizationContactPeople)
+                .Include(x => x.ManagingOrganization)
+                    .ThenInclude(x => x.DssOrganizationContactPeople)
+                .FirstAsync(x => x.OrganizationId == platformId);
+
+            var platformEmails = platform.ManagingOrganization == null
+                ? platform.DssOrganizationContactPeople
+                    .Where(x => x.IsPrimary == true && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown && x.EmailAddressDsc != null)
+                    .Select(x => x.EmailAddressDsc)
+                : platform.ManagingOrganization.DssOrganizationContactPeople
+                    .Where(x => x.IsPrimary == true && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown && x.EmailAddressDsc != null)
+                    .Select(x => x.EmailAddressDsc);
+
+            var providingPlatformId = platform.ManagingOrganization == null ? platform.OrganizationId : platform.ManagingOrganizationId ?? 0;
+
+            return (platformEmails.ToList(), providingPlatformId);
+        }
+
     }
 }

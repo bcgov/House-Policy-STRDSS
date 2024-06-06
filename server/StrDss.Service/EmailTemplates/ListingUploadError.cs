@@ -8,7 +8,7 @@ namespace StrDss.Service.EmailTemplates
             : base(emailService)
         {
             EmailMessageType = EmailMessageTypes.ListingUploadError;
-            From = From = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? From;
+            From = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? From;
         }
         public string UserName { get; set; } = "";
         public long NumErrors { get; set; }

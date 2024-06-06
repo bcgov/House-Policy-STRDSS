@@ -78,7 +78,10 @@
                 <span class="value">{{listing.nightsBookedYtdQty}}</span>
             </div>
             <div class="row">
-                <p-table [value]="listing.listingHistory" styleClass="p-datatable-sm">
+                <p-table [value]="listing.listingHistory" [paginator]="listing.listingHistory.length>12"
+                    [showPageLinks]="false" currentPageReportTemplate="{first}-{last} of {totalRecords}"
+                    [showFirstLastIcon]="false" [showCurrentPageReport]="true" paginatorStyleClass="paging-right"
+                    [rows]="12" styleClass="p-datatable-sm" class="table-paging-right">
                     <ng-template pTemplate="header">
                         <tr>
                             <th>Month</th>
@@ -95,6 +98,13 @@
                             <td>{{ listingHistory.reportPeriodYM }}</td>
                             <td>{{ listingHistory.nightsBookedQty }}</td>
                             <td>{{ listingHistory.separateReservationsQty }}</td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
                         </tr>
                     </ng-template>
                 </p-table>
@@ -126,6 +136,13 @@
                         <td>{{ actionHistory.action }}</td>
                         <td>{{ actionHistory.date |date}}</td>
                         <td>{{ actionHistory.user }}</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
                     </tr>
                 </ng-template>
             </p-table>

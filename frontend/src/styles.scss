@@ -329,6 +329,12 @@ body {
         }
     }
 
+
+    .p-paginator.paging-right {
+        justify-content: end
+    }
+
+
     .p-toast {
         min-width: 25rem;
         width: auto;

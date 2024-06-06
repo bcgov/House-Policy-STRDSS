@@ -15,7 +15,8 @@ namespace StrDss.Service.EmailTemplates
         public string? ListingId { get; set; }
         public string Comment { get; set; } = "";
         public string LgName { get; set; } = "";
-        public long RentalListingId { get; set; }
+        public string OrgCd { get; set; } //optional field
+        public long RentalListingId { get; set; } //optional field
 
         public override string GetContent()
         {

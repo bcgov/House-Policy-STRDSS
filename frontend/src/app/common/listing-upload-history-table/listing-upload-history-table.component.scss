@@ -4,7 +4,7 @@
     h2 {
         padding: 0;
         font-size: 24px;
-        font-weight: 700;
+        font-family: 'BcSans-bold';
         margin-top: 0;
         margin-bottom: 12px;
     }
@@ -15,7 +15,7 @@
 
     p-table {
         th {
-            font-weight: 600;
+            font-family: 'BcSans-bold';
 
             &.sortable-header {
                 -webkit-user-select: none;

@@ -222,7 +222,7 @@ namespace StrDss.Service
 
             foreach (var listing in listings)
             {
-                var rentalListing = await _listingRepo.GetRentalLisgingForTakedownNotice(listing.RentalListingId);                
+                var rentalListing = await _listingRepo.GetRentalLisgingForTakedownAction(listing.RentalListingId, true);                
 
                 if (rentalListing == null) continue; //error message
 
@@ -272,9 +272,12 @@ namespace StrDss.Service
                 }
 
                 //Bcc
-                rentalListing.PlatformEmails.Add(_currentUser.EmailAddress);
-                template.Bcc = rentalListing.PlatformEmails;
-                template.EmailsToHide = template.Bcc;                
+                listing.CcList ??= new List<string>();
+                listing.CcList.Add(_currentUser.EmailAddress);
+                listing.CcList.AddRange(rentalListing.PlatformEmails);
+                template.Bcc = listing.CcList;
+
+                template.EmailsToHide = rentalListing.PlatformEmails;                
             }
 
             if (errors.Count > 0)
@@ -357,6 +360,95 @@ namespace StrDss.Service
                 Preview = preview
             };
             return template;
+        }
+
+        public async Task<Dictionary<string, List<string>>> CreateBulkTakedownReqeustAsync(BulkTakedownRequestsDto[] listings)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var templates = new List<TakedownRequest>();
+
+            foreach (var listing in listings)
+            {
+                var rentalListing = await _listingRepo.GetRentalLisgingForTakedownAction(listing.RentalListingId, false);
+
+                if (rentalListing == null) continue; //error message
+
+                listing.ProvidingPlatformId = rentalListing.ProvidingPlatformId;
+
+                var template = new TakedownRequest(_emailService)
+                {
+                    RentalListingId = listing.RentalListingId,
+                    Url = rentalListing!.PlatformListingUrl ?? "",
+                    OrgCd = rentalListing!.OrganizationCd,
+                    ListingId = rentalListing!.PlatformListingNo,
+                    Info = rentalListing!.PlatformListingUrl ?? "",
+                };
+
+                templates.Add(template);
+
+                //To
+                template.To = new string[] { _currentUser.EmailAddress };
+
+                //Cc
+                listing.CcList ??= new List<string>();
+                template.Cc = listing.CcList;
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            foreach (var template in templates)
+            {
+                try
+                {
+                    await SendTakedownRequestEmail(listings, template);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
+                    errors.AddItem($"{template.OrgCd}-{template.ListingId}", "Failed to send email for the listing.");
+                }
+            }
+
+            return errors;
+        }
+
+        private async Task SendTakedownRequestEmail(BulkTakedownRequestsDto[] listings, TakedownRequest template)
+        {
+            var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
+
+
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsHostContactedExternally = false,
+                LgPhoneNo = null,
+                UnreportedListingNo = template.ListingId,
+                HostEmailAddressDsc = null,
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = string.Join("; ", template.Cc),
+                UnreportedListingUrl = template.Url,
+                LgStrBylawUrl = null,
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = null,
+                InvolvedInOrganizationId = listing.ProvidingPlatformId,
+                RequestingOrganizationId = _currentUser.OrganizationId,
+                IsWithStandardDetail = listing.IsWithStandardDetail,
+                CustomDetailTxt = listing.CustomDetailTxt,
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            emailEntity.ExternalMessageNo = await template.SendEmail();
+
+            _unitOfWork.Commit();
         }
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto)

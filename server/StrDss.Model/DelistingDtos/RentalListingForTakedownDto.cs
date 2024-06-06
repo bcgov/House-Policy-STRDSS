@@ -1,6 +1,6 @@
-﻿namespace StrDss.Model.RentalReportDtos
+﻿namespace StrDss.Model.DelistingDtos
 {
-    public class RentalListingForTakedownNotice
+    public class RentalListingForTakedownDto
     {
         public long RentalListingId { get; set; }
         public string OrganizationCd { get; set; } = "";

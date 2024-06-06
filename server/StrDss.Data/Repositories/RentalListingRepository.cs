@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using StrDss.Model.DelistingDtos;
 using StrDss.Model.RentalReportDtos;
 
 namespace StrDss.Data.Repositories
@@ -12,7 +13,7 @@ namespace StrDss.Data.Repositories
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long listingId);
-        Task<RentalListingForTakedownNotice?> GetRentalLisgingForTakedownNotice(long listingId);
+        Task<RentalListingForTakedownDto?> GetRentalLisgingForTakedownAction(long listingId, bool includeHostEmails);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -145,21 +146,25 @@ namespace StrDss.Data.Repositories
             return listing;
         }
 
-        public async Task<RentalListingForTakedownNotice?> GetRentalLisgingForTakedownNotice(long listingId)
+        public async Task<RentalListingForTakedownDto?> GetRentalLisgingForTakedownAction(long listingId, bool includeHostEmail)
         {
             var listing = await GetRentalListingAsync(listingId);
             if (listing == null) return null;
 
-            listing.HostEmails = await GetHostEmailsAsync(listingId);
+            if (includeHostEmail)
+            {
+                listing.HostEmails = await GetHostEmailsAsync(listingId);
+            }
+
             (listing.PlatformEmails, listing.ProvidingPlatformId) = await GetPlatformEmailsAsync(listing.OfferingPlatformId);
 
             return listing;
         }
 
-        private async Task<RentalListingForTakedownNotice?> GetRentalListingAsync(long listingId)
+        private async Task<RentalListingForTakedownDto?> GetRentalListingAsync(long listingId)
         {
             return await _dbContext.DssRentalListings
-                .Select(x => new RentalListingForTakedownNotice
+                .Select(x => new RentalListingForTakedownDto
                 {
                     RentalListingId = listingId,
                     PlatformListingNo = x.PlatformListingNo,

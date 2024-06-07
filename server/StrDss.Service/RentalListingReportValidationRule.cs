@@ -82,27 +82,27 @@ namespace StrDss.Service
             {
                 EntityName = Entities.RentalListingRowUntyped,
                 FieldName = RentalListingReportFields.BedroomsQty,
-                FieldType = FieldTypes.Decimal,
+                FieldType = FieldTypes.String,
                 Required = false,
-                MaxValue = 255
+                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Quantity)
             });
 
             rules.Add(new FieldValidationRule
             {
                 EntityName = Entities.RentalListingRowUntyped,
                 FieldName = RentalListingReportFields.NightsBookedQty,
-                FieldType = FieldTypes.Decimal,
+                FieldType = FieldTypes.String,
                 Required = false,
-                MaxValue = 255
+                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Quantity)
             });
 
             rules.Add(new FieldValidationRule
             {
                 EntityName = Entities.RentalListingRowUntyped,
                 FieldName = RentalListingReportFields.ReservationsQty,
-                FieldType = FieldTypes.Decimal,
+                FieldType = FieldTypes.String,
                 Required = false,
-                MaxValue = 255
+                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Quantity)
             });
 
             rules.Add(new FieldValidationRule

@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using AutoMapper;
-using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -17,8 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using StrDss.Api.Middlewares;
 using StrDss.Api;
 using StrDss.Service.Bceid;
-using StrDss.Service.Hangfire;
-using Hangfire.PostgreSql;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +48,9 @@ builder.Services.AddDbContext<DssDbContext>(opt =>
         opt.EnableSensitiveDataLogging();
     }
 });
+
+//https://github.com/npgsql/efcore.pg/issues/2736#issuecomment-1875391344
+NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
 
 builder.Services.AddApiVersioning(options =>
 {
@@ -97,18 +98,6 @@ var mappingConfig = new MapperConfiguration(cfg =>
 
 var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
-
-builder.Services
-    .AddHangfire(configuration => configuration
-        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-        .UseSimpleAssemblyNameTypeSerializer()
-        .UseRecommendedSerializerSettings()
-        .UsePostgreSqlStorage(connString));
-
-builder.Services.AddHangfireServer(options =>
-{
-    options.WorkerCount = 1;
-});
 
 //Add logging
 builder.Services.AddLogging(builder => builder.AddConsole());
@@ -184,12 +173,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseHangfireDashboard();
-
 app.UseMiddleware<ExceptionMiddleware>();
-
-// make sure this is after app.UseHangfireDashboard()
-RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/10 * * * *");
-RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *");
 
 app.Run();

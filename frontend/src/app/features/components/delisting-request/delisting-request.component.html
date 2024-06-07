@@ -72,6 +72,36 @@
         </div>
     </div>
 
+    <h4>Add Details of your request</h4>
+    <div class="form-group-row">
+        <div class="form-group-row-col has-checkbox">
+            <p-checkbox formControlName="isWithStandardDetail" [binary]="true" id="isWithStandardDetail"
+                name="isWithStandardDetail" inputId="isWithStandardDetailInput"
+                (onChange)="onWithStandardDetailChanged($event)"></p-checkbox>
+            <label for="isWithStandardDetail">Remove the listing from platform, do not allow transactions for payments
+                associated with the listing, and cancel all bookings associated with the listing.</label>
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="customDetailTxt">Provide details of the request</label>
+        </div>
+        <div class="form-group-row-col">
+            <textarea #textarea rows="5" cols="30" maxlength="2000" class="customDetail-txa"
+                formControlName="customDetailTxt"
+                placeholder="{{isWithStandardDetailControl.value?'Optional':'Required'}}" pInputTextarea
+                id="customDetailTxt" name="customDetailTxt"></textarea>
+            <span class="limit-text" [class.almost-limit-text]="textarea.value.length > 1950"
+                [class.limited-text]="textarea.value.length > 1999">{{textarea.value.length}}/2000</span>
+        </div>
+        <div class="form-group-row-col validation-errors"
+            *ngIf="!customDetailTxtControl.pristine && customDetailTxtControl.errors">
+            <small id="customDetailTxtError" *ngIf="customDetailTxtControl.errors?.['required']">Details of the request
+                are required</small>
+        </div>
+    </div>
+
     <button type="submit" id="form-preview-btn" pButton pRipple [disabled]="!myForm.valid" label="Review"></button>
 </form>
 

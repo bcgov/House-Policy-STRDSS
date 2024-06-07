@@ -14,14 +14,17 @@ namespace StrDss.Model.OrganizationDtos
         [JsonPropertyName("label")]
         public string OrganizationNm { get; set; } = null!;
 
-        public Geometry? LocalGovernmentGeometry { get; set; }
+        [JsonIgnore]
+        public NetTopologySuite.Geometries.Geometry? AreaGeometry { get; set; }
 
         public long? ManagingOrganizationId { get; set; }
 
         public DateTime UpdDtm { get; set; }
 
         public Guid? UpdUserGuid { get; set; }
-
+        public bool? IsLgParticipating { get; set; }
+        public bool? IsPrincipalResidenceRequired { get; set; }
+        public bool? IsBusinessLicenceRequired { get; set; }
         public virtual ICollection<ContactPersonDto> ContactPeople { get; set; } = new List<ContactPersonDto>();
 
     }

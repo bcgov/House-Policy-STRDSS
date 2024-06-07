@@ -38,7 +38,6 @@ namespace StrDss.Test
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
 
             configMock.Setup(x => x.GetValue(typeof(string), "")).Returns("https://ches.example.com");
-            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
             // Act
@@ -341,7 +340,6 @@ namespace StrDss.Test
             lg.OrganizationType = OrganizationTypes.LG;
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
 
-            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
 
             // Act
@@ -374,7 +372,6 @@ namespace StrDss.Test
 
             dto.HostEmail = "host@example.com";
 
-            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
 
             // Act
@@ -396,7 +393,6 @@ namespace StrDss.Test
 
             // Act
             await sut.CreateTakedownNoticeAsync(dto);
-            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
 
             // Assert
             Assert.DoesNotContain(dto.HostEmail, dto.ToList);
@@ -423,7 +419,6 @@ namespace StrDss.Test
             lg.OrganizationType = OrganizationTypes.LG;
             orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
 
-            emailServiceMock.Setup(x => x.GetMessageReasonByMessageTypeAndId(It.IsAny<string>(), It.IsAny<long>())).ReturnsAsync(new DropdownNumDto { Id = 1, Description = "reason1" });
             platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
             // Act
             await sut.CreateTakedownNoticeAsync(dto);
@@ -459,55 +454,6 @@ namespace StrDss.Test
 
             // Assert
             emailServiceMock.Verify(m => m.SendEmailAsync(It.IsAny<EmailContent>()), Times.Once);
-        }
-
-        [Theory]
-        [AutoDomainData]
-        public async Task SendDelistingRequestAsync_WhenSendCopyIsTrue_AddsCurrentUserEmailToList(
-            TakedownRequestCreateDto dto,
-            OrganizationDto platform,
-            [Frozen] Mock<ICurrentUser> currentUserMock,
-            [Frozen] Mock<IOrganizationService> orgServiceMock,
-            DelistingService sut)
-        {
-            // Arrange
-            dto.SendCopy = true;
-            dto.PlatformId = 2;
-            var currentUserEmail = "user@example.com";
-            currentUserMock.Setup(m => m.EmailAddress).Returns(currentUserEmail);
-            currentUserMock.Setup(m => m.OrganizationId).Returns(1);
-            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(dto.PlatformId)).ReturnsAsync(platform);
-
-            var lg = CommonUtils.CloneObject(platform);
-            lg.OrganizationType = OrganizationTypes.LG;
-            orgServiceMock.Setup(x => x.GetOrganizationByIdAsync(1)).ReturnsAsync(lg);
-
-            platform.ContactPeople.First().EmailMessageType = EmailMessageTypes.TakedownRequest;
-
-            // Act
-            await sut.CreateTakedownRequestAsync(dto);
-
-            // Assert
-            Assert.Contains(currentUserEmail, dto.ToList);
-        }
-
-        [Theory]
-        [AutoDomainData]
-        public async Task SendDelistingRequestAsync_WhenSendCopyIsFalse_DoesNotAddCurrentUserEmailToCcList(
-            TakedownRequestCreateDto dto,
-            [Frozen] Mock<ICurrentUser> currentUserMock,
-            DelistingService sut)
-        {
-            // Arrange
-            dto.SendCopy = false;
-            var currentUserEmail = "user@example.com";
-            currentUserMock.Setup(m => m.EmailAddress).Returns("user@example.com");
-
-            // Act
-            await sut.CreateTakedownRequestAsync(dto);
-
-            // Assert
-            Assert.DoesNotContain(currentUserEmail, dto.CcList);
         }
     }
 }

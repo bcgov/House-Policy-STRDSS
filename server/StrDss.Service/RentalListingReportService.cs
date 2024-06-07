@@ -4,6 +4,8 @@ using CsvHelper.TypeConversion;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Index.Quadtree;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Entities;
@@ -11,8 +13,11 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
+using StrDss.Model.UserDtos;
 using StrDss.Service.CsvHelpers;
+using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -22,7 +27,9 @@ namespace StrDss.Service
     {
         Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string hashValue, TextReader textReader, List<DssUploadLine> lines);
         Task<Dictionary<string, List<string>>> UploadRentalReport(string reportPeriod, long orgId, Stream stream);
-        Task ProcessRentalReportUploadsAsync();
+        Task ProcessRentalReportUploadAsync();
+        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<byte[]?> GetRentalListingErrorFile(long uploadId);
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
@@ -31,11 +38,14 @@ namespace StrDss.Service
         private IRentalListingReportRepository _reportRepo;
         private IPhysicalAddressRepository _addressRepo;
         private IGeocoderApi _geocoder;
+        private IUserRepository _userRepo;
+        private IEmailMessageService _emailService;
+        private IEmailMessageRepository _emailRepo;
         private IConfiguration _config;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
-            IGeocoderApi geocoder,
+            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo,
             IConfiguration config, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
@@ -44,6 +54,9 @@ namespace StrDss.Service
             _reportRepo = reportRepo;
             _addressRepo = addressRepo;
             _geocoder = geocoder;
+            _userRepo = userRepo;
+            _emailService = emailService;
+            _emailRepo = emailRepo;
             _config = config;
         }
 
@@ -74,6 +87,7 @@ namespace StrDss.Service
                 SourceHashDsc = hashValue,
                 SourceBin = sourceBin,
                 ProvidingOrganizationId = orgId,
+                UpdUserGuid = _currentUser.UserGuid
             };
 
             foreach (var line in uploadLines)
@@ -103,7 +117,7 @@ namespace StrDss.Service
             var firstDayOfCurrentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
             if (firstDayOfReportMonth >= firstDayOfCurrentMonth)
             {
-                errors.AddItem("ReportPeriod", "Report period cannot be current or futrue month.");
+                errors.AddItem("ReportPeriod", "Report period cannot be current or future month.");
             }
 
             var isDuplicate = await _uploadRepo.IsDuplicateRentalReportUploadAsnyc(firstDayOfReportMonth, orgId, hashValue);
@@ -228,7 +242,7 @@ namespace StrDss.Service
 
             if (reportPeriodMismatch > 0)
             {
-                errors.AddItem("rpt_period", $"Report period mismatch found in {reportPeriodMismatch} record(s). The report period must be {reportPeriod}.");
+                errors.AddItem("rpt_period", $"Report period mismatch found in {reportPeriodMismatch} record(s). The file contains report period(s) other than the selected period of {reportPeriod}");
             }
 
             if (reportPeriodMissing > 0)
@@ -275,11 +289,11 @@ namespace StrDss.Service
             return errors.Count == 0;
         }
 
-        public async Task ProcessRentalReportUploadsAsync()
+        public async Task ProcessRentalReportUploadAsync()
         {
-            var uploads = await _uploadRepo.GetRentalReportUploadsToProcessAsync();
+            var upload = await _uploadRepo.GetRentalReportUploadToProcessAsync();
 
-            foreach (var upload in uploads)
+            if (upload != null)
             {
                 await ProcessRentalReportUploadAsync(upload);
             }
@@ -290,6 +304,8 @@ namespace StrDss.Service
             _logger.LogInformation($"Processing Rental Listing Report {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
 
             var reportPeriodYm = (DateOnly)upload.ReportPeriodYm!;
+            var lineCount = await _reportRepo.GetTotalNumberOfUploadLines(upload.UploadDeliveryId);
+            var count = 0;
 
             var report = await _reportRepo.GetRentalListingReportAsync(upload.ProvidingOrganizationId, reportPeriodYm);
 
@@ -307,6 +323,8 @@ namespace StrDss.Service
                 _unitOfWork.Commit();
             }
 
+            var linesToProcess = await _uploadRepo.GetUploadLinesToProcessAsync(upload.UploadDeliveryId);
+
             var errors = new Dictionary<string, List<string>>();
             var csvConfig = CsvHelperUtils.GetConfig(errors, false);
 
@@ -317,31 +335,128 @@ namespace StrDss.Service
 
             csv.Read();
             var headerExists = csv.ReadHeader();
+            var hasError = false;
+            var isLastLine = false;
+            var processedCount = 0;
 
             while (csv.Read())
             {
-                var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
-                var uploadLine = upload.DssUploadLines.FirstOrDefault(x => x.SourceOrganizationCd == row.OrgCd && x.SourceRecordNo == row.ListingId);
+                if (processedCount >= 100) break; //To process 100 lines per job
 
-                if (uploadLine == null)
+                count++;
+                isLastLine = count == lineCount;
+
+                var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
+
+                var exists = linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.ListingId == row.ListingId);
+
+                if (!exists)
                 {
-                    continue; //already processed
+                    _logger.LogInformation($"Skipping listing - ({row.OrgCd} - {row.ListingId})");
+                    continue;
                 }
 
-                await ProcessUploadLine(report, upload, uploadLine, row, csv.Parser.RawRecord);
+                var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.ListingId);
+
+                if (uploadLine == null || uploadLine.IsProcessed)
+                {
+                    _logger.LogInformation($"Skipping listing - ({row.OrgCd} - {row.ListingId})");
+                    continue;
+                }
+
+                _logger.LogInformation($"Processing listing ({row.OrgCd} - {row.ListingId})");
+
+                var stopwatch = Stopwatch.StartNew();
+                hasError = !await ProcessUploadLine(report, upload, uploadLine, row, isLastLine);
+                stopwatch.Stop();
+
+                processedCount++;
+
+                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
             }
+
+            if (!isLastLine)
+            {
+                _logger.LogInformation($"Processed {processedCount} lines: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
+                return;
+            }
+
+            if (hasError || (await _uploadRepo.UploadHasErrors(upload.UploadDeliveryId)))
+            {
+                if (upload.UpdUserGuid == null) return;
+
+                var user = await _userRepo.GetUserByGuid((Guid)upload.UpdUserGuid!);
+
+                if (user == null) return;
+
+                var history = await _reportRepo.GetRentalListingUpload(upload.UploadDeliveryId);
+
+                if (history == null) return;
+
+                var adminEmail = _config.GetValue<string>("ADMIN_EMAIL");
+                if (adminEmail == null) return;
+
+                using var transaction = _unitOfWork.BeginTransaction();
+
+                //upload.UploadDeliveryId
+                var template = new ListingUploadError(_emailService)
+                {
+                    UserName = $"{user!.GivenNm}",
+                    NumErrors = (long)history.Errors!,
+                    Link = GetHostUrl() + "/upload-listing-history",
+                    To = new string[] { user!.EmailAddressDsc! },
+                    Info = $"{EmailMessageTypes.ListingUploadError} for {user.FamilyNm}, {user.GivenNm}",
+                    From = adminEmail
+                };
+
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = template.EmailMessageType,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = false,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = null,
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = null,
+                    UnreportedListingUrl = null,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = user.UserIdentityId,
+                    AffectedByUserIdentityId = user.UserIdentityId,
+                    InvolvedInOrganizationId = upload.ProvidingOrganizationId
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+
+                emailEntity.ExternalMessageNo = await template.SendEmail();
+
+                _unitOfWork.Commit();
+
+                _unitOfWork.CommitTransaction(transaction);
+            }
+
+            _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
         }
 
-        private async Task ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, string rawRecord)
+        private async Task<bool> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, bool isLastLine)
         {
             var errors = new Dictionary<string, List<string>>();
+            
             _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
 
             if (errors.Count > 0)
             {
-                SaveUploadLine(uploadLine, errors, true);
+                SaveUploadLine(uploadLine, errors, true, "");
+
+                if (isLastLine)
+                {
+                    await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
+                }
+
                 _unitOfWork.Commit();
-                return;
+                return false;
             }
 
             var offeringOrg = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd); //already validated in the file upload
@@ -352,29 +467,58 @@ namespace StrDss.Service
 
             AddContacts(listing, row);
 
-            var physicalAddress = await CreateOrGetPhysicalAddress(listing, row);
+            var (physicalAddress, systemError) = await CreateOrGetPhysicalAddress(listing, row);
 
             listing.LocatingPhysicalAddress = physicalAddress;
 
-            SaveUploadLine(uploadLine, errors, false);
+            SaveUploadLine(uploadLine, errors, false, systemError);
 
             _unitOfWork.Commit();
+
+            if (systemError.IsNotEmpty())
+            {
+                if (isLastLine)
+                {
+                    await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
+                }
+
+                tran.Commit();
+                return false;
+            }
 
             var (needUpdate, masterListing) = await CreateOrUpdateMasterListing(report.ReportPeriodYm, listing, offeringOrg, row, physicalAddress);
 
             if (needUpdate)
             {
                 AddContacts(masterListing, row);
-                _unitOfWork.Commit();
+            }
+
+            _unitOfWork.Commit();
+
+            await _reportRepo.UpdateListingStatus(upload.ProvidingOrganizationId, masterListing.RentalListingId);
+
+            _unitOfWork.Commit();
+
+            if (isLastLine)
+            {
+                await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
             }
 
             tran.Commit();
+            return true;
         }
 
-        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid)
+        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid, string systemError)
         {
             uploadLine.IsValidationFailure = isValid;
-            uploadLine.ErrorTxt = errors.ParseError();
+            uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
+
+            uploadLine.IsSystemFailure = systemError.IsNotEmpty();
+            if (uploadLine.IsSystemFailure)
+            {
+                uploadLine.ErrorTxt = systemError;
+            }
+
             uploadLine.IsProcessed = true;
         }
 
@@ -399,12 +543,13 @@ namespace StrDss.Service
             return listing;
         }
 
-        private async Task<DssPhysicalAddress> CreateOrGetPhysicalAddress(DssRentalListing listing, RentalListingRowUntyped row)
+        private async Task<(DssPhysicalAddress, string)> CreateOrGetPhysicalAddress(DssRentalListing listing, RentalListingRowUntyped row)
         {
             var address = row.RentalAddress;
 
             var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, address);
 
+            var error = "";
             if (physicalAddress == null)
             {
                 physicalAddress = new DssPhysicalAddress
@@ -412,12 +557,17 @@ namespace StrDss.Service
                     OriginalAddressTxt = row.RentalAddress,
                 };
 
-                await _geocoder.GetAddressAsync(physicalAddress);
+                error = await _geocoder.GetAddressAsync(physicalAddress);
+
+                if (error.IsEmpty() && physicalAddress.LocationGeometry is not null && physicalAddress.LocationGeometry is Point point)
+                {
+                    physicalAddress.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+                }
 
                 await _addressRepo.AddPhysicalAddressAsync(physicalAddress);
             }
 
-            return physicalAddress;
+            return (physicalAddress, error);
         }
 
         private async Task<(bool needUpdate, DssRentalListing masterListing)> CreateOrUpdateMasterListing(DateOnly reportPeriodYm, DssRentalListing listing, OrganizationDto offeringOrg, RentalListingRowUntyped row, DssPhysicalAddress physicalAddress)
@@ -474,5 +624,41 @@ namespace StrDss.Service
             }
         }
 
+        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            return await _reportRepo.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
+        }
+
+        public async Task<byte[]?> GetRentalListingErrorFile(long uploadId)
+        {
+            var upload = await _uploadRepo.GetRentalListingUploadWithErrors(uploadId);
+
+            if (upload == null) return null;
+
+            var linesWithError = await _uploadRepo.GetUploadLineIdsWithErrors(uploadId);
+
+            var memoryStream = new MemoryStream(upload.SourceBin!);
+            using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
+
+            var errors = new Dictionary<string, List<string>>();
+            var csvConfig = CsvHelperUtils.GetConfig(errors, false);
+
+            using var csv = new CsvReader(textReader, csvConfig);
+
+            var contents = new StringBuilder();
+
+            csv.Read();
+            var header = csv.Parser.RawRecord.TrimEndNewLine() + ",errors";
+
+            contents.AppendLine(header);
+
+            foreach (var lineId in linesWithError)
+            {
+                var line = await _uploadRepo.GetUploadLineWithError(lineId);
+                contents.AppendLine(line.LineText.TrimEndNewLine() + $",\"{line.ErrorText ?? ""}\"");
+            }
+
+            return Encoding.UTF8.GetBytes(contents.ToString());
+        }
     }
 }

@@ -8,6 +8,8 @@ namespace StrDss.Service.EmailTemplates
             : base(emailService)
         {
             EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
+            From = Environment.GetEnvironmentVariable("STR_NOTICE_EMAIL") ?? From;
+
         }
 
         public override string GetContent()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using StrDss.Common;
 using StrDss.Model;
+using StrDss.Model.UserDtos;
 using StrDss.Service;
 using StrDss.Service.Bceid;
 
@@ -66,6 +67,7 @@ namespace StrDss.Api.Authentication
                 _currentUser.AccessRequestRequired = _currentUser.AccessRequestStatus == AccessRequestStatuses.Denied;
                 _currentUser.OrganizationType = user.RepresentedByOrganization?.OrganizationType ?? "";
                 _currentUser.OrganizationId = user.RepresentedByOrganizationId ?? 0;
+                _currentUser.OrganizationName = user.RepresentedByOrganization?.OrganizationNm ?? "";
                 _currentUser.TermsAcceptanceDtm = user.TermsAcceptanceDtm;
 
                 if (user.IsEnabled)
@@ -78,32 +80,38 @@ namespace StrDss.Api.Authentication
                     }
                 }
 
-                if (user.IdentityProviderNm == StrDssIdProviders.BceidBusiness && (int)(DateTime.UtcNow - user!.UpdDtm).TotalDays > 1)
+                //await UpdateBceidUserInfo(user);
+            }
+        }
+
+        private async Task UpdateBceidUserInfo(UserDto? user)
+        {
+            if (user!.IdentityProviderNm == StrDssIdProviders.BceidBusiness && (int)(DateTime.UtcNow - user!.UpdDtm).TotalDays > 1)
+            {
+                try
                 {
-                    try
+                    var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
+
+                    if (account == null)
                     {
-                        var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
+                        _logger.LogError($"BCeID call error: {error}");
+                    }
 
-                        if (account == null)
+                    if (account != null)
+                    {
+                        _currentUser.FirstName = account.FirstName;
+                        _currentUser.LastName = account.LastName;
+
+                        if (account.FirstName != user.GivenNm || account.LastName != user.FamilyNm)
                         {
-                            _logger.LogError($"BCeID call error: {error}");
-                        }
-
-                        if (account != null)
-                        {
-                            _currentUser.FirstName = account.FirstName;
-                            _currentUser.LastName = account.LastName;
-
-                            if (account.FirstName != user.GivenNm || account.LastName != user.FamilyNm)
-                            {
-                                await _userService.UpdateBceidUserInfo(user.UserIdentityId, account.FirstName, account.LastName);
-                            }
+                            await _userService.UpdateBceidUserInfo(user.UserIdentityId, account.FirstName, account.LastName);
                         }
                     }
-                    catch
-                    {
-                        _logger.LogInformation("BCeID Web call failed - Skipping UpdateBceidUserInfo ");
-                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"BCeID Web call failed - {ex.Message}", ex);
+                    _logger.LogInformation("BCeID Web call failed - Skipping UpdateBceidUserInfo ");
                 }
             }
         }

@@ -24,18 +24,23 @@ namespace StrDss.Service
         Task ProcessTakedownRequestBatchEmailsAsync();
         Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream);
         Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, Stream stream);
+        Task<Dictionary<string, List<string>>> CreateBulkTakedownNoticesAsync(BulkTakedownNoticesDto[] listings);
+        Task<Dictionary<string, List<string>>> CreateBulkTakedownReqeustsAsync(BulkTakedownRequestsDto[] listings);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
+        private IRentalListingRepository _listingRepo;
         private IConfiguration _config;
         private IEmailMessageService _emailService;
         private IOrganizationService _orgService;
         private IEmailMessageRepository _emailRepo;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
+            IRentalListingRepository listingRepo,
             IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, IEmailMessageRepository emailRepo, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
+            _listingRepo = listingRepo;
             _config = config;
             _emailService = emailService;
             _orgService = orgService;
@@ -173,7 +178,6 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = dto.HostEmailSent,
                 IsSubmitterCcRequired = true,
-                MessageReasonId = null,
                 LgPhoneNo = dto.LgContactPhone,
                 UnreportedListingNo = dto.ListingId,
                 HostEmailAddressDsc = dto.HostEmail,
@@ -193,6 +197,142 @@ namespace StrDss.Service
             _unitOfWork.Commit();
         }
 
+        public async Task<Dictionary<string, List<string>>> CreateBulkTakedownNoticesAsync(BulkTakedownNoticesDto[] listings)
+        {
+            var errors = new Dictionary<string, List<string>>();
+            var regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+            var templates = new List<TakedownNotice>();
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
+
+            if (lg == null)
+            {
+                errors.AddItem("organization", $"No organization found for the user");
+                return errors;
+            }
+
+            //var lgEmails = lg.ContactPeople
+            //    .Where(x => x.EmailAddressDsc != null)
+            //    .Select(x => x.EmailAddressDsc)
+            //    .ToList();
+
+            //if (lgEmails.Count == 0)
+            //{
+            //    errors.AddItem("organization", $"No organization email found for the organization {lg.OrganizationNm}");
+            //    return errors;
+            //}
+
+            foreach (var listing in listings)
+            {
+                var rentalListing = await _listingRepo.GetRentalLisgingForTakedownAction(listing.RentalListingId, true);                
+
+                if (rentalListing == null) continue; //error message
+
+                if (rentalListing.LocalGovernmentId != _currentUser.OrganizationId)
+                {
+                    errors.AddItem("No access", $"The listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo} does not belong to {lg.OrganizationNm}");
+                }
+
+                listing.ProvidingPlatformId = rentalListing.ProvidingPlatformId;
+
+                var template = new TakedownNotice(_emailService)
+                {
+                    RentalListingId = listing.RentalListingId,
+                    Url = rentalListing!.PlatformListingUrl ?? "",
+                    OrgCd = rentalListing!.OrganizationCd,
+                    ListingId = rentalListing!.PlatformListingNo,
+                    Comment = listing.Comment,
+                    LgName = _currentUser.OrganizationName,
+                    Info = rentalListing!.PlatformListingUrl ?? "",
+                };
+
+                templates.Add(template);
+
+                //To
+                if (!listing.HostEmailSent)
+                {
+                    var hostEmails = new List<string>();
+
+                    foreach (var email in rentalListing!.HostEmails)
+                    {
+                        if (email == null) continue;
+
+                        if (Regex.IsMatch(email, regex.Regex))
+                        {
+                            hostEmails.Add(email);
+                        }
+                    }
+                    
+                    if (!hostEmails.Any())
+                    {
+                        errors.AddItem("hostEmail", $"No valid host email for the listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo}");
+                    }
+                    else
+                    {
+                        listing.HostEmails = hostEmails;
+                        template.To = hostEmails;
+                    }
+                }
+
+                //Bcc
+                listing.CcList ??= new List<string>();
+                listing.CcList.Add(_currentUser.EmailAddress);
+                listing.CcList.AddRange(rentalListing.PlatformEmails);
+                template.Bcc = listing.CcList;
+
+                template.EmailsToHide = rentalListing.PlatformEmails;                
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            foreach (var template in templates)
+            {
+                try
+                {
+                    await SendTakedownNoticeEmail(listings, template);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
+                    errors.AddItem($"{template.OrgCd}-{template.ListingId}", "Failed to send email for the listing.");
+                }
+            }
+
+            return errors;
+        }
+
+        private async Task SendTakedownNoticeEmail(BulkTakedownNoticesDto[] listings, TakedownNotice template)
+        {
+            var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
+
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsHostContactedExternally = listing.HostEmailSent,
+                IsSubmitterCcRequired = true,
+                LgPhoneNo = "",
+                UnreportedListingNo = template.ListingId,
+                HostEmailAddressDsc = listing.HostEmails.FirstOrDefault(),
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = string.Join("; ", template.Bcc),
+                UnreportedListingUrl = template.Url,
+                LgStrBylawUrl = "",
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = null,
+                InvolvedInOrganizationId = listing.ProvidingPlatformId,
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            emailEntity.ExternalMessageNo = await template.SendEmail();
+
+            _unitOfWork.Commit();
+        }
+
         private TakedownNotice GetTakedownNoticeTemplate(TakedownNoticeCreateDto dto, OrganizationDto? platform, OrganizationDto? lg, bool preview = false)
         {
             // To: [host] (optional), [Local Gov contact info email]
@@ -202,11 +342,12 @@ namespace StrDss.Service
             // BCC: [sender], [platform], [Additional CCs] (optional)
             dto.CcList.Add(_currentUser.EmailAddress);
 
-            var platformEmail = platform!.ContactPeople
-                .FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown)!
-                .EmailAddressDsc;
+            var platformEmails = platform!.ContactPeople
+                .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown)
+                .Select(x => x.EmailAddressDsc)
+                .ToArray();
 
-            dto.CcList.Add(platformEmail);
+            dto.CcList.AddRange(platformEmails);
 
             var template = new TakedownNotice(_emailService)
             {
@@ -215,12 +356,112 @@ namespace StrDss.Service
                 LgName = lg!.OrganizationNm,
                 To = dto.ToList,
                 Bcc = dto.CcList,
-                EmailsToHide = new List<string> { platformEmail! },
+                EmailsToHide = platformEmails,
                 Info = dto.ListingUrl,
                 Comment = dto.Comment,
                 Preview = preview
             };
             return template;
+        }
+
+        public async Task<Dictionary<string, List<string>>> CreateBulkTakedownReqeustsAsync(BulkTakedownRequestsDto[] listings)
+        {
+            var errors = new Dictionary<string, List<string>>();
+            var templates = new List<TakedownRequest>();
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
+
+            if (lg == null)
+            {
+                errors.AddItem("organization", $"No organization found for the user");
+                return errors;
+            }
+
+            foreach (var listing in listings)
+            {
+                var rentalListing = await _listingRepo.GetRentalLisgingForTakedownAction(listing.RentalListingId, false);
+
+                if (rentalListing == null) continue; //error message
+
+                if (rentalListing.LocalGovernmentId != _currentUser.OrganizationId)
+                {
+                    errors.AddItem("No access", $"The listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo} does not belong to {lg.OrganizationNm}");
+                }
+
+                listing.ProvidingPlatformId = rentalListing.ProvidingPlatformId;
+
+                var template = new TakedownRequest(_emailService)
+                {
+                    RentalListingId = listing.RentalListingId,
+                    Url = rentalListing!.PlatformListingUrl ?? "",
+                    OrgCd = rentalListing!.OrganizationCd,
+                    ListingId = rentalListing!.PlatformListingNo,
+                    Info = rentalListing!.PlatformListingUrl ?? "",
+                };
+
+                templates.Add(template);
+
+                //To
+                template.To = new string[] { _currentUser.EmailAddress };
+
+                //Cc
+                listing.CcList ??= new List<string>();
+                template.Cc = listing.CcList;
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            foreach (var template in templates)
+            {
+                try
+                {
+                    await SendTakedownRequestEmail(listings, template);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
+                    errors.AddItem($"{template.OrgCd}-{template.ListingId}", "Failed to send email for the listing.");
+                }
+            }
+
+            return errors;
+        }
+
+        private async Task SendTakedownRequestEmail(BulkTakedownRequestsDto[] listings, TakedownRequest template)
+        {
+            var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
+
+
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsHostContactedExternally = false,
+                LgPhoneNo = null,
+                UnreportedListingNo = template.ListingId,
+                HostEmailAddressDsc = null,
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = string.Join("; ", template.Cc),
+                UnreportedListingUrl = template.Url,
+                LgStrBylawUrl = null,
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = null,
+                InvolvedInOrganizationId = listing.ProvidingPlatformId,
+                RequestingOrganizationId = _currentUser.OrganizationId,
+                IsWithStandardDetail = listing.IsWithStandardDetail,
+                CustomDetailTxt = listing.CustomDetailTxt,
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            emailEntity.ExternalMessageNo = await template.SendEmail();
+
+            _unitOfWork.Commit();
         }
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto)
@@ -334,8 +575,6 @@ namespace StrDss.Service
                 MessageDeliveryDtm = DateTime.UtcNow,
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = false,
-                IsSubmitterCcRequired = dto.SendCopy,
-                MessageReasonId = null,
                 LgPhoneNo = null,
                 UnreportedListingNo = dto.ListingId,
                 HostEmailAddressDsc = null,
@@ -346,7 +585,9 @@ namespace StrDss.Service
                 InitiatingUserIdentityId = _currentUser.Id,
                 AffectedByUserIdentityId = null,
                 InvolvedInOrganizationId = dto.PlatformId,
-                RequestingOrganizationId = lg!.OrganizationId
+                RequestingOrganizationId = lg!.OrganizationId,
+                IsWithStandardDetail = dto.IsWithStandardDetail,
+                CustomDetailTxt = dto.CustomDetailTxt,
             };
 
             await _emailRepo.AddEmailMessage(emailEntity);
@@ -413,9 +654,12 @@ namespace StrDss.Service
 
         private async Task ProcessTakedownRequestBatchEmailAsync(OrganizationDto platform, List<DssEmailMessage> allEmails)
         {            
-            var contact = platform.ContactPeople.FirstOrDefault(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest);
+            var contacts = platform.ContactPeople
+                .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest)
+                .Select(x => x.EmailAddressDsc)
+                .ToArray();
 
-            if (contact == null)
+            if (contacts.Length == 0)
             {
                 throw new Exception($"There's no primary '{EmailMessageTypes.BatchTakedownRequest}' contact email for {platform.OrganizationNm}");
             }
@@ -423,7 +667,14 @@ namespace StrDss.Service
             var emails = allEmails.Where(x => x.InvolvedInOrganizationId == platform.OrganizationId).ToList();
 
             var csvRecords = emails.Select(x =>
-                new TakedownRequestCsvRecord { ListingId = x.UnreportedListingNo ?? "", Url = x.UnreportedListingUrl ?? "", RequestedBy = x.RequestingOrganization?.OrganizationNm ?? "" })
+                new TakedownRequestCsvRecord 
+                { 
+                    ListingId = x.UnreportedListingNo ?? "", 
+                    Url = x.UnreportedListingUrl ?? "", 
+                    RequestedBy = x.RequestingOrganization?.OrganizationNm ?? "",
+                    TakedownRequest = (x.IsWithStandardDetail ?? false) ? "Remove the listing from the platform, do not allow transactions for payments associated with the listing, and cancel all booking associated with the listing." : "",
+                    TakedownRequestDetail = x.CustomDetailTxt ?? ""
+                })
                 .ToList();
 
             var content = CsvHelperUtils.GetBase64CsvString(csvRecords);
@@ -433,7 +684,7 @@ namespace StrDss.Service
 
             var template = new BatchTakedownRequest(_emailService)
             {
-                To = new string[] { contact!.EmailAddressDsc },
+                To = contacts,
                 Bcc = new string[] { adminEmail! },
                 Info = $"{EmailMessageTypes.BatchTakedownRequest} for {platform.OrganizationNm}",
                 Attachments = new EmailAttachment[] { new EmailAttachment {
@@ -451,7 +702,6 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName} ({csvRecords.Count})",
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
-                MessageReasonId = null,
                 LgPhoneNo = null,
                 UnreportedListingNo = null,
                 HostEmailAddressDsc = null,
@@ -494,7 +744,10 @@ namespace StrDss.Service
             }
 
             //the existence of the contact email has been validated above
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest);
+            var contacts = platform.ContactPeople
+                .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest)
+                .Select(x => x.EmailAddressDsc)
+                .ToArray();
 
             var content = CommonUtils.StreamToBase64(stream);
             var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyy-MM-dd-HH-mm");
@@ -503,7 +756,7 @@ namespace StrDss.Service
 
             var template = new BatchTakedownRequest(_emailService)
             {
-                To = new string[] { contact!.EmailAddressDsc },
+                To = contacts,
                 Bcc = new string[] { adminEmail! },
                 Info = $"{EmailMessageTypes.BatchTakedownRequest} for {platform.OrganizationNm}",
                 Attachments = new EmailAttachment[] { new EmailAttachment {
@@ -521,7 +774,6 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName}",
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
-                MessageReasonId = null,
                 LgPhoneNo = null,
                 UnreportedListingNo = null,
                 HostEmailAddressDsc = null,
@@ -590,7 +842,10 @@ namespace StrDss.Service
             }
 
             //the existence of the contact email has been validated above
-            var contact = platform.ContactPeople.First(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown);
+            var contacts = platform!.ContactPeople
+                .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown)
+                .Select(x => x.EmailAddressDsc)
+                .ToArray();
 
             var content = CommonUtils.StreamToBase64(stream);
             var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyy-MM-dd-HH-mm");
@@ -599,7 +854,7 @@ namespace StrDss.Service
 
             var template = new BatchTakedownNotice(_emailService)
             {
-                To = new string[] { contact!.EmailAddressDsc },
+                To = contacts,
                 Bcc = new string[] { adminEmail! },
                 Info = $"{EmailMessageTypes.NoticeOfTakedown} for {platform.OrganizationNm}",
                 Attachments = new EmailAttachment[] { new EmailAttachment {
@@ -617,7 +872,6 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName}",
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
-                MessageReasonId = null,
                 LgPhoneNo = null,
                 UnreportedListingNo = null,
                 HostEmailAddressDsc = null,

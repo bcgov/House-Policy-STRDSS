@@ -17,8 +17,6 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssEmailMessageType> DssEmailMessageTypes { get; set; }
 
-    public virtual DbSet<DssMessageReason> DssMessageReasons { get; set; }
-
     public virtual DbSet<DssOrganization> DssOrganizations { get; set; }
 
     public virtual DbSet<DssOrganizationContactPerson> DssOrganizationContactPeople { get; set; }
@@ -32,6 +30,10 @@ public partial class DssDbContext : DbContext
     public virtual DbSet<DssRentalListingContact> DssRentalListingContacts { get; set; }
 
     public virtual DbSet<DssRentalListingReport> DssRentalListingReports { get; set; }
+
+    public virtual DbSet<DssRentalListingVw> DssRentalListingVws { get; set; }
+
+    public virtual DbSet<DssRentalUploadHistoryView> DssRentalUploadHistoryViews { get; set; }
 
     public virtual DbSet<DssUploadDelivery> DssUploadDeliveries { get; set; }
 
@@ -88,6 +90,10 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.ConcernedWithRentalListingId)
                 .HasComment("Foreign key")
                 .HasColumnName("concerned_with_rental_listing_id");
+            entity.Property(e => e.CustomDetailTxt)
+                .HasMaxLength(4000)
+                .HasComment("Free form text that should be included in the message body")
+                .HasColumnName("custom_detail_txt");
             entity.Property(e => e.EmailMessageType)
                 .HasMaxLength(50)
                 .HasComment("Foreign key")
@@ -112,6 +118,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsSubmitterCcRequired)
                 .HasComment("Indicates whether the user initiating the message should receive a copy of the email")
                 .HasColumnName("is_submitter_cc_required");
+            entity.Property(e => e.IsWithStandardDetail)
+                .HasComment("Indicates whether message body should include text a block of detail text that is standard for the message type")
+                .HasColumnName("is_with_standard_detail");
             entity.Property(e => e.LgEmailAddressDsc)
                 .HasMaxLength(320)
                 .HasComment("E-mail address of a local government contact (directly entered by the user as a message recipient)")
@@ -127,9 +136,6 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.MessageDeliveryDtm)
                 .HasComment("A timestamp indicating when the message delivery was initiated")
                 .HasColumnName("message_delivery_dtm");
-            entity.Property(e => e.MessageReasonId)
-                .HasComment("Foreign key")
-                .HasColumnName("message_reason_id");
             entity.Property(e => e.MessageTemplateDsc)
                 .HasMaxLength(4000)
                 .HasComment("The full text or template for the message that is sent")
@@ -177,10 +183,6 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.InvolvedInOrganizationId)
                 .HasConstraintName("dss_email_message_fk_involving");
 
-            entity.HasOne(d => d.MessageReason).WithMany(p => p.DssEmailMessages)
-                .HasForeignKey(d => d.MessageReasonId)
-                .HasConstraintName("dss_email_message_fk_justified_by");
-
             entity.HasOne(d => d.RequestingOrganization).WithMany(p => p.DssEmailMessageRequestingOrganizations)
                 .HasForeignKey(d => d.RequestingOrganizationId)
                 .HasConstraintName("dss_email_message_fk_requested_by");
@@ -202,44 +204,28 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("email_message_type_nm");
         });
 
-        modelBuilder.Entity<DssMessageReason>(entity =>
-        {
-            entity.HasKey(e => e.MessageReasonId).HasName("dss_message_reason_pk");
-
-            entity.ToTable("dss_message_reason", tb => tb.HasComment("A description of the justification for initiating a message"));
-
-            entity.Property(e => e.MessageReasonId)
-                .HasComment("Unique generated key")
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("message_reason_id");
-            entity.Property(e => e.EmailMessageType)
-                .HasMaxLength(50)
-                .HasComment("Foreign key")
-                .HasColumnName("email_message_type");
-            entity.Property(e => e.MessageReasonDsc)
-                .HasMaxLength(250)
-                .HasComment("A description of the justification for initiating a message")
-                .HasColumnName("message_reason_dsc");
-
-            entity.HasOne(d => d.EmailMessageTypeNavigation).WithMany(p => p.DssMessageReasons)
-                .HasForeignKey(d => d.EmailMessageType)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("dss_message_reason_fk_justifying");
-        });
-
         modelBuilder.Entity<DssOrganization>(entity =>
         {
             entity.HasKey(e => e.OrganizationId).HasName("dss_organization_pk");
 
-            entity.ToTable("dss_organization", tb => tb.HasComment("A private company or governing body that plays a role in short term rental reporting or enforcement"));
+            entity.ToTable("dss_organization", tb => tb.HasComment("A private company or governing body component that plays a role in short term rental reporting or enforcement"));
 
             entity.Property(e => e.OrganizationId)
                 .HasComment("Unique generated key")
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("organization_id");
-            entity.Property(e => e.LocalGovernmentGeometry)
-                .HasComment("the shape identifying the boundaries of a local government")
-                .HasColumnName("local_government_geometry");
+            entity.Property(e => e.AreaGeometry)
+                .HasComment("the multipolygon shape identifying the boundaries of a local government subdivision")
+                .HasColumnName("area_geometry");
+            entity.Property(e => e.IsBusinessLicenceRequired)
+                .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION requires a business licence for Short Term Rental operation")
+                .HasColumnName("is_business_licence_required");
+            entity.Property(e => e.IsLgParticipating)
+                .HasComment("Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing")
+                .HasColumnName("is_lg_participating");
+            entity.Property(e => e.IsPrincipalResidenceRequired)
+                .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions")
+                .HasColumnName("is_principal_residence_required");
             entity.Property(e => e.ManagingOrganizationId)
                 .HasComment("Self-referential hierarchical foreign key")
                 .HasColumnName("managing_organization_id");
@@ -461,14 +447,20 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IncludingRentalListingReportId)
                 .HasComment("Foreign key")
                 .HasColumnName("including_rental_listing_report_id");
+            entity.Property(e => e.IsActive)
+                .HasComment("Indicates whether a CURRENT RENTAL LISTING was included in the most recent RENTAL LISTING REPORT")
+                .HasColumnName("is_active");
             entity.Property(e => e.IsCurrent)
-                .HasComment("Indicates whether the listing version is the most current one (within the same listing number for the same offering platform)")
+                .HasComment("Indicates whether the RENTAL LISTING VERSION is a CURRENT RENTAL LISTING (if it is a copy of the most current REPORTED RENTAL LISTING (having the same listing number for the same offering platform)")
                 .HasColumnName("is_current");
             entity.Property(e => e.IsEntireUnit)
                 .HasComment("Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)")
                 .HasColumnName("is_entire_unit");
+            entity.Property(e => e.IsNew)
+                .HasComment("Indicates whether a CURRENT RENTAL LISTING appeared for the first time in the last reporting period")
+                .HasColumnName("is_new");
             entity.Property(e => e.IsTakenDown)
-                .HasComment("Indicates whether a current listing is no longer considered active")
+                .HasComment("Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform")
                 .HasColumnName("is_taken_down");
             entity.Property(e => e.LocatingPhysicalAddressId)
                 .HasComment("Foreign key")
@@ -601,6 +593,109 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.ProvidingOrganizationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_rental_listing_report_fk_provided_by");
+        });
+
+        modelBuilder.Entity<DssRentalListingVw>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("dss_rental_listing_vw");
+
+            entity.Property(e => e.AddressSort1ProvinceCd)
+                .HasMaxLength(5)
+                .HasColumnName("address_sort_1_province_cd");
+            entity.Property(e => e.AddressSort2LocalityNm)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_2_locality_nm");
+            entity.Property(e => e.AddressSort3LocalityTypeDsc)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_3_locality_type_dsc");
+            entity.Property(e => e.AddressSort4StreetNm)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_4_street_nm");
+            entity.Property(e => e.AddressSort5StreetTypeDsc)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_5_street_type_dsc");
+            entity.Property(e => e.AddressSort6StreetDirectionDsc)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_6_street_direction_dsc");
+            entity.Property(e => e.AddressSort7CivicNo)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_7_civic_no");
+            entity.Property(e => e.AddressSort8UnitNo)
+                .HasMaxLength(50)
+                .HasColumnName("address_sort_8_unit_no");
+            entity.Property(e => e.AvailableBedroomsQty).HasColumnName("available_bedrooms_qty");
+            entity.Property(e => e.BcRegistryNo)
+                .HasMaxLength(50)
+                .HasColumnName("bc_registry_no");
+            entity.Property(e => e.BusinessLicenceNo)
+                .HasMaxLength(50)
+                .HasColumnName("business_licence_no");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.IsBusinessLicenceRequired).HasColumnName("is_business_licence_required");
+            entity.Property(e => e.IsEntireUnit).HasColumnName("is_entire_unit");
+            entity.Property(e => e.IsNew).HasColumnName("is_new");
+            entity.Property(e => e.IsPrincipalResidenceRequired).HasColumnName("is_principal_residence_required");
+            entity.Property(e => e.IsTakenDown).HasColumnName("is_taken_down");
+            entity.Property(e => e.LastActionDtm).HasColumnName("last_action_dtm");
+            entity.Property(e => e.LastActionNm)
+                .HasMaxLength(250)
+                .HasColumnName("last_action_nm");
+            entity.Property(e => e.LatestReportPeriodYm).HasColumnName("latest_report_period_ym");
+            entity.Property(e => e.ListingContactNamesTxt).HasColumnName("listing_contact_names_txt");
+            entity.Property(e => e.ListingStatusSortNo).HasColumnName("listing_status_sort_no");
+            entity.Property(e => e.ListingStatusType).HasColumnName("listing_status_type");
+            entity.Property(e => e.ManagingOrganizationId).HasColumnName("managing_organization_id");
+            entity.Property(e => e.ManagingOrganizationNm)
+                .HasMaxLength(250)
+                .HasColumnName("managing_organization_nm");
+            entity.Property(e => e.MatchAddressTxt)
+                .HasMaxLength(250)
+                .HasColumnName("match_address_txt");
+            entity.Property(e => e.MatchScoreAmt).HasColumnName("match_score_amt");
+            entity.Property(e => e.NightsBookedYtdQty).HasColumnName("nights_booked_ytd_qty");
+            entity.Property(e => e.OfferingOrganizationId).HasColumnName("offering_organization_id");
+            entity.Property(e => e.OfferingOrganizationNm)
+                .HasMaxLength(250)
+                .HasColumnName("offering_organization_nm");
+            entity.Property(e => e.OriginalAddressTxt)
+                .HasMaxLength(250)
+                .HasColumnName("original_address_txt");
+            entity.Property(e => e.PlatformListingNo)
+                .HasMaxLength(50)
+                .HasColumnName("platform_listing_no");
+            entity.Property(e => e.PlatformListingUrl)
+                .HasMaxLength(4000)
+                .HasColumnName("platform_listing_url");
+            entity.Property(e => e.RentalListingId).HasColumnName("rental_listing_id");
+            entity.Property(e => e.SeparateReservationsYtdQty).HasColumnName("separate_reservations_ytd_qty");
+        });
+
+        modelBuilder.Entity<DssRentalUploadHistoryView>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("dss_rental_upload_history_view");
+
+            entity.Property(e => e.Errors).HasColumnName("errors");
+            entity.Property(e => e.FamilyNm)
+                .HasMaxLength(25)
+                .HasColumnName("family_nm");
+            entity.Property(e => e.GivenNm)
+                .HasMaxLength(25)
+                .HasColumnName("given_nm");
+            entity.Property(e => e.OrganizationNm)
+                .HasMaxLength(250)
+                .HasColumnName("organization_nm");
+            entity.Property(e => e.Processed).HasColumnName("processed");
+            entity.Property(e => e.ProvidingOrganizationId).HasColumnName("providing_organization_id");
+            entity.Property(e => e.ReportPeriodYm).HasColumnName("report_period_ym");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.Success).HasColumnName("success");
+            entity.Property(e => e.Total).HasColumnName("total");
+            entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
+            entity.Property(e => e.UploadDeliveryId).HasColumnName("upload_delivery_id");
         });
 
         modelBuilder.Entity<DssUploadDelivery>(entity =>

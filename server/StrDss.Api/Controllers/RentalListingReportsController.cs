@@ -1,11 +1,9 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using StrDss.Api.Authorization;
 using StrDss.Api.Models;
 using StrDss.Common;
-using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Service;
 using StrDss.Service.HttpClients;
@@ -67,13 +65,25 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        //[ApiAuthorize]
-        //[HttpGet("processreport")]
-        //public async Task<ActionResult> ProcessReport()
-        //{
-        //    await _listingService.ProcessRentalReportUploadsAsync();
+        [ApiAuthorize(Permissions.ListingFileUpload)]
+        [HttpGet("rentallistinghistory")]
+        public async Task<ActionResult> GetRentalListingHistory(long? platformId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
+        {
+            var history = await _listingService.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
 
-        //    return Ok();
-        //}
+            return Ok(history);
+        }
+
+        [ApiAuthorize(Permissions.ListingFileUpload)]
+        [HttpGet("uploads/{uploadId}/errorfile")]
+        public async Task<ActionResult> GetRentalListingErrorFile(long uploadId)
+        {
+            var bytes = await _listingService.GetRentalListingErrorFile(uploadId);
+
+            if (bytes == null)
+                return NotFound();
+
+            return File(bytes!, "text/csv", $"errors-{uploadId}.csv");
+        }
     }
 }

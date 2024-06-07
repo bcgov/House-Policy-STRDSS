@@ -5,7 +5,7 @@ using NetTopologySuite.Geometries;
 namespace StrDss.Data.Entities;
 
 /// <summary>
-/// A private company or governing body that plays a role in short term rental reporting or enforcement
+/// A private company or governing body component that plays a role in short term rental reporting or enforcement
 /// </summary>
 public partial class DssOrganization
 {
@@ -30,9 +30,9 @@ public partial class DssOrganization
     public string OrganizationNm { get; set; } = null!;
 
     /// <summary>
-    /// the shape identifying the boundaries of a local government
+    /// the multipolygon shape identifying the boundaries of a local government subdivision
     /// </summary>
-    public Geometry? LocalGovernmentGeometry { get; set; }
+    public Geometry? AreaGeometry { get; set; }
 
     /// <summary>
     /// Self-referential hierarchical foreign key
@@ -48,6 +48,21 @@ public partial class DssOrganization
     /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
+
+    /// <summary>
+    /// Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing
+    /// </summary>
+    public bool? IsLgParticipating { get; set; }
+
+    /// <summary>
+    /// Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions
+    /// </summary>
+    public bool? IsPrincipalResidenceRequired { get; set; }
+
+    /// <summary>
+    /// Indicates whether a LOCAL GOVERNMENT SUBDIVISION requires a business licence for Short Term Rental operation
+    /// </summary>
+    public bool? IsBusinessLicenceRequired { get; set; }
 
     public virtual ICollection<DssEmailMessage> DssEmailMessageInvolvedInOrganizations { get; set; } = new List<DssEmailMessage>();
 

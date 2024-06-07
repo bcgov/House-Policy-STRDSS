@@ -10,6 +10,13 @@ import { DelistingService } from '../../../common/services/delisting.service';
 import { ToastModule } from 'primeng/toast';
 import { ListingDataService } from '../../../common/services/listing-data.service';
 import { YearMonthGenService } from '../../../common/services/year-month-gen.service';
+import { MessageService } from 'primeng/api';
+import { UserDataService } from '../../../common/services/user-data.service';
+import { Observable, forkJoin } from 'rxjs';
+import { User } from '../../../common/models/user';
+import { environment } from '../../../../environments/environment';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+
 @Component({
   selector: 'app-upload-listings',
   standalone: true,
@@ -28,9 +35,11 @@ import { YearMonthGenService } from '../../../common/services/year-month-gen.ser
 export class UploadListingsComponent implements OnInit {
   platformOptions = new Array<DropdownOption>();
   monthsOptions = new Array<DropdownOption>();
-  maxFileSize = 4000000;
+  maxFileSize = Number(environment.RENTAL_LISTING_REPORT_MAX_SIZE) * 1024 * 1024;
   uploadedFile: any;
   uploadElem!: FileUpload;
+  currentUser!: User;
+  isUploadStarted = false;
 
   myForm = this.fb.group({
     platformId: [0, Validators.required],
@@ -57,11 +66,26 @@ export class UploadListingsComponent implements OnInit {
     private delistingService: DelistingService,
     private listingDataService: ListingDataService,
     private yearMonthGenService: YearMonthGenService,
+    private messageService: MessageService,
+    private userDataService: UserDataService,
+    private loaderService: GlobalLoaderService
   ) { }
 
   ngOnInit(): void {
     this.monthsOptions = this.yearMonthGenService.getPreviousMonths(10);
-    this.delistingService.getPlatforms().subscribe((platformOptions) => this.platformOptions = platformOptions);
+    const getCurrentUser = this.userDataService.getCurrentUser()
+    const getPlatforms = this.delistingService.getPlatforms();
+
+    forkJoin([getCurrentUser, getPlatforms]).subscribe({
+      next: ([currentUser, platforms]) => {
+        this.currentUser = currentUser;
+        if (currentUser.organizationType !== "Platform") {
+          this.platformOptions = platforms;
+        } else {
+          this.myForm.controls['platformId'].setValue(currentUser.organizationId);
+        }
+      },
+    });
   }
 
   onFileSelected(event: any, uploadElem: FileUpload): void {
@@ -73,6 +97,7 @@ export class UploadListingsComponent implements OnInit {
       this.uploadElem.disabled = true;
     }
   }
+
   onClear(): void {
     this.uploadElem.clear();
     this.myForm.controls['file'].setValue(null);
@@ -81,11 +106,24 @@ export class UploadListingsComponent implements OnInit {
   }
 
   onUpload(): void {
+    this.isUploadStarted = true;
     const formResult = this.myForm.value;
+    this.loaderService.loadingStart('Uploading');
 
     this.listingDataService.uploadData(formResult.month || '', formResult.platformId || 0, this.uploadedFile)
       .subscribe({
-        next: (_res) => { },
+        next: (_res) => {
+          this.myForm.reset();
+          this.onClear();
+
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File has been uploaded successfully' });
+        },
+        complete: () => {
+          this.loaderService.loadingEnd();
+          setTimeout(() => {
+            this.isUploadStarted = false;
+          }, 300);
+        }
       });
   }
 }

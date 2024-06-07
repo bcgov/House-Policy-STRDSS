@@ -34,12 +34,12 @@ public partial class DssRentalListing
     public string? BcRegistryNo { get; set; }
 
     /// <summary>
-    /// Indicates whether the listing version is the most current one (within the same listing number for the same offering platform)
+    /// Indicates whether the RENTAL LISTING VERSION is a CURRENT RENTAL LISTING (if it is a copy of the most current REPORTED RENTAL LISTING (having the same listing number for the same offering platform)
     /// </summary>
     public bool IsCurrent { get; set; }
 
     /// <summary>
-    /// Indicates whether a current listing is no longer considered active
+    /// Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform
     /// </summary>
     public bool? IsTakenDown { get; set; }
 
@@ -92,6 +92,16 @@ public partial class DssRentalListing
     /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
+
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING was included in the most recent RENTAL LISTING REPORT
+    /// </summary>
+    public bool? IsActive { get; set; }
+
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING appeared for the first time in the last reporting period
+    /// </summary>
+    public bool? IsNew { get; set; }
 
     public virtual DssRentalListing? DerivedFromRentalListing { get; set; }
 

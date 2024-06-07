@@ -44,26 +44,6 @@
 			"response": []
 		},
 		{
-			"name": "GetReqeustReasonDrowdown",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/api/delisting/reasons/dropdown",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"delisting",
-						"reasons",
-						"dropdown"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "CreateTakedownNotice",
 			"request": {
 				"method": "POST",
@@ -86,6 +66,62 @@
 						"api",
 						"delisting",
 						"warnings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateBulkTakedownNotices",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"rentalListingId\": 570,\r\n    \"hostEmailSent\": false,\r\n    \"ccList\": [],\r\n    \"comment\": \"Testing\"\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/delisting/bulkwarnings",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"delisting",
+						"bulkwarnings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateBulkTakedownRequests",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"rentalListingId\": 570,\r\n    \"ccList\": [],\r\n    \"isWithStandardDetail\": true,\r\n    \"customDetailTxt\": \"string\"\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/delisting/bulkrequests",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"delisting",
+						"bulkrequests"
 					]
 				}
 			},
@@ -127,7 +163,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": \"1\",\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"sendCopy\": true,\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ]\r\n}",
+					"raw": "{\r\n  \"platformId\": 2,\r\n  \"listingId\": \"1\",\r\n  \"listingUrl\": \"https://www.airbnb.com/rooms/16120388?check_in=2024-04-25&amp;check_out=2024-04-27&amp;guests=1&amp;adults=1&amp;s=67&amp;unique_share_id=fa107d24-b0df-49bd-91e4-576dd7d368ab\",\r\n  \"isWithStandardDetail\": false,\r\n  \"customDetailTxt\": \"Please remove it\",\r\n  \"ccList\": [\r\n    \"young-jin.1.chung@gov.bc.ca\"\r\n  ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -178,6 +214,36 @@
 			"response": []
 		},
 		{
+			"name": "Get Organizations",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/organizations",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"organizations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get Organization Types",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -203,36 +269,6 @@
 						"api",
 						"organizations",
 						"types"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Organizations",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/organizations",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"organizations"
 					]
 				}
 			},
@@ -550,44 +586,6 @@
 			"response": []
 		},
 		{
-			"name": "CreateRentalLisingReport",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "ReportPeriod",
-							"value": "2024-03",
-							"type": "text"
-						},
-						{
-							"key": "OrganizationId",
-							"value": "2",
-							"type": "text"
-						},
-						{
-							"key": "File",
-							"type": "file",
-							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing-valid2.csv"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{host}}/api/rentallistingreports",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"rentallistingreports"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Send Batch Takedown Request",
 			"request": {
 				"method": "POST",
@@ -650,6 +648,153 @@
 						"api",
 						"delisting",
 						"batchtakedownnotice"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateRentalLisingReport",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "ReportPeriod",
+							"value": "2024-02",
+							"type": "text"
+						},
+						{
+							"key": "OrganizationId",
+							"value": "590",
+							"type": "text"
+						},
+						{
+							"key": "File",
+							"type": "file",
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/listing-valid-2024-02.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/api/rentallistingreports",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistingreports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Rental History",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistingreports/rentallistinghistory?platformId=&pageSize=10&pageNumber=1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistingreports",
+						"rentallistinghistory"
+					],
+					"query": [
+						{
+							"key": "platformId",
+							"value": ""
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Error File",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistingreports/uploads/19/errorfile",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistingreports",
+						"uploads",
+						"19",
+						"errorfile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Listings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistings?pageSize=10&pageNumber=1&orderBy=platformListingNo&direction=desc",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings"
+					],
+					"query": [
+						{
+							"key": "pageSize",
+							"value": "10"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						},
+						{
+							"key": "orderBy",
+							"value": "platformListingNo"
+						},
+						{
+							"key": "direction",
+							"value": "desc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Listing",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistings/450",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"450"
 					]
 				}
 			},

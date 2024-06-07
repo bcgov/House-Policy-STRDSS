@@ -15,9 +15,10 @@ global:
     'SM_LOGOFF_URL': 'https://logon7.gov.bc.ca/clp-cgi/logoff.cgi/'
     'CHES_TOKEN_URL': 'https://loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token'
     'CHES_URL': 'https://ches.api.gov.bc.ca'
-    'RENTAL_LISTING_REPORT_MAX_SIZE': '4'
+    'RENTAL_LISTING_REPORT_MAX_SIZE': '10'
     'BCEID_URL': 'https://gws1.bceid.ca/webservices/client/v10/bceidservice.asmx'
     'BCEID_CACHE_LIFESPAN': '600'
+    'GEOCODER_URL': 'https://geocoder.api.gov.bc.ca'
 
 nameOverride: strdss-prod
 fullnameOverride: strdss-prod
@@ -28,7 +29,7 @@ route:
 
 frontend:
   enabled: true
-  replicaCount: 3
+  replicaCount: 2
   nameOverride: strdss-prod-frontend
   fullnameOverride: strdss-prod-frontend
   secretName: strdss-secrets-prod
@@ -55,7 +56,7 @@ frontend:
 
 backend:
   enabled: true
-  replicaCount: 3
+  replicaCount: 2
   nameOverride: strdss-prod-backend
   fullnameOverride: strdss-prod-backend
   secretName: strdss-secrets-prod
@@ -81,3 +82,32 @@ backend:
           topologyKey: "kubernetes.io/hostname"
           labelSelector:
             matchLabels: {{ include "app.selectorLabels" . | nindent 10 }}
+
+hangfire:
+  enabled: true
+  replicaCount: 1
+  nameOverride: strdss-prod-hangfire
+  fullnameOverride: strdss-prod-hangfire
+  secretName: strdss-secrets-prod
+  dbSecretName: strdssprod-pguser-strdssprod
+  crunchydb: true
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 600Mi
+    requests:
+      cpu: 100m
+      memory: 400Mi
+
+  env:
+    'API_HOST': '/api'
+
+  affinityTemplate: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchLabels: {{ include "app.selectorLabels" . | nindent 10 }}            

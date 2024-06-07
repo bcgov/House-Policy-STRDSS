@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using StrDss.Common;
 using StrDss.Data.Entities;
+using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
+using StrDss.Model.RentalReportDtos;
 using StrDss.Model.UserDtos;
 
 namespace StrDss.Data.Mappings
@@ -25,6 +28,14 @@ namespace StrDss.Data.Mappings
             CreateMap<DssUserRole, RoleDto>();
             CreateMap<DssUserPrivilege, PermissionDto>();
             CreateMap<DssUserIdentityView, UserListtDto>();
+
+            CreateMap<DssRentalUploadHistoryView, RentalUploadHistoryViewDto>()
+                .ForMember(o => o.ReportPeriodYM, opt => opt.MapFrom(i => ((DateOnly)i.ReportPeriodYm!).ToString("yyyy-MM")))
+                .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime((DateTime)i.UpdDtm!)))
+                ;
+
+            CreateMap<DssRentalListingVw, RentalListingViewDto>();
+            CreateMap<DssRentalListingContact, RentalListingContactDto>();
         }
     }
 }

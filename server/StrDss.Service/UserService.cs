@@ -65,17 +65,25 @@ namespace StrDss.Service
 
             if (_currentUser.IdentityProviderNm == StrDssIdProviders.BceidBusiness)
             {
-                var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
-
-                if (account == null)
+                try
                 {
-                    _logger.LogError($"BCeID call error: {error}");
+                    var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
+
+                    if (account == null)
+                    {
+                        _logger.LogError($"BCeID call error: {error}");
+                    }
+
+                    if (account != null)
+                    {
+                        _currentUser.FirstName = account.FirstName;
+                        _currentUser.LastName = account.LastName;
+                    }
                 }
-
-                if (account != null)
+                catch (Exception ex)
                 {
-                    _currentUser.FirstName = account.FirstName;
-                    _currentUser.LastName = account.LastName;
+                    _logger.LogError($"BCeID Web call failed - {ex.Message}", ex);
+                    _logger.LogInformation("BCeID Web call failed - Skipping UpdateBceidUserInfo ");
                 }
             }
 
@@ -142,7 +150,6 @@ namespace StrDss.Service
                     MessageTemplateDsc = template.GetContent(),
                     IsHostContactedExternally = false,
                     IsSubmitterCcRequired = false,
-                    MessageReasonId = null,
                     LgPhoneNo = null,
                     UnreportedListingNo = null,
                     HostEmailAddressDsc = null,
@@ -259,7 +266,6 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
-                MessageReasonId = null,
                 LgPhoneNo = null,
                 UnreportedListingNo = null,
                 HostEmailAddressDsc = null,
@@ -362,7 +368,6 @@ namespace StrDss.Service
                 MessageTemplateDsc = template.GetContent(),
                 IsHostContactedExternally = false,
                 IsSubmitterCcRequired = false,
-                MessageReasonId = null,
                 LgPhoneNo = null,
                 UnreportedListingNo = null,
                 HostEmailAddressDsc = null,

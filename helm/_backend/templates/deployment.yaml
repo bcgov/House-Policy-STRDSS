@@ -41,6 +41,8 @@ spec:
             export SA_PASS="{{ .Data.data.SA_PASS }}"
             export SA_USER="{{ .Data.data.SA_USER }}"
             export ADMIN_EMAIL="{{ .Data.data.ADMIN_EMAIL }}"
+            export STR_NOTICE_EMAIL="{{ .Data.data.STR_NOTICE_EMAIL }}"
+            export STR_DATA_EMAIL="{{ .Data.data.STR_DATA_EMAIL }}"
           {{- end }}`}}
       labels:
         {{- include "app.selectorLabels" . | nindent 8 }}

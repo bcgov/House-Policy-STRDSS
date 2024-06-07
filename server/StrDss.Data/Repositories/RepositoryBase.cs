@@ -10,7 +10,7 @@ namespace StrDss.Data.Repositories
     public interface IRepositoryBase<TEntity> 
         where TEntity : class
     {
-        Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string orderDir);
+        Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string orderDir, string extraSort = "");
     }
     public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
         where TEntity : class
@@ -33,13 +33,28 @@ namespace StrDss.Data.Repositories
             _logger = logger;
         }
 
-        public async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "")
+        public async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "", string extraSort = "")
         {
             var totalRecords = list.Count();
 
             if (pageNumber <= 0) pageNumber = 1;
 
-            var pagedList = list.DynamicOrderBy($"{orderBy} {direction}") as IQueryable<TInput>;
+            var sort = "";
+
+            if (extraSort.IsEmpty())
+            {
+                sort = $"{orderBy} {direction}";
+            }
+            else if (orderBy.IsNotEmpty())
+            {
+                sort = $"{orderBy} {direction}, {extraSort}";
+            }
+            else 
+            {
+                sort = $"{extraSort}";
+            }
+
+            var pagedList = list.DynamicOrderBy($"{sort}") as IQueryable<TInput>;
 
             if (pageSize > 0)
             {

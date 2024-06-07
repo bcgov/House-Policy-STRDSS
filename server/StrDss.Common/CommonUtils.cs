@@ -6,17 +6,17 @@ namespace StrDss.Common
     {
         public static string GetFullName(string firstName, string lastName)
         {
-            if (!firstName.IsEmpty() && !lastName.IsEmpty())
+            if (firstName.IsNotEmpty() && lastName.IsNotEmpty())
             {
                 return $"{lastName}, {firstName}";
             }
-            else if (!firstName.IsEmpty())
+            else if (firstName.IsNotEmpty())
             {
-                return lastName;
+                return firstName;
             }
             else
             {
-                return firstName;
+                return lastName;
             }
         }
 

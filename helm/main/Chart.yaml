@@ -13,3 +13,7 @@ dependencies:
     version: '0.1.0'
     repository: 'file://../_backend'
     condition: backend.enabled
+  - name: hangfire
+    version: '0.1.0'
+    repository: 'file://../_hangfire'
+    condition: hangfire.enabled

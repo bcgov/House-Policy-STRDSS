@@ -4,13 +4,18 @@ namespace StrDss.Service.EmailTemplates
 {
     public class TakedownRequest : EmailTemplateBase
     {
-        public TakedownRequest(IEmailMessageService emailService) : base(emailService)
+        public TakedownRequest(IEmailMessageService emailService)
+            : base(emailService)
         {
             EmailMessageType = EmailMessageTypes.TakedownRequest;
+            From = Environment.GetEnvironmentVariable("STR_DATA_EMAIL") ?? From;
         }
 
         public string Url { get; set; } = "";
         public string? ListingId { get; set; }
+        public string OrgCd { get; set; } = ""; //optional field
+        public long RentalListingId { get; set; } //optional field
+
         public override string GetContent()
         {
             Subject = "Confirmation of Takedown Request";

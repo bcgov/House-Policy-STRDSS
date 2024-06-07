@@ -101,19 +101,14 @@ namespace StrDss.Service
                 return messages;
             }
 
-            if (rule.MinLength != null && rule.MaxLength != null)
-            {               
-                if (value.Length < rule.MinLength || value.Length > rule.MaxLength)
-                {
-                    if (rule.MinLength == rule.MaxLength)
-                    {
-                        messages.Add($"{rowNumPrefix}The length of {field} field must be {rule.MinLength}.");
-                    }
-                    else
-                    {
-                        messages.Add($"{rowNumPrefix}The length of {field} field must be between {rule.MinLength} and {rule.MaxLength}.");
-                    }
-                }
+            if (rule.MinLength != null && value.Length < rule.MinLength)
+            {
+                messages.Add($"{rowNumPrefix}The length of {field} field must be equal to or greater than {rule.MinLength}.");
+            }
+
+            if (rule.MaxLength != null && value.Length > rule.MaxLength)
+            {
+                messages.Add($"{rowNumPrefix}The length of {field} field must be equal to or smaller than {rule.MaxLength}.");
             }
 
             if (rule.RegexInfo != null)

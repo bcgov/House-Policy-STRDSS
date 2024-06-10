@@ -2,9 +2,9 @@
 
 namespace StrDss.Service.EmailTemplates
 {
-    public class TakedownNotice : EmailTemplateBase
+    public class TakedownNoticeFromListing : EmailTemplateBase
     {
-        public TakedownNotice(IEmailMessageService emailService)
+        public TakedownNoticeFromListing(IEmailMessageService emailService)
             : base(emailService)
         {
             EmailMessageType = EmailMessageTypes.NoticeOfTakedown;
@@ -15,6 +15,8 @@ namespace StrDss.Service.EmailTemplates
         public string? ListingId { get; set; }
         public string Comment { get; set; } = "";
         public string LgName { get; set; } = "";
+        public string OrgCd { get; set; } = ""; //optional field
+        public long RentalListingId { get; set; } //optional field
 
         public override string GetContent()
         {

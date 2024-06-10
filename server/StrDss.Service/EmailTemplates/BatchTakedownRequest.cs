@@ -15,7 +15,7 @@ namespace StrDss.Service.EmailTemplates
         {
             Subject = "Takedown Request";
 
-            return (Preview ? GetPreviewContent() : "") + $@"
+            return (Preview ? GetPreviewHeader() : "") + $@"
 The short-term rental listings in the attached file are the subject of a request by a local government described under s. 18(3) of the <i>Short-Term Rental Accommodations Act</i> and s. 16 of the <i>Short-Term Rental Accommodations Regulation</i>. <br/><br/>
 A “takedown request” (a request for a platform to cease providing platform services, ie., remove the listing and cancel bookings associated with the listing) has been submitted for each of these listings by the respective local government via the Province of British Columbia’s Short-term Rental (STR) Data Portal.<br/><br/>
 In accordance with s. 18(3) of the <i>Short-Term Rental Accommodations Act</i> and s. 16 (3) of the <i>Short-Term Rental Accommodations Regulation</i>, please cease providing platform services in respect of the attached platform offers within 5 days from the date of receipt of this request.<br/><br/>

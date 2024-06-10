@@ -1,14 +1,12 @@
-﻿using NUnit.Framework;
-using UITest.PageObjects;
-using UITest.TestDriver;
-using Configuration;
-using TestFrameWork.Models;
-using TechTalk.SpecFlow;
-using TechTalk.SpecFlow.Assist;
-using Gherkin.CucumberMessages.Types;
+﻿using Configuration;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
-using System.Reflection.Metadata;
+using SpecFlowProjectBDD.Helpers;
+using TestFrameWork.Models;
+using UITest.PageObjects;
+using UITest.TestDriver;
+using static SpecFlowProjectBDD.SFEnums;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -52,16 +50,10 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _Driver.Url = _AppSettings.GetServer("default");
             _Driver.Navigate();
 
+            AuthHelper authHelper = new AuthHelper(_Driver);
 
-            _PathFinderPage.BCIDButton.Click();
-
-            _BCIDPage.UserNameTextBox.WaitFor(5);
-
-            _BCIDPage.UserNameTextBox.EnterText(_TestUserName);
-
-            _BCIDPage.PasswordTextBox.EnterText(_TestPassword);
-
-            _BCIDPage.ContinueButton.Click();
+            //Authenticate user using IDir or BCID depending on the user
+            authHelper.Authenticate(_TestUserName, UserTypeEnum.LOCALGOVERNMENT);
 
             IWebElement TOC = null;
 
@@ -161,7 +153,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _DelistingRequestPage.PlatformReceipientDropdown.Click();
             _DelistingRequestPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-            ClassicAssert.IsTrue(_DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper().Contains("TEST PLATFORM"));
+            ClassicAssert.IsTrue(_DelistingRequestPage.PlatformReceipientDropdown.Text.ToUpper().Contains("TEST AIRBNB"));
         }
 
         [Then("the system should present a list of available platform options to populate the field")]
@@ -215,7 +207,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void ThenIShouldReceiveAConfirmationMessage()
         {
             System.Threading.Thread.Sleep(3000);
-            ClassicAssert.IsTrue(_DelistingRequestPage.Driver.PageSource.Contains("Your Notice of Takedown was Successfully Submitted!"));
+            ClassicAssert.IsTrue(_DelistingRequestPage.Driver.PageSource.Contains("Your Takedown Request was Successfully Submitted!"));
             _DelistingRequestPage.ReturnHomeButton.Click();
         }
 

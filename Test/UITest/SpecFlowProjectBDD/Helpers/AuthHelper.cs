@@ -20,7 +20,7 @@ namespace SpecFlowProjectBDD.Helpers
         private string _TestUserName;
         private string _TestPassword;
         private AppSettings _AppSettings;
-        private UserTypeEnum _UserType;
+        private LogonTypeEnum _LogonType;
         private BCIDPage _BCIDPage;
 
         public AuthHelper(IDriver Driver)
@@ -31,20 +31,42 @@ namespace SpecFlowProjectBDD.Helpers
             _BCIDPage = new BCIDPage(_Driver);
             _AppSettings = new AppSettings();
         }
+        public LogonTypeEnum SetLogonType(UserTypeEnum UserType)
+        {
+            LogonTypeEnum _LogonType;
+            switch (UserType)
+            {
+                case UserTypeEnum.BCGOVERNMENTSTAFF:
+                    {
+                        _LogonType = SFEnums.LogonTypeEnum.IDIR;
+                        break;
+                    }
+                case UserTypeEnum.CEUSTAFF:
+                case UserTypeEnum.CEUADMIN:
+                case UserTypeEnum.LOCALGOVERNMENT:
+                case UserTypeEnum.SHORTTERMRENTALPLATFORM:
+                    {
+                        _LogonType = SFEnums.LogonTypeEnum.BCID;
+                        break;
+                    }
+                default:
+                    throw new ArgumentException("Unknown User Type (" + UserType + ")");
+            }
+            return (_LogonType);
+        }
 
-        public UserTypeEnum Authenticate(string UserName, string UserType)
+        public LogonTypeEnum Authenticate(string UserName, UserTypeEnum UserType)
         {
             _TestUserName = UserName;
             _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
-            UserHelper userHelper = new UserHelper();
-            _UserType = userHelper.SetUserType(UserType);
+            _LogonType = SetLogonType(UserType);
 
             _Driver.Url = _AppSettings.GetServer("default");
             _Driver.Navigate();
 
-            switch (_UserType)
+            switch (_LogonType)
             {
-                case UserTypeEnum.BCGOVERNMENT:
+                case LogonTypeEnum.IDIR:
                     {
                         _PathFinderPage.IDRButton.Click();
                         _IDRLoginPage.UserNameTextBox.WaitFor(5);
@@ -53,7 +75,7 @@ namespace SpecFlowProjectBDD.Helpers
                         _IDRLoginPage.ContinueButton.Click();
                         break;
                     }
-                case UserTypeEnum.PLATFORM:
+                case LogonTypeEnum.BCID:
                     {
                         _PathFinderPage.BCIDButton.Click();
                         _BCIDPage.UserNameTextBox.WaitFor(5);
@@ -64,7 +86,7 @@ namespace SpecFlowProjectBDD.Helpers
                     }
             }
 
-            return (_UserType);
+            return (_LogonType);
         }
     }
 }

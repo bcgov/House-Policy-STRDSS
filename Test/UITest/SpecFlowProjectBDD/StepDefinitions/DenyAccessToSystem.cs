@@ -1,15 +1,8 @@
-﻿using NUnit.Framework;
+﻿using Configuration;
+using NUnit.Framework.Legacy;
+using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
-using TestFrameWork.Models;
-using Configuration;
-using NUnit.Framework.Legacy;
-using TechTalk.SpecFlow.CommonModels;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using System.Security.Policy;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using System;
-using System.Collections.Generic;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {

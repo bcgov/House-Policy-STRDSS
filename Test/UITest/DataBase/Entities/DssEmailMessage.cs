@@ -14,7 +14,7 @@ public partial class DssEmailMessage
     public long EmailMessageId { get; set; }
 
     /// <summary>
-    /// Business term for the type or purpose of the message (e.g. Notice of Takedown, Takedown Request, Delisting Warning, Delisting Request, Access Granted Notification, Access Denied Notification)
+    /// Foreign key
     /// </summary>
     public string EmailMessageType { get; set; } = null!;
 
@@ -28,14 +28,24 @@ public partial class DssEmailMessage
     /// </summary>
     public string MessageTemplateDsc { get; set; } = null!;
 
-    public bool IsHostContactedExternally { get; set; }
-
+    /// <summary>
+    /// Indicates whether the user initiating the message should receive a copy of the email
+    /// </summary>
     public bool IsSubmitterCcRequired { get; set; }
 
-    public long? MessageReasonId { get; set; }
+    /// <summary>
+    /// Indicates whether the the property host has already been contacted by external means
+    /// </summary>
+    public bool? IsHostContactedExternally { get; set; }
 
+    /// <summary>
+    /// A phone number associated with a Local Government contact
+    /// </summary>
     public string? LgPhoneNo { get; set; }
 
+    /// <summary>
+    /// The platform issued identification number for the listing (if not included in a rental listing report)
+    /// </summary>
     public string? UnreportedListingNo { get; set; }
 
     /// <summary>
@@ -43,6 +53,9 @@ public partial class DssEmailMessage
     /// </summary>
     public string? HostEmailAddressDsc { get; set; }
 
+    /// <summary>
+    /// E-mail address of a local government contact (directly entered by the user as a message recipient)
+    /// </summary>
     public string? LgEmailAddressDsc { get; set; }
 
     /// <summary>
@@ -55,12 +68,20 @@ public partial class DssEmailMessage
     /// </summary>
     public string? UnreportedListingUrl { get; set; }
 
+    /// <summary>
+    /// User-provided URL for a local government bylaw that is the subject of the message
+    /// </summary>
     public string? LgStrBylawUrl { get; set; }
 
     /// <summary>
     /// Foreign key
     /// </summary>
-    public long InitiatingUserIdentityId { get; set; }
+    public long? ConcernedWithRentalListingId { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? InitiatingUserIdentityId { get; set; }
 
     /// <summary>
     /// Foreign key
@@ -72,13 +93,51 @@ public partial class DssEmailMessage
     /// </summary>
     public long? InvolvedInOrganizationId { get; set; }
 
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? BatchingEmailMessageId { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? RequestingOrganizationId { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? MessageReasonId { get; set; }
+
+    /// <summary>
+    /// External identifier for tracking the message delivery progress
+    /// </summary>
+    public string? ExternalMessageNo { get; set; }
+
+    /// <summary>
+    /// Trigger-updated timestamp of last change
+    /// </summary>
+    public DateTime? UpdDtm { get; set; }
+
+    /// <summary>
+    /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
+    /// </summary>
+    public Guid? UpdUserGuid { get; set; }
+
     public virtual DssUserIdentity? AffectedByUserIdentity { get; set; }
+
+    public virtual DssEmailMessage? BatchingEmailMessage { get; set; }
+
+    public virtual DssRentalListing? ConcernedWithRentalListing { get; set; }
 
     public virtual DssEmailMessageType EmailMessageTypeNavigation { get; set; } = null!;
 
-    public virtual DssUserIdentity InitiatingUserIdentity { get; set; } = null!;
+    public virtual DssUserIdentity? InitiatingUserIdentity { get; set; }
+
+    public virtual ICollection<DssEmailMessage> InverseBatchingEmailMessage { get; } = new List<DssEmailMessage>();
 
     public virtual DssOrganization? InvolvedInOrganization { get; set; }
 
     public virtual DssMessageReason? MessageReason { get; set; }
+
+    public virtual DssOrganization? RequestingOrganization { get; set; }
 }

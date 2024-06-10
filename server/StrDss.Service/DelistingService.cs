@@ -201,7 +201,7 @@ namespace StrDss.Service
         {
             var errors = new Dictionary<string, List<string>>();
             var regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
-            var templates = new List<TakedownNotice>();
+            var templates = new List<TakedownNoticeFromListing>();
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
             if (lg == null)
@@ -234,7 +234,7 @@ namespace StrDss.Service
 
                 listing.ProvidingPlatformId = rentalListing.ProvidingPlatformId;
 
-                var template = new TakedownNotice(_emailService)
+                var template = new TakedownNoticeFromListing(_emailService)
                 {
                     RentalListingId = listing.RentalListingId,
                     Url = rentalListing!.PlatformListingUrl ?? "",
@@ -291,7 +291,7 @@ namespace StrDss.Service
             {
                 try
                 {
-                    await SendTakedownNoticeEmail(listings, template);
+                    await SendTakedownNoticeFromListingEmail(listings, template);
                 }
                 catch (Exception ex)
                 {
@@ -303,7 +303,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendTakedownNoticeEmail(BulkTakedownNoticesDto[] listings, TakedownNotice template)
+        private async Task SendTakedownNoticeFromListingEmail(BulkTakedownNoticesDto[] listings, TakedownNoticeFromListing template)
         {
             var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
 

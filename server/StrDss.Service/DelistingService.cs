@@ -24,8 +24,8 @@ namespace StrDss.Service
         Task ProcessTakedownRequestBatchEmailsAsync();
         Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream);
         Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, Stream stream);
-        Task<Dictionary<string, List<string>>> CreateBulkTakedownNoticesAsync(BulkTakedownNoticesDto[] listings);
-        Task<Dictionary<string, List<string>>> CreateBulkTakedownReqeustsAsync(BulkTakedownRequestsDto[] listings);
+        Task<Dictionary<string, List<string>>> CreateTakedownNoticesFromListingAsync(BulkTakedownNoticesDto[] listings);
+        Task<Dictionary<string, List<string>>> CreateTakedownReqeustsFromListingAsync(BulkTakedownRequestsDto[] listings);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -197,7 +197,7 @@ namespace StrDss.Service
             _unitOfWork.Commit();
         }
 
-        public async Task<Dictionary<string, List<string>>> CreateBulkTakedownNoticesAsync(BulkTakedownNoticesDto[] listings)
+        public async Task<Dictionary<string, List<string>>> CreateTakedownNoticesFromListingAsync(BulkTakedownNoticesDto[] listings)
         {
             var errors = new Dictionary<string, List<string>>();
             var regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
@@ -242,7 +242,7 @@ namespace StrDss.Service
                     ListingId = rentalListing!.PlatformListingNo,
                     Comment = listing.Comment,
                     LgName = _currentUser.OrganizationName,
-                    Info = rentalListing!.PlatformListingUrl ?? "",
+                    Info = $"{rentalListing!.OrganizationCd}-{rentalListing!.PlatformListingNo}"
                 };
 
                 templates.Add(template);
@@ -364,7 +364,7 @@ namespace StrDss.Service
             return template;
         }
 
-        public async Task<Dictionary<string, List<string>>> CreateBulkTakedownReqeustsAsync(BulkTakedownRequestsDto[] listings)
+        public async Task<Dictionary<string, List<string>>> CreateTakedownReqeustsFromListingAsync(BulkTakedownRequestsDto[] listings)
         {
             var errors = new Dictionary<string, List<string>>();
             var templates = new List<TakedownRequest>();
@@ -395,7 +395,7 @@ namespace StrDss.Service
                     Url = rentalListing!.PlatformListingUrl ?? "",
                     OrgCd = rentalListing!.OrganizationCd,
                     ListingId = rentalListing!.PlatformListingNo,
-                    Info = rentalListing!.PlatformListingUrl ?? "",
+                    Info = $"{rentalListing!.OrganizationCd}-{rentalListing!.PlatformListingNo}",
                 };
 
                 templates.Add(template);

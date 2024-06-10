@@ -55,7 +55,7 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.TakedownAction)]
         [HttpPost("bulkwarnings", Name = "CreateTakedownNoticesFromListing")]
-        public async Task<ActionResult> CreateTakedownNoticesFromListing(BulkTakedownNoticesDto[] notices)
+        public async Task<ActionResult> CreateTakedownNoticesFromListing(TakedownNoticesFromListingDto[] notices)
         {
             var errors = await _delistingService.CreateTakedownNoticesFromListingAsync(notices);
 
@@ -96,9 +96,9 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.TakedownAction)]
         [HttpPost("bulkrequests", Name = "CreateTakedownRequestsFromListing")]
-        public async Task<ActionResult> CreateTakedownRequestsFromListing(BulkTakedownRequestsDto[] requests)
+        public async Task<ActionResult> CreateTakedownRequestsFromListing(TakedownRequestsFromListingDto[] requests)
         {
-            var errors = await _delistingService.CreateTakedownReqeustsFromListingAsync(requests);
+            var errors = await _delistingService.CreateTakedownRequestsFromListingAsync(requests);
 
             if (errors.Count > 0)
             {
@@ -106,6 +106,20 @@ namespace StrDss.Api.Controllers
             }
 
             return NoContent();
+        }
+
+        [ApiAuthorize(Permissions.TakedownAction)]
+        [HttpPost("bulkrequests/preview", Name = "GetTakedownRequestsFromListingPreview")]
+        public async Task<ActionResult> GetTakedownRequestsFromListingPreview(TakedownRequestsFromListingDto[] requests)
+        {
+            var (errors, preview) = await _delistingService.GetTakedownRequestsFromListingPreviewAsync(requests);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok(preview);
         }
 
         [ApiAuthorize(Permissions.TakedownAction)]

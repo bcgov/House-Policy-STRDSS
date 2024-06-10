@@ -13,7 +13,7 @@ namespace StrDss.Data.Repositories
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long listingId);
-        Task<RentalListingForTakedownDto?> GetRentalLisgingForTakedownAction(long listingId, bool includeHostEmails);
+        Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long listingId, bool includeHostEmails);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -146,7 +146,7 @@ namespace StrDss.Data.Repositories
             return listing;
         }
 
-        public async Task<RentalListingForTakedownDto?> GetRentalLisgingForTakedownAction(long listingId, bool includeHostEmail)
+        public async Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long listingId, bool includeHostEmail)
         {
             var listing = await GetRentalListingAsync(listingId);
             if (listing == null) return null;

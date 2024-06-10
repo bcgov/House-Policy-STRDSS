@@ -9,6 +9,7 @@
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Calculator - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\SendNoticeOfTakedownWithoutADSSlisting - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\STRDSSLandingPage - Copy.feature.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,6 +39,9 @@
       <DesignTime>true</DesignTime>
       <AutoGen>true</AutoGen>
     </Compile>
+    <Compile Update="Features\UploadListingDataPlatformUser.feature.cs">
+      <DependentUpon>UploadListingDataPlatformUser.feature</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +56,10 @@
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\ManagingAccess.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\UploadListingDataPlatformUser.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>

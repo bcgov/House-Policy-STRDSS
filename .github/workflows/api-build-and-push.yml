@@ -130,15 +130,15 @@ jobs:
           labels: ${{ steps.meta.outputs.labels || steps.meta-test.outputs.labels || steps.meta-prod.outputs.labels }}
           #platforms: linux/amd64,linux/arm64
 
-      - name: Build CI
-        id: ci
-        uses: docker/build-push-action@v2
-        if: github.ref != 'refs/heads/test' || github.ref != 'refs/heads/emerald' || github.ref != 'refs/heads/main'
-        with:
-          push: false
-          context: ./server
-          tags: ${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }}
-          labels: ${{ steps.meta.outputs.labels || steps.meta-test.outputs.labels || steps.meta-prod.outputs.labels }}
+      # - name: Build CI
+      #   id: ci
+      #   uses: docker/build-push-action@v2
+      #   if: github.ref != 'refs/heads/test' || github.ref != 'refs/heads/emerald' || github.ref != 'refs/heads/main'
+      #   with:
+      #     push: false
+      #     context: ./server
+      #     tags: ${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }}
+      #     labels: ${{ steps.meta.outputs.labels || steps.meta-test.outputs.labels || steps.meta-prod.outputs.labels }}
 
       - name: Checkout ArgoCD Repo
         id: gitops

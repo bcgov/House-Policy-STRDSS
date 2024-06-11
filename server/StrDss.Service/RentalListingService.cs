@@ -12,7 +12,7 @@ namespace StrDss.Service
     public interface IRentalListingService
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<RentalListingViewDto?> GetRentalListing(long listingId);
+        Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
@@ -30,9 +30,9 @@ namespace StrDss.Service
             return await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicense, pageSize, pageNumber, orderBy, direction);
         }
 
-        public async Task<RentalListingViewDto?> GetRentalListing(long listingId)
+        public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId)
         {
-            return await _listingRepo.GetRentalListing(listingId);
+            return await _listingRepo.GetRentalListing(rentalListingId);
         }
     }
 }

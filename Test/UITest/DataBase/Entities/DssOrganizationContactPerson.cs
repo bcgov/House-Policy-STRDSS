@@ -16,22 +16,22 @@ public partial class DssOrganizationContactPerson
     /// <summary>
     /// Indicates whether the contact should receive all communications directed at the organization
     /// </summary>
-    public bool IsPrimary { get; set; }
+    public bool? IsPrimary { get; set; }
 
     /// <summary>
     /// A name given to a person so that they can easily be identified among their family members (in some cultures, this is often the first name)
     /// </summary>
-    public string GivenNm { get; set; } = null!;
+    public string? GivenNm { get; set; }
 
     /// <summary>
     /// A name that is often shared amongst members of the same family (commonly known as a surname within some cultures)
     /// </summary>
-    public string FamilyNm { get; set; } = null!;
+    public string? FamilyNm { get; set; }
 
     /// <summary>
     /// Phone number given for the contact by the organization (contains only digits)
     /// </summary>
-    public string PhoneNo { get; set; } = null!;
+    public string? PhoneNo { get; set; }
 
     /// <summary>
     /// E-mail address given for the contact by the organization
@@ -53,5 +53,12 @@ public partial class DssOrganizationContactPerson
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
 
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public string? EmailMessageType { get; set; }
+
     public virtual DssOrganization ContactedThroughOrganization { get; set; } = null!;
+
+    public virtual DssEmailMessageType? EmailMessageTypeNavigation { get; set; }
 }

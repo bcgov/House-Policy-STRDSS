@@ -13,14 +13,12 @@ namespace StrDss.Service.EmailTemplates
 
         public string Url { get; set; } = "";
         public string? ListingId { get; set; }
-        public string OrgCd { get; set; } = ""; //optional field
-        public long RentalListingId { get; set; } //optional field
 
         public override string GetContent()
         {
             Subject = "Confirmation of Takedown Request";
 
-            return (Preview ? GetPreviewContent() : "") + $@"
+            return (Preview ? GetPreviewHeader() : "") + $@"
 A takedown request for the following short-term rental listing was submitted to the Province of B.C.’s Short-term Rental Data Portal and will be delivered to the platform at 11:50pm PST tonight:<br/><br/>
 <b>{Url}</b><br/><br/>
 Listing ID Number: <b>{ListingId}</b><br/><br/>

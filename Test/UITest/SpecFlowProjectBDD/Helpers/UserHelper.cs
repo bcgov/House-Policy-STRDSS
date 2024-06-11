@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataBase.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,17 +14,30 @@ namespace SpecFlowProjectBDD.Helpers
         {
             UserTypeEnum _UserType;
             switch (UserType.ToUpper())
-            {                
-                case "CODEENFOREMENTSTAFF":
-                case "CODEENFORCEMENTADMIN":
-                case "LOCALGOVERNMENTUSER":
+            {
+                case "CEU_STAFF":
                     {
-                        _UserType = SFEnums.UserTypeEnum.BCGOVERNMENT;
+                        _UserType = UserTypeEnum.CEUSTAFF;
                         break;
                     }
-                case "PLATFORMUSER":
+                case "CEU_ADMIN":
                     {
-                        _UserType = SFEnums.UserTypeEnum.BCGOVERNMENT;
+                        _UserType = UserTypeEnum.CEUADMIN;
+                        break;
+                    }
+                case "LG_STAFF":
+                    {
+                        _UserType = UserTypeEnum.LOCALGOVERNMENT;
+                        break;
+                    }
+                case "PLATFORM_STAFF":
+                    {
+                        _UserType = UserTypeEnum.SHORTTERMRENTALPLATFORM;
+                        break;
+                    }
+                case "bC_STAFF":
+                    {
+                        _UserType = UserTypeEnum.BCGOVERNMENTSTAFF;
                         break;
                     }
                 default:
@@ -31,5 +45,13 @@ namespace SpecFlowProjectBDD.Helpers
             }
             return (_UserType);
         }
+
+        public DssUserRole GetRole(DssDbContext DBContext, string RoleName)
+        {
+            DssUserRole dssUserRole = DBContext.DssUserRoles.FirstOrDefault(p => p.UserRoleNm == RoleName);
+
+            return (dssUserRole);
+        }
     }
 }
+

@@ -22,9 +22,9 @@ namespace StrDss.Service.EmailTemplates
         public IEnumerable<EmailAttachment> Attachments { get; set; } = Enumerable.Empty<EmailAttachment>();
         public IEnumerable<string> EmailsToHide { get; set; } = new List<string>();
 
-        public string GetPreviewContent()
+        public virtual string GetPreviewHeader()
         {
-            return $@"To: {GetRecipentsForPreview(To)}" 
+            return $@"To: {GetRecipentsForPreview(To)}<br/><br/>" 
                 + (Bcc.Count() > 0 ? $"<br/>Bcc: {GetRecipentsForPreview(Bcc)}<br/><br/>" : "")
                 + (Cc.Count() > 0 ? $"<br/>Cc: {GetRecipentsForPreview(Cc)}<br/><br/>" : "")
                 ;

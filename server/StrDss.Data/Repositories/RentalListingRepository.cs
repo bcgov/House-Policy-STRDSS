@@ -146,17 +146,17 @@ namespace StrDss.Data.Repositories
             return listing;
         }
 
-        public async Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long listingId, bool includeHostEmail)
+        public async Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentallistingId, bool includeHostEmail)
         {
-            var listing = await GetRentalListingAsync(listingId);
+            var listing = await GetRentalListingAsync(rentallistingId);
             if (listing == null) return null;
 
             if (includeHostEmail)
             {
-                listing.HostEmails = await GetHostEmailsAsync(listingId);
+                listing.HostEmails = await GetHostEmailsAsync(rentallistingId);
             }
 
-            var listingView = await _dbContext.DssRentalListingVws.FirstAsync(x => x.RentalListingId == listingId);
+            var listingView = await _dbContext.DssRentalListingVws.FirstAsync(x => x.RentalListingId == rentallistingId);
             listing.LocalGovernmentId = listingView.ManagingOrganizationId ?? 0;
 
             (listing.PlatformEmails, listing.ProvidingPlatformId) = await GetPlatformEmailsAsync(listing.OfferingPlatformId);
@@ -164,18 +164,19 @@ namespace StrDss.Data.Repositories
             return listing;
         }
 
-        private async Task<RentalListingForTakedownDto?> GetRentalListingAsync(long listingId)
+        private async Task<RentalListingForTakedownDto?> GetRentalListingAsync(long rentallistingId)
         {
             return await _dbContext.DssRentalListings
+                .Where(x => x.RentalListingId == rentallistingId)
                 .Select(x => new RentalListingForTakedownDto
                 {
-                    RentalListingId = listingId,
+                    RentalListingId = rentallistingId,
                     PlatformListingNo = x.PlatformListingNo,
                     PlatformListingUrl = x.PlatformListingUrl,
                     OrganizationCd = x.OfferingOrganization.OrganizationCd,
                     OfferingPlatformId = x.OfferingOrganizationId
                 })
-                .FirstOrDefaultAsync(x => x.RentalListingId == listingId);
+                .FirstOrDefaultAsync();
         }
 
         private async Task<List<string>> GetHostEmailsAsync(long listingId)

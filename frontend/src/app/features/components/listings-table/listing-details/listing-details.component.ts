@@ -9,6 +9,7 @@ import { ListingDetails } from '../../../../common/models/listing-details';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { UserDataService } from '../../../../common/services/user-data.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-listing-details',
@@ -28,7 +29,7 @@ export class ListingDetailsComponent implements OnInit {
   id!: number;
   listing!: ListingDetails;
   isLegendShown = false;
-  addressWarningScoreLimit = 75;
+  addressWarningScoreLimit = environment.ADDRESS_SCORE;
   isCEU = false;
 
   constructor(private route: ActivatedRoute, private listingService: ListingDataService, private userDataService: UserDataService) {

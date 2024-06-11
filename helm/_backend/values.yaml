@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend
-  tag: latest
+  tag: 0.6.32
   pullPolicy: Always
 
 imagePullSecrets:

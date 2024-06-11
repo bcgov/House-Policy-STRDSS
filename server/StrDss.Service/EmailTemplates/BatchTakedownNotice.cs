@@ -16,7 +16,7 @@ namespace StrDss.Service.EmailTemplates
         {
             Subject = "Notice of non-compliance with short-term rental business licence requirement";
 
-            return (Preview ? GetPreviewContent() : "") + $@"
+            return (Preview ? GetPreviewHeader() : "") + $@"
 Dear Platform,<br/><br/>
 The respective local governments in B.C. with a short-term rental business licencing requirement have determined the the short-term rental listings in the attached spreadsheet are not in compliance with an applicable local government business licence requirement.<br/><br/>
 Under the provincial <a href='https://www.bclaws.gov.bc.ca/civix/document/id/bills/billsprevious/4th42nd:gov35-1'><i>Short-Term Rental Accommodations Act</i></a> and its regulations, the local government may submit a request to the short-term rental platform to cease providing platform services (e.g., remove this listing from the platform and cancel bookings) within a period of 5-90 days after the date of delivery of this Notice. Short-term rental platforms are required to comply with the local government’s request within 5 days of receiving the request.<br/><br/>

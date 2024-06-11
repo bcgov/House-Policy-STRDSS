@@ -1,15 +1,12 @@
-﻿using NUnit.Framework;
+﻿using Configuration;
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
+using OpenQA.Selenium;
+using SpecFlowProjectBDD.Helpers;
+using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
-using TestFrameWork.Models;
-using Configuration;
-using NUnit.Framework.Legacy;
-using System.Linq.Expressions;
-using UITest.Models;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.Extensions;
-using System.Reflection.Metadata;
-using OpenQA.Selenium.Support.UI;
+using static SpecFlowProjectBDD.SFEnums;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -52,15 +49,10 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _Driver.Url = _AppSettings.GetServer("default");
             _Driver.Navigate();
 
-            _PathFinderPage.BCIDButton.Click();
+            AuthHelper authHelper = new AuthHelper(_Driver);
 
-            _BCIDPage.UserNameTextBox.WaitFor(5);
-
-            _BCIDPage.UserNameTextBox.EnterText(_TestUserName);
-
-            _BCIDPage.PasswordTextBox.EnterText(_TestPassword);
-
-            _BCIDPage.ContinueButton.Click();
+            //Authenticate user using IDir or BCID depending on the user
+            authHelper.Authenticate(_TestUserName, UserTypeEnum.LOCALGOVERNMENT);
 
             IWebElement TOC = null;
 
@@ -153,7 +145,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _DelistingWarningPage.PlatformReceipientDropdown.WaitFor();
             _DelistingWarningPage.PlatformReceipientDropdown.ExecuteJavaScript(@"document.querySelector(""#platformId_0"").click()");
-            ClassicAssert.IsTrue(_DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper().Contains("TEST PLATFORM"));
+            ClassicAssert.IsTrue(_DelistingWarningPage.PlatformReceipientDropdown.Text.ToUpper().Contains("TEST AIRBNB"));
         }
 
         [Then("the system should validate the email format")]

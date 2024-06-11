@@ -24,8 +24,9 @@ namespace StrDss.Service
         Task ProcessTakedownRequestBatchEmailsAsync();
         Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream);
         Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, Stream stream);
-        Task<Dictionary<string, List<string>>> CreateBulkTakedownNoticesAsync(BulkTakedownNoticesDto[] listings);
-        Task<Dictionary<string, List<string>>> CreateBulkTakedownReqeustsAsync(BulkTakedownRequestsDto[] listings);
+        Task<Dictionary<string, List<string>>> CreateTakedownNoticesFromListingAsync(TakedownNoticesFromListingDto[] listings);
+        Task<Dictionary<string, List<string>>> CreateTakedownRequestsFromListingAsync(TakedownRequestsFromListingDto[] listings);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestsFromListingPreviewAsync(TakedownRequestsFromListingDto[] listings);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -196,12 +197,27 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
         }
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto)
+        {
+            var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
+            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
-        public async Task<Dictionary<string, List<string>>> CreateBulkTakedownNoticesAsync(BulkTakedownNoticesDto[] listings)
+            var errors = await ValidateTakedownNoticeAsync(dto, platform, lg);
+            if (errors.Count > 0)
+            {
+                return (errors, new EmailPreview());
+            }
+
+            var template = GetTakedownNoticeTemplate(dto, platform, lg, true);
+
+            return (errors, new EmailPreview { Content = template.GetContent().HtmlToPlainText() });
+        }
+
+        public async Task<Dictionary<string, List<string>>> CreateTakedownNoticesFromListingAsync(TakedownNoticesFromListingDto[] listings)
         {
             var errors = new Dictionary<string, List<string>>();
-            var regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
-            var templates = new List<TakedownNotice>();
+            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+            var templates = new List<TakedownNoticeFromListing>();
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
             if (lg == null)
@@ -210,20 +226,9 @@ namespace StrDss.Service
                 return errors;
             }
 
-            //var lgEmails = lg.ContactPeople
-            //    .Where(x => x.EmailAddressDsc != null)
-            //    .Select(x => x.EmailAddressDsc)
-            //    .ToList();
-
-            //if (lgEmails.Count == 0)
-            //{
-            //    errors.AddItem("organization", $"No organization email found for the organization {lg.OrganizationNm}");
-            //    return errors;
-            //}
-
             foreach (var listing in listings)
             {
-                var rentalListing = await _listingRepo.GetRentalLisgingForTakedownAction(listing.RentalListingId, true);                
+                var rentalListing = await _listingRepo.GetRentalListingForTakedownAction(listing.RentalListingId, true);                
 
                 if (rentalListing == null) continue; //error message
 
@@ -234,7 +239,7 @@ namespace StrDss.Service
 
                 listing.ProvidingPlatformId = rentalListing.ProvidingPlatformId;
 
-                var template = new TakedownNotice(_emailService)
+                var template = new TakedownNoticeFromListing(_emailService)
                 {
                     RentalListingId = listing.RentalListingId,
                     Url = rentalListing!.PlatformListingUrl ?? "",
@@ -242,10 +247,30 @@ namespace StrDss.Service
                     ListingId = rentalListing!.PlatformListingNo,
                     Comment = listing.Comment,
                     LgName = _currentUser.OrganizationName,
-                    Info = rentalListing!.PlatformListingUrl ?? "",
+                    Info = $"{rentalListing!.OrganizationCd}-{rentalListing!.PlatformListingNo}"
                 };
 
                 templates.Add(template);
+
+                foreach (var email in listing.CcList)
+                {
+                    if (!Regex.IsMatch(email, emailRegex.Regex))
+                    {
+                        errors.AddItem("ccList", $"Email ({email}) is invalid");
+                    }
+                }
+
+                if (listing.LgContactEmail.IsEmpty())
+                {
+                    errors.AddItem("lgContactEmail", $"Local government contact email is required");
+                }
+                else
+                {
+                    if (!Regex.IsMatch(listing.LgContactEmail, emailRegex.Regex))
+                    {
+                        errors.AddItem("lgContactEmail", $"Local government contact email is invalid");
+                    }
+                }
 
                 //To
                 if (!listing.HostEmailSent)
@@ -256,12 +281,12 @@ namespace StrDss.Service
                     {
                         if (email == null) continue;
 
-                        if (Regex.IsMatch(email, regex.Regex))
+                        if (Regex.IsMatch(email, emailRegex.Regex))
                         {
                             hostEmails.Add(email);
                         }
                     }
-                    
+
                     if (!hostEmails.Any())
                     {
                         errors.AddItem("hostEmail", $"No valid host email for the listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo}");
@@ -272,6 +297,8 @@ namespace StrDss.Service
                         template.To = hostEmails;
                     }
                 }
+
+                template.To = template.To.Add(listing.LgContactEmail);
 
                 //Bcc
                 listing.CcList ??= new List<string>();
@@ -291,7 +318,7 @@ namespace StrDss.Service
             {
                 try
                 {
-                    await SendTakedownNoticeEmail(listings, template);
+                    await SendTakedownNoticeFromListingEmail(listings, template);
                 }
                 catch (Exception ex)
                 {
@@ -303,7 +330,7 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task SendTakedownNoticeEmail(BulkTakedownNoticesDto[] listings, TakedownNotice template)
+        private async Task SendTakedownNoticeFromListingEmail(TakedownNoticesFromListingDto[] listings, TakedownNoticeFromListing template)
         {
             var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
 
@@ -364,60 +391,94 @@ namespace StrDss.Service
             return template;
         }
 
-        public async Task<Dictionary<string, List<string>>> CreateBulkTakedownReqeustsAsync(BulkTakedownRequestsDto[] listings)
+        public async Task<Dictionary<string, List<string>>> CreateTakedownRequestsFromListingAsync(TakedownRequestsFromListingDto[] listings)
         {
             var errors = new Dictionary<string, List<string>>();
-            var templates = new List<TakedownRequest>();
-            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
+            var templates = new List<TakedownRequestFromListing>();
 
-            if (lg == null)
+            var organization = await GetOrganizationAsync(errors);
+            if (organization == null)
             {
-                errors.AddItem("organization", $"No organization found for the user");
                 return errors;
             }
 
+            await ProcessListings(listings, errors, templates, organization);
+
+            if (errors.Count == 0)
+            {
+                await SendTakedownRequestEmailsFromListingAsync(listings, templates, errors);
+            }
+
+            return errors;
+        }
+
+        private async Task<OrganizationDto?> GetOrganizationAsync(Dictionary<string, List<string>> errors)
+        {
+            var organization = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
+
+            if (organization == null)
+            {
+                errors.AddItem("organization", "No organization found for the user");
+            }
+
+            return organization;
+        }
+
+        private async Task ProcessListings(TakedownRequestsFromListingDto[] listings, Dictionary<string, List<string>> errors,
+            List<TakedownRequestFromListing> templates, OrganizationDto organization)
+        {
+            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+
             foreach (var listing in listings)
             {
-                var rentalListing = await _listingRepo.GetRentalLisgingForTakedownAction(listing.RentalListingId, false);
+                foreach (var email in listing.CcList)
+                {
+                    if (!Regex.IsMatch(email, emailRegex.Regex))
+                    {
+                        errors.AddItem("ccList", $"Email ({email}) is invalid");
+                    }
+                }
 
-                if (rentalListing == null) continue; //error message
+                var rentalListing = await _listingRepo.GetRentalListingForTakedownAction(listing.RentalListingId, false);
+
+                if (rentalListing == null) continue;
 
                 if (rentalListing.LocalGovernmentId != _currentUser.OrganizationId)
                 {
-                    errors.AddItem("No access", $"The listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo} does not belong to {lg.OrganizationNm}");
+                    errors.AddItem("No access", $"The listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo} does not belong to {organization.OrganizationNm}");
+                    continue;
                 }
 
                 listing.ProvidingPlatformId = rentalListing.ProvidingPlatformId;
 
-                var template = new TakedownRequest(_emailService)
-                {
-                    RentalListingId = listing.RentalListingId,
-                    Url = rentalListing!.PlatformListingUrl ?? "",
-                    OrgCd = rentalListing!.OrganizationCd,
-                    ListingId = rentalListing!.PlatformListingNo,
-                    Info = rentalListing!.PlatformListingUrl ?? "",
-                };
-
+                var template = CreateTakedownRequestTemplateFromListing(listing, rentalListing);
                 templates.Add(template);
-
-                //To
-                template.To = new string[] { _currentUser.EmailAddress };
-
-                //Cc
-                listing.CcList ??= new List<string>();
-                template.Cc = listing.CcList;
             }
+        }
 
-            if (errors.Count > 0)
+        private TakedownRequestFromListing CreateTakedownRequestTemplateFromListing(TakedownRequestsFromListingDto listing, RentalListingForTakedownDto rentalListing)
+        {
+            var template = new TakedownRequestFromListing(_emailService)
             {
-                return errors;
-            }
+                RentalListingId = listing.RentalListingId,
+                Url = rentalListing.PlatformListingUrl ?? "",
+                OrgCd = rentalListing.OrganizationCd,
+                ListingId = rentalListing.PlatformListingNo,
+                Info = $"{rentalListing.OrganizationCd}-{rentalListing.PlatformListingNo}",
+                To = new string[] { _currentUser.EmailAddress },
+                Cc = listing.CcList ?? new List<string>()
+            };
 
+            return template;
+        }
+
+        private async Task SendTakedownRequestEmailsFromListingAsync(TakedownRequestsFromListingDto[] listings, List<TakedownRequestFromListing> templates, Dictionary<string, List<string>> errors)
+        {
             foreach (var template in templates)
             {
                 try
                 {
-                    await SendTakedownRequestEmail(listings, template);
+                    await SendTakedownRequestEmailFromListing(listings, template);
                 }
                 catch (Exception ex)
                 {
@@ -425,14 +486,11 @@ namespace StrDss.Service
                     errors.AddItem($"{template.OrgCd}-{template.ListingId}", "Failed to send email for the listing.");
                 }
             }
-
-            return errors;
         }
 
-        private async Task SendTakedownRequestEmail(BulkTakedownRequestsDto[] listings, TakedownRequest template)
+        private async Task SendTakedownRequestEmailFromListing(TakedownRequestsFromListingDto[] listings, TakedownRequestFromListing template)
         {
             var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
-
 
             var emailEntity = new DssEmailMessage
             {
@@ -464,20 +522,41 @@ namespace StrDss.Service
             _unitOfWork.Commit();
         }
 
-        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto)
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestsFromListingPreviewAsync(TakedownRequestsFromListingDto[] listings)
         {
-            var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
-            var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
+            var errors = new Dictionary<string, List<string>>();
+            var templates = new List<TakedownRequestFromListing>();
 
-            var errors = await ValidateTakedownNoticeAsync(dto, platform, lg);
+            var organization = await GetOrganizationAsync(errors);
+            if (organization == null)
+            {
+                if (errors.Count > 0)
+                {
+                    return (errors, new EmailPreview());
+                }
+            }
+
+            await ProcessListings(listings, errors, templates, organization!);
+
             if (errors.Count > 0)
             {
                 return (errors, new EmailPreview());
             }
 
-            var template = GetTakedownNoticeTemplate(dto, platform, lg, true);
+            var template = templates.FirstOrDefault();
 
-            return (errors, new EmailPreview { Content = template.GetContent().HtmlToPlainText() });
+            if (template == null)
+            {
+                errors.AddItem("template", "Wasn't able to create email templates from the selected listings");
+                return (errors, new EmailPreview());
+            }
+
+            template.Preview = true;
+
+            return (errors, new EmailPreview()
+            {
+                Content = template.GetHtmlPreview()
+            });
         }
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto)

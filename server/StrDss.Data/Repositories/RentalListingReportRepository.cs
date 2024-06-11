@@ -13,14 +13,14 @@ namespace StrDss.Data.Repositories
     {
         Task<DssRentalListingReport?> GetRentalListingReportAsync(long orgId, DateOnly reportPeriodYm);
         Task AddRentalListingReportAsync(DssRentalListingReport report);
-        Task<DssRentalListing?> GetRentalListingAsync(long reportId, long offeringOrgId, string listingId);
+        Task<DssRentalListing?> GetRentalListingAsync(long reportId, long offeringOrgId, string rentalListingId);
         Task AddRentalListingAsync(DssRentalListing listing);
-        Task<DssRentalListing?> GetMasterListingAsync(long offeringOrgId, string listingId);
-        void DeleteListingContacts(long listingId);
+        Task<DssRentalListing?> GetMasterListingAsync(long offeringOrgId, string rentalListingId);
+        void DeleteListingContacts(long rentalListingId);
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
         Task UpdateInactiveListings(long providingPlatformId);
-        Task UpdateListingStatus(long providingPlatformId, long listingId);
+        Task UpdateListingStatus(long providingPlatformId, long rentalListingId);
         Task<int> GetTotalNumberOfUploadLines(long uploadId);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
@@ -77,12 +77,12 @@ namespace StrDss.Data.Repositories
             return listing;
         }
 
-        public void DeleteListingContacts(long listingId)
+        public void DeleteListingContacts(long rentalListingId)
         {
             var stopwatch = Stopwatch.StartNew();
 
             var contactsToDelete = _dbContext.DssRentalListingContacts
-                .Where(c => c.ContactedThroughRentalListingId == listingId);
+                .Where(c => c.ContactedThroughRentalListingId == rentalListingId);
 
             _dbContext.DssRentalListingContacts.RemoveRange(contactsToDelete);
 
@@ -152,7 +152,7 @@ namespace StrDss.Data.Repositories
             _logger.LogDebug($"UpdateInactiveListings = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
         }
 
-        public async Task UpdateListingStatus(long providingPlatformId, long listingId)
+        public async Task UpdateListingStatus(long providingPlatformId, long rentalListingId)
         {
             var reports = await _dbSet.AsNoTracking()
                 .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
@@ -161,7 +161,7 @@ namespace StrDss.Data.Repositories
             var listing = await _dbContext.DssRentalListings
                 .Include(x => x.DerivedFromRentalListing)
                     .ThenInclude(x => x.IncludingRentalListingReport)
-                .FirstAsync(x => x.RentalListingId == listingId);
+                .FirstAsync(x => x.RentalListingId == rentalListingId);
     
             if (reports.Count == 0)
             {

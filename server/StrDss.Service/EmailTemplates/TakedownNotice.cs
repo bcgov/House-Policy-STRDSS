@@ -15,14 +15,12 @@ namespace StrDss.Service.EmailTemplates
         public string? ListingId { get; set; }
         public string Comment { get; set; } = "";
         public string LgName { get; set; } = "";
-        public string OrgCd { get; set; } = ""; //optional field
-        public long RentalListingId { get; set; } //optional field
 
         public override string GetContent()
         {
             Subject = "Notice of non-compliance with short-term rental business licence requirement";
 
-            return (Preview ? GetPreviewContent() : "") + $@"
+            return (Preview ? GetPreviewHeader() : "") + $@"
 Dear Host,<br/><br/>
 Short-term rental accommodations in your community are regulated by your local government. The {LgName} has determined that the following short-term rental listing is not in compliance with an applicable local government business licence requirement:<br/><br/>
 <b>{Url}</b><br/><br/>

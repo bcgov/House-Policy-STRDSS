@@ -281,5 +281,13 @@ namespace StrDss.Common
             }
             return result.ToString();
         }
+        public static IEnumerable<T> Add<T>(this IEnumerable<T> source, T item)
+        {
+            foreach (var element in source)
+            {
+                yield return element;
+            }
+            yield return item;
+        }
     }
 }

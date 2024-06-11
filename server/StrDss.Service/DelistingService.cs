@@ -216,7 +216,7 @@ namespace StrDss.Service
         public async Task<Dictionary<string, List<string>>> CreateTakedownNoticesFromListingAsync(TakedownNoticesFromListingDto[] listings)
         {
             var errors = new Dictionary<string, List<string>>();
-            var regex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
             var templates = new List<TakedownNoticeFromListing>();
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
@@ -225,17 +225,6 @@ namespace StrDss.Service
                 errors.AddItem("organization", $"No organization found for the user");
                 return errors;
             }
-
-            //var lgEmails = lg.ContactPeople
-            //    .Where(x => x.EmailAddressDsc != null)
-            //    .Select(x => x.EmailAddressDsc)
-            //    .ToList();
-
-            //if (lgEmails.Count == 0)
-            //{
-            //    errors.AddItem("organization", $"No organization email found for the organization {lg.OrganizationNm}");
-            //    return errors;
-            //}
 
             foreach (var listing in listings)
             {
@@ -263,6 +252,26 @@ namespace StrDss.Service
 
                 templates.Add(template);
 
+                foreach (var email in listing.CcList)
+                {
+                    if (!Regex.IsMatch(email, emailRegex.Regex))
+                    {
+                        errors.AddItem("ccList", $"Email ({email}) is invalid");
+                    }
+                }
+
+                if (listing.LgContactEmail.IsEmpty())
+                {
+                    errors.AddItem("lgContactEmail", $"Local government contact email is required");
+                }
+                else
+                {
+                    if (!Regex.IsMatch(listing.LgContactEmail, emailRegex.Regex))
+                    {
+                        errors.AddItem("lgContactEmail", $"Local government contact email is invalid");
+                    }
+                }
+
                 //To
                 if (!listing.HostEmailSent)
                 {
@@ -272,12 +281,12 @@ namespace StrDss.Service
                     {
                         if (email == null) continue;
 
-                        if (Regex.IsMatch(email, regex.Regex))
+                        if (Regex.IsMatch(email, emailRegex.Regex))
                         {
                             hostEmails.Add(email);
                         }
                     }
-                    
+
                     if (!hostEmails.Any())
                     {
                         errors.AddItem("hostEmail", $"No valid host email for the listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo}");
@@ -288,6 +297,8 @@ namespace StrDss.Service
                         template.To = hostEmails;
                     }
                 }
+
+                template.To = template.To.Add(listing.LgContactEmail);
 
                 //Bcc
                 listing.CcList ??= new List<string>();
@@ -416,8 +427,18 @@ namespace StrDss.Service
         private async Task ProcessListings(TakedownRequestsFromListingDto[] listings, Dictionary<string, List<string>> errors,
             List<TakedownRequestFromListing> templates, OrganizationDto organization)
         {
+            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+
             foreach (var listing in listings)
             {
+                foreach (var email in listing.CcList)
+                {
+                    if (!Regex.IsMatch(email, emailRegex.Regex))
+                    {
+                        errors.AddItem("ccList", $"Email ({email}) is invalid");
+                    }
+                }
+
                 var rentalListing = await _listingRepo.GetRentalListingForTakedownAction(listing.RentalListingId, false);
 
                 if (rentalListing == null) continue;

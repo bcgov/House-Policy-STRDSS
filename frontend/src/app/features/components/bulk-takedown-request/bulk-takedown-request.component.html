@@ -1,0 +1,159 @@
+<h2>Send Takedown Requests</h2>
+<h4>Complete the following fields to send Takedown Requests to STR Platform representatives.</h4>
+<h4>Takedown Requests for each platform are aggregated into a CSV file and sent to the platform at 11:50pm PST each day.
+    You will receive an email confirmation of your request once the form is submitted. All fields are required except
+    where stated.</h4>
+<form *ngIf="myForm" [formGroup]="myForm">
+
+    <p-panel class="table-panel" header="Included Listings">
+        <p-table [value]="listings" [scrollable]="true" scrollDirection="vertical" scrollHeight="425px"
+            styleClass="p-datatable-sm" [(selection)]="selectedListings">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 4rem">
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    </th>
+                    <th class="sortable-header" id="status_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'offeringOrganizationNm'"
+                        (click)="onSort('offeringOrganizationNm')">
+                        Platform
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'offeringOrganizationNm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'offeringOrganizationNm' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th class="sortable-header" id="status_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'platformListingNo'"
+                        (click)="onSort('platformListingNo')">
+                        Listing ID
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th class="sortable-header" id="status_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"
+                        (click)="onSort('matchAddressTxt')">
+                        Address (Best Match)
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th class="sortable-header" id="status_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'listingContactNamesTxt'"
+                        (click)="onSort('listingContactNamesTxt')">
+                        Supplier host
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'listingContactNamesTxt' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'listingContactNamesTxt' && this.sort.dir === 'asc'"></i>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-listing>
+                <tr class="small-text">
+                    <td>
+                        <p-tableCheckbox [value]="listing"></p-tableCheckbox>
+                    </td>
+                    <td>{{ listing.offeringOrganizationNm }}</td>
+                    <td>
+                        <a target="_blank" [href]="listing.platformListingUrl">{{ listing.platformListingNo }}</a>
+                    </td>
+                    <td [class.warning]="listing.matchScoreAmt<addressWarningScoreLimit">{{ listing.matchAddressTxt }}
+                    </td>
+                    <td>{{ listing.listingContactNamesTxt }}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-panel>
+
+    <p-panel class="bcc-panel" header="Add BCCs (Optional)">
+        <div class="form-group-row">
+            <div class="form-group-row-col">
+                <span class="info-tooltip" pTooltip="Enter additional email addresses separated by commas."
+                    tooltipPosition="top" placeholder="Top"></span>
+                <label for="ccList">Add any additional recipients to receive a confirmation of the request
+                    (optional)</label>
+            </div>
+            <div class="form-group-row-col">
+                <textarea formControlName="ccList" placeholder="Enter email address" rows="1" cols="20" pInputTextarea
+                    id="ccList" name="ccList" class="wide"></textarea>
+            </div>
+            <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine && ccListControl.errors">
+                <small id="invalidCcList" *ngIf="ccListControl.errors?.['invalidEmailList']">Please make sure the email
+                    format you have entered is correct</small>
+            </div>
+        </div>
+    </p-panel>
+    <p-panel class="details-panel" header="Add Details to Your Requests">
+        <div class="form-group-row">
+            <div class="form-group-row-col has-checkbox">
+                <p-checkbox formControlName="isWithStandardDetail" [binary]="true" id="isWithStandardDetail"
+                    name="isWithStandardDetail" inputId="isWithStandardDetailInput"
+                    (onChange)="onWithStandardDetailChanged($event)"></p-checkbox>
+                <label for="isWithStandardDetail">Remove the listing from platform, do not allow transactions for
+                    payments
+                    associated with the listing, and cancel all bookings associated with the listing.</label>
+            </div>
+        </div>
+
+        <div class="form-group-row">
+            <div class="form-group-row-col">
+                <label for="customDetailTxt">Provide details of the request</label>
+            </div>
+            <div class="form-group-row-col">
+                <textarea #textarea rows="5" cols="30" maxlength="2000" class="wide custom-details"
+                    formControlName="customDetailTxt"
+                    placeholder="{{isWithStandardDetailControl.value?'Optional':'Required'}}" pInputTextarea
+                    id="customDetailTxt" name="customDetailTxt"></textarea>
+                <span class="limit-text" [class.almost-limit-text]="textarea.value.length > 1950"
+                    [class.limited-text]="textarea.value.length > 1999">{{textarea.value.length}}/2000</span>
+            </div>
+            <div class="form-group-row-col validation-errors"
+                *ngIf="!customDetailTxtControl.pristine && customDetailTxtControl.errors">
+                <small id="customDetailTxtError" *ngIf="customDetailTxtControl.errors?.['required']">Details of the
+                    request
+                    are required</small>
+            </div>
+        </div>
+    </p-panel>
+
+</form>
+<div class="actions" *ngIf="selectedListings">
+    <button pButton id="submit-btn" [disabled]="!selectedListings.length || !myForm.valid" class=""
+        (click)="submit()">Review</button>
+    <button pButton id="cancel-btn" class="outline-btn" (click)="cancel()">Cancel</button>
+</div>
+<p-dialog class="preview-dialog" header="Send Takedown Request" [(visible)]="showPreviewDialog" [modal]="true"
+    [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+
+    <div class="note">
+        <div class="title">
+            <i class="pi pi-info-circle"></i>
+            <strong>Please Note</strong>
+        </div>
+        <div class="content">
+            When you click submit, this email will be personalized and sent to the platform representatives and all
+            hosts for each listing (unless you have indicated a notice to the host has been sent through an alternative
+            delivery method).
+        </div>
+    </div>
+
+    <div class="preview-html" [innerHTML]="previewText"></div>
+    <ng-template pTemplate="footer">
+        <div class="actions popup-actions">
+            <button pButton id="submit-preview-btn" class="" (click)="submitAfterPreview()">Submit</button>
+            <button pButton id="cancel-preview-btn" class="outline-btn" (click)="cancelPreview()">Cancel</button>
+        </div>
+    </ng-template>
+</p-dialog>

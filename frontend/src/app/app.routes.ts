@@ -17,6 +17,7 @@ import { UploadListingsComponent } from './features/components/upload-listings/u
 import { ListingUploadHistoryComponent } from './features/components/listing-upload-history/listing-upload-history.component';
 import { ListingsTableComponent } from './features/components/listings-table/listings-table.component';
 import { ListingDetailsComponent } from './features/components/listings-table/listing-details/listing-details.component';
+import { BulkTakedownRequestComponent } from './features/components/bulk-takedown-request/bulk-takedown-request.component';
 
 export const routes: Routes = [
     {
@@ -51,6 +52,12 @@ export const routes: Routes = [
         path: 'delisting-request',
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: DelistingRequestComponent,
+        data: { permissions: [takedown_action] }
+    },
+    {
+        path: 'bulk-takedown-request',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: BulkTakedownRequestComponent,
         data: { permissions: [takedown_action] }
     },
     {

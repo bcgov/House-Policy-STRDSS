@@ -16,20 +16,32 @@
     </div>
 </div>
 <div class="actions" *ngIf="!isCEU">
-    <button pButton [disabled]="!selectedListings.length || isNotImplemented" id="send_delisting_notice_btn">Send
-        Delisting Notice</button>
-    <button pButton [disabled]="!selectedListings.length || isNotImplemented" id="send_takedown_request_btn">Send
-        Takedown Request</button>
+    <button pButton [disabled]="!selectedListings.length || isNotImplemented" id="send_delisting_notice_btn"
+        (click)="onNoticeOpen()">
+        Send Notice of Non-Compliance
+    </button>
+    <button pButton [disabled]="!selectedListings.length" id="send_takedown_request_btn" (click)="onTakedownOpen()">
+        Send Takedown Request
+    </button>
 </div>
 <div class="content">
 
     <p-panel class="listing-table-panel">
         <ng-template pTemplate="header">
-            <span class="panel-header-small" *ngIf="currentPage">Showing {{currentPage.pageSize || 25}} of
-                {{currentPage.totalCount || 0}} listings</span></ng-template>
+            <div class="rows-info-wrapper">
+                <span class="panel-header-small"
+                    [style.visibility]="selectedListings.length ? 'visible' : 'hidden'">Selected
+                    {{selectedListings.length}} items. <button pButton class="p-button-link zero-padding small-text"
+                        (click)="unselectAll()">Unselect All</button>
+                </span>
+                <span class="panel-header-small" *ngIf="currentPage">Showing {{currentPage.pageSize || 25}} of
+                    {{currentPage.totalCount || 0}} listings</span>
+            </div>
+        </ng-template>
 
-        <p-table [value]="listings" [scrollable]="true" scrollHeight="{{isCEU?'500px':'450px'}}"
-            [(selection)]="selectedListings" styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }">
+        <p-table #table [value]="listings" [scrollable]="true" scrollHeight="{{isCEU?'550px':'500px'}}"
+            [(selection)]="selectedListings" styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }"
+            [selectionPageOnly]="true">
 
             <ng-template pTemplate="header">
                 <tr>
@@ -64,7 +76,7 @@
                             *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'asc'"></i>
                     </th>
 
-                    <th>Listing Details</th>
+                    <th style="text-align: center;">Listing Details</th>
 
                     <th class="sortable-header" id="addressNormalized_header"
                         [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"

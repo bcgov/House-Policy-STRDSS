@@ -86,12 +86,10 @@ body {
             }
         }
 
-        &.details-block {
-            .p-panel-header {
-                .p-panel-title {
-                    font-family: 'BcSans-bold';
-                    font-size: large;
-                }
+        .p-panel-header {
+            .p-panel-title {
+                font-family: 'BcSans-bold';
+                font-size: large;
             }
         }
     }
@@ -167,6 +165,10 @@ body {
 
             &.zero-padding {
                 padding: 0;
+            }
+
+            &.small-text {
+                font-size: small;
             }
 
             &:disabled {
@@ -341,7 +343,22 @@ body {
         max-width: 40rem;
     }
 
-    strong {
+    strong,
+    b {
         font-family: 'BcSans-bold';
+    }
+
+    .preview-dialog {
+        .p-dialog-header {
+            border-bottom: 1px solid #D8D8D8;
+
+            .p-dialog-title {
+                font-family: 'BcSans-bold';
+            }
+        }
+
+        .p-dialog-footer {
+            border-top: 1px solid #D8D8D8;
+        }
     }
 }

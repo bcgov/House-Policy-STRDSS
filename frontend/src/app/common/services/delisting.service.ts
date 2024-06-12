@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { DropdownOption } from '../models/dropdown-option';
 import { ComplianceNotice } from '../models/compliance-notice';
-import { DelistingRequest } from '../models/delisting-request';
+import { DelistingRequest, DelistingRequestBulk } from '../models/delisting-request';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +36,14 @@ export class DelistingService {
 
   delistingRequestPreview(delistingRequest: DelistingRequest): Observable<{ content: string }> {
     return this.httpClient.post<{ content: string }>(`${environment.API_HOST}/delisting/requests/preview`, delistingRequest)
+  }
+
+  delistingRequestBulkPreview(delistingRequests: Array<DelistingRequestBulk>): Observable<{ content: string }> {
+    return this.httpClient.post<{ content: string }>(`${environment.API_HOST}/delisting/bulkrequests/preview`, delistingRequests)
+  }
+
+  delistingRequestBulk(delistingRequests: Array<DelistingRequestBulk>): Observable<void> {
+    return this.httpClient.post<void>(`${environment.API_HOST}/delisting/bulkrequests`, delistingRequests)
   }
 
   createDelistingRequest(delistingRequest: DelistingRequest): Observable<any> {

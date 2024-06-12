@@ -4,8 +4,9 @@
     padding: 0 24px 24px 24px;
     background-color: #FFFFFF;
 
-    .takedown-notice-wrapper {
+    .takedown-and-notice-wrapper {
         position: absolute;
+        overflow: auto;
         top: 118px;
         left: 184px;
         background-color: #FFFFFF;
@@ -15,7 +16,6 @@
 
         padding: 24px;
         padding-top: 0;
-        overflow: hidden;
 
         .header {
             height: 60px;
@@ -95,9 +95,18 @@
 
     .content {
         p-panel {
-            .panel-header-small {
-                font-size: small;
+            .rows-info-wrapper {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
 
+                .panel-header-small {
+                    font-size: small;
+
+                    &:not(:last-child) {
+                        margin-right: 24px;
+                    }
+                }
             }
         }
 

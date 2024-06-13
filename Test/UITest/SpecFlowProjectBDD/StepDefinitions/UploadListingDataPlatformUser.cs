@@ -7,6 +7,7 @@ using TechTalk.SpecFlow;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
+using TestFrameWork.WindowsAutomation.Controls;
 using static SpecFlowProjectBDD.SFEnums;
 
 namespace SpecFlowProjectBDD.StepDefinitions
@@ -16,13 +17,13 @@ namespace SpecFlowProjectBDD.StepDefinitions
     {
         private IDriver _Driver;
         private LandingPage _LandingPage;
-        private DelistingWarningPage _DelistingWarningPage;
         private TermsAndConditionsPage _TermsAndConditionsPage;
         private PathFinderPage _PathFinderPage;
         private IDirLoginPage _IDRLoginPage;
-        private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
+        private UploadListingsPage _UploadListingsPage;
         private string _TestUserName;
         private string _TestPassword;
+        private string _listingFile;
         private bool _ExpectedResult = false;
         private AppSettings _AppSettings;
         private SFEnums.UserTypeEnum _UserType;
@@ -33,12 +34,11 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
-            _DelistingWarningPage = new DelistingWarningPage(_Driver);
             _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
-            _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDRLoginPage = new IDirLoginPage(_Driver);
             _BCIDPage = new BCIDPage(_Driver);
+            _UploadListingsPage = new UploadListingsPage(_Driver);
             _AppSettings = new AppSettings();
         }
 
@@ -49,6 +49,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _TestUserName = UserName;
             _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
+
+            _listingFile = _AppSettings.GetListingFile("File1");
 
             _Driver.Url = _AppSettings.GetServer("default");
             _Driver.Navigate();
@@ -102,7 +104,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"the upload data interface should load")]
         public void ThenTheUploadDataInterfaceShouldLoad()
         {
-            //throw new PendingStepException();
+            _LandingPage.Upload_ListingsButton.Click();
         }
 
 
@@ -115,13 +117,16 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When(@"I select a CSV file containing short-term listing data")]
         public void WhenISelectACSVFileContainingShort_TermListingData()
         {
-            //throw new PendingStepException();
+            _UploadListingsPage.SelectFileButton.Click();
+            FileDialog fileDialog = new FileDialog();
+            fileDialog.FindAndSet("C:\\Users\\RAnderson\\Source\\Repos\\House-Policy-STRDSS\\Test\\UITest\\TestData\\listing files\\listing-valid-2024-04.csv", "Open", "007C2B0C");
+
         }
 
         [When(@"I select which month the STR listing data is for")]
         public void WhenISelectWhichMonthTheSTRListingDataIsFor()
         {
-            //throw new PendingStepException();
+            _UploadListingsPage.ReportingMonthDropDown.Click();
         }
 
         [When(@"I initiate the upload")]

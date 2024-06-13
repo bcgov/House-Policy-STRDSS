@@ -30,6 +30,7 @@
     <ProjectReference Include="..\Configuration\Configuration.csproj" />
     <ProjectReference Include="..\DataBase\DataBase.csproj" />
     <ProjectReference Include="..\TestFrameWork\TestFrameWork.csproj" />
+    <ProjectReference Include="..\WinFormsLibrary1\WindowsAutomation.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,9 +39,6 @@
       <DependentUpon>DenyAccessToSystem.feature</DependentUpon>
       <DesignTime>true</DesignTime>
       <AutoGen>true</AutoGen>
-    </Compile>
-    <Compile Update="Features\UploadListingDataPlatformUser.feature.cs">
-      <DependentUpon>UploadListingDataPlatformUser.feature</DependentUpon>
     </Compile>
   </ItemGroup>
 

@@ -73,9 +73,9 @@ Scenario: UploadListingDataPlatformUser
 
 
 Examples:
-	| UserName        | UserType       | Environment | ExpectedResult |
-	| STRDSSVrboDev   | platform_staff | dev         | pass           |
-	#| STRDSSAirbnbDev | platform_staff | test        | pass           |
+	| UserName      | UserType       | Environment | ExpectedResult |
+	| STRDSSVrboDev | platform_staff | dev         | pass           |
+	#| STRDSSAirbnbDev | platform_staff | dev       | pass           |
 
 
 

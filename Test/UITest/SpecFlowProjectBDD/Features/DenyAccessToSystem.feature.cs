@@ -76,11 +76,13 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("DenyAccessToSystem")]
         [NUnit.Framework.CategoryAttribute("Access")]
+        [NUnit.Framework.CategoryAttribute("Headless")]
         [NUnit.Framework.TestCaseAttribute("CEUATST", "ceuatst@gov.bc.ca", "ceu_admin", "HappyPath", "pass", null)]
         public void DenyAccessToSystem(string userName, string email, string roleName, string description, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {
-                    "Access"};
+                    "Access",
+                    "Headless"};
             if ((exampleTags != null))
             {
                 @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));

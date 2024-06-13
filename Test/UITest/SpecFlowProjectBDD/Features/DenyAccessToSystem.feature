@@ -1,7 +1,7 @@
 ﻿Feature: DenyAccessToSystem
 Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-75
 
-@Access
+@Access @Headless
 Scenario: DenyAccessToSystem
 #User Authentication
 

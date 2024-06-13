@@ -10,6 +10,7 @@ namespace Configuration
         private IConfigurationSection _UsersSection;
         private  IConfigurationSection _ServersSection;
         private IConfiguration _ConnectionStringSection;
+        private IConfiguration _ListingFilesSection;
 
         public AppSettings()
         {
@@ -18,6 +19,7 @@ namespace Configuration
             _UsersSection = _Configuration.GetSection("Users");
             _ServersSection = _Configuration.GetSection("Servers");
             _ConnectionStringSection = _Configuration.GetSection("ConnectionStrings");
+            _ListingFilesSection = _Configuration.GetSection("ListingFiles");
         }
 
         public string GetUser(string Key)
@@ -32,6 +34,11 @@ namespace Configuration
         public string GetConnectionString(string key)
         {
             return (_ConnectionStringSection[key]);
+        }
+
+        public string GetListingFile(string key)
+        {
+            return (_ListingFilesSection[key]);
         }
     }
 }

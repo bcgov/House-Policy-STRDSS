@@ -64,7 +64,12 @@ export class BulkTakedownRequestComponent implements OnInit {
     return this.myForm.controls['customDetailTxt'];
   }
 
-  constructor(private fb: FormBuilder, private messageHandlerService: ErrorHandlingService, private delistingService: DelistingService, private router: Router, private route: ActivatedRoute, private searchService: SelectedListingsStateService) { }
+  constructor(private fb: FormBuilder,
+    private messageHandlerService: ErrorHandlingService,
+    private delistingService: DelistingService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private searchService: SelectedListingsStateService) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(

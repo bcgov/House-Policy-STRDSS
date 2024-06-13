@@ -76,7 +76,7 @@ jobs:
             *.jar
             *.cs
        #Docker new 
-  build-backend:
+   build-backend:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
 
@@ -125,86 +125,86 @@ jobs:
           run: cd server && docker build -t strdss-backend -f Dockerfile .
 
         - name: Tag Docker image
-          run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/server:2
+          run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
 
         - name: Push Docker image to Artifactory
           run: |
             docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-            docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-server:2
-      # Docker old from stan 
+            docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
+      # Docker 
       # - name: Set up QEMU
-      #   uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v1
 
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-      # - name: Login to Artifactory
-      #   uses: docker/login-action@v1
-      #   with:
-      #     registry: artifacts.developer.gov.bc.ca
-      #     username: ${{ secrets.JFROG_USERNAME }}
-      #     password: ${{ secrets.JFROG_PASSWORD }}
+      - name: Login to Artifactory
+        uses: docker/login-action@v1
+        with:
+          registry: artifacts.developer.gov.bc.ca
+          username: ${{ secrets.JFROG_USERNAME }}
+          password: ${{ secrets.JFROG_PASSWORD }}
 
-      # - name: Extract metadata for Docker
-      #   id: meta
-      #   uses: docker/metadata-action@v3
-      #   if: github.ref == 'refs/heads/emerald' || startsWith(github.ref, 'refs/tags/')
-      #   with:
-      #     images: |
-      #       artifacts.developer.gov.bc.ca/sf4a-strdss/server
-      #     tags: |
-      #       type=sha,format=short,prefix=dev-
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v3
+        if: github.ref == 'refs/heads/emerald' || startsWith(github.ref, 'refs/tags/')
+        with:
+          images: |
+            artifacts.developer.gov.bc.ca/sf4a-strdss/server
+          tags: |
+            type=sha,format=short,prefix=dev-
             
-      # - name: Extract metadata for Docker
-      #   id: meta-test
-      #   uses: docker/metadata-action@v3
-      #   if: github.ref == 'refs/heads/test' || startsWith(github.ref, 'refs/tags/')
-      #   with:
-      #     images: |
-      #       artifacts.developer.gov.bc.ca/sf4a-strdss/server
-      #     tags: |
-      #       type=sha,format=short,prefix=test-
+      - name: Extract metadata for Docker
+        id: meta-test
+        uses: docker/metadata-action@v3
+        if: github.ref == 'refs/heads/test' || startsWith(github.ref, 'refs/tags/')
+        with:
+          images: |
+            artifacts.developer.gov.bc.ca/sf4a-strdss/server
+          tags: |
+            type=sha,format=short,prefix=test-
 
-      # - name: Extract metadata for Docker
-      #   id: meta-prod
-      #   uses: docker/metadata-action@v3
-      #   if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
-      #   with:
-      #     images: |
-      #       artifacts.developer.gov.bc.ca/sf4a-strdss/server
-      #     tags: |
-      #       type=sha,format=short,prefix=prod-
+      - name: Extract metadata for Docker
+        id: meta-prod
+        uses: docker/metadata-action@v3
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+        with:
+          images: |
+            artifacts.developer.gov.bc.ca/sf4a-strdss/server
+          tags: |
+            type=sha,format=short,prefix=prod-
             
-      # - name: Build and Push to registries
-      #   id: publish
+      - name: Build and Push to registries
+        id: publish
+        uses: docker/build-push-action@v2
+        if: steps.meta.outcome == 'success' || steps.meta-prod.outcome == 'success' || steps.meta-test.outcome == 'success'
+        with:
+          push: true
+          context: ./server
+          tags: ${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }}
+          labels: ${{ steps.meta.outputs.labels || steps.meta-test.outputs.labels || steps.meta-prod.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+
+      # - name: Build CI
+      #   id: ci
       #   uses: docker/build-push-action@v2
-      #   if: steps.meta.outcome == 'success' || steps.meta-prod.outcome == 'success' || steps.meta-test.outcome == 'success'
+      #   if: github.ref != 'refs/heads/test' || github.ref != 'refs/heads/emerald' || github.ref != 'refs/heads/main'
       #   with:
-      #     push: true
+      #     push: false
       #     context: ./server
       #     tags: ${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }}
       #     labels: ${{ steps.meta.outputs.labels || steps.meta-test.outputs.labels || steps.meta-prod.outputs.labels }}
-      #     #platforms: linux/amd64,linux/arm64
 
-      # # - name: Build CI
-      # #   id: ci
-      # #   uses: docker/build-push-action@v2
-      # #   if: github.ref != 'refs/heads/test' || github.ref != 'refs/heads/emerald' || github.ref != 'refs/heads/main'
-      # #   with:
-      # #     push: false
-      # #     context: ./server
-      # #     tags: ${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }}
-      # #     labels: ${{ steps.meta.outputs.labels || steps.meta-test.outputs.labels || steps.meta-prod.outputs.labels }}
-
-      # - name: Checkout ArgoCD Repo
-      #   id: gitops
-      #   if: steps.publish.outcome == 'success'
-      #   uses: actions/checkout@v4
-      #   with:
-      #     repository: bcgov-c/tenant-gitops-b0471a
-      #     ref: develop
-      #     token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
-      #     path: gitops
+      - name: Checkout ArgoCD Repo
+        id: gitops
+        if: steps.publish.outcome == 'success'
+        uses: actions/checkout@v4
+        with:
+          repository: bcgov-c/tenant-gitops-b0471a
+          ref: develop
+          token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+          path: gitops
 
       - name: Update Helm Values and Commit
         id: helm

@@ -56,7 +56,49 @@ jobs:
     #       SONAR_HOST_URL: https://sonarcloud.io
     #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
  
- 
+  build-frontend:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Angular CLI
+        run: |
+          cd ./frontend
+          npm install -g @angular/cli
+
+      - name: Install project dependencies
+        run: |
+          cd ./frontend
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd ./frontend
+          ng build --configuration=production
+
+      - name: Run frontend tests
+        run: |
+          cd ./frontend
+          ng test --watch=false --progress=false --browsers=ChromeHeadless --code-coverage --source-map=false
+        continue-on-error: true
+
+    #  # SonarQube integration frontend
+    #   - name: SonarQube Scan
+    #     uses: sonarsource/sonarcloud-github-action@v2
+    #     env:
+    #       SONAR_HOST_URL: https://sonarcloud.io
+    #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
  
   docker-build-backend:
     needs: [build-backend]
@@ -126,3 +168,31 @@ jobs:
       #           cat response.txt    
       #       fi
       #   working-directory: ${{env.working-directory}}
+  docker-build-frontend:
+    needs: [build-frontend]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
+
+    - name: Render style_nonce
+      id: render_style_nonce
+      run: echo "::set-output name=style_nonce::$(echo -n ${{ github.sha }} | base64)"
+
+    - name: Build Docker image
+      run: cd frontend && docker build -t strdss-frontend -f Dockerfile .
+
+    - name: Tag Docker image
+      run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
+
+    - name: Push Docker image to Artifactory
+      run: |
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest

@@ -406,6 +406,7 @@ jobs:
           helm package ../../database/
                     
           git add .
+          ls -s
 
           git commit -m "Update image tag to $IMAGE_TAG on $DATETIME"
           git push origin develop  # Update the branch name as needed 

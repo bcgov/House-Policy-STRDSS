@@ -125,9 +125,6 @@ jobs:
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.0
  
- 
-  
-
 
  # Update API Specification in the service registry - RBA skip for initial implmentation
       # - name: Publish API Specification
@@ -169,6 +166,7 @@ jobs:
       #       fi
       #   working-directory: ${{env.working-directory}}
   docker-build-frontend:
+
     needs: [build-frontend]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -196,3 +194,77 @@ jobs:
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
+
+    
+  package-h-charts:
+    needs: [docker-build-frontend, docker-build-backend]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    
+    steps:
+    - name: Checkout ArgoCD Repo
+      id: gitops
+      if: steps.publish.outcome == 'success'
+      uses: actions/checkout@v4
+      with:
+        repository: bcgov-c/tenant-gitops-b0471a
+        ref: develop
+        token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+        path: gitops
+    - name: Update Helm Values and Commit
+      id: helm
+      if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
+      run: |
+          pwd
+          ls -ARl gitops/
+          # Navigate to the directory containing your Helm values file for the environment develop -> DEV, test -> test and 
+          #cd gitops
+          cd gitops/charts/webapi-core
+
+          IMAGE="${{ steps.meta.outputs.tags || steps.meta-test.outputs.tags || steps.meta-prod.outputs.tags  }} "
+          IMAGE_TAG=$(echo "$IMAGE" | awk -F':' '{print $NF}')
+          echo "Image Tag:"
+          echo $IMAGE_TAG
+
+          # Update the Helm values file with the new image tag or (SHA)
+          DATETIME=$(date +'%Y-%m-%d %H:%M:%S')  # Get current date and time
+          # check if branch is dev update dev_values with sed if branch is test update test value if branch is main update prod values 
+          
+
+          if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+             echo "This is the main branch"
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/prod_values.yaml
+          elif [[ "$GITHUB_REF" == "refs/heads/emerald" ]]; then
+             echo "This is the emerald branch"
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/dev_values.yaml
+          elif [[ "$GITHUB_REF" == "refs/heads/test" ]]; then
+             echo "This is the test branch"
+             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/test_values.yaml
+          else
+            echo updating dev values for CIs
+            sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/dev_values.yaml
+          fi
+         
+
+
+          # Commit and push the changes
+          git config --global user.email "richand101@github.com"
+          git config --global user.name "Rick Anderson"
+
+          git add ../../deploy/dev_values.yaml
+          git add ../../deploy/prod_values.yaml
+          git add ../../deploy/test_values.yaml
+
+          pwd
+          # Repackage Helm Chart
+          cd ../gitops/charts         
+
+          helm package ../../database/
+          helm package ../../react-baseapp/
+          helm package ../../webapi-core/
+
+          git add .
+
+          git commit -m "Update image tag to $IMAGE_TAG on $DATETIME"
+          git push origin develop  # Update the branch name as needed
+   

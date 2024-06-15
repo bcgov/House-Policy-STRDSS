@@ -118,12 +118,12 @@ jobs:
       run: cd server && docker build -t strdss-backend -f Dockerfile .
  
     - name: Tag Docker image
-      run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.1
+      run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.2
  
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.1
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.2
  
 
  # Update API Specification in the service registry - RBA skip for initial implmentation
@@ -188,12 +188,12 @@ jobs:
       run: cd frontend && docker build -t strdss-frontend -f Dockerfile .
 
     - name: Tag Docker image
-      run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.1
+      run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/frontend:2.2
 
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.1
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/frontend:2.2
 
     
   package-h-chart-webapi-core:

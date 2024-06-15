@@ -204,7 +204,7 @@ jobs:
     steps:
     - name: Checkout ArgoCD Repo
       id: gitops
-      if: steps.publish.outcome == 'success'
+     # if: steps.publish.outcome == 'success'
       uses: actions/checkout@v4
       with:
         repository: bcgov-c/tenant-gitops-b0471a
@@ -213,7 +213,7 @@ jobs:
         path: gitops
     - name: Update Helm Values and Commit Webapi-core
       id: helm
-      if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
+    #  if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
       run: |
           pwd
           ls -ARl gitops/
@@ -276,7 +276,7 @@ jobs:
     steps:
     - name: Checkout ArgoCD Repo
       id: gitops
-      if: steps.publish.outcome == 'success'
+     # if: steps.publish.outcome == 'success'
       uses: actions/checkout@v4
       with:
         repository: bcgov-c/tenant-gitops-b0471a
@@ -285,7 +285,7 @@ jobs:
         path: gitops
     - name: Update Helm Values and Commit Webapi-core
       id: helm
-      if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
+     # if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
       run: |
           pwd
           ls -ARl gitops/
@@ -348,7 +348,7 @@ jobs:
     steps:
     - name: Checkout ArgoCD Repo
       id: gitops
-      if: steps.publish.outcome == 'success'
+     # if: steps.publish.outcome == 'success'
       uses: actions/checkout@v4
       with:
         repository: bcgov-c/tenant-gitops-b0471a
@@ -357,7 +357,7 @@ jobs:
         path: gitops
     - name: Update Helm Values and Commit database
       id: helm
-      if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
+     # if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
       run: |
           pwd
           ls -ARl gitops/

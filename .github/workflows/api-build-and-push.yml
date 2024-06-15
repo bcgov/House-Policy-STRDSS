@@ -118,12 +118,12 @@ jobs:
       run: cd server && docker build -t strdss-backend -f Dockerfile .
  
     - name: Tag Docker image
-      run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.0
+      run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.1
  
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.0
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.1
  
 
  # Update API Specification in the service registry - RBA skip for initial implmentation
@@ -188,12 +188,12 @@ jobs:
       run: cd frontend && docker build -t strdss-frontend -f Dockerfile .
 
     - name: Tag Docker image
-      run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
+      run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.1
 
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/server:2.1
 
     
   package-h-chart-webapi-core:
@@ -252,8 +252,8 @@ jobs:
           git config --global user.name "Rick Anderson"
 
           git add ../../deploy/dev_values.yaml
-          git add ../../deploy/prod_values.yaml
-          git add ../../deploy/test_values.yaml
+        #  git add ../../deploy/prod_values.yaml
+        #  git add ../../deploy/test_values.yaml
 
           pwd
           # Repackage Helm Chart
@@ -324,8 +324,8 @@ jobs:
           git config --global user.name "Rick Anderson"
 
           git add ../../deploy/dev_values.yaml
-          git add ../../deploy/prod_values.yaml
-          git add ../../deploy/test_values.yaml
+         # git add ../../deploy/prod_values.yaml
+         # git add ../../deploy/test_values.yaml
 
           pwd
           # Repackage Helm Chart
@@ -355,7 +355,7 @@ jobs:
         ref: develop
         token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
         path: gitops
-    - name: Update Helm Values and Commit Webapi-core
+    - name: Update Helm Values and Commit database
       id: helm
       if: steps.gitops.outcome == 'success' # Only run if the previous step (publish) was successful
       run: |
@@ -396,8 +396,8 @@ jobs:
           git config --global user.name "Rick Anderson"
 
           git add ../../deploy/dev_values.yaml
-          git add ../../deploy/prod_values.yaml
-          git add ../../deploy/test_values.yaml
+         # git add ../../deploy/prod_values.yaml
+         # git add ../../deploy/test_values.yaml
 
           pwd
           # Repackage Helm Chart

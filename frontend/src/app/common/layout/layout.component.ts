@@ -35,6 +35,12 @@ export class LayoutComponent {
       }
     });
 
+    this.errorHandlingService.successSubject.subscribe({
+      next: (message: string) => {
+        this.showSuccess(message);
+      }
+    });
+
     this.items = [
       {
         label: 'Forms',
@@ -107,6 +113,10 @@ export class LayoutComponent {
     if (!!error.traceId) {
       console.info('TraceID:', error.traceId);
     }
+  }
+
+  showSuccess(message: string): void {
+    this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
   }
 
   logout(): void {

@@ -2,7 +2,8 @@
     <div class="title">
         <h2>Detailed Listing Information for</h2>
 
-        <a class="listing-url-lnk" [href]="listing.platformListingUrl">{{listing.platformListingNo}}</a>&nbsp; <i
+        <a target="_blank" class="listing-url-lnk"
+            [href]="listing.platformListingUrl">{{listing.platformListingNo}}</a>&nbsp; <i
             class="pi pi-external-link"></i>
     </div>
     <div class="legend-container">
@@ -118,7 +119,7 @@
                     Non-Compliance </button>
             </div>
             <div class="row">
-                <button disabled pButton (click)="sendTakedownRequest()" class="p-button-link"> Send Takedown
+                <button pButton (click)="sendTakedownRequest()" class="p-button-link"> Send Takedown
                     Request</button>
             </div>
         </p-panel>

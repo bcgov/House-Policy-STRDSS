@@ -25,6 +25,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream);
         Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, Stream stream);
         Task<Dictionary<string, List<string>>> CreateTakedownNoticesFromListingAsync(TakedownNoticesFromListingDto[] listings);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticesFromListingPreviewAsync(TakedownNoticesFromListingDto[] listings);
         Task<Dictionary<string, List<string>>> CreateTakedownRequestsFromListingAsync(TakedownRequestsFromListingDto[] listings);
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestsFromListingPreviewAsync(TakedownRequestsFromListingDto[] listings);
     }
@@ -383,6 +384,57 @@ namespace StrDss.Service
             emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
+        }
+
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticesFromListingPreviewAsync(TakedownNoticesFromListingDto[] listings)
+        {
+            var errors = new Dictionary<string, List<string>>();
+            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+            var templates = new List<TakedownNoticeFromListing>();
+            var organization = await GetOrganizationAsync(errors);
+
+            if (organization == null)
+            {
+                return (errors, new EmailPreview());
+            }
+
+            foreach (var listing in listings)
+            {
+                var rentalListing = await _listingRepo.GetRentalListingForTakedownAction(listing.RentalListingId, true);
+
+                if (rentalListing == null) continue;
+
+                ValidateRentalListingAccess(rentalListing, organization, errors);
+
+                var template = CreateTakedownNoticeTemplate(listing, rentalListing);
+                templates.Add(template);
+
+                ValidateCcListEmails(listing.CcList, emailRegex, errors);
+                ValidateLocalGovernmentContactEmail(listing, emailRegex, errors);
+                ValidateAndSetHostEmails(listing, rentalListing, emailRegex, template, errors);
+
+                SetTemplateEmailFields(listing, rentalListing, template);
+            }
+
+            if (errors.Count > 0)
+            {
+                return (errors, new EmailPreview());
+            }
+
+            var template1 = templates.FirstOrDefault();
+
+            if (template1 == null)
+            {
+                errors.AddItem("template", "Wasn't able to create email templates from the selected listings");
+                return (errors, new EmailPreview());
+            }
+
+            template1.Preview = true;
+
+            return (errors, new EmailPreview()
+            {
+                Content = template1.GetHtmlPreview()
+            });
         }
 
 

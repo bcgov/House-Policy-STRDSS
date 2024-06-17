@@ -67,6 +67,19 @@ namespace StrDss.Api.Controllers
             return NoContent();
         }
 
+        [ApiAuthorize(Permissions.TakedownAction)]
+        [HttpPost("bulkwarnings/preview", Name = "GetTakedownNoticesFromListingPreview")]
+        public async Task<ActionResult> GetTakedownNoticesFromListingPreview(TakedownNoticesFromListingDto[] requests)
+        {
+            var (errors, preview) = await _delistingService.GetTakedownNoticesFromListingPreviewAsync(requests);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok(preview);
+        }
 
         [ApiAuthorize(Permissions.TakedownAction)]
         [HttpPost("requests", Name = "CreateTakedownRequest")]

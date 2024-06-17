@@ -511,6 +511,7 @@ namespace StrDss.Service
                 RequestingOrganizationId = _currentUser.OrganizationId,
                 IsWithStandardDetail = listing.IsWithStandardDetail,
                 CustomDetailTxt = listing.CustomDetailTxt,
+                ConcernedWithRentalListingId = template.RentalListingId,
             };
 
             await _emailRepo.AddEmailMessage(emailEntity);

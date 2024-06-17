@@ -12,5 +12,6 @@ namespace TestFrameWork.Models
         public static string ReportingMonthDropDownList { get => "#month > div > chevrondownicon > svg"; }
 
         public static string SelectFileButton { get => "fileSelect-btn"; }
+        public static string UploadButton { get => "upload-btn"; }
     }
 }

@@ -10,10 +10,12 @@ namespace UITest.PageObjects
     {
         private DropDownList _ReportingMonthDropDown;
         private Button _SelectFileButton;
+        private Button _UploadButton;
         private IDriver _Driver;
 
         public DropDownList ReportingMonthDropDown { get => _ReportingMonthDropDown; }
         public Button SelectFileButton { get => _SelectFileButton;  }
+        public Button UploadButton { get => _UploadButton; }
         public IDriver Driver { get => _Driver; }
 
         public UploadListingsPage(IDriver Driver)
@@ -21,6 +23,7 @@ namespace UITest.PageObjects
             _Driver = Driver;
             _ReportingMonthDropDown = new DropDownList(Driver, Enums.FINDBY.CSSSELECTOR, UploadListingsModel.ReportingMonthDropDownList);
             _SelectFileButton = new Button(Driver, Enums.FINDBY.ID, UploadListingsModel.SelectFileButton);
+            _UploadButton = new Button(Driver, Enums.FINDBY.ID, UploadListingsModel.UploadButton);
         }
     }
 }

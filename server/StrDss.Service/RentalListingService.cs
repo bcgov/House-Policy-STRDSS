@@ -6,6 +6,7 @@ using StrDss.Data;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
+using System.Text.RegularExpressions;
 
 namespace StrDss.Service
 {
@@ -27,7 +28,32 @@ namespace StrDss.Service
 
         public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction)
         {
-            return await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicense, pageSize, pageNumber, orderBy, direction);
+            var listings = await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicense, pageSize, pageNumber, orderBy, direction);
+
+            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+
+            foreach (var listing in listings.SourceList) 
+            {
+                foreach (var host in listing.Hosts)
+                {
+                    if (host.EmailAddressDsc == null) continue;
+
+                    var hasValidEmail = Regex.IsMatch(host.EmailAddressDsc, emailRegex.Regex);
+
+                    var hostType = host.IsPropertyOwner ? "Property Owner" : "Supplier Host";
+
+                    listing.HostsInfo.Add(new HostInfo
+                    {
+                        Host = $"{hostType}: {host.FullNm}; {host.EmailAddressDsc}",
+                        HasValidEmail = hasValidEmail,
+                    });
+                }
+
+                listing.HasAtLeastOneValidHostEmail = listing.HostsInfo.Any(x => x.HasValidEmail);
+                listing.Hosts = new List<RentalListingContactDto>();
+            }
+
+            return listings;
         }
 
         public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId)

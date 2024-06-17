@@ -76,14 +76,14 @@ namespace StrDss.Data.Repositories
 
             var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
 
-            //foreach (var listing in listings.SourceList)
-            //{
-            //    listing.Hosts =
-            //        _mapper.Map<List<RentalListingContactDto>>(await
-            //            _dbContext.DssRentalListingContacts
-            //                .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
-            //                .ToListAsync());
-            //}
+            foreach (var listing in listings.SourceList)
+            {
+                listing.Hosts =
+                    _mapper.Map<List<RentalListingContactDto>>(await
+                        _dbContext.DssRentalListingContacts
+                            .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
+                            .ToListAsync());
+            }
 
             return listings;
         }

@@ -12,5 +12,9 @@ namespace StrDss.Model.DelistingDtos
         public List<string> PlatformEmails { get; set; } = new List<string>();
         [JsonIgnore]
         public long ProvidingPlatformId { get; set; }
+        [JsonIgnore]
+        public string Url { get; set; } = "";
+        [JsonIgnore]
+        public string ListingId { get; set; } = "";
     }
 }

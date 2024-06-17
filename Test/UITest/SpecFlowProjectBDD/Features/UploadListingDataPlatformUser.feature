@@ -23,7 +23,7 @@ Scenario: UploadListingDataPlatformUser
 
 	Given I am on the upload data interface
 
-	When I select a CSV file containing short-term listing data
+	When I select a CSV file containing short-term listing data "<UploadFile>"
 
 #Month Designation:
 
@@ -73,9 +73,9 @@ Scenario: UploadListingDataPlatformUser
 
 
 Examples:
-	| UserName      | UserType       | Environment | ExpectedResult |
-	| STRDSSVrboDev | platform_staff | dev         | pass           |
-	#| STRDSSAirbnbDev | platform_staff | dev       | pass           |
+	| UserName      | UserType       | Environment | UploadFile | ExpectedResult |
+	| STRDSSVrboDev | platform_staff | dev         |  C:\Users\RAnderson\Source\Repos\House-Policy-STRDSS\Test\UITest\TestData\listing files\listing-valid-2024-04.csv| pass           |
+	#| STRDSSAirbnbDev | platform_staff | dev       | |pass           |
 
 
 

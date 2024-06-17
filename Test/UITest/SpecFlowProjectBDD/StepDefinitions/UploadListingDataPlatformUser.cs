@@ -114,12 +114,12 @@ namespace SpecFlowProjectBDD.StepDefinitions
             //throw new PendingStepException();
         }
 
-        [When(@"I select a CSV file containing short-term listing data")]
-        public void WhenISelectACSVFileContainingShort_TermListingData()
+        [When(@"I select a CSV file containing short-term listing data ""([^""]*)""")]
+        public void WhenISelectACSVFileContainingShort_TermListingData(string UploadFile)
         {
             _UploadListingsPage.SelectFileButton.Click();
             FileDialog fileDialog = new FileDialog();
-            fileDialog.FindAndSet("C:\\Users\\RAnderson\\Source\\Repos\\House-Policy-STRDSS\\Test\\UITest\\TestData\\listing files\\listing-valid-2024-04.csv", "Open", "007C2B0C");
+            fileDialog.FindAndSet(UploadFile, "Short-Term Rental Data Portal - Google Chrome", "Chrome_WidgetWin_1");
 
         }
 
@@ -127,12 +127,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void WhenISelectWhichMonthTheSTRListingDataIsFor()
         {
             _UploadListingsPage.ReportingMonthDropDown.Click();
+            _UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(@"document.querySelector(""#month_0"").click()");
+
         }
 
         [When(@"I initiate the upload")]
-        public void WhenIInitiateTheUpload()
+        public void WhenInitiateTheUpload()
         {
-            //throw new PendingStepException();
+            _UploadListingsPage.UploadButton.Click();
         }
 
         [Then(@"the Data Sharing System should import the STR listing data")]

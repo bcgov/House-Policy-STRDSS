@@ -76,8 +76,9 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("UploadListingDataPlatformUser")]
         [NUnit.Framework.CategoryAttribute("UploadListingData")]
-        [NUnit.Framework.TestCaseAttribute("STRDSSVrboDev", "platform_staff", "dev", "pass", null)]
-        public void UploadListingDataPlatformUser(string userName, string userType, string environment, string expectedResult, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("STRDSSVrboDev", "platform_staff", "dev", "C:\\Users\\RAnderson\\Source\\Repos\\House-Policy-STRDSS\\Test\\UITest\\TestData\\listing " +
+            "files\\listing-valid-2024-04.csv", "pass", null)]
+        public void UploadListingDataPlatformUser(string userName, string userType, string environment, string uploadFile, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "UploadListingData"};
@@ -90,6 +91,7 @@ namespace SpecFlowProjectBDD.Features
             argumentsOfScenario.Add("UserName", userName);
             argumentsOfScenario.Add("UserType", userType);
             argumentsOfScenario.Add("Environment", environment);
+            argumentsOfScenario.Add("UploadFile", uploadFile);
             argumentsOfScenario.Add("ExpectedResult", expectedResult);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("UploadListingDataPlatformUser", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 5
@@ -122,7 +124,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("I am on the upload data interface", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 26
- testRunner.When("I select a CSV file containing short-term listing data", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When(string.Format("I select a CSV file containing short-term listing data \"{0}\"", uploadFile), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 30
  testRunner.And("I select which month the STR listing data is for", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

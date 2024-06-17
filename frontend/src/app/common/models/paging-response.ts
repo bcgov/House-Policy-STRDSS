@@ -4,13 +4,13 @@ export interface PagingResponse<T> {
 }
 
 export interface PagingResponsePageInfo {
-    pageNumber: number;
-    pageSize: number;
-    itemCount: number;
-    totalCount: number;
-    pageCount: number;
-    hasPreviousPage: boolean;
-    hasNextPage: boolean;
-    orderBy: string;
-    direction: 'asc' | 'desc';
+    pageNumber?: number;
+    pageSize?: number;
+    itemCount?: number;
+    totalCount?: number;
+    pageCount?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+    orderBy?: string;
+    direction?: 'asc' | 'desc';
 }

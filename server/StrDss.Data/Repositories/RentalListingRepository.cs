@@ -11,9 +11,9 @@ namespace StrDss.Data.Repositories
 {
     public interface IRentalListingRepository
     {
-        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<RentalListingViewDto?> GetRentalListing(long listingId);
-        Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long listingId, bool includeHostEmails);
+        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? rentalListingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<RentalListingViewDto?> GetRentalListing(long rentaListingId);
+        Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -88,9 +88,9 @@ namespace StrDss.Data.Repositories
             return listings;
         }
 
-        public async Task<RentalListingViewDto?> GetRentalListing(long listingId)
+        public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId)
         {
-            var listing = _mapper.Map<RentalListingViewDto>(await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.RentalListingId == listingId));
+            var listing = _mapper.Map<RentalListingViewDto>(await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.RentalListingId == rentalListingId));
 
             if (listing == null) return listing;
 
@@ -146,17 +146,17 @@ namespace StrDss.Data.Repositories
             return listing;
         }
 
-        public async Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long listingId, bool includeHostEmail)
+        public async Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentalListingId, bool includeHostEmail)
         {
-            var listing = await GetRentalListingAsync(listingId);
+            var listing = await GetRentalListingAsync(rentalListingId);
             if (listing == null) return null;
 
             if (includeHostEmail)
             {
-                listing.HostEmails = await GetHostEmailsAsync(listingId);
+                listing.HostEmails = await GetHostEmailsAsync(rentalListingId);
             }
 
-            var listingView = await _dbContext.DssRentalListingVws.FirstAsync(x => x.RentalListingId == listingId);
+            var listingView = await _dbContext.DssRentalListingVws.FirstAsync(x => x.RentalListingId == rentalListingId);
             listing.LocalGovernmentId = listingView.ManagingOrganizationId ?? 0;
 
             (listing.PlatformEmails, listing.ProvidingPlatformId) = await GetPlatformEmailsAsync(listing.OfferingPlatformId);
@@ -164,24 +164,25 @@ namespace StrDss.Data.Repositories
             return listing;
         }
 
-        private async Task<RentalListingForTakedownDto?> GetRentalListingAsync(long listingId)
+        private async Task<RentalListingForTakedownDto?> GetRentalListingAsync(long rentalListingId)
         {
             return await _dbContext.DssRentalListings
+                .Where(x => x.RentalListingId == rentalListingId)
                 .Select(x => new RentalListingForTakedownDto
                 {
-                    RentalListingId = listingId,
+                    RentalListingId = rentalListingId,
                     PlatformListingNo = x.PlatformListingNo,
                     PlatformListingUrl = x.PlatformListingUrl,
                     OrganizationCd = x.OfferingOrganization.OrganizationCd,
                     OfferingPlatformId = x.OfferingOrganizationId
                 })
-                .FirstOrDefaultAsync(x => x.RentalListingId == listingId);
+                .FirstOrDefaultAsync();
         }
 
-        private async Task<List<string>> GetHostEmailsAsync(long listingId)
+        private async Task<List<string>> GetHostEmailsAsync(long rentalListingId)
         {
             var emails = await _dbContext.DssRentalListingContacts
-                .Where(x => x.ContactedThroughRentalListingId == listingId && x.EmailAddressDsc != null)
+                .Where(x => x.ContactedThroughRentalListingId == rentalListingId && x.EmailAddressDsc != null)
                 .Select(x => x.EmailAddressDsc)
                 .ToListAsync();
 

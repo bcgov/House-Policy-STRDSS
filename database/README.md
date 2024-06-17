@@ -42,7 +42,8 @@ Each production release depends on the execution of a fixed set of scripts again
 - Sprint 4:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_4.sql`
   - `seeding/STR_DSS_Data_Seeding_Sprint_4.sql`
-  - `seeding/STR_DSS_Data_Seeding_PRODONLY_Sprint_4.sql` **OR** `seeding/STR_DSS_Data_Seeding_NONPROD_Sprint_4.sql`
+  - `seeding/STR_DSS_Data_Seeding_PRODONLY_Sprint_4.sql` **(PRD ONLY) OR** `seeding/STR_DSS_Data_Seeding_NONPROD_Sprint_4.sql`
+  - `STR_DSS_Data_Seeding_PRODONLY_PRIVATE_Sprint_4.sql` **(PRD ONLY - not in repo)**
 ### Release 2 Scripts:
 - Sprint 5:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_5.sql`
@@ -56,4 +57,8 @@ Each production release depends on the execution of a fixed set of scripts again
   - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_6.sql`
   - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_6.sql`
   - `seeding/STR_DSS_Data_Seeding_Platforms_Sprint_6.sql`
-  - **PRD ONLY TBD OR** `seeding/STR_DSS_Data_Seeding_NONPROD_Sprint_6.sql`
+  - `STR_DSS_Data_Seeding_PRODONLY_PRIVATE_Sprint_6.sql` **(PRD ONLY - not in repo) OR** `seeding/STR_DSS_Data_Seeding_NONPROD_Sprint_6.sql`
+### Release 3 Scripts:
+- Sprint 7:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_7.sql`
+  - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_7.sql`

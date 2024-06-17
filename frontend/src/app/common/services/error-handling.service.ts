@@ -7,10 +7,15 @@ import { Subject } from 'rxjs';
 })
 export class ErrorHandlingService {
   public errorSubject = new Subject<ErrorBackEnd>();
+  public successSubject = new Subject<string>();
 
   constructor() { }
 
   showError(error: ErrorBackEnd): void {
     this.errorSubject.next(error);
+  }
+
+  showSuccess(message: string): void {
+    this.successSubject.next(message);
   }
 }

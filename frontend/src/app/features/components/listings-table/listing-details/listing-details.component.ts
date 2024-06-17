@@ -3,12 +3,14 @@ import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ListingDataService } from '../../../../common/services/listing-data.service';
 import { ListingDetails } from '../../../../common/models/listing-details';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { UserDataService } from '../../../../common/services/user-data.service';
+import { environment } from '../../../../../environments/environment';
+import { SelectedListingsStateService } from '../../../../common/services/selected-listings-state.service';
 
 @Component({
   selector: 'app-listing-details',
@@ -28,11 +30,16 @@ export class ListingDetailsComponent implements OnInit {
   id!: number;
   listing!: ListingDetails;
   isLegendShown = false;
-  addressWarningScoreLimit = 75;
+  addressWarningScoreLimit = environment.ADDRESS_SCORE;
   isCEU = false;
 
-  constructor(private route: ActivatedRoute, private listingService: ListingDataService, private userDataService: UserDataService) {
-  }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private listingService: ListingDataService,
+    private userDataService: UserDataService,
+    private searchStateService: SelectedListingsStateService
+  ) { }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.params['id'];
@@ -50,11 +57,16 @@ export class ListingDetailsComponent implements OnInit {
   }
 
   sendTakedownRequest(): void {
-
+    this.searchStateService.selectedListings = [this.listing];
+    this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } })
   }
 
   sendNoticeOfNonCompliance(): void {
+    this.searchStateService.selectedListings = [this.listing];
+  }
 
+  private getUrlFromState(): string {
+    return `/listing/${this.id}`
   }
 
   private getListingDetailsById(id: number): void {

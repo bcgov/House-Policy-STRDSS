@@ -78,7 +78,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "[\r\n  {\r\n    \"rentalListingId\": 570,\r\n    \"hostEmailSent\": false,\r\n    \"ccList\": [],\r\n    \"comment\": \"Testing\"\r\n  }\r\n]",
+					"raw": "[\r\n  {\r\n    \"rentalListingId\": 570,\r\n    \"hostEmailSent\": false,\r\n    \"ccList\": [],\r\n    \"comment\": \"Testing\",\r\n    \"lgContactEmail\": \"lg@lg.com\" \r\n  }\r\n]",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -94,6 +94,35 @@
 						"api",
 						"delisting",
 						"bulkwarnings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetBulkTakedownNoticesPreview",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"rentalListingId\": 570,\r\n    \"hostEmailSent\": false,\r\n    \"ccList\": [],\r\n    \"comment\": \"Testing\",\r\n    \"lgContactEmail\": \"lg@lg.com\" \r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/delisting/bulkwarnings/preview",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"delisting",
+						"bulkwarnings",
+						"preview"
 					]
 				}
 			},
@@ -134,7 +163,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "[\r\n  {\r\n    \"rentalListingId\": 570,\r\n    \"ccList\": [],\r\n    \"isWithStandardDetail\": true,\r\n    \"customDetailTxt\": \"string\"\r\n  }\r\n]",
+					"raw": "[{\"rentalListingId\":408,\"ccList\":[\"test@mail.com\"],\"isWithStandardDetail\":true,\"customDetailTxt\":\"Test details\"},{\"rentalListingId\":410,\"ccList\":[\"test@mail.com\"],\"isWithStandardDetail\":true,\"customDetailTxt\":\"Test details\"},{\"rentalListingId\":412,\"ccList\":[\"test@mail.com\"],\"isWithStandardDetail\":true,\"customDetailTxt\":\"Test details\"},{\"rentalListingId\":414,\"ccList\":[\"test@mail.com\"],\"isWithStandardDetail\":true,\"customDetailTxt\":\"Test details\"},{\"rentalListingId\":416,\"ccList\":[\"test@mail.com\"],\"isWithStandardDetail\":true,\"customDetailTxt\":\"Test details\"}]",
 					"options": {
 						"raw": {
 							"language": "json"

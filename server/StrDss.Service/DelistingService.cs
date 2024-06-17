@@ -487,6 +487,8 @@ namespace StrDss.Service
                 if (!ValidateRentalListingAccess(rentalListing, organization, errors)) continue;
 
                 listing.ProvidingPlatformId = rentalListing.ProvidingPlatformId;
+                listing.Url = rentalListing.PlatformListingUrl ?? "";
+                listing.ListingId = rentalListing.PlatformListingNo;
 
                 var template = CreateTakedownRequestTemplateFromListing(listing, rentalListing);
                 templates.Add(template);
@@ -549,35 +551,45 @@ namespace StrDss.Service
 
         private async Task SendTakedownRequestEmailFromListing(TakedownRequestsFromListingDto[] listings, TakedownRequestFromListing template)
         {
-            var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
+            var emailEntities = new List<DssEmailMessage>();
 
-            var emailEntity = new DssEmailMessage
+            foreach (var listing in listings)
             {
-                EmailMessageType = template.EmailMessageType,
-                MessageDeliveryDtm = DateTime.UtcNow,
-                MessageTemplateDsc = template.GetContent(),
-                IsHostContactedExternally = false,
-                LgPhoneNo = null,
-                UnreportedListingNo = template.ListingId,
-                HostEmailAddressDsc = null,
-                LgEmailAddressDsc = null,
-                CcEmailAddressDsc = string.Join("; ", template.Cc),
-                UnreportedListingUrl = template.Url,
-                LgStrBylawUrl = null,
-                InitiatingUserIdentityId = _currentUser.Id,
-                AffectedByUserIdentityId = null,
-                InvolvedInOrganizationId = listing.ProvidingPlatformId,
-                RequestingOrganizationId = _currentUser.OrganizationId,
-                IsWithStandardDetail = listing.IsWithStandardDetail,
-                CustomDetailTxt = listing.CustomDetailTxt,
-                ConcernedWithRentalListingId = template.RentalListingId,
-            };
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = template.EmailMessageType,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = false,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = listing.ListingId,
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = string.Join("; ", template.Cc),
+                    UnreportedListingUrl = listing.Url,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = _currentUser.Id,
+                    AffectedByUserIdentityId = null,
+                    InvolvedInOrganizationId = listing.ProvidingPlatformId,
+                    RequestingOrganizationId = _currentUser.OrganizationId,
+                    IsWithStandardDetail = listing.IsWithStandardDetail,
+                    CustomDetailTxt = listing.CustomDetailTxt,
+                    ConcernedWithRentalListingId = listing.RentalListingId,
+                };
 
-            await _emailRepo.AddEmailMessage(emailEntity);
+                emailEntities.Add(emailEntity);
 
-            await _emailRepo.AddEmailMessage(emailEntity);
+                await _emailRepo.AddEmailMessage(emailEntity);
+            }
 
-            emailEntity.ExternalMessageNo = await template.SendEmail();
+            await _emailRepo.AddEmailMessage(emailEntities.First());
+
+            var messageNo = await template.SendEmail();
+
+            foreach (var emailEntity in emailEntities)
+            {
+                emailEntity.ExternalMessageNo = messageNo;
+            }
 
             _unitOfWork.Commit();
         }

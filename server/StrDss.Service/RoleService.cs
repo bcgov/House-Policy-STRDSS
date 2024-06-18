@@ -5,12 +5,14 @@ using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Repositories;
 using StrDss.Model;
+using StrDss.Model.UserDtos;
 
 namespace StrDss.Service
 {
     public interface IRoleService
     {
-
+        Task<List<RoleDto>> GetRolesAync();
+        Task<List<PermissionDto>> GetPermissionsAync();
     }
     public class RoleService : ServiceBase, IRoleService
     {
@@ -21,6 +23,14 @@ namespace StrDss.Service
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _roleRepo = roleRepo;
+        }
+        public async Task<List<RoleDto>> GetRolesAync()
+        {
+            return await _roleRepo.GetRolesAync();
+        }
+        public async Task<List<PermissionDto>> GetPermissionsAync()
+        {
+            return await _roleRepo.GetPermissionsAync();
         }
     }
 }

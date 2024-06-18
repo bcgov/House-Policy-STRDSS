@@ -64,8 +64,10 @@ namespace StrDss.Common
                     return result;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine($"Error Value: [{str}]");
                 return null;
             }
 

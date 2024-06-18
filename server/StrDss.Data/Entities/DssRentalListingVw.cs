@@ -21,6 +21,8 @@ public partial class DssRentalListingVw
 
     public long? OfferingOrganizationId { get; set; }
 
+    public string? OfferingOrganizationCd { get; set; }
+
     public string? OfferingOrganizationNm { get; set; }
 
     public string? PlatformListingNo { get; set; }

@@ -34,16 +34,6 @@ public partial class DssRentalListing
     public string? BcRegistryNo { get; set; }
 
     /// <summary>
-    /// Indicates whether the RENTAL LISTING VERSION is a CURRENT RENTAL LISTING (if it is a copy of the most current REPORTED RENTAL LISTING (having the same listing number for the same offering platform)
-    /// </summary>
-    public bool IsCurrent { get; set; }
-
-    /// <summary>
-    /// Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform
-    /// </summary>
-    public bool? IsTakenDown { get; set; }
-
-    /// <summary>
     /// Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)
     /// </summary>
     public bool? IsEntireUnit { get; set; }
@@ -66,17 +56,12 @@ public partial class DssRentalListing
     /// <summary>
     /// Foreign key
     /// </summary>
-    public long OfferingOrganizationId { get; set; }
-
-    /// <summary>
-    /// Foreign key
-    /// </summary>
     public long? IncludingRentalListingReportId { get; set; }
 
     /// <summary>
     /// Foreign key
     /// </summary>
-    public long? DerivedFromRentalListingId { get; set; }
+    public long OfferingOrganizationId { get; set; }
 
     /// <summary>
     /// Foreign key
@@ -92,6 +77,21 @@ public partial class DssRentalListing
     /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
+
+    /// <summary>
+    /// Indicates whether the RENTAL LISTING VERSION is a CURRENT RENTAL LISTING (if it is a copy of the most current REPORTED RENTAL LISTING (having the same listing number for the same offering platform)
+    /// </summary>
+    public bool IsCurrent { get; set; }
+
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform
+    /// </summary>
+    public bool? IsTakenDown { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? DerivedFromRentalListingId { get; set; }
 
     /// <summary>
     /// Indicates whether a CURRENT RENTAL LISTING was included in the most recent RENTAL LISTING REPORT

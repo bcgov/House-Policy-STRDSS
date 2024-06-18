@@ -970,13 +970,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/roles",
+					"raw": "{{host}}/api/roles/permissions",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"roles"
+						"roles",
+						"permissions"
 					]
 				}
 			},

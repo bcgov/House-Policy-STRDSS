@@ -52,7 +52,7 @@ namespace StrDss.Common
 
         public static short? StringToShort(string str)
         {
-            if (str == null)
+            if (str == null || str.IsEmpty())
             {
                 return null;
             }

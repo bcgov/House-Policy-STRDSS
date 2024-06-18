@@ -52,6 +52,8 @@ namespace StrDss.Common
 
         public static short? StringToShort(string str)
         {
+            Console.WriteLine(str);
+
             if (string.IsNullOrWhiteSpace(str))
             {
                 return null;

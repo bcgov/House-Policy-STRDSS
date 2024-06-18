@@ -71,7 +71,7 @@ export class ListingsTableComponent implements OnInit {
       { label: 'Listing Url', value: 'url' },
       { label: 'Listing ID', value: 'listingId' },
       { label: 'Host Name', value: 'hostName' },
-      { label: 'Business License', value: 'businessLicense' },
+      { label: 'Business Licence', value: 'businessLicense' },
     ]
 
     this.route.queryParams.subscribe({

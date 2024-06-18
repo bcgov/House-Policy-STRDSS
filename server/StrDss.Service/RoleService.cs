@@ -17,6 +17,7 @@ namespace StrDss.Service
         Task<List<PermissionDto>> GetPermissionsAync();
         Task<Dictionary<string, List<string>>> CreateRoleAsync(RoleUpdateDto role);
         Task<Dictionary<string, List<string>>> UpdateRoleAsync(RoleUpdateDto role);
+        Task<Dictionary<string, List<string>>> DeleteRoleAsync(string roleCd);
     }
     public class RoleService : ServiceBase, IRoleService
     {
@@ -92,6 +93,35 @@ namespace StrDss.Service
             }
 
             await _roleRepo.UpdateRoleAsync(role);
+
+            _unitOfWork.Commit();
+
+            return errors;
+        }
+
+        public async Task<Dictionary<string, List<string>>> DeleteRoleAsync(string roleCd)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var role = await _roleRepo.GetRoleAync(roleCd);
+
+            if (role == null)
+            {
+                errors.AddItem("userRoleCd", $"Role Code [{roleCd}] not found.");
+                return errors;
+            }
+
+            if (role.IsReferenced)
+            {
+                errors.AddItem("userRoleCd", $"Role Code [{roleCd}] is assigned to users and cannot be deleted.");
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            await _roleRepo.DeleteRoleAsync(roleCd);
 
             _unitOfWork.Commit();
 

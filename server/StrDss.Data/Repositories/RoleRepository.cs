@@ -12,6 +12,7 @@ namespace StrDss.Data.Repositories
     {
         Task<List<RoleDto>> GetRolesAync();
         Task<List<PermissionDto>> GetPermissionsAync();
+        Task<RoleDto?> GetRoleAync(string roleCd);
     }
     public class RoleRepository : RepositoryBase<DssUserRole>, IRoleRepository
     {
@@ -30,6 +31,17 @@ namespace StrDss.Data.Repositories
             }
 
             return roles;
+        }
+
+        public async Task<RoleDto?> GetRoleAync(string roleCd)
+        {
+            var role = _mapper.Map<RoleDto>(await _dbSet.AsNoTracking().Include(x => x.UserPrivilegeCds).Where(x => x.UserRoleCd == roleCd).FirstOrDefaultAsync());
+
+            if (role == null) return null;
+
+            role.IsReferenced = await _dbSet.AsNoTracking().Where(x => x.UserRoleCd == roleCd).Select(x => x.UserIdentities.Any()).FirstAsync();
+
+            return role;
         }
 
         public async Task<List<PermissionDto>> GetPermissionsAync()

@@ -12,6 +12,7 @@ namespace StrDss.Service
     public interface IRoleService
     {
         Task<List<RoleDto>> GetRolesAync();
+        Task<RoleDto?> GetRoleAync(string roleCd);
         Task<List<PermissionDto>> GetPermissionsAync();
     }
     public class RoleService : ServiceBase, IRoleService
@@ -27,6 +28,11 @@ namespace StrDss.Service
         public async Task<List<RoleDto>> GetRolesAync()
         {
             return await _roleRepo.GetRolesAync();
+        }
+
+        public async Task<RoleDto?> GetRoleAync(string roleCd)
+        {
+            return await _roleRepo.GetRoleAync(roleCd);
         }
         public async Task<List<PermissionDto>> GetPermissionsAync()
         {

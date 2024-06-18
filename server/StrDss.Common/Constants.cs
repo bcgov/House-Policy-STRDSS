@@ -9,10 +9,9 @@
     }
     public static class Entities
     {
-        public const string SystemUser = "SystemUser";
-        public const string StrApplication = "StrApplication";
-        public const string Audit = "Audit";
         public const string RentalListingRowUntyped = "RentalListingRowUntyped";
+        public const string Role = "Role";
+
     }
     public static class Fields
     {
@@ -84,6 +83,11 @@
         public const string SupplierHost5Id = "SupplierHost5Id";
     }
 
+    public static class RoleFields
+    {
+        public const string UserRoleCd = "UserRoleCd";
+        public const string UserRoleNm = "UserRoleNm";
+    }
 
     public static class AccessRequestStatuses
     {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data;
+using StrDss.Data.Entities;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.UserDtos;
@@ -14,6 +15,8 @@ namespace StrDss.Service
         Task<List<RoleDto>> GetRolesAync();
         Task<RoleDto?> GetRoleAync(string roleCd);
         Task<List<PermissionDto>> GetPermissionsAync();
+        Task<Dictionary<string, List<string>>> CreateRoleAsync(RoleUpdateDto role);
+        Task<Dictionary<string, List<string>>> UpdateRoleAsync(RoleUpdateDto role);
     }
     public class RoleService : ServiceBase, IRoleService
     {
@@ -37,6 +40,62 @@ namespace StrDss.Service
         public async Task<List<PermissionDto>> GetPermissionsAync()
         {
             return await _roleRepo.GetPermissionsAync();
+        }
+        public async Task<Dictionary<string, List<string>>> CreateRoleAsync(RoleUpdateDto role)
+        {
+            var errors = await ValidateRoleDtoAsync(role);
+
+            if (await _roleRepo.DoesRoleCdExist(role.UserRoleCd))
+            {
+                errors.AddItem("userRoleCd", $"Role Code [{role.UserRoleCd}] already exists.");
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            await _roleRepo.CreateRoleAsync(role);
+
+            _unitOfWork.Commit();
+
+            return errors;
+        }
+
+        private async Task<Dictionary<string, List<string>>> ValidateRoleDtoAsync(RoleUpdateDto role)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            errors = _validator.Validate(Entities.Role, role, errors);
+
+            var permissionCount = await _roleRepo.CountActivePermissionIdsAsnyc(role.Permissions);
+            if (permissionCount != role.Permissions.Count)
+            {
+                errors.AddItem("permission", $"Some of the permissions are invalid.");
+            }
+
+            return errors;
+        }
+
+        public async Task<Dictionary<string, List<string>>> UpdateRoleAsync(RoleUpdateDto role)
+        {
+            var errors = await ValidateRoleDtoAsync(role);
+
+            if (!await _roleRepo.DoesRoleCdExist(role.UserRoleCd))
+            {
+                errors.AddItem("userRoleCd", $"Role Code [{role.UserRoleCd}] not found.");
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            await _roleRepo.UpdateRoleAsync(role);
+
+            _unitOfWork.Commit();
+
+            return errors;
         }
     }
 }

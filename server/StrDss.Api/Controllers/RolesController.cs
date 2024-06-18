@@ -31,6 +31,36 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize]
+        [HttpPost("", Name = "CreateRoles")]
+        public async Task<ActionResult> CreateRoles(RoleUpdateDto dto)
+        {
+            var errors = await _roleService.CreateRoleAsync(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return NoContent();
+        }
+
+        [ApiAuthorize]
+        [HttpPut("{roleCd}", Name = "UpdateRoles")]
+        public async Task<ActionResult> UpdateRoles(string roleCd, RoleUpdateDto dto)
+        {
+            dto.UserRoleCd = roleCd;
+
+            var errors = await _roleService.UpdateRoleAsync(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return NoContent();
+        }
+
+        [ApiAuthorize]
         [HttpGet("{roleCd}", Name = "GetRole")]
         public async Task<ActionResult<RoleDto>> GetRole(string roleCd)
         {

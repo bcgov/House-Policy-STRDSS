@@ -69,18 +69,18 @@ export class BulkTakedownRequestComponent implements OnInit {
     private delistingService: DelistingService,
     private router: Router,
     private route: ActivatedRoute,
-    private searchService: SelectedListingsStateService) { }
+    private searchStateService: SelectedListingsStateService) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(
       (param) => {
-        if (!this.searchService?.selectedListings || !param['returnUrl']) {
-          this.router.navigateByUrl('/listings')
+        if (!this.searchStateService?.selectedListings || !param['returnUrl']) {
+          this.router.navigateByUrl('/listings');
         }
         else {
           this.returnUrl = param['returnUrl'];
-          this.listings = [...this.searchService.selectedListings];
-          this.searchService.selectedListings = new Array<ListingDetails>();
+          this.listings = [...this.searchStateService.selectedListings];
+          this.searchStateService.selectedListings = new Array<ListingDetails>();
           this.selectedListings = this.listings;
           this.initForm();
           this.cloakParams();
@@ -119,6 +119,7 @@ export class BulkTakedownRequestComponent implements OnInit {
   }
 
   cancel(): void {
+    this.searchStateService.selectedListings = [];
     this.router.navigateByUrl(this.returnUrl)
   }
 

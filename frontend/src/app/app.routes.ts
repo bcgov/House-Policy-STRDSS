@@ -18,6 +18,7 @@ import { ListingUploadHistoryComponent } from './features/components/listing-upl
 import { ListingsTableComponent } from './features/components/listings-table/listings-table.component';
 import { ListingDetailsComponent } from './features/components/listings-table/listing-details/listing-details.component';
 import { BulkTakedownRequestComponent } from './features/components/bulk-takedown-request/bulk-takedown-request.component';
+import { BulkComplianceNoticeComponent } from './features/components/bulk-compliance-notice/bulk-compliance-notice.component';
 
 export const routes: Routes = [
     {
@@ -61,6 +62,12 @@ export const routes: Routes = [
         data: { permissions: [takedown_action] }
     },
     {
+        path: 'bulk-compliance-notice',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: BulkComplianceNoticeComponent,
+        data: { permissions: [takedown_action] }
+    },
+    {
         path: 'listings',
         component: ListingsTableComponent,
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
@@ -94,5 +101,4 @@ export const routes: Routes = [
         path: '**',
         redirectTo: '/404'
     }
-
 ];

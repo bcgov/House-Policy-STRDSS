@@ -54,8 +54,6 @@ export class ListingsTableComponent implements OnInit {
   searchColumns = new Array<DropdownOption>();
   isCEU = false;
   isLegendShown = false;
-  // MOCK: 
-  isNotImplemented = true;
 
   constructor(
     private listingService: ListingDataService,
@@ -75,7 +73,7 @@ export class ListingsTableComponent implements OnInit {
       { label: 'Host Name', value: 'hostName' },
       { label: 'Business License', value: 'businessLicense' },
     ]
-    const state = {} as ListingSearchState;
+
     this.route.queryParams.subscribe({
       next: (prms) => {
 
@@ -141,20 +139,13 @@ export class ListingsTableComponent implements OnInit {
   }
 
   onNoticeOpen(): void {
-  }
-
-  onNoticeClose(): void {
+    this.searchStateService.selectedListings = this.selectedListings;
+    this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } })
   }
 
   onTakedownOpen(): void {
     this.searchStateService.selectedListings = this.selectedListings;
     this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } })
-  }
-
-  onTakedownClose(reason: 'cancel' | 'submit'): void {
-    if (reason === 'cancel') {
-      this.selectedListings = [];
-    }
   }
 
   onPageChange(value: any): void {
@@ -171,6 +162,7 @@ export class ListingsTableComponent implements OnInit {
   onSearch(): void {
     this.getListings(this.currentPage.pageNumber)
   }
+
   private cloakParams(): void {
     var newURL = location.href.split("?")[0];
     window.history.pushState('object', document.title, newURL);

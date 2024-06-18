@@ -341,7 +341,7 @@ jobs:
 
 
   package-h-chart-database:
-    #needs:  [docker-build-frontend]
+    #needs:[docker-build-frontend]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     

@@ -50,6 +50,11 @@ namespace StrDss.Common
             return Convert.ToBase64String(memoryStream.ToArray());
         }
 
+        /// <summary>
+        /// Try to parse string to short
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static short? StringToShort(string str)
         {
             if (string.IsNullOrWhiteSpace(str))
@@ -57,18 +62,9 @@ namespace StrDss.Common
                 return null;
             }
 
-            try
+            if (short.TryParse(str, out short result))
             {
-                if (short.TryParse(str, out short result))
-                {
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                Console.WriteLine($"Error Value: [{str}]");
-                return null;
+                return result;
             }
 
             return null;

@@ -63,6 +63,7 @@ export class ListingDetailsComponent implements OnInit {
 
   sendNoticeOfNonCompliance(): void {
     this.searchStateService.selectedListings = [this.listing];
+    this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } })
   }
 
   private getUrlFromState(): string {

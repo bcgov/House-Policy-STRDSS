@@ -101,7 +101,6 @@ body {
             }
 
             .p-dropdown {
-
                 width: 200px;
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
@@ -305,9 +304,9 @@ body {
     }
 
     p-paginator {
-
         .p-paginator-rpp-options,
         .p-dropdown-label.p-inputtext,
+
         p-dropdown {
             width: 100px;
         }
@@ -330,7 +329,6 @@ body {
             }
         }
     }
-
 
     .p-paginator.paging-right {
         justify-content: end

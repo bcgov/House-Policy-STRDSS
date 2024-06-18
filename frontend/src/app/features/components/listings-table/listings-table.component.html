@@ -5,8 +5,8 @@
             class="search-by-select"></p-dropdown>
         <span class="p-input-icon-right search-input-container">
             <button pButton id="search-submit-btn" (click)="onSearch()"> <i class="pi pi-search"></i></button>
-            <input type="text" id="search-term-inp" class="search-input" placeholder="Search" pInputText
-                [(ngModel)]="searchTerm" />
+            <input type="text" id="search-term-inp" (keydown.enter)="onSearch()" class="search-input"
+                placeholder="Search" pInputText [(ngModel)]="searchTerm" />
         </span>
     </div>
     <div class="legend-container">
@@ -16,8 +16,7 @@
     </div>
 </div>
 <div class="actions" *ngIf="!isCEU">
-    <button pButton [disabled]="!selectedListings.length || isNotImplemented" id="send_delisting_notice_btn"
-        (click)="onNoticeOpen()">
+    <button pButton [disabled]="!selectedListings.length" id="send_delisting_notice_btn" (click)="onNoticeOpen()">
         Send Notice of Non-Compliance
     </button>
     <button pButton [disabled]="!selectedListings.length" id="send_takedown_request_btn" (click)="onTakedownOpen()">
@@ -34,7 +33,7 @@
                     {{selectedListings.length}} items. <button pButton class="p-button-link zero-padding small-text"
                         (click)="unselectAll()">Unselect All</button>
                 </span>
-                <span class="panel-header-small" *ngIf="currentPage">Showing {{currentPage.pageSize || 25}} of
+                <span class="panel-header-small" *ngIf="currentPage">Showing {{ currentPage.itemCount}} of
                     {{currentPage.totalCount || 0}} listings</span>
             </div>
         </ng-template>

@@ -1,1 +1,166 @@
-<p>bulk-compliance-notice works!</p>
+<h2>Send Notices of Non-Compliance</h2>
+<h4>Complete the following fields to send Notices of Non-Compliance to STR Hosts and Platform Representatives.</h4>
+<h4>All fields are required except where stated.</h4>
+
+<p-panel class="table-panel" header="Included Listings">
+    <p-table [value]="extendedListings" [scrollable]="true" scrollDirection="vertical" scrollHeight="425px"
+        styleClass="p-datatable-sm" [(selection)]="selectedListings">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 4rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th class="sortable-header" id="offeringOrganizationNm_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'offeringOrganizationNm'"
+                    (click)="onSort('offeringOrganizationNm')">
+                    Platform
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'offeringOrganizationNm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'offeringOrganizationNm' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="platformListingNo_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'platformListingNo'"
+                    (click)="onSort('platformListingNo')">
+                    Listing ID
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="matchAddressTxt_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"
+                    (click)="onSort('matchAddressTxt')">
+                    Address (Best Match)
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th id="sendNoticeToHosts_header" [class.sorted]="this.sort && this.sort.prop === 'sendNoticeToHosts'"
+                    (click)="onSort('sendNoticeToHosts')">
+                    Send Notice to Hosts
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'sendNoticeToHostsChb' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'sendNoticeToHostsChb' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="hasAtLeastOneValidHostEmail_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'hasAtLeastOneValidHostEmail'"
+                    (click)="onSort('hasAtLeastOneValidHostEmail')">
+                    Invalid Host Email Address
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'hasAtLeastOneValidHostEmail' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'hasAtLeastOneValidHostEmail' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="limit-width">
+                    Host Name & Emails
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-listing>
+            <tr class="small-text">
+                <td>
+                    <p-tableCheckbox [value]="listing"></p-tableCheckbox>
+                </td>
+                <td>{{ listing.offeringOrganizationNm }}</td>
+                <td>
+                    <a target="_blank" [href]="listing.platformListingUrl">{{ listing.platformListingNo }}</a>
+                </td>
+                <td [class.warning]="listing.matchScoreAmt<addressWarningScoreLimit">{{ listing.matchAddressTxt }}
+                </td>
+                <td>
+                    <p-checkbox [(ngModel)]="listing.sendNoticeToHosts" [binary]="true" inputId="binary"></p-checkbox>
+                </td>
+                <td>{{ !listing.hasAtLeastOneValidHostEmail? 'Yes':'No' }}</td>
+                <td class="host-info limit-width">
+                    <span class="tip" (click)="op.toggle($event)">
+                        <i class="pi pi-info-circle"></i>
+                    </span>
+                    <p-overlayPanel #op>
+                        <span class="host-data" *ngFor="let hostData of listing.hostsInfo"
+                            [class.invalid-email]="!hostData.hasValidEmail">{{hostData.host}}<br></span>
+                    </p-overlayPanel>
+                    <span class="host-data" *ngFor="let hostData of listing.hostsInfo">{{hostData.host}};</span>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-panel>
+<form *ngIf="myForm" [formGroup]="myForm">
+    <p-panel class="bcc-panel" header="Add Additional Information to all Notices">
+        <div class="form-group-row">
+            <div class="form-group-row-col">
+                <label for="lgContactEmail">Provide a local government email address to receive a copy of the
+                    Notice</label>
+            </div>
+            <div class="form-group-row-col">
+                <input type="text" placeholder="Enter email address" pInputText formControlName="lgContactEmail"
+                    id="lgContactEmail" name="lgContactEmail" class="wide" />
+            </div>
+            <div class="form-group-row-col validation-errors"
+                *ngIf="!lgContactEmailControl.pristine && lgContactEmailControl.errors">
+                <small id="invalidLgContactEmail" *ngIf="lgContactEmailControl.errors?.['invalidEmail']">Please make
+                    sure the email
+                    format you have entered is correct</small>
+            </div>
+        </div>
+        <div class="form-group-row">
+            <div class="form-group-row-col">
+                <span class="info-tooltip" pTooltip="Enter additional email addresses separated by commas."
+                    tooltipPosition="top" placeholder="Top"></span>
+                <label for="ccList">Add BCCs (Optional)</label>
+            </div>
+            <div class="form-group-row-col">
+                <textarea formControlName="ccList" placeholder="Enter email address" rows="1" cols="20" pInputTextarea
+                    id="ccList" name="ccList" class="wide"></textarea>
+            </div>
+            <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine && ccListControl.errors">
+                <small id="invalidCcList" *ngIf="ccListControl.errors?.['invalidEmailList']">Please make sure the email
+                    format you have entered is correct</small>
+            </div>
+        </div>
+        <div class="form-group-row">
+            <div class="form-group-row-col">
+                <label for="comment">Add additional comments to all Notices to selected listings (optional)</label>
+            </div>
+            <div class="form-group-row-col">
+                <textarea #textarea rows="5" cols="30" maxlength="2000" class="wide custom-details"
+                    formControlName="comment" placeholder="Optional" pInputTextarea id="comment"
+                    name="comment"></textarea>
+                <span class="limit-text" [class.almost-limit-text]="textarea.value.length > 1950"
+                    [class.limited-text]="textarea.value.length > 1999">{{textarea.value.length}}/2000</span>
+            </div>
+        </div>
+    </p-panel>
+
+</form>
+<div class="actions" *ngIf="selectedListings">
+    <button pButton id="submit-btn" [disabled]="!selectedListings.length || !myForm.valid" class=""
+        (click)="submit()">Review</button>
+    <button pButton id="cancel-btn" class="outline-btn" (click)="cancel()">Cancel</button>
+</div>
+<p-dialog class="preview-dialog" header="Send Takedown Request" [(visible)]="showPreviewDialog" [modal]="true"
+    [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+
+    <div class="note">
+        <div class="title">
+            <i class="pi pi-info-circle"></i>
+            <strong>Please Note</strong>
+        </div>
+        <div class="content">
+            When you click submit, this email will be personalized and sent to the platform representatives and all
+            hosts for each listing (unless you have indicated a notice to the host has been sent through an alternative
+            delivery method).
+        </div>
+    </div>
+
+    <div class="preview-html" [innerHTML]="previewText"></div>
+    <ng-template pTemplate="footer">
+        <div class="actions popup-actions">
+            <button pButton id="submit-preview-btn" class="" (click)="submitAfterPreview()">Submit</button>
+            <button pButton id="cancel-preview-btn" class="outline-btn" (click)="cancelPreview()">Cancel</button>
+        </div>
+    </ng-template>
+</p-dialog>

@@ -965,6 +965,25 @@
 			"response": []
 		},
 		{
+			"name": "Get Role",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/roles/ceu_admin",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"roles",
+						"ceu_admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get Permissions",
 			"request": {
 				"method": "GET",

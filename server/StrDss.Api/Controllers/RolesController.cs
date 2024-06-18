@@ -31,6 +31,13 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize]
+        [HttpGet("{roleCd}", Name = "GetRole")]
+        public async Task<ActionResult<RoleDto>> GetRole(string roleCd)
+        {
+            return Ok(await _roleService.GetRoleAync(roleCd));
+        }
+
+        [ApiAuthorize]
         [HttpGet("permissions", Name = "GetPermissions")]
         public async Task<ActionResult<List<RoleDto>>> GetPermissions()
         {

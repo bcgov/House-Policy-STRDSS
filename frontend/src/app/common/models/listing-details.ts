@@ -37,6 +37,17 @@ export interface ListingDetails {
     hosts: Array<ListingDetailsHost>;
     listingHistory: Array<ListingDetailsListingHistory>;
     actionHistory: Array<ListingDetailsActionHistory>;
+    hasAtLeastOneValidHostEmail: boolean;
+    hostsInfo: Array<ListingDetailsHostInfo>;
+}
+
+export interface ListingDetailsWithHostCheckboxExtension extends ListingDetails {
+    sendNoticeToHosts: boolean;
+}
+
+export interface ListingDetailsHostInfo {
+    host: string;
+    hasValidEmail: boolean;
 }
 
 export interface ListingDetailsHost {

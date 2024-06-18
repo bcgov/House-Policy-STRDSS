@@ -16,8 +16,7 @@
     </div>
 </div>
 <div class="actions" *ngIf="!isCEU">
-    <button pButton [disabled]="!selectedListings.length || isNotImplemented" id="send_delisting_notice_btn"
-        (click)="onNoticeOpen()">
+    <button pButton [disabled]="!selectedListings.length" id="send_delisting_notice_btn" (click)="onNoticeOpen()">
         Send Notice of Non-Compliance
     </button>
     <button pButton [disabled]="!selectedListings.length" id="send_takedown_request_btn" (click)="onTakedownOpen()">

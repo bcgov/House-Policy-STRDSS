@@ -1,4 +1,4 @@
-/* STR DSS Sprint 7 Mandatory Data Seeding */
+/* STR DSS Sprint 8 Mandatory Data Seeding */
 
 MERGE INTO dss_access_request_status AS tgt
 USING ( SELECT * FROM (VALUES
@@ -55,13 +55,19 @@ VALUES (src.organization_type, src.organization_type_nm);
 MERGE INTO dss_user_privilege AS tgt
 USING ( SELECT * FROM (VALUES
 ('user_read','View users'),
-('user_write','Manage users'),
-('listing_read','View listings'),
+('user_write','Manage/edit users'),
+('role_read','View roles and permissions'),
+('role_write','Manage roles and permissions'),
+('listing_read','View/search/export listings and address log'),
+('address_write','Edit addresses'),
 ('licence_file_upload','Upload business licence files'),
 ('listing_file_upload','Upload platform listing files'),
+('takedown_file_upload','Upload platform takedown files'),
+('upload_history_read','View platform upload listing/takedown history'),
 ('audit_read','View audit logs'),
 ('takedown_action','Create Takedown Action'),
-('ceu_action','Create CEU Action'))
+('province_action','Create Provincial Compliance Order'),
+('ceu_action','Send email to all hosts or platforms'))
 AS s (user_privilege_cd, user_privilege_nm)
 ) AS src
 ON (tgt.user_privilege_cd=src.user_privilege_cd)

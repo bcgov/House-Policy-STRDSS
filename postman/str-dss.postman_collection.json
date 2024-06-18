@@ -721,7 +721,7 @@
 					"formdata": [
 						{
 							"key": "ReportPeriod",
-							"value": "2024-02",
+							"value": "2024-04",
 							"type": "text"
 						},
 						{
@@ -732,7 +732,7 @@
 						{
 							"key": "File",
 							"type": "file",
-							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/listing-valid-2024-02.csv"
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/prod.csv"
 						}
 					]
 				},
@@ -801,7 +801,95 @@
 					]
 				}
 			},
-			"response": []
+			"response": [
+				{
+					"name": "Get Error File",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/rentallistingreports/uploads/2/errorfile",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"rentallistingreports",
+								"uploads",
+								"2",
+								"errorfile"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "content-length",
+							"value": "26229"
+						},
+						{
+							"key": "content-type",
+							"value": "text/csv"
+						},
+						{
+							"key": "date",
+							"value": "Tue, 18 Jun 2024 14:54:37 GMT"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-cache, no-store, must-revalidate"
+						},
+						{
+							"key": "expires",
+							"value": "0"
+						},
+						{
+							"key": "pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "content-security-policy",
+							"value": "default-src 'self'; style-src 'self' 'img-src 'self' data:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';"
+						},
+						{
+							"key": "strict-transport-security",
+							"value": "max-age=15768000; includeSubDomains; preload"
+						},
+						{
+							"key": "x-content-type-options",
+							"value": "nosniff"
+						},
+						{
+							"key": "x-frame-options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "x-xss-protection",
+							"value": "0"
+						},
+						{
+							"key": "permissions-policy",
+							"value": "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()"
+						},
+						{
+							"key": "referrer-policy",
+							"value": "strict-origin"
+						},
+						{
+							"key": "x-dns-prefetch-control",
+							"value": "off"
+						},
+						{
+							"key": "content-disposition",
+							"value": "attachment; filename=errors-2.csv; filename*=UTF-8''errors-2.csv"
+						}
+					],
+					"cookie": [],
+					"body": "rpt_period,org_cd,listing_id,listing_url,rental_address,bus_lic_no,is_entire_unit,bedrooms_qty,nights_booked_qty,reservations_qty,property_host_nm,property_host_email,property_host_phone,property_host_fax,property_host_address,supplier_host_1_nm,supplier_host_1_email,supplier_host_1_phone,supplier_host_1_fax,supplier_host_1_address,supplier_host_1_id,supplier_host_2_nm,supplier_host_2_email,supplier_host_2_phone,supplier_host_2_fax,supplier_host_2_address,supplier_host_2_id,supplier_host_3_nm,supplier_host_3_email,supplier_host_3_phone,supplier_host_3_fax,supplier_host_3_address,supplier_host_3_id,supplier_host_4_nm,supplier_host_4_email,supplier_host_4_phone,supplier_host_4_fax,supplier_host_4_address,supplier_host_4_id,supplier_host_5_nm,supplier_host_5_email,supplier_host_5_phone,supplier_host_5_fax,supplier_host_5_address,supplier_host_5_id,errors\n2024-05,PLAT-EXP-VRBO ,100469,https://www.vrbo.com/100469,4891 Painted Cliff RoadUnit 44 Whistler BC,\"151-257-0880-01, 151-257-0880-01\",Y,3,0,0,Diane Huff,dianehuff.coho@gmail.com,12063341211,,\"4891 Painted Cliff Road, Unit 44 Whistler BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,361440,https://www.vrbo.com/361440,409 Swift St#506 Victoria BC,City of Victoria Business Licence 00036637,Y,1,0,0,Teresa R.,info@tdswansburg.com,16046183289,,\"409 Swift St, #506 Victoria BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,385167,https://www.vrbo.com/385167,4645 Blackcomb Way5 Whistler BC,Whistler business license 00009557,Y,2,0,1,Sherry Whitmore,sherry@whitmorefamily.org,17788740362,,\"4645 Blackcomb Way, 5 Whistler BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,389026,https://www.vrbo.com/389026,309 1 St W302 Revelstoke BC,Vacation Rental License 4176,Y,2,0,0,Andy Stein,astein@thinkverticalnow.com,17054588874,,\"309 1 St W, 302 Revelstoke BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2297584,https://www.vrbo.com/2297584,667 Victoria Dr101 Penticton BC,PENTICTON SHORT TERM RENTAL LICENSE #1007165,Y,3,0,0,DYANNA Downey,aquaaccomodations@shaw.ca,12504629262,,\"667 Victoria Dr, 101 Penticton BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2359183,https://www.vrbo.com/2359183,667 Victoria Dr102 Penticton BC,PENTICTON STR LICENSE 00113737,Y,3,0,0,DYANNA Downey,aquaaccomodations@shaw.ca,12504629262,,\"667 Victoria Dr, 102 Penticton BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,681977,https://www.vrbo.com/681977,749 Franklin Rd Gibsons BC,Gibsons Business licence RGA-2022-10,Y,3,19,5,Peter Fluker,peterfluker@yahoo.com,16044416779,,749 Franklin Rd Gibsons BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2502671,https://www.vrbo.com/2502671,751 Fairfield Rd Victoria BC,City of Victoria #00041307,Y,2,0,0,Melissa Frank,stay@citylifesuites.com,250-360-0774,,751 Fairfield Rd Victoria BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2969976,https://www.vrbo.com/2969976,Riverside Way Fernie BC,City of Fernie Business License #002391,Y,2,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,Riverside Way Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2761010,https://www.vrbo.com/2761010,2234 Prince Albert St Vancouver BC,22-888888,Y,1,0,0,Emily from Vancouver. I grew up in these parts and my place is in my favorite neighborhood! Wadler,songsays@hotmail.com,16042307571,,2234 Prince Albert St Vancouver BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,2943388,https://www.vrbo.com/2943388,1022 Odlum Drive Vancouver BC,22--262403,Y,3,0,0,Stay In Vancouver Executive Properties Stay In Vancouver Executive Properties,info@stayinvancouver.ca,16047678441,,1022 Odlum Drive Vancouver BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,2560314,https://www.vrbo.com/2560314,Riverside Way Fernie BC,City of Fernie Business License #002420,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,Riverside Way Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2624011,https://www.vrbo.com/2624011,1500 McDonald Avenue Fernie BC,City of Fernie Business License #002426,Y,2,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1500 McDonald Avenue Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2734141,https://www.vrbo.com/2734141,1383 Howe Street #1105 Vancouver BC,24-105479,Y,1,0,0,Stay In Vancouver Executive Properties Stay In Vancouver Executive Properties,info@stayinvancouver.ca,16047678441,,1383 Howe Street #1105 Vancouver BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,2923955,https://www.vrbo.com/2923955,500 Riverside Way Fernie BC,City of Fernie Business License #002391,Y,1,5,1,Diana Corak,diana@fernieco.ca,(416) 659-5315,,500 Riverside Way Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2966244,https://www.vrbo.com/2966244,500 Riverside Way Fernie BC,City of Fernie Business License #002391,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,500 Riverside Way Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3013408,https://www.vrbo.com/3013408,102 Rivermount Pl Fernie BC,City of Fernie Business License #002058,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,102 Rivermount Pl Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3136643,https://www.vrbo.com/3136643,2209 Stephens Street Vancouver BC,24-157754,Y,2,0,2,Stay In Vancouver Executive Properties Stay In Vancouver Executive Properties,info@stayinvancouver.ca,16047678441,,2209 Stephens Street Vancouver BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,3551995,https://www.vrbo.com/3551995,605 Riverside Way Fernie BC,City of Fernie Business License #002420,Y,2,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,605 Riverside Way Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3637746,https://www.vrbo.com/3637746,102 Rivermount Pl45-104 Fernie BC,City of Fernie Short-term Rental License #002663,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,\"102 Rivermount Pl, 45-104 Fernie BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2562320,https://www.vrbo.com/2562320,1473 Olive Street Pemberton BC,Business License  #  OLI002,Y,3,0,0,Sally Gray,spencesal64@gmail.com,16049028552,,1473 Olive Street Pemberton BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2563608,https://www.vrbo.com/2563608,1500 McDonald Ave Fernie BC,City of Fernie Business License #02422,Y,2,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1500 McDonald Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2673805,https://www.vrbo.com/2673805,621 Su'it St unit 5 Victoria BC,Business Licence #00039505,Y,1,0,2,Chan Holly,hchan1054@gmail.com,17782887294,,621 Su'it St unit 5 Victoria BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2723405,https://www.vrbo.com/2723405,102 Rivermount Pl47-101 Fernie BC,City of Fernie Business License #002467,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,\"102 Rivermount Pl, 47-101 Fernie BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2734140,https://www.vrbo.com/2734140,1383 Howe Street #1306 Vancouver BC,24-104255,Y,2,0,0,Stay In Vancouver Executive Properties Stay In Vancouver Executive Properties,info@stayinvancouver.ca,16047678441,,1383 Howe Street #1306 Vancouver BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,2734429,https://www.vrbo.com/2734429,1922 Kootenay ST Nelson BC,Listing has current business license with the City of Nelson,Y,2,12,2,Wren McElroy,skiwren@gmail.com,12505090659,,1922 Kootenay ST Nelson BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2750520,https://www.vrbo.com/2750520,3343 Chancellor Place West Kelowna BC,Business License # 8895 West Kelowna,Y,1,8,2,Cathy Paterson,cathypaterson62@gmail.com,17789523226,,3343 Chancellor Place West Kelowna BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2786799,https://www.vrbo.com/2786799,621 Trutch Street1 Victoria BC,Business Licence #00039505,Y,1,0,0,Chan Holly,hchan1054@gmail.com,17782887294,,\"621 Trutch Street, 1 Victoria BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2830180,https://www.vrbo.com/2830180,Morrissey Ct Fernie BC,City of Fernie Business License #002480,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,Morrissey Ct Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2836284,https://www.vrbo.com/2836284,468 Pickering St101 Penticton BC,Short-term rental license #: 00114321,Y,3,0,0,Brett Laturnus,brett.laturnus@gmail.com,12507947797,,\"468 Pickering St, 101 Penticton BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2910494,https://www.vrbo.com/2910494,1114 Lenora Rd Bowen Island BC,Business License No: 00000827,Y,2,8,6,M S,bowensnugspot@outlook.com,16047260592,,1114 Lenora Rd Bowen Island BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2973947,https://www.vrbo.com/2973947,1500 McDonald Ave Fernie BC,City of Fernie Business License #002504,Y,3,3,1,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1500 McDonald Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3073237,https://www.vrbo.com/3073237,1500 McDonald Ave Fernie BC,City of Fernie Business License #002300,Y,1,12,3,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1500 McDonald Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3103672,https://www.vrbo.com/3103672,621 Su'it St6 Victoria BC,Business Licence #00039505,Y,1,0,4,Chan Holly,hchan1054@gmail.com,17782887294,,\"621 Su'it St, 6 Victoria BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3403090,https://www.vrbo.com/3403090,901 2 Ave Fernie BC,City of Fernie Business License # 002608,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,901 2 Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3552508,https://www.vrbo.com/3552508,Riverside Way607 Fernie BC,City of Fernie Business License #002420,Y,1,7,1,Diana Corak,diana@fernieco.ca,(416) 659-5315,,\"Riverside Way, 607 Fernie BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3711695,https://www.vrbo.com/3711695ha,709 Bond Lane Tofino B.C,Business License Number 20230024,Y,3,7,3,Kevin Bond,kevin@cablelan.net,12502662945,,709 Bond Lane Tofino B.C,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3722659,https://www.vrbo.com/3722659,Riverside Way1200 - 1202 Fernie BC,City of Fernie Business License #002662,Y,6,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,\"Riverside Way, 1200 - 1202 Fernie BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3752765,https://www.vrbo.com/3752765,1202 Riverside Way Fernie BC,City of Fernie Business License #002662,Y,1,17,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1202 Riverside Way Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,3777750,https://www.vrbo.com/3777750ha,534 Yates St Victoria BC,City of Victoria Business License: 00039900,Y,1,0,0,Doug Hensby,dhensby@telus.net,16046526626,,534 Yates St Victoria BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,348858,https://www.vrbo.com/348858,506 Eves Road Bowen Island British Columbia,Business Licence No: 00000675,Y,3,4,1,Abraham Chaiton,contact@bowenislandbeachhouse.com,14374242414,,506 Eves Road Bowen Island British Columbia,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,491568,https://www.vrbo.com/491568,3300 Ptarmigan Place405 Whistler BC,Whistler Business licence  00011936,Y,4,0,0,Peter Fluker,peterfluker@yahoo.com,16044416779,,\"3300 Ptarmigan Place, 405 Whistler BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,499103,https://www.vrbo.com/499103,5333 Lookout Ridge Sun Peaks BC,Business License number: 232,Y,5,0,0,Sherry Keane,sunpeaks5333lookoutridge@gmail.com,16043452667,,5333 Lookout Ridge Sun Peaks BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,508390,https://www.vrbo.com/508390,1628 Mt. Gardner Road Bowen Island British Columbia,Business Licence No: 00000564,Y,2,3,1,Charles McNeill,cimcneill@earthlink.net,16048001486,,1628 Mt. Gardner Road Bowen Island British Columbia,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,721431,https://www.vrbo.com/721431,728 Yates St304 Victoria BC,CITY OF VICTORIA BUSINESS LICENCE #00036525,Y,1,0,0,Rick/Nancy Chan,eraretreat@gmail.com,12508916885,,\"728 Yates St, 304 Victoria BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,819567,https://www.vrbo.com/819567,1873 Country Club Drive2220 Kelowna BC,Kelowna Rental Licence #4088344,Y,2,0,0,Jimmi Singh,sanjitsingh@shaw.ca,14037002648,,\"1873 Country Club Drive, 2220 Kelowna BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,854163,https://www.vrbo.com/854163,438 West 21st Avenue Vancouver BC,24-152216,Y,3,0,0,Stay In Vancouver Executive Properties Stay In Vancouver Executive Properties,info@stayinvancouver.ca,16047678441,,438 West 21st Avenue Vancouver BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,917556,https://www.vrbo.com/917556,432 West 21st Avenue Vancouver BC,24-152216,Y,2,0,0,Stay In Vancouver Executive Properties Stay In Vancouver Executive Properties,info@stayinvancouver.ca,16047678441,,432 West 21st Avenue Vancouver BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,932974,https://www.vrbo.com/932974,901 - 2nd Ave Fernie BC,CIty Of Fernie Business License #002205,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,901 - 2nd Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1024853,https://www.vrbo.com/1024853,517 Fisgard Street505 Victoria BC,City of Victoria Business License #00035579,Y,1,0,0,Karen Weiss,thekarenweiss@gmail.com,12506427005,,\"517 Fisgard Street, 505 Victoria BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,932977,https://www.vrbo.com/932977,1500 McDonald Avenue Fernie BC,City of Fernie Business License #002577,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1500 McDonald Avenue Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,978312,https://www.vrbo.com/978312,901 - 2nd Ave Fernie BC,City Of Fernie Business License #002419,Y,5,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,901 - 2nd Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,978076,https://www.vrbo.com/978076,1500 MacDonald Ave Fernie BC,City of Fernie Business License #002191,Y,4,11,1,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1500 MacDonald Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,983373,https://www.vrbo.com/983373,901 - 2nd Avenue Fernie BC,City Of Fernie Business License #002204,Y,2,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,901 - 2nd Avenue Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1030938,https://www.vrbo.com/1030938,986 8 Avenue Fernie BC,City of Fernie Business License #002330,Y,5,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,986 8 Avenue Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1070941,https://www.vrbo.com/1070941,901 - 2nd ave#203A Fernie BC,City of Fernie Business License #002195,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,\"901 - 2nd ave, #203A Fernie BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1093274,https://www.vrbo.com/1093274,409 Swift Stsuite 521 Victoria BC,2024 business licence 00039915,Y,1,0,0,,,,,\"409 Swift St, suite 521 Victoria BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1126050,https://www.vrbo.com/1126050,1088 Sunset Dr Kelowna BC,City of Kelowna Business License # 04091746,Y,3,0,0,Leanne Madsen,leanne@gsdrum.ca,14038230172,,1088 Sunset Dr Kelowna BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1233787,https://www.vrbo.com/1233787,901 2 Ave Fernie BC,City Of Fernie Business License #002236,Y,3,1,1,Diana Corak,diana@fernieco.ca,(416) 659-5315,,901 2 Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1234229,https://www.vrbo.com/1234229,Rivermount Place#41-103 Fernie BC,City of Fernie Business License #002388,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,\"Rivermount Place, #41-103 Fernie BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1311365,https://www.vrbo.com/1311365,365 Neill StUpstairs Tofino BC,District of Tofino License number 20190319,Y,3,5,1,Lochie MacKenzie,llochie@gmail.com,12502660587,,\"365 Neill St, Upstairs Tofino BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1540717,https://www.vrbo.com/1540717,933 Mclean Vancouver BC,24-119746,Y,3,0,0,Stay In Vancouver Executive Properties Stay In Vancouver Executive Properties,info@stayinvancouver.ca,16047678441,,933 Mclean Vancouver BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,1870556,https://www.vrbo.com/1870556,901 2 Ave Fernie BC,City Of Fernie Business License #002187,Y,4,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,901 2 Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1869124,https://www.vrbo.com/1869124,609 Marisa St Nanaimo BC,City of Nanaimo Business Lic 5030507,Y,2,0,0,Eden Brager,nses1@telus.net,16047825479,,609 Marisa St Nanaimo BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1884344,https://www.vrbo.com/1884344,1500 McDonald Ave Fernie BC,City of Fernie Business License #001992,Y,1,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1500 McDonald Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2007117,https://www.vrbo.com/2007117,1480 Howe Street Vancouver BC,23-105716,Y,3,0,0,Stay In Vancouver Executive Properties Stay In Vancouver Executive Properties,info@stayinvancouver.ca,16047678441,,1480 Howe Street Vancouver BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,1870594,https://www.vrbo.com/1870594,901 2 Ave Fernie BC,City Of Fernie Business License #002187,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,901 2 Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1884164,https://www.vrbo.com/1884164,1500 McDonald Ave Fernie BC,City of Fernie Business License #001992,Y,2,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1500 McDonald Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1884801,https://www.vrbo.com/1884801,189 Davie Street805 Vancouver BC,22-10576,Y,2,0,0,Stay In Vancouver Executive Properties Stay In Vancouver Executive Properties,info@stayinvancouver.ca,16047678441,,\"189 Davie Street, 805 Vancouver BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,1884387,https://www.vrbo.com/1884387,1500 McDonald Ave Fernie BC,City of Fernie Business License #001992,Y,1,16,3,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1500 McDonald Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1958101,https://www.vrbo.com/1958101,1500 McDonald Ave Fernie BC,City of Fernie Business License #002387,Y,2,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,1500 McDonald Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,1934802,https://www.vrbo.com/1934802,1480 Howe Street Vancouver BC,21-106321,Y,1,0,0,Stay In Vancouver Executive Properties Stay In Vancouver Executive Properties,info@stayinvancouver.ca,16047678441,,1480 Howe Street Vancouver BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"property_host_nm:\nThe length of Property Host Nm field must be equal to or smaller than 50.\n\"\n2024-05,PLAT-EXP-VRBO ,1942571,https://www.vrbo.com/1942571,404 Riverside Way Fernie BC,City of Fernie Business License #002220,Y,2,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,404 Riverside Way Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2119761,https://www.vrbo.com/2119761,901 2 Ave Fernie BC,City Of Fernie Business License #002310,Y,3,0,0,Diana Corak,diana@fernieco.ca,(416) 659-5315,,901 2 Ave Fernie BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2160356,https://www.vrbo.com/2160356,960 Yates St Victoria BC,City of Victoria STR #1035045,Y,2,0,0,Stephanie Babin,stephbabin07@gmail.com,12508898981,,960 Yates St Victoria BC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n2024-05,PLAT-EXP-VRBO ,2243204,https://www.vrbo.com/2243204,409 Swift St503 Victoria BC,Business Licence Number 00040432,Y,1,0,0,Jackie Mackay,jacmac3453@gmail.com,12365086549,,\"409 Swift St, 503 Victoria BC\",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\"bus_lic_no:\nThe length of Bus Lic No field must be equal to or smaller than 25.\n\"\n"
+				}
+			]
 		},
 		{
 			"name": "Get Listings",
@@ -853,6 +941,42 @@
 						"api",
 						"rentallistings",
 						"450"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Roles",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/roles",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"roles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Permissions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/roles",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"roles"
 					]
 				}
 			},

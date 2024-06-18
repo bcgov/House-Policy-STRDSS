@@ -5,6 +5,7 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.UserDtos;
+using System.Collections.Generic;
 using System.Security;
 
 namespace StrDss.Data.Repositories
@@ -18,6 +19,7 @@ namespace StrDss.Data.Repositories
         Task<int> CountActivePermissionIdsAsnyc(IEnumerable<string> permissions);
         Task<bool> DoesRoleCdExist(string roleCd);
         Task UpdateRoleAsync(RoleUpdateDto role);
+        Task DeleteRoleAsync(string roleCd);
     }
     public class RoleRepository : RepositoryBase<DssUserRole>, IRoleRepository
     {
@@ -98,27 +100,15 @@ namespace StrDss.Data.Repositories
             }
         }
 
-        private async Task SyncPermissionsAsync(RoleUpdateDto role, DssUserRole roleEntity)
+        public async Task DeleteRoleAsync(string roleCd)
         {
-            var permissionsToDelete =
-                roleEntity.UserPrivilegeCds.Where(x => !role.Permissions.Contains(x.UserPrivilegeCd)).ToList();
+            var roleEntity = await _dbSet
+                .Include(x => x.UserPrivilegeCds)
+                .FirstAsync(x => x.UserRoleCd == roleCd);
 
-            for (var i = permissionsToDelete.Count() - 1; i >= 0; i--)
-            {
-                _dbContext.Remove(permissionsToDelete[i]);
-            }
+            roleEntity.UserPrivilegeCds.Clear();
 
-            var existingPermissions = roleEntity.UserPrivilegeCds.Select(x => x.UserPrivilegeCd);
-
-            var newPermissions = role.Permissions.Where(x => !existingPermissions.Contains(x));
-
-            foreach (var permission in newPermissions)
-            {
-                var privilege = await _dbContext.DssUserPrivileges
-                    .FirstAsync(x => x.UserPrivilegeCd == permission);
-
-                roleEntity.UserPrivilegeCds.Add(privilege);
-            }
+            _dbSet.Remove(roleEntity);
         }
     }
 }

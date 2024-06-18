@@ -35,6 +35,41 @@ public partial class DssPhysicalAddress
     public short? MatchScoreAmt { get; set; }
 
     /// <summary>
+    /// The siteID returned by the address match
+    /// </summary>
+    public string? SiteNo { get; set; }
+
+    /// <summary>
+    /// The blockID returned by the address match
+    /// </summary>
+    public string? BlockNo { get; set; }
+
+    /// <summary>
+    /// The computed location point of the matched address
+    /// </summary>
+    public Geometry? LocationGeometry { get; set; }
+
+    /// <summary>
+    /// Indicates whether the address has been identified as exempt from Short Term Rental regulations
+    /// </summary>
+    public bool? IsExempt { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? ContainingOrganizationId { get; set; }
+
+    /// <summary>
+    /// Trigger-updated timestamp of last change
+    /// </summary>
+    public DateTime UpdDtm { get; set; }
+
+    /// <summary>
+    /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
+    /// </summary>
+    public Guid? UpdUserGuid { get; set; }
+
+    /// <summary>
     /// The unitNumber (suite) returned by the address match (e.g. 100)
     /// </summary>
     public string? UnitNo { get; set; }
@@ -75,44 +110,9 @@ public partial class DssPhysicalAddress
     public string? ProvinceCd { get; set; }
 
     /// <summary>
-    /// The siteID returned by the address match
-    /// </summary>
-    public string? SiteNo { get; set; }
-
-    /// <summary>
-    /// The blockID returned by the address match
-    /// </summary>
-    public string? BlockNo { get; set; }
-
-    /// <summary>
-    /// The computed location point of the matched address
-    /// </summary>
-    public Geometry? LocationGeometry { get; set; }
-
-    /// <summary>
-    /// Indicates whether the address has been identified as exempt from Short Term Rental regulations
-    /// </summary>
-    public bool? IsExempt { get; set; }
-
-    /// <summary>
-    /// Foreign key
-    /// </summary>
-    public long? ContainingOrganizationId { get; set; }
-
-    /// <summary>
     /// Foreign key
     /// </summary>
     public long? ReplacingPhysicalAddressId { get; set; }
-
-    /// <summary>
-    /// Trigger-updated timestamp of last change
-    /// </summary>
-    public DateTime UpdDtm { get; set; }
-
-    /// <summary>
-    /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
-    /// </summary>
-    public Guid? UpdUserGuid { get; set; }
 
     public virtual DssOrganization? ContainingOrganization { get; set; }
 

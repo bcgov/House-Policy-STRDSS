@@ -73,6 +73,8 @@ public partial class DssDbContext : DbContext
 
             entity.ToTable("dss_email_message", tb => tb.HasComment("A message that is sent to one or more recipients via email"));
 
+            entity.HasIndex(e => new { e.ConcernedWithRentalListingId, e.MessageDeliveryDtm }, "dss_email_message_i1");
+
             entity.Property(e => e.EmailMessageId)
                 .HasComment("Unique generated key")
                 .UseIdentityAlwaysColumn()
@@ -210,6 +212,12 @@ public partial class DssDbContext : DbContext
 
             entity.ToTable("dss_organization", tb => tb.HasComment("A private company or governing body component that plays a role in short term rental reporting or enforcement"));
 
+            entity.HasIndex(e => e.OrganizationType, "dss_organization_i1");
+
+            entity.HasIndex(e => e.ManagingOrganizationId, "dss_organization_i2");
+
+            entity.HasIndex(e => e.OrganizationCd, "dss_organization_uk").IsUnique();
+
             entity.Property(e => e.OrganizationId)
                 .HasComment("Unique generated key")
                 .UseIdentityAlwaysColumn()
@@ -333,6 +341,12 @@ public partial class DssDbContext : DbContext
 
             entity.ToTable("dss_physical_address", tb => tb.HasComment("A property address that includes any verifiable BC attributes"));
 
+            entity.HasIndex(e => e.OriginalAddressTxt, "dss_physical_address_i1");
+
+            entity.HasIndex(e => e.MatchAddressTxt, "dss_physical_address_i2");
+
+            entity.HasIndex(e => e.ContainingOrganizationId, "dss_physical_address_i3");
+
             entity.Property(e => e.PhysicalAddressId)
                 .HasComment("Unique generated key")
                 .UseIdentityAlwaysColumn()
@@ -426,6 +440,14 @@ public partial class DssDbContext : DbContext
 
             entity.ToTable("dss_rental_listing", tb => tb.HasComment("A rental listing snapshot that is either relevant to a specific monthly report, or is the current, master version"));
 
+            entity.HasIndex(e => new { e.OfferingOrganizationId, e.PlatformListingNo }, "dss_rental_listing_i1");
+
+            entity.HasIndex(e => e.IncludingRentalListingReportId, "dss_rental_listing_i2");
+
+            entity.HasIndex(e => e.DerivedFromRentalListingId, "dss_rental_listing_i3");
+
+            entity.HasIndex(e => e.LocatingPhysicalAddressId, "dss_rental_listing_i4");
+
             entity.Property(e => e.RentalListingId)
                 .HasComment("Unique generated key")
                 .UseIdentityAlwaysColumn()
@@ -513,6 +535,8 @@ public partial class DssDbContext : DbContext
 
             entity.ToTable("dss_rental_listing_contact", tb => tb.HasComment("A person who has been identified as a notable contact for a particular rental listing"));
 
+            entity.HasIndex(e => e.ContactedThroughRentalListingId, "dss_rental_listing_contact_i1");
+
             entity.Property(e => e.RentalListingContactId)
                 .HasComment("Unique generated key")
                 .UseIdentityAlwaysColumn()
@@ -568,6 +592,8 @@ public partial class DssDbContext : DbContext
             entity.HasKey(e => e.RentalListingReportId).HasName("dss_rental_listing_report_pk");
 
             entity.ToTable("dss_rental_listing_report", tb => tb.HasComment("A platform-specific collection of rental listing information that is relevant to a specific month"));
+
+            entity.HasIndex(e => new { e.ProvidingOrganizationId, e.ReportPeriodYm }, "dss_rental_listing_report_uk").IsUnique();
 
             entity.Property(e => e.RentalListingReportId)
                 .HasComment("Unique generated key")
@@ -655,6 +681,9 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("match_address_txt");
             entity.Property(e => e.MatchScoreAmt).HasColumnName("match_score_amt");
             entity.Property(e => e.NightsBookedYtdQty).HasColumnName("nights_booked_ytd_qty");
+            entity.Property(e => e.OfferingOrganizationCd)
+                .HasMaxLength(25)
+                .HasColumnName("offering_organization_cd");
             entity.Property(e => e.OfferingOrganizationId).HasColumnName("offering_organization_id");
             entity.Property(e => e.OfferingOrganizationNm)
                 .HasMaxLength(250)
@@ -743,6 +772,8 @@ public partial class DssDbContext : DbContext
             entity.HasKey(e => e.UploadLineId).HasName("dss_upload_line_pk");
 
             entity.ToTable("dss_upload_line", tb => tb.HasComment("An upload delivery line that has been extracted from the source"));
+
+            entity.HasIndex(e => new { e.IncludingUploadDeliveryId, e.SourceRecordNo }, "dss_upload_line_uk").IsUnique();
 
             entity.Property(e => e.UploadLineId)
                 .HasComment("Unique generated key")

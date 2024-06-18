@@ -14,7 +14,7 @@
 </div>
 <div class="subtitle" *ngIf="listing">
     <div class="last-updated-container">
-        <strong>Last Updated: </strong>{{listing.lastActionDtm}}
+        <strong>Last Updated: </strong>{{(listing.lastActionDtm |date) || '-'}}
     </div>
     <div class="platform-container">
         <strong>Platform: </strong>{{listing.offeringOrganizationNm}}

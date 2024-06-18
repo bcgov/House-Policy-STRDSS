@@ -52,12 +52,17 @@ namespace StrDss.Common
 
         public static short? StringToShort(string str)
         {
-            if (str == null || str.IsEmpty())
+            if (string.IsNullOrWhiteSpace(str))
             {
                 return null;
             }
 
-            return Convert.ToInt16(str);
+            if (short.TryParse(str, out short result))
+            {
+                return result;
+            }
+
+            return null;
         }
     }
 }

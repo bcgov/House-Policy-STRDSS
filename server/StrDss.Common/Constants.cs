@@ -202,14 +202,20 @@
 
     public static class Permissions
     {
-        public const string CeuAction = "ceu_action";
-        public const string AuditRead = "audit_read";
-        public const string ListingRead = "listing_read";
-        public const string TakedownAction = "takedown_action";
         public const string UserRead = "user_read";
+        public const string UserWrite = "user_write";
+        public const string RoleRead = "role_read";
+        public const string RoleWrite = "role_write";
+        public const string ListingRead = "listing_read";
+        public const string AddressWrite = "address_write";
         public const string LicenceFileUpload = "licence_file_upload";
         public const string ListingFileUpload = "listing_file_upload";
-        public const string UserWrite = "user_write";
+        public const string TakdownFileUpload = "takedown_file_upload";
+        public const string UploadHistoryRead = "upload_history_read";
+        public const string AuditRead = "audit_read";
+        public const string TakedownAction = "takedown_action";
+        public const string ProvinceAction = "province_action";
+        public const string CeuAction = "ceu_action";
     }
 
     public static class UploadDeliveryTypes

@@ -64,3 +64,4 @@ Each production release depends on the execution of a fixed set of scripts again
   - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_7.sql`
 - Sprint 8:
   - `ddl/STR_DSS_Views_Sprint_8.sql`
+  - `seeding/STR_DSS_Data_Seeding_Sprint_8.sql`

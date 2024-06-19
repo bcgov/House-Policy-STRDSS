@@ -374,7 +374,7 @@ namespace StrDss.Service
 
                 processedCount++;
 
-                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/100");
             }
 
             if (!isLastLine)

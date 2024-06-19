@@ -25,6 +25,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> AcceptTermsConditions();
         Task UpdateBceidUserInfo(long userId, string firstName, string LastName);
         Task<UserDto?> GetUserByIdAsync(long userId);
+        Task<Dictionary<string, List<string>>> UpdateUserAsync(UserUpdateDto dto);
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -456,10 +457,44 @@ namespace StrDss.Service
             return await _userRepo.GetUserById(userId);
         }
 
-        //public async Task<Dictionary<string, List<string>>> UpdateUserAsync(UserUpdateDto dto)
-        //{
-        //    //existance of all the IDs.
+        public async Task<Dictionary<string, List<string>>> UpdateUserAsync(UserUpdateDto dto)
+        {
+            var errors = await ValidateUserUpdateDto(dto);
+            if (errors.Count > 0) return errors;
 
-        //}
+            await _userRepo.UpdateUserAsync(dto);
+            _unitOfWork.Commit();
+
+            return errors;
+        }
+
+        public async Task<Dictionary<string, List<string>>> ValidateUserUpdateDto(UserUpdateDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var user = await _userRepo.GetUserById(dto.UserIdentityId);
+            if (user == null)
+            {
+                errors.AddItem("userIdentityId", $"User ({dto.UserIdentityId}) doesn't exist");
+                return errors;
+            }
+
+            var org = await _orgRepo.GetOrganizationByIdAsync(dto.RepresentedByOrganizationId);
+            if (org == null)
+            {
+                errors.AddItem("representedByOrganizationId", $"Organization ({dto.RepresentedByOrganizationId}) doesn't exist");
+            }
+
+            foreach (var roleCd in dto.RoleCds)
+            {
+                var exists = await _roleRepo.DoesRoleCdExist(roleCd);
+                if (!exists)
+                {
+                    errors.AddItem("roleCd", $"Role ({roleCd}) doesn't exist");
+                }
+            }
+
+            return errors;
+        }
     }
 }

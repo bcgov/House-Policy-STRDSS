@@ -352,11 +352,7 @@ namespace StrDss.Service
 
                 var exists = linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.ListingId == row.ListingId);
 
-                if (!exists)
-                {
-                    _logger.LogInformation($"Skipping listing - ({row.OrgCd} - {row.ListingId})");
-                    continue;
-                }
+                if (!exists) continue;
 
                 var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.ListingId);
 

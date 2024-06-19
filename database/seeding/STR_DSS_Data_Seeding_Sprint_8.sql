@@ -95,24 +95,44 @@ WHEN NOT MATCHED
 THEN INSERT (user_role_cd, user_role_nm)
 VALUES (src.user_role_cd, src.user_role_nm);
 
+DELETE FROM dss_user_role_privilege WHERE user_role_cd='ceu_staff' AND user_privilege_cd='listing_file_upload';
+
+DELETE FROM dss_user_role_privilege WHERE user_role_cd='bc_staff' AND user_privilege_cd='audit_read';
+
 MERGE INTO dss_user_role_privilege AS tgt
 USING ( SELECT * FROM (VALUES
 ('ceu_admin','user_read'),
 ('ceu_admin','user_write'),
+('ceu_admin','role_read'),
+('ceu_admin','role_write'),
 ('ceu_admin','listing_read'),
+('ceu_admin','address_write'),
 ('ceu_admin','licence_file_upload'),
 ('ceu_admin','listing_file_upload'),
+('ceu_admin','takedown_file_upload'),
+('ceu_admin','upload_history_read'),
+('ceu_admin','audit_read'),
 ('ceu_admin','ceu_action'),
-('ceu_staff','listing_file_upload'),
+--
 ('ceu_staff','listing_read'),
+('ceu_staff','address_write'),
+('ceu_staff','upload_history_read'),
 ('ceu_staff','audit_read'),
+('ceu_staff','province_action'),
 ('ceu_staff','ceu_action'),
+--
 ('bc_staff','listing_read'),
-('bc_staff','audit_read'),
+('bc_staff','upload_history_read'),
+--
 ('lg_staff','listing_read'),
+('lg_staff','address_write'),
 ('lg_staff','licence_file_upload'),
+('lg_staff','upload_history_read'),
 ('lg_staff','audit_read'),
 ('lg_staff','takedown_action'),
+--
+('platform_staff','upload_history_read'),
+('platform_staff','takedown_file_upload'),
 ('platform_staff','listing_file_upload'))
 AS s (user_role_cd, user_privilege_cd)
 ) AS src

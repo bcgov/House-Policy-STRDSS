@@ -23,14 +23,28 @@ namespace StrDss.Api.Controllers
             _roleService = roleService;
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.RoleRead)]
         [HttpGet("", Name = "GetRoles")]
         public async Task<ActionResult<List<RoleDto>>> GetRoles()
         {
             return Ok(await _roleService.GetRolesAync());
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.RoleRead)]
+        [HttpGet("{roleCd}", Name = "GetRole")]
+        public async Task<ActionResult<RoleDto>> GetRole(string roleCd)
+        {
+            return Ok(await _roleService.GetRoleAync(roleCd));
+        }
+
+        [ApiAuthorize(Permissions.RoleRead)]
+        [HttpGet("permissions", Name = "GetPermissions")]
+        public async Task<ActionResult<List<RoleDto>>> GetPermissions()
+        {
+            return Ok(await _roleService.GetPermissionsAync());
+        }
+
+        [ApiAuthorize(Permissions.RoleWrite)]
         [HttpPost("", Name = "CreateRole")]
         public async Task<ActionResult> CreateRole(RoleUpdateDto dto)
         {
@@ -44,7 +58,7 @@ namespace StrDss.Api.Controllers
             return NoContent();
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.RoleWrite)]
         [HttpPut("{roleCd}", Name = "UpdateRole")]
         public async Task<ActionResult> UpdateRole(string roleCd, RoleUpdateDto dto)
         {
@@ -60,7 +74,7 @@ namespace StrDss.Api.Controllers
             return NoContent();
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.RoleWrite)]
         [HttpDelete("{roleCd}", Name = "DeleteRole")]
         public async Task<ActionResult> DeleteRole(string roleCd)
         {
@@ -74,18 +88,5 @@ namespace StrDss.Api.Controllers
             return NoContent();
         }
 
-        [ApiAuthorize]
-        [HttpGet("{roleCd}", Name = "GetRole")]
-        public async Task<ActionResult<RoleDto>> GetRole(string roleCd)
-        {
-            return Ok(await _roleService.GetRoleAync(roleCd));
-        }
-
-        [ApiAuthorize]
-        [HttpGet("permissions", Name = "GetPermissions")]
-        public async Task<ActionResult<List<RoleDto>>> GetPermissions()
-        {
-            return Ok(await _roleService.GetPermissionsAync());
-        }
     }
 }

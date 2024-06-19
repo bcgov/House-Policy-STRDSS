@@ -17,6 +17,7 @@ using StrDss.Api.Middlewares;
 using StrDss.Api;
 using StrDss.Service.Bceid;
 using Npgsql;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,12 @@ var dbPort = builder.Configuration.GetValue<string>("DB_PORT");
 var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
 
 builder.Services.AddHttpContextAccessor();
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -98,9 +105,6 @@ var mappingConfig = new MapperConfiguration(cfg =>
 
 var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
-
-//Add logging
-builder.Services.AddLogging(builder => builder.AddConsole());
 
 builder.Services.AddScoped<KcJwtBearerEvents>();
 

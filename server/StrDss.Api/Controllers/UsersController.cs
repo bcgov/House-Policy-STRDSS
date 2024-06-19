@@ -126,5 +126,21 @@ namespace StrDss.Api.Controllers
 
             return Ok();
         }
+
+        [ApiAuthorize(Permissions.UserWrite)]
+        [HttpPut("{userId}", Name = "UpdateUser")]
+        public async Task<ActionResult> UpdateUser(long userId, UserUpdateDto dto)
+        {
+            dto.UserIdentityId = userId;
+
+            var errors = await _userService.UpdateUserAsync(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
+        }
     }
 }

@@ -19,6 +19,7 @@ namespace StrDss.Model.UserDtos
         public string AccessRequestStatusCd { get; set; } = null!;
 
         public DateTime? AccessRequestDtm { get; set; }
+        public DateTime? AccessGrantedDtm { get; set; }
 
         public string? AccessRequestJustificationTxt { get; set; }
 

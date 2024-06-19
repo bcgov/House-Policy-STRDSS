@@ -38,6 +38,18 @@ namespace StrDss.Api.Controllers
             return Ok(list);
         }
 
+        [ApiAuthorize(Permissions.UserRead)]
+        [HttpGet("{userId}", Name = "GetUser")]
+        public async Task<ActionResult<UserDto>> GetUser(long userId)
+        {
+            var user = await _userService.GetUserByIdAsync(userId);
+
+            if (user == null)
+                return NotFound();
+
+            return Ok(user);
+        }
+
         [ApiAuthorize]
         [HttpPost("accessrequests", Name = "CreateAccessRequest")]
         public async Task<ActionResult> CreateAccessRequest(AccessRequestCreateDto dto)

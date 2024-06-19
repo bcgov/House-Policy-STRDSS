@@ -23,25 +23,70 @@ namespace StrDss.Api.Controllers
             _roleService = roleService;
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.RoleRead)]
         [HttpGet("", Name = "GetRoles")]
         public async Task<ActionResult<List<RoleDto>>> GetRoles()
         {
             return Ok(await _roleService.GetRolesAync());
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.RoleRead)]
         [HttpGet("{roleCd}", Name = "GetRole")]
         public async Task<ActionResult<RoleDto>> GetRole(string roleCd)
         {
             return Ok(await _roleService.GetRoleAync(roleCd));
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.RoleRead)]
         [HttpGet("permissions", Name = "GetPermissions")]
         public async Task<ActionResult<List<RoleDto>>> GetPermissions()
         {
             return Ok(await _roleService.GetPermissionsAync());
         }
+
+        [ApiAuthorize(Permissions.RoleWrite)]
+        [HttpPost("", Name = "CreateRole")]
+        public async Task<ActionResult> CreateRole(RoleUpdateDto dto)
+        {
+            var errors = await _roleService.CreateRoleAsync(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return NoContent();
+        }
+
+        [ApiAuthorize(Permissions.RoleWrite)]
+        [HttpPut("{roleCd}", Name = "UpdateRole")]
+        public async Task<ActionResult> UpdateRole(string roleCd, RoleUpdateDto dto)
+        {
+            dto.UserRoleCd = roleCd;
+
+            var errors = await _roleService.UpdateRoleAsync(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return NoContent();
+        }
+
+        [ApiAuthorize(Permissions.RoleWrite)]
+        [HttpDelete("{roleCd}", Name = "DeleteRole")]
+        public async Task<ActionResult> DeleteRole(string roleCd)
+        {
+            var errors = await _roleService.DeleteRoleAsync(roleCd);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return NoContent();
+        }
+
     }
 }

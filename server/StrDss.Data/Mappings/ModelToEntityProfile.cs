@@ -25,6 +25,8 @@ namespace StrDss.Data.Mappings
                 .ForMember(dest => dest.AvailableBedroomsQty, opt => opt.MapFrom(src => CommonUtils.StringToShort(src.BedroomsQty)))
                 .ForMember(dest => dest.NightsBookedQty, opt => opt.MapFrom(src => CommonUtils.StringToShort(src.NightsBookedQty)))
                 .ForMember(dest => dest.SeparateReservationsQty, opt => opt.MapFrom(src => CommonUtils.StringToShort(src.ReservationsQty)));
+
+            CreateMap<RoleUpdateDto, DssUserRole>();
         }
     }
 }

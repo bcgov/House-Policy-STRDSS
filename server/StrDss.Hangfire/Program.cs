@@ -15,6 +15,7 @@ using StrDss.Service.Hangfire;
 using Hangfire.PostgreSql;
 using Npgsql;
 using StrDss.Hangfire;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,12 @@ var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={d
 builder.Services.AddHttpContextAccessor();
 
 Console.WriteLine("Hangfire");
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddControllers();

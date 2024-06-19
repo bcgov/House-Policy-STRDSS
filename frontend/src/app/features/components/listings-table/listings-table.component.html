@@ -162,8 +162,8 @@
                         <a target="_blank" [href]="row.platformListingUrl">{{ row.platformListingNo }}</a>
                     </td>
                     <td class="align-center">
-                        <a pButton class="details-button-with-icon" [routerLink]="'/listing/'+row.rentalListingId"><i
-                                class="pi pi-list"></i></a>
+                        <a pButton class="details-button-with-icon" target="_blank"
+                            [routerLink]="'/listing/'+row.rentalListingId"><i class="pi pi-list"></i></a>
                     </td>
                     <td>{{ row.matchAddressTxt }}</td>
                     <td>{{ row.isEntireUnit?'Yes':'No' }}</td>

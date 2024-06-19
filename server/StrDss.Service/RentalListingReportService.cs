@@ -301,6 +301,8 @@ namespace StrDss.Service
 
         private async Task ProcessRentalReportUploadAsync(DssUploadDelivery upload)
         {
+            var processStopwatch = Stopwatch.StartNew();
+
             _logger.LogInformation($"Processing Rental Listing Report {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
 
             var reportPeriodYm = (DateOnly)upload.ReportPeriodYm!;
@@ -372,7 +374,7 @@ namespace StrDss.Service
 
                 processedCount++;
 
-                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/100");
             }
 
             if (!isLastLine)
@@ -437,7 +439,9 @@ namespace StrDss.Service
                 _unitOfWork.CommitTransaction(transaction);
             }
 
-            _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
+            processStopwatch.Stop();
+
+            _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
         private async Task<bool> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, bool isLastLine)

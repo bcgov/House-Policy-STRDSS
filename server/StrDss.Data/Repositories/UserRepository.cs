@@ -16,6 +16,7 @@ namespace StrDss.Data.Repositories
         Task<UserDto?> GetUserById(long id);
         Task<UserDto?> GetUserByGuid(Guid guid);
         Task UpdateUserAsync(UserDto dto);
+        Task UpdateUserAsync(UserUpdateDto dto);
         Task DenyAccessRequest(AccessRequestDenyDto dto);
         Task ApproveAccessRequest(AccessRequestApproveDto dto, string role);
         Task<List<UserDto>> GetAdminUsers();
@@ -94,8 +95,20 @@ namespace StrDss.Data.Repositories
         {
             var entity = await _dbSet.AsNoTracking()
                 .Include(x => x.RepresentedByOrganization)
+                .Include(x => x.UserRoleCds)
                 .FirstOrDefaultAsync(x => x.UserIdentityId == id);
-            return _mapper.Map<UserDto>(entity);
+
+            var user = _mapper.Map<UserDto>(entity);
+
+            var grantedMessage = await _dbContext.DssEmailMessages
+                .FirstOrDefaultAsync(x => x.EmailMessageType == EmailMessageTypes.AccessGranted && x.AffectedByUserIdentityId == user.UserIdentityId);
+
+            if (grantedMessage != null)
+            {
+                user.AccessGrantedDtm = grantedMessage.UpdDtm;
+            }
+
+            return user;
         }
 
         public async Task<UserDto?> GetUserByGuid(Guid guid)
@@ -108,6 +121,27 @@ namespace StrDss.Data.Repositories
         {
             var entity = await _dbSet.FirstAsync(x => x.UserIdentityId == dto.UserIdentityId);
             _mapper.Map(dto, entity);
+        }
+
+        public async Task UpdateUserAsync(UserUpdateDto dto)
+        {
+            var userEntity = await _dbSet
+                .Include(x => x.UserRoleCds)
+                .FirstAsync(x => x.UserIdentityId == dto.UserIdentityId);
+
+            _mapper.Map(dto, userEntity);
+
+            userEntity.UserRoleCds.Clear();
+
+            var roleCds = dto.RoleCds.Distinct();
+
+            foreach (var roleCd in roleCds)
+            {
+                var roleEntity = await _dbContext.DssUserRoles
+                    .FirstAsync(x => x.UserRoleCd == roleCd);
+
+                userEntity.UserRoleCds.Add(roleEntity);
+            }
         }
 
         public async Task DenyAccessRequest(AccessRequestDenyDto dto)

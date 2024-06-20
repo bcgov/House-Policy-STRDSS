@@ -1,4 +1,4 @@
-name: "STRDSS Server"
+name: "api-build-and-push"
 
 on:
   workflow_dispatch:

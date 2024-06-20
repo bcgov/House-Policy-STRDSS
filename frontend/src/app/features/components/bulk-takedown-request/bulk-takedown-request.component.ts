@@ -16,6 +16,7 @@ import { ChipsModule } from 'primeng/chips';
 import { DelistingService } from '../../../common/services/delisting.service';
 import { validateEmailListString } from '../../../common/consts/validators.const';
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-bulk-takedown-request',
@@ -69,7 +70,9 @@ export class BulkTakedownRequestComponent implements OnInit {
     private delistingService: DelistingService,
     private router: Router,
     private route: ActivatedRoute,
-    private searchStateService: SelectedListingsStateService) { }
+    private searchStateService: SelectedListingsStateService,
+    private loaderService: GlobalLoaderService,
+  ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(
@@ -124,11 +127,15 @@ export class BulkTakedownRequestComponent implements OnInit {
   }
 
   submitAfterPreview(): void {
+    this.loaderService.loadingStart();
     this.delistingService.delistingRequestBulk(this.submissionArray)
       .subscribe({
         next: () => {
           this.messageHandlerService.showSuccess('Takedown request has been sent successfully');
           this.cancel();
+        },
+        complete: () => {
+          this.loaderService.loadingEnd();
         }
       })
   }
@@ -158,12 +165,16 @@ export class BulkTakedownRequestComponent implements OnInit {
       customDetailTxt: formValues.customDetailTxt,
     }));
 
+    this.loaderService.loadingStart();
     this.delistingService.delistingRequestBulkPreview(this.submissionArray)
       .subscribe({
         next: (preview: { content: string }) => {
           this.previewText = preview.content;
           this.showPreviewDialog = true;
         },
+        complete: () => {
+          this.loaderService.loadingEnd();
+        }
       });
   }
 

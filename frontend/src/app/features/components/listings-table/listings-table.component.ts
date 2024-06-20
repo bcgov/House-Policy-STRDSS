@@ -21,6 +21,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SelectedListingsStateService } from '../../../common/services/selected-listings-state.service';
 import { environment } from '../../../../environments/environment';
 import { TooltipModule } from 'primeng/tooltip';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-listings-table',
@@ -63,6 +64,7 @@ export class ListingsTableComponent implements OnInit {
     private router: Router,
     private searchStateService: SelectedListingsStateService,
     private route: ActivatedRoute,
+    private loaderService: GlobalLoaderService,
   ) { }
 
   ngOnInit(): void {
@@ -109,7 +111,7 @@ export class ListingsTableComponent implements OnInit {
           next: (currentUser: User) => {
             this.isCEU = currentUser.permissions.includes(ceu_action);
             this.getListings(page);
-          }
+          },
         });
       }
     });
@@ -190,6 +192,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   private getListings(selectedPageNumber: number = 1): void {
+    this.loaderService.loadingStart();
     const searchReq = {} as ListingSearchRequest;
     searchReq[this.searchColumn] = this.searchTerm;
 
@@ -202,6 +205,9 @@ export class ListingsTableComponent implements OnInit {
         next: (res: PagingResponse<ListingTableRow>) => {
           this.currentPage = res.pageInfo;
           this.listings = res.sourceList;
+        },
+        complete: () => {
+          this.loaderService.loadingEnd();
         }
       });
   }

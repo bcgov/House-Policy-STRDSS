@@ -1,0 +1,7 @@
+<h2 class="header">Manage Roles and Permissions</h2>
+
+<p-listbox [options]="permissions" [(ngModel)]="selectedPermissions" optionLabel="label" [style]="{ width: '15rem' }"
+    [virtualScroll]="true" [filter]="true" [virtualScrollItemSize]="43" [multiple]="true" [checkbox]="true"
+    [showToggleAll]="false" [metaKeySelection]="false" [showToggleAll]="true"
+    (onSelectAllChange)="onSelectAllChange($event)" (onChange)="onChange($event)"
+    [listStyle]="{ 'max-height': '220px' }"></p-listbox>

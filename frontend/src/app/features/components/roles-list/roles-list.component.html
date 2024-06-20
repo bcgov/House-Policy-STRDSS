@@ -1,0 +1,14 @@
+<div class="header">
+    <h2>Manage Roles and Permissions</h2>
+</div>
+<div class="tile-list">
+    <div class="tile" *ngFor="let role of roles">
+        <a class="title" routerLink="/role/{{role.userRoleCd}}">
+            {{role.userRoleCd}}
+        </a>
+        <div class="description">{{role.userRoleNm}}</div>
+        <div class="actions">
+            <button pButton (click)="getRoleDetails(role.userRoleCd)">View Details</button>
+        </div>
+    </div>
+</div>

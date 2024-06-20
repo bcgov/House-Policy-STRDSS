@@ -1,0 +1,35 @@
+:host {
+
+    width: 100%;
+    flex: 0 0 100%;
+    padding: 0 24px 24px 24px;
+    background-color: #FFFFFF;
+
+    .header {
+        width: 100%;
+    }
+
+    .tile-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+
+        .tile {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            padding: 18px 16px;
+            width: 354px;
+            height: 158px;
+
+            border-radius: 4px;
+            box-shadow: 0px 3.2px 7.2px 0px rgba(0, 0, 0, 0.23);
+
+            .title {
+                font-family: 'BcSans-bold';
+                color: #004578;
+            }
+        }
+    }
+}

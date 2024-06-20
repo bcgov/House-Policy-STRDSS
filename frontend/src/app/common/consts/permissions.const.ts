@@ -6,3 +6,5 @@ export const listing_file_upload: string = 'listing_file_upload';
 export const listing_read: string = 'listing_read';
 export const ceu_action: string = 'ceu_action';
 export const audit_read: string = 'audit_read';
+export const role_read: string = 'role_read';
+export const role_write: string = 'role_write';

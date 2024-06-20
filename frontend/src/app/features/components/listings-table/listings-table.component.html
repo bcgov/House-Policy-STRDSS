@@ -165,7 +165,10 @@
                         <a pButton class="details-button-with-icon" target="_blank"
                             [routerLink]="'/listing/'+row.rentalListingId"><i class="pi pi-list"></i></a>
                     </td>
-                    <td>{{ row.matchAddressTxt }}</td>
+                    <td [class.low-address-score-match]="row.matchScoreAmt<addressLowScore">{{ row.matchAddressTxt }}
+                        &nbsp; <i class="pi pi-info-circle" pTooltip="Low Address Match Confidence"
+                            *ngIf="row.matchScoreAmt<=addressLowScore"></i>
+                    </td>
                     <td>{{ row.isEntireUnit?'Yes':'No' }}</td>
                     <td>{{ row.nightsBookedYtdQty }}</td>
                     <td>{{ row.businessLicenceNo }}</td>

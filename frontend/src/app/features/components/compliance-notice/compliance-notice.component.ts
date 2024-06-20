@@ -19,6 +19,7 @@ import { ComplianceNotice } from '../../../common/models/compliance-notice';
 import { MessagesModule } from 'primeng/messages';
 import { Router } from '@angular/router';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-compliance-notice',
@@ -77,7 +78,12 @@ export class ComplianceNoticeComponent implements OnInit {
     return this.myForm.controls['StrBylawUrl'];
   }
 
-  constructor(private fb: FormBuilder, private delistingService: DelistingService, private router: Router) { }
+  constructor(
+    private fb: FormBuilder,
+    private delistingService: DelistingService,
+    private router: Router,
+    private loaderService: GlobalLoaderService,
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -89,6 +95,7 @@ export class ComplianceNoticeComponent implements OnInit {
     this.messages = [];
 
     if (this.myForm.valid) {
+      this.loaderService.loadingStart();
       this.delistingService.complianceNoticePreview(this.prepareFormModel(this.myForm))
         .subscribe(
           {
@@ -98,6 +105,9 @@ export class ComplianceNoticeComponent implements OnInit {
             },
             error: error => {
               this.showErrors(error);
+            },
+            complete: () => {
+              this.loaderService.loadingEnd();
             }
           }
         )
@@ -111,6 +121,7 @@ export class ComplianceNoticeComponent implements OnInit {
     this.messages = [];
 
     if (this.myForm.valid) {
+      this.loaderService.loadingStart();
       const model: ComplianceNotice = this.prepareFormModel(this.myForm);
       model.comment = comment;
 
@@ -127,6 +138,7 @@ export class ComplianceNoticeComponent implements OnInit {
             this.initForm();
             this.onPreviewClose();
             this.cleanupPopupComment(textAreaElement);
+            this.loaderService.loadingEnd();
           }
         });
     }

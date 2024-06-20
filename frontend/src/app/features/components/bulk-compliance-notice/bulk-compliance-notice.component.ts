@@ -18,6 +18,7 @@ import { validateEmailListString } from '../../../common/consts/validators.const
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
 import { ComplianceNoticeBulk } from '../../../common/models/compliance-notice';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-bulk-compliance-notice',
@@ -51,7 +52,7 @@ export class BulkComplianceNoticeComponent implements OnInit {
   submissionArray!: Array<ComplianceNoticeBulk>;
 
   selectedListings!: Array<ListingDetailsWithHostCheckboxExtension>;
-  addressWarningScoreLimit = environment.ADDRESS_SCORE;
+  addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   sort!: { prop: string, dir: 'asc' | 'desc' }
 
   public get ccListControl(): AbstractControl {
@@ -66,7 +67,9 @@ export class BulkComplianceNoticeComponent implements OnInit {
     private delistingService: DelistingService,
     private router: Router,
     private route: ActivatedRoute,
-    private searchStateService: SelectedListingsStateService) { }
+    private searchStateService: SelectedListingsStateService,
+    private loaderService: GlobalLoaderService,
+  ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(
@@ -123,11 +126,15 @@ export class BulkComplianceNoticeComponent implements OnInit {
   }
 
   submitAfterPreview(): void {
+    this.loaderService.loadingStart();
     this.delistingService.complianceNoticeBulk(this.submissionArray)
       .subscribe({
         next: () => {
           this.messageHandlerService.showSuccess('Notice of non-compliance has been sent successfully');
           this.cancel();
+        },
+        complete: () => {
+          this.loaderService.loadingEnd();
         }
       });
   }
@@ -147,13 +154,16 @@ export class BulkComplianceNoticeComponent implements OnInit {
       comment: formValues.customDetailTxt,
       lgContactEmail: formValues.lgContactEmail,
     }));
-
+    this.loaderService.loadingStart();
     this.delistingService.complianceNoticeBulkPreview(this.submissionArray)
       .subscribe({
         next: (preview: { content: string }) => {
           this.previewText = preview.content;
           this.showPreviewDialog = true;
         },
+        complete: () => {
+          this.loaderService.loadingEnd();
+        }
       });
   }
 

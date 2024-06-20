@@ -8,15 +8,15 @@ using StrDss.Service;
 using Xunit;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Common;
-using Microsoft.EntityFrameworkCore;
-using StrDss.Data.Entities;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace StrDss.Test
 {
     public class UserServiceShould
     {
+        private const string UserNotFoundError = "User ({0}) doesn't exist";
+        private const string OrgNotFoundError = "Organization ({0}) doesn't exist";
+        private const string RoleNotFoundError = "Role ({0}) doesn't exist";
+
         [Theory]
         [AutoDomainData]
         public async Task CreateAccessRequestAsync_ValidDto_NoErrors(
@@ -346,6 +346,90 @@ namespace StrDss.Test
             {
                 return organizationDto;
             });
+        }
+        [Theory]
+        [AutoDomainData]
+        public async Task UpdateUserAsync_ValidDto_ReturnsNoErrors(
+            UserUpdateDto dto,
+            [Frozen] Mock<IUserRepository> userRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            [Frozen] Mock<IRoleRepository> roleRepoMock,
+            [Frozen] Mock<IUnitOfWork> unitOfWorkMock,
+            UserService sut)
+        {
+            // Arrange
+            userRepoMock.Setup(x => x.GetUserById(dto.UserIdentityId)).ReturnsAsync(new UserDto());
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(dto.RepresentedByOrganizationId)).ReturnsAsync(new OrganizationDto());
+            roleRepoMock.Setup(x => x.DoesRoleCdExist(It.IsAny<string>())).ReturnsAsync(true);
+
+            // Act
+            var result = await sut.UpdateUserAsync(dto);
+
+            // Assert
+            Assert.Empty(result);
+            userRepoMock.Verify(x => x.UpdateUserAsync(dto), Times.Once);
+            unitOfWorkMock.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task UpdateUserAsync_UserNotFound_ReturnsUserIdentityIdError(
+            UserUpdateDto dto,
+            [Frozen] Mock<IUserRepository> userRepoMock,
+            UserService sut)
+        {
+            // Arrange
+            userRepoMock.Setup(x => x.GetUserById(dto.UserIdentityId)).ReturnsAsync((UserDto)null);
+
+            // Act
+            var result = await sut.UpdateUserAsync(dto);
+
+            // Assert
+            Assert.Contains("userIdentityId", result.Keys);
+            Assert.Single(result["userIdentityId"]);
+            Assert.Equal(string.Format(UserNotFoundError, dto.UserIdentityId), result["userIdentityId"].First());
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task UpdateUserAsync_OrganizationNotFound_ReturnsOrganizationIdError(
+            UserUpdateDto dto,
+            [Frozen] Mock<IUserRepository> userRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            UserService sut)
+        {
+            // Arrange
+            userRepoMock.Setup(x => x.GetUserById(dto.UserIdentityId)).ReturnsAsync(new UserDto());
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(dto.RepresentedByOrganizationId)).ReturnsAsync((OrganizationDto)null);
+
+            // Act
+            var result = await sut.UpdateUserAsync(dto);
+
+            // Assert
+            Assert.Contains("representedByOrganizationId", result.Keys);
+            Assert.Single(result["representedByOrganizationId"]);
+            Assert.Equal(string.Format(OrgNotFoundError, dto.RepresentedByOrganizationId), result["representedByOrganizationId"].First());
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public async Task UpdateUserAsync_RoleNotFound_ReturnsRoleCdError(
+            UserUpdateDto dto,
+            [Frozen] Mock<IUserRepository> userRepoMock,
+            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
+            [Frozen] Mock<IRoleRepository> roleRepoMock,
+            UserService sut)
+        {
+            // Arrange
+            userRepoMock.Setup(x => x.GetUserById(dto.UserIdentityId)).ReturnsAsync(new UserDto());
+            orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(dto.RepresentedByOrganizationId)).ReturnsAsync(new OrganizationDto());
+            roleRepoMock.Setup(x => x.DoesRoleCdExist(It.IsAny<string>())).ReturnsAsync(false);
+
+            // Act
+            var result = await sut.UpdateUserAsync(dto);
+
+            // Assert
+            Assert.Contains("roleCd", result.Keys);
         }
 
     }

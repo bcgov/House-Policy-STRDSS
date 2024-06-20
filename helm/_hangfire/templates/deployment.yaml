@@ -103,7 +103,7 @@ spec:
             failureThreshold: 5
           volumeMounts:
             - name: logs
-              mountPath: /strdss/logs
+              mountPath: /strdss
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

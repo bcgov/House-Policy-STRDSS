@@ -52,7 +52,7 @@ export class BulkComplianceNoticeComponent implements OnInit {
   submissionArray!: Array<ComplianceNoticeBulk>;
 
   selectedListings!: Array<ListingDetailsWithHostCheckboxExtension>;
-  addressWarningScoreLimit = environment.ADDRESS_SCORE;
+  addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   sort!: { prop: string, dir: 'asc' | 'desc' }
 
   public get ccListControl(): AbstractControl {

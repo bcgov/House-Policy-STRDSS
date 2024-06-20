@@ -56,7 +56,7 @@ export class ListingsTableComponent implements OnInit {
   isCEU = false;
   isLegendShown = false;
 
-  readonly addressLowScore = environment.ADDRESS_SCORE;
+  readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
 
   constructor(
     private listingService: ListingDataService,

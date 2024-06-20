@@ -52,7 +52,7 @@ export class BulkTakedownRequestComponent implements OnInit {
   }[]
 
   selectedListings!: Array<ListingDetails>;
-  addressWarningScoreLimit = environment.ADDRESS_SCORE;
+  addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   sort!: { prop: string, dir: 'asc' | 'desc' }
 
   public get ccListControl(): AbstractControl {

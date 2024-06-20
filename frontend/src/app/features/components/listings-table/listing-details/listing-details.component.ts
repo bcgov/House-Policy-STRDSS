@@ -31,7 +31,7 @@ export class ListingDetailsComponent implements OnInit {
   id!: number;
   listing!: ListingDetails;
   isLegendShown = false;
-  addressWarningScoreLimit = environment.ADDRESS_SCORE;
+  addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   isCEU = false;
 
   constructor(

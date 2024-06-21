@@ -122,7 +122,7 @@ export class BulkComplianceNoticeComponent implements OnInit {
 
   cancel(): void {
     this.searchStateService.selectedListings = [];
-    this.router.navigateByUrl(this.returnUrl)
+    this.router.navigateByUrl(this.returnUrl);
   }
 
   submitAfterPreview(): void {
@@ -151,10 +151,12 @@ export class BulkComplianceNoticeComponent implements OnInit {
         ? formValues
         : (formValues.ccList as string).split(',').filter(x => !!x).map(x => x.trim()),
       hostEmailSent: x.sendNoticeToHosts,
-      comment: formValues.customDetailTxt,
+      comment: formValues.comment,
       lgContactEmail: formValues.lgContactEmail,
     }));
+
     this.loaderService.loadingStart();
+
     this.delistingService.complianceNoticeBulkPreview(this.submissionArray)
       .subscribe({
         next: (preview: { content: string }) => {

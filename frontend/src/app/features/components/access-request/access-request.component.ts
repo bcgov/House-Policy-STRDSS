@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Message } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -12,6 +12,7 @@ import { RequestAccessService } from '../../../common/services/request-access.se
 import { AccessRequest } from '../../../common/models/access-request';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-access-request',
@@ -52,6 +53,7 @@ export class AccessRequestComponent implements OnInit {
     private requestAccessService: RequestAccessService,
     private userDataService: UserDataService,
     private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -100,22 +102,26 @@ export class AccessRequestComponent implements OnInit {
         },
         complete: () => {
           this.loaderService.loadingEnd();
+          this.cd.detectChanges();
         }
       });
     }
   }
 
   private initData(): void {
-    this.requestAccessService.getOrganizationTypes().subscribe({
-      next: (types => {
+    this.loaderService.loadingStart();
+    const getCurrentUser = this.userDataService.getCurrentUser();
+    const getOrgs = this.requestAccessService.getOrganizationTypes();
+
+    forkJoin([getCurrentUser, getOrgs]).subscribe({
+      next: ([user, types]) => {
         this.roles = types;
-      }),
-    });
-    this.userDataService.getCurrentUser().subscribe({
-      next: user => {
         this.currentUser = user;
+      }, complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
       }
-    })
+    });
   }
 
   private initForm(): void {

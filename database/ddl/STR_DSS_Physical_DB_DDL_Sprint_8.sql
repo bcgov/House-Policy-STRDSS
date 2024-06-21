@@ -466,11 +466,19 @@ CREATE TRIGGER dss_rental_listing_br_iu_tr BEFORE INSERT OR UPDATE ON dss_rental
 
 CREATE TRIGGER dss_rental_listing_contact_br_iu_tr BEFORE INSERT OR UPDATE ON dss_rental_listing_contact FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
+CREATE TRIGGER dss_rental_listing_extract_br_iu_tr BEFORE INSERT OR UPDATE ON dss_rental_listing_extract FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
+
 CREATE TRIGGER dss_rental_listing_report_br_iu_tr BEFORE INSERT OR UPDATE ON dss_rental_listing_report FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
 CREATE TRIGGER dss_upload_delivery_br_iu_tr BEFORE INSERT OR UPDATE ON dss_upload_delivery FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
 CREATE TRIGGER dss_user_identity_br_iu_tr BEFORE INSERT OR UPDATE ON dss_user_identity FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
+
+CREATE TRIGGER dss_user_role_br_iu_tr BEFORE INSERT OR UPDATE ON dss_user_role FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
+
+CREATE TRIGGER dss_user_role_assignment_br_iu_tr BEFORE INSERT OR UPDATE ON dss_user_role_assignment FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
+
+CREATE TRIGGER dss_user_role_privilege_br_iu_tr BEFORE INSERT OR UPDATE ON dss_user_role_privilege FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
 CREATE OR REPLACE FUNCTION dss_containing_organization_id(p_point geometry)
  RETURNS bigint

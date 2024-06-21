@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -41,11 +41,13 @@ export class ListingDetailsComponent implements OnInit {
     private userDataService: UserDataService,
     private searchStateService: SelectedListingsStateService,
     private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
     this.loaderService.loadingStart();
     this.id = this.route.snapshot.params['id'];
+
     this.userDataService.getCurrentUser().subscribe({
       next: (user) => {
         this.isCEU = user.permissions.includes('ceu_action');
@@ -83,6 +85,7 @@ export class ListingDetailsComponent implements OnInit {
       },
       complete: () => {
         this.loaderService.loadingEnd();
+        this.cd.detectChanges();
       }
     });
   }

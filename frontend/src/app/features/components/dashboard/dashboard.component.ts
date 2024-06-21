@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -37,6 +37,7 @@ export class DashboardComponent implements OnInit {
     private userDataService: UserDataService,
     private dashboardService: DashboardService,
     private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -49,6 +50,7 @@ export class DashboardComponent implements OnInit {
       },
       complete: () => {
         this.loaderService.loadingEnd();
+        this.cd.detectChanges();
       }
     })
   }

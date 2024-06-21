@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { environment } from '../../../../environments/environment';
 import { TableModule } from 'primeng/table';
@@ -69,6 +69,7 @@ export class BulkComplianceNoticeComponent implements OnInit {
     private route: ActivatedRoute,
     private searchStateService: SelectedListingsStateService,
     private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -135,6 +136,7 @@ export class BulkComplianceNoticeComponent implements OnInit {
         },
         complete: () => {
           this.loaderService.loadingEnd();
+          this.cd.detectChanges();
         }
       });
   }
@@ -165,6 +167,7 @@ export class BulkComplianceNoticeComponent implements OnInit {
         },
         complete: () => {
           this.loaderService.loadingEnd();
+          this.cd.detectChanges();
         }
       });
   }

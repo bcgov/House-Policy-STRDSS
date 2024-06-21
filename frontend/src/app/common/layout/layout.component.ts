@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -26,18 +26,31 @@ export class LayoutComponent {
   showHeaderMenu = true;
   items: MenuItem[] | undefined;
 
-  constructor(public userDataService: UserDataService, private topMenuService: TopMenuService, private authService: AuthService, private messageService: MessageService, private errorHandlingService: ErrorHandlingService) { }
+  constructor(
+    public userDataService: UserDataService,
+    private topMenuService: TopMenuService,
+    private authService: AuthService,
+    private messageService: MessageService,
+    private errorHandlingService: ErrorHandlingService,
+    private cd: ChangeDetectorRef,
+  ) { }
 
   ngOnInit() {
     this.errorHandlingService.errorSubject.subscribe({
       next: (error) => {
         this.showError(error);
+      },
+      complete: () => {
+        this.cd.detectChanges();
       }
     });
 
     this.errorHandlingService.successSubject.subscribe({
       next: (message: string) => {
         this.showSuccess(message);
+      },
+      complete: () => {
+        this.cd.detectChanges();
       }
     });
 

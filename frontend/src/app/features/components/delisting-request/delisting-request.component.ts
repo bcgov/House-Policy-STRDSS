@@ -19,6 +19,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessagesModule } from 'primeng/messages';
 import { Router } from '@angular/router';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-delisting-request',
@@ -72,7 +73,12 @@ export class DelistingRequestComponent implements OnInit {
     return this.myForm.controls['customDetailTxt'];
   }
 
-  constructor(private fb: FormBuilder, private delistingService: DelistingService, private router: Router) { }
+  constructor(
+    private fb: FormBuilder,
+    private delistingService: DelistingService,
+    private router: Router,
+    private loaderService: GlobalLoaderService,
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -85,6 +91,7 @@ export class DelistingRequestComponent implements OnInit {
     this.messages = [];
 
     if (this.myForm.valid) {
+      this.loaderService.loadingStart();
       this.delistingService.delistingRequestPreview(this.prepareFormModel(this.myForm))
         .subscribe(
           {
@@ -94,6 +101,9 @@ export class DelistingRequestComponent implements OnInit {
             },
             error: error => {
               this.showErrors(error);
+            },
+            complete: () => {
+              this.loaderService.loadingEnd();
             }
           }
         )
@@ -107,6 +117,7 @@ export class DelistingRequestComponent implements OnInit {
     this.messages = [];
 
     if (this.myForm.valid) {
+      this.loaderService.loadingStart();
       this.delistingService.createDelistingRequest(this.prepareFormModel(this.myForm))
         .subscribe({
           next: (_) => {
@@ -119,6 +130,7 @@ export class DelistingRequestComponent implements OnInit {
             this.myForm.reset();
             this.initForm();
             this.onPreviewClose();
+            this.loaderService.loadingEnd();
           }
         });
     }

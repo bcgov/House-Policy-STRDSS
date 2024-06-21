@@ -59,7 +59,7 @@ namespace StrDss.Api.Controllers
 
             if (errors.Count > 0)
             {
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext, "One or more validation errors occurred in uploaded file.");
             }
 
             return Ok();

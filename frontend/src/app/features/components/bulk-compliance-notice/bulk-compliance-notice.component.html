@@ -141,7 +141,7 @@
         (click)="submit()">Review</button>
     <button pButton id="cancel-btn" class="outline-btn" (click)="cancel()">Cancel</button>
 </div>
-<p-dialog class="preview-dialog" header="Send Takedown Request" [(visible)]="showPreviewDialog" [modal]="true"
+<p-dialog class="preview-dialog" header="Send Notice of Non-Compliance" [(visible)]="showPreviewDialog" [modal]="true"
     [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
 
     <div class="note">
@@ -151,8 +151,7 @@
         </div>
         <div class="content">
             When you click submit, this email will be personalized and sent to the platform representatives and all
-            hosts for each listing (unless you have indicated a notice to the host has been sent through an alternative
-            delivery method).
+            hosts for each listing (if selected).
         </div>
     </div>
 

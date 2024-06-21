@@ -11,6 +11,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { UserDataService } from '../../../../common/services/user-data.service';
 import { environment } from '../../../../../environments/environment';
 import { SelectedListingsStateService } from '../../../../common/services/selected-listings-state.service';
+import { GlobalLoaderService } from '../../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-listing-details',
@@ -30,7 +31,7 @@ export class ListingDetailsComponent implements OnInit {
   id!: number;
   listing!: ListingDetails;
   isLegendShown = false;
-  addressWarningScoreLimit = environment.ADDRESS_SCORE;
+  addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   isCEU = false;
 
   constructor(
@@ -38,15 +39,19 @@ export class ListingDetailsComponent implements OnInit {
     private router: Router,
     private listingService: ListingDataService,
     private userDataService: UserDataService,
-    private searchStateService: SelectedListingsStateService
+    private searchStateService: SelectedListingsStateService,
+    private loaderService: GlobalLoaderService,
   ) { }
 
   ngOnInit(): void {
+    this.loaderService.loadingStart();
     this.id = this.route.snapshot.params['id'];
     this.userDataService.getCurrentUser().subscribe({
       next: (user) => {
         this.isCEU = user.permissions.includes('ceu_action');
-      }
+      }, complete: () => {
+        this.loaderService.loadingEnd();
+      },
     });
 
     this.getListingDetailsById(this.id);
@@ -71,9 +76,13 @@ export class ListingDetailsComponent implements OnInit {
   }
 
   private getListingDetailsById(id: number): void {
+    this.loaderService.loadingStart();
     this.listingService.getListingDetailsById(id).subscribe({
       next: (response: ListingDetails) => {
         this.listing = response;
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
       }
     });
   }

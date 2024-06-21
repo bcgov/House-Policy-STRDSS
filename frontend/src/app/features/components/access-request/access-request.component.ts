@@ -11,6 +11,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RequestAccessService } from '../../../common/services/request-access.service';
 import { AccessRequest } from '../../../common/models/access-request';
 import { UserDataService } from '../../../common/services/user-data.service';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-access-request',
@@ -50,6 +51,7 @@ export class AccessRequestComponent implements OnInit {
     private fb: FormBuilder,
     private requestAccessService: RequestAccessService,
     private userDataService: UserDataService,
+    private loaderService: GlobalLoaderService,
   ) { }
 
   ngOnInit(): void {
@@ -65,6 +67,7 @@ export class AccessRequestComponent implements OnInit {
       this.showRequestedFailedMessage = false;
       this.showRequestedSuccessfullyMessage = false;
       const model: AccessRequest = this.myForm.getRawValue();
+      this.loaderService.loadingStart();
 
       this.requestAccessService.createAccessRequest(model).subscribe({
         next: _ => {
@@ -95,7 +98,10 @@ export class AccessRequestComponent implements OnInit {
             this.messages.push({ severity: 'error', summary: 'Request failed!', detail: 'Unhandled error.' });
           }
         },
-      })
+        complete: () => {
+          this.loaderService.loadingEnd();
+        }
+      });
     }
   }
 

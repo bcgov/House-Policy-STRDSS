@@ -9,20 +9,17 @@ namespace StrDss.Api.Authorization
     public class ApiAuthorizeAttribute : AuthorizeAttribute, IAuthorizationFilter
     {
         private readonly string[] _permissions = null!;
-        private readonly ILogger<StrDssLogger> _logger = null!;
+        private ILogger<StrDssLogger> _logger = null!;
+
         public ApiAuthorizeAttribute(params string[] permissions)
         {
             _permissions = permissions;
-
-            using var loggerFactory = LoggerFactory.Create(config =>
-            {
-                config.AddConsole(); 
-            });
-
-            _logger = loggerFactory.CreateLogger<StrDssLogger>();
         }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
+            var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+            _logger = loggerFactory.CreateLogger<StrDssLogger>();
+
             var user = context.HttpContext.User;
             var username = user?.Identity?.Name ?? "Unknown";
             var ipAddress = context.HttpContext.Connection.RemoteIpAddress;

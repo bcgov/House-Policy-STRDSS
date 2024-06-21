@@ -984,6 +984,89 @@
 			"response": []
 		},
 		{
+			"name": "Create Role",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userRoleCd\": \"test_role\",\r\n  \"userRoleNm\": \"Role for Testing\",\r\n  \"permissions\": [\r\n    \"listing_read\"\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/roles",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"roles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Role",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userRoleCd\": \"test_role\",\r\n  \"userRoleNm\": \"Role for Testing\",\r\n  \"permissions\": [\r\n \r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/roles/test_role",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"roles",
+						"test_role"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Role",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/roles/test_role",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"roles",
+						"test_role"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get Permissions",
 			"request": {
 				"method": "GET",
@@ -997,6 +1080,53 @@
 						"api",
 						"roles",
 						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/users/8",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"8"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userIdentityId\": 8,\r\n  \"representedByOrganizationId\": 256,\r\n  \"roleCds\": [\r\n    \"lg_staff\"\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/users/8",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"8"
 					]
 				}
 			},

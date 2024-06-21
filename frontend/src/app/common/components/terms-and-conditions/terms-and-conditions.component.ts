@@ -5,6 +5,7 @@ import { CardModule } from 'primeng/card';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CheckboxModule } from 'primeng/checkbox';
+import { GlobalLoaderService } from '../../services/global-loader.service';
 
 @Component({
   selector: 'app-terms-and-conditions',
@@ -17,9 +18,13 @@ export class TermsAndConditionsComponent implements OnInit {
   accepted = false;
   termsAndConditionsUrl = '';
 
-  constructor(private userDataService: UserDataService) { }
+  constructor(
+    private userDataService: UserDataService,
+    private loaderService: GlobalLoaderService,
+  ) { }
 
   ngOnInit(): void {
+    this.loaderService.loadingStart();
     this.userDataService.getCurrentUser().subscribe({
       next: (user) => {
         switch (user.organizationType) {
@@ -34,14 +39,20 @@ export class TermsAndConditionsComponent implements OnInit {
           default:
             break;
         }
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
       }
-    })
+    });
   }
 
   accept(): void {
+    this.loaderService.loadingStart();
     this.userDataService.acceptTermsAndConditions().subscribe({
       next: () => {
         window.location.href = '/';
+      }, complete: () => {
+        this.loaderService.loadingEnd();
       }
     });
   }

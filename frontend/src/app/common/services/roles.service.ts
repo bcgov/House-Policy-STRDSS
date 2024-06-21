@@ -15,7 +15,7 @@ export class RolesService {
     return this.httpClient.get<Array<UserRole>>(`${environment.API_HOST}/roles`)
   }
 
-  getRolesById(id: any): Observable<UserRole> {
+  getRoleById(id: any): Observable<UserRole> {
     return this.httpClient.get<UserRole>(`${environment.API_HOST}/roles/${id}`)
   }
 

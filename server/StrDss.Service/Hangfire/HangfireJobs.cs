@@ -28,5 +28,13 @@ namespace StrDss.Service.Hangfire
         {
             await _delistingService.ProcessTakedownRequestBatchEmailsAsync();
         }
+
+        [Queue("default")]
+        [SkipSameJob]
+        [AutomaticRetry(Attempts = 0)]
+        public async Task CleanUpAddresses()
+        {
+            await Task.CompletedTask;
+        }
     }
 }

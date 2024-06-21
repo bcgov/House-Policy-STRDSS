@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UserDataService } from '../../services/user-data.service';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -21,6 +21,7 @@ export class TermsAndConditionsComponent implements OnInit {
   constructor(
     private userDataService: UserDataService,
     private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -42,6 +43,7 @@ export class TermsAndConditionsComponent implements OnInit {
       },
       complete: () => {
         this.loaderService.loadingEnd();
+        this.cd.detectChanges();
       }
     });
   }
@@ -53,6 +55,7 @@ export class TermsAndConditionsComponent implements OnInit {
         window.location.href = '/';
       }, complete: () => {
         this.loaderService.loadingEnd();
+        this.cd.detectChanges();
       }
     });
   }

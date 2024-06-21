@@ -21,6 +21,7 @@ USING ( SELECT * FROM (VALUES
 ('Notice of Takedown','Notice of Non-Compliance'),
 ('Takedown Request','Takedown Request Confirmation'),
 ('Batch Takedown Request','Batch Takedown Request'),
+('Completed Takedown','Completed Takedown'),
 ('Escalation Request','STR Escalation Request'),
 ('Compliance Order','Provincial Compliance Order'),
 ('Access Requested','Access Requested Notification'),
@@ -95,9 +96,11 @@ WHEN NOT MATCHED
 THEN INSERT (user_role_cd, user_role_nm)
 VALUES (src.user_role_cd, src.user_role_nm);
 
-DELETE FROM dss_user_role_privilege WHERE user_role_cd='ceu_staff' AND user_privilege_cd='listing_file_upload';
+DELETE FROM dss_user_role_privilege WHERE user_role_cd='ceu_staff' AND user_privilege_cd in ('listing_file_upload','listing_read','address_write');
 
-DELETE FROM dss_user_role_privilege WHERE user_role_cd='bc_staff' AND user_privilege_cd='audit_read';
+DELETE FROM dss_user_role_privilege WHERE user_role_cd='bc_staff' AND user_privilege_cd in ('audit_read','listing_read');
+
+DELETE FROM dss_user_role_privilege WHERE user_role_cd='lg_staff' AND user_privilege_cd in ('listing_read','address_write');
 
 MERGE INTO dss_user_role_privilege AS tgt
 USING ( SELECT * FROM (VALUES
@@ -114,18 +117,18 @@ USING ( SELECT * FROM (VALUES
 ('ceu_admin','audit_read'),
 ('ceu_admin','ceu_action'),
 --
-('ceu_staff','listing_read'),
-('ceu_staff','address_write'),
+--('ceu_staff','listing_read'), -- to be reinstated before release 3
+--('ceu_staff','address_write'), -- to be reinstated before release 3
 ('ceu_staff','upload_history_read'),
 ('ceu_staff','audit_read'),
 ('ceu_staff','province_action'),
 ('ceu_staff','ceu_action'),
 --
-('bc_staff','listing_read'),
+--('bc_staff','listing_read'), -- to be reinstated before release 3
 ('bc_staff','upload_history_read'),
 --
-('lg_staff','listing_read'),
-('lg_staff','address_write'),
+--('lg_staff','listing_read'), -- to be reinstated before release 3
+--('lg_staff','address_write'), -- to be reinstated before release 3
 ('lg_staff','licence_file_upload'),
 ('lg_staff','upload_history_read'),
 ('lg_staff','audit_read'),

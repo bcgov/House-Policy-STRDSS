@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ListingDataService } from '../../../common/services/listing-data.service';
 import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { ListingTableRow } from '../../../common/models/listing-table-row';
@@ -65,6 +65,7 @@ export class ListingsTableComponent implements OnInit {
     private searchStateService: SelectedListingsStateService,
     private route: ActivatedRoute,
     private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -208,6 +209,7 @@ export class ListingsTableComponent implements OnInit {
         },
         complete: () => {
           this.loaderService.loadingEnd();
+          this.cd.detectChanges();
         }
       });
   }

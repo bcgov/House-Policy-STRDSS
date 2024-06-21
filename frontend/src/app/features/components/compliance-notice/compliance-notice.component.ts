@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -83,12 +83,20 @@ export class ComplianceNoticeComponent implements OnInit {
     private delistingService: DelistingService,
     private router: Router,
     private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
     this.initForm();
+    this.loaderService.loadingStart();
 
-    this.delistingService.getPlatforms().subscribe((platformOptions) => this.platformOptions = platformOptions);
+    this.delistingService.getPlatforms().subscribe({
+      next: (platformOptions) => { this.platformOptions = platformOptions },
+      complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
+      }
+    });
   }
 
   onPreview(): void {
@@ -108,9 +116,10 @@ export class ComplianceNoticeComponent implements OnInit {
             },
             complete: () => {
               this.loaderService.loadingEnd();
+              this.cd.detectChanges();
             }
           }
-        )
+        );
     } else {
       this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Form is invalid' }];
       console.error('Form is invalid!');
@@ -139,6 +148,7 @@ export class ComplianceNoticeComponent implements OnInit {
             this.onPreviewClose();
             this.cleanupPopupComment(textAreaElement);
             this.loaderService.loadingEnd();
+            this.cd.detectChanges();
           }
         });
     }

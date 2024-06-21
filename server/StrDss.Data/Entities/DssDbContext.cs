@@ -29,6 +29,8 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssRentalListingContact> DssRentalListingContacts { get; set; }
 
+    public virtual DbSet<DssRentalListingExtract> DssRentalListingExtracts { get; set; }
+
     public virtual DbSet<DssRentalListingReport> DssRentalListingReports { get; set; }
 
     public virtual DbSet<DssRentalListingVw> DssRentalListingVws { get; set; }
@@ -46,6 +48,10 @@ public partial class DssDbContext : DbContext
     public virtual DbSet<DssUserPrivilege> DssUserPrivileges { get; set; }
 
     public virtual DbSet<DssUserRole> DssUserRoles { get; set; }
+
+    public virtual DbSet<DssUserRoleAssignment> DssUserRoleAssignments { get; set; }
+
+    public virtual DbSet<DssUserRolePrivilege> DssUserRolePrivileges { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -365,6 +371,15 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsExempt)
                 .HasComment("Indicates whether the address has been identified as exempt from Short Term Rental regulations")
                 .HasColumnName("is_exempt");
+            entity.Property(e => e.IsMatchCorrected)
+                .HasComment("Indicates whether the matched address has been manually changed to one that is verified as correct for the listing")
+                .HasColumnName("is_match_corrected");
+            entity.Property(e => e.IsMatchVerified)
+                .HasComment("Indicates whether the matched address has been verified as correct for the listing by the responsible authorities")
+                .HasColumnName("is_match_verified");
+            entity.Property(e => e.IsSystemProcessing)
+                .HasComment("Indicates whether the physical address is being processed by the system and may not yet be in its final form")
+                .HasColumnName("is_system_processing");
             entity.Property(e => e.LocalityNm)
                 .HasMaxLength(50)
                 .HasComment("The localityName (community) returned by the address match (e.g. Vancouver)")
@@ -472,12 +487,18 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasComment("Indicates whether a CURRENT RENTAL LISTING was included in the most recent RENTAL LISTING REPORT")
                 .HasColumnName("is_active");
+            entity.Property(e => e.IsChangedAddress)
+                .HasComment("Indicates whether a CURRENT RENTAL LISTING has been subjected to address changes")
+                .HasColumnName("is_changed_address");
             entity.Property(e => e.IsCurrent)
                 .HasComment("Indicates whether the RENTAL LISTING VERSION is a CURRENT RENTAL LISTING (if it is a copy of the most current REPORTED RENTAL LISTING (having the same listing number for the same offering platform)")
                 .HasColumnName("is_current");
             entity.Property(e => e.IsEntireUnit)
                 .HasComment("Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)")
                 .HasColumnName("is_entire_unit");
+            entity.Property(e => e.IsLgTransferred)
+                .HasComment("Indicates whether a CURRENT RENTAL LISTING has been transferred to a different Local Goverment Organization as a result of address changes")
+                .HasColumnName("is_lg_transferred");
             entity.Property(e => e.IsNew)
                 .HasComment("Indicates whether a CURRENT RENTAL LISTING appeared for the first time in the last reporting period")
                 .HasColumnName("is_new");
@@ -585,6 +606,41 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.ContactedThroughRentalListingId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_rental_listing_contact_fk_contacted_for");
+        });
+
+        modelBuilder.Entity<DssRentalListingExtract>(entity =>
+        {
+            entity.HasKey(e => e.RentalListingExtractId).HasName("dss_rental_listing_extract_pk");
+
+            entity.ToTable("dss_rental_listing_extract", tb => tb.HasComment("A prebuilt report that is specific to a subset of rental listings"));
+
+            entity.Property(e => e.RentalListingExtractId)
+                .HasComment("Unique generated key")
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("rental_listing_extract_id");
+            entity.Property(e => e.FilteringOrganizationId)
+                .HasComment("Foreign key")
+                .HasColumnName("filtering_organization_id");
+            entity.Property(e => e.IsPrRequirementFiltered)
+                .HasComment("Indicates whether the report is filtered by jurisdictional principal residence requirement")
+                .HasColumnName("is_pr_requirement_filtered");
+            entity.Property(e => e.RentalListingExtractNm)
+                .HasMaxLength(250)
+                .HasComment("A description of the information contained in the extract")
+                .HasColumnName("rental_listing_extract_nm");
+            entity.Property(e => e.SourceBin)
+                .HasComment("The binary image of the information in the report")
+                .HasColumnName("source_bin");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
+
+            entity.HasOne(d => d.FilteringOrganization).WithMany(p => p.DssRentalListingExtracts)
+                .HasForeignKey(d => d.FilteringOrganizationId)
+                .HasConstraintName("dss_rental_listing_extract_fk_filtered_by");
         });
 
         modelBuilder.Entity<DssRentalListingReport>(entity =>
@@ -886,30 +942,6 @@ public partial class DssDbContext : DbContext
             entity.HasOne(d => d.RepresentedByOrganization).WithMany(p => p.DssUserIdentities)
                 .HasForeignKey(d => d.RepresentedByOrganizationId)
                 .HasConstraintName("dss_user_identity_fk_representing");
-
-            entity.HasMany(d => d.UserRoleCds).WithMany(p => p.UserIdentities)
-                .UsingEntity<Dictionary<string, object>>(
-                    "DssUserRoleAssignment",
-                    r => r.HasOne<DssUserRole>().WithMany()
-                        .HasForeignKey("UserRoleCd")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("dss_user_role_assignment_fk_granted"),
-                    l => l.HasOne<DssUserIdentity>().WithMany()
-                        .HasForeignKey("UserIdentityId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("dss_user_role_assignment_fk_granted_to"),
-                    j =>
-                    {
-                        j.HasKey("UserIdentityId", "UserRoleCd").HasName("dss_user_role_assignment_pk");
-                        j.ToTable("dss_user_role_assignment", tb => tb.HasComment("The association of a grantee credential to a role for the purpose of conveying application privileges"));
-                        j.IndexerProperty<long>("UserIdentityId")
-                            .HasComment("Foreign key")
-                            .HasColumnName("user_identity_id");
-                        j.IndexerProperty<string>("UserRoleCd")
-                            .HasMaxLength(25)
-                            .HasComment("Foreign key")
-                            .HasColumnName("user_role_cd");
-                    });
         });
 
         modelBuilder.Entity<DssUserIdentityView>(entity =>
@@ -970,31 +1002,6 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(250)
                 .HasComment("The human-readable name that is given for the role")
                 .HasColumnName("user_privilege_nm");
-
-            entity.HasMany(d => d.UserRoleCds).WithMany(p => p.UserPrivilegeCds)
-                .UsingEntity<Dictionary<string, object>>(
-                    "DssUserRolePrivilege",
-                    r => r.HasOne<DssUserRole>().WithMany()
-                        .HasForeignKey("UserRoleCd")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("dss_user_role_privilege_fk_conferred_by"),
-                    l => l.HasOne<DssUserPrivilege>().WithMany()
-                        .HasForeignKey("UserPrivilegeCd")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("dss_user_role_privilege_fk_conferring"),
-                    j =>
-                    {
-                        j.HasKey("UserPrivilegeCd", "UserRoleCd").HasName("dss_user_role_privilege_pk");
-                        j.ToTable("dss_user_role_privilege", tb => tb.HasComment("The association of a granular application privilege to a role"));
-                        j.IndexerProperty<string>("UserPrivilegeCd")
-                            .HasMaxLength(25)
-                            .HasComment("Foreign key")
-                            .HasColumnName("user_privilege_cd");
-                        j.IndexerProperty<string>("UserRoleCd")
-                            .HasMaxLength(25)
-                            .HasComment("Foreign key")
-                            .HasColumnName("user_role_cd");
-                    });
         });
 
         modelBuilder.Entity<DssUserRole>(entity =>
@@ -1007,10 +1014,83 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(25)
                 .HasComment("The immutable system code that identifies the role")
                 .HasColumnName("user_role_cd");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
+            entity.Property(e => e.UserRoleDsc)
+                .HasMaxLength(200)
+                .HasComment("The human-readable description that is given for the role")
+                .HasColumnName("user_role_dsc");
             entity.Property(e => e.UserRoleNm)
                 .HasMaxLength(250)
                 .HasComment("The human-readable name that is given for the role")
                 .HasColumnName("user_role_nm");
+        });
+
+        modelBuilder.Entity<DssUserRoleAssignment>(entity =>
+        {
+            entity.HasKey(e => new { e.UserIdentityId, e.UserRoleCd }).HasName("dss_user_role_assignment_pk");
+
+            entity.ToTable("dss_user_role_assignment", tb => tb.HasComment("The association of a grantee credential to a role for the purpose of conveying application privileges"));
+
+            entity.Property(e => e.UserIdentityId)
+                .HasComment("Foreign key")
+                .HasColumnName("user_identity_id");
+            entity.Property(e => e.UserRoleCd)
+                .HasMaxLength(25)
+                .HasComment("Foreign key")
+                .HasColumnName("user_role_cd");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
+
+            entity.HasOne(d => d.UserIdentity).WithMany(p => p.DssUserRoleAssignments)
+                .HasForeignKey(d => d.UserIdentityId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_user_role_assignment_fk_granted_to");
+
+            entity.HasOne(d => d.UserRoleCdNavigation).WithMany(p => p.DssUserRoleAssignments)
+                .HasForeignKey(d => d.UserRoleCd)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_user_role_assignment_fk_granted");
+        });
+
+        modelBuilder.Entity<DssUserRolePrivilege>(entity =>
+        {
+            entity.HasKey(e => new { e.UserPrivilegeCd, e.UserRoleCd }).HasName("dss_user_role_privilege_pk");
+
+            entity.ToTable("dss_user_role_privilege", tb => tb.HasComment("The association of a granular application privilege to a role"));
+
+            entity.Property(e => e.UserPrivilegeCd)
+                .HasMaxLength(25)
+                .HasComment("Foreign key")
+                .HasColumnName("user_privilege_cd");
+            entity.Property(e => e.UserRoleCd)
+                .HasMaxLength(25)
+                .HasComment("Foreign key")
+                .HasColumnName("user_role_cd");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
+
+            entity.HasOne(d => d.UserPrivilegeCdNavigation).WithMany(p => p.DssUserRolePrivileges)
+                .HasForeignKey(d => d.UserPrivilegeCd)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_user_role_privilege_fk_conferring");
+
+            entity.HasOne(d => d.UserRoleCdNavigation).WithMany(p => p.DssUserRolePrivileges)
+                .HasForeignKey(d => d.UserRoleCd)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_user_role_privilege_fk_conferred_by");
         });
 
         OnModelCreatingPartial(modelBuilder);

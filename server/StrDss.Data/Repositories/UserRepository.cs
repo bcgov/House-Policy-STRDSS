@@ -69,7 +69,7 @@ namespace StrDss.Data.Repositories
         public async Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByGuidAsync(Guid guid)
         {
             var query = await _dbSet.AsNoTracking()
-                .Include(x => x.UserRoleCds)
+                .Include(x => x.DssUserRoleAssignments)
                 .Include(x => x.RepresentedByOrganization)
                 .FirstOrDefaultAsync(x => x.UserGuid == guid);
 
@@ -78,11 +78,11 @@ namespace StrDss.Data.Repositories
 
             var user = _mapper.Map<UserDto>(query); 
 
-            var roles = user.UserRoleCds.Select(x => x.UserRoleCd).ToList();
+            var roles = query.DssUserRoleAssignments.Select(x => x.UserRoleCd).ToList(); 
 
             var permssions = _dbContext.DssUserRoles
                 .Where(x => roles.Contains(x.UserRoleCd))
-                .SelectMany(x => x.UserPrivilegeCds)
+                .SelectMany(x => x.DssUserRolePrivileges)
                 .ToLookup(x => x.UserPrivilegeCd)
                 .Select(x => x.First())
                 .Select(x => x.UserPrivilegeCd)
@@ -95,7 +95,7 @@ namespace StrDss.Data.Repositories
         {
             var entity = await _dbSet.AsNoTracking()
                 .Include(x => x.RepresentedByOrganization)
-                .Include(x => x.UserRoleCds)
+                .Include(x => x.DssUserRoleAssignments)
                 .FirstOrDefaultAsync(x => x.UserIdentityId == id);
 
             var user = _mapper.Map<UserDto>(entity);
@@ -126,21 +126,24 @@ namespace StrDss.Data.Repositories
         public async Task UpdateUserAsync(UserUpdateDto dto)
         {
             var userEntity = await _dbSet
-                .Include(x => x.UserRoleCds)
+                .Include(x => x.DssUserRoleAssignments)
                 .FirstAsync(x => x.UserIdentityId == dto.UserIdentityId);
 
             _mapper.Map(dto, userEntity);
 
-            userEntity.UserRoleCds.Clear();
+            userEntity.DssUserRoleAssignments.Clear();
 
             var roleCds = dto.RoleCds.Distinct();
 
             foreach (var roleCd in roleCds)
             {
-                var roleEntity = await _dbContext.DssUserRoles
-                    .FirstAsync(x => x.UserRoleCd == roleCd);
+                var userRole = new DssUserRoleAssignment
+                {
+                    UserIdentityId = dto.UserIdentityId,
+                    UserRoleCd = roleCd
+                };
 
-                userEntity.UserRoleCds.Add(roleEntity);
+                userEntity.DssUserRoleAssignments.Add(userRole);
             }
         }
 
@@ -156,14 +159,16 @@ namespace StrDss.Data.Repositories
             _mapper.Map(dto, entity);
 
             var roleEntity = await _dbContext.DssUserRoles.FirstAsync(x => x.UserRoleCd == role);
-            entity.UserRoleCds.Add(roleEntity);
+            var userRole = new DssUserRoleAssignment { UserIdentityId = dto.UserIdentityId, UserRoleCd = role };
+            entity.DssUserRoleAssignments.Add(userRole);
         }
 
         public async Task<List<UserDto>> GetAdminUsers()
         {
             var adminUsers = await _dbContext.DssUserRoles
                 .Where(x => x.UserRoleCd == Roles.CeuAdmin)
-                .SelectMany(x => x.UserIdentities)
+                .SelectMany(x => x.DssUserRoleAssignments)
+                .Select(x => x.UserIdentity)
                 .Where(x => x.IsEnabled == true)
                 .ToListAsync();
 

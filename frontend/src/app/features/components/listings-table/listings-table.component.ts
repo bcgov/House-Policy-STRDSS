@@ -18,10 +18,10 @@ import { ceu_action } from '../../../common/consts/permissions.const';
 import { ListingDetailsComponent } from './listing-details/listing-details.component';
 import { ListingSearchRequest } from '../../../common/models/listing-search-request';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { BulkComplianceNoticeComponent } from '../bulk-compliance-notice/bulk-compliance-notice.component';
-import { BulkTakedownRequestComponent } from '../bulk-takedown-request/bulk-takedown-request.component';
 import { SelectedListingsStateService } from '../../../common/services/selected-listings-state.service';
-import { ListingSearchState } from '../../../common/models/listing-search-state';
+import { environment } from '../../../../environments/environment';
+import { TooltipModule } from 'primeng/tooltip';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-listings-table',
@@ -37,6 +37,7 @@ import { ListingSearchState } from '../../../common/models/listing-search-state'
     InputTextModule,
     PanelModule,
     RouterModule,
+    TooltipModule,
     ListingDetailsComponent,
   ],
   templateUrl: './listings-table.component.html',
@@ -55,12 +56,15 @@ export class ListingsTableComponent implements OnInit {
   isCEU = false;
   isLegendShown = false;
 
+  readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
+
   constructor(
     private listingService: ListingDataService,
     private userService: UserDataService,
     private router: Router,
     private searchStateService: SelectedListingsStateService,
     private route: ActivatedRoute,
+    private loaderService: GlobalLoaderService,
   ) { }
 
   ngOnInit(): void {
@@ -107,7 +111,7 @@ export class ListingsTableComponent implements OnInit {
           next: (currentUser: User) => {
             this.isCEU = currentUser.permissions.includes(ceu_action);
             this.getListings(page);
-          }
+          },
         });
       }
     });
@@ -188,6 +192,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   private getListings(selectedPageNumber: number = 1): void {
+    this.loaderService.loadingStart();
     const searchReq = {} as ListingSearchRequest;
     searchReq[this.searchColumn] = this.searchTerm;
 
@@ -200,6 +205,9 @@ export class ListingsTableComponent implements OnInit {
         next: (res: PagingResponse<ListingTableRow>) => {
           this.currentPage = res.pageInfo;
           this.listings = res.sourceList;
+        },
+        complete: () => {
+          this.loaderService.loadingEnd();
         }
       });
   }

@@ -116,10 +116,14 @@ export class ListingUploadHistoryTableComponent implements OnInit {
   }
 
   private getHistoryUploadRecords(selectedPageNumber?: number): void {
+    this.loaderService.loadingStart();
     this.listingDataService.getListingUploadHistoryRecords(selectedPageNumber ?? (this.currentPage?.pageNumber || 0), this.currentPage?.pageSize || 10, this.selectedPlatformId, this.sort?.prop || '', this.sort?.dir || 'asc').subscribe({
       next: (value) => {
         this.processRecords(value);
       },
+      complete: () => {
+        this.loaderService.loadingEnd();
+      }
     })
   }
 

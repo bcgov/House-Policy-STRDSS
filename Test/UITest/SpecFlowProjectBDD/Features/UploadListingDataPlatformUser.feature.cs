@@ -77,8 +77,8 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.DescriptionAttribute("UploadListingDataPlatformUser")]
         [NUnit.Framework.CategoryAttribute("UploadListingData")]
         [NUnit.Framework.TestCaseAttribute("STRDSSVrboDev", "platform_staff", "dev", "C:\\Users\\RAnderson\\Source\\Repos\\House-Policy-STRDSS\\Test\\UITest\\TestData\\listing " +
-            "files\\listing-valid-2024-04.csv", "pass", null)]
-        public void UploadListingDataPlatformUser(string userName, string userType, string environment, string uploadFile, string expectedResult, string[] exampleTags)
+            "files\\listing-valid-2024-04.csv", "April", "pass", null)]
+        public void UploadListingDataPlatformUser(string userName, string userType, string environment, string uploadFile, string month, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "UploadListingData"};
@@ -92,6 +92,7 @@ namespace SpecFlowProjectBDD.Features
             argumentsOfScenario.Add("UserType", userType);
             argumentsOfScenario.Add("Environment", environment);
             argumentsOfScenario.Add("UploadFile", uploadFile);
+            argumentsOfScenario.Add("Month", month);
             argumentsOfScenario.Add("ExpectedResult", expectedResult);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("UploadListingDataPlatformUser", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 5
@@ -127,7 +128,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When(string.Format("I select a CSV file containing short-term listing data \"{0}\"", uploadFile), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 30
- testRunner.And("I select which month the STR listing data is for", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And(string.Format("I select which month the STR listing data is for \"{0}\"", month), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 40
  testRunner.When("I initiate the upload", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

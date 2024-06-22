@@ -27,7 +27,7 @@ Scenario: UploadListingDataPlatformUser
 
 #Month Designation:
 
-	And I select which month the STR listing data is for
+	And I select which month the STR listing data is for "<Month>"
 
 #Validation rules 
 
@@ -73,8 +73,8 @@ Scenario: UploadListingDataPlatformUser
 
 
 Examples:
-	| UserName      | UserType       | Environment | UploadFile | ExpectedResult |
-	| STRDSSVrboDev | platform_staff | dev         |  C:\Users\RAnderson\Source\Repos\House-Policy-STRDSS\Test\UITest\TestData\listing files\listing-valid-2024-04.csv| pass           |
+	| UserName      | UserType       | Environment | UploadFile                                                                                                                 | Month | ExpectedResult |
+	| STRDSSVrboDev | platform_staff | dev         | C:\\Users\\RAnderson\\Source\\Repos\\House-Policy-STRDSS\\Test\\UITest\\TestData\\listing files\\listing-valid-2024-04.csv | April | pass           |
 	#| STRDSSAirbnbDev | platform_staff | dev       | |pass           |
 
 

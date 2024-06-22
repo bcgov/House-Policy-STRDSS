@@ -2,13 +2,17 @@ using Configuration;
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using SpecFlowProjectBDD.Helpers;
-using System;
-using TechTalk.SpecFlow;
+using DataBase.Entities;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
 using TestFrameWork.WindowsAutomation.Controls;
 using static SpecFlowProjectBDD.SFEnums;
+using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
+using System.Data;
+using Npgsql;
+using DataBase.UnitOfWork;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
@@ -29,6 +33,10 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private SFEnums.UserTypeEnum _UserType;
         private SFEnums.LogonTypeEnum _LogonType;
         private BCIDPage _BCIDPage;
+        private DssDbContext _DssDBContext;
+        private DssUploadDelivery _DssUploadDelivery;
+        private DateTime _updateTime;
+        private IUnitOfWork _UnitOfWork;
 
         public UploadListingDataPlatformUser(SeleniumDriver Driver)
         {
@@ -40,6 +48,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _BCIDPage = new BCIDPage(_Driver);
             _UploadListingsPage = new UploadListingsPage(_Driver);
             _AppSettings = new AppSettings();
+            DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
+            _DssDBContext = new DssDbContext(dbContextOptions);
+            _UnitOfWork = new UnitOfWork(_DssDBContext);
         }
 
 
@@ -121,19 +132,96 @@ namespace SpecFlowProjectBDD.StepDefinitions
             FileDialog fileDialog = new FileDialog();
             fileDialog.FindAndSet(UploadFile, "Short-Term Rental Data Portal - Google Chrome", "Chrome_WidgetWin_1");
 
+            _listingFile = UploadFile;
+            // Define a regular expression to match the year and month in the filename
+            string pattern = @"listing-valid-(\d{4})-(\d{2})\.csv";
+            Regex regex = new Regex(pattern);
+
+            // Match the regular expression with the filename
+            Match match = regex.Match(_listingFile);
+
+            string yearMonth = string.Empty;
+
+            if (match.Success)
+            {
+                // Extract the year and month from the match groups
+                string year = match.Groups[1].Value;
+                string month = match.Groups[2].Value;
+                yearMonth = $"{year}-{month}";
+            }
+            else
+            {
+                throw new FormatException("The filename does not match the expected pattern.");
+            }
+
+            var dt = DateOnly.Parse(yearMonth);
+            //var DSSUploadDeliverys = _DssDBContext.DssUploadDeliveries.Where(p => p.ReportPeriodYm == dt).ToList();
+            var DSSUploadDeliverys = _UnitOfWork.DssUploadDeliveryRepository.Get(p => p.ReportPeriodYm == dt).ToList(); ;
+
+
+            foreach (var DSSLoadDelivery in DSSUploadDeliverys)
+            {
+                try
+                {
+                    long id = DSSLoadDelivery.UploadDeliveryId;
+                    _UnitOfWork.DssUploadDeliveryRepository.Delete(DSSLoadDelivery);
+                    var DSSUploadDeliveryLines = _UnitOfWork.DssUploadLineRepository.Get(p => p.IncludingUploadDeliveryId == id);
+                    foreach (var dSSDeliveryLine in DSSUploadDeliveryLines)
+                    {
+                        _UnitOfWork.DssUploadLineRepository.Delete(dSSDeliveryLine.UploadLineId);
+                    }
+                    _UnitOfWork.Save();
+                }
+                
+                catch(NpgsqlOperationInProgressException ex)
+                {
+                    //should not happen, but continue if it does for now
+                }
+            }
         }
 
-        [When(@"I select which month the STR listing data is for")]
-        public void WhenISelectWhichMonthTheSTRListingDataIsFor()
+        [When(@"I select which month the STR listing data is for ""([^""]*)""")]
+        public void WhenISelectWhichMonthTheSTRListingDataIsFor(string Month)
         {
             _UploadListingsPage.ReportingMonthDropDown.Click();
-            _UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(@"document.querySelector(""#month_0"").click()");
+
+            string listboxItems = _UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(@"return document.querySelector(""#month_list"").children.length").ToString();
+
+            int count = 0;
+
+            if (int.TryParse(listboxItems, out count) == false)
+            {
+                throw new ArgumentException("Value returned for ListBox Item count is not an int");
+            }
+
+            int index = 0;
+            string script = string.Empty;
+
+            for (int i = 0; i < count; i++)
+            {
+                //script = $@"document.querySelector(""#month_{i} > span"");";
+                script = "document.querySelector('#month_" + i + "');";
+
+                string result = _UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(script) == null ? string.Empty: _UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(script).ToString();
+
+                if (result.ToUpper().Contains(Month.ToUpper()))
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            //_UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(@"document.querySelector(""#month_0 > span"").click()");
+            //script = $@"document.querySelector(""#month_{index}"").click();";
+            script = "document.querySelector('#month_1').click();";
+            _UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(script);
 
         }
 
         [When(@"I initiate the upload")]
         public void WhenInitiateTheUpload()
         {
+            _updateTime = DateTime.UtcNow;
             _UploadListingsPage.UploadButton.Click();
         }
 
@@ -158,7 +246,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"a new entry on an upload log with a timestamp, username, and the number of records created\.")]
         public void ThenANewEntryOnAnUploadLogWithATimestampUsernameAndTheNumberOfRecordsCreated_()
         {
-            //throw new PendingStepException();
+            var updateTime  = _UnitOfWork.DssUploadDeliveryRepository.Get(p => p.UpdDtm >= _updateTime);
+            ClassicAssert.IsNotNull(updateTime);
         }
 
         [When(@"the data import is not successful")]

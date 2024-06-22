@@ -69,14 +69,15 @@ namespace UITest.SeleniumObjects
             return (true);
         }
 
-        public bool ExecuteJavaScript(string JavaScript)
+        public object ExecuteJavaScript(string JavaScript)
         {
             if (null == _Driver)
                 throw new ArgumentNullException("No driver defined");
             else
             {
                 IJavaScriptExecutor js = _Driver.Driver as IJavaScriptExecutor;
-                js.ExecuteScript(JavaScript);
+                var result = js.ExecuteScript(JavaScript);
+                return (result);
             }
 
             return (true);

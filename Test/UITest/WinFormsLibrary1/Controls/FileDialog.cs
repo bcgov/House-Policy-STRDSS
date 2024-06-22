@@ -43,9 +43,13 @@ namespace TestFrameWork.WindowsAutomation.Controls
 
                 IUIAutomationCondition openButtonNameCondition = automation.CreatePropertyCondition(UIA_PropertyIds.UIA_NamePropertyId, "Open");
                 IUIAutomationCondition openButtonClassCondition = automation.CreatePropertyCondition(UIA_PropertyIds.UIA_ClassNamePropertyId, "Button");
-                IUIAutomationCondition openButtonCombinedCondition = automation.CreateAndCondition(openButtonNameCondition, openButtonClassCondition);
+                IUIAutomationCondition automationIDCondition = automation.CreatePropertyCondition(UIA_PropertyIds.UIA_AutomationIdPropertyId, "1");
+                IUIAutomationCondition openButtonCombinedCondition = automation.CreateAndCondition(openButtonNameCondition, automationIDCondition);
+
                 Thread.Sleep(2000);
                 IUIAutomationElement openButton = fileDialog.FindFirst(TreeScope.TreeScope_Descendants, openButtonCombinedCondition);
+
+                openButton.SetFocus();
 
                 if (openButton != null)
                 {

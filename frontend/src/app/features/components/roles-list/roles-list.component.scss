@@ -29,6 +29,11 @@
             .title {
                 font-family: 'BcSans-bold';
                 color: #004578;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
             }
         }
     }

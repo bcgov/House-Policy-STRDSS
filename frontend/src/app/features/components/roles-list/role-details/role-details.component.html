@@ -1,7 +1,54 @@
-<h2 class="header">Manage Roles and Permissions</h2>
+<h2 class="header" *ngIf="role && !isEdit && !isCreate">Short Term Rental Platform {{role.userRoleCd}}
+    <div class="actions">
+        <button pButton (click)="onEdit()">Edit</button>
+    </div>
+</h2>
+<div class="header edit" *ngIf="(role && isEdit) || isCreate">
+    <div class="header-edit">
+        <label for="headerInput">Role Name</label>
+        <input #input pInputText [disabled]="isEdit" id="headerInput" [(ngModel)]="editRoleName" [maxlength]="25"
+            type="text">
+        <span class="limit-text" [class.almost-limit-text]="input.value.length > 20"
+            [class.limited-text]="input.value.length > 24">{{input.value.length}}/25</span>
+    </div>
+    <div *ngIf="isEdit" class="actions">
+        <button pButton [disabled]="!editRoleDescription || !editRoleName" (click)="onEditSave()">Save</button>
+        <button pButton class="outline-btn" (click)="onEditCancel()">Cancel</button>
+    </div>
+    <div *ngIf="isCreate" class="actions">
+        <button pButton [disabled]="!editRoleDescription || !editRoleName" (click)="onCreate()">Save</button>
+        <button pButton class="outline-btn" (click)="onCreateCancel()">Cancel</button>
+    </div>
+</div>
+<div class="sub-header" *ngIf="role && !isEdit">
+    <strong>
+        {{role.userRoleNm}}
+    </strong>
+</div>
+<div class="sub-header edit" *ngIf="(role && isEdit) || isCreate">
+    <div class="header-edit">
+        <label for="subHeaderInput">Role Description</label>
+        <input #input pInputText class="wide" id="subHeaderInput" [(ngModel)]="editRoleDescription" [maxlength]="200"
+            type="text">
+        <span class="limit-text" [class.almost-limit-text]="input.value.length > 175"
+            [class.limited-text]="input.value.length > 199">{{input.value.length}}/200</span>
+    </div>
+</div>
 
-<p-listbox [options]="permissions" [(ngModel)]="selectedPermissions" optionLabel="label" [style]="{ width: '15rem' }"
-    [virtualScroll]="true" [filter]="true" [virtualScrollItemSize]="43" [multiple]="true" [checkbox]="true"
-    [showToggleAll]="false" [metaKeySelection]="false" [showToggleAll]="true"
-    (onSelectAllChange)="onSelectAllChange($event)" (onChange)="onChange($event)"
-    [listStyle]="{ 'max-height': '220px' }"></p-listbox>
+<div class="permissions-container" [class.edit]="isEdit || isCreate" *ngIf="permissions">
+    <div class="permissions-header">Permissions</div>
+    <div class="permissions">
+        <div class="row" *ngFor="let permission of permissions" id="{{permission.userPrivilegeCd}}">
+            <div class="checkbox-container"><p-checkbox [disabled]="!isEdit && !isCreate"
+                    [(ngModel)]="permission.selected" [binary]="true" inputId="binary"></p-checkbox>
+            </div>
+            <div class="permission-container">{{permission.userPrivilegeNm}}</div>
+        </div>
+    </div>
+</div>
+<div class="delete-container" *ngIf="!isEdit && role && !isCreate">
+    <button pButton class="outline-btn red" [disabled]="role.isReferenced" (click)=" onDeleteRole()">Delete This
+        Role</button>
+</div>
+
+<p-confirmDialog [style]="{width: '50vw'}"></p-confirmDialog>

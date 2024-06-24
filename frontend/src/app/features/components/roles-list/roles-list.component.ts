@@ -33,6 +33,10 @@ export class RolesListComponent implements OnInit {
     });
   }
 
+  createNewRole(): void {
+    this.router.navigate([`/role`])
+  }
+
   getRoleDetails(id: string): void {
     this.router.navigate([`/role/${id}`])
   }

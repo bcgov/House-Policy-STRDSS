@@ -64,6 +64,9 @@ namespace StrDss.Service.HttpClients
                     address.BlockNo = properties.BlockId;
                     address.LocationGeometry = new Point(feature.Geometry.Coordinates[0], feature.Geometry.Coordinates[1]) { SRID = 4326 };
                     address.IsSystemProcessing = true;
+                    address.IsExempt = false;
+                    address.IsMatchCorrected = false;
+                    address.IsMatchVerified = false;
                 }
 
                 return "";

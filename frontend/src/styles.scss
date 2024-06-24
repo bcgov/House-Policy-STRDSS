@@ -154,6 +154,12 @@ body {
         &.outline-btn {
             background-color: transparent;
             color: #053662;
+            border-color: #053662;
+
+            &.red {
+                color: #CE3E39;
+                border-color: #CE3E39;
+            }
         }
 
         &.p-button-link {

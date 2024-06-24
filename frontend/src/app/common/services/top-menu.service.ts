@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TopMenuItem } from '../models/top-menu-item';
-import { ceu_action, licence_file_upload, listing_file_upload, listing_read, takedown_action, user_write } from '../consts/permissions.const';
+import { ceu_action, licence_file_upload, listing_file_upload, listing_read, role_read, takedown_action, user_write } from '../consts/permissions.const';
 import { User } from '../models/user';
 
 @Injectable({
@@ -117,6 +117,14 @@ export class TopMenuService {
         route: '/user-management',
         description: 'Process new requests for system access',
         title: 'User Management',
+        folderName: 'Admin Tools',
+      },
+      {
+        accessPermission: role_read,
+        buttonId: 'roleManagement_mi_btn',
+        route: '/roles',
+        description: 'Add or edit roles and permissions',
+        title: 'Manage Roles & Permissions',
         folderName: 'Admin Tools',
       },
 

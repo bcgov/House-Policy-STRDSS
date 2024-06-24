@@ -94,7 +94,7 @@ public partial class DssUserIdentity
 
     public virtual ICollection<DssEmailMessage> DssEmailMessageInitiatingUserIdentities { get; set; } = new List<DssEmailMessage>();
 
-    public virtual DssOrganization? RepresentedByOrganization { get; set; }
+    public virtual ICollection<DssUserRoleAssignment> DssUserRoleAssignments { get; set; } = new List<DssUserRoleAssignment>();
 
-    public virtual ICollection<DssUserRole> UserRoleCds { get; set; } = new List<DssUserRole>();
+    public virtual DssOrganization? RepresentedByOrganization { get; set; }
 }

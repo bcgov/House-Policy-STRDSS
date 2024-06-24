@@ -72,6 +72,8 @@ public partial class DssOrganization
 
     public virtual ICollection<DssPhysicalAddress> DssPhysicalAddresses { get; set; } = new List<DssPhysicalAddress>();
 
+    public virtual ICollection<DssRentalListingExtract> DssRentalListingExtracts { get; set; } = new List<DssRentalListingExtract>();
+
     public virtual ICollection<DssRentalListingReport> DssRentalListingReports { get; set; } = new List<DssRentalListingReport>();
 
     public virtual ICollection<DssRentalListing> DssRentalListings { get; set; } = new List<DssRentalListing>();

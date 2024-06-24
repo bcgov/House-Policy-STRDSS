@@ -18,6 +18,7 @@ using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -30,6 +31,7 @@ namespace StrDss.Service
         Task ProcessRentalReportUploadAsync();
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<byte[]?> GetRentalListingErrorFile(long uploadId);
+        Task CleaupAddressAsync();
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
@@ -659,6 +661,44 @@ namespace StrDss.Service
             }
 
             return Encoding.UTF8.GetBytes(contents.ToString());
+        }
+
+        public async Task CleaupAddressAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var addresses = await _addressRepo.GetPhysicalAddressesToCleanUpAsync();
+
+            var totalCount = addresses.Count;
+            var processedCount = 0;
+
+            foreach (var address in addresses)
+            {
+                var stopwatchForGeocoder = Stopwatch.StartNew();
+
+                var error = await _geocoder.GetAddressAsync(address);
+
+                if (error.IsEmpty() && address.LocationGeometry is not null && address.LocationGeometry is Point point)
+                {
+                    address.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+                    address.IsSystemProcessing = true;
+                }
+                else
+                {
+                    address.IsSystemProcessing = false; //system error
+                }
+
+                processedCount++;
+
+                stopwatchForGeocoder.Stop();
+
+                _logger.LogInformation($"Address Cleanup (geocoder): {stopwatchForGeocoder.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/{totalCount}");
+
+                _unitOfWork.Commit();
+            }
+
+            stopwatch.Stop();
+            _logger.LogInformation($"Address Cleanup Finished: {stopwatch.Elapsed.TotalSeconds} seconds");
         }
     }
 }

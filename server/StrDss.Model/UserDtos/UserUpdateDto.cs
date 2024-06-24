@@ -5,6 +5,6 @@
         public long UserIdentityId { get; set; }
         public long RepresentedByOrganizationId { get; set; }
         public List<string> RoleCds { get; set; } = new List<string>();
-
+        public DateTime? UpdDtm { get; set; }
     }
 }

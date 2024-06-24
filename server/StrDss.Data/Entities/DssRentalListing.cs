@@ -103,6 +103,16 @@ public partial class DssRentalListing
     /// </summary>
     public bool? IsNew { get; set; }
 
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING has been subjected to address changes
+    /// </summary>
+    public bool? IsChangedAddress { get; set; }
+
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING has been transferred to a different Local Goverment Organization as a result of address changes
+    /// </summary>
+    public bool? IsLgTransferred { get; set; }
+
     public virtual DssRentalListing? DerivedFromRentalListing { get; set; }
 
     public virtual ICollection<DssEmailMessage> DssEmailMessages { get; set; } = new List<DssEmailMessage>();

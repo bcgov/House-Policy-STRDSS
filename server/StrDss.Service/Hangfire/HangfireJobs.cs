@@ -34,7 +34,7 @@ namespace StrDss.Service.Hangfire
         [AutomaticRetry(Attempts = 0)]
         public async Task CleanUpAddresses()
         {
-            await Task.CompletedTask;
+            await _linstingService.CleaupAddressAsync();
         }
     }
 }

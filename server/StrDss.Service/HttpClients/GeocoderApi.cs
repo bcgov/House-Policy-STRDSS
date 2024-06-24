@@ -33,7 +33,7 @@ namespace StrDss.Service.HttpClients
 
             try
             {
-                var response = await _client.GetStringAsync($"addresses.geojson?addressString={address.OriginalAddressTxt}");
+                var response = await _client.GetStringAsync($"addresses.geojson?addressString={SanitizeAddress(address.OriginalAddressTxt)}");
 
                 address.MatchResultJson = response;
 
@@ -74,6 +74,20 @@ namespace StrDss.Service.HttpClients
                 return ex.Message;
             }
 
+        }
+
+        private string SanitizeAddress(string address)
+        {
+            var toRemove = ", Canada";
+
+            address = address.Replace("#", " ");
+
+            if (address.EndsWith(toRemove))
+            {
+                address = address[..^toRemove.Length];
+            }
+
+            return address;
         }
     }
 }

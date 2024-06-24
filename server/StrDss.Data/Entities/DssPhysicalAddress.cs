@@ -114,6 +114,21 @@ public partial class DssPhysicalAddress
     /// </summary>
     public long? ReplacingPhysicalAddressId { get; set; }
 
+    /// <summary>
+    /// Indicates whether the matched address has been verified as correct for the listing by the responsible authorities
+    /// </summary>
+    public bool? IsMatchVerified { get; set; }
+
+    /// <summary>
+    /// Indicates whether the matched address has been manually changed to one that is verified as correct for the listing
+    /// </summary>
+    public bool? IsMatchCorrected { get; set; }
+
+    /// <summary>
+    /// Indicates whether the physical address is being processed by the system and may not yet be in its final form
+    /// </summary>
+    public bool? IsSystemProcessing { get; set; }
+
     public virtual DssOrganization? ContainingOrganization { get; set; }
 
     public virtual ICollection<DssRentalListing> DssRentalListings { get; set; } = new List<DssRentalListing>();

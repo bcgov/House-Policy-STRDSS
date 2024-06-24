@@ -78,7 +78,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "[\r\n  {\r\n    \"rentalListingId\": 570,\r\n    \"hostEmailSent\": false,\r\n    \"ccList\": [],\r\n    \"comment\": \"Testing\",\r\n    \"lgContactEmail\": \"lg@lg.com\" \r\n  }\r\n]",
+					"raw": "[\r\n  {\r\n    \"rentalListingId\": 570,\r\n    \"hostEmailSent\": false,\r\n    \"ccList\": [],\r\n    \"comment\": \"Testing 1\",\r\n    \"lgContactEmail\": \"lg@lg.com\" \r\n  }\r\n]",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -970,14 +970,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/roles/ceu_admin",
+					"raw": "{{host}}/api/roles/test_role",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
 						"roles",
-						"ceu_admin"
+						"test_role"
 					]
 				}
 			},
@@ -990,7 +990,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"userRoleCd\": \"test_role\",\r\n  \"userRoleNm\": \"Role for Testing\",\r\n  \"permissions\": [\r\n    \"listing_read\"\r\n  ]\r\n}",
+					"raw": "{\r\n  \"userRoleCd\": \"test_role\",\r\n  \"userRoleNm\": \"Role for Testing\",\r\n  \"UserRoleDsc\": \"Testing role\",\r\n  \"permissions\": [\r\n    \"listing_read\"\r\n  ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1017,7 +1017,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"userRoleCd\": \"test_role\",\r\n  \"userRoleNm\": \"Role for Testing\",\r\n  \"permissions\": [\r\n \r\n  ]\r\n}",
+					"raw": "{\r\n  \"userRoleCd\": \"test_role\",\r\n  \"userRoleNm\": \"Role for Testing 1\",\r\n   \"UserRoleDsc\": \"Testing role\",\r\n  \"permissions\": [\r\n    \"listing_read\"\r\n  ],\r\n  \"updDtm\": \"2024-06-24T18:34:46.836989Z\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1111,7 +1111,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"userIdentityId\": 8,\r\n  \"representedByOrganizationId\": 256,\r\n  \"roleCds\": [\r\n    \"lg_staff\"\r\n  ]\r\n}",
+					"raw": "{\r\n  \"userIdentityId\": 8,\r\n  \"representedByOrganizationId\": 256,\r\n  \"roleCds\": [\r\n    \"lg_staff\"\r\n  ],\r\n  \"updDtm\": \"2024-06-19T16:58:39.279025Z\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

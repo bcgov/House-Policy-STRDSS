@@ -5,28 +5,28 @@ using System.Reflection;
 
 namespace StrDss.Test.AutoDomainDataBuilder
 {
-    public class UserUpdateDtoCustomization : ICustomization
+    public class RoleDtoCustomization : ICustomization
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Customizations.Add(new UserUpdateDtoBuilder());
+            fixture.Customizations.Add(new RoleDtoBuilder());
         }
     }
 
-    public class UserUpdateDtoBuilder : ISpecimenBuilder
+    public class RoleDtoBuilder : ISpecimenBuilder
     {
         public object Create(object request, ISpecimenContext context)
         {
             var pi = request as PropertyInfo;
 
-            if (pi == null || pi.DeclaringType != typeof(UserUpdateDto))
+            if (pi == null || pi.DeclaringType != typeof(RoleDto))
                 return new NoSpecimen();
 
             return pi.Name switch
             {
-                nameof(UserUpdateDto.UserIdentityId) => 1,
-                nameof(UserUpdateDto.RepresentedByOrganizationId) => 1,
-                nameof(UserUpdateDto.RoleCds) => new List<string> { "admin", "user" },
+                nameof(RoleDto.UserRoleCd) => "admin",
+                nameof(RoleDto.Permissions) => context.CreateMany<PermissionDto>(2).ToList(),
+                nameof(RoleDto.IsReferenced) => true,
                 _ => new NoSpecimen()
             };
         }

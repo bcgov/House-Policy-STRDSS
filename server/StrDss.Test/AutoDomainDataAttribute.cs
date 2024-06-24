@@ -11,8 +11,8 @@ namespace StrDss.Test
         public AutoDomainDataAttribute()
             : base(() => new Fixture()
                 .Customize(new AutoMoqCustomization())
-                .Customize(new DelistingWarningCreateDtoCustomization())
-                .Customize(new DelistingRequestCreateDtoCustomization())
+                .Customize(new TakedownNoticeCreateDtoCustomization())
+                .Customize(new TakedownRequestCreateDtoCustomization())
                 .Customize(new EmailContentCustomization())
                 .Customize(new OrganizationDtoCustomization())
                 .Customize(new UserDtoCustomization())
@@ -20,6 +20,8 @@ namespace StrDss.Test
                 .Customize (new RentalListingRowUntypedCustomization())
                 .Customize(new UserUpdateDtoCustomization())
                 .Customize(new RoleUpdateDtoCustomization())
+                .Customize(new RoleDtoCustomization())
+                .Customize(new AccessRequestCreateDtoCustomization())
             )                
         {
         }

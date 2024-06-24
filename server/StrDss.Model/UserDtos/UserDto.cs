@@ -37,6 +37,5 @@ namespace StrDss.Model.UserDtos
 
         public DateTime UpdDtm { get; set; }
         public virtual OrganizationDto? RepresentedByOrganization { get; set; }
-        public virtual ICollection<RoleDto> UserRoleCds { get; set; } = new List<RoleDto>();
     }
 }

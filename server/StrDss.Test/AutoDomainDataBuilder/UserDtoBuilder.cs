@@ -54,8 +54,8 @@ namespace StrDss.Test.AutoDomainDataBuilder
                     return null!;
                 case nameof(UserDto.UpdDtm):
                     return DateTime.UtcNow;
-                case nameof(UserDto.UserRoleCds):
-                    return new List<RoleDto> { new RoleDto { UserRoleCd = "Role1" }, new RoleDto { UserRoleCd = "Role2" } };
+                //case nameof(UserDto.UserRoleCds):
+                //    return new List<RoleDto> { new RoleDto { UserRoleCd = "Role1" }, new RoleDto { UserRoleCd = "Role2" } };
                 default:
                     return new NoSpecimen();
             }

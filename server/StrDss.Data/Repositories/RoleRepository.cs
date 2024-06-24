@@ -30,11 +30,20 @@ namespace StrDss.Data.Repositories
 
         public async Task<List<RoleDto>> GetRolesAync()
         {
-            var roles = _mapper.Map<List<RoleDto>>(await _dbSet.AsNoTracking().Include(x => x.UserPrivilegeCds).ToListAsync());
+            var roleEntities = await _dbSet.AsNoTracking().Include(x => x.DssUserRolePrivileges).ToListAsync();
+
+            var roles = _mapper.Map<List<RoleDto>>(roleEntities);
 
             foreach (var role in roles)
             {
-                role.IsReferenced = await _dbSet.AsNoTracking().Where(x => x.UserRoleCd == role.UserRoleCd).Select(x => x.UserIdentities.Any()).FirstAsync();
+                var permissionEntities = await _dbContext
+                    .DssUserRolePrivileges
+                    .Where(x => x.UserRoleCd == role.UserRoleCd)
+                    .Select(x => x.UserPrivilegeCdNavigation)
+                    .ToListAsync();
+
+                role.Permissions = _mapper.Map<List<PermissionDto>>(permissionEntities);
+                role.IsReferenced = await _dbSet.AsNoTracking().Where(x => x.UserRoleCd == role.UserRoleCd).Select(x => x.DssUserRoleAssignments.Any()).FirstAsync();
             }
 
             return roles;
@@ -42,11 +51,20 @@ namespace StrDss.Data.Repositories
 
         public async Task<RoleDto?> GetRoleAync(string roleCd)
         {
-            var role = _mapper.Map<RoleDto>(await _dbSet.AsNoTracking().Include(x => x.UserPrivilegeCds).Where(x => x.UserRoleCd == roleCd).FirstOrDefaultAsync());
+            var roleEntity = await _dbSet.AsNoTracking().Include(x => x.DssUserRolePrivileges).FirstOrDefaultAsync(x => x.UserRoleCd == roleCd);
 
-            if (role == null) return null;
+            if (roleEntity == null) return null;
 
-            role.IsReferenced = await _dbSet.AsNoTracking().Where(x => x.UserRoleCd == roleCd).Select(x => x.UserIdentities.Any()).FirstAsync();
+            var role = _mapper.Map<RoleDto>(roleEntity);
+
+            var permissionEntities = await _dbContext
+                .DssUserRolePrivileges
+                .Where(x => x.UserRoleCd == role.UserRoleCd)
+                .Select(x => x.UserPrivilegeCdNavigation)
+                .ToListAsync();
+
+            role.Permissions = _mapper.Map<List<PermissionDto>>(permissionEntities);
+            role.IsReferenced = await _dbSet.AsNoTracking().Where(x => x.UserRoleCd == roleCd).Select(x => x.DssUserRoleAssignments.Any()).FirstAsync();
 
             return role;
         }
@@ -69,10 +87,13 @@ namespace StrDss.Data.Repositories
 
             foreach (var permission in role.Permissions)
             {
-                var privilege = await _dbContext.DssUserPrivileges
-                    .FirstAsync(x => x.UserPrivilegeCd == permission);
+                var rolePermission = new DssUserRolePrivilege
+                {
+                    UserPrivilegeCd = permission,
+                    UserRoleCd = roleEntity.UserRoleCd,
+                };
 
-                roleEntity.UserPrivilegeCds.Add(privilege);
+                roleEntity.DssUserRolePrivileges.Add(rolePermission);
             }
         }
 
@@ -83,30 +104,33 @@ namespace StrDss.Data.Repositories
 
         public async Task UpdateRoleAsync(RoleUpdateDto role)
         {
-            var roleEntity = await _dbSet.Include(x => x.UserPrivilegeCds).FirstAsync(x => x.UserRoleCd == role.UserRoleCd);
+            var roleEntity = await _dbSet.Include(x => x.DssUserRolePrivileges).FirstAsync(x => x.UserRoleCd == role.UserRoleCd);
 
             _mapper.Map(role, roleEntity);
 
-            roleEntity.UserPrivilegeCds.Clear();
+            roleEntity.DssUserRolePrivileges.Clear();
 
             var permissions = role.Permissions.Distinct();
             
             foreach (var permission in role.Permissions)
             {
-                var privilege = await _dbContext.DssUserPrivileges
-                    .FirstAsync(x => x.UserPrivilegeCd == permission);
+                var rolePermission = new DssUserRolePrivilege
+                {
+                    UserPrivilegeCd = permission,
+                    UserRoleCd = roleEntity.UserRoleCd,
+                };
 
-                roleEntity.UserPrivilegeCds.Add(privilege);
+                roleEntity.DssUserRolePrivileges.Add(rolePermission);
             }
         }
 
         public async Task DeleteRoleAsync(string roleCd)
         {
             var roleEntity = await _dbSet
-                .Include(x => x.UserPrivilegeCds)
+                .Include(x => x.DssUserRolePrivileges)
                 .FirstAsync(x => x.UserRoleCd == roleCd);
 
-            roleEntity.UserPrivilegeCds.Clear();
+            roleEntity.DssUserRolePrivileges.Clear();
 
             _dbSet.Remove(roleEntity);
         }

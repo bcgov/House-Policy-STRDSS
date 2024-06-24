@@ -5,21 +5,21 @@ using System.Reflection;
 
 namespace StrDss.Test.AutoDomainDataBuilder
 {
-    public class DelistingRequestCreateDtoCustomization : ICustomization
+    public class TakedownRequestCreateDtoCustomization : ICustomization
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Customizations.Add(new DelistingRequestCreateDtoBuilder());
+            fixture.Customizations.Add(new TakedownRequestCreateDtoBuilder());
         }
     }
 
-    public class DelistingRequestCreateDtoBuilder : ISpecimenBuilder
+    public class TakedownRequestCreateDtoBuilder : ISpecimenBuilder
     {
         public object Create(object request, ISpecimenContext context)
         {
             var pi = request as PropertyInfo;
 
-            if (pi == null)
+            if (pi == null || pi.DeclaringType != typeof(TakedownRequestCreateDto))
                 return new NoSpecimen();
 
             switch (pi.Name)
@@ -27,7 +27,7 @@ namespace StrDss.Test.AutoDomainDataBuilder
                 case nameof(TakedownRequestCreateDto.PlatformId):
                     return 1;
                 case nameof(TakedownRequestCreateDto.ListingId):
-                    return 1;
+                    return "1";
                 case nameof(TakedownRequestCreateDto.ListingUrl):
                     return "https://example.com/listing";
                 case nameof(TakedownRequestCreateDto.CcList):

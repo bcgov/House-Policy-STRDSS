@@ -5,20 +5,20 @@ using System.Reflection;
 
 namespace StrDss.Test.AutoDomainDataBuilder
 {
-    public class DelistingWarningCreateDtoCustomization : ICustomization
+    public class TakedownNoticeCreateDtoCustomization : ICustomization
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Customizations.Add(new DelistingWarningCreateDtoBuilder());
+            fixture.Customizations.Add(new TakedownNoticeCreateDtoBuilder());
         }
     }
-    public class DelistingWarningCreateDtoBuilder : ISpecimenBuilder
+    public class TakedownNoticeCreateDtoBuilder : ISpecimenBuilder
     {
         public object Create(object request, ISpecimenContext context)
         {
             var pi = request as PropertyInfo;
 
-            if (pi == null)
+            if (pi == null || pi.DeclaringType != typeof(TakedownNoticeCreateDto))
                 return new NoSpecimen();
 
             switch (pi.Name)

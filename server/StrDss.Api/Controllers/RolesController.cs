@@ -39,7 +39,7 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.RoleRead)]
         [HttpGet("permissions", Name = "GetPermissions")]
-        public async Task<ActionResult<List<RoleDto>>> GetPermissions()
+        public async Task<ActionResult<List<PermissionDto>>> GetPermissions()
         {
             return Ok(await _roleService.GetPermissionsAync());
         }

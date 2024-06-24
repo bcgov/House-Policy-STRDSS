@@ -46,6 +46,7 @@ namespace StrDss.Data.Repositories
         {
             return await _dbSet
                 .Where(x => x.IsSystemProcessing == null && x.MatchScoreAmt < 90)
+                .OrderBy(x => x.PhysicalAddressId)
                 .Take(300)
                 .ToListAsync();
         }

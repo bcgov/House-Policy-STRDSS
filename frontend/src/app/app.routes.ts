@@ -9,7 +9,7 @@ import { PageNotFoundComponent } from './common/components/page-not-found/page-n
 import { approvedUserGuard } from './common/guards/approved-user.guard';
 import { activeUserGuard } from './common/guards/active-user.guard';
 import { accessRequestTokenGuard } from './common/guards/access-request-token.guard';
-import { listing_file_upload, listing_read, takedown_action, user_write } from './common/consts/permissions.const';
+import { listing_file_upload, listing_read, role_read, role_write, takedown_action, user_write } from './common/consts/permissions.const';
 import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 import { TermsAndConditionsComponent } from './common/components/terms-and-conditions/terms-and-conditions.component';
 import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
@@ -19,6 +19,8 @@ import { ListingsTableComponent } from './features/components/listings-table/lis
 import { ListingDetailsComponent } from './features/components/listings-table/listing-details/listing-details.component';
 import { BulkTakedownRequestComponent } from './features/components/bulk-takedown-request/bulk-takedown-request.component';
 import { BulkComplianceNoticeComponent } from './features/components/bulk-compliance-notice/bulk-compliance-notice.component';
+import { RolesListComponent } from './features/components/roles-list/roles-list.component';
+import { RoleDetailsComponent } from './features/components/roles-list/role-details/role-details.component';
 
 export const routes: Routes = [
     {
@@ -88,6 +90,24 @@ export const routes: Routes = [
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: UserManagementComponent,
         data: { permissions: [user_write] }
+    },
+    {
+        path: 'roles',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: RolesListComponent,
+        data: { permissions: [role_read] }
+    },
+    {
+        path: 'role/:id',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: RoleDetailsComponent,
+        data: { permissions: [role_write] }
+    },
+    {
+        path: 'role',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: RoleDetailsComponent,
+        data: { permissions: [role_write] }
     },
     {
         path: '401',

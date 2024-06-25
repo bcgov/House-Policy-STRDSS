@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DashboardCard } from '../models/dashboard-card';
-import { ceu_action, listing_file_upload, listing_read, takedown_action, user_write } from '../consts/permissions.const';
+import { ceu_action, listing_file_upload, listing_read, role_read, takedown_action, user_write } from '../consts/permissions.const';
 import { User } from '../models/user';
 
 @Injectable({
@@ -74,12 +74,22 @@ export class DashboardService {
       {
         accessPermission: user_write,
         buttonIcon: '',
-        buttonText: 'Manage Access Requests',
+        buttonText: 'User Management',
         description: 'Process new requests for system access',
         route: '/user-management',
-        title: 'Manage Access Requests',
+        title: 'User Management',
         boxId: 'manageAccessRequests_box',
         buttonId: 'manageAccessRequests_btn',
+      },
+      {
+        accessPermission: role_read,
+        buttonIcon: '',
+        buttonText: 'Manage Roles And Permissions',
+        description: 'Add or edit roles and permissions',
+        route: '/roles',
+        title: 'Manage Roles And Permissions',
+        boxId: 'roleManagement_box',
+        buttonId: 'roleManagement_btn',
       },
       {
         accessPermission: '',

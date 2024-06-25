@@ -44,12 +44,15 @@ namespace StrDss.Service
         }
         public async Task<Dictionary<string, List<string>>> CreateRoleAsync(RoleUpdateDto role)
         {
-            var errors = await ValidateRoleDtoAsync(role);
+            var errors = new Dictionary<string, List<string>>();
 
             if (await _roleRepo.DoesRoleCdExist(role.UserRoleCd))
             {
                 errors.AddItem("userRoleCd", $"Role Code [{role.UserRoleCd}] already exists.");
+                return errors;
             }
+
+            errors = await ValidateRoleDtoAsync(role);
 
             if (errors.Count > 0)
             {
@@ -75,17 +78,25 @@ namespace StrDss.Service
                 errors.AddItem("permission", $"Some of the permissions are invalid.");
             }
 
+            if (await _roleRepo.DoseRoleWithSamePermissionsExist(role.UserRoleCd, role.Permissions))
+            {
+                errors.AddItem("permissions", $"A role with these permissions already exists. Duplicate roles are not permitted. Please modify the permissions and try again.");
+            }
+
             return errors;
         }
 
         public async Task<Dictionary<string, List<string>>> UpdateRoleAsync(RoleUpdateDto role)
         {
-            var errors = await ValidateRoleDtoAsync(role);
+            var errors = new Dictionary<string, List<string>>();
 
             if (!await _roleRepo.DoesRoleCdExist(role.UserRoleCd))
             {
                 errors.AddItem("userRoleCd", $"Role Code [{role.UserRoleCd}] not found.");
+                return errors;
             }
+
+            errors = await ValidateRoleDtoAsync(role);
 
             if (errors.Count > 0)
             {

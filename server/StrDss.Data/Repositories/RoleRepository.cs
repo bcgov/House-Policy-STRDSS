@@ -18,6 +18,7 @@ namespace StrDss.Data.Repositories
         Task CreateRoleAsync(RoleUpdateDto role);
         Task<int> CountActivePermissionIdsAsnyc(IEnumerable<string> permissions);
         Task<bool> DoesRoleCdExist(string roleCd);
+        Task<bool> DoseRoleWithSamePermissionsExist(string roleCd, IEnumerable<string> permissions);
         Task UpdateRoleAsync(RoleUpdateDto role);
         Task DeleteRoleAsync(string roleCd);
     }
@@ -101,6 +102,27 @@ namespace StrDss.Data.Repositories
         {
             return await _dbSet.AnyAsync(x => x.UserRoleCd == roleCd);
         }
+
+        public async Task<bool> DoseRoleWithSamePermissionsExist(string roleCd, IEnumerable<string> permissions)
+        {
+            // Convert permissions to a sorted list to ensure order does not matter
+            var sortedPermissions = permissions.Distinct().OrderBy(p => p).ToList();
+
+            // Get roles and their permissions, excluding the specified roleCd
+            var rolesWithPermissions = await _dbContext.DssUserRolePrivileges
+                .Where(rp => rp.UserRoleCd != roleCd)
+                .GroupBy(rp => rp.UserRoleCd)
+                .Select(g => new
+                {
+                    UserRoleCd = g.Key,
+                    Permissions = g.Select(rp => rp.UserPrivilegeCd).OrderBy(p => p).ToList()
+                })
+                .ToListAsync();
+
+            // Check if any role has the same permissions as provided
+            return rolesWithPermissions.Any(rwp => rwp.Permissions.SequenceEqual(sortedPermissions));
+        }
+
 
         public async Task UpdateRoleAsync(RoleUpdateDto role)
         {

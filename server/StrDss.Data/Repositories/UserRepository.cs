@@ -96,9 +96,12 @@ namespace StrDss.Data.Repositories
             var entity = await _dbSet.AsNoTracking()
                 .Include(x => x.RepresentedByOrganization)
                 .Include(x => x.DssUserRoleAssignments)
+                .Include(x => x.DssUserRoleAssignments)
                 .FirstOrDefaultAsync(x => x.UserIdentityId == id);
 
             var user = _mapper.Map<UserDto>(entity);
+
+            user.RoleCds = entity!.DssUserRoleAssignments.Select(x => x.UserRoleCd).ToList();
 
             var grantedMessage = await _dbContext.DssEmailMessages
                 .FirstOrDefaultAsync(x => x.EmailMessageType == EmailMessageTypes.AccessGranted && x.AffectedByUserIdentityId == user.UserIdentityId);

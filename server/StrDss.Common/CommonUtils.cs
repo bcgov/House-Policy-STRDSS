@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IO.Compression;
+using System.Reflection;
 
 namespace StrDss.Common
 {
@@ -50,11 +51,6 @@ namespace StrDss.Common
             return Convert.ToBase64String(memoryStream.ToArray());
         }
 
-        /// <summary>
-        /// Try to parse string to short
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
         public static short? StringToShort(string str)
         {
             if (string.IsNullOrWhiteSpace(str))
@@ -68,6 +64,20 @@ namespace StrDss.Common
             }
 
             return null;
+        }
+        public static byte[] CreateZip(string csvContent)
+        {
+            using var memoryStream = new MemoryStream();
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                var demoFile = archive.CreateEntry("RentalListings.csv");
+
+                using var entryStream = demoFile.Open();
+                using var streamWriter = new StreamWriter(entryStream);
+                streamWriter.Write(csvContent);
+            }
+
+            return memoryStream.ToArray();
         }
     }
 }

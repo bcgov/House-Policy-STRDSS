@@ -100,14 +100,20 @@ namespace StrDss.Service
 
                 if (listing == null) continue;
 
-                if (count != 1 && lg != listing.ManagingOrganizationNm)
+                if (lg != listing.ManagingOrganizationNm)
                 {
-                    if (lgExport.Count > 1)
+                    if (lgExport.Count > 1 && lgId != 0)
                     {
-                        var lgzip = CommonUtils.CreateZip(string.Join("\r\n", lgExport));
                         _logger.LogInformation($"Rental Listing Export - Creating a zip file for {lg}");
 
-                        //insser the zip file to DB
+                        var extract = await _listingRepo.GetRentalListingExtractByOrgId(lgId);
+
+                        extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", lgExport));
+                        extract.IsPrRequirementFiltered = false;
+                        extract.RentalListingExtractNm = lg ?? "";
+                        extract.FilteringOrganizationId = lgId;
+
+                        _unitOfWork.Commit();
                     }
 
                     lg = listing.ManagingOrganizationNm;
@@ -136,26 +142,40 @@ namespace StrDss.Service
 
             if (allExport.Count > 1) 
             {
-                var allZip = CommonUtils.CreateZip(string.Join("\r\n", allExport));
                 _logger.LogInformation($"Rental Listing Export - Creating a zip file for all rental listings");
 
-                //insser the zip file to DB
+                var extract = await _listingRepo.GetRentalListingExtractByExtractNm("BC");
+
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", allExport));
+                extract.IsPrRequirementFiltered = false;
+
+                _unitOfWork.Commit();
             }
 
             if (prExport.Count > 1)
             {
-                var prZip = CommonUtils.CreateZip(string.Join("\r\n", prExport));
                 _logger.LogInformation($"Rental Listing Export - Creating a zip file for all PR required listings");
 
-                //insser the zip file to DB
+                var extract = await _listingRepo.GetRentalListingExtractByExtractNm("BC_PR");
+
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", prExport));
+                extract.IsPrRequirementFiltered = true;
+
+                _unitOfWork.Commit();
             }
 
             if (lgExport.Count > 1)
             {
-                var lgZip = CommonUtils.CreateZip(string.Join("\r\n", lgExport));
                 _logger.LogInformation($"Rental Listing Export - Creating a zip file for {lg}");
 
-                //insser the zip file to DB
+                var extract = await _listingRepo.GetRentalListingExtractByOrgId(lgId);
+
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", lgExport));
+                extract.IsPrRequirementFiltered = false;
+                extract.RentalListingExtractNm = lg ?? "";
+                extract.FilteringOrganizationId = lgId;
+
+                _unitOfWork.Commit();
             }
 
             stopWatchForAll.Stop();

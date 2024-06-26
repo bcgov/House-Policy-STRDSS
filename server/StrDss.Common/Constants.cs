@@ -83,6 +83,98 @@
         public const string SupplierHost5Id = "SupplierHost5Id";
     }
 
+    public static class RentalListingExport
+    {
+        public static readonly string[] Headers = new string[]
+        {
+            "Most Recent Platform Report Month",
+            "Status",
+            "Jurisdiction assigned to",
+            "economic_region_name",
+            "pr_requirement",
+            "BL_requirement",
+            "Platform Code",
+            "Listing ID",
+            "URL Address",
+            "Platform listing address",
+            "Geocoder Best match address (current month) - complete address",
+            "Geocoder Best match address (current month) -city only",
+            "Local Government Business Licence Number",
+            "Accommodation Type",
+            "Number of Bedrooms available for STR",
+            "Number of nights booked (Current month)",
+            "Number of nights booked (Current month - 1)",
+            "Number of nights booked (Current month - 2)",
+            "Number of nights booked (Current month - 3)",
+            "Number of nights booked (Current month - 4)",
+            "Number of nights booked (Current month - 5)",
+            "Number of nights booked (Current month - 6)",
+            "Number of nights booked (Current month - 7)",
+            "Number of nights booked (Current month - 8)",
+            "Number of nights booked (Current month - 9)",
+            "Number of nights booked (Current month - 10)",
+            "Number of nights booked (Current month - 11)",
+            "Number of separate reservations (Current month)",
+            "Number of separate reservations (Current month - 1)",
+            "Number of separate reservations (Current month - 2)",
+            "Number of separate reservations (Current month - 3)",
+            "Number of separate reservations (Current month - 4)",
+            "Number of separate reservations (Current month - 5)",
+            "Number of separate reservations (Current month - 6)",
+            "Number of separate reservations (Current month - 7)",
+            "Number of separate reservations (Current month - 8)",
+            "Number of separate reservations (Current month - 9)",
+            "Number of separate reservations (Current month - 10)",
+            "Number of separate reservations (Current month - 11)",
+            "Property Host name",
+            "Property Host email address",
+            "Property Host phone number",
+            "Property Host fax number",
+            "Property Host Mailing Address",
+            "Supplier Host 1 name",
+            "Supplier Host 1 email address",
+            "Supplier Host 1 phone number",
+            "Supplier Host 1 fax number",
+            "Supplier Host 1 Mailing Address",
+            "Host ID of Supplier Host 1",
+            "Supplier Host 2 name",
+            "Supplier Host 2 email address",
+            "Supplier Host 2 phone number",
+            "Supplier Host 2 fax number",
+            "Supplier Host 2 Mailing Address",
+            "Host ID of Supplier Host 2",
+            "Supplier Host 3 name",
+            "Supplier Host 3 email address",
+            "Supplier Host 3 phone number",
+            "Supplier Host 3 fax number",
+            "Supplier Host 3 Mailing Address",
+            "Host ID of Supplier Host 3",
+            "Supplier Host 4 name",
+            "Supplier Host 4 email address",
+            "Supplier Host 4 phone number",
+            "Supplier Host 4 fax number",
+            "Supplier Host 4 Mailing Address",
+            "Host ID of Supplier Host 4",
+            "Supplier Host 5 name",
+            "Supplier Host 5 email address",
+            "Supplier Host 5 phone number",
+            "Supplier Host 5 fax number",
+            "Supplier Host 5 Mailing Address",
+            "Host ID of Supplier Host 5",
+            "Last Action Taken",
+            "Date of Last Action Taken",
+            "Previous Action Taken 1",
+            "Date of Previous Action Taken 1",
+            "Previous Action Taken 2",
+            "Date of Previous Action Taken 2"
+        };
+
+        public static string GetHeadersAsCsv()
+        {
+            return string.Join(", ", Headers);
+        }
+    }
+
     public static class RoleFields
     {
         public const string UserRoleCd = "UserRoleCd";
@@ -222,5 +314,6 @@
     {
         public const string RentalReport = "rental_report";
     }
+
 
 }

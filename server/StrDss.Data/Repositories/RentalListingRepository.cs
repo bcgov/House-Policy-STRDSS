@@ -16,6 +16,8 @@ namespace StrDss.Data.Repositories
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
         Task<List<long>> GetRentalListingIdsToExport();
         Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId);
+        Task<DssRentalListingExtract> GetRentalListingExtractByOrgId(long organizationId);
+        Task<DssRentalListingExtract> GetRentalListingExtractByExtractNm(string name);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -232,6 +234,44 @@ namespace StrDss.Data.Repositories
         public async Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId)
         {
             return _mapper.Map<RentalListingExportDto>(await _dbSet.FirstAsync(x => x.RentalListingId == rentalListingId));
+        }
+
+        public async Task<DssRentalListingExtract> GetRentalListingExtractByOrgId(long organizationId)
+        {
+            var extract = await _dbContext.DssRentalListingExtracts.FirstOrDefaultAsync(x => x.FilteringOrganizationId == organizationId);
+
+            if (extract == null)
+            {
+                extract = new DssRentalListingExtract
+                {
+                    FilteringOrganizationId = organizationId,
+                    IsPrRequirementFiltered = false,
+                    UpdUserGuid = Guid.Empty,
+                };
+
+                _dbContext.DssRentalListingExtracts.Add(extract);
+            }
+
+            return extract;
+        }
+
+        public async Task<DssRentalListingExtract> GetRentalListingExtractByExtractNm(string name)
+        {
+            var extract = await _dbContext.DssRentalListingExtracts.FirstOrDefaultAsync(x => x.RentalListingExtractNm == name);
+
+            if (extract == null)
+            {
+                extract = new DssRentalListingExtract
+                {
+                    RentalListingExtractNm = name,
+                    IsPrRequirementFiltered = false,
+                    UpdUserGuid = Guid.Empty,
+                };
+
+                _dbContext.DssRentalListingExtracts.Add(extract);
+            }
+
+            return extract;
         }
     }
 }

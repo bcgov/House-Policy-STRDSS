@@ -33,27 +33,9 @@ namespace StrDss.Service
         {
             var listings = await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicense, pageSize, pageNumber, orderBy, direction);
 
-            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
-
-            foreach (var listing in listings.SourceList) 
+            foreach (var listing in listings.SourceList)
             {
-                foreach (var host in listing.Hosts)
-                {
-                    if (host.EmailAddressDsc == null) continue;
-
-                    var hasValidEmail = Regex.IsMatch(host.EmailAddressDsc, emailRegex.Regex);
-
-                    var hostType = host.IsPropertyOwner ? "Property Owner" : "Supplier Host";
-
-                    listing.HostsInfo.Add(new HostInfo
-                    {
-                        Host = $"{hostType}: {host.FullNm}; {host.EmailAddressDsc}",
-                        HasValidEmail = hasValidEmail,
-                    });
-                }
-
-                listing.HasAtLeastOneValidHostEmail = listing.HostsInfo.Any(x => x.HasValidEmail);
-                listing.Hosts = new List<RentalListingContactDto>();
+                ProcessHosts(listing, true);
             }
 
             return listings;
@@ -61,15 +43,38 @@ namespace StrDss.Service
 
         public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId)
         {
-            return await _listingRepo.GetRentalListing(rentalListingId);
+            var listing = await _listingRepo.GetRentalListing(rentalListingId);
+
+            if (listing == null) return null;
+
+            ProcessHosts(listing);
+
+            return listing;
         }
 
-        //listing IDs order by ManagingOrganizationId, IsPrincipalResidenceRequired
-        //List<string>, lg, all, pr
-        //loop through listings
-        //fetch listing, monthly data, action history, etc for the line
-        //if lg ends, creates lg zip and insert to DB and clear lg
-        //after loop, creates all zip and pr zip and insert to dB.
+        private void ProcessHosts(RentalListingViewDto listing, bool clearHosts = false)
+        {
+            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+
+            foreach (var host in listing.Hosts)
+            {
+                if (host.EmailAddressDsc == null) continue;
+
+                var hasValidEmail = Regex.IsMatch(host.EmailAddressDsc, emailRegex.Regex);
+
+                var hostType = host.IsPropertyOwner ? "Property Owner" : "Supplier Host";
+
+                listing.HostsInfo.Add(new HostInfo
+                {
+                    Host = $"{hostType}: {host.FullNm}; {host.EmailAddressDsc}",
+                    HasValidEmail = hasValidEmail,
+                });
+            }
+
+            listing.HasAtLeastOneValidHostEmail = listing.HostsInfo.Any(x => x.HasValidEmail);
+
+            if (clearHosts) listing.HostsInfo.Clear();
+        }
 
         public async Task CreateRentalListingExportFiles()
         {
@@ -81,6 +86,7 @@ namespace StrDss.Service
             var prExport = new List<string> { headers };
             var count = 0;
             var totalCount = listingIds.Count;
+            var lgId = 0L;
             var lg = "";
 
             var stopWatchForAll = new Stopwatch();
@@ -105,6 +111,8 @@ namespace StrDss.Service
                     }
 
                     lg = listing.ManagingOrganizationNm;
+                    lgId = listing.ManagingOrganizationId ?? 0;
+
                     lgExport = new List<string> { headers };
                 }
 

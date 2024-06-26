@@ -45,5 +45,13 @@ namespace StrDss.Api.Controllers
 
             return Ok(listing);
         }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("exports")]
+        public async Task<ActionResult> Export()
+        {
+            await _listingService.CreateRentalListingExportFiles();
+            return Ok();
+        }
     }
 }

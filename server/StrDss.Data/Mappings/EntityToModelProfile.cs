@@ -39,6 +39,8 @@ namespace StrDss.Data.Mappings
 
             CreateMap<DssUserPrivilege, PermissionDto>();
             CreateMap<DssUserRole, RoleDto>();
+
+            CreateMap<DssRentalListingVw, RentalListingExportDto>();
         }
     }
 }

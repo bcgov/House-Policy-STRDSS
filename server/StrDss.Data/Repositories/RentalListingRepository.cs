@@ -14,6 +14,8 @@ namespace StrDss.Data.Repositories
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? rentalListingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
+        Task<List<long>> GetRentalListingIdsToExport();
+        Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -218,5 +220,18 @@ namespace StrDss.Data.Repositories
             return (platformEmails.ToList(), providingPlatformId);
         }
 
+        public async Task<List<long>> GetRentalListingIdsToExport()
+        {
+            return await _dbSet
+                .OrderBy(x => x.ManagingOrganizationId)
+                .ThenBy(x => x.IsPrincipalResidenceRequired)
+                .Select(x => x.RentalListingId ?? 0)
+                .ToListAsync();
+        }
+
+        public async Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId)
+        {
+            return _mapper.Map<RentalListingExportDto>(await _dbSet.FirstAsync(x => x.RentalListingId == rentalListingId));
+        }
     }
 }

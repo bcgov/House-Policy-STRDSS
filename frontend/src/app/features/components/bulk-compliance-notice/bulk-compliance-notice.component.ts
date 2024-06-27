@@ -152,7 +152,7 @@ export class BulkComplianceNoticeComponent implements OnInit {
       ccList: formValues.ccList.prototype === Array
         ? formValues
         : (formValues.ccList as string).split(',').filter(x => !!x).map(x => x.trim()),
-      hostEmailSent: x.sendNoticeToHosts,
+      hostEmailSent: !x.sendNoticeToHosts,
       comment: formValues.comment,
       lgContactEmail: formValues.lgContactEmail,
     }));

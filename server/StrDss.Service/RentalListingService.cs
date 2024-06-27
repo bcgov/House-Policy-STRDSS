@@ -17,6 +17,7 @@ namespace StrDss.Service
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
         Task CreateRentalListingExportFiles();
+        Task<byte[]?> GetRentalListingExportFileForLg(long lgId);
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
@@ -299,6 +300,13 @@ namespace StrDss.Service
             }
 
             return fieldString;
+        }
+
+        public async Task<byte[]?> GetRentalListingExportFileForLg(long lgId)
+        {
+            var extract = await _listingRepo.GetRentalListingExtractByOrgId(lgId);
+
+            return extract.SourceBin;
         }
     }
 }

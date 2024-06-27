@@ -317,8 +317,6 @@ jobs:
             sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" ../../deploy/dev_values.yaml
           fi
          
-
-
           # Commit and push the changes
           git config --global user.email "richand101@github.com"
           git config --global user.name "Rick Anderson"

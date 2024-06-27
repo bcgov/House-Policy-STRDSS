@@ -69,6 +69,8 @@ namespace StrDss.Service
                     Host = $"{hostType}: {host.FullNm}; {host.EmailAddressDsc}",
                     HasValidEmail = hasValidEmail,
                 });
+
+                host.HasValidEmail = hasValidEmail;
             }
 
             listing.HasAtLeastOneValidHostEmail = listing.HostsInfo.Any(x => x.HasValidEmail);

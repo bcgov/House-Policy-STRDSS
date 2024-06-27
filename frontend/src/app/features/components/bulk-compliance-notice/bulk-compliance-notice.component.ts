@@ -81,7 +81,7 @@ export class BulkComplianceNoticeComponent implements OnInit {
         else {
           this.returnUrl = param['returnUrl'];
           this.listings = [...this.searchStateService.selectedListings];
-          this.extendedListings = this.listings.map((listing) => ({ ...listing, sendNoticeToHosts: true }));
+          this.extendedListings = this.listings.map((listing) => ({ ...listing, sendNoticeToHosts: listing.hasAtLeastOneValidHostEmail }));
           this.searchStateService.selectedListings = new Array<ListingDetailsWithHostCheckboxExtension>();
           this.selectedListings = this.extendedListings;
 

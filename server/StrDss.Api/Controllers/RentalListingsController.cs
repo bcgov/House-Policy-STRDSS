@@ -47,7 +47,7 @@ namespace StrDss.Api.Controllers
         }
 
         //[ApiAuthorize(Permissions.ListingRead)]
-        //[HttpGet("exports")]
+        //[HttpGet("exports/lastupdate")]
         //public async Task<ActionResult> Export()
         //{
         //    await _listingService.CreateRentalListingExportFiles();

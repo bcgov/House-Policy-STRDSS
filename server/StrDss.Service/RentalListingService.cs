@@ -81,13 +81,13 @@ namespace StrDss.Service
             var listingIds = await _listingRepo.GetRentalListingIdsToExport();
             var headers = RentalListingExport.GetHeadersAsCsv();
 
-            var lgExport = new List<string> { headers };
-            var allExport = new List<string> { headers };
-            var prExport = new List<string> { headers };
+            var lgExport = InitializeExport(headers);
+            var allExport = InitializeExport(headers);
+            var prExport = InitializeExport(headers);
             var count = 0;
             var totalCount = listingIds.Count;
             var lgId = 0L;
-            var lg = "";
+            var lg = string.Empty;
 
             var stopWatchForAll = new Stopwatch();
             var stopWatch = Stopwatch.StartNew();
@@ -97,89 +97,82 @@ namespace StrDss.Service
                 count++;
 
                 var listing = await _listingRepo.GetRentalListingToExport(listingId);
-
                 if (listing == null) continue;
 
                 if (lg != listing.ManagingOrganizationNm)
                 {
-                    if (lgExport.Count > 1 && lgId != 0)
-                    {
-                        _logger.LogInformation($"Rental Listing Export - Creating a zip file for {lg}");
-
-                        var extract = await _listingRepo.GetRentalListingExtractByOrgId(lgId);
-
-                        extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", lgExport));
-                        extract.IsPrRequirementFiltered = false;
-                        extract.RentalListingExtractNm = lg ?? "";
-                        extract.FilteringOrganizationId = lgId;
-
-                        _unitOfWork.Commit();
-                    }
-
+                    await ProcessExportForLocalGovernment(lgExport, lgId, lg);
                     lg = listing.ManagingOrganizationNm;
                     lgId = listing.ManagingOrganizationId ?? 0;
-
-                    lgExport = new List<string> { headers };
+                    lgExport = InitializeExport(headers);
                 }
 
                 var line = ToCsvString(listing);
 
                 lgExport.Add(line);
                 allExport.Add(line);
-
                 if (listing.IsPrincipalResidenceRequired == true)
                 {
                     prExport.Add(line);
                 }
 
-
-                if (count % 10 == 0)
-                {
-                    _logger.LogInformation($"Rental Listing Export - {count}/{totalCount} - {stopWatch.Elapsed.TotalSeconds} seconds ");
-                    stopWatch.Restart();
-                }
+                LogProgress(count, totalCount, stopWatch);
             }
 
-            if (allExport.Count > 1) 
+            await CreateFinalExports(allExport, prExport, lgExport, lg, lgId);
+            stopWatchForAll.Stop();
+            _logger.LogInformation($"Rental Listing Export - Finished - {stopWatchForAll.Elapsed.TotalSeconds} seconds");
+        }
+
+        private List<string> InitializeExport(string headers)
+        {
+            return new List<string> { headers };
+        }
+
+        private async Task ProcessExportForLocalGovernment(List<string> export, long orgId, string orgName)
+        {
+            if (export.Count > 1 && orgId != 0)
             {
-                _logger.LogInformation($"Rental Listing Export - Creating a zip file for all rental listings");
+                _logger.LogInformation($"Rental Listing Export - Creating a zip file for {orgName}");
+                var extract = await _listingRepo.GetRentalListingExtractByOrgId(orgId);
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", export));
+                extract.IsPrRequirementFiltered = false;
+                extract.RentalListingExtractNm = orgName ?? string.Empty;
+                extract.FilteringOrganizationId = orgId;
+                _unitOfWork.Commit();
+            }
+        }
 
+        private void LogProgress(int count, int totalCount, Stopwatch stopWatch)
+        {
+            if (count % 10 == 0)
+            {
+                _logger.LogInformation($"Rental Listing Export - {count}/{totalCount} - {stopWatch.Elapsed.TotalSeconds} seconds ");
+                stopWatch.Restart();
+            }
+        }
+
+        private async Task CreateFinalExports(List<string> allExport, List<string> prExport, List<string> lgExport, string lg, long lgId)
+        {
+            if (allExport.Count > 1)
+            {
+                _logger.LogInformation("Rental Listing Export - Creating a zip file for all rental listings");
                 var extract = await _listingRepo.GetRentalListingExtractByExtractNm("BC");
-
                 extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", allExport));
                 extract.IsPrRequirementFiltered = false;
-
                 _unitOfWork.Commit();
             }
 
             if (prExport.Count > 1)
             {
-                _logger.LogInformation($"Rental Listing Export - Creating a zip file for all PR required listings");
-
+                _logger.LogInformation("Rental Listing Export - Creating a zip file for all PR required listings");
                 var extract = await _listingRepo.GetRentalListingExtractByExtractNm("BC_PR");
-
                 extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", prExport));
                 extract.IsPrRequirementFiltered = true;
-
                 _unitOfWork.Commit();
             }
 
-            if (lgExport.Count > 1)
-            {
-                _logger.LogInformation($"Rental Listing Export - Creating a zip file for {lg}");
-
-                var extract = await _listingRepo.GetRentalListingExtractByOrgId(lgId);
-
-                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", lgExport));
-                extract.IsPrRequirementFiltered = false;
-                extract.RentalListingExtractNm = lg ?? "";
-                extract.FilteringOrganizationId = lgId;
-
-                _unitOfWork.Commit();
-            }
-
-            stopWatchForAll.Stop();
-            _logger.LogInformation($"Rental Listing Export - Finished - {stopWatchForAll.Elapsed.TotalSeconds} seconds");
+            await ProcessExportForLocalGovernment(lgExport, lgId, lg);
         }
 
         private static string ToCsvString(RentalListingExportDto listing)

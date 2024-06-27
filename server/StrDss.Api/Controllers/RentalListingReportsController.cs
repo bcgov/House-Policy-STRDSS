@@ -65,7 +65,7 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        [ApiAuthorize(Permissions.ListingFileUpload)]
+        [ApiAuthorize(Permissions.UploadHistoryRead)]
         [HttpGet("rentallistinghistory")]
         public async Task<ActionResult> GetRentalListingHistory(long? platformId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
@@ -74,7 +74,7 @@ namespace StrDss.Api.Controllers
             return Ok(history);
         }
 
-        [ApiAuthorize(Permissions.ListingFileUpload)]
+        [ApiAuthorize(Permissions.UploadHistoryRead)]
         [HttpGet("uploads/{uploadId}/errorfile")]
         public async Task<ActionResult> GetRentalListingErrorFile(long uploadId)
         {

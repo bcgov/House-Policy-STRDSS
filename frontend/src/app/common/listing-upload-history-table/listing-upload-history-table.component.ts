@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorModule } from 'primeng/paginator';
 import { TableModule } from 'primeng/table';
@@ -49,10 +49,11 @@ export class ListingUploadHistoryTableComponent implements OnInit {
     private delistingService: DelistingService,
     private userDataService: UserDataService,
     private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
-
+    this.loaderService.loadingStart();
     const getCurrentUser = this.userDataService.getCurrentUser()
     const getPlatforms = this.delistingService.getPlatforms();
 
@@ -63,6 +64,10 @@ export class ListingUploadHistoryTableComponent implements OnInit {
           const options: Array<DropdownOption> = [{ label: 'All', value: 0 }, ...platforms]
           this.platformOptions = options;
         }
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
       }
     });
 
@@ -111,16 +116,22 @@ export class ListingUploadHistoryTableComponent implements OnInit {
       },
       complete: () => {
         this.loaderService.loadingEnd();
+        this.cd.detectChanges();
       },
-    })
+    });
   }
 
   private getHistoryUploadRecords(selectedPageNumber?: number): void {
+    this.loaderService.loadingStart();
     this.listingDataService.getListingUploadHistoryRecords(selectedPageNumber ?? (this.currentPage?.pageNumber || 0), this.currentPage?.pageSize || 10, this.selectedPlatformId, this.sort?.prop || '', this.sort?.dir || 'asc').subscribe({
       next: (value) => {
         this.processRecords(value);
       },
-    })
+      complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
+      }
+    });
   }
 
   private processRecords(raw: PagingResponse<ListingUploadHistoryRecord>): void {

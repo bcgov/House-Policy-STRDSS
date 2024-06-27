@@ -33,7 +33,7 @@ namespace StrDss.Service.HttpClients
 
             try
             {
-                var response = await _client.GetStringAsync($"addresses.geojson?addressString={address.OriginalAddressTxt}");
+                var response = await _client.GetStringAsync($"addresses.geojson?addressString={SanitizeAddress(address.OriginalAddressTxt)}");
 
                 address.MatchResultJson = response;
 
@@ -63,6 +63,10 @@ namespace StrDss.Service.HttpClients
                     address.SiteNo = properties.SiteId;
                     address.BlockNo = properties.BlockId;
                     address.LocationGeometry = new Point(feature.Geometry.Coordinates[0], feature.Geometry.Coordinates[1]) { SRID = 4326 };
+                    address.IsSystemProcessing = true;
+                    address.IsExempt = false;
+                    address.IsMatchCorrected = false;
+                    address.IsMatchVerified = false;
                 }
 
                 return "";
@@ -74,6 +78,20 @@ namespace StrDss.Service.HttpClients
                 return ex.Message;
             }
 
+        }
+
+        private string SanitizeAddress(string address)
+        {
+            var toRemove = ", Canada";
+
+            address = address.Replace("#", " ");
+
+            if (address.EndsWith(toRemove))
+            {
+                address = address[..^toRemove.Length];
+            }
+
+            return address;
         }
     }
 }

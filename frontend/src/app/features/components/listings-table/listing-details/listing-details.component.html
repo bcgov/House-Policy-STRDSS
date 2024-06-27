@@ -14,7 +14,7 @@
 </div>
 <div class="subtitle" *ngIf="listing">
     <div class="last-updated-container">
-        <strong>Last Updated: </strong>{{listing.lastActionDtm}}
+        <strong>Last Updated: </strong>{{(listing.lastActionDtm |date) || '-'}}
     </div>
     <div class="platform-container">
         <strong>Platform: </strong>{{listing.offeringOrganizationNm}}
@@ -115,7 +115,7 @@
     <div class="sidebar">
         <p-panel class="details-block" header="Actions" *ngIf="!isCEU">
             <div class="row">
-                <button disabled pButton (click)="sendNoticeOfNonCompliance()" class="p-button-link"> Send Notice Of
+                <button pButton (click)="sendNoticeOfNonCompliance()" class="p-button-link"> Send Notice Of
                     Non-Compliance </button>
             </div>
             <div class="row">

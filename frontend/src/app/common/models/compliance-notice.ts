@@ -12,3 +12,11 @@ export interface ComplianceNotice {
     StrBylawUrl?: string;
     comment: string;
 }
+
+export interface ComplianceNoticeBulk {
+    rentalListingId: number;
+    hostEmailSent: boolean;
+    ccList: Array<string>;
+    comment: string;
+    lgContactEmail: string;
+}

@@ -1,4 +1,4 @@
-/* STR DSS Sprint 7 Mandatory Data Seeding */
+/* STR DSS Sprint 8 Mandatory Data Seeding */
 
 MERGE INTO dss_access_request_status AS tgt
 USING ( SELECT * FROM (VALUES
@@ -21,6 +21,7 @@ USING ( SELECT * FROM (VALUES
 ('Notice of Takedown','Notice of Non-Compliance'),
 ('Takedown Request','Takedown Request Confirmation'),
 ('Batch Takedown Request','Batch Takedown Request'),
+('Completed Takedown','Completed Takedown'),
 ('Escalation Request','STR Escalation Request'),
 ('Compliance Order','Provincial Compliance Order'),
 ('Access Requested','Access Requested Notification'),
@@ -55,13 +56,19 @@ VALUES (src.organization_type, src.organization_type_nm);
 MERGE INTO dss_user_privilege AS tgt
 USING ( SELECT * FROM (VALUES
 ('user_read','View users'),
-('user_write','Manage users'),
-('listing_read','View listings'),
+('user_write','Manage/edit users'),
+('role_read','View roles and permissions'),
+('role_write','Manage roles and permissions'),
+('listing_read','View/search/export listings and address log'),
+('address_write','Edit addresses'),
 ('licence_file_upload','Upload business licence files'),
 ('listing_file_upload','Upload platform listing files'),
+('takedown_file_upload','Upload platform takedown files'),
+('upload_history_read','View platform upload listing/takedown history'),
 ('audit_read','View audit logs'),
 ('takedown_action','Create Takedown Action'),
-('ceu_action','Create CEU Action'))
+('province_action','Create Provincial Compliance Order'),
+('ceu_action','Send email to all hosts or platforms'))
 AS s (user_privilege_cd, user_privilege_nm)
 ) AS src
 ON (tgt.user_privilege_cd=src.user_privilege_cd)
@@ -89,24 +96,46 @@ WHEN NOT MATCHED
 THEN INSERT (user_role_cd, user_role_nm)
 VALUES (src.user_role_cd, src.user_role_nm);
 
+DELETE FROM dss_user_role_privilege WHERE user_role_cd='ceu_staff' AND user_privilege_cd in ('listing_file_upload','listing_read','address_write');
+
+DELETE FROM dss_user_role_privilege WHERE user_role_cd='bc_staff' AND user_privilege_cd in ('audit_read','listing_read');
+
+DELETE FROM dss_user_role_privilege WHERE user_role_cd='lg_staff' AND user_privilege_cd in ('listing_read','address_write');
+
 MERGE INTO dss_user_role_privilege AS tgt
 USING ( SELECT * FROM (VALUES
 ('ceu_admin','user_read'),
 ('ceu_admin','user_write'),
+('ceu_admin','role_read'),
+('ceu_admin','role_write'),
 ('ceu_admin','listing_read'),
+('ceu_admin','address_write'),
 ('ceu_admin','licence_file_upload'),
 ('ceu_admin','listing_file_upload'),
+('ceu_admin','takedown_file_upload'),
+('ceu_admin','upload_history_read'),
+('ceu_admin','audit_read'),
 ('ceu_admin','ceu_action'),
-('ceu_staff','listing_file_upload'),
-('ceu_staff','listing_read'),
+--
+--('ceu_staff','listing_read'), -- to be reinstated before release 3
+--('ceu_staff','address_write'), -- to be reinstated before release 3
+('ceu_staff','upload_history_read'),
 ('ceu_staff','audit_read'),
+('ceu_staff','province_action'),
 ('ceu_staff','ceu_action'),
-('bc_staff','listing_read'),
-('bc_staff','audit_read'),
-('lg_staff','listing_read'),
+--
+--('bc_staff','listing_read'), -- to be reinstated before release 3
+('bc_staff','upload_history_read'),
+--
+--('lg_staff','listing_read'), -- to be reinstated before release 3
+--('lg_staff','address_write'), -- to be reinstated before release 3
 ('lg_staff','licence_file_upload'),
+('lg_staff','upload_history_read'),
 ('lg_staff','audit_read'),
 ('lg_staff','takedown_action'),
+--
+('platform_staff','upload_history_read'),
+('platform_staff','takedown_file_upload'),
 ('platform_staff','listing_file_upload'))
 AS s (user_role_cd, user_privilege_cd)
 ) AS src

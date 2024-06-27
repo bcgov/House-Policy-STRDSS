@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -19,6 +19,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessagesModule } from 'primeng/messages';
 import { Router } from '@angular/router';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-delisting-request',
@@ -72,19 +74,37 @@ export class DelistingRequestComponent implements OnInit {
     return this.myForm.controls['customDetailTxt'];
   }
 
-  constructor(private fb: FormBuilder, private delistingService: DelistingService, private router: Router) { }
+  constructor(
+    private fb: FormBuilder,
+    private delistingService: DelistingService,
+    private router: Router,
+    private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
+    this.loaderService.loadingStart();
+    const getPlatforms = this.delistingService.getPlatforms();
+    const getLgOptions = this.delistingService.getLocalGovernments();
 
-    this.delistingService.getPlatforms().subscribe((platformOptions) => this.platformOptions = platformOptions);
-    this.delistingService.getLocalGovernments().subscribe((lgOptions) => this.initiatorsOptions = lgOptions);
+    forkJoin([getPlatforms, getLgOptions]).subscribe({
+      next: ([platformOptions, lgOptions]) => {
+        this.platformOptions = platformOptions;
+        this.initiatorsOptions = lgOptions;
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
+      }
+    });
   }
 
   onPreview(): void {
     this.messages = [];
 
     if (this.myForm.valid) {
+      this.loaderService.loadingStart();
       this.delistingService.delistingRequestPreview(this.prepareFormModel(this.myForm))
         .subscribe(
           {
@@ -94,9 +114,12 @@ export class DelistingRequestComponent implements OnInit {
             },
             error: error => {
               this.showErrors(error);
+            },
+            complete: () => {
+              this.loaderService.loadingEnd();
             }
           }
-        )
+        );
     } else {
       this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Form is invalid' }];
       console.error('Form is invalid!');
@@ -107,6 +130,7 @@ export class DelistingRequestComponent implements OnInit {
     this.messages = [];
 
     if (this.myForm.valid) {
+      this.loaderService.loadingStart();
       this.delistingService.createDelistingRequest(this.prepareFormModel(this.myForm))
         .subscribe({
           next: (_) => {
@@ -119,6 +143,7 @@ export class DelistingRequestComponent implements OnInit {
             this.myForm.reset();
             this.initForm();
             this.onPreviewClose();
+            this.loaderService.loadingEnd();
           }
         });
     }
@@ -170,6 +195,7 @@ export class DelistingRequestComponent implements OnInit {
 
   private showErrors(error: HttpErrorResponse | any): void {
     let errorObject = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
+
     if (error.error['detail']) {
       this.messages = [{ severity: 'error', summary: 'Server error', closable: true, detail: `${error.error['detail']}` }];
     } else {

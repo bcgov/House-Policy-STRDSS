@@ -143,6 +143,14 @@
                     text-align: center;
                 }
 
+                &.low-address-score-match {
+                    color: #CE3E39;
+
+                    i {
+                        font-weight: 600;
+                    }
+                }
+
                 .status-circle {
                     background-color: #FFFFFF;
                     width: 20px;

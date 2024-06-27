@@ -23,10 +23,15 @@ ifndef IMAGE_TAG_BACKEND
 $(error IMAGE_TAG_BACKEND is not set)
 endif
 
+ifndef IMAGE_TAG_HANGFIRE
+$(error IMAGE_TAG_HANGFIRE is not set)
+endif
+
 define arguments
 	"${NAME}" . -n "${NAMESPACE}" -f values.yaml -f "values-${ENV_NAME}.yaml" \
 	--set frontend.image.tag="${IMAGE_TAG_FRONTEND}" \
 	--set backend.image.tag="${IMAGE_TAG_BACKEND}" \
+	--set hangfire.image.tag="${IMAGE_TAG_HANGFIRE}" \
 	--set backend.env.InternalTokenSecret="${RANDOM_STRING}"
 endef
 

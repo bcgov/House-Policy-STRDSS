@@ -9,7 +9,7 @@ import { PageNotFoundComponent } from './common/components/page-not-found/page-n
 import { approvedUserGuard } from './common/guards/approved-user.guard';
 import { activeUserGuard } from './common/guards/active-user.guard';
 import { accessRequestTokenGuard } from './common/guards/access-request-token.guard';
-import { listing_file_upload, listing_read, takedown_action, user_write } from './common/consts/permissions.const';
+import { listing_file_upload, listing_read, role_read, role_write, takedown_action, upload_history_read, user_write } from './common/consts/permissions.const';
 import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 import { TermsAndConditionsComponent } from './common/components/terms-and-conditions/terms-and-conditions.component';
 import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
@@ -18,6 +18,9 @@ import { ListingUploadHistoryComponent } from './features/components/listing-upl
 import { ListingsTableComponent } from './features/components/listings-table/listings-table.component';
 import { ListingDetailsComponent } from './features/components/listings-table/listing-details/listing-details.component';
 import { BulkTakedownRequestComponent } from './features/components/bulk-takedown-request/bulk-takedown-request.component';
+import { BulkComplianceNoticeComponent } from './features/components/bulk-compliance-notice/bulk-compliance-notice.component';
+import { RolesListComponent } from './features/components/roles-list/roles-list.component';
+import { RoleDetailsComponent } from './features/components/roles-list/role-details/role-details.component';
 
 export const routes: Routes = [
     {
@@ -35,7 +38,7 @@ export const routes: Routes = [
         path: 'upload-listing-history',
         canActivate: [approvedUserGuard, activeUserGuard, areTermsAceptedGuard, hasPermissionsGuard],
         component: ListingUploadHistoryComponent,
-        data: { permissions: [listing_file_upload] }
+        data: { permissions: [upload_history_read] }
     },
     {
         path: 'terms-and-conditions',
@@ -61,6 +64,12 @@ export const routes: Routes = [
         data: { permissions: [takedown_action] }
     },
     {
+        path: 'bulk-compliance-notice',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: BulkComplianceNoticeComponent,
+        data: { permissions: [takedown_action] }
+    },
+    {
         path: 'listings',
         component: ListingsTableComponent,
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
@@ -83,6 +92,24 @@ export const routes: Routes = [
         data: { permissions: [user_write] }
     },
     {
+        path: 'roles',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: RolesListComponent,
+        data: { permissions: [role_read] }
+    },
+    {
+        path: 'role/:id',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: RoleDetailsComponent,
+        data: { permissions: [role_write] }
+    },
+    {
+        path: 'role',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: RoleDetailsComponent,
+        data: { permissions: [role_write] }
+    },
+    {
         path: '401',
         component: UnauthorizedComponent,
     },
@@ -94,5 +121,4 @@ export const routes: Routes = [
         path: '**',
         redirectTo: '/404'
     }
-
 ];

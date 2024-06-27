@@ -12,6 +12,7 @@ namespace StrDss.Data.Mappings
         {
             CreateMap<UserCreateDto, DssUserIdentity>();
             CreateMap<UserDto, DssUserIdentity>();
+            CreateMap<UserUpdateDto, DssUserIdentity>();
             CreateMap<AccessRequestDenyDto, DssUserIdentity>();
             CreateMap<AccessRequestApproveDto, DssUserIdentity>();
             CreateMap<UpdateIsEnabledDto, DssUserIdentity>();
@@ -25,6 +26,8 @@ namespace StrDss.Data.Mappings
                 .ForMember(dest => dest.AvailableBedroomsQty, opt => opt.MapFrom(src => CommonUtils.StringToShort(src.BedroomsQty)))
                 .ForMember(dest => dest.NightsBookedQty, opt => opt.MapFrom(src => CommonUtils.StringToShort(src.NightsBookedQty)))
                 .ForMember(dest => dest.SeparateReservationsQty, opt => opt.MapFrom(src => CommonUtils.StringToShort(src.ReservationsQty)));
+
+            CreateMap<RoleUpdateDto, DssUserRole>();
         }
     }
 }

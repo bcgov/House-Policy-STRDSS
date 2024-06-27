@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -19,6 +19,7 @@ import { ComplianceNotice } from '../../../common/models/compliance-notice';
 import { MessagesModule } from 'primeng/messages';
 import { Router } from '@angular/router';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-compliance-notice',
@@ -77,18 +78,32 @@ export class ComplianceNoticeComponent implements OnInit {
     return this.myForm.controls['StrBylawUrl'];
   }
 
-  constructor(private fb: FormBuilder, private delistingService: DelistingService, private router: Router) { }
+  constructor(
+    private fb: FormBuilder,
+    private delistingService: DelistingService,
+    private router: Router,
+    private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
+    this.loaderService.loadingStart();
 
-    this.delistingService.getPlatforms().subscribe((platformOptions) => this.platformOptions = platformOptions);
+    this.delistingService.getPlatforms().subscribe({
+      next: (platformOptions) => { this.platformOptions = platformOptions },
+      complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
+      }
+    });
   }
 
   onPreview(): void {
     this.messages = [];
 
     if (this.myForm.valid) {
+      this.loaderService.loadingStart();
       this.delistingService.complianceNoticePreview(this.prepareFormModel(this.myForm))
         .subscribe(
           {
@@ -98,9 +113,13 @@ export class ComplianceNoticeComponent implements OnInit {
             },
             error: error => {
               this.showErrors(error);
+            },
+            complete: () => {
+              this.loaderService.loadingEnd();
+              this.cd.detectChanges();
             }
           }
-        )
+        );
     } else {
       this.messages = [{ severity: 'error', summary: 'Validation error', closable: true, detail: 'Form is invalid' }];
       console.error('Form is invalid!');
@@ -111,6 +130,7 @@ export class ComplianceNoticeComponent implements OnInit {
     this.messages = [];
 
     if (this.myForm.valid) {
+      this.loaderService.loadingStart();
       const model: ComplianceNotice = this.prepareFormModel(this.myForm);
       model.comment = comment;
 
@@ -127,6 +147,8 @@ export class ComplianceNoticeComponent implements OnInit {
             this.initForm();
             this.onPreviewClose();
             this.cleanupPopupComment(textAreaElement);
+            this.loaderService.loadingEnd();
+            this.cd.detectChanges();
           }
         });
     }

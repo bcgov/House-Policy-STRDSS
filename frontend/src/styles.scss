@@ -101,7 +101,6 @@ body {
             }
 
             .p-dropdown {
-
                 width: 200px;
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
@@ -155,6 +154,12 @@ body {
         &.outline-btn {
             background-color: transparent;
             color: #053662;
+            border-color: #053662;
+
+            &.red {
+                color: #CE3E39;
+                border-color: #CE3E39;
+            }
         }
 
         &.p-button-link {
@@ -305,9 +310,9 @@ body {
     }
 
     p-paginator {
-
         .p-paginator-rpp-options,
         .p-dropdown-label.p-inputtext,
+
         p-dropdown {
             width: 100px;
         }
@@ -330,7 +335,6 @@ body {
             }
         }
     }
-
 
     .p-paginator.paging-right {
         justify-content: end

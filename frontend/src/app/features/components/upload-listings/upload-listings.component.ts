@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
@@ -68,7 +68,8 @@ export class UploadListingsComponent implements OnInit {
     private yearMonthGenService: YearMonthGenService,
     private messageService: MessageService,
     private userDataService: UserDataService,
-    private loaderService: GlobalLoaderService
+    private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -84,6 +85,7 @@ export class UploadListingsComponent implements OnInit {
         } else {
           this.myForm.controls['platformId'].setValue(currentUser.organizationId);
         }
+        this.cd.detectChanges();
       },
     });
   }

@@ -19,7 +19,7 @@ namespace StrDss.Test.AutoDomainDataBuilder
         {
             var pi = request as PropertyInfo;
 
-            if (pi == null)
+            if (pi == null || pi.DeclaringType != typeof(RentalListingRowUntyped))
                 return new NoSpecimen();
 
             switch (pi.Name)

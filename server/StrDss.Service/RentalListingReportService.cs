@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Index.Quadtree;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Entities;
@@ -13,7 +12,6 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
-using StrDss.Model.UserDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
@@ -30,6 +28,7 @@ namespace StrDss.Service
         Task ProcessRentalReportUploadAsync();
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<byte[]?> GetRentalListingErrorFile(long uploadId);
+        Task CleaupAddressAsync();
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
@@ -301,6 +300,8 @@ namespace StrDss.Service
 
         private async Task ProcessRentalReportUploadAsync(DssUploadDelivery upload)
         {
+            var processStopwatch = Stopwatch.StartNew();
+
             _logger.LogInformation($"Processing Rental Listing Report {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
 
             var reportPeriodYm = (DateOnly)upload.ReportPeriodYm!;
@@ -350,11 +351,7 @@ namespace StrDss.Service
 
                 var exists = linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.ListingId == row.ListingId);
 
-                if (!exists)
-                {
-                    _logger.LogInformation($"Skipping listing - ({row.OrgCd} - {row.ListingId})");
-                    continue;
-                }
+                if (!exists) continue;
 
                 var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.ListingId);
 
@@ -372,12 +369,13 @@ namespace StrDss.Service
 
                 processedCount++;
 
-                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/100");
             }
 
             if (!isLastLine)
             {
-                _logger.LogInformation($"Processed {processedCount} lines: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
+                processStopwatch.Stop();
+                _logger.LogInformation($"Processed {processedCount} lines: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
                 return;
             }
 
@@ -437,7 +435,8 @@ namespace StrDss.Service
                 _unitOfWork.CommitTransaction(transaction);
             }
 
-            _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
+            processStopwatch.Stop();
+            _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
         private async Task<bool> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, bool isLastLine)
@@ -659,6 +658,44 @@ namespace StrDss.Service
             }
 
             return Encoding.UTF8.GetBytes(contents.ToString());
+        }
+
+        public async Task CleaupAddressAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var addresses = await _addressRepo.GetPhysicalAddressesToCleanUpAsync();
+
+            var totalCount = addresses.Count;
+            var processedCount = 0;
+
+            foreach (var address in addresses)
+            {
+                var stopwatchForGeocoder = Stopwatch.StartNew();
+
+                var error = await _geocoder.GetAddressAsync(address);
+
+                if (error.IsEmpty() && address.LocationGeometry is not null && address.LocationGeometry is Point point)
+                {
+                    address.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+                    address.IsSystemProcessing = true;
+                }
+                else
+                {
+                    address.IsSystemProcessing = false; //system error
+                }
+
+                processedCount++;
+
+                stopwatchForGeocoder.Stop();
+
+                _logger.LogInformation($"Address Cleanup (geocoder): {stopwatchForGeocoder.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/{totalCount}");
+
+                _unitOfWork.Commit();
+            }
+
+            stopwatch.Stop();
+            _logger.LogInformation($"Address Cleanup Finished: {stopwatch.Elapsed.TotalSeconds} seconds");
         }
     }
 }

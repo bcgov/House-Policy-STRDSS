@@ -9,7 +9,7 @@ export class GlobalLoaderService {
 
   constructor() { }
 
-  loadingStart(title: string): void {
+  loadingStart(title: string = 'Loading'): void {
     this.loadingNotification.next({ isLoading: true, title });
   }
 

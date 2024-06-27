@@ -14,6 +14,10 @@ namespace StrDss.Data.Repositories
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? rentalListingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
+        Task<List<long>> GetRentalListingIdsToExport();
+        Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId);
+        Task<DssRentalListingExtract> GetRentalListingExtractByOrgId(long organizationId);
+        Task<DssRentalListingExtract> GetRentalListingExtractByExtractNm(string name);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -156,9 +160,6 @@ namespace StrDss.Data.Repositories
                 listing.HostEmails = await GetHostEmailsAsync(rentalListingId);
             }
 
-            var listingView = await _dbContext.DssRentalListingVws.FirstAsync(x => x.RentalListingId == rentalListingId);
-            listing.LocalGovernmentId = listingView.ManagingOrganizationId ?? 0;
-
             (listing.PlatformEmails, listing.ProvidingPlatformId) = await GetPlatformEmailsAsync(listing.OfferingPlatformId);
 
             return listing;
@@ -166,15 +167,16 @@ namespace StrDss.Data.Repositories
 
         private async Task<RentalListingForTakedownDto?> GetRentalListingAsync(long rentalListingId)
         {
-            return await _dbContext.DssRentalListings
+            return await _dbContext.DssRentalListingVws
                 .Where(x => x.RentalListingId == rentalListingId)
                 .Select(x => new RentalListingForTakedownDto
                 {
                     RentalListingId = rentalListingId,
-                    PlatformListingNo = x.PlatformListingNo,
+                    PlatformListingNo = x.PlatformListingNo ?? "",
                     PlatformListingUrl = x.PlatformListingUrl,
-                    OrganizationCd = x.OfferingOrganization.OrganizationCd,
-                    OfferingPlatformId = x.OfferingOrganizationId
+                    OrganizationCd = x.OfferingOrganizationCd ?? "",
+                    OfferingPlatformId = x.OfferingOrganizationId ?? 0,
+                    LocalGovernmentId = x.ManagingOrganizationId ?? 0,
                 })
                 .FirstOrDefaultAsync();
         }
@@ -220,5 +222,56 @@ namespace StrDss.Data.Repositories
             return (platformEmails.ToList(), providingPlatformId);
         }
 
+        public async Task<List<long>> GetRentalListingIdsToExport()
+        {
+            return await _dbSet
+                .OrderBy(x => x.ManagingOrganizationId)
+                .ThenBy(x => x.IsPrincipalResidenceRequired)
+                .Select(x => x.RentalListingId ?? 0)
+                .ToListAsync();
+        }
+
+        public async Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId)
+        {
+            return _mapper.Map<RentalListingExportDto>(await _dbSet.FirstAsync(x => x.RentalListingId == rentalListingId));
+        }
+
+        public async Task<DssRentalListingExtract> GetRentalListingExtractByOrgId(long organizationId)
+        {
+            var extract = await _dbContext.DssRentalListingExtracts.FirstOrDefaultAsync(x => x.FilteringOrganizationId == organizationId);
+
+            if (extract == null)
+            {
+                extract = new DssRentalListingExtract
+                {
+                    FilteringOrganizationId = organizationId,
+                    IsPrRequirementFiltered = false,
+                    UpdUserGuid = Guid.Empty,
+                };
+
+                _dbContext.DssRentalListingExtracts.Add(extract);
+            }
+
+            return extract;
+        }
+
+        public async Task<DssRentalListingExtract> GetRentalListingExtractByExtractNm(string name)
+        {
+            var extract = await _dbContext.DssRentalListingExtracts.FirstOrDefaultAsync(x => x.RentalListingExtractNm == name);
+
+            if (extract == null)
+            {
+                extract = new DssRentalListingExtract
+                {
+                    RentalListingExtractNm = name,
+                    IsPrRequirementFiltered = false,
+                    UpdUserGuid = Guid.Empty,
+                };
+
+                _dbContext.DssRentalListingExtracts.Add(extract);
+            }
+
+            return extract;
+        }
     }
 }

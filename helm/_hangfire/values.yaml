@@ -54,3 +54,7 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+persistence:
+  enabled: true
+  pvcSize: 256Mi

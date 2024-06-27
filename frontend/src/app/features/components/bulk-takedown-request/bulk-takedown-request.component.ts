@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { environment } from '../../../../environments/environment';
 import { TableModule } from 'primeng/table';
@@ -16,6 +16,7 @@ import { ChipsModule } from 'primeng/chips';
 import { DelistingService } from '../../../common/services/delisting.service';
 import { validateEmailListString } from '../../../common/consts/validators.const';
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-bulk-takedown-request',
@@ -51,7 +52,7 @@ export class BulkTakedownRequestComponent implements OnInit {
   }[]
 
   selectedListings!: Array<ListingDetails>;
-  addressWarningScoreLimit = environment.ADDRESS_SCORE;
+  addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   sort!: { prop: string, dir: 'asc' | 'desc' }
 
   public get ccListControl(): AbstractControl {
@@ -69,18 +70,21 @@ export class BulkTakedownRequestComponent implements OnInit {
     private delistingService: DelistingService,
     private router: Router,
     private route: ActivatedRoute,
-    private searchService: SelectedListingsStateService) { }
+    private searchStateService: SelectedListingsStateService,
+    private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
+  ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(
       (param) => {
-        if (!this.searchService?.selectedListings || !param['returnUrl']) {
-          this.router.navigateByUrl('/listings')
+        if (!this.searchStateService?.selectedListings || !param['returnUrl']) {
+          this.router.navigateByUrl('/listings');
         }
         else {
           this.returnUrl = param['returnUrl'];
-          this.listings = [...this.searchService.selectedListings];
-          this.searchService.selectedListings = new Array<ListingDetails>();
+          this.listings = [...this.searchStateService.selectedListings];
+          this.searchStateService.selectedListings = new Array<ListingDetails>();
           this.selectedListings = this.listings;
           this.initForm();
           this.cloakParams();
@@ -119,15 +123,21 @@ export class BulkTakedownRequestComponent implements OnInit {
   }
 
   cancel(): void {
+    this.searchStateService.selectedListings = [];
     this.router.navigateByUrl(this.returnUrl)
   }
 
   submitAfterPreview(): void {
+    this.loaderService.loadingStart();
     this.delistingService.delistingRequestBulk(this.submissionArray)
       .subscribe({
         next: () => {
           this.messageHandlerService.showSuccess('Takedown request has been sent successfully');
           this.cancel();
+        },
+        complete: () => {
+          this.loaderService.loadingEnd();
+          this.cd.detectChanges();
         }
       })
   }
@@ -157,12 +167,17 @@ export class BulkTakedownRequestComponent implements OnInit {
       customDetailTxt: formValues.customDetailTxt,
     }));
 
+    this.loaderService.loadingStart();
     this.delistingService.delistingRequestBulkPreview(this.submissionArray)
       .subscribe({
         next: (preview: { content: string }) => {
           this.previewText = preview.content;
           this.showPreviewDialog = true;
         },
+        complete: () => {
+          this.loaderService.loadingEnd();
+          this.cd.detectChanges();
+        }
       });
   }
 

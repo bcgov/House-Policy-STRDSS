@@ -17,6 +17,7 @@
         public bool? IsTakenDown { get; set; }
 
         public long? OfferingOrganizationId { get; set; }
+        public string? OfferingOrganizationCd { get; set; }
 
         public string? OfferingOrganizationNm { get; set; }
 

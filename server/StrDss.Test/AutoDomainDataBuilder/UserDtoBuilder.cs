@@ -19,7 +19,7 @@ namespace StrDss.Test.AutoDomainDataBuilder
         {
             var pi = request as PropertyInfo;
 
-            if (pi == null)
+            if (pi == null || pi.DeclaringType != typeof(UserDto))
                 return new NoSpecimen();
 
              switch (pi.Name)
@@ -54,8 +54,8 @@ namespace StrDss.Test.AutoDomainDataBuilder
                     return null!;
                 case nameof(UserDto.UpdDtm):
                     return DateTime.UtcNow;
-                case nameof(UserDto.UserRoleCds):
-                    return new List<RoleDto> { new RoleDto { UserRoleCd = "Role1" }, new RoleDto { UserRoleCd = "Role2" } };
+                //case nameof(UserDto.UserRoleCds):
+                //    return new List<RoleDto> { new RoleDto { UserRoleCd = "Role1" }, new RoleDto { UserRoleCd = "Role2" } };
                 default:
                     return new NoSpecimen();
             }

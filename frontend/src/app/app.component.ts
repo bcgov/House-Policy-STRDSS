@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { LayoutComponent } from './common/layout/layout.component';
 import { CommonModule } from '@angular/common';
@@ -12,19 +12,25 @@ import { GlobalLoaderService } from './common/services/global-loader.service';
     imports: [CommonModule, KeycloakAngularModule, LayoutComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
     currentUserLoaded = false;
     isLoading = true;
     loaderTitle? = 'Loading'
 
-    constructor(private userService: UserDataService, private loaderService: GlobalLoaderService) { }
+    constructor(
+        private userService: UserDataService,
+        private loaderService: GlobalLoaderService,
+        private cd: ChangeDetectorRef,
+    ) { }
 
     ngOnInit(): void {
         this.loaderService.loadingNotification.subscribe({
             next: ({ isLoading, title }) => {
                 this.isLoading = isLoading;
                 this.loaderTitle = title;
+                this.cd.detectChanges();
             },
         })
 

@@ -19,6 +19,7 @@ namespace StrDss.Service
             _rules = new List<FieldValidationRule>();
 
             RentalListingReportValidationRule.LoadReportValidationRules(_rules);
+            RoleValidationRule.LoadReportValidationRules(_rules);
         }
 
         public IEnumerable<FieldValidationRule> GetFieldValidationRules(string entityName)

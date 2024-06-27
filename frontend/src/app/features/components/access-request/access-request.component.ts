@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Message } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -11,6 +11,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RequestAccessService } from '../../../common/services/request-access.service';
 import { AccessRequest } from '../../../common/models/access-request';
 import { UserDataService } from '../../../common/services/user-data.service';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-access-request',
@@ -50,6 +52,8 @@ export class AccessRequestComponent implements OnInit {
     private fb: FormBuilder,
     private requestAccessService: RequestAccessService,
     private userDataService: UserDataService,
+    private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -65,6 +69,7 @@ export class AccessRequestComponent implements OnInit {
       this.showRequestedFailedMessage = false;
       this.showRequestedSuccessfullyMessage = false;
       const model: AccessRequest = this.myForm.getRawValue();
+      this.loaderService.loadingStart();
 
       this.requestAccessService.createAccessRequest(model).subscribe({
         next: _ => {
@@ -95,21 +100,28 @@ export class AccessRequestComponent implements OnInit {
             this.messages.push({ severity: 'error', summary: 'Request failed!', detail: 'Unhandled error.' });
           }
         },
-      })
+        complete: () => {
+          this.loaderService.loadingEnd();
+          this.cd.detectChanges();
+        }
+      });
     }
   }
 
   private initData(): void {
-    this.requestAccessService.getOrganizationTypes().subscribe({
-      next: (types => {
+    this.loaderService.loadingStart();
+    const getCurrentUser = this.userDataService.getCurrentUser();
+    const getOrgs = this.requestAccessService.getOrganizationTypes();
+
+    forkJoin([getCurrentUser, getOrgs]).subscribe({
+      next: ([user, types]) => {
         this.roles = types;
-      }),
-    });
-    this.userDataService.getCurrentUser().subscribe({
-      next: user => {
         this.currentUser = user;
+      }, complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
       }
-    })
+    });
   }
 
   private initForm(): void {

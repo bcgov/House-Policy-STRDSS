@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { DropdownOption } from '../models/dropdown-option';
-import { ComplianceNotice } from '../models/compliance-notice';
+import { ComplianceNotice, ComplianceNoticeBulk } from '../models/compliance-notice';
 import { DelistingRequest, DelistingRequestBulk } from '../models/delisting-request';
 
 @Injectable({
@@ -38,6 +38,10 @@ export class DelistingService {
     return this.httpClient.post<{ content: string }>(`${environment.API_HOST}/delisting/requests/preview`, delistingRequest)
   }
 
+  createDelistingRequest(delistingRequest: DelistingRequest): Observable<any> {
+    return this.httpClient.post<any>(`${environment.API_HOST}/delisting/requests`, delistingRequest)
+  }
+
   delistingRequestBulkPreview(delistingRequests: Array<DelistingRequestBulk>): Observable<{ content: string }> {
     return this.httpClient.post<{ content: string }>(`${environment.API_HOST}/delisting/bulkrequests/preview`, delistingRequests)
   }
@@ -46,7 +50,11 @@ export class DelistingService {
     return this.httpClient.post<void>(`${environment.API_HOST}/delisting/bulkrequests`, delistingRequests)
   }
 
-  createDelistingRequest(delistingRequest: DelistingRequest): Observable<any> {
-    return this.httpClient.post<any>(`${environment.API_HOST}/delisting/requests`, delistingRequest)
+  complianceNoticeBulkPreview(delistingRequests: Array<ComplianceNoticeBulk>): Observable<{ content: string }> {
+    return this.httpClient.post<{ content: string }>(`${environment.API_HOST}/delisting/bulkwarnings/preview`, delistingRequests)
+  }
+
+  complianceNoticeBulk(delistingRequests: Array<ComplianceNoticeBulk>): Observable<void> {
+    return this.httpClient.post<void>(`${environment.API_HOST}/delisting/bulkwarnings`, delistingRequests)
   }
 }

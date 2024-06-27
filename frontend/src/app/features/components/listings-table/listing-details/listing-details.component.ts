@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -11,6 +11,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { UserDataService } from '../../../../common/services/user-data.service';
 import { environment } from '../../../../../environments/environment';
 import { SelectedListingsStateService } from '../../../../common/services/selected-listings-state.service';
+import { GlobalLoaderService } from '../../../../common/services/global-loader.service';
 
 @Component({
   selector: 'app-listing-details',
@@ -30,7 +31,7 @@ export class ListingDetailsComponent implements OnInit {
   id!: number;
   listing!: ListingDetails;
   isLegendShown = false;
-  addressWarningScoreLimit = environment.ADDRESS_SCORE;
+  addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   isCEU = false;
 
   constructor(
@@ -38,15 +39,21 @@ export class ListingDetailsComponent implements OnInit {
     private router: Router,
     private listingService: ListingDataService,
     private userDataService: UserDataService,
-    private searchStateService: SelectedListingsStateService
+    private searchStateService: SelectedListingsStateService,
+    private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
+    this.loaderService.loadingStart();
     this.id = this.route.snapshot.params['id'];
+
     this.userDataService.getCurrentUser().subscribe({
       next: (user) => {
         this.isCEU = user.permissions.includes('ceu_action');
-      }
+      }, complete: () => {
+        this.loaderService.loadingEnd();
+      },
     });
 
     this.getListingDetailsById(this.id);
@@ -58,21 +65,27 @@ export class ListingDetailsComponent implements OnInit {
 
   sendTakedownRequest(): void {
     this.searchStateService.selectedListings = [this.listing];
-    this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } })
+    this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } });
   }
 
   sendNoticeOfNonCompliance(): void {
     this.searchStateService.selectedListings = [this.listing];
+    this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } });
   }
 
   private getUrlFromState(): string {
-    return `/listing/${this.id}`
+    return `/listing/${this.id}`;
   }
 
   private getListingDetailsById(id: number): void {
+    this.loaderService.loadingStart();
     this.listingService.getListingDetailsById(id).subscribe({
       next: (response: ListingDetails) => {
         this.listing = response;
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
       }
     });
   }

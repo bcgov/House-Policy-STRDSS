@@ -37,4 +37,5 @@ jobs:
         ENV_NAME=prod \
         IMAGE_TAG_FRONTEND=${vtag//v} \
         IMAGE_TAG_BACKEND=${vtag//v} \
+        IMAGE_TAG_HANGFIRE=${vtag//v} \
       working-directory: ./helm/main

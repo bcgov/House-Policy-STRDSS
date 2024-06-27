@@ -4,7 +4,7 @@ namespace StrDss.Api
 {
     public static class ValidationUtils
     {
-        public static UnprocessableEntityObjectResult GetValidationErrorResult(Dictionary<string, List<string>> messages, ActionContext context)
+        public static UnprocessableEntityObjectResult GetValidationErrorResult(Dictionary<string, List<string>> messages, ActionContext context, string title = "")
         {
             var errors = new Dictionary<string, string[]>();
 
@@ -16,7 +16,7 @@ namespace StrDss.Api
             var problem = new ValidationProblemDetails(errors)
             {
                 Type = "https://strdss.bc.gov.ca/model-validation-error",
-                Title = "One or more validation errors occurred.",
+                Title = title == "" ? "One or more validation errors occurred." : title,
                 Status = StatusCodes.Status422UnprocessableEntity,
                 Detail = "Please refer to the errors property for additional details",
                 Instance = context.HttpContext.Request.Path

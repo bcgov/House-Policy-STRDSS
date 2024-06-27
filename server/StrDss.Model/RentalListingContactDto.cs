@@ -12,6 +12,7 @@
         public string? FullAddressTxt { get; set; }
         public string? EmailAddressDsc { get; set; }
         public long ContactedThroughRentalListingId { get; set; }
+        public bool HasValidEmail { get; set; }
         public DateTime UpdDtm { get; set; }
         public Guid? UpdUserGuid { get; set; }
     }

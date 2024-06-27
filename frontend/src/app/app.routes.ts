@@ -9,7 +9,7 @@ import { PageNotFoundComponent } from './common/components/page-not-found/page-n
 import { approvedUserGuard } from './common/guards/approved-user.guard';
 import { activeUserGuard } from './common/guards/active-user.guard';
 import { accessRequestTokenGuard } from './common/guards/access-request-token.guard';
-import { listing_file_upload, listing_read, role_read, role_write, takedown_action, user_write } from './common/consts/permissions.const';
+import { listing_file_upload, listing_read, role_read, role_write, takedown_action, upload_history_read, user_write } from './common/consts/permissions.const';
 import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 import { TermsAndConditionsComponent } from './common/components/terms-and-conditions/terms-and-conditions.component';
 import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
@@ -38,7 +38,7 @@ export const routes: Routes = [
         path: 'upload-listing-history',
         canActivate: [approvedUserGuard, activeUserGuard, areTermsAceptedGuard, hasPermissionsGuard],
         component: ListingUploadHistoryComponent,
-        data: { permissions: [listing_file_upload] }
+        data: { permissions: [upload_history_read] }
     },
     {
         path: 'terms-and-conditions',

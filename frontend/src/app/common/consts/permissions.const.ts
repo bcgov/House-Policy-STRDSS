@@ -8,3 +8,4 @@ export const ceu_action: string = 'ceu_action';
 export const audit_read: string = 'audit_read';
 export const role_read: string = 'role_read';
 export const role_write: string = 'role_write';
+export const upload_history_read: string = 'upload_history_read';

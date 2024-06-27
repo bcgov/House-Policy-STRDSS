@@ -35,6 +35,12 @@
                 }
             }
         }
+
+        td {
+            &.no-email {
+                color: #D32F2F;
+            }
+        }
     }
 
     .limit-width {

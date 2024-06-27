@@ -93,7 +93,7 @@ jobs:
           ng test --watch=false --progress=false --browsers=ChromeHeadless --code-coverage --source-map=false
         continue-on-error: true
 
-    #  # SonarQube integration frontend
+    #  #  SonarQube integration frontend
     #   - name: SonarQube Scan
     #     uses: sonarsource/sonarcloud-github-action@v2
     #     env:

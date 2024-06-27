@@ -65,16 +65,16 @@ export class ListingDetailsComponent implements OnInit {
 
   sendTakedownRequest(): void {
     this.searchStateService.selectedListings = [this.listing];
-    this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } })
+    this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } });
   }
 
   sendNoticeOfNonCompliance(): void {
     this.searchStateService.selectedListings = [this.listing];
-    this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } })
+    this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } });
   }
 
   private getUrlFromState(): string {
-    return `/listing/${this.id}`
+    return `/listing/${this.id}`;
   }
 
   private getListingDetailsById(id: number): void {

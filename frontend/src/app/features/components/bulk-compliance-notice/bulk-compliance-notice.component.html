@@ -71,18 +71,22 @@
                 <td [class.warning]="listing.matchScoreAmt<addressWarningScoreLimit">{{ listing.matchAddressTxt }}
                 </td>
                 <td>
-                    <p-checkbox [(ngModel)]="listing.sendNoticeToHosts" [binary]="true" inputId="binary"></p-checkbox>
+                    <p-checkbox [disabled]="!listing.hasAtLeastOneValidHostEmail"
+                        [(ngModel)]="listing.sendNoticeToHosts" [binary]="true" inputId="binary"></p-checkbox>
                 </td>
-                <td>{{ !listing.hasAtLeastOneValidHostEmail? 'Yes':'No' }}</td>
+                <td [class.no-email]="!listing.hasAtLeastOneValidHostEmail">{{ !listing.hasAtLeastOneValidHostEmail?
+                    'Yes':'No' }}</td>
                 <td class="host-info limit-width">
                     <span class="tip" (click)="op.toggle($event)">
                         <i class="pi pi-info-circle"></i>
                     </span>
                     <p-overlayPanel #op>
-                        <span class="host-data" *ngFor="let hostData of listing.hostsInfo"
-                            [class.invalid-email]="!hostData.hasValidEmail">{{hostData.host}}<br></span>
+                        <span class="host-data" *ngFor="let hostData of listing.hosts"
+                            [class.invalid-email]="!hostData.hasValidEmail">{{hostData.fullNm}}
+                            {{hostData.emailAddressDsc}}<br></span>
                     </p-overlayPanel>
-                    <span class="host-data" *ngFor="let hostData of listing.hostsInfo">{{hostData.host}};</span>
+                    <span class="host-data" *ngFor="let hostData of listing.hosts">{{hostData.fullNm}}
+                        {{hostData.emailAddressDsc}};</span>
                 </td>
             </tr>
         </ng-template>

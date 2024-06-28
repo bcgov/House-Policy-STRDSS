@@ -12,6 +12,7 @@ namespace StrDss.Data.Repositories
         Task AddPhysicalAddressAsync(DssPhysicalAddress address);
         Task<DssPhysicalAddress?> GetPhysicalAdderssFromMasterListingAsync(long offeringOrgId, string listingId, string address);
         Task<List<DssPhysicalAddress>> GetPhysicalAddressesToCleanUpAsync();
+        Task ReloadAddressAsync(DssPhysicalAddress address);
     }
     public class PhysicalAddressRepository : RepositoryBase<DssPhysicalAddress>, IPhysicalAddressRepository
     {
@@ -49,6 +50,10 @@ namespace StrDss.Data.Repositories
                 .OrderBy(x => x.PhysicalAddressId)
                 .Take(300)
                 .ToListAsync();
+        }
+        public async Task ReloadAddressAsync(DssPhysicalAddress address)
+        {
+            await _dbContext.Entry(address).ReloadAsync();
         }
     }
 }

@@ -47,11 +47,21 @@ namespace StrDss.Api.Controllers
         }
 
         //[ApiAuthorize(Permissions.ListingRead)]
-        //[HttpGet("exports/lastupdate")]
-        //public async Task<ActionResult> Export()
+        //[HttpGet("exports/lg/{lgId}")]
+        //public async Task<ActionResult> RentalListingExportForLg(long lgId)
         //{
-        //    await _listingService.CreateRentalListingExportFiles();
-        //    return Ok();
+        //    if (_currentUser.OrganizationType == OrganizationTypes.LG && _currentUser.OrganizationId != lgId)
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    var source = await _listingService.GetRentalListingExportFileForLg(lgId);
+        //    if (source == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return File(source!, "application/zip", $"export-{lgId}.zip");
         //}
     }
 }

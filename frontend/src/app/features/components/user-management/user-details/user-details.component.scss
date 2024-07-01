@@ -36,6 +36,7 @@
     .status-checkboxes {
         display: flex;
         gap: 12px;
+        padding-top: 12px;
     }
 
     .value-block {
@@ -43,10 +44,6 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-
-        .label {}
-
-        .value {}
 
         .tags-block {
             .link-to-roles {

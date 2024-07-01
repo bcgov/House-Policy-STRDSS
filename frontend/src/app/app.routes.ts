@@ -9,7 +9,7 @@ import { PageNotFoundComponent } from './common/components/page-not-found/page-n
 import { approvedUserGuard } from './common/guards/approved-user.guard';
 import { activeUserGuard } from './common/guards/active-user.guard';
 import { accessRequestTokenGuard } from './common/guards/access-request-token.guard';
-import { listing_file_upload, listing_read, role_read, role_write, takedown_action, upload_history_read, user_write } from './common/consts/permissions.const';
+import { listing_file_upload, listing_read, role_read, role_write, takedown_action, upload_history_read, user_read, user_write } from './common/consts/permissions.const';
 import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 import { TermsAndConditionsComponent } from './common/components/terms-and-conditions/terms-and-conditions.component';
 import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
@@ -21,6 +21,7 @@ import { BulkTakedownRequestComponent } from './features/components/bulk-takedow
 import { BulkComplianceNoticeComponent } from './features/components/bulk-compliance-notice/bulk-compliance-notice.component';
 import { RolesListComponent } from './features/components/roles-list/roles-list.component';
 import { RoleDetailsComponent } from './features/components/roles-list/role-details/role-details.component';
+import { UserDetailsComponent } from './features/components/user-management/user-details/user-details.component';
 
 export const routes: Routes = [
     {
@@ -90,6 +91,12 @@ export const routes: Routes = [
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: UserManagementComponent,
         data: { permissions: [user_write] }
+    },
+    {
+        path: 'user/:id',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: UserDetailsComponent,
+        data: { permissions: [user_read] }
     },
     {
         path: 'roles',

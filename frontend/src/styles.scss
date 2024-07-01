@@ -60,11 +60,23 @@ body {
     }
 
     p-dropdown,
+    p-multiSelect,
     input {
         &.full-width-text-field {
             width: 100%;
 
-            .p-dropdown {
+            .p-inputtext,
+            .p-dropdown,
+            .p-multiselect {
+                width: 100%;
+            }
+        }
+
+        &.auto-width {
+
+            .p-inputtext,
+            .p-dropdown,
+            .p-multiselect {
                 width: 100%;
             }
         }
@@ -73,7 +85,8 @@ body {
             width: 340px;
 
             .p-inputtext,
-            .p-dropdown {
+            .p-dropdown,
+            .p-multiselect {
                 width: 340px;
             }
         }

@@ -15,3 +15,6 @@ export interface UserPermission {
 export interface UserPermissionSelectable extends UserPermission {
     selected: boolean;
 }
+export interface UserRoleSelectable extends UserRole {
+    selected: boolean;
+}

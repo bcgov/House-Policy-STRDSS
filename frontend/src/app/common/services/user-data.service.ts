@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { DropdownOption } from '../models/dropdown-option';
-import { User } from '../models/user';
+import { User, UserDetails } from '../models/user';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -28,6 +28,19 @@ export class UserDataService {
     return this.httpClient.get(
       `${environment.API_HOST}/users?status=${status ?? ''}&search=${search ?? ''}&organizationId=${organizationId ?? ''}&pageSize=${pageSize ?? ''}&pageNumber=${pageNumber ?? ''}&orderBy=${orderBy ?? ''}&direction=${direction ?? ''}`
     );
+  }
+
+  getUserById(userId: number): Observable<UserDetails> {
+    return this.httpClient.get<UserDetails>(`${environment.API_HOST}/users/${userId}`);
+  }
+
+  updateUser(data: {
+    userIdentityId: number,
+    representedByOrganizationId: string,
+    roleCds: Array<string>,
+    updDtm: string
+  }): Observable<any> {
+    return this.httpClient.put<UserDetails>(`${environment.API_HOST}/users/${data.userIdentityId}`, data)
   }
 
   updateIsEnabled(userIdentityId: number, isEnabled: boolean, updDtm: string): Observable<void> {

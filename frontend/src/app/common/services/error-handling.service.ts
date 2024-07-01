@@ -6,13 +6,18 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class ErrorHandlingService {
-  public errorSubject = new Subject<ErrorBackEnd>();
+  public backendErrorSubject = new Subject<ErrorBackEnd>();
   public successSubject = new Subject<string>();
+  public errorSubject = new Subject<string>();
 
   constructor() { }
 
-  showError(error: ErrorBackEnd): void {
-    this.errorSubject.next(error);
+  showErrorFromBackend(error: ErrorBackEnd): void {
+    this.backendErrorSubject.next(error);
+  }
+
+  showError(message: string): void {
+    this.errorSubject.next(message);
   }
 
   showSuccess(message: string): void {

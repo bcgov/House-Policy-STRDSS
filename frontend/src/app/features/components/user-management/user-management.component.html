@@ -46,7 +46,7 @@
                     </th>
                     <th pSortableColumn="code2">Organization<p-sortIcon field="code2"></p-sortIcon></th>
                     <th pSortableColumn="code2">Status<p-sortIcon field="code2"></p-sortIcon></th>
-                    <th pSortableColumn="action">Action<p-sortIcon field="action"></p-sortIcon></th>
+                    <th pSortableColumn="action" class="action">Action<p-sortIcon field="action"></p-sortIcon></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-accessRequest>
@@ -67,24 +67,30 @@
                                 <span [style]="{'color':'#CE3E39'}">Denied</span>
                             </ng-container>
                             <ng-container *ngSwitchCase="'Requested'">
-
                                 <button pButton name="form-approve-btn" id="form-approve-btn"
                                     (click)="onApprovePopup(accessRequest)" class="table-small-btn">Approve</button>
 
                                 <button pButton name="form-reject-bt" id="form-reject-bt"
-                                    class="outline-btn table-small-btn"
-                                    (click)="onRejectPopup(accessRequest)">Deny</button>
-
+                                    class="outline-btn table-small-btn" (click)="onRejectPopup(accessRequest)">
+                                    Deny
+                                </button>
                             </ng-container>
                         </ng-container>
                     </td>
-                    <td>
+                    <td class="action non-header-cell">
                         <span
                             (click)="accessRequest.accessRequestStatusCd === 'Requested' || onActivateDeactivateToggle($event, accessRequest)">
                             <p-inputSwitch class="table-small-switch"
                                 [disabled]="accessRequest.accessRequestStatusCd ==='Requested'"
                                 [(ngModel)]="accessRequest.isEnabled" [readonly]="true"></p-inputSwitch>
                         </span>
+
+                        <span class="user-edit-icon" *ngIf="accessRequest.accessRequestStatusCd
+                            !=='Requested'" [routerLink]="'/user/'+accessRequest.userIdentityId"
+                            [class.disabled]="accessRequest.accessRequestStatusCd ==='Requested'"></span>
+                        <span *ngIf=" accessRequest.accessRequestStatusCd==='Requested'"
+                            class="user-edit-icon disabled"></span>
+
                     </td>
                 </tr>
             </ng-template>

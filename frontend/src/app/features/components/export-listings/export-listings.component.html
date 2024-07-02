@@ -1,0 +1,24 @@
+<div class="message">
+    <i class="pi pi-info-circle"></i>
+    <strong class="message-text">Data last updated on {{dateLastUpdated
+        | date: 'YYYY-MM-dd'}}</strong>
+</div>
+
+<h2>Download Listing Data</h2>
+<h4>Download listings as .CSV file</h4>
+
+<div class="card">
+    <div class="header">Select Jurisdiction to Download Listing Data</div>
+    <div class="content">
+        <div class="row" *ngFor="let item of jurisdictions; let i=index">
+            <p-radioButton name="jurisdiction-radio" [label]="item.label" [value]="item.value"
+                [(ngModel)]="selectedJurisdiction" inputId="disabled-radio_{{i}}">
+
+            </p-radioButton>
+        </div>
+    </div>
+</div>
+
+<div class="actions">
+    <button pButton (click)="onDownload()">Download</button>
+</div>

@@ -18,6 +18,8 @@ namespace StrDss.Data.Repositories
         Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId);
         Task<DssRentalListingExtract> GetRentalListingExtractByOrgId(long organizationId);
         Task<DssRentalListingExtract> GetRentalListingExtractByExtractNm(string name);
+        Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
+        Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -272,6 +274,23 @@ namespace StrDss.Data.Repositories
             }
 
             return extract;
+        }
+        public async Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId)
+        {
+            var extract = _mapper.Map<RentalListingExtractWithFileDto>(await _dbContext.DssRentalListingExtracts.FirstOrDefaultAsync(x => x.RentalListingExtractId == extractId));
+
+            if (extract == null) return null;
+
+            return extract;
+        }
+
+        public async Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync()
+        {
+            var datasets = _mapper.Map<List<RentalListingExtractDto>>(await _dbContext.DssRentalListingExtracts.AsNoTracking().ToListAsync());
+
+            return datasets.Where(x => _currentUser.OrganizationType == OrganizationTypes.LG
+                                       ? x.FilteringOrganizationId == _currentUser.OrganizationId
+                                       : x.FilteringOrganizationId == null).ToList();
         }
     }
 }

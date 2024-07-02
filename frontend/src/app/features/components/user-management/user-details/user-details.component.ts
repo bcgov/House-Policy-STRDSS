@@ -59,14 +59,11 @@ export class UserDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.params['id']);
-    console.log(this.id);
 
     if (isNaN(this.id)) {
       this.errorService.showError('Invalid User ID: User ID must consist of numbers only.');
       this.router.navigate(['/user-management']);
     }
-
-    this.loaderService.loadingStart();
 
     this.init();
   }
@@ -85,41 +82,18 @@ export class UserDetailsComponent implements OnInit {
   }
 
   onSave(): void {
-    // TODO: this part needs to be reconsidered. Either use concatMap or do everything in one API call (backend involvement required);
     this.userService.updateUser({
       roleCds: this.user.roleCds,
       updDtm: this.user.updDtm,
       userIdentityId: this.user.userIdentityId,
+      isEnabled: this.state === 'Active',
       representedByOrganizationId: this.selectedOrg
     }).subscribe({
       next: (_) => {
-
-        if ((this.user.isEnabled && this.state === 'Disabled') || (!this.user.isEnabled && this.state === 'Active')) {
-          this.loaderService.loadingStart();
-
-          this.userService.getUserById(this.id).subscribe({
-            next: (user) => {
-              this.loaderService.loadingStart();
-
-              this.userService.updateIsEnabled(this.user.userIdentityId, this.state === 'Active', user.updDtm).subscribe({
-                next: () => {
-                  this.init();
-                }, complete: () => {
-                  this.loaderService.loadingEnd();
-                }
-              });
-
-            }, complete: () => {
-              this.loaderService.loadingEnd();
-            }
-          });
-        }
-
-        this.onCancel();
-        this.errorService.showSuccess('User has been successfully updated');
+        this.init();
+        this.isEdit = false;
       },
       complete: () => {
-
         this.loaderService.loadingEnd();
         this.cd.detectChanges();
       }
@@ -139,6 +113,8 @@ export class UserDetailsComponent implements OnInit {
   }
 
   private init(): void {
+    this.loaderService.loadingStart();
+
     forkJoin([
       this.userService.getUserById(this.id),
       this.rolesService.getRoles(),

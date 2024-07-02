@@ -277,11 +277,14 @@ namespace StrDss.Data.Repositories
         }
         public async Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId)
         {
-            var extract = _mapper.Map<RentalListingExtractWithFileDto>(await _dbContext.DssRentalListingExtracts.FirstOrDefaultAsync(x => x.RentalListingExtractId == extractId));
+            var extract = await _dbContext
+                .DssRentalListingExtracts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.RentalListingExtractId == extractId);
 
             if (extract == null) return null;
 
-            return extract;
+            return _mapper.Map<RentalListingExtractWithFileDto>(extract);
         }
 
         public async Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync()

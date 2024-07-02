@@ -71,7 +71,7 @@ namespace StrDss.Api.Controllers
                 return Unauthorized();
             }
 
-            return File(extract.SourceBin!, "application/zip", $"export-{extract.FilteringOrganizationId}.zip");
+            return File(extract.SourceBin!, "application/zip", $"STRlisting_{extract.RentalListingExtractNm}_{extract.UpdDtm.ToString("yyyyMMdd")}.zip");
         }
     }
 }

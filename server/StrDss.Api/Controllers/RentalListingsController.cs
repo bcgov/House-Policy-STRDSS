@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
 using StrDss.Common;
 using StrDss.Model;
+using StrDss.Model.RentalReportDtos;
 using StrDss.Service;
 
 namespace StrDss.Api.Controllers
@@ -46,22 +47,31 @@ namespace StrDss.Api.Controllers
             return Ok(listing);
         }
 
-        //[ApiAuthorize(Permissions.ListingRead)]
-        //[HttpGet("exports/lg/{lgId}")]
-        //public async Task<ActionResult> RentalListingExportForLg(long lgId)
-        //{
-        //    if (_currentUser.OrganizationType == OrganizationTypes.LG && _currentUser.OrganizationId != lgId)
-        //    {
-        //        return Unauthorized();
-        //    }
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("exports")]
+        public async Task<ActionResult<List<RentalListingExtractDto>>> GetRetalListingExports()
+        {
+            return Ok(await _listingService.GetRetalListingExportsAsync());
+        }
 
-        //    var source = await _listingService.GetRentalListingExportFileForLg(lgId);
-        //    if (source == null)
-        //    {
-        //        return NotFound();
-        //    }
 
-        //    return File(source!, "application/zip", $"export-{lgId}.zip");
-        //}
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("exports/{extractId}")]
+        public async Task<ActionResult> GetRetalListingExportAsync(long extractId)
+        {
+            var extract = await _listingService.GetRetalListingExportAsync(extractId);
+
+            if (extract == null)
+            {
+                return NotFound();
+            }
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG && extract.FilteringOrganizationId != _currentUser.OrganizationId)
+            {
+                return Unauthorized();
+            }
+
+            return File(extract.SourceBin!, "application/zip", $"export-{extract.FilteringOrganizationId}.zip");
+        }
     }
 }

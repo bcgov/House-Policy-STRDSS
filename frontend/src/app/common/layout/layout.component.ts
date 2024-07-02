@@ -36,9 +36,9 @@ export class LayoutComponent {
   ) { }
 
   ngOnInit() {
-    this.errorHandlingService.errorSubject.subscribe({
+    this.errorHandlingService.backendErrorSubject.subscribe({
       next: (error) => {
-        this.showError(error);
+        this.showBackendError(error);
       },
       complete: () => {
         this.cd.detectChanges();
@@ -48,6 +48,15 @@ export class LayoutComponent {
     this.errorHandlingService.successSubject.subscribe({
       next: (message: string) => {
         this.showSuccess(message);
+      },
+      complete: () => {
+        this.cd.detectChanges();
+      }
+    });
+
+    this.errorHandlingService.errorSubject.subscribe({
+      next: (message: string) => {
+        this.showError(message);
       },
       complete: () => {
         this.cd.detectChanges();
@@ -111,7 +120,7 @@ export class LayoutComponent {
     });
   }
 
-  private showError(error: ErrorBackEnd): void {
+  private showBackendError(error: ErrorBackEnd): void {
     if (!!error.errors) {
       Object.keys(error.errors).forEach(oneError => {
         this.messageService.add({ severity: 'error', summary: error.title, detail: error.errors[oneError].join(' ') });
@@ -130,6 +139,10 @@ export class LayoutComponent {
 
   showSuccess(message: string): void {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
+  }
+
+  showError(message: string): void {
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
   }
 
   logout(): void {

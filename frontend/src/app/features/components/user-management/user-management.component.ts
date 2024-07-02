@@ -18,6 +18,7 @@ import { UserDataService } from '../../../common/services/user-data.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-user-management',
@@ -35,6 +36,7 @@ import { GlobalLoaderService } from '../../../common/services/global-loader.serv
     ConfirmDialogModule,
     InputTextModule,
     ToastModule,
+    RouterModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './user-management.component.html',
@@ -75,6 +77,7 @@ export class UserManagementComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private loaderService: GlobalLoaderService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {

@@ -12,10 +12,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
                 switch (err.status) {
                     case 422:
-                        errorService.showError(err.error as any);
+                        errorService.showErrorFromBackend(err.error as any);
                         return EMPTY;
                     case 500:
-                        errorService.showError(err as any);
+                        errorService.showErrorFromBackend(err as any);
                         return EMPTY;
 
                     default:

@@ -18,7 +18,7 @@ namespace StrDss.Service
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
         Task CreateRentalListingExportFiles();
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
-        Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId);
+        Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
@@ -302,7 +302,7 @@ namespace StrDss.Service
             return fieldString;
         }
 
-        public async Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId)
+        public async Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId)
         {
             return await _listingRepo.GetRetalListingExportAsync(extractId);
         }

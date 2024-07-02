@@ -1,4 +1,6 @@
-﻿namespace StrDss.Model.RentalReportDtos
+﻿using System.Text.Json.Serialization;
+
+namespace StrDss.Model.RentalReportDtos
 {
     public class RentalListingExtractDto
     {
@@ -6,6 +8,8 @@
         public string RentalListingExtractNm { get; set; } = null!;
         public bool IsPrRequirementFiltered { get; set; }
         public long? FilteringOrganizationId { get; set; }
+        [JsonIgnore]
+        public byte[]? SourceBin { get; set; }
         public DateTime UpdDtm { get; set; }
     }
 }

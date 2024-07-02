@@ -144,7 +144,7 @@ namespace StrDss.Data.Repositories
 
             foreach (var action in listing.ActionHistory)
             {
-                action.User = CommonUtils.GetFullName(action.FirstName, action.LastName);
+                action.User = CommonUtils.GetFullName(action.FirstName ?? "", action.LastName ?? "");
             }
 
             return listing;

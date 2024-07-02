@@ -18,6 +18,8 @@ namespace StrDss.Data.Repositories
         Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId);
         Task<DssRentalListingExtract> GetRentalListingExtractByOrgId(long organizationId);
         Task<DssRentalListingExtract> GetRentalListingExtractByExtractNm(string name);
+        Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
+        Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -128,23 +130,21 @@ namespace StrDss.Data.Repositories
             listing.ActionHistory = (await
                 _dbContext.DssEmailMessages.AsNoTracking()
                     .Include(x => x.EmailMessageTypeNavigation)
+                    .Include(x => x.InitiatingUserIdentity)
                     .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
                     .OrderByDescending(x => x.MessageDeliveryDtm)
                     .Select(x => new ActionHistoryDto
                     {
                         Action = x.EmailMessageTypeNavigation.EmailMessageTypeNm,
                         Date = DateUtils.ConvertUtcToPacificTime((DateTime)x.MessageDeliveryDtm!),
-                        UserGuid = x.UpdUserGuid
+                        FirstName = x.InitiatingUserIdentity == null ? "" : x.InitiatingUserIdentity.GivenNm,
+                        LastName = x.InitiatingUserIdentity == null ? "" : x.InitiatingUserIdentity.FamilyNm
                     })
                     .ToListAsync());
 
-            foreach(var action in listing.ActionHistory)
+            foreach (var action in listing.ActionHistory)
             {
-                var user = await _dbContext.DssUserIdentities.FirstOrDefaultAsync(x => x.UserGuid == x.UpdUserGuid);
-
-                if (user == null) continue;
-
-                action.User = CommonUtils.GetFullName(user!.GivenNm ?? "", user!.FamilyNm ?? "");
+                action.User = CommonUtils.GetFullName(action.FirstName, action.LastName);
             }
 
             return listing;
@@ -272,6 +272,26 @@ namespace StrDss.Data.Repositories
             }
 
             return extract;
+        }
+        public async Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId)
+        {
+            var extract = await _dbContext
+                .DssRentalListingExtracts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.RentalListingExtractId == extractId);
+
+            if (extract == null) return null;
+
+            return _mapper.Map<RentalListingExtractWithFileDto>(extract);
+        }
+
+        public async Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync()
+        {
+            var datasets = _mapper.Map<List<RentalListingExtractDto>>(await _dbContext.DssRentalListingExtracts.AsNoTracking().ToListAsync());
+
+            return datasets.Where(x => _currentUser.OrganizationType == OrganizationTypes.LG
+                                       ? x.FilteringOrganizationId == _currentUser.OrganizationId
+                                       : x.FilteringOrganizationId == null).ToList();
         }
     }
 }

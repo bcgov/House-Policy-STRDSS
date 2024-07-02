@@ -38,6 +38,7 @@ export class UserDataService {
     userIdentityId: number,
     representedByOrganizationId: string,
     roleCds: Array<string>,
+    isEnabled: boolean,
     updDtm: string
   }): Observable<any> {
     return this.httpClient.put<UserDetails>(`${environment.API_HOST}/users/${data.userIdentityId}`, data)

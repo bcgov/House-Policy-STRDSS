@@ -689,6 +689,15 @@ namespace StrDss.Service
 
                 stopwatchForGeocoder.Stop();
 
+                var validationErrors = ValidateStringLengths(address);
+                if (validationErrors.Any())
+                {
+                    _logger.LogWarning($"Address Cleanup: {address.OriginalAddressTxt} - Address validation errors: {string.Join(", ", validationErrors)}");
+
+                    await _addressRepo.ReloadAddressAsync(address);
+                    address.IsSystemProcessing = false;
+                }
+
                 _logger.LogInformation($"Address Cleanup (geocoder): {stopwatchForGeocoder.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/{totalCount}");
 
                 _unitOfWork.Commit();
@@ -697,5 +706,40 @@ namespace StrDss.Service
             stopwatch.Stop();
             _logger.LogInformation($"Address Cleanup Finished: {stopwatch.Elapsed.TotalSeconds} seconds");
         }
+
+        private static List<string> ValidateStringLengths(DssPhysicalAddress address)
+        {
+            var errors = new List<string>();
+            var maxLengths = new Dictionary<string, int>
+                {
+                    { nameof(DssPhysicalAddress.OriginalAddressTxt), 250 },
+                    { nameof(DssPhysicalAddress.MatchAddressTxt), 250 },
+                    { nameof(DssPhysicalAddress.SiteNo), 50 },
+                    { nameof(DssPhysicalAddress.BlockNo), 50 },
+                    { nameof(DssPhysicalAddress.UnitNo), 50 },
+                    { nameof(DssPhysicalAddress.CivicNo), 50 },
+                    { nameof(DssPhysicalAddress.StreetNm), 50 },
+                    { nameof(DssPhysicalAddress.StreetTypeDsc), 50 },
+                    { nameof(DssPhysicalAddress.StreetDirectionDsc), 50 },
+                    { nameof(DssPhysicalAddress.LocalityNm), 50 },
+                    { nameof(DssPhysicalAddress.LocalityTypeDsc), 50 },
+                    { nameof(DssPhysicalAddress.ProvinceCd), 5 }
+                };
+
+            foreach (var property in address.GetType().GetProperties())
+            {
+                if (property.PropertyType == typeof(string))
+                {
+                    var value = property.GetValue(address) as string;
+                    if (value != null && maxLengths.ContainsKey(property.Name) && value.Length > maxLengths[property.Name])
+                    {
+                        errors.Add($"{property.Name} exceeds maximum length of {maxLengths[property.Name]} characters.");
+                    }
+                }
+            }
+
+            return errors;
+        }
+
     }
 }

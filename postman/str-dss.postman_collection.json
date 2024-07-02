@@ -933,14 +933,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistings/450",
+					"raw": "{{host}}/api/rentallistings/546",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
 						"rentallistings",
-						"450"
+						"546"
 					]
 				}
 			},
@@ -990,7 +990,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"userRoleCd\": \"test_role\",\r\n  \"userRoleNm\": \"Role for Testing\",\r\n  \"UserRoleDsc\": \"Testing role\",\r\n  \"permissions\": [\r\n    \"listing_read\"\r\n  ]\r\n}",
+					"raw": "{\r\n  \"userRoleCd\": \"test_role_1\",\r\n  \"userRoleNm\": \"Role for Testing\",\r\n  \"UserRoleDsc\": \"\",\r\n  \"permissions\": [\r\n    \"listing_read\"\r\n  ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1111,7 +1111,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"userIdentityId\": 8,\r\n  \"representedByOrganizationId\": 256,\r\n  \"roleCds\": [\r\n    \"lg_staff\"\r\n  ],\r\n  \"updDtm\": \"2024-06-19T16:58:39.279025Z\"\r\n}",
+					"raw": "{\r\n  \"userIdentityId\": 8,\r\n  \"representedByOrganizationId\": 256,\r\n  \"roleCds\": [\r\n    \"lg_staff\"\r\n  ],\r\n  \"isEnabled\": true,\r\n  \"updDtm\": \"2024-07-02T13:53:25.154713Z\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1127,6 +1127,45 @@
 						"api",
 						"users",
 						"8"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "exports",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistings/exports",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"exports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "export file",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistings/exports/22",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"exports",
+						"22"
 					]
 				}
 			},

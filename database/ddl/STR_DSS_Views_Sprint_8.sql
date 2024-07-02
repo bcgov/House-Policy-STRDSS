@@ -38,7 +38,7 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS select drl.rental_listing_id
 	, dpa.civic_no as address_sort_7_civic_no
 	, dpa.unit_no as address_sort_8_unit_no
 	, (select string_agg(full_nm,' ; ') from dss_rental_listing_contact drlc where drlc.contacted_through_rental_listing_id=drl.rental_listing_id) as listing_contact_names_txt
-	, lgs.managing_organization_id
+	, lg.organization_id as managing_organization_id
 	, lg.organization_nm as managing_organization_nm
 	, lgs.is_principal_residence_required
 	, lgs.is_business_licence_required

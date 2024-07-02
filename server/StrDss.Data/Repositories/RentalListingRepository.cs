@@ -19,7 +19,7 @@ namespace StrDss.Data.Repositories
         Task<DssRentalListingExtract> GetRentalListingExtractByOrgId(long organizationId);
         Task<DssRentalListingExtract> GetRentalListingExtractByExtractNm(string name);
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
-        Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId);
+        Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -273,7 +273,7 @@ namespace StrDss.Data.Repositories
 
             return extract;
         }
-        public async Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId)
+        public async Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId)
         {
             var extract = await _dbContext
                 .DssRentalListingExtracts
@@ -282,7 +282,7 @@ namespace StrDss.Data.Repositories
 
             if (extract == null) return null;
 
-            return _mapper.Map<RentalListingExtractWithFileDto>(extract);
+            return _mapper.Map<RentalListingExtractDto>(extract);
         }
 
         public async Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync()

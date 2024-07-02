@@ -130,23 +130,21 @@ namespace StrDss.Data.Repositories
             listing.ActionHistory = (await
                 _dbContext.DssEmailMessages.AsNoTracking()
                     .Include(x => x.EmailMessageTypeNavigation)
+                    .Include(x => x.InitiatingUserIdentity)
                     .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
                     .OrderByDescending(x => x.MessageDeliveryDtm)
                     .Select(x => new ActionHistoryDto
                     {
                         Action = x.EmailMessageTypeNavigation.EmailMessageTypeNm,
                         Date = DateUtils.ConvertUtcToPacificTime((DateTime)x.MessageDeliveryDtm!),
-                        UserGuid = x.UpdUserGuid
+                        FirstName = x.InitiatingUserIdentity == null ? "" : x.InitiatingUserIdentity.GivenNm,
+                        LastName = x.InitiatingUserIdentity == null ? "" : x.InitiatingUserIdentity.FamilyNm
                     })
                     .ToListAsync());
 
-            foreach(var action in listing.ActionHistory)
+            foreach (var action in listing.ActionHistory)
             {
-                var user = await _dbContext.DssUserIdentities.FirstOrDefaultAsync(x => x.UserGuid == x.UpdUserGuid);
-
-                if (user == null) continue;
-
-                action.User = CommonUtils.GetFullName(user!.GivenNm ?? "", user!.FamilyNm ?? "");
+                action.User = CommonUtils.GetFullName(action.FirstName, action.LastName);
             }
 
             return listing;

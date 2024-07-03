@@ -237,6 +237,8 @@ namespace StrDss.Data.Repositories
 
             await LoadHistoryFields(listing);
 
+            await LoadPropertyHostsFields(listing);
+
             return listing;
         }
 
@@ -258,6 +260,39 @@ namespace StrDss.Data.Repositories
                 {
                     RentalListingExtportDtoSetters.NightsBookedSetters[i](listing, history.NightsBookedQty);
                     RentalListingExtportDtoSetters.SeparateReservationsSetters[i](listing, history.SeparateReservationsQty);
+                }
+            }
+        }
+
+        private async Task LoadPropertyHostsFields(RentalListingExportDto listing)
+        {
+            var listingContacts = await _dbContext.DssRentalListingContacts.AsNoTracking()
+                .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
+                .ToListAsync();
+
+            var propertyHosts = new DssRentalListingContact?[6];
+
+            //owner
+            propertyHosts[0] = listingContacts
+                .FirstOrDefault(x => x.ContactedThroughRentalListingId == listing.RentalListingId && x.IsPropertyOwner);
+
+            //supplier hosts
+            for (int i = 1; i <= 5; i++)
+            {
+                propertyHosts[i] = listingContacts
+                    .FirstOrDefault(x => x.ContactedThroughRentalListingId == listing.RentalListingId && !x.IsPropertyOwner && x.ListingContactNbr == i);
+            }
+
+            //load property hosts fields
+            for (int i = 0; i < propertyHosts.Length; i++)
+            {
+                var host = propertyHosts[i];
+                if (host != null)
+                {
+                    RentalListingExtportDtoSetters.PropertyHostNameSetters[i](listing, host.FullNm);
+                    RentalListingExtportDtoSetters.PropertyHostEmailSetters[i](listing, host.EmailAddressDsc);
+                    RentalListingExtportDtoSetters.PropertyHostPhoneNumberSetters[i](listing, host.PhoneNo);
+                    RentalListingExtportDtoSetters.PropertyHostMailingAddressSetters[i](listing, host.FullAddressTxt);
                 }
             }
         }

@@ -14,7 +14,7 @@ import { PanelModule } from 'primeng/panel';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { User } from '../../../common/models/user';
-import { ceu_action } from '../../../common/consts/permissions.const';
+import { takedown_action } from '../../../common/consts/permissions.const';
 import { ListingDetailsComponent } from './listing-details/listing-details.component';
 import { ListingSearchRequest } from '../../../common/models/listing-search-request';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -110,7 +110,7 @@ export class ListingsTableComponent implements OnInit {
 
         this.userService.getCurrentUser().subscribe({
           next: (currentUser: User) => {
-            this.isCEU = currentUser.permissions.includes(ceu_action);
+            this.isCEU = !currentUser.permissions.includes(takedown_action);
             this.getListings(page);
           },
         });

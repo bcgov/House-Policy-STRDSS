@@ -12,6 +12,7 @@ import { UserDataService } from '../../../../common/services/user-data.service';
 import { environment } from '../../../../../environments/environment';
 import { SelectedListingsStateService } from '../../../../common/services/selected-listings-state.service';
 import { GlobalLoaderService } from '../../../../common/services/global-loader.service';
+import { listing_read, takedown_action } from '../../../../common/consts/permissions.const';
 
 @Component({
   selector: 'app-listing-details',
@@ -50,7 +51,7 @@ export class ListingDetailsComponent implements OnInit {
 
     this.userDataService.getCurrentUser().subscribe({
       next: (user) => {
-        this.isCEU = user.permissions.includes('ceu_action');
+        this.isCEU = !user.permissions.includes(takedown_action);
       }, complete: () => {
         this.loaderService.loadingEnd();
       },

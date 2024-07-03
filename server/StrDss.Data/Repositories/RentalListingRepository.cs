@@ -16,8 +16,8 @@ namespace StrDss.Data.Repositories
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
         Task<List<long>> GetRentalListingIdsToExport();
         Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId);
-        Task<DssRentalListingExtract> GetRentalListingExtractByOrgId(long organizationId);
-        Task<DssRentalListingExtract> GetRentalListingExtractByExtractNm(string name);
+        Task<DssRentalListingExtract> GetOrCreateRentalListingExtractByOrgId(long organizationId);
+        Task<DssRentalListingExtract> GetOrCreateRentalListingExtractByExtractNm(string name);
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
         Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
     }
@@ -233,10 +233,51 @@ namespace StrDss.Data.Repositories
 
         public async Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId)
         {
-            return _mapper.Map<RentalListingExportDto>(await _dbSet.FirstAsync(x => x.RentalListingId == rentalListingId));
+            var listing = _mapper.Map<RentalListingExportDto>(await _dbSet.AsNoTracking().FirstAsync(x => x.RentalListingId == rentalListingId));
+
+            await LoadHistoryFields(listing);
+
+            return listing;
         }
 
-        public async Task<DssRentalListingExtract> GetRentalListingExtractByOrgId(long organizationId)
+        private async Task LoadHistoryFields(RentalListingExportDto listing)
+        {
+            var reportMonths = GetLast12ReportMonths();
+
+            var listingHistory = await _dbContext.DssRentalListings.AsNoTracking()
+                .Include(x => x.IncludingRentalListingReport)
+                .Where(x => x.OfferingOrganizationId == listing.OfferingOrganizationId && x.PlatformListingNo == listing.PlatformListingNo && x.IncludingRentalListingReportId != null)
+                .OrderByDescending(x => x.IncludingRentalListingReport.ReportPeriodYm)
+                .Take(12)
+                .ToListAsync();
+
+            for (int i = 0; i < reportMonths.Length; i++)
+            {
+                var history = listingHistory.FirstOrDefault(x => x.IncludingRentalListingReport.ReportPeriodYm == reportMonths[i]);
+                if (history != null)
+                {
+                    RentalListingExtractDtoSetters.NightsBookedSetters[i](listing, history.NightsBookedQty);
+                    RentalListingExtractDtoSetters.SeparateReservationsSetters[i](listing, history.SeparateReservationsQty);
+                }
+            }
+        }
+
+        private DateOnly[] GetLast12ReportMonths()
+        {
+            var today = DateTime.UtcNow;
+            var currentMonth = new DateOnly(today.Year, today.Month, 1);
+            var reportMonths = new DateOnly[12];
+
+            for (var i = 0; i < 12; i++)
+            {
+                reportMonths[i] = currentMonth.AddMonths(-1 * (i + 1));
+            }
+
+            return reportMonths;
+        }
+
+
+        public async Task<DssRentalListingExtract> GetOrCreateRentalListingExtractByOrgId(long organizationId)
         {
             var extract = await _dbContext.DssRentalListingExtracts.FirstOrDefaultAsync(x => x.FilteringOrganizationId == organizationId);
 
@@ -255,7 +296,7 @@ namespace StrDss.Data.Repositories
             return extract;
         }
 
-        public async Task<DssRentalListingExtract> GetRentalListingExtractByExtractNm(string name)
+        public async Task<DssRentalListingExtract> GetOrCreateRentalListingExtractByExtractNm(string name)
         {
             var extract = await _dbContext.DssRentalListingExtracts.FirstOrDefaultAsync(x => x.RentalListingExtractNm == name);
 

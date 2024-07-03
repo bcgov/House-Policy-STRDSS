@@ -73,5 +73,12 @@ namespace StrDss.Api.Controllers
 
             return File(extract.SourceBin!, "application/zip", $"STRlisting_{extract.RentalListingExtractNm}_{extract.UpdDtm.ToString("yyyyMMdd")}.zip");
         }
+
+        [HttpGet("exports/run")]
+        public async Task<ActionResult<List<RentalListingExtractDto>>> CreateRetalListingExports()
+        {
+            await _listingService.CreateRentalListingExportFiles();
+            return Ok();
+        }
     }
 }

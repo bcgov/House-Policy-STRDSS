@@ -256,10 +256,12 @@ namespace StrDss.Service
             builder.Append(FormatCsvField(listing.SupplierHost5FaxNumber)).Append(','); // Supplier Host 5 fax number
             builder.Append(FormatCsvField(listing.SupplierHost5MailingAddress)).Append(','); // Supplier Host 5 Mailing Address
             builder.Append(FormatCsvField(listing.SupplierHost5Id)).Append(','); // Host ID of Supplier Host 5
-            builder.Append(FormatCsvField(listing.LastActionNm1)).Append(','); // Last Action Taken
-            builder.Append(FormatCsvField(listing.LastActionDtm1)).Append(','); // Date of Last Action Taken
-            builder.Append(FormatCsvField(listing.LastActionNm2)).Append(','); // Previous Action Taken 1
-            builder.Append(FormatCsvField(listing.LastActionDtm2)); // Date of Previous Action Taken 1
+            builder.Append(FormatCsvField(listing.LastActionNm)).Append(','); // Last Action Taken
+            builder.Append(FormatCsvField(listing.LastActionDtm)).Append(','); // Date of Last Action Taken
+            builder.Append(FormatCsvField(listing.LastActionNm1)).Append(','); // Last Action Taken 1
+            builder.Append(FormatCsvField(listing.LastActionDtm1)).Append(','); // Date of Last Action Taken 1
+            builder.Append(FormatCsvField(listing.LastActionNm2)).Append(','); // Previous Action Taken 2
+            builder.Append(FormatCsvField(listing.LastActionDtm2)); // Date of Previous Action Taken 2
 
             return builder.ToString();
         }

@@ -46,7 +46,7 @@ export class DashboardComponent implements OnInit {
       next: (value: User) => {
         this.currentUser = value;
         this.cardsToDisplay = this.dashboardService.getCardsPerUserType(this.currentUser);
-        this.showListingHistory = this.currentUser.permissions.includes(upload_history_read);
+        this.showListingHistory = this.currentUser.permissions.includes(upload_history_read) && this.currentUser.organizationType !== 'LG';
       },
       complete: () => {
         this.loaderService.loadingEnd();

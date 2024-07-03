@@ -1,6 +1,6 @@
-﻿namespace StrDss.Model.RentalReportDtos
+﻿namespace StrDss.Model
 {
-    public class RentalListingExtractDtoSetters
+    public class RentalListingExtportDtoSetters
     {
         public static readonly Action<RentalListingExportDto, short?>[] NightsBookedSetters = new Action<RentalListingExportDto, short?>[]
         {

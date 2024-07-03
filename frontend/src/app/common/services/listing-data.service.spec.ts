@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ListingDataService } from './listing-data.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-xdescribe('ListingDataService', () => {
+describe('ListingDataService', () => {
   let service: ListingDataService;
 
   beforeEach(() => {

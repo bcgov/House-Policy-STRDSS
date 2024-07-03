@@ -42,10 +42,15 @@ export class TopMenuService {
       {
         accessPermission: listing_read,
         buttonId: 'listings_mi_btn',
-        route: '',
-        title: 'Listings',
-        disabled: true,
-        hidden: true,
+        route: '/listings',
+        title: 'View Listings',
+        folderName: 'Listings',
+      },
+      {
+        accessPermission: listing_read,
+        buttonId: 'export_listings_mi_btn',
+        route: '/export-listings',
+        title: 'Download Listing Data',
         folderName: 'Listings',
       },
       {

@@ -1,22 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ListingUploadHistoryComponent } from './listing-upload-history.component';
+import { ExportListingsComponent } from './export-listings.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('ListingUploadHistoryComponent', () => {
-  let component: ListingUploadHistoryComponent;
-  let fixture: ComponentFixture<ListingUploadHistoryComponent>;
+describe('ExportListingsComponent', () => {
+  let component: ExportListingsComponent;
+  let fixture: ComponentFixture<ExportListingsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        ListingUploadHistoryComponent,
+        ExportListingsComponent,
         HttpClientTestingModule,
       ],
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(ListingUploadHistoryComponent);
+    fixture = TestBed.createComponent(ExportListingsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

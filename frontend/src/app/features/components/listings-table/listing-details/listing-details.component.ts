@@ -12,7 +12,7 @@ import { UserDataService } from '../../../../common/services/user-data.service';
 import { environment } from '../../../../../environments/environment';
 import { SelectedListingsStateService } from '../../../../common/services/selected-listings-state.service';
 import { GlobalLoaderService } from '../../../../common/services/global-loader.service';
-import { listing_read, takedown_action } from '../../../../common/consts/permissions.const';
+import { takedown_action } from '../../../../common/consts/permissions.const';
 
 @Component({
   selector: 'app-listing-details',

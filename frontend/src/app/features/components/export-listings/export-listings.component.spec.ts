@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ExportListingsComponent } from './export-listings.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('ExportListingsComponent', () => {
   let component: ExportListingsComponent;
@@ -8,10 +9,13 @@ describe('ExportListingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ExportListingsComponent]
+      imports: [
+        ExportListingsComponent,
+        HttpClientTestingModule,
+      ],
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(ExportListingsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

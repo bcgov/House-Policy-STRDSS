@@ -40,6 +40,26 @@ export class DashboardService {
   private initCards(): void {
     this.cards = [
       {
+        accessPermission: listing_read,
+        buttonIcon: '',
+        buttonText: 'View Listing Data',
+        description: 'View platform listing data for your community',
+        route: 'listings',
+        title: 'Listing Data',
+        boxId: 'listings_box',
+        buttonId: 'listings_btn',
+      },
+      {
+        accessPermission: listing_read,
+        buttonIcon: '',
+        buttonText: 'Download Listing Data',
+        description: 'Download listing data for your community',
+        route: 'export-listings',
+        title: 'Download Listing Data',
+        boxId: 'export-listings_box',
+        buttonId: 'export-listings_btn',
+      },
+      {
         title: 'Platform Upload History',
         accessPermission: upload_history_read,
         description: 'View all platform upload history here',

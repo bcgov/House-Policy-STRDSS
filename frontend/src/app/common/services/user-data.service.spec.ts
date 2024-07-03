@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { UserDataService } from './user-data.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-xdescribe('UserDataService', () => {
+describe('UserDataService', () => {
   let service: UserDataService;
 
   beforeEach(() => {

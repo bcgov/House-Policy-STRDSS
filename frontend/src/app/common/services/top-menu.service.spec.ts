@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { TopMenuService } from './top-menu.service';
 
-xdescribe('TopMenuService', () => {
+describe('TopMenuService', () => {
   let service: TopMenuService;
 
   beforeEach(() => {

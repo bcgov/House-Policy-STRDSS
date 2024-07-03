@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { DropdownOption } from '../../../common/models/dropdown-option';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
@@ -7,7 +6,9 @@ import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessagesModule } from 'primeng/messages';
-import { Message } from 'primeng/api';
+import { ListingDataService } from '../../../common/services/listing-data.service';
+import { ExportJurisdiction } from '../../../common/models/export-listing';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-export-listings',
@@ -24,104 +25,57 @@ import { Message } from 'primeng/api';
 })
 export class ExportListingsComponent implements OnInit {
   dateLastUpdated = '';
-  jurisdictions = new Array<DropdownOption>();
+  jurisdictions = new Array<ExportJurisdiction>();
   selectedJurisdiction!: any;
 
   constructor(
     private cd: ChangeDetectorRef,
     private errorService: ErrorHandlingService,
     private loaderService: GlobalLoaderService,
-  ) {
-
-  }
+    private listingService: ListingDataService,
+  ) { }
 
   ngOnInit(): void {
+    this.loaderService.loadingStart();
+    this.listingService.getJurisdictions().subscribe({
+      next: (jurisdictions) => {
+        console.log(jurisdictions);
 
-    this.jurisdictions.push(...[
-      {
-        label: 'Test LG',
-        value: 'test_lg'
+        if (jurisdictions) {
+          this.jurisdictions = jurisdictions;
+          this.dateLastUpdated = this.jurisdictions[0].updDtm;
+        }
       },
-      {
-        label: 'Test LG 2',
-        value: 'test_lg_2'
-      },
-      {
-        label: 'Test LG 3',
-        value: 'test_lg_3'
-      },
-      {
-        label: 'Test LG 4',
-        value: 'test_lg_4'
-      },
-      {
-        label: 'Test LG 5',
-        value: 'test_lg_5'
-      },
-      {
-        label: 'Test LG 6',
-        value: 'test_lg_6'
-      },
-      {
-        label: 'Test LG 7',
-        value: 'test_lg_7'
-      },
-      {
-        label: 'Test LG 8',
-        value: 'test_lg_8'
-      },
-      {
-        label: 'Test LG 9',
-        value: 'test_lg_9'
-      },
-      {
-        label: 'Test LG 10',
-        value: 'test_lg_10'
-      },
-      {
-        label: 'Test LG 11',
-        value: 'test_lg_11'
-      },
-      {
-        label: 'Test LG 12',
-        value: 'test_lg_12'
-      },
-      {
-        label: 'Test LG 13',
-        value: 'test_lg_13'
-      },
-      {
-        label: 'Test LG 14',
-        value: 'test_lg_14'
-      },
-      {
-        label: 'Test LG 15',
-        value: 'test_lg_15'
-      },
-      {
-        label: 'Test LG 16',
-        value: 'test_lg_16'
-      },
-      {
-        label: 'Test LG 17',
-        value: 'test_lg_17'
-      },
-      {
-        label: 'Test LG 18',
-        value: 'test_lg_18'
-      },
-      {
-        label: 'Test LG 19',
-        value: 'test_lg_19'
-      },
-      {
-        label: 'Test LG 20',
-        value: 'test_lg_20'
-      },
-    ])
+      complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
+      }
+    });
   }
 
   onDownload(): void {
+    this.loaderService.loadingStart();
+    this.listingService.downloadListings(this.selectedJurisdiction).subscribe({
+      next: (content) => {
+        const jurisdiction = this.jurisdictions.filter(x => x.rentalListingExtractId === this.selectedJurisdiction)[0];
+        const date = new Date(jurisdiction.updDtm);
 
+        var blob = new Blob([content]);
+        var url = window.URL.createObjectURL(blob);
+
+        const element = document.createElement('a');
+        element.setAttribute('href', url);
+        element.setAttribute('download', `STRlisting_${jurisdiction.rentalListingExtractNm}_${formatDate(date, 'yyyyMMdd', 'en-US')}.zip`);
+
+        element.click();
+        element.remove();
+        window.URL.revokeObjectURL(url);
+
+        this.errorService.showSuccess('Your Listing Data was Successfully Downloaded.');
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+      }
+    })
   }
 }

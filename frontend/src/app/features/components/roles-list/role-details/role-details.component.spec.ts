@@ -1,14 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RoleDetailsComponent } from './role-details.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
-xdescribe('RoleDetailsComponent', () => {
+describe('RoleDetailsComponent', () => {
   let component: RoleDetailsComponent;
   let fixture: ComponentFixture<RoleDetailsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RoleDetailsComponent]
+      imports: [RoleDetailsComponent, HttpClientTestingModule,
+      ], providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              params: of({ id: 123 })
+            }
+          }
+        }
+      ],
     })
       .compileComponents();
 

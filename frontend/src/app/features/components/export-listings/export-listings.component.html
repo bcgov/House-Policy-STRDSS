@@ -1,8 +1,18 @@
-<div class="message">
-    <i class="pi pi-info-circle"></i>
-    <strong class="message-text">Data last updated on {{dateLastUpdated
-        | date: 'YYYY-MM-dd'}}</strong>
+<div *ngIf="!!dateLastUpdated;then info else warn">
 </div>
+<ng-template #info>
+    <div class="message info">
+        <i class="pi pi-info-circle"></i>
+        <strong class="message-text">Data last updated on {{dateLastUpdated
+            | date: 'YYYY-MM-dd'}}</strong>
+    </div>
+</ng-template>
+<ng-template #warn>
+    <div class="message warn">
+        <i class="pi pi-times-circle"></i>
+        <strong class="message-text">There is No Listing Data Available in Your Jurisdiction.</strong>
+    </div>
+</ng-template>
 
 <h2>Download Listing Data</h2>
 <h4>Download listings as .CSV file</h4>
@@ -11,14 +21,17 @@
     <div class="header">Select Jurisdiction to Download Listing Data</div>
     <div class="content">
         <div class="row" *ngFor="let item of jurisdictions; let i=index">
-            <p-radioButton name="jurisdiction-radio" [label]="item.label" [value]="item.value"
-                [(ngModel)]="selectedJurisdiction" inputId="disabled-radio_{{i}}">
-
+            <p-radioButton name="jurisdiction-radio" [label]="item.rentalListingExtractNm"
+                [value]="item.rentalListingExtractId" [(ngModel)]="selectedJurisdiction" inputId="disabled-radio_{{i}}">
             </p-radioButton>
+        </div>
+
+        <div class="row" *ngIf="!jurisdictions.length">
+            <strong>No Jurisdictions available</strong>
         </div>
     </div>
 </div>
 
 <div class="actions">
-    <button pButton (click)="onDownload()">Download</button>
+    <button pButton [disabled]="!selectedJurisdiction" (click)="onDownload()">Download</button>
 </div>

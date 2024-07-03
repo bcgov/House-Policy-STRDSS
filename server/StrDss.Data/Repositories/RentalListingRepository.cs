@@ -239,7 +239,38 @@ namespace StrDss.Data.Repositories
 
             await LoadPropertyHostsFields(listing);
 
+            await LoadActionsFields(listing);
+
             return listing;
+        }
+
+        private async Task LoadActionsFields(RentalListingExportDto listing)
+        {
+            if (listing.LastActionDtm != null)
+                listing.LastActionDtm = DateUtils.ConvertUtcToPacificTime((DateTime)listing.LastActionDtm);
+
+            var actions = await _dbContext.DssEmailMessages.AsNoTracking()
+                .Include(x => x.EmailMessageTypeNavigation)
+                .Include(x => x.InitiatingUserIdentity)
+                .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
+                .OrderByDescending(x => x.MessageDeliveryDtm)
+                .Skip(1)
+                .Take(2)
+                .ToListAsync();
+
+            if (actions.Count == 2)
+            {
+                listing.LastActionDtm1 = DateUtils.ConvertUtcToPacificTime(actions[0].MessageDeliveryDtm);
+                listing.LastActionNm1 = actions[0].EmailMessageTypeNavigation.EmailMessageTypeNm;
+
+                listing.LastActionDtm2 = DateUtils.ConvertUtcToPacificTime(actions[1].MessageDeliveryDtm);
+                listing.LastActionNm2 = actions[1].EmailMessageTypeNavigation.EmailMessageTypeNm;
+            }
+            else if (actions.Count == 1)
+            {
+                listing.LastActionDtm1 = DateUtils.ConvertUtcToPacificTime(actions[0].MessageDeliveryDtm);
+                listing.LastActionNm1 = actions[0].EmailMessageTypeNavigation.EmailMessageTypeNm;
+            }
         }
 
         private async Task LoadHistoryFields(RentalListingExportDto listing)
@@ -258,8 +289,8 @@ namespace StrDss.Data.Repositories
                 var history = listingHistory.FirstOrDefault(x => x.IncludingRentalListingReport.ReportPeriodYm == reportMonths[i]);
                 if (history != null)
                 {
-                    RentalListingExtportDtoSetters.NightsBookedSetters[i](listing, history.NightsBookedQty);
-                    RentalListingExtportDtoSetters.SeparateReservationsSetters[i](listing, history.SeparateReservationsQty);
+                    RentalListingExportDto.NightsBookedSetters[i](listing, history.NightsBookedQty);
+                    RentalListingExportDto.SeparateReservationsSetters[i](listing, history.SeparateReservationsQty);
                 }
             }
         }
@@ -289,10 +320,10 @@ namespace StrDss.Data.Repositories
                 var host = propertyHosts[i];
                 if (host != null)
                 {
-                    RentalListingExtportDtoSetters.PropertyHostNameSetters[i](listing, host.FullNm);
-                    RentalListingExtportDtoSetters.PropertyHostEmailSetters[i](listing, host.EmailAddressDsc);
-                    RentalListingExtportDtoSetters.PropertyHostPhoneNumberSetters[i](listing, host.PhoneNo);
-                    RentalListingExtportDtoSetters.PropertyHostMailingAddressSetters[i](listing, host.FullAddressTxt);
+                    RentalListingExportDto.PropertyHostNameSetters[i](listing, host.FullNm);
+                    RentalListingExportDto.PropertyHostEmailSetters[i](listing, host.EmailAddressDsc);
+                    RentalListingExportDto.PropertyHostPhoneNumberSetters[i](listing, host.PhoneNo);
+                    RentalListingExportDto.PropertyHostMailingAddressSetters[i](listing, host.FullAddressTxt);
                 }
             }
         }

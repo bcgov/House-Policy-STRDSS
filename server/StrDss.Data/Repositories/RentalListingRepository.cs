@@ -246,9 +246,6 @@ namespace StrDss.Data.Repositories
 
         private async Task LoadActionsFields(RentalListingExportDto listing)
         {
-            if (listing.LastActionDtm != null)
-                listing.LastActionDtm = DateUtils.ConvertUtcToPacificTime((DateTime)listing.LastActionDtm);
-
             var actions = await _dbContext.DssEmailMessages.AsNoTracking()
                 .Include(x => x.EmailMessageTypeNavigation)
                 .Include(x => x.InitiatingUserIdentity)
@@ -260,15 +257,15 @@ namespace StrDss.Data.Repositories
 
             if (actions.Count == 2)
             {
-                listing.LastActionDtm1 = DateUtils.ConvertUtcToPacificTime(actions[0].MessageDeliveryDtm);
+                listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
                 listing.LastActionNm1 = actions[0].EmailMessageTypeNavigation.EmailMessageTypeNm;
 
-                listing.LastActionDtm2 = DateUtils.ConvertUtcToPacificTime(actions[1].MessageDeliveryDtm);
+                listing.LastActionDtm2 = actions[1].MessageDeliveryDtm;
                 listing.LastActionNm2 = actions[1].EmailMessageTypeNavigation.EmailMessageTypeNm;
             }
             else if (actions.Count == 1)
             {
-                listing.LastActionDtm1 = DateUtils.ConvertUtcToPacificTime(actions[0].MessageDeliveryDtm);
+                listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
                 listing.LastActionNm1 = actions[0].EmailMessageTypeNavigation.EmailMessageTypeNm;
             }
         }

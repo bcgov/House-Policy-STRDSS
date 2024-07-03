@@ -246,45 +246,56 @@ namespace StrDss.Data.Repositories
 
         private async Task LoadActionsFields(RentalListingExportDto listing)
         {
-            var actions = await _dbContext.DssEmailMessages.AsNoTracking()
-                .Include(x => x.EmailMessageTypeNavigation)
-                .Include(x => x.InitiatingUserIdentity)
+            var actions = await _dbContext.DssEmailMessages
+                .AsNoTracking()
                 .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
                 .OrderByDescending(x => x.MessageDeliveryDtm)
                 .Skip(1)
                 .Take(2)
+                .Select(x => new
+                {
+                    x.MessageDeliveryDtm,
+                    x.EmailMessageTypeNavigation.EmailMessageTypeNm
+                })
                 .ToListAsync();
 
-            if (actions.Count == 2)
+            switch (actions.Count)
             {
-                listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
-                listing.LastActionNm1 = actions[0].EmailMessageTypeNavigation.EmailMessageTypeNm;
-
-                listing.LastActionDtm2 = actions[1].MessageDeliveryDtm;
-                listing.LastActionNm2 = actions[1].EmailMessageTypeNavigation.EmailMessageTypeNm;
-            }
-            else if (actions.Count == 1)
-            {
-                listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
-                listing.LastActionNm1 = actions[0].EmailMessageTypeNavigation.EmailMessageTypeNm;
+                case 2:
+                    listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
+                    listing.LastActionNm1 = actions[0].EmailMessageTypeNm;
+                    listing.LastActionDtm2 = actions[1].MessageDeliveryDtm;
+                    listing.LastActionNm2 = actions[1].EmailMessageTypeNm;
+                    break;
+                case 1:
+                    listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
+                    listing.LastActionNm1 = actions[0].EmailMessageTypeNm;
+                    break;
             }
         }
 
         private async Task LoadHistoryFields(RentalListingExportDto listing)
         {
             var reportMonths = GetLast12ReportMonths();
-
-            var listingHistory = await _dbContext.DssRentalListings.AsNoTracking()
-                .Include(x => x.IncludingRentalListingReport)
-                .Where(x => x.OfferingOrganizationId == listing.OfferingOrganizationId && x.PlatformListingNo == listing.PlatformListingNo && x.IncludingRentalListingReportId != null)
-                .OrderByDescending(x => x.IncludingRentalListingReport.ReportPeriodYm)
-                .Take(12)
+            var listingHistory = await _dbContext.DssRentalListings
+                .AsNoTracking()
+                .Where(x => x.OfferingOrganizationId == listing.OfferingOrganizationId
+                    && x.PlatformListingNo == listing.PlatformListingNo
+                    && x.IncludingRentalListingReportId != null
+                    && reportMonths.Contains(x.IncludingRentalListingReport.ReportPeriodYm))
+                .Select(x => new
+                {
+                    x.IncludingRentalListingReport.ReportPeriodYm,
+                    x.NightsBookedQty,
+                    x.SeparateReservationsQty
+                })
                 .ToListAsync();
+
+            var historyDict = listingHistory.ToDictionary(x => x.ReportPeriodYm);
 
             for (int i = 0; i < reportMonths.Length; i++)
             {
-                var history = listingHistory.FirstOrDefault(x => x.IncludingRentalListingReport.ReportPeriodYm == reportMonths[i]);
-                if (history != null)
+                if (historyDict.TryGetValue(reportMonths[i], out var history))
                 {
                     RentalListingExportDto.NightsBookedSetters[i](listing, history.NightsBookedQty);
                     RentalListingExportDto.SeparateReservationsSetters[i](listing, history.SeparateReservationsQty);
@@ -294,24 +305,30 @@ namespace StrDss.Data.Repositories
 
         private async Task LoadPropertyHostsFields(RentalListingExportDto listing)
         {
-            var listingContacts = await _dbContext.DssRentalListingContacts.AsNoTracking()
+            var listingContacts = await _dbContext.DssRentalListingContacts
+                .AsNoTracking()
                 .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
+                .Select(x => new
+                {
+                    x.IsPropertyOwner,
+                    x.ListingContactNbr,
+                    x.FullNm,
+                    x.EmailAddressDsc,
+                    x.PhoneNo,
+                    x.FullAddressTxt
+                })
                 .ToListAsync();
 
-            var propertyHosts = new DssRentalListingContact?[6];
-
-            //owner
-            propertyHosts[0] = listingContacts
-                .FirstOrDefault(x => x.ContactedThroughRentalListingId == listing.RentalListingId && x.IsPropertyOwner);
-
-            //supplier hosts
-            for (int i = 1; i <= 5; i++)
+            var propertyHosts = new[]
             {
-                propertyHosts[i] = listingContacts
-                    .FirstOrDefault(x => x.ContactedThroughRentalListingId == listing.RentalListingId && !x.IsPropertyOwner && x.ListingContactNbr == i);
-            }
+                listingContacts.FirstOrDefault(x => x.IsPropertyOwner),
+                listingContacts.FirstOrDefault(x => !x.IsPropertyOwner && x.ListingContactNbr == 1),
+                listingContacts.FirstOrDefault(x => !x.IsPropertyOwner && x.ListingContactNbr == 2),
+                listingContacts.FirstOrDefault(x => !x.IsPropertyOwner && x.ListingContactNbr == 3),
+                listingContacts.FirstOrDefault(x => !x.IsPropertyOwner && x.ListingContactNbr == 4),
+                listingContacts.FirstOrDefault(x => !x.IsPropertyOwner && x.ListingContactNbr == 5)
+            };
 
-            //load property hosts fields
             for (int i = 0; i < propertyHosts.Length; i++)
             {
                 var host = propertyHosts[i];

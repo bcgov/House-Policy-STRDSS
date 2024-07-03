@@ -65,12 +65,12 @@ namespace StrDss.Common
 
             return null;
         }
-        public static byte[] CreateZip(string csvContent)
+        public static byte[] CreateZip(string csvContent, string fileName)
         {
             using var memoryStream = new MemoryStream();
             using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
             {
-                var demoFile = archive.CreateEntry("RentalListings.csv");
+                var demoFile = archive.CreateEntry($"{fileName}.csv");
 
                 using var entryStream = demoFile.Open();
                 using var streamWriter = new StreamWriter(entryStream);

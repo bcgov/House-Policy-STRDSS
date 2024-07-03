@@ -134,11 +134,13 @@ namespace StrDss.Service
 
         private async Task ProcessExportForLocalGovernment(List<string> export, long orgId, string orgName)
         {
+            var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyyMMdd");
+
             if (export.Count > 1 && orgId != 0)
             {
                 _logger.LogInformation($"Rental Listing Export - Creating a zip file for {orgName}");
                 var extract = await _listingRepo.GetOrCreateRentalListingExtractByOrgId(orgId);
-                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", export));
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", export), $"STRlisting_{orgName}_{date}");
                 extract.IsPrRequirementFiltered = false;
                 extract.RentalListingExtractNm = orgName ?? string.Empty;
                 extract.FilteringOrganizationId = orgId;
@@ -157,11 +159,13 @@ namespace StrDss.Service
 
         private async Task CreateFinalExports(List<string> allExport, List<string> prExport, List<string> lgExport, string lg, long lgId)
         {
+            var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyyMMdd");
+
             if (allExport.Count > 1)
             {
                 _logger.LogInformation("Rental Listing Export - Creating a zip file for all rental listings");
-                var extract = await _listingRepo.GetOrCreateRentalListingExtractByExtractNm("BC");
-                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", allExport));
+                var extract = await _listingRepo.GetOrCreateRentalListingExtractByExtractNm(ListingExportFileNames.All);
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", allExport), $"STRlisting_{ListingExportFileNames.All}_{date}");
                 extract.IsPrRequirementFiltered = false;
                 _unitOfWork.Commit();
             }
@@ -169,8 +173,8 @@ namespace StrDss.Service
             if (prExport.Count > 1)
             {
                 _logger.LogInformation("Rental Listing Export - Creating a zip file for all PR required listings");
-                var extract = await _listingRepo.GetOrCreateRentalListingExtractByExtractNm("BC_PR");
-                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", prExport));
+                var extract = await _listingRepo.GetOrCreateRentalListingExtractByExtractNm(ListingExportFileNames.AllPr);
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", prExport), $"STRlisting_{ListingExportFileNames.AllPr}_{date}");
                 extract.IsPrRequirementFiltered = true;
                 _unitOfWork.Commit();
             }

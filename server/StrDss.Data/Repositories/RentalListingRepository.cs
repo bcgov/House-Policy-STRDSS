@@ -256,8 +256,8 @@ namespace StrDss.Data.Repositories
                 var history = listingHistory.FirstOrDefault(x => x.IncludingRentalListingReport.ReportPeriodYm == reportMonths[i]);
                 if (history != null)
                 {
-                    RentalListingExtractDtoSetters.NightsBookedSetters[i](listing, history.NightsBookedQty);
-                    RentalListingExtractDtoSetters.SeparateReservationsSetters[i](listing, history.SeparateReservationsQty);
+                    RentalListingExtportDtoSetters.NightsBookedSetters[i](listing, history.NightsBookedQty);
+                    RentalListingExtportDtoSetters.SeparateReservationsSetters[i](listing, history.SeparateReservationsQty);
                 }
             }
         }

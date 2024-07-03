@@ -104,7 +104,7 @@ namespace StrDss.Service
 
                 if (lg != listing.ManagingOrganizationNm)
                 {
-                    await ProcessExportForLocalGovernment(lgExport, lgId, lg);
+                    await ProcessExportForLocalGovernment(lgExport, lgId, lg!);
                     lg = listing.ManagingOrganizationNm;
                     lgId = listing.ManagingOrganizationId ?? 0;
                     lgExport = InitializeExport(headers);
@@ -137,7 +137,7 @@ namespace StrDss.Service
             if (export.Count > 1 && orgId != 0)
             {
                 _logger.LogInformation($"Rental Listing Export - Creating a zip file for {orgName}");
-                var extract = await _listingRepo.GetRentalListingExtractByOrgId(orgId);
+                var extract = await _listingRepo.GetOrCreateRentalListingExtractByOrgId(orgId);
                 extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", export));
                 extract.IsPrRequirementFiltered = false;
                 extract.RentalListingExtractNm = orgName ?? string.Empty;
@@ -160,7 +160,7 @@ namespace StrDss.Service
             if (allExport.Count > 1)
             {
                 _logger.LogInformation("Rental Listing Export - Creating a zip file for all rental listings");
-                var extract = await _listingRepo.GetRentalListingExtractByExtractNm("BC");
+                var extract = await _listingRepo.GetOrCreateRentalListingExtractByExtractNm("BC");
                 extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", allExport));
                 extract.IsPrRequirementFiltered = false;
                 _unitOfWork.Commit();
@@ -169,7 +169,7 @@ namespace StrDss.Service
             if (prExport.Count > 1)
             {
                 _logger.LogInformation("Rental Listing Export - Creating a zip file for all PR required listings");
-                var extract = await _listingRepo.GetRentalListingExtractByExtractNm("BC_PR");
+                var extract = await _listingRepo.GetOrCreateRentalListingExtractByExtractNm("BC_PR");
                 extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", prExport));
                 extract.IsPrRequirementFiltered = true;
                 _unitOfWork.Commit();

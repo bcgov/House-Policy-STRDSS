@@ -22,6 +22,7 @@ import { BulkComplianceNoticeComponent } from './features/components/bulk-compli
 import { RolesListComponent } from './features/components/roles-list/roles-list.component';
 import { RoleDetailsComponent } from './features/components/roles-list/role-details/role-details.component';
 import { UserDetailsComponent } from './features/components/user-management/user-details/user-details.component';
+import { ExportListingsComponent } from './features/components/export-listings/export-listings.component';
 
 export const routes: Routes = [
     {
@@ -115,6 +116,12 @@ export const routes: Routes = [
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: RoleDetailsComponent,
         data: { permissions: [role_write] }
+    },
+    {
+        path: 'export-listings',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: ExportListingsComponent,
+        data: { permissions: [listing_read] }
     },
     {
         path: '401',

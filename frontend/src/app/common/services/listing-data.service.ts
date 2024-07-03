@@ -1,12 +1,13 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
 import { ListingTableRow } from '../models/listing-table-row';
 import { ListingSearchRequest } from '../models/listing-search-request';
 import { ListingDetails } from '../models/listing-details';
+import { ExportJurisdiction } from '../models/export-listing';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ export class ListingDataService {
 
     return this.httpClient.post<any>(
       `${environment.API_HOST}/RentalListingReports`,
-      formData
+      formData,
     );
   }
 
@@ -55,7 +56,8 @@ export class ListingDataService {
   }
 
   getUploadHistoryErrors(id: number): Observable<any> {
-    return this.httpClient.get<any>(`${environment.API_HOST}/rentallistingreports/uploads/${id}/errorfile`, { headers: this.textHeaders, responseType: 'text' as 'json' });
+    return this.httpClient.get<any>(`${environment.API_HOST}/rentallistingreports/uploads/${id}/errorfile`,
+      { headers: this.textHeaders, responseType: 'text' as 'json' });
   }
 
   getListings(
@@ -94,6 +96,15 @@ export class ListingDataService {
   }
 
   getListingDetailsById(id: number): Observable<ListingDetails> {
-    return this.httpClient.get<ListingDetails>(`${environment.API_HOST}/rentallistings/${id}`)
+    return this.httpClient.get<ListingDetails>(`${environment.API_HOST}/rentallistings/${id}`);
+  }
+
+  getJurisdictions(): Observable<Array<ExportJurisdiction>> {
+    return this.httpClient.get<Array<ExportJurisdiction>>(`${environment.API_HOST}/rentallistings/exports`);
+  }
+
+  downloadListings(jurisdictionId: number): Observable<any> {
+    return this.httpClient.get(`${environment.API_HOST}/rentallistings/exports/${jurisdictionId}`,
+      { responseType: 'arraybuffer' });
   }
 }

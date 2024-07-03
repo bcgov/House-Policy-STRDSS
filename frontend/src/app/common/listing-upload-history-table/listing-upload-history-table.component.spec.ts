@@ -1,14 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ListingUploadHistoryTableComponent } from './listing-upload-history-table.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-xdescribe('ListingUploadHistoryTableComponent', () => {
+describe('ListingUploadHistoryTableComponent', () => {
   let component: ListingUploadHistoryTableComponent;
   let fixture: ComponentFixture<ListingUploadHistoryTableComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ListingUploadHistoryTableComponent]
+      imports: [
+        ListingUploadHistoryTableComponent,
+        HttpClientTestingModule,
+      ],
     })
       .compileComponents();
 

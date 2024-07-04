@@ -75,16 +75,32 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.AddressWrite)]
-        [HttpPut("{listingId}/address")]
-        public async Task<ActionResult> UpdateAddress(UpdateListingAddressDto dto)
+        [HttpPut("{rentalListingId}/address")]
+        public async Task<ActionResult> UpdateAddress(long rentalListingId, UpdateListingAddressDto dto)
         {
+            dto.RentalListingId = rentalListingId;
+
+            var errors = await _listingService.UpdateAddressAsync(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
             return Ok();
         }
 
         [ApiAuthorize(Permissions.AddressWrite)]
-        [HttpPut("{listingId}/address/confirm")]
-        public async Task<ActionResult> ConfirmAddress(long listingId)
+        [HttpPut("{rentalListingId}/address/confirm")]
+        public async Task<ActionResult> ConfirmAddress(long rentalListingId)
         {
+            var errors = await _listingService.ConfirmAddressAsync(rentalListingId);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
             return Ok();
         }
 

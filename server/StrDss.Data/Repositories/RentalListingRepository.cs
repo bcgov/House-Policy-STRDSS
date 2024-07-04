@@ -20,6 +20,7 @@ namespace StrDss.Data.Repositories
         Task<DssRentalListingExtract> GetOrCreateRentalListingExtractByExtractNm(string name);
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
         Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
+        Task ConfirmAddressAsync(long rentalListingId);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -413,6 +414,17 @@ namespace StrDss.Data.Repositories
             return datasets.Where(x => _currentUser.OrganizationType == OrganizationTypes.LG
                                        ? x.FilteringOrganizationId == _currentUser.OrganizationId
                                        : x.FilteringOrganizationId == null).ToList();
+        }
+
+        public async Task ConfirmAddressAsync(long rentalListingId)
+        {
+            var listing = await _dbContext
+                .DssRentalListings
+                .Include(x => x.LocatingPhysicalAddress)
+                .FirstAsync(x => x.RentalListingId == rentalListingId);
+
+            listing.LocatingPhysicalAddress!.IsMatchVerified = true;
+            listing.IsChangedAddress = true;
         }
     }
 }

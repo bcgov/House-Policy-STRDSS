@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using StrDss.Common;
@@ -22,6 +23,8 @@ namespace StrDss.Service
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
         Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
         Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults);
+        Task<Dictionary<string, List<string>>> ConfirmAddressAsync(long rentalListingId);
+        Task<Dictionary<string, List<string>>> UpdateAddressAsync(UpdateListingAddressDto dto);
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
@@ -339,6 +342,60 @@ namespace StrDss.Service
             }
 
             return addresses;
+        }
+
+        public async Task<Dictionary<string, List<string>>> ConfirmAddressAsync(long rentalListingId) 
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var listing = await _listingRepo.GetRentalListing(rentalListingId);
+
+            if (listing == null)
+            {
+                errors.AddItem("entity", $"Rental listing with the ID {rentalListingId} does not exist.");
+                return errors;
+            }
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG && listing.ManagingOrganizationId != _currentUser.OrganizationId)
+            {
+                errors.AddItem("managingOrganization", $"The user is not authorized to confirm address.");
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            await _listingRepo.ConfirmAddressAsync(rentalListingId);
+
+            return errors;
+        }
+
+        public async Task<Dictionary<string, List<string>>> UpdateAddressAsync(UpdateListingAddressDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var listing = await _listingRepo.GetRentalListing(dto.RentalListingId);
+
+            if (listing == null)
+            {
+                errors.AddItem("entity", $"Rental listing with ID {dto.RentalListingId} does not exist.");
+                return errors;
+            }
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG && listing.ManagingOrganizationId != _currentUser.OrganizationId)
+            {
+                errors.AddItem("managingOrganization", $"The user is not authorized to update address.");
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            //await _listingRepo.ConfirmAddressAsync(rentalListingId);
+
+            return errors;
         }
     }
 }

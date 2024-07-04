@@ -4,13 +4,15 @@ namespace StrDss.Service.Hangfire
 {
     public class HangfireJobs
     {
-        private IRentalListingReportService _linstingService;
+        private IRentalListingReportService _linstingReportService;
         private IDelistingService _delistingService;
+        private IRentalListingService _listingService;
 
-        public HangfireJobs(IRentalListingReportService listingService, IDelistingService delistingService)
+        public HangfireJobs(IRentalListingReportService listingReportService, IRentalListingService listingService, IDelistingService delistingService)
         {
-            _linstingService = listingService;
+            _linstingReportService = listingReportService;
             _delistingService = delistingService;
+            _listingService = listingService;
         }
 
         [Queue("default")]
@@ -18,7 +20,7 @@ namespace StrDss.Service.Hangfire
         [AutomaticRetry(Attempts = 0)]
         public async Task ProcessRentalListingReports()
         {
-            await _linstingService.ProcessRentalReportUploadAsync();
+            await _linstingReportService.ProcessRentalReportUploadAsync();
         }
 
         [Queue("default")]
@@ -34,7 +36,15 @@ namespace StrDss.Service.Hangfire
         [AutomaticRetry(Attempts = 0)]
         public async Task CleanUpAddresses()
         {
-            await _linstingService.CleaupAddressAsync();
+            await _linstingReportService.CleaupAddressAsync();
+        }
+
+        [Queue("default")]
+        [SkipSameJob]
+        [AutomaticRetry(Attempts = 0)]
+        public async Task CreateRentalListingExportFiles()
+        {
+            await _listingService.CreateRentalListingExportFiles();
         }
     }
 }

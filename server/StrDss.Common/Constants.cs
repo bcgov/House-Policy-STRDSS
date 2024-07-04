@@ -315,5 +315,9 @@
         public const string RentalReport = "rental_report";
     }
 
-
+    public static class ListingExportFileNames
+    {
+        public const string All = "BC";
+        public const string AllPr = "BC_PR";
+    }
 }

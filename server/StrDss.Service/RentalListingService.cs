@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
+using StrDss.Service.HttpClients;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -19,16 +21,21 @@ namespace StrDss.Service
         Task CreateRentalListingExportFiles();
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
         Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
+        Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults);
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
         private IRentalListingRepository _listingRepo;
+        private IGeocoderApi _geocoder;
+        private IOrganizationRepository _orgRepo;
 
         public RentalListingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IRentalListingRepository listingRep)
+            IRentalListingRepository listingRep, IGeocoderApi geocoder, IOrganizationRepository orgRepo)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _listingRepo = listingRep;
+            _geocoder = geocoder;
+            _orgRepo = orgRepo;
         }
         public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction)
         {
@@ -317,5 +324,21 @@ namespace StrDss.Service
         {
             return await _listingRepo.GetRetalListingExportsAsync();
         }
-}
+
+        public async Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults)
+        {
+            var addresses = await _geocoder.GetAddressCandidatesAsync(addressText, maxResults);
+
+            foreach (var address in addresses)
+            {
+                var orgId = await _orgRepo.GetContainingOrganizationId(address.LocationGeometry);
+                if (orgId != null)
+                {
+                    address.OrganizationId = await _orgRepo.GetManagingOrgId(orgId.Value);
+                }
+            }
+
+            return addresses;
+        }
+    }
 }

@@ -73,5 +73,13 @@ namespace StrDss.Api.Controllers
 
             return File(extract.SourceBin!, "application/zip", $"STRlisting_{extract.RentalListingExtractNm}_{extract.UpdDtm.ToString("yyyyMMdd")}.zip");
         }
+
+        [ApiAuthorize]
+        [HttpGet("addresses/candidates")]
+        public async Task<ActionResult<List<AddressDto>>> GetAddressCandidates(string addressString)
+        {
+            var addresses = await _listingService.GetAddressCandidatesAsync(addressString, 3);
+            return Ok(addresses);
+        }
     }
 }

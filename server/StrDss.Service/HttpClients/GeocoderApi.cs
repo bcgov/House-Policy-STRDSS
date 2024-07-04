@@ -6,13 +6,13 @@ using System.Text.Json;
 using StrDss.Model;
 using NetTopologySuite.Geometries;
 using System.Text.Json.Serialization;
-using Microsoft.IdentityModel.Protocols.WsTrust;
 
 namespace StrDss.Service.HttpClients
 {
     public interface IGeocoderApi
     {
-        Task<string> GetAddressAsync(DssPhysicalAddress address);
+        Task<string> GetAddressAsync(DssPhysicalAddress addressText);
+        Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults);
     }
     public class GeocoderApi : IGeocoderApi
     {
@@ -78,6 +78,37 @@ namespace StrDss.Service.HttpClients
                 return ex.Message;
             }
 
+        }
+
+        public async Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults)
+        {
+            _logger.LogInformation($"[Egress] Calling Geocoder API: {_client.BaseAddress}");
+
+            var addresses = new List<AddressDto>();
+
+            var response = await _client.GetStringAsync($"addresses.geojson?addressString={SanitizeAddress(addressText)}&maxResults={maxResults}");
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+            };
+
+            var root = JsonSerializer.Deserialize<GeocoderResponse>(response, options);
+
+            if (root?.Features != null && root.Features.Length > 0)
+            {
+                foreach (var feature in root.Features)
+                {
+                    addresses.Add(new AddressDto
+                    {
+                        LocationGeometry = new Point(feature.Geometry.Coordinates[0], feature.Geometry.Coordinates[1]) { SRID = 4326 },
+                        Address = feature.Properties.FullAddress,
+                    });
+                }
+            }
+
+            return addresses;
         }
 
         private string SanitizeAddress(string address)

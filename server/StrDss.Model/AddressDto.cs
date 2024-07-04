@@ -8,6 +8,6 @@ namespace StrDss.Model
         [JsonIgnore]
         public NetTopologySuite.Geometries.Point LocationGeometry { get; set; }
         public long? OrganizationId { get; set; }
-
+        public int Score { get; set; }
     }
 }

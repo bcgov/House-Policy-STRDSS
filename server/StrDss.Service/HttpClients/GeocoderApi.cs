@@ -104,6 +104,7 @@ namespace StrDss.Service.HttpClients
                     {
                         LocationGeometry = new Point(feature.Geometry.Coordinates[0], feature.Geometry.Coordinates[1]) { SRID = 4326 },
                         Address = feature.Properties.FullAddress,
+                        Score = feature.Properties.Score,
                     });
                 }
             }

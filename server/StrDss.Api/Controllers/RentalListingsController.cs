@@ -73,5 +73,27 @@ namespace StrDss.Api.Controllers
 
             return File(extract.SourceBin!, "application/zip", $"STRlisting_{extract.RentalListingExtractNm}_{extract.UpdDtm.ToString("yyyyMMdd")}.zip");
         }
+
+        [ApiAuthorize(Permissions.AddressWrite)]
+        [HttpPut("{listingId}/address")]
+        public async Task<ActionResult> UpdateAddress(UpdateListingAddressDto dto)
+        {
+            return Ok();
+        }
+
+        [ApiAuthorize(Permissions.AddressWrite)]
+        [HttpPut("{listingId}/address/confirm")]
+        public async Task<ActionResult> ConfirmAddress(long listingId)
+        {
+            return Ok();
+        }
+
+        [ApiAuthorize]
+        [HttpGet("addresses/candidates")]
+        public async Task<ActionResult<List<AddressDto>>> GetAddressCandidates(string addressString)
+        {
+            var addresses = await _listingService.GetAddressCandidatesAsync(addressString, 3);
+            return Ok(addresses);
+        }
     }
 }

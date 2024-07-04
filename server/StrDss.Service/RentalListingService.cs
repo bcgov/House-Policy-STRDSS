@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
+using StrDss.Service.HttpClients;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,17 +20,22 @@ namespace StrDss.Service
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
         Task CreateRentalListingExportFiles();
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
-        Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId);
+        Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
+        Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults);
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
         private IRentalListingRepository _listingRepo;
+        private IGeocoderApi _geocoder;
+        private IOrganizationRepository _orgRepo;
 
         public RentalListingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IRentalListingRepository listingRep)
+            IRentalListingRepository listingRep, IGeocoderApi geocoder, IOrganizationRepository orgRepo)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _listingRepo = listingRep;
+            _geocoder = geocoder;
+            _orgRepo = orgRepo;
         }
         public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction)
         {
@@ -104,7 +111,7 @@ namespace StrDss.Service
 
                 if (lg != listing.ManagingOrganizationNm)
                 {
-                    await ProcessExportForLocalGovernment(lgExport, lgId, lg);
+                    await ProcessExportForLocalGovernment(lgExport, lgId, lg!);
                     lg = listing.ManagingOrganizationNm;
                     lgId = listing.ManagingOrganizationId ?? 0;
                     lgExport = InitializeExport(headers);
@@ -134,11 +141,13 @@ namespace StrDss.Service
 
         private async Task ProcessExportForLocalGovernment(List<string> export, long orgId, string orgName)
         {
+            var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyyMMdd");
+
             if (export.Count > 1 && orgId != 0)
             {
                 _logger.LogInformation($"Rental Listing Export - Creating a zip file for {orgName}");
-                var extract = await _listingRepo.GetRentalListingExtractByOrgId(orgId);
-                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", export));
+                var extract = await _listingRepo.GetOrCreateRentalListingExtractByOrgId(orgId);
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", export), $"STRlisting_{orgName}_{date}");
                 extract.IsPrRequirementFiltered = false;
                 extract.RentalListingExtractNm = orgName ?? string.Empty;
                 extract.FilteringOrganizationId = orgId;
@@ -157,11 +166,13 @@ namespace StrDss.Service
 
         private async Task CreateFinalExports(List<string> allExport, List<string> prExport, List<string> lgExport, string lg, long lgId)
         {
+            var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyyMMdd");
+
             if (allExport.Count > 1)
             {
                 _logger.LogInformation("Rental Listing Export - Creating a zip file for all rental listings");
-                var extract = await _listingRepo.GetRentalListingExtractByExtractNm("BC");
-                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", allExport));
+                var extract = await _listingRepo.GetOrCreateRentalListingExtractByExtractNm(ListingExportFileNames.All);
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", allExport), $"STRlisting_{ListingExportFileNames.All}_{date}");
                 extract.IsPrRequirementFiltered = false;
                 _unitOfWork.Commit();
             }
@@ -169,8 +180,8 @@ namespace StrDss.Service
             if (prExport.Count > 1)
             {
                 _logger.LogInformation("Rental Listing Export - Creating a zip file for all PR required listings");
-                var extract = await _listingRepo.GetRentalListingExtractByExtractNm("BC_PR");
-                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", prExport));
+                var extract = await _listingRepo.GetOrCreateRentalListingExtractByExtractNm(ListingExportFileNames.AllPr);
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", prExport), $"STRlisting_{ListingExportFileNames.AllPr}_{date}");
                 extract.IsPrRequirementFiltered = true;
                 _unitOfWork.Commit();
             }
@@ -256,10 +267,12 @@ namespace StrDss.Service
             builder.Append(FormatCsvField(listing.SupplierHost5FaxNumber)).Append(','); // Supplier Host 5 fax number
             builder.Append(FormatCsvField(listing.SupplierHost5MailingAddress)).Append(','); // Supplier Host 5 Mailing Address
             builder.Append(FormatCsvField(listing.SupplierHost5Id)).Append(','); // Host ID of Supplier Host 5
-            builder.Append(FormatCsvField(listing.LastActionNm1)).Append(','); // Last Action Taken
-            builder.Append(FormatCsvField(listing.LastActionDtm1)).Append(','); // Date of Last Action Taken
-            builder.Append(FormatCsvField(listing.LastActionNm2)).Append(','); // Previous Action Taken 1
-            builder.Append(FormatCsvField(listing.LastActionDtm2)); // Date of Previous Action Taken 1
+            builder.Append(FormatCsvField(listing.LastActionNm)).Append(','); // Last Action Taken
+            builder.Append(FormatCsvField(listing.LastActionDtm)).Append(','); // Date of Last Action Taken
+            builder.Append(FormatCsvField(listing.LastActionNm1)).Append(','); // Last Action Taken 1
+            builder.Append(FormatCsvField(listing.LastActionDtm1)).Append(','); // Date of Last Action Taken 1
+            builder.Append(FormatCsvField(listing.LastActionNm2)).Append(','); // Previous Action Taken 2
+            builder.Append(FormatCsvField(listing.LastActionDtm2)); // Date of Previous Action Taken 2
 
             return builder.ToString();
         }
@@ -302,7 +315,7 @@ namespace StrDss.Service
             return fieldString;
         }
 
-        public async Task<RentalListingExtractWithFileDto?> GetRetalListingExportAsync(long extractId)
+        public async Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId)
         {
             return await _listingRepo.GetRetalListingExportAsync(extractId);
         }
@@ -311,5 +324,21 @@ namespace StrDss.Service
         {
             return await _listingRepo.GetRetalListingExportsAsync();
         }
-}
+
+        public async Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults)
+        {
+            var addresses = await _geocoder.GetAddressCandidatesAsync(addressText, maxResults);
+
+            foreach (var address in addresses)
+            {
+                var orgId = await _orgRepo.GetContainingOrganizationId(address.LocationGeometry);
+                if (orgId != null)
+                {
+                    address.OrganizationId = await _orgRepo.GetManagingOrgId(orgId.Value);
+                }
+            }
+
+            return addresses;
+        }
+    }
 }

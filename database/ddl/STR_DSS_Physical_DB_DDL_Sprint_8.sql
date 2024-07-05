@@ -26,7 +26,7 @@ CREATE  TABLE dss_user_privilege (
 
 CREATE  TABLE dss_user_role ( 
 	user_role_cd         varchar(25)  NOT NULL  ,
-	user_role_nm         varchar(50)  NOT NULL  ,
+	user_role_nm         varchar(250)  NOT NULL  ,
 	user_role_dsc        varchar(200)    ,
 	upd_dtm              timestamptz    ,
 	upd_user_guid        uuid    ,

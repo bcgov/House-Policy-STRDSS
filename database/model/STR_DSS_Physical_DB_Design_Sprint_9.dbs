@@ -129,6 +129,19 @@
 				<column name="email_message_type" />
 			</index>
 		</table>
+		<table name="dss_listing_status_type" prior="dss_email_message_type_0" >
+			<comment><![CDATA[A potential status for a CURRENT RENTAL LISTING (e.g. New, Active, Inactive, Reassigned, Taken Down)]]></comment>
+			<column name="listing_status_type" prior="email_message_type" type="varchar" length="2" jt="12" mandatory="y" >
+				<comment><![CDATA[System-consistent code for the listing status (e.g. N, A, I, R, T)]]></comment>
+			</column>
+			<column name="listing_status_type_nm" prior="email_message_type_nm" type="varchar" length="50" jt="12" mandatory="y" >
+				<comment><![CDATA[Business term for the listing status (e.g. New, Active, Inactive, Reassigned, Taken Down)]]></comment>
+			</column>
+			<column name="listing_status_sort_no" type="smallint" jt="5" mandatory="y" />
+			<index name="dss_listing_status_type_pk" unique="PRIMARY_KEY" >
+				<column name="listing_status_type" />
+			</index>
+		</table>
 		<table name="dss_organization" prior="dss_str_organization" >
 			<comment><![CDATA[A private company or governing body component that plays a role in short term rental reporting or enforcement]]></comment>
 			<column name="organization_id" prior="str_organization_id" type="bigint" jt="-5" mandatory="y" >
@@ -143,6 +156,9 @@
 			</column>
 			<column name="organization_nm" prior="business_name" type="varchar" length="250" jt="12" mandatory="y" >
 				<comment><![CDATA[A human-readable name that identifies the organization (e.g. Corporate Enforecement Unit, City of Victoria)]]></comment>
+			</column>
+			<column name="economic_region_dsc" type="varchar" length="100" jt="12" >
+				<comment><![CDATA[A free form description of the economic region to which a Local Government Subdivision belongs]]></comment>
 			</column>
 			<column name="is_lg_participating" type="boolean" jt="16" >
 				<comment><![CDATA[Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing]]></comment>
@@ -263,7 +279,7 @@
 			<column name="civic_no" prior="civic no" type="varchar" length="50" jt="12" >
 				<comment><![CDATA[The civicNumber (building number) returned by the address match (e.g. 1285)]]></comment>
 			</column>
-			<column name="street_nm" prior="street nm" type="varchar" length="50" jt="12" >
+			<column name="street_nm" prior="street nm" type="varchar" length="100" jt="12" >
 				<comment><![CDATA[The streetName returned by the address match (e.g. Pender)]]></comment>
 			</column>
 			<column name="street_type_dsc" type="varchar" length="50" jt="12" >
@@ -272,7 +288,7 @@
 			<column name="street_direction_dsc" type="varchar" length="50" jt="12" >
 				<comment><![CDATA[The streetDirection returned by the address match (e.g. W or West)]]></comment>
 			</column>
-			<column name="locality_nm" type="varchar" length="50" jt="12" >
+			<column name="locality_nm" type="varchar" length="100" jt="12" >
 				<comment><![CDATA[The localityName (community) returned by the address match (e.g. Vancouver)]]></comment>
 			</column>
 			<column name="locality_type_dsc" type="varchar" length="50" jt="12" >
@@ -345,7 +361,7 @@
 			<column name="platform_listing_url" type="varchar" length="4000" jt="12" >
 				<comment><![CDATA[URL for the short-term rental platform listing]]></comment>
 			</column>
-			<column name="business_licence_no" prior="is_current" type="varchar" length="50" jt="12" >
+			<column name="business_licence_no" prior="is_current" type="varchar" length="100" jt="12" >
 				<comment><![CDATA[The local government issued licence number that applies to the rental offering]]></comment>
 			</column>
 			<column name="bc_registry_no" type="varchar" length="50" jt="12" >
@@ -363,8 +379,11 @@
 			<column name="is_taken_down" type="boolean" jt="16" >
 				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform]]></comment>
 			</column>
+			<column name="is_changed_original_address" prior="is changed_original_address" type="boolean" jt="16" >
+				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has received a different property address in the last reporting period]]></comment>
+			</column>
 			<column name="is_changed_address" type="boolean" jt="16" >
-				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has been subjected to address changes]]></comment>
+				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has been subjected to address match changes by a user]]></comment>
 			</column>
 			<column name="is_lg_transferred" type="boolean" jt="16" >
 				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has been transferred to a different Local Goverment Organization as a result of address changes]]></comment>
@@ -393,6 +412,9 @@
 			<column name="locating_physical_address_id" type="bigint" jt="-5" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
+			<column name="listing_status_type" type="varchar" length="2" jt="12" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
 			<column name="upd_dtm" type="timestamptz" jt="93" mandatory="y" >
 				<comment><![CDATA[Trigger-updated timestamp of last change]]></comment>
 			</column>
@@ -415,6 +437,10 @@
 			<index name="dss_rental_listing_i4" unique="NORMAL" >
 				<column name="locating_physical_address_id" />
 			</index>
+			<index name="dss_rental_listing_i5" unique="NORMAL" >
+				<column name="listing_status_type" />
+				<column name="offering_organization_id" />
+			</index>
 			<fk name="dss_rental_listing_fk_offered_by" to_schema="dss" to_table="dss_organization" >
 				<fk_column name="offering_organization_id" pk="organization_id" />
 			</fk>
@@ -426,6 +452,9 @@
 			</fk>
 			<fk name="dss_rental_listing_fk_generating" to_schema="dss" to_table="dss_rental_listing" >
 				<fk_column name="derived_from_rental_listing_id" pk="rental_listing_id" />
+			</fk>
+			<fk name="dss_rental_listing_fk_classified_as" to_schema="dss" to_table="dss_listing_status_type" >
+				<fk_column name="listing_status_type" pk="listing_status_type" />
 			</fk>
 		</table>
 		<table name="dss_rental_listing_contact" prior="dss_organization_contact_person_0" >
@@ -443,7 +472,7 @@
 			<column name="supplier_host_no" type="varchar" length="50" jt="12" >
 				<comment><![CDATA[The platform identifier for the supplier host]]></comment>
 			</column>
-			<column name="full_nm" prior="given_nm" type="varchar" length="50" jt="12" >
+			<column name="full_nm" prior="given_nm" type="varchar" length="100" jt="12" >
 				<comment><![CDATA[The full name of the contact person as inluded in the listing]]></comment>
 			</column>
 			<column name="phone_no" type="varchar" length="30" jt="12" >
@@ -693,7 +722,7 @@
 			<column name="user_role_cd" prior="organization_type" type="varchar" length="25" jt="12" mandatory="y" >
 				<comment><![CDATA[The immutable system code that identifies the role]]></comment>
 			</column>
-			<column name="user_role_nm" type="varchar" length="200" jt="12" mandatory="y" >
+			<column name="user_role_nm" type="varchar" length="250" jt="12" mandatory="y" >
 				<comment><![CDATA[The human-readable name that is given for the role]]></comment>
 			</column>
 			<column name="user_role_dsc" type="varchar" length="200" jt="12" >
@@ -761,18 +790,9 @@
 		</table>
 		<view name="dss_rental_listing_vw" >
 			<view_script><![CDATA[CREATE OR REPLACE VIEW ${view} AS SELECT drl.rental_listing_id,
-        CASE
-            WHEN drl.is_taken_down THEN 'R'::text
-            WHEN drl.is_new THEN 'N'::text
-            WHEN drl.is_active THEN 'A'::text
-            ELSE 'I'::text
-        END AS listing_status_type,
-        CASE
-            WHEN drl.is_taken_down THEN 4
-            WHEN drl.is_new THEN 1
-            WHEN drl.is_active THEN 2
-            ELSE 3
-        END AS listing_status_sort_no,
+    dlst.listing_status_type,
+    dlst.listing_status_type_nm,
+    dlst.listing_status_sort_no,
     ( SELECT max(drlr.report_period_ym) AS max
            FROM (dss.dss_rental_listing drl2
              JOIN dss.dss_rental_listing_report drlr ON ((drlr.rental_listing_report_id = drl2.including_rental_listing_report_id)))
@@ -799,8 +819,9 @@
     ( SELECT string_agg((drlc.full_nm)::text, ' ; '::text) AS string_agg
            FROM dss.dss_rental_listing_contact drlc
           WHERE (drlc.contacted_through_rental_listing_id = drl.rental_listing_id)) AS listing_contact_names_txt,
-    lgs.managing_organization_id,
+    lg.organization_id AS managing_organization_id,
     lg.organization_nm AS managing_organization_nm,
+    lgs.economic_region_dsc,
     lgs.is_principal_residence_required,
     lgs.is_business_licence_required,
     drl.is_entire_unit,
@@ -815,10 +836,11 @@
     drl.bc_registry_no,
     demt.email_message_type_nm AS last_action_nm,
     dem.message_delivery_dtm AS last_action_dtm
-   FROM ((((((dss.dss_rental_listing drl
+   FROM (((((((dss.dss_rental_listing drl
      JOIN dss.dss_organization org ON ((org.organization_id = drl.offering_organization_id)))
+     LEFT JOIN dss.dss_listing_status_type dlst ON (((drl.listing_status_type)::text = (dlst.listing_status_type)::text)))
      LEFT JOIN dss.dss_physical_address dpa ON ((drl.locating_physical_address_id = dpa.physical_address_id)))
-     LEFT JOIN dss.dss_organization lgs ON ((lgs.organization_id = dpa.containing_organization_id)))
+     LEFT JOIN dss.dss_organization lgs ON (((lgs.organization_id = dpa.containing_organization_id) AND (dpa.match_score_amt > 1))))
      LEFT JOIN dss.dss_organization lg ON ((lgs.managing_organization_id = lg.organization_id)))
      LEFT JOIN dss.dss_email_message dem ON ((dem.email_message_id = ( SELECT msg.email_message_id
            FROM dss.dss_email_message msg
@@ -828,13 +850,15 @@
      LEFT JOIN dss.dss_email_message_type demt ON (((dem.email_message_type)::text = (demt.email_message_type)::text)))
   WHERE (drl.including_rental_listing_report_id IS NULL)]]></view_script>
 			<column name="rental_listing_id" type="bigint" />
-			<column name="listing_status_type" type="text" />
-			<column name="listing_status_sort_no" type="integer" />
+			<column name="listing_status_type" type="varchar" />
+			<column name="listing_status_type_nm" type="varchar" />
+			<column name="listing_status_sort_no" type="smallint" />
 			<column name="latest_report_period_ym" type="date" />
 			<column name="is_active" type="boolean" />
 			<column name="is_new" type="boolean" />
 			<column name="is_taken_down" type="boolean" />
 			<column name="offering_organization_id" type="bigint" />
+			<column name="offering_organization_cd" type="varchar" />
 			<column name="offering_organization_nm" type="varchar" />
 			<column name="platform_listing_no" type="varchar" />
 			<column name="platform_listing_url" type="varchar" />
@@ -852,6 +876,7 @@
 			<column name="listing_contact_names_txt" type="text" />
 			<column name="managing_organization_id" type="bigint" />
 			<column name="managing_organization_nm" type="varchar" />
+			<column name="economic_region_dsc" type="varchar" />
 			<column name="is_principal_residence_required" type="boolean" />
 			<column name="is_business_licence_required" type="boolean" />
 			<column name="is_entire_unit" type="boolean" />
@@ -862,7 +887,6 @@
 			<column name="bc_registry_no" type="varchar" />
 			<column name="last_action_nm" type="varchar" />
 			<column name="last_action_dtm" type="timestamptz" />
-			<column name="offering_organization_cd" type="varchar" />
 		</view>
 		<view name="dss_rental_upload_history_view" >
 			<view_script><![CDATA[CREATE OR REPLACE VIEW ${view} AS SELECT dud.upload_delivery_id,
@@ -1010,32 +1034,33 @@ END;$function$
 			<result_param jt="-1" />
 		</function>
 	</schema>
-	<layout name="Physical Data Diagram (Sprint 8)" id="Layout-662" show_column_type="y" show_relation="name" >
-		<comment><![CDATA[Physical Database Design (Sprint 8)]]></comment>
-		<entity schema="dss" name="dss_access_request_status" color="C0C139" x="816" y="560" />
+	<layout name="Physical Data Diagram (Sprint 9)" id="Layout-662" show_column_type="y" show_relation="name" >
+		<comment><![CDATA[Physical Database Design (Sprint 9)]]></comment>
+		<entity schema="dss" name="dss_access_request_status" color="C0C139" x="816" y="576" />
 		<entity schema="dss" name="dss_email_message" color="C0C139" x="1760" y="128" />
 		<entity schema="dss" name="dss_email_message_type" color="C0C139" x="784" y="208" />
-		<entity schema="dss" name="dss_organization" color="C0C139" x="496" y="160" />
+		<entity schema="dss" name="dss_listing_status_type" color="4AC139" x="96" y="1280" />
+		<entity schema="dss" name="dss_organization" color="C18A39" x="496" y="144" />
 		<entity schema="dss" name="dss_organization_contact_person" color="C0C139" x="1360" y="48" />
 		<entity schema="dss" name="dss_organization_type" color="C0C139" x="48" y="224" />
 		<entity schema="dss" name="dss_physical_address" color="C18A39" x="368" y="624" />
 		<entity schema="dss" name="dss_rental_listing" color="C18A39" x="560" y="1280" />
-		<entity schema="dss" name="dss_rental_listing_contact" color="C0C139" x="1104" y="1456" />
-		<entity schema="dss" name="dss_rental_listing_extract" color="3DC139" x="976" y="384" />
-		<entity schema="dss" name="dss_rental_listing_report" color="C0C139" x="672" y="848" />
-		<entity schema="dss" name="dss_upload_delivery" color="C0C139" x="720" y="656" />
+		<entity schema="dss" name="dss_rental_listing_contact" color="C18A39" x="1104" y="1472" />
+		<entity schema="dss" name="dss_rental_listing_extract" color="C0C139" x="976" y="384" />
+		<entity schema="dss" name="dss_rental_listing_report" color="C0C139" x="672" y="864" />
+		<entity schema="dss" name="dss_upload_delivery" color="C0C139" x="720" y="672" />
 		<entity schema="dss" name="dss_upload_line" color="C0C139" x="1152" y="672" />
 		<entity schema="dss" name="dss_user_identity" color="C0C139" x="1248" y="352" />
 		<entity schema="dss" name="dss_user_privilege" color="C0C139" x="1536" y="816" />
-		<entity schema="dss" name="dss_user_role" color="C18A39" x="1552" y="672" />
-		<entity schema="dss" name="dss_user_role_assignment" color="C18A39" x="2048" y="608" />
-		<entity schema="dss" name="dss_user_role_privilege" color="C18A39" x="2032" y="768" />
+		<entity schema="dss" name="dss_user_role" color="C0C139" x="1552" y="672" />
+		<entity schema="dss" name="dss_user_role_assignment" color="C0C139" x="2048" y="608" />
+		<entity schema="dss" name="dss_user_role_privilege" color="C0C139" x="2032" y="768" />
 		<callout x="64" y="64" pointer="Round" >
 			<comment><![CDATA[Ministry of Housing
 Short Term Rental Data Sharing
-Physical Data Diagram (Sprint 8)
+Physical Data Diagram (Sprint 9)
 Leif Larsen, DXC Technology
-June 19, 2024]]></comment>
+July 3, 2024]]></comment>
 		</callout>
 	</layout>
 </project>

@@ -5,7 +5,7 @@
         public long? RentalListingId { get; set; }
 
         public string? ListingStatusType { get; set; }
-
+        public string? ListingStatusTypeNm { get; set; }
         public int? ListingStatusSortNo { get; set; }
 
         public DateOnly? LatestReportPeriodYm { get; set; }
@@ -52,6 +52,7 @@
         public long? ManagingOrganizationId { get; set; }
 
         public string? ManagingOrganizationNm { get; set; }
+        public string? EconomicRegionDsc { get; set; }
 
         public bool? IsPrincipalResidenceRequired { get; set; }
 

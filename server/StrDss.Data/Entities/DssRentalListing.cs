@@ -104,7 +104,7 @@ public partial class DssRentalListing
     public bool? IsNew { get; set; }
 
     /// <summary>
-    /// Indicates whether a CURRENT RENTAL LISTING has been subjected to address changes
+    /// Indicates whether a CURRENT RENTAL LISTING has been subjected to address match changes by a user
     /// </summary>
     public bool? IsChangedAddress { get; set; }
 
@@ -112,6 +112,16 @@ public partial class DssRentalListing
     /// Indicates whether a CURRENT RENTAL LISTING has been transferred to a different Local Goverment Organization as a result of address changes
     /// </summary>
     public bool? IsLgTransferred { get; set; }
+
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING has received a different property address in the last reporting period
+    /// </summary>
+    public bool? IsChangedOriginalAddress { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public string? ListingStatusType { get; set; }
 
     public virtual DssRentalListing? DerivedFromRentalListing { get; set; }
 
@@ -122,6 +132,8 @@ public partial class DssRentalListing
     public virtual DssRentalListingReport? IncludingRentalListingReport { get; set; }
 
     public virtual ICollection<DssRentalListing> InverseDerivedFromRentalListing { get; set; } = new List<DssRentalListing>();
+
+    public virtual DssListingStatusType? ListingStatusTypeNavigation { get; set; }
 
     public virtual DssPhysicalAddress? LocatingPhysicalAddress { get; set; }
 

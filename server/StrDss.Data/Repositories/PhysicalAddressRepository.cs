@@ -46,7 +46,11 @@ namespace StrDss.Data.Repositories
         public async Task<List<DssPhysicalAddress>> GetPhysicalAddressesToCleanUpAsync()
         {
             return await _dbSet
-                .Where(x => x.IsSystemProcessing == null && x.MatchScoreAmt < 90)
+                .Where(x => x.IsSystemProcessing == null 
+                    && x.MatchScoreAmt < 90
+                    && (x.IsMatchCorrected == null || (x.IsMatchCorrected.HasValue && x.IsMatchCorrected.Value == false))
+                    && (x.IsMatchVerified == null || (x.IsMatchVerified.HasValue && x.IsMatchVerified.Value == false))
+                 )
                 .OrderBy(x => x.PhysicalAddressId)
                 .Take(300)
                 .ToListAsync();

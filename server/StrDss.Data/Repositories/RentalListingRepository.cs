@@ -502,6 +502,9 @@ namespace StrDss.Data.Repositories
             if (address.IsMatchCorrected != null && address.IsMatchCorrected.Value)
                 return "User Edit";
 
+            if (address.IsChangedOriginalAddress != null && address.IsChangedOriginalAddress.Value)
+                return "Platform Data";
+
             return "Platform Data";
         }
     }

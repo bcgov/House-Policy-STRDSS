@@ -350,7 +350,7 @@ namespace StrDss.Service
         {
             var errors = new Dictionary<string, List<string>>();
 
-            var listing = await _listingRepo.GetRentalListing(rentalListingId);
+            var listing = await _listingRepo.GetRentalListing(rentalListingId, false);
 
             if (listing == null)
             {
@@ -379,7 +379,7 @@ namespace StrDss.Service
         {
             var errors = new Dictionary<string, List<string>>();
 
-            var listing = await _listingRepo.GetRentalListing(dto.RentalListingId);
+            var listing = await _listingRepo.GetRentalListing(dto.RentalListingId, false);
 
             if (listing == null)
             {

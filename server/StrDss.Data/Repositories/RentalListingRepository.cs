@@ -12,7 +12,7 @@ namespace StrDss.Data.Repositories
     public interface IRentalListingRepository
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? rentalListingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<RentalListingViewDto?> GetRentalListing(long rentaListingId);
+        Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
         Task<List<long>> GetRentalListingIdsToExport();
         Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId);
@@ -100,7 +100,7 @@ namespace StrDss.Data.Repositories
             return listings;
         }
 
-        public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId)
+        public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId, bool loadHistory = true)
         {
             var listing = _mapper.Map<RentalListingViewDto>(await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.RentalListingId == rentalListingId));
 
@@ -120,6 +120,8 @@ namespace StrDss.Data.Repositories
                 _dbContext.DssRentalListingContacts.AsNoTracking()
                 .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
                 .ToListAsync());
+
+            if (!loadHistory) return listing;
 
             listing.ListingHistory = (await
                 _dbContext.DssRentalListings.AsNoTracking()

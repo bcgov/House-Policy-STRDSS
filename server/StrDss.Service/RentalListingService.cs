@@ -368,6 +368,8 @@ namespace StrDss.Service
 
             await _listingRepo.ConfirmAddressAsync(rentalListingId);
 
+            _unitOfWork.Commit();
+
             return errors;
         }
 
@@ -394,6 +396,8 @@ namespace StrDss.Service
             }
 
             //await _listingRepo.ConfirmAddressAsync(rentalListingId);
+
+            //_unitOfWork.Commit();
 
             return errors;
         }

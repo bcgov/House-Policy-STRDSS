@@ -64,6 +64,11 @@ public partial class DssOrganization
     /// </summary>
     public bool? IsBusinessLicenceRequired { get; set; }
 
+    /// <summary>
+    /// A free form description of the economic region to which a Local Government Subdivision belongs
+    /// </summary>
+    public string? EconomicRegionDsc { get; set; }
+
     public virtual ICollection<DssEmailMessage> DssEmailMessageInvolvedInOrganizations { get; set; } = new List<DssEmailMessage>();
 
     public virtual ICollection<DssEmailMessage> DssEmailMessageRequestingOrganizations { get; set; } = new List<DssEmailMessage>();

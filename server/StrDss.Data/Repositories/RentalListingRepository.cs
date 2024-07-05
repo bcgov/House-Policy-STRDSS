@@ -12,7 +12,7 @@ namespace StrDss.Data.Repositories
     public interface IRentalListingRepository
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? rentalListingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<RentalListingViewDto?> GetRentalListing(long rentaListingId);
+        Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
         Task<List<long>> GetRentalListingIdsToExport();
         Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId);
@@ -21,6 +21,7 @@ namespace StrDss.Data.Repositories
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
         Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
         Task ConfirmAddressAsync(long rentalListingId);
+        Task<DssRentalListing> UpdateAddressAsync(UpdateListingAddressDto dto);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -99,7 +100,7 @@ namespace StrDss.Data.Repositories
             return listings;
         }
 
-        public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId)
+        public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId, bool loadHistory = true)
         {
             var listing = _mapper.Map<RentalListingViewDto>(await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.RentalListingId == rentalListingId));
 
@@ -119,6 +120,8 @@ namespace StrDss.Data.Repositories
                 _dbContext.DssRentalListingContacts.AsNoTracking()
                 .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
                 .ToListAsync());
+
+            if (!loadHistory) return listing;
 
             listing.ListingHistory = (await
                 _dbContext.DssRentalListings.AsNoTracking()
@@ -433,13 +436,17 @@ namespace StrDss.Data.Repositories
 
             newAddress.PhysicalAddressId = 0;
             newAddress.IsMatchVerified = true;
+            newAddress.IsMatchCorrected = null;
+            newAddress.IsChangedOriginalAddress = null;
+            newAddress.IsSystemProcessing = true;
+
             newAddress.ReplacingPhysicalAddressId = listing.LocatingPhysicalAddressId;
 
-            listing.IsChangedAddress = true;
+            listing.IsChangedAddress = true;           
+            
             listing.LocatingPhysicalAddress = newAddress;
 
             _dbContext.Entry(listing.LocatingPhysicalAddress).State = EntityState.Detached;
-
             _dbContext.Entry(newAddress).State = EntityState.Added;
         }
 
@@ -502,7 +509,37 @@ namespace StrDss.Data.Repositories
             if (address.IsMatchCorrected != null && address.IsMatchCorrected.Value)
                 return "User Edit";
 
+            if (address.IsChangedOriginalAddress != null && address.IsChangedOriginalAddress.Value)
+                return "Platform Data";
+
             return "Platform Data";
+        }
+
+        public async Task<DssRentalListing> UpdateAddressAsync(UpdateListingAddressDto dto)
+        {
+            var listing = await _dbContext
+                .DssRentalListings
+                .Include(x => x.LocatingPhysicalAddress)
+                .FirstAsync(x => x.RentalListingId == dto.RentalListingId);
+
+            var newAddress = _mapper.Map<DssPhysicalAddress>(listing.LocatingPhysicalAddress);
+
+            newAddress.PhysicalAddressId = 0;
+            newAddress.IsMatchVerified = null;
+            newAddress.IsMatchCorrected = null;
+            newAddress.IsChangedOriginalAddress = null;
+            newAddress.IsSystemProcessing = true;
+
+            newAddress.ReplacingPhysicalAddressId = listing.LocatingPhysicalAddressId;
+
+            listing.LocatingPhysicalAddress = newAddress;
+
+            _dbContext.Entry(listing.LocatingPhysicalAddress).State = EntityState.Detached;
+            _dbContext.Entry(newAddress).State = EntityState.Added;
+            //if (listing.LocatingPhysicalAddress.ContainingOrganization != null)
+            //    _dbContext.Entry(listing.LocatingPhysicalAddress.ContainingOrganization).State = EntityState.Detached;
+
+            return listing;
         }
     }
 }

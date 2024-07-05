@@ -1,4 +1,4 @@
-/* Create all Sprint 8 DB Objects STR DSS */
+/* Create all Sprint 9 DB Objects STR DSS */
 
 CREATE  TABLE dss_access_request_status ( 
 	access_request_status_cd varchar(25)  NOT NULL  ,
@@ -10,6 +10,13 @@ CREATE  TABLE dss_email_message_type (
 	email_message_type   varchar(50)  NOT NULL  ,
 	email_message_type_nm varchar(250)  NOT NULL  ,
 	CONSTRAINT dss_email_message_type_pk PRIMARY KEY ( email_message_type )
+ );
+
+CREATE  TABLE dss_listing_status_type ( 
+	listing_status_type  varchar(2)  NOT NULL  ,
+	listing_status_type_nm varchar(50)  NOT NULL  ,
+	listing_status_sort_no smallint  NOT NULL  ,
+	CONSTRAINT dss_listing_status_type_pk PRIMARY KEY ( listing_status_type )
  );
 
 CREATE  TABLE dss_organization_type ( 
@@ -46,6 +53,7 @@ CREATE  TABLE dss_organization (
 	organization_type    varchar(25)  NOT NULL  ,
 	organization_cd      varchar(25)  NOT NULL  ,
 	organization_nm      varchar(250)  NOT NULL  ,
+	economic_region_dsc  varchar(100)    ,
 	is_lg_participating  boolean    ,
 	is_principal_residence_required boolean    ,
 	is_business_licence_required boolean    ,
@@ -83,10 +91,10 @@ CREATE  TABLE dss_physical_address (
 	match_score_amt      smallint    ,
 	unit_no              varchar(50)    ,
 	civic_no             varchar(50)    ,
-	street_nm            varchar(50)    ,
+	street_nm            varchar(100)    ,
 	street_type_dsc      varchar(50)    ,
 	street_direction_dsc varchar(50)    ,
-	locality_nm          varchar(50)    ,
+	locality_nm          varchar(100)    ,
 	locality_type_dsc    varchar(50)    ,
 	province_cd          varchar(5)    ,
 	site_no              varchar(50)    ,
@@ -94,6 +102,7 @@ CREATE  TABLE dss_physical_address (
 	location_geometry    geometry    ,
 	is_exempt            boolean    ,
 	is_match_verified    boolean    ,
+	is_changed_original_address boolean    ,
 	is_match_corrected   boolean    ,
 	is_system_processing boolean    ,
 	containing_organization_id bigint    ,
@@ -189,12 +198,13 @@ CREATE  TABLE dss_rental_listing (
 	rental_listing_id    bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
 	platform_listing_no  varchar(50)  NOT NULL  ,
 	platform_listing_url varchar(4000)    ,
-	business_licence_no  varchar(50)    ,
+	business_licence_no  varchar(100)    ,
 	bc_registry_no       varchar(50)    ,
 	is_current           boolean  NOT NULL  ,
 	is_active            boolean    ,
 	is_new               boolean    ,
 	is_taken_down        boolean    ,
+	is_changed_original_address boolean    ,
 	is_changed_address   boolean    ,
 	is_lg_transferred    boolean    ,
 	is_entire_unit       boolean    ,
@@ -205,6 +215,7 @@ CREATE  TABLE dss_rental_listing (
 	including_rental_listing_report_id bigint    ,
 	derived_from_rental_listing_id bigint    ,
 	locating_physical_address_id bigint    ,
+	listing_status_type  varchar(2)    ,
 	upd_dtm              timestamptz  NOT NULL  ,
 	upd_user_guid        uuid    ,
 	CONSTRAINT dss_rental_listing_pk PRIMARY KEY ( rental_listing_id )
@@ -218,12 +229,14 @@ CREATE INDEX dss_rental_listing_i3 ON dss_rental_listing  ( derived_from_rental_
 
 CREATE INDEX dss_rental_listing_i4 ON dss_rental_listing  ( locating_physical_address_id );
 
+CREATE INDEX dss_rental_listing_i5 ON dss_rental_listing  ( listing_status_type, offering_organization_id );
+
 CREATE  TABLE dss_rental_listing_contact ( 
 	rental_listing_contact_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
 	is_property_owner    boolean  NOT NULL  ,
 	listing_contact_nbr  smallint    ,
 	supplier_host_no     varchar(50)    ,
-	full_nm              varchar(50)    ,
+	full_nm              varchar(100)    ,
 	phone_no             varchar(30)    ,
 	fax_no               varchar(30)    ,
 	full_address_txt     varchar(250)    ,
@@ -300,6 +313,8 @@ ALTER TABLE dss_rental_listing ADD CONSTRAINT dss_rental_listing_fk_located_at F
 
 ALTER TABLE dss_rental_listing ADD CONSTRAINT dss_rental_listing_fk_generating FOREIGN KEY ( derived_from_rental_listing_id ) REFERENCES dss_rental_listing( rental_listing_id );
 
+ALTER TABLE dss_rental_listing ADD CONSTRAINT dss_rental_listing_fk_classified_as FOREIGN KEY ( listing_status_type ) REFERENCES dss_listing_status_type( listing_status_type );
+
 ALTER TABLE dss_rental_listing_contact ADD CONSTRAINT dss_rental_listing_contact_fk_contacted_for FOREIGN KEY ( contacted_through_rental_listing_id ) REFERENCES dss_rental_listing( rental_listing_id );
 
 ALTER TABLE dss_rental_listing_extract ADD CONSTRAINT dss_rental_listing_extract_fk_filtered_by FOREIGN KEY ( filtering_organization_id ) REFERENCES dss_organization( organization_id );
@@ -323,18 +338,9 @@ ALTER TABLE dss_user_role_privilege ADD CONSTRAINT dss_user_role_privilege_fk_co
 ALTER TABLE dss_user_role_privilege ADD CONSTRAINT dss_user_role_privilege_fk_conferring FOREIGN KEY ( user_privilege_cd ) REFERENCES dss_user_privilege( user_privilege_cd );
 
 CREATE OR REPLACE VIEW dss_rental_listing_vw AS SELECT drl.rental_listing_id,
-        CASE
-            WHEN drl.is_taken_down THEN 'R'::text
-            WHEN drl.is_new THEN 'N'::text
-            WHEN drl.is_active THEN 'A'::text
-            ELSE 'I'::text
-        END AS listing_status_type,
-        CASE
-            WHEN drl.is_taken_down THEN 4
-            WHEN drl.is_new THEN 1
-            WHEN drl.is_active THEN 2
-            ELSE 3
-        END AS listing_status_sort_no,
+    dlst.listing_status_type,
+    dlst.listing_status_type_nm,
+    dlst.listing_status_sort_no,
     ( SELECT max(drlr.report_period_ym) AS max
            FROM (dss_rental_listing drl2
              JOIN dss_rental_listing_report drlr ON ((drlr.rental_listing_report_id = drl2.including_rental_listing_report_id)))
@@ -361,8 +367,9 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS SELECT drl.rental_listing_id,
     ( SELECT string_agg((drlc.full_nm)::text, ' ; '::text) AS string_agg
            FROM dss_rental_listing_contact drlc
           WHERE (drlc.contacted_through_rental_listing_id = drl.rental_listing_id)) AS listing_contact_names_txt,
-    lgs.managing_organization_id,
+    lg.organization_id AS managing_organization_id,
     lg.organization_nm AS managing_organization_nm,
+    lgs.economic_region_dsc,
     lgs.is_principal_residence_required,
     lgs.is_business_licence_required,
     drl.is_entire_unit,
@@ -377,10 +384,11 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS SELECT drl.rental_listing_id,
     drl.bc_registry_no,
     demt.email_message_type_nm AS last_action_nm,
     dem.message_delivery_dtm AS last_action_dtm
-   FROM ((((((dss_rental_listing drl
+   FROM (((((((dss_rental_listing drl
      JOIN dss_organization org ON ((org.organization_id = drl.offering_organization_id)))
+     LEFT JOIN dss_listing_status_type dlst ON (((drl.listing_status_type)::text = (dlst.listing_status_type)::text)))
      LEFT JOIN dss_physical_address dpa ON ((drl.locating_physical_address_id = dpa.physical_address_id)))
-     LEFT JOIN dss_organization lgs ON ((lgs.organization_id = dpa.containing_organization_id)))
+     LEFT JOIN dss_organization lgs ON (((lgs.organization_id = dpa.containing_organization_id) AND (dpa.match_score_amt > 1))))
      LEFT JOIN dss_organization lg ON ((lgs.managing_organization_id = lg.organization_id)))
      LEFT JOIN dss_email_message dem ON ((dem.email_message_id = ( SELECT msg.email_message_id
            FROM dss_email_message msg
@@ -474,9 +482,9 @@ CREATE TRIGGER dss_upload_delivery_br_iu_tr BEFORE INSERT OR UPDATE ON dss_uploa
 
 CREATE TRIGGER dss_user_identity_br_iu_tr BEFORE INSERT OR UPDATE ON dss_user_identity FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
-CREATE TRIGGER dss_user_role_br_iu_tr BEFORE INSERT OR UPDATE ON dss_user_role FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
-
 CREATE TRIGGER dss_user_role_assignment_br_iu_tr BEFORE INSERT OR UPDATE ON dss_user_role_assignment FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
+
+CREATE TRIGGER dss_user_role_br_iu_tr BEFORE INSERT OR UPDATE ON dss_user_role FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
 CREATE TRIGGER dss_user_role_privilege_br_iu_tr BEFORE INSERT OR UPDATE ON dss_user_role_privilege FOR EACH ROW EXECUTE FUNCTION dss_update_audit_columns();
 
@@ -498,6 +506,12 @@ COMMENT ON TABLE dss_email_message_type IS 'The type or purpose of a system gene
 COMMENT ON COLUMN dss_email_message_type.email_message_type IS 'System-consistent code for the type or purpose of the message (e.g. Notice of Takedown, Takedown Request, Delisting Warning, Delisting Request, Access Granted Notification, Access Denied Notification)';
 
 COMMENT ON COLUMN dss_email_message_type.email_message_type_nm IS 'Business term for the type or purpose of the message (e.g. Notice of Takedown, Takedown Request, Delisting Warning, Delisting Request, Access Granted Notification, Access Denied Notification)';
+
+COMMENT ON TABLE dss_listing_status_type IS 'A potential status for a CURRENT RENTAL LISTING (e.g. New, Active, Inactive, Reassigned, Taken Down)';
+
+COMMENT ON COLUMN dss_listing_status_type.listing_status_type IS 'System-consistent code for the listing status (e.g. N, A, I, R, T)';
+
+COMMENT ON COLUMN dss_listing_status_type.listing_status_type_nm IS 'Business term for the listing status (e.g. New, Active, Inactive, Reassigned, Taken Down)';
 
 COMMENT ON TABLE dss_organization_type IS 'A level of government or business category';
 
@@ -542,6 +556,8 @@ COMMENT ON COLUMN dss_organization.organization_type IS 'Foreign key';
 COMMENT ON COLUMN dss_organization.organization_cd IS 'An immutable system code that identifies the organization (e.g. CEU, AIRBNB)';
 
 COMMENT ON COLUMN dss_organization.organization_nm IS 'A human-readable name that identifies the organization (e.g. Corporate Enforecement Unit, City of Victoria)';
+
+COMMENT ON COLUMN dss_organization.economic_region_dsc IS 'A free form description of the economic region to which a Local Government Subdivision belongs';
 
 COMMENT ON COLUMN dss_organization.is_lg_participating IS 'Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing';
 
@@ -616,6 +632,8 @@ COMMENT ON COLUMN dss_physical_address.location_geometry IS 'The computed locati
 COMMENT ON COLUMN dss_physical_address.is_exempt IS 'Indicates whether the address has been identified as exempt from Short Term Rental regulations';
 
 COMMENT ON COLUMN dss_physical_address.is_match_verified IS 'Indicates whether the matched address has been verified as correct for the listing by the responsible authorities';
+
+COMMENT ON COLUMN dss_physical_address.is_changed_original_address IS 'Indicates whether the original address has received a different property address from the platform in the last reporting period';
 
 COMMENT ON COLUMN dss_physical_address.is_match_corrected IS 'Indicates whether the matched address has been manually changed to one that is verified as correct for the listing';
 
@@ -761,7 +779,9 @@ COMMENT ON COLUMN dss_rental_listing.is_new IS 'Indicates whether a CURRENT RENT
 
 COMMENT ON COLUMN dss_rental_listing.is_taken_down IS 'Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform';
 
-COMMENT ON COLUMN dss_rental_listing.is_changed_address IS 'Indicates whether a CURRENT RENTAL LISTING has been subjected to address changes';
+COMMENT ON COLUMN dss_rental_listing.is_changed_original_address IS 'Indicates whether a CURRENT RENTAL LISTING has received a different property address in the last reporting period';
+
+COMMENT ON COLUMN dss_rental_listing.is_changed_address IS 'Indicates whether a CURRENT RENTAL LISTING has been subjected to address match changes by a user';
 
 COMMENT ON COLUMN dss_rental_listing.is_lg_transferred IS 'Indicates whether a CURRENT RENTAL LISTING has been transferred to a different Local Goverment Organization as a result of address changes';
 
@@ -780,6 +800,8 @@ COMMENT ON COLUMN dss_rental_listing.including_rental_listing_report_id IS 'Fore
 COMMENT ON COLUMN dss_rental_listing.derived_from_rental_listing_id IS 'Foreign key';
 
 COMMENT ON COLUMN dss_rental_listing.locating_physical_address_id IS 'Foreign key';
+
+COMMENT ON COLUMN dss_rental_listing.listing_status_type IS 'Foreign key';
 
 COMMENT ON COLUMN dss_rental_listing.upd_dtm IS 'Trigger-updated timestamp of last change';
 

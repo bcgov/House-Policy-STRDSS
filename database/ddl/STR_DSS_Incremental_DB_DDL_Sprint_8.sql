@@ -1,4 +1,4 @@
-/* Sprint 7 Incremental DB Changes to STR DSS */
+/* Sprint 8 Incremental DB Changes to STR DSS */
 
 CREATE  TABLE dss_rental_listing_extract ( 
 	rental_listing_extract_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,

@@ -129,6 +129,11 @@ public partial class DssPhysicalAddress
     /// </summary>
     public bool? IsSystemProcessing { get; set; }
 
+    /// <summary>
+    /// Indicates whether the original address has received a different property address from the platform in the last reporting period
+    /// </summary>
+    public bool? IsChangedOriginalAddress { get; set; }
+
     public virtual DssOrganization? ContainingOrganization { get; set; }
 
     public virtual ICollection<DssRentalListing> DssRentalListings { get; set; } = new List<DssRentalListing>();

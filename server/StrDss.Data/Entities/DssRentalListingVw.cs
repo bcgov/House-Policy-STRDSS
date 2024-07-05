@@ -9,7 +9,9 @@ public partial class DssRentalListingVw
 
     public string? ListingStatusType { get; set; }
 
-    public int? ListingStatusSortNo { get; set; }
+    public string? ListingStatusTypeNm { get; set; }
+
+    public short? ListingStatusSortNo { get; set; }
 
     public DateOnly? LatestReportPeriodYm { get; set; }
 
@@ -56,6 +58,8 @@ public partial class DssRentalListingVw
     public long? ManagingOrganizationId { get; set; }
 
     public string? ManagingOrganizationNm { get; set; }
+
+    public string? EconomicRegionDsc { get; set; }
 
     public bool? IsPrincipalResidenceRequired { get; set; }
 

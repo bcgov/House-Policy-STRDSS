@@ -10,8 +10,10 @@ using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service.HttpClients;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace StrDss.Service
 {
@@ -348,7 +350,7 @@ namespace StrDss.Service
         {
             var errors = new Dictionary<string, List<string>>();
 
-            var listing = await _listingRepo.GetRentalListing(rentalListingId);
+            var listing = await _listingRepo.GetRentalListing(rentalListingId, false);
 
             if (listing == null)
             {
@@ -377,7 +379,7 @@ namespace StrDss.Service
         {
             var errors = new Dictionary<string, List<string>>();
 
-            var listing = await _listingRepo.GetRentalListing(dto.RentalListingId);
+            var listing = await _listingRepo.GetRentalListing(dto.RentalListingId, false);
 
             if (listing == null)
             {
@@ -395,9 +397,35 @@ namespace StrDss.Service
                 return errors;
             }
 
-            //await _listingRepo.ConfirmAddressAsync(rentalListingId);
+            var listingEntity = await _listingRepo.UpdateAddressAsync(dto);
+            var addressEntity = listingEntity!.LocatingPhysicalAddress!;
 
-            //_unitOfWork.Commit();
+            var originalAddress = addressEntity.OriginalAddressTxt;
+            var originalOrgId = addressEntity.ContainingOrganizationId;
+
+            addressEntity.OriginalAddressTxt = dto.AddressString;
+            var error = await _geocoder.GetAddressAsync(addressEntity);
+
+            addressEntity.OriginalAddressTxt = originalAddress;
+            addressEntity.IsMatchCorrected = true;
+
+            if (error.IsEmpty() && addressEntity.LocationGeometry is not null && addressEntity.LocationGeometry is Point point)
+            {
+                addressEntity.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+            }
+            else
+            {
+                throw new Exception(error);
+            }
+
+            if (addressEntity.ContainingOrganizationId != originalOrgId)
+            {
+                listingEntity.IsLgTransferred = true;
+            }
+
+            listingEntity.IsChangedAddress = true;
+
+            _unitOfWork.Commit();
 
             return errors;
         }

@@ -6,6 +6,8 @@ ALTER TABLE dss_physical_address ALTER COLUMN street_nm TYPE varchar(100);
 
 ALTER TABLE dss_physical_address ALTER COLUMN locality_nm TYPE varchar(100);
 
+ALTER TABLE dss_physical_address ADD "is_changed_original_address" boolean    ;
+
 ALTER TABLE dss_rental_listing ALTER COLUMN business_licence_no TYPE varchar(100);
 
 ALTER TABLE dss_rental_listing_contact ALTER COLUMN full_nm TYPE varchar(100);
@@ -28,6 +30,8 @@ CREATE INDEX dss_rental_listing_i5 ON dss_rental_listing  ( listing_status_type,
 ALTER TABLE dss_rental_listing ADD CONSTRAINT dss_rental_listing_fk_classified_as FOREIGN KEY ( listing_status_type ) REFERENCES dss_listing_status_type( listing_status_type )   ;
 
 COMMENT ON COLUMN dss_organization.economic_region_dsc IS 'A free form description of the economic region to which a Local Government Subdivision belongs';
+
+COMMENT ON COLUMN dss_physical_address."is_changed_original_address" IS 'Indicates whether the original address has received a different property address from the platform in the last reporting period';
 
 COMMENT ON COLUMN dss_rental_listing."is_changed_original_address" IS 'Indicates whether a CURRENT RENTAL LISTING has received a different property address in the last reporting period';
 

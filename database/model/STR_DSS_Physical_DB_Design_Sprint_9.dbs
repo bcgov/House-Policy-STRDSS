@@ -312,6 +312,9 @@
 			<column name="is_match_verified" type="boolean" jt="16" >
 				<comment><![CDATA[Indicates whether the matched address has been verified as correct for the listing by the responsible authorities]]></comment>
 			</column>
+			<column name="is_changed_original_address" type="boolean" jt="16" >
+				<comment><![CDATA[Indicates whether the original address has received a different property address from the platform in the last reporting period]]></comment>
+			</column>
 			<column name="is_match_corrected" type="boolean" jt="16" >
 				<comment><![CDATA[Indicates whether the matched address has been manually changed to one that is verified as correct for the listing]]></comment>
 			</column>
@@ -1036,19 +1039,19 @@ END;$function$
 	</schema>
 	<layout name="Physical Data Diagram (Sprint 9)" id="Layout-662" show_column_type="y" show_relation="name" >
 		<comment><![CDATA[Physical Database Design (Sprint 9)]]></comment>
-		<entity schema="dss" name="dss_access_request_status" color="C0C139" x="816" y="576" />
+		<entity schema="dss" name="dss_access_request_status" color="C0C139" x="816" y="560" />
 		<entity schema="dss" name="dss_email_message" color="C0C139" x="1760" y="128" />
 		<entity schema="dss" name="dss_email_message_type" color="C0C139" x="784" y="208" />
-		<entity schema="dss" name="dss_listing_status_type" color="4AC139" x="96" y="1280" />
+		<entity schema="dss" name="dss_listing_status_type" color="4AC139" x="64" y="1280" />
 		<entity schema="dss" name="dss_organization" color="C18A39" x="496" y="144" />
 		<entity schema="dss" name="dss_organization_contact_person" color="C0C139" x="1360" y="48" />
 		<entity schema="dss" name="dss_organization_type" color="C0C139" x="48" y="224" />
-		<entity schema="dss" name="dss_physical_address" color="C18A39" x="368" y="624" />
-		<entity schema="dss" name="dss_rental_listing" color="C18A39" x="560" y="1280" />
-		<entity schema="dss" name="dss_rental_listing_contact" color="C18A39" x="1104" y="1472" />
+		<entity schema="dss" name="dss_physical_address" color="C18A39" x="336" y="624" />
+		<entity schema="dss" name="dss_rental_listing" color="C18A39" x="528" y="1280" />
+		<entity schema="dss" name="dss_rental_listing_contact" color="C18A39" x="1072" y="1488" />
 		<entity schema="dss" name="dss_rental_listing_extract" color="C0C139" x="976" y="384" />
-		<entity schema="dss" name="dss_rental_listing_report" color="C0C139" x="672" y="864" />
-		<entity schema="dss" name="dss_upload_delivery" color="C0C139" x="720" y="672" />
+		<entity schema="dss" name="dss_rental_listing_report" color="C0C139" x="672" y="848" />
+		<entity schema="dss" name="dss_upload_delivery" color="C0C139" x="720" y="656" />
 		<entity schema="dss" name="dss_upload_line" color="C0C139" x="1152" y="672" />
 		<entity schema="dss" name="dss_user_identity" color="C0C139" x="1248" y="352" />
 		<entity schema="dss" name="dss_user_privilege" color="C0C139" x="1536" y="816" />
@@ -1060,7 +1063,7 @@ END;$function$
 Short Term Rental Data Sharing
 Physical Data Diagram (Sprint 9)
 Leif Larsen, DXC Technology
-July 3, 2024]]></comment>
+July 5, 2024]]></comment>
 		</callout>
 	</layout>
 </project>

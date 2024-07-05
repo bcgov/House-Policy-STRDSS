@@ -16,6 +16,7 @@ namespace StrDss.Model.OrganizationDtos
 
         [JsonIgnore]
         public NetTopologySuite.Geometries.Geometry? AreaGeometry { get; set; }
+        public string? EconomicRegionDsc { get; set; }
 
         public long? ManagingOrganizationId { get; set; }
 

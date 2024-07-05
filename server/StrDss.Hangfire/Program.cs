@@ -171,5 +171,6 @@ app.UseHangfireDashboard();
 RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/3 * * * *");
 RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *");
 RecurringJob.AddOrUpdate<HangfireJobs>("Clean up addresses", job => job.CleanUpAddresses(), "*/2 * * * *");
+RecurringJob.AddOrUpdate<HangfireJobs>("Create Rental Listing Export Files", job => job.CreateRentalListingExportFiles(), "50 5 * * *");
 
 app.Run();

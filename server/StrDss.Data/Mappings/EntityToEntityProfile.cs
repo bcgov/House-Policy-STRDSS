@@ -8,6 +8,7 @@ namespace StrDss.Data.Mappings
         public EntityToEntityProfile()
         {
             CreateMap<DssRentalListing, DssRentalListing>();
+            CreateMap<DssPhysicalAddress, DssPhysicalAddress>();
         }
     }
 }

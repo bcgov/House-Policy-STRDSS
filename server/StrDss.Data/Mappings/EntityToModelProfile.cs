@@ -43,8 +43,6 @@ namespace StrDss.Data.Mappings
             CreateMap<DssRentalListingVw, RentalListingExportDto>();
             CreateMap<DssRentalListingExtract, RentalListingExtractDto>()
                 .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime(i.UpdDtm)));
-            CreateMap<DssRentalListingExtract, RentalListingExtractWithFileDto>()
-                .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime(i.UpdDtm)));
         }
     }
 }

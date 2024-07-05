@@ -24,9 +24,13 @@ namespace StrDss.Data.Repositories
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
-        public RentalListingRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger) 
+        private IUserRepository _userRepo;
+
+        public RentalListingRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger,
+            IUserRepository userRepo) 
             : base(dbContext, mapper, currentUser, logger)
         {
+            _userRepo = userRepo;
         }
         public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, 
             int pageSize, int pageNumber, string orderBy, string direction)
@@ -147,6 +151,8 @@ namespace StrDss.Data.Repositories
             {
                 action.User = CommonUtils.GetFullName(action.FirstName ?? "", action.LastName ?? "");
             }
+
+            listing.AddressChangeHistory = await GetAddressChangeHistoryAsync(rentalListingId);
 
             return listing;
         }
@@ -423,8 +429,80 @@ namespace StrDss.Data.Repositories
                 .Include(x => x.LocatingPhysicalAddress)
                 .FirstAsync(x => x.RentalListingId == rentalListingId);
 
-            listing.LocatingPhysicalAddress!.IsMatchVerified = true;
+            var newAddress = _mapper.Map<DssPhysicalAddress>(listing.LocatingPhysicalAddress);
+
+            newAddress.PhysicalAddressId = 0;
+            newAddress.IsMatchVerified = true;
+            newAddress.ReplacingPhysicalAddressId = listing.LocatingPhysicalAddressId;
+
             listing.IsChangedAddress = true;
+            listing.LocatingPhysicalAddress = newAddress;
+
+            _dbContext.Entry(listing.LocatingPhysicalAddress).State = EntityState.Detached;
+
+            _dbContext.Entry(newAddress).State = EntityState.Added;
+        }
+
+        public async Task<List<AddressChangeHistoryDto>> GetAddressChangeHistoryAsync(long rentalListingId)
+        {
+            var history = new List<AddressChangeHistoryDto>();
+            var listing = await _dbContext.DssRentalListings
+                .Include(x => x.LocatingPhysicalAddress)
+                .FirstOrDefaultAsync(x => x.RentalListingId == rentalListingId);
+
+            if (listing?.LocatingPhysicalAddress == null)
+                return history;
+
+            var addressIds = new HashSet<long>();
+            await BuildAddressHistoryRecursivelyAsync(listing.LocatingPhysicalAddress, history, addressIds);
+            return history.OrderByDescending(x => x.Date).ToList();
+        }
+
+        private async Task BuildAddressHistoryRecursivelyAsync(DssPhysicalAddress address, List<AddressChangeHistoryDto> history, HashSet<long> processedAddressIds)
+        {
+            if (address == null || !processedAddressIds.Add(address.PhysicalAddressId))
+                return;
+
+            var addressDto = new AddressChangeHistoryDto
+            {
+                Type = GetAddressHistoryType(address),
+                PlatformAddress = address.OriginalAddressTxt,
+                BestMatchAddress = address.MatchAddressTxt ?? "",
+                Date = DateUtils.ConvertUtcToPacificTime(address.UpdDtm),
+                User = await GetUserNameAsync(address.UpdUserGuid)
+            };
+
+            history.Add(addressDto);
+
+            if (address.ReplacingPhysicalAddressId.HasValue)
+            {
+                var previousAddress = await _dbContext.DssPhysicalAddresses
+                    .FirstOrDefaultAsync(a => a.PhysicalAddressId == address.ReplacingPhysicalAddressId);
+                await BuildAddressHistoryRecursivelyAsync(previousAddress, history, processedAddressIds);
+            }
+        }
+
+        private async Task<string> GetUserNameAsync(Guid? userGuid)
+        {
+            if (userGuid == null || userGuid == Guid.Empty)
+                return "System";
+
+            var user = await _userRepo.GetUserByGuid(userGuid.Value);
+            return user == null ? "System" : CommonUtils.GetFullName(user.GivenNm ?? "", user.FamilyNm ?? "");
+        }
+
+        private string GetAddressHistoryType(DssPhysicalAddress address)
+        {
+            if (address == null)
+                return "Unknown";
+
+            if (address.IsMatchVerified != null && address.IsMatchVerified.Value)
+                return "User Confirmation";
+
+            if (address.IsMatchCorrected != null && address.IsMatchCorrected.Value)
+                return "User Edit";
+
+            return "Platform Data";
         }
     }
 }

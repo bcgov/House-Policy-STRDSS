@@ -71,3 +71,4 @@ Each production release depends on the execution of a fixed set of scripts again
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_9.sql`
   - `ddl/STR_DSS_Views_Sprint_9.sql`
   - `seeding/STR_DSS_Data_Seeding_Sprint_9.sql`
+  - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_9.sql`

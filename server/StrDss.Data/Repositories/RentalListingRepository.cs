@@ -536,8 +536,6 @@ namespace StrDss.Data.Repositories
 
             _dbContext.Entry(listing.LocatingPhysicalAddress).State = EntityState.Detached;
             _dbContext.Entry(newAddress).State = EntityState.Added;
-            //if (listing.LocatingPhysicalAddress.ContainingOrganization != null)
-            //    _dbContext.Entry(listing.LocatingPhysicalAddress.ContainingOrganization).State = EntityState.Detached;
 
             return listing;
         }

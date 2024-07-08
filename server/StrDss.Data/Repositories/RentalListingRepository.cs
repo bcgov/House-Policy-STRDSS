@@ -503,14 +503,14 @@ namespace StrDss.Data.Repositories
             if (address == null)
                 return "Unknown";
 
+            if (address.IsChangedOriginalAddress != null && address.IsChangedOriginalAddress.Value)
+                return "Platform Data";
+
             if (address.IsMatchVerified != null && address.IsMatchVerified.Value)
                 return "User Confirmation";
 
             if (address.IsMatchCorrected != null && address.IsMatchCorrected.Value)
                 return "User Edit";
-
-            if (address.IsChangedOriginalAddress != null && address.IsChangedOriginalAddress.Value)
-                return "Platform Data";
 
             return "Platform Data";
         }
@@ -536,8 +536,6 @@ namespace StrDss.Data.Repositories
 
             _dbContext.Entry(listing.LocatingPhysicalAddress).State = EntityState.Detached;
             _dbContext.Entry(newAddress).State = EntityState.Added;
-            //if (listing.LocatingPhysicalAddress.ContainingOrganization != null)
-            //    _dbContext.Entry(listing.LocatingPhysicalAddress.ContainingOrganization).State = EntityState.Detached;
 
             return listing;
         }

@@ -13,6 +13,7 @@ namespace StrDss.Data.Repositories
         Task<DssPhysicalAddress?> GetPhysicalAdderssFromMasterListingAsync(long offeringOrgId, string listingId, string address);
         Task<List<DssPhysicalAddress>> GetPhysicalAddressesToCleanUpAsync();
         Task ReloadAddressAsync(DssPhysicalAddress address);
+        void ReplaceAddress(DssRentalListing listing, DssPhysicalAddress newAddress);
     }
     public class PhysicalAddressRepository : RepositoryBase<DssPhysicalAddress>, IPhysicalAddressRepository
     {
@@ -37,9 +38,6 @@ namespace StrDss.Data.Repositories
             if (listing == null) 
                 return null;
 
-            if (listing.LocatingPhysicalAddress!.OriginalAddressTxt.ToLower().Trim() != address.ToLower().Trim()) 
-                return null;
-
             return listing.LocatingPhysicalAddress;
         }
 
@@ -58,6 +56,14 @@ namespace StrDss.Data.Repositories
         public async Task ReloadAddressAsync(DssPhysicalAddress address)
         {
             await _dbContext.Entry(address).ReloadAsync();
+        }
+
+        public void ReplaceAddress(DssRentalListing listing, DssPhysicalAddress newAddress)
+        {
+            listing.LocatingPhysicalAddress = newAddress;
+
+            _dbContext.Entry(listing.LocatingPhysicalAddress).State = EntityState.Detached;
+            _dbContext.Entry(newAddress).State = EntityState.Added;
         }
     }
 }

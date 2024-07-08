@@ -548,25 +548,81 @@ namespace StrDss.Service
 
             var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, address);
 
+            // brandnew address
             var error = "";
             if (physicalAddress == null)
             {
-                physicalAddress = new DssPhysicalAddress
+                var newAddress = new DssPhysicalAddress
                 {
                     OriginalAddressTxt = row.RentalAddress,
                 };
 
-                error = await _geocoder.GetAddressAsync(physicalAddress);
+                error = await _geocoder.GetAddressAsync(newAddress);
 
-                if (error.IsEmpty() && physicalAddress.LocationGeometry is not null && physicalAddress.LocationGeometry is Point point)
+                if (error.IsEmpty() && newAddress.LocationGeometry is not null && newAddress.LocationGeometry is Point point)
                 {
-                    physicalAddress.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+                    newAddress.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
                 }
 
-                await _addressRepo.AddPhysicalAddressAsync(physicalAddress);
+                await _addressRepo.AddPhysicalAddressAsync(newAddress);
+                return (newAddress, error);
             }
 
-            return (physicalAddress, error);
+            // same address as before
+            if (physicalAddress!.OriginalAddressTxt.ToLower().Trim() == address.ToLower().Trim())
+            {
+                return (physicalAddress, "");
+            }
+
+            // different address after user edit or confirmation
+            if ((physicalAddress.IsMatchCorrected != null && physicalAddress.IsMatchCorrected.Value) 
+                || (physicalAddress.IsMatchVerified != null && physicalAddress.IsMatchVerified.Value))
+            {
+                //create a new physical address, link to the previous address, and flag is_changed_original_address
+                var newAddress = _mapper.Map<DssPhysicalAddress>(physicalAddress);
+                newAddress.OriginalAddressTxt = row.RentalAddress;
+                newAddress.PhysicalAddressId = 0;
+
+                newAddress.IsSystemProcessing = true;
+                newAddress.IsChangedOriginalAddress = true;
+                newAddress.ReplacingPhysicalAddressId = physicalAddress.PhysicalAddressId;
+
+                listing.IsChangedOriginalAddress = true;
+
+                _addressRepo.ReplaceAddress(listing, newAddress);
+
+                return (newAddress, error);
+            }
+            // different address without user edit or confirmation
+            else
+            {
+                var newAddress = new DssPhysicalAddress
+                {
+                    OriginalAddressTxt = row.RentalAddress,
+                };
+
+                error = await _geocoder.GetAddressAsync(newAddress);
+
+                if (error.IsEmpty() && newAddress.LocationGeometry is not null && newAddress.LocationGeometry is Point point)
+                {
+                    newAddress.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+                }
+
+                newAddress.IsSystemProcessing = true;
+                newAddress.IsChangedOriginalAddress = true;
+                newAddress.ReplacingPhysicalAddressId = physicalAddress.PhysicalAddressId;
+
+                listing.IsChangedOriginalAddress = true;
+
+                if (physicalAddress.ContainingOrganizationId != newAddress.ContainingOrganizationId)
+                {
+                    listing.IsLgTransferred = true;
+                }                
+
+                _addressRepo.ReplaceAddress(listing, newAddress);
+
+                return (newAddress, error);
+            }
         }
 
         private async Task<(bool needUpdate, DssRentalListing masterListing)> CreateOrUpdateMasterListing(DateOnly reportPeriodYm, DssRentalListing listing, OrganizationDto offeringOrg, RentalListingRowUntyped row, DssPhysicalAddress physicalAddress)
@@ -591,6 +647,10 @@ namespace StrDss.Service
             masterListing.OfferingOrganizationId = offeringOrg.OrganizationId;
             masterListing.DerivedFromRentalListingId = listing.RentalListingId;
             masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
+
+            //if these are changed, the master listing must be updated as well
+            masterListing.IsLgTransferred = listing.IsLgTransferred != null ? listing.IsLgTransferred : masterListing.IsLgTransferred;
+            masterListing.IsChangedOriginalAddress = listing.IsChangedOriginalAddress != null ? listing.IsChangedOriginalAddress : masterListing.IsChangedOriginalAddress;
 
             return (true, masterListing);
         }

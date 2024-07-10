@@ -648,6 +648,9 @@ namespace StrDss.Service
             masterListing.DerivedFromRentalListingId = listing.RentalListingId;
             masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
 
+            (masterListing.NightsBookedQty, masterListing.SeparateReservationsQty) = 
+                await _reportRepo.GetYtdValuesOfListingAsync(reportPeriodYm, offeringOrg.OrganizationId, masterListing.PlatformListingNo);
+
             //if these are changed, the master listing must be updated as well
             masterListing.IsLgTransferred = listing.IsLgTransferred != null ? listing.IsLgTransferred : masterListing.IsLgTransferred;
             masterListing.IsChangedOriginalAddress = listing.IsChangedOriginalAddress != null ? listing.IsChangedOriginalAddress : masterListing.IsChangedOriginalAddress;

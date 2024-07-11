@@ -758,7 +758,9 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("economic_region_dsc");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.IsBusinessLicenceRequired).HasColumnName("is_business_licence_required");
+            entity.Property(e => e.IsChangedAddress).HasColumnName("is_changed_address");
             entity.Property(e => e.IsEntireUnit).HasColumnName("is_entire_unit");
+            entity.Property(e => e.IsLgTransferred).HasColumnName("is_lg_transferred");
             entity.Property(e => e.IsNew).HasColumnName("is_new");
             entity.Property(e => e.IsPrincipalResidenceRequired).HasColumnName("is_principal_residence_required");
             entity.Property(e => e.IsTakenDown).HasColumnName("is_taken_down");

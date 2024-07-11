@@ -21,6 +21,10 @@ public partial class DssRentalListingVw
 
     public bool? IsTakenDown { get; set; }
 
+    public bool? IsLgTransferred { get; set; }
+
+    public bool? IsChangedAddress { get; set; }
+
     public long? OfferingOrganizationId { get; set; }
 
     public string? OfferingOrganizationCd { get; set; }
@@ -69,9 +73,9 @@ public partial class DssRentalListingVw
 
     public short? AvailableBedroomsQty { get; set; }
 
-    public long? NightsBookedYtdQty { get; set; }
+    public short? NightsBookedYtdQty { get; set; }
 
-    public long? SeparateReservationsYtdQty { get; set; }
+    public short? SeparateReservationsYtdQty { get; set; }
 
     public string? BusinessLicenceNo { get; set; }
 

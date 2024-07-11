@@ -167,7 +167,7 @@ namespace StrDss.Data.Repositories
             foreach (var listingId in inactiveListingIds)
             {
                 await _dbContext.Database.ExecuteSqlAsync(
-                    $"UPDATE dss_rental_listing SET is_active = false, is_new = false WHERE rental_listing_id = {listingId}");
+                    $"UPDATE dss_rental_listing SET is_active = false, is_new = false, listing_status_type = 'I' WHERE rental_listing_id = {listingId}");
             }
 
             stopwatch.Stop();
@@ -177,6 +177,8 @@ namespace StrDss.Data.Repositories
 
         public async Task UpdateListingStatus(long providingPlatformId, long rentalListingId)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var reports = await _dbSet.AsNoTracking()
                 .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
                 .ToListAsync();
@@ -190,6 +192,7 @@ namespace StrDss.Data.Repositories
             {
                 listing.IsActive = true;
                 listing.IsNew = true;
+                listing.ListingStatusType = "N";
             }
             else
             {
@@ -201,7 +204,12 @@ namespace StrDss.Data.Repositories
 
                 listing.IsActive = isActive;
                 listing.IsNew = isActive && count == 1;
+                listing.ListingStatusType = listing.IsNew.Value ? "N": "A";
             }
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"UpdateListingStatus = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
         }
 
         public async Task<int> GetTotalNumberOfUploadLines(long uploadId)

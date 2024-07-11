@@ -5,7 +5,7 @@
         public long? RentalListingId { get; set; }
 
         public string? ListingStatusType { get; set; }
-
+        public string? ListingStatusTypeNm { get; set; }
         public int? ListingStatusSortNo { get; set; }
 
         public DateOnly? LatestReportPeriodYm { get; set; }
@@ -15,7 +15,9 @@
         public bool? IsNew { get; set; }
 
         public bool? IsTakenDown { get; set; }
+        public bool? IsLgTransferred { get; set; }
 
+        public bool? IsChangedAddress { get; set; }
         public long? OfferingOrganizationId { get; set; }
 
         public string? OfferingOrganizationCd { get; set; }
@@ -53,6 +55,7 @@
         public long? ManagingOrganizationId { get; set; }
 
         public string? ManagingOrganizationNm { get; set; }
+        public string? EconomicRegionDsc { get; set; }
 
         public bool? IsPrincipalResidenceRequired { get; set; }
 

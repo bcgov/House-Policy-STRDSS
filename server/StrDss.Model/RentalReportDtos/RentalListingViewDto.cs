@@ -15,6 +15,9 @@
         public bool? IsNew { get; set; }
 
         public bool? IsTakenDown { get; set; }
+        public bool? IsLgTransferred { get; set; }
+
+        public bool? IsChangedAddress { get; set; }
 
         public long? OfferingOrganizationId { get; set; }
         public string? OfferingOrganizationCd { get; set; }

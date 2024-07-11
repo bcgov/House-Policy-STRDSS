@@ -201,7 +201,7 @@ namespace StrDss.Service
             builder.Append(FormatCsvField(listing.LatestReportPeriodYm)).Append(','); // Most Recent Platform Report Month
             builder.Append(FormatCsvField(listing.ListingStatusType)).Append(','); // Status
             builder.Append(FormatCsvField(listing.ManagingOrganizationNm)).Append(','); // Jurisdiction assigned to
-            builder.Append(FormatCsvField("economic region name")).Append(','); // economic_region_name
+            builder.Append(FormatCsvField(listing.EconomicRegionDsc)).Append(','); // economic_region_name
             builder.Append(FormatCsvField(listing.IsPrincipalResidenceRequired)).Append(','); // pr_requirement
             builder.Append(FormatCsvField(listing.IsBusinessLicenceRequired)).Append(','); // BL_requirement
             builder.Append(FormatCsvField(listing.OfferingOrganizationCd)).Append(','); // Platform Code

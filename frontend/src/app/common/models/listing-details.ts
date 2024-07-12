@@ -1,6 +1,6 @@
 export interface ListingDetails {
     rentalListingId: number;
-    listingStatusType: 'N' | 'I' | 'R' | 'A';
+    listingStatusType: 'N' | 'I' | 'R' | 'A' | 'T';
     listingStatusSortNo: number;
     latestReportPeriodYm: string;
     isActive: boolean;
@@ -21,12 +21,15 @@ export interface ListingDetails {
     addressSort6StreetDirectionDsc: string;
     addressSort7CivicNo: string;
     addressSort8UnitNo: string;
+    addressChangeHistory: Array<ListingAddressChangeHistory>;
     listingContactNamesTxt: string;
     managingOrganizationId: number;
     managingOrganizationNm: string;
     isPrincipalResidenceRequired: boolean;
     isBusinessLicenceRequired: boolean;
     isEntireUnit: boolean;
+    isChangedAddress: boolean;
+    isLgTransferred: boolean;
     availableBedroomsQty: number;
     nightsBookedYtdQty: number;
     separateReservationsYtdQty: number;
@@ -66,11 +69,25 @@ export interface ListingDetailsHost {
 }
 
 export interface ListingDetailsListingHistory {
-    reportPeriodYM: string,
-    nightsBookedQty: number,
-    separateReservationsQty: number
+    reportPeriodYM: string;
+    nightsBookedQty: number;
+    separateReservationsQty: number;
 }
 
 export interface ListingDetailsActionHistory {
     [key: string]: any;
+}
+
+export interface ListingAddressChangeHistory {
+    bestMatchAddress: string;
+    date: string;
+    platformAddress: string;
+    type: string;
+    user: string;
+}
+
+export interface ListingAddressCandidate {
+    address: string;
+    organizationId: number;
+    score: number;
 }

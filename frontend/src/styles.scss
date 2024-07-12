@@ -134,6 +134,15 @@ body {
         }
     }
 
+    p-tag {
+        &.updated-tag {
+            .p-tag {
+                background-color: #ECEAE8;
+                color: #2D2D2D;
+            }
+        }
+    }
+
     .p-element.p-button.p-component {
         border-radius: 4px;
 
@@ -239,6 +248,12 @@ body {
                     background-color: #42814A;
                 }
             }
+        }
+    }
+
+    .p-checkbox-label {
+        &.warn {
+            color: #CE3E39;
         }
     }
 
@@ -365,7 +380,8 @@ body {
         font-family: 'BcSans-bold';
     }
 
-    .preview-dialog {
+    .preview-dialog,
+    .address-change-popup {
         .p-dialog-header {
             border-bottom: 1px solid #D8D8D8;
 
@@ -376,6 +392,12 @@ body {
 
         .p-dialog-footer {
             border-top: 1px solid #D8D8D8;
+        }
+
+        &.address-change-popup {
+            .p-dialog-footer {
+                padding: .75rem 1rem;
+            }
         }
     }
 }

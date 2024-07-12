@@ -5,6 +5,41 @@
     display: flex;
     flex-direction: column;
 
+    .message {
+        margin-top: 12px;
+        padding: 16px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+
+        .header {
+            display: flex;
+            gap: 12px;
+        }
+
+        .content {
+            padding-left: 33px;
+        }
+
+        &.warn {
+            border: 1px solid #F8BB47;
+            background-color: #FEF1D8;
+
+            i.pi {
+                color: #F8BB47;
+            }
+        }
+
+        .exclamation {
+            display: block;
+            width: 20px;
+            height: 20px;
+            background-position: center center;
+            background-image: url(../../../../../assets/images/warn-icon.svg);
+            background-repeat: no-repeat;
+        }
+    }
+
     .header-container {
         display: flex;
         justify-content: space-between;
@@ -27,11 +62,18 @@
     .subtitle {
         width: 100%;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
 
-        .last-updated-container,
-        .platform-container {
-            min-width: 350px;
+        .row {
+            display: flex;
+            flex-direction: row;
+
+            .last-updated-container,
+            .platform-container {
+                min-width: 350px;
+                display: flex;
+                gap: 8px;
+            }
         }
     }
 
@@ -63,6 +105,8 @@
                 }
 
                 th {
+                    font-family: 'BcSans-bold';
+
                     i {
                         font-weight: 600;
                         color: #053662;
@@ -96,12 +140,98 @@
                         color: #CE3E39;
 
                         i {
+                            margin-left: 8px;
                             font-weight: 600;
                             color: #CE3E39;
+                            line-height: 19px;
+                            vertical-align: middle;
                         }
                     }
                 }
+            }
+        }
+    }
 
+    .status-circle {
+        background-color: #FFFFFF;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        line-height: 20px;
+        color: #FFFFFF;
+        font-family: 'BcSans-bold';
+
+        &.status-new {
+            background-color: #F8BB47;
+        }
+
+        &.status-active {
+            background-color: #42814A;
+        }
+
+        &.status-inactive {
+            background-color: #9F9D9C;
+        }
+
+        &.status-takedown-complete {
+            background-color: #2D2D2D;
+        }
+
+        &.status-reassigned {
+            background-color: #255A90;
+        }
+    }
+
+    .change-address-button-container {
+        padding-left: 16px;
+
+        button {
+            width: 22px;
+            height: 22px;
+            padding: 2px;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+
+            .edit-address-icon {
+                width: 18px;
+                height: 18px;
+                background-image: url(../../../../../assets/images/edit-info.svg);
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-size: contain;
+            }
+        }
+    }
+
+    .address-change-popup {
+        .content {
+            display: flex;
+            flex-direction: column;
+
+            .spacer {
+                height: 18px;
+            }
+
+            .row {
+                padding: 6px 0;
+                position: relative;
+
+                .search-btn {
+                    position: absolute;
+                    right: 0;
+                    height: 3rem;
+                    padding: 1rem;
+                    border-radius: 0 6px 6px 0;
+                }
+
+                .address-search-input {
+                    height: 3rem;
+                    padding-right: 3.75rem;
+                }
             }
         }
     }

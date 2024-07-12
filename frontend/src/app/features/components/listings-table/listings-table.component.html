@@ -24,7 +24,6 @@
     </button>
 </div>
 <div class="content">
-
     <p-panel class="listing-table-panel">
         <ng-template pTemplate="header">
             <div class="rows-info-wrapper">
@@ -41,7 +40,6 @@
         <p-table #table [value]="listings" [scrollable]="true" scrollHeight="{{isCEU?'550px':'500px'}}"
             [(selection)]="selectedListings" styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }"
             [selectionPageOnly]="true">
-
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width: 4rem">
@@ -143,18 +141,23 @@
                     <td>
                         <p-tableCheckbox [value]="row"></p-tableCheckbox>
                     </td>
-                    <td [ngSwitch]="row.listingStatusType" class="align-center">
-                        <div *ngSwitchCase="'N'" class="status-circle status-new">
-                            N
-                        </div>
-                        <div *ngSwitchCase="'A'" class="status-circle status-active">
-                            A
-                        </div>
-                        <div *ngSwitchCase="'I'" class="status-circle status-inactive">
-                            I
-                        </div>
-                        <div *ngSwitchCase="'R'" class="status-circle status-removed">
-                            R
+                    <td>
+                        <div [ngSwitch]="row.listingStatusType" class="align-center status-col">
+                            <div *ngSwitchCase="'N'" class="status-circle status-new">
+                                N
+                            </div>
+                            <div *ngSwitchCase="'A'" class="status-circle status-active">
+                                A
+                            </div>
+                            <div *ngSwitchCase="'I'" class="status-circle status-inactive">
+                                I
+                            </div>
+                            <div *ngIf="row.isTakenDown" class="status-circle status-takedown-complete">
+                                T
+                            </div>
+                            <div *ngIf="row.isLgTransferred" class="status-circle status-reassigned">
+                                R
+                            </div>
                         </div>
                     </td>
                     <td>{{ row.offeringOrganizationNm }}</td>
@@ -165,9 +168,15 @@
                         <a pButton class="details-button-with-icon" target="_blank"
                             [routerLink]="'/listing/'+row.rentalListingId"><i class="pi pi-list"></i></a>
                     </td>
-                    <td [class.low-address-score-match]="row.matchScoreAmt<addressLowScore">{{ row.matchAddressTxt }}
-                        &nbsp; <i class="pi pi-info-circle" pTooltip="Low Address Match Confidence"
-                            *ngIf="row.matchScoreAmt<=addressLowScore"></i>
+                    <td [class.low-address-score-match]="row.matchScoreAmt<addressLowScore">
+                        <div class="address-col">
+                            <div class="address-text">
+                                {{ row.matchAddressTxt }}
+                            </div>
+                            <i class="pi pi-info-circle" pTooltip="Low Address Match Confidence"
+                                *ngIf="row.matchScoreAmt<=addressLowScore"></i>
+                            <p-tag *ngIf="row.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
+                        </div>
                     </td>
                     <td>{{ row.isEntireUnit?'Yes':'No' }}</td>
                     <td>{{ row.nightsBookedYtdQty }}</td>
@@ -186,7 +195,6 @@
             [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
             [showCurrentPageReport]="true" [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
             [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
-
     </p-panel>
 
     <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
@@ -195,19 +203,18 @@
             <ul>
                 <li>New (N): Listing reported for the first time in current monthly data</li>
                 <li>Active (A): Listing appeared in previous and current monthly data</li>
-                <li>Inactive (I): Listing appeared in previous but not current monthly data</li>
-                <li>Removed (R): Platform confirmed takedown of the listing</li>
+                <li>Inactive (I): Listing appeared in previous but not current monthly data </li>
+                <li>Takedown Complete (T): Platform confirmed takedown of the listing</li>
+                <li>Reassigned (R): Address (best match) was updated to a new jurisdiction</li>
             </ul>
         </span>
         <p>
             <strong>Listing ID:</strong> Platform ID number for the listing.
         </p>
-
         <p>
             <strong>Address (Best Match):</strong> Best physical address match provided by the BC Address Geocoder based
-            on the address from the platform listing (accuracy of % or above).
+            on the address from the platform listing (accuracy of {{addressLowScore}}% or above).
         </p>
-
         <p>
             <strong>Address (from platform listing):</strong> Property address of the short-term rental accommodation
             provided to the platform by the host. May be incomplete or inaccurate.
@@ -242,5 +249,4 @@
             <i>See Short-term Rental Accommodations Act</i> for definition.
         </p>
     </p-dialog>
-
 </div>

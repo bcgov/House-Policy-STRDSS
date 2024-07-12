@@ -6,7 +6,7 @@ import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
 import { ListingTableRow } from '../models/listing-table-row';
 import { ListingSearchRequest } from '../models/listing-search-request';
-import { ListingDetails } from '../models/listing-details';
+import { ListingAddressCandidate, ListingDetails } from '../models/listing-details';
 import { ExportJurisdiction } from '../models/export-listing';
 
 @Injectable({
@@ -106,5 +106,25 @@ export class ListingDataService {
   downloadListings(jurisdictionId: number): Observable<any> {
     return this.httpClient.get(`${environment.API_HOST}/rentallistings/exports/${jurisdictionId}`,
       { responseType: 'arraybuffer' });
+  }
+
+  // Note: Address change methods
+  getAddressCandidates(addressString: string): Observable<Array<ListingAddressCandidate>> {
+    return this.httpClient.get<Array<ListingAddressCandidate>>(`${environment.API_HOST}/rentallistings/addresses/candidates`, {
+      params: {
+        addressString,
+      }
+    });
+  }
+
+  changeAddress(id: number, addressString: string): Observable<any> {
+    return this.httpClient.put<any>(`${environment.API_HOST}/rentallistings/${id}/address`, {
+      rentalListingId: id,
+      addressString,
+    });
+  }
+
+  confirmAddress(id: number): Observable<any> {
+    return this.httpClient.put<any>(`${environment.API_HOST}/rentallistings/${id}/address/confirm`, {});
   }
 }

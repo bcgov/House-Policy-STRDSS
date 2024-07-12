@@ -13,11 +13,36 @@
     </div>
 </div>
 <div class="subtitle" *ngIf="listing">
-    <div class="last-updated-container">
-        <strong>Last Updated: </strong>{{(listing.lastActionDtm |date) || '-'}}
+    <div class="row">
+        <div class="last-updated-container">
+            <strong>Platform Report Month: </strong>{{listing.latestReportPeriodYm || '-'}}
+        </div>
+        <div class="platform-container">
+            <strong>Platform: </strong>{{listing.offeringOrganizationNm || '-'}}
+        </div>
     </div>
-    <div class="platform-container">
-        <strong>Platform: </strong>{{listing.offeringOrganizationNm}}
+    <div class="row">
+        <div class="last-updated-container" [ngSwitch]="listing.listingStatusType">
+            <strong>Listing Status: </strong>
+            <div *ngSwitchCase="'N'" class="status-circle status-new">
+                N
+            </div>
+            <div *ngSwitchCase="'A'" class="status-circle status-active">
+                A
+            </div>
+            <div *ngSwitchCase="'I'" class="status-circle status-inactive">
+                I
+            </div>
+            <div *ngIf="listing.isTakenDown" class="status-circle status-takedown-complete">
+                T
+            </div>
+            <div *ngIf="listing.isLgTransferred" class="status-circle status-reassigned">
+                R
+            </div>
+        </div>
+        <div class="platform-container">
+            <strong>Assigned to: </strong>{{listing.managingOrganizationNm || '-'}}
+        </div>
     </div>
 </div>
 <div class="content" *ngIf="listing">
@@ -29,6 +54,12 @@
                     {{listing.matchAddressTxt}}&nbsp; <i class="pi pi-info-circle"
                         pTooltip="Low Address Match Confidence"
                         *ngIf="listing.matchScoreAmt<=addressWarningScoreLimit"></i>
+                </span>
+                <span *ngIf="canUserEditAddress" class="change-address-button-container">
+                    <button pButton class="p-button-transparent" pTooltip="Edit Address"
+                        (click)="onAddressChangeClicked()">
+                        <span class="edit-address-icon"></span>
+                    </button>
                 </span>
             </div>
             <div class="row">
@@ -73,6 +104,7 @@
                 </ng-template>
             </ng-template>
         </p-panel>
+
         <p-panel class="details-block" header="Listing History (for This Listing ID)">
             <div class="row">
                 <span class="label">Night Stayed YTD:</span>
@@ -103,6 +135,43 @@
                     </ng-template>
                     <ng-template pTemplate="emptymessage">
                         <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-panel>
+
+        <p-panel class="details-block" header="Address History">
+            <div class="row">
+                <p-table [value]="listing.addressChangeHistory" [paginator]="listing.addressChangeHistory.length>12"
+                    [showPageLinks]="false" currentPageReportTemplate="{first}-{last} of {totalRecords}"
+                    [showFirstLastIcon]="false" [showCurrentPageReport]="true" paginatorStyleClass="paging-right"
+                    [rows]="12" styleClass="p-datatable-sm" class="table-paging-right">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Type</th>
+                            <th>Platform Address</th>
+                            <th>Best Match Address</th>
+                            <th>Date</th>
+                            <th>User</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-addressChange>
+                        <tr>
+                            <td>{{ addressChange.type }}</td>
+                            <td>{{ addressChange.platformAddress }}</td>
+                            <td>{{ addressChange.bestMatchAddress }}</td>
+                            <td>{{ addressChange.date |date:'YYYY-MM-dd' }}</td>
+                            <td>{{ addressChange.user }}</td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
                             <td>-</td>
                             <td>-</td>
                             <td>-</td>
@@ -157,8 +226,9 @@
         <ul>
             <li>New (N): Listing reported for the first time in current monthly data</li>
             <li>Active (A): Listing appeared in previous and current monthly data</li>
-            <li>Inactive (I): Listing appeared in previous but not current monthly data</li>
-            <li>Removed (R): Platform confirmed takedown of the listing</li>
+            <li>Inactive (I): Listing appeared in previous but not current monthly data </li>
+            <li>Takedown Complete (T): Platform confirmed takedown of the listing</li>
+            <li>Reassigned (R): Address (best match) was updated to a new jurisdiction</li>
         </ul>
     </span>
     <p>
@@ -167,7 +237,7 @@
 
     <p>
         <strong>Address (Best Match):</strong> Best physical address match provided by the BC Address Geocoder based
-        on the address from the platform listing (accuracy of % or above).
+        on the address from the platform listing (accuracy of {{addressWarningScoreLimit}}% or above).
     </p>
 
     <p>
@@ -203,4 +273,57 @@
         property manager).
         <i>See Short-term Rental Accommodations Act</i> for definition.
     </p>
+</p-dialog>
+
+<p-dialog header="Suggest a New Address" class="address-change-popup" [modal]="true" [closable]="false"
+    [(visible)]="isEditAddressShown" [style]="{width: '50vw'}">
+    <div class="content" *ngIf="listing">
+        <div class="message warn" *ngIf="isJurisdictionDifferent">
+            <div class="header">
+                <span class="exclamation"></span>
+                <strong class="message-text" *ngIf="!isCEU">There is No Listing Data Available in Your
+                    Jurisdiction.</strong>
+                <strong class="message-text" *ngIf="isCEU">This Address is in a Different Jurisdiction.</strong>
+            </div>
+            <div class="content" *ngIf="!isCEU">
+                <span class="message-text">The address you are suggesting is outside of your jurisdiction. You will lose
+                    access to this listing after you click submit.</span>
+            </div>
+        </div>
+
+        <div class="row"><strong>Address (Best Match):</strong> {{listing.matchAddressTxt}}</div>
+        <div class="row"><strong>Address (Platform Listing):</strong> {{listing.originalAddressTxt}}</div>
+        <div class="row">
+            <p-checkbox labelStyleClass="warn" label="Confirm the Best Match Address on this Listing is Correct"
+                [binary]="true" name="accept" [(ngModel)]="confirmTheBestMatchAddress" inputId="accept-chb"
+                (ngModelChange)="onConfirmFlagChanged($event)"></p-checkbox>
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+            <strong>Suggest different address</strong>
+        </div>
+        <div class="row">
+            <input #searchTerm [disabled]="confirmTheBestMatchAddress" type="text"
+                class="address-search-input full-width-text-field" placeholder="Search" pInputText>
+            <button pButton [disabled]="confirmTheBestMatchAddress" class="search-btn"
+                (click)="onSearchCandidates(searchTerm.value)"><i class="pi pi-search"></i></button>
+        </div>
+        <div class="candidates" *ngIf="addressChangeCandidates.length && !confirmTheBestMatchAddress">
+            <div class="spacer"></div>
+            <div class="row"><strong>Best Match Candidates</strong></div>
+            <div class="row" *ngFor="let candidate of addressChangeCandidates; let i=index">
+                <p-radioButton name="address-candidate-radio" [label]="candidate.address" [value]="candidate"
+                    [(ngModel)]="selectedCandidate" inputId="address-candidate-radio-{{i}}"
+                    (ngModelChange)="onCandidateSelected($event)">
+                </p-radioButton>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton name="submit-dialog-btn" id="submit-dialog-btn" (click)="onSubmitAddressChange()"
+            [disabled]="!(confirmTheBestMatchAddress || (selectedCandidate && selectedCandidate.address))">Update</button>
+        <button pButton name="cancel-dialog-btn" id="cancel-dialog-btn" class="outline-btn"
+            (click)="onCancelAddressChange()">Cancel</button>
+    </ng-template>
 </p-dialog>

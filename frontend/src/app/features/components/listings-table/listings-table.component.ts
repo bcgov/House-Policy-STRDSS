@@ -22,6 +22,7 @@ import { SelectedListingsStateService } from '../../../common/services/selected-
 import { environment } from '../../../../environments/environment';
 import { TooltipModule } from 'primeng/tooltip';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-listings-table',
@@ -39,6 +40,7 @@ import { GlobalLoaderService } from '../../../common/services/global-loader.serv
     RouterModule,
     TooltipModule,
     ListingDetailsComponent,
+    TagModule,
   ],
   templateUrl: './listings-table.component.html',
   styleUrl: './listings-table.component.scss'
@@ -122,8 +124,7 @@ export class ListingsTableComponent implements OnInit {
     if (this.sort) {
       if (this.sort.prop === property) {
         this.sort.dir = this.sort.dir === 'asc' ? 'desc' : 'asc';
-      }
-      else {
+      } else {
         this.sort.prop = property;
         this.sort.dir = 'asc';
       }
@@ -181,9 +182,9 @@ export class ListingsTableComponent implements OnInit {
       sortColumn: this.sort?.prop,
       searchBy: this.searchColumn,
       sortDirection: this.sort?.dir || 'asc'
-    }
+    };
 
-    let url = '/listings?'
+    let url = '/listings?';
     Object.keys(state).forEach((key: string, index: number, array: string[]) => {
       if ((state as any)[key]) {
         url += `${key}=${(state as any)[key]}${index + 1 == array.length ? '' : '&'}`;

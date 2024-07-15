@@ -68,7 +68,7 @@ export class ListingDetailsComponent implements OnInit {
 
     this.userDataService.getCurrentUser().subscribe({
       next: (user) => {
-        this.isCEU = !user.permissions.includes(takedown_action);
+        this.isCEU = user.organizationType === 'BCGov';
         this.canUserEditAddress = user.permissions.includes(address_write);
       }, complete: () => {
         this.loaderService.loadingEnd();

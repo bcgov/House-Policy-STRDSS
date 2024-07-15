@@ -21,6 +21,8 @@
 
         .upload-container {
             width: 100%;
+            display: flex;
+            gap: 12px;
 
             p-fileupload {
                 margin-right: 12px;

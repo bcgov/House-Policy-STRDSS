@@ -112,7 +112,7 @@ export class ListingsTableComponent implements OnInit {
 
         this.userService.getCurrentUser().subscribe({
           next: (currentUser: User) => {
-            this.isCEU = !currentUser.permissions.includes(takedown_action);
+            this.isCEU = currentUser.organizationType === 'BCGov';
             this.getListings(page);
           },
         });

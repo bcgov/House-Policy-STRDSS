@@ -104,7 +104,7 @@ namespace StrDss.Service
             var lgId = 0L;
             var lg = string.Empty;
 
-            var stopWatchForAll = new Stopwatch();
+            var stopWatchForAll = Stopwatch.StartNew();
             var stopWatch = Stopwatch.StartNew();
 
             foreach (var listingId in listingIds)

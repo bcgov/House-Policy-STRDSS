@@ -18,6 +18,7 @@ import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ErrorHandlingService } from '../../../../common/services/error-handling.service';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-listing-details',
@@ -33,6 +34,7 @@ import { ErrorHandlingService } from '../../../../common/services/error-handling
     TableModule,
     DialogModule,
     TooltipModule,
+    TagModule,
   ],
   templateUrl: './listing-details.component.html',
   styleUrl: './listing-details.component.scss'

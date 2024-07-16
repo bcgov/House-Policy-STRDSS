@@ -48,7 +48,7 @@
 <div class="content" *ngIf="listing">
     <div class="main-block">
         <p-panel class="details-block" header="Property Information">
-            <div class="row">
+            <div class="row address">
                 <span class="label">Address (Best Match):</span>
                 <span class="value" [class.warning]="listing.matchScoreAmt<=addressWarningScoreLimit">
                     {{listing.matchAddressTxt}}&nbsp; <i class="pi pi-info-circle"
@@ -61,6 +61,7 @@
                         <span class="edit-address-icon"></span>
                     </button>
                 </span>
+                <p-tag *ngIf="listing.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
             </div>
             <div class="row">
                 <span class="label">Address (Platform Listing):</span>

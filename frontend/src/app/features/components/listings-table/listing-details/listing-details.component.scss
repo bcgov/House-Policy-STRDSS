@@ -119,6 +119,11 @@
                     margin-bottom: 6px;
                 }
 
+                &.address {
+                    display: flex;
+                    gap: 10px;
+                }
+
                 button {
                     &.p-button-link {
                         font-family: 'BcSans-bold';
@@ -140,7 +145,6 @@
                         color: #CE3E39;
 
                         i {
-                            margin-left: 8px;
                             font-weight: 600;
                             color: #CE3E39;
                             line-height: 19px;
@@ -186,8 +190,6 @@
     }
 
     .change-address-button-container {
-        padding-left: 16px;
-
         button {
             width: 22px;
             height: 22px;

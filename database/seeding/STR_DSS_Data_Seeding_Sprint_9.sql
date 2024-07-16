@@ -41,9 +41,7 @@ MERGE INTO dss_listing_status_type AS tgt
 USING ( SELECT * FROM (VALUES
 (1,'N','New'),
 (2,'A','Active'),
-(3,'I','Inactive'),
-(4,'T','Takedown Complete'),
-(5,'R','Reassigned'))
+(3,'I','Inactive'))
 AS s (listing_status_sort_no,listing_status_type, listing_status_type_nm)
 ) AS src
 ON (tgt.listing_status_type=src.listing_status_type)

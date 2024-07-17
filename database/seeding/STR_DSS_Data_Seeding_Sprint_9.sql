@@ -19,7 +19,7 @@ MERGE INTO dss_email_message_type AS tgt
 USING ( SELECT * FROM (VALUES
 ('Listing Upload Error','Listing Upload Error'),
 ('Notice of Takedown','Notice of Non-Compliance'),
-('Takedown Request','Takedown Request Confirmation'),
+('Takedown Request','Takedown Request'),
 ('Batch Takedown Request','Batch Takedown Request'),
 ('Completed Takedown','Completed Takedown'),
 ('Escalation Request','STR Escalation Request'),
@@ -36,6 +36,10 @@ email_message_type_nm=src.email_message_type_nm
 WHEN NOT MATCHED
 THEN INSERT (email_message_type, email_message_type_nm)
 VALUES (src.email_message_type, src.email_message_type_nm);
+
+DELETE FROM dss_listing_status_type
+WHERE listing_status_type not in ('N','A','I') and not exists (
+select 1 from dss_rental_listing where listing_status_type not in ('N','A','I'));
 
 MERGE INTO dss_listing_status_type AS tgt
 USING ( SELECT * FROM (VALUES

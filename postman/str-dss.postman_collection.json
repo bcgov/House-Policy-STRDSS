@@ -732,7 +732,7 @@
 						{
 							"key": "File",
 							"type": "file",
-							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/prod.csv"
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/listing-valid-2024-04.csv"
 						}
 					]
 				},
@@ -897,7 +897,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistings?pageSize=10&pageNumber=1&orderBy=platformListingNo&direction=desc",
+					"raw": "{{host}}/api/rentallistings?prRequirement=true&blRequirement=true&lgId=36&reassigned=true&takedownComplete=true&statuses=A,I&pageSize=10&pageNumber=1&orderBy=platformListingNo&direction=desc",
 					"host": [
 						"{{host}}"
 					],
@@ -906,6 +906,30 @@
 						"rentallistings"
 					],
 					"query": [
+						{
+							"key": "prRequirement",
+							"value": "true"
+						},
+						{
+							"key": "blRequirement",
+							"value": "true"
+						},
+						{
+							"key": "lgId",
+							"value": "36"
+						},
+						{
+							"key": "reassigned",
+							"value": "true"
+						},
+						{
+							"key": "takedownComplete",
+							"value": "true"
+						},
+						{
+							"key": "statuses",
+							"value": "A,I"
+						},
 						{
 							"key": "pageSize",
 							"value": "10"
@@ -933,14 +957,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistings/546",
+					"raw": "{{host}}/api/rentallistings/408",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
 						"rentallistings",
-						"546"
+						"408"
 					]
 				}
 			},
@@ -1157,7 +1181,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistings/exports/22",
+					"raw": "{{host}}/api/rentallistings/exports/28",
 					"host": [
 						"{{host}}"
 					],
@@ -1165,7 +1189,92 @@
 						"api",
 						"rentallistings",
 						"exports",
-						"22"
+						"28"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm Address",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/rentallistings/546/address/confirm",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"546",
+						"address",
+						"confirm"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Address",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"rentalListingId\": 546,\r\n  \"addressString\": \"1 Hospital Way, Victoria, BC V8Z 6R5\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/rentallistings/408/address",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"408",
+						"address"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAddressCandidates",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistings/addresses/candidates?addressString=72 Switchmen St, Vancouver, BC, Canada",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"addresses",
+						"candidates"
+					],
+					"query": [
+						{
+							"key": "addressString",
+							"value": "72 Switchmen St, Vancouver, BC, Canada"
+						}
 					]
 				}
 			},

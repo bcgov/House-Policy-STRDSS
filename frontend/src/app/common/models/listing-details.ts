@@ -30,6 +30,8 @@ export interface ListingDetails {
     isEntireUnit: boolean;
     isChangedAddress: boolean;
     isLgTransferred: boolean;
+    isMatchVerified: boolean;
+    isMatchCorrected: boolean;
     availableBedroomsQty: number;
     nightsBookedYtdQty: number;
     separateReservationsYtdQty: number;

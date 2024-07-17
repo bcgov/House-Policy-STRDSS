@@ -1,6 +1,8 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using StrDss.Api.Authorization;
 using StrDss.Common;
 using StrDss.Model;
@@ -26,8 +28,10 @@ namespace StrDss.Api.Controllers
         [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet]
         public async Task<ActionResult> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+            bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete,
             int pageSize, int pageNumber, string orderBy = "ListingStatusSortNo", string direction = "asc")
         {
+            var statusArray = statuses == null ? null : statuses!.Split(',');
             var listings = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicense, pageSize, pageNumber, orderBy, direction);
 
             return Ok(listings);

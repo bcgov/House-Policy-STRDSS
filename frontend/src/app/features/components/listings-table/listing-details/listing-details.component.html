@@ -50,10 +50,11 @@
         <p-panel class="details-block" header="Property Information">
             <div class="row address">
                 <span class="label">Address (Best Match):</span>
-                <span class="value" [class.warning]="listing.matchScoreAmt<=addressWarningScoreLimit">
+                <span class="value"
+                    [class.warning]="listing.matchScoreAmt<=addressWarningScoreLimit && (!listing.isMatchVerified && !listing.isMatchCorrected)">
                     {{listing.matchAddressTxt}}&nbsp; <i class="pi pi-info-circle"
                         pTooltip="Low Address Match Confidence"
-                        *ngIf="listing.matchScoreAmt<=addressWarningScoreLimit"></i>
+                        *ngIf="listing.matchScoreAmt<=addressWarningScoreLimit && (!listing.isMatchVerified && !listing.isMatchCorrected)"></i>
                 </span>
                 <span *ngIf="canUserEditAddress" class="change-address-button-container">
                     <button pButton class="p-button-transparent" pTooltip="Edit Address"

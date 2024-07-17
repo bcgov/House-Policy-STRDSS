@@ -442,8 +442,6 @@ namespace StrDss.Data.Repositories
 
             newAddress.ReplacingPhysicalAddressId = listing.LocatingPhysicalAddressId;
 
-            listing.IsChangedAddress = true;           
-            
             listing.LocatingPhysicalAddress = newAddress;
 
             _dbContext.Entry(listing.LocatingPhysicalAddress).State = EntityState.Detached;

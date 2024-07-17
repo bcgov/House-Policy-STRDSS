@@ -22,6 +22,8 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS select drl.rental_listing_id
 	, drl.platform_listing_no
 	, drl.platform_listing_url
 	, dpa.original_address_txt
+	, dpa.is_match_corrected
+	, dpa.is_match_verified
 	, dpa.match_score_amt
 	, dpa.match_address_txt
 	, dpa.province_cd as address_sort_1_province_cd

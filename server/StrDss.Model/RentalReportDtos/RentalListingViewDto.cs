@@ -29,6 +29,9 @@
         public string? PlatformListingUrl { get; set; }
 
         public string? OriginalAddressTxt { get; set; }
+        public bool? IsMatchCorrected { get; set; }
+
+        public bool? IsMatchVerified { get; set; }
 
         public short? MatchScoreAmt { get; set; }
 

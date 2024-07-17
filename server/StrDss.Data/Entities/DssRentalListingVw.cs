@@ -37,6 +37,10 @@ public partial class DssRentalListingVw
 
     public string? OriginalAddressTxt { get; set; }
 
+    public bool? IsMatchCorrected { get; set; }
+
+    public bool? IsMatchVerified { get; set; }
+
     public short? MatchScoreAmt { get; set; }
 
     public string? MatchAddressTxt { get; set; }

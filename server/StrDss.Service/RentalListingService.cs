@@ -19,7 +19,8 @@ namespace StrDss.Service
 {
     public interface IRentalListingService
     {
-        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, 
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
         Task CreateRentalListingExportFiles();
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
@@ -42,9 +43,12 @@ namespace StrDss.Service
             _geocoder = geocoder;
             _orgRepo = orgRepo;
         }
-        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction)
         {
-            var listings = await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicense, pageSize, pageNumber, orderBy, direction);
+            var listings = await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicense,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
+                pageSize, pageNumber, orderBy, direction);
 
             foreach (var listing in listings.SourceList)
             {

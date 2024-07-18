@@ -31,7 +31,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private bool _ExpectedResult = false;
         private AppSettings _AppSettings;
         private SFEnums.UserTypeEnum _UserType;
-        private SFEnums.LogonTypeEnum _LogonType;
         private BCIDPage _BCIDPage;
         private DssDbContext _DssDBContext;
         private DssUploadDelivery _DssUploadDelivery;
@@ -71,7 +70,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _UserType = userHelper.SetUserType(UserType);
             //Authenticate user using IDir or BCID depending on the user
-            _LogonType = authHelper.Authenticate(UserName, _UserType);
+            authHelper.Authenticate(UserName, _UserType);
         }
 
         [When(@"I access the Data Sharing System")]

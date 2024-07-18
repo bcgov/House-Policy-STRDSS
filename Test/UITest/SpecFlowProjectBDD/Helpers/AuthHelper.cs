@@ -20,7 +20,7 @@ namespace SpecFlowProjectBDD.Helpers
         private string _TestUserName;
         private string _TestPassword;
         private AppSettings _AppSettings;
-        private LogonTypeEnum _LogonType;
+        private LogonTypeEnum? _LogonType;
         private BCIDPage _BCIDPage;
 
         public AuthHelper(IDriver Driver)
@@ -55,7 +55,7 @@ namespace SpecFlowProjectBDD.Helpers
             return (_LogonType);
         }
 
-        public LogonTypeEnum Authenticate(string UserName, UserTypeEnum UserType)
+        public LogonTypeEnum? Authenticate(string UserName, UserTypeEnum UserType)
         {
             _TestUserName = UserName;
             _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
@@ -84,6 +84,11 @@ namespace SpecFlowProjectBDD.Helpers
                         _BCIDPage.ContinueButton.Click();
                         break;
                     }
+            }
+
+            if (_Driver.Url.ToLower().Contains("logon.cgi"))
+            {
+                _LogonType = null;
             }
 
             return (_LogonType);

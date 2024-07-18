@@ -93,6 +93,17 @@ namespace StrDss.Service
 
         public async Task CreateRentalListingExportFiles()
         {
+            // Throttle export frequency: Prevent running if less than 2 hours since last export
+            var latestExtractTime = _listingRepo.GetLatestRentalListingExportTime();
+            var currentTime = DateTime.UtcNow;
+            var timeDifference = currentTime - latestExtractTime;
+
+            if (timeDifference < TimeSpan.FromHours(2))
+            {
+                _logger.LogInformation("Skipping CreateRentalListingExportFiles: Last export was {TimeDifference:hh\\:mm\\:ss} ago, less than 2 hours", timeDifference);
+                return;
+            }
+
             var listingIds = await _listingRepo.GetRentalListingIdsToExport();
             var headers = RentalListingExport.GetHeadersAsCsv();
 

@@ -28,12 +28,13 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private string _TestEmail;
         private string _TestUserType;
         private SFEnums.UserTypeEnum _UserType;
-        private SFEnums.LogonTypeEnum _LogonType;
+        private SFEnums.LogonTypeEnum? _LogonType;
         private bool _ExpectedResult = false;
         private AppSettings _AppSettings;
         private DssDbContext _DssDBContext;
         private DssUserIdentity _UserIdentity;
         private DssUserIdentity _OriginalUserIdentity;
+        private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
 
         public TermsAndConditions(SeleniumDriver Driver)
         {
@@ -45,11 +46,13 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _AppSettings = new AppSettings();
         }
 
-        [SetUp]
+        [BeforeScenario]
         public void TestSetUp()
         {
-            DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
-            _DssDBContext = new DssDbContext(dbContextOptions);
+            string dbConnectionString = _AppSettings.GetConnectionString(_Environment.ToString().ToLower()) ?? string.Empty;
+            DbContextOptions <DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
+
+            _DssDBContext = new DssDbContext(dbContextOptions, dbConnectionString);
         }
 
         [Given(@"User ""(.*)"" is enabled, approved, has the correct roles ""(.*)"", but has not accepted TOC")]
@@ -112,6 +115,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             //Authenticate user using IDir or BCID depending on the user
             _LogonType = authHelper.Authenticate(_TestUserName, _UserType);
+            ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
 
             //TODO: Validate that the login was sucessfull
         }

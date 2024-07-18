@@ -10,5 +10,6 @@ namespace SpecFlowProjectBDD
     {
         public enum UserTypeEnum { CEUSTAFF, CEUADMIN, LOCALGOVERNMENT, BCGOVERNMENTSTAFF, SHORTTERMRENTALPLATFORM }
         public enum LogonTypeEnum { IDIR, BCID }
+        public enum Environment { LOCAL,DEV,TEST,UAT,PROD}
     }
 }

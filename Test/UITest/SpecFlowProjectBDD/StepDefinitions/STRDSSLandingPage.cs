@@ -25,7 +25,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private bool _ExpectedResult = false;
         private AppSettings _AppSettings;
         private SFEnums.UserTypeEnum _UserType;
-        private SFEnums.LogonTypeEnum _LogonType;
         private BCIDPage _BCIDPage;
 
         public STRDSSLandingPage(SeleniumDriver Driver)
@@ -58,7 +57,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _UserType = userHelper.SetUserType(UserType);
             //Authenticate user using IDir or BCID depending on the user
-            _LogonType = authHelper.Authenticate(UserName, _UserType);
+            authHelper.Authenticate(UserName, _UserType);
             
             IWebElement TOC = null;
 

@@ -22,6 +22,7 @@ namespace StrDss.Data.Repositories
         Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
         Task ConfirmAddressAsync(long rentalListingId);
         Task<DssRentalListing> UpdateAddressAsync(UpdateListingAddressDto dto);
+        DateTime GetLatestRentalListingExportTime();
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -538,6 +539,18 @@ namespace StrDss.Data.Repositories
             _dbContext.Entry(newAddress).State = EntityState.Added;
 
             return listing;
+        }
+
+        public DateTime GetLatestRentalListingExportTime()
+        {
+            if (_dbContext.DssRentalListingExtracts.Any())
+            {
+                return _dbContext.DssRentalListingExtracts.Max(x => x.UpdDtm);
+            }
+            else
+            {
+                return DateTime.UtcNow.AddDays(-1);
+            }
         }
     }
 }

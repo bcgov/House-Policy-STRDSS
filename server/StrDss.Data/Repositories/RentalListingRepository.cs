@@ -301,7 +301,9 @@ namespace StrDss.Data.Repositories
                 })
                 .ToListAsync();
 
-            var historyDict = listingHistory.ToDictionary(x => x.ReportPeriodYm);
+            var historyDict = listingHistory
+                .GroupBy(x => x.ReportPeriodYm)
+                .ToDictionary(g => g.Key, g => g.First()); // Use the first entry in case of duplicates
 
             for (int i = 0; i < reportMonths.Length; i++)
             {

@@ -104,6 +104,14 @@ namespace StrDss.Service
                 return;
             }
 
+            var isListingUploadProcessRunning = await _listingRepo.IsListingUploadProcessRunning();
+
+            if (isListingUploadProcessRunning)
+            {
+                _logger.LogInformation("Skipping CreateRentalListingExportFiles: Rental Listing Upload Process is running");
+                return;
+            }
+
             var listingIds = await _listingRepo.GetRentalListingIdsToExport();
             var headers = RentalListingExport.GetHeadersAsCsv();
 

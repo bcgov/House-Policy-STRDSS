@@ -23,6 +23,7 @@ namespace StrDss.Data.Repositories
         Task ConfirmAddressAsync(long rentalListingId);
         Task<DssRentalListing> UpdateAddressAsync(UpdateListingAddressDto dto);
         DateTime GetLatestRentalListingExportTime();
+        Task<bool> IsListingUploadProcessRunning();
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -551,6 +552,12 @@ namespace StrDss.Data.Repositories
             {
                 return DateTime.UtcNow.AddDays(-1);
             }
+        }
+
+        public async Task<bool> IsListingUploadProcessRunning()
+        {
+            return await _dbContext.DssUploadLines
+                .AnyAsync(x => x.IncludingUploadDelivery.UploadDeliveryType == "rental_report" && x.IsProcessed == false);                
         }
     }
 }

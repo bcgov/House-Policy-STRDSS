@@ -130,12 +130,16 @@ namespace StrDss.Service
             var stopWatchForAll = Stopwatch.StartNew();
             var stopWatch = Stopwatch.StartNew();
 
+            var currentMonth = DateUtils.ConvertUtcToPacificTime(new DateTime(currentTime.Year, currentTime.Month, 1)).AddDays(-1).ToString("yyyy-MM");
+
             foreach (var listingId in listingIds)
             {
                 count++;
 
                 var listing = await _listingRepo.GetRentalListingToExport(listingId);
                 if (listing == null) continue;
+
+                listing.CurrentMonth = currentMonth;
 
                 if (lg != listing.ManagingOrganizationNm)
                 {
@@ -219,10 +223,12 @@ namespace StrDss.Service
 
         private static string ToCsvString(RentalListingExportDto listing)
         {
+            
+
             var builder = new StringBuilder();
 
             builder.Append(FormatCsvField(listing.LatestReportPeriodYm)).Append(','); // Most Recent Platform Report Month
-            builder.Append(FormatCsvField(listing.ListingStatusType)).Append(','); // Status
+            builder.Append(FormatCsvField(listing.ListingStatusTypeNm)).Append(','); // Status
             builder.Append(FormatCsvField(listing.ManagingOrganizationNm)).Append(','); // Jurisdiction assigned to
             builder.Append(FormatCsvField(listing.EconomicRegionDsc)).Append(','); // economic_region_name
             builder.Append(FormatCsvField(listing.IsPrincipalResidenceRequired)).Append(','); // pr_requirement
@@ -236,6 +242,7 @@ namespace StrDss.Service
             builder.Append(FormatCsvField(listing.BusinessLicenceNo)).Append(','); // Local Government Business Licence Number
             builder.Append(FormatCsvField(listing.IsEntireUnit)).Append(','); // Accommodation Type
             builder.Append(FormatCsvField(listing.AvailableBedroomsQty)).Append(','); // Number of Bedrooms available for STR
+            builder.Append(FormatCsvField(listing.CurrentMonth)).Append(','); // Current Month
             builder.Append(FormatCsvField(listing.NightsBookedQty00)).Append(','); // Number of nights booked (Current month)
             builder.Append(FormatCsvField(listing.NightsBookedQty01)).Append(','); // Number of nights booked (Current month - 1)
             builder.Append(FormatCsvField(listing.NightsBookedQty02)).Append(','); // Number of nights booked (Current month - 2)

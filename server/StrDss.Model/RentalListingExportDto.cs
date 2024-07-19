@@ -78,6 +78,7 @@
         public DateTime? LastActionDtm { get; set; }
 
         #region Extra Columns
+        public string? CurrentMonth { get; set; }
         public long? NightsBookedQty00 { get; set; }
         public long? NightsBookedQty01 { get; set; }
         public long? NightsBookedQty02 { get; set; }

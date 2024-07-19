@@ -31,8 +31,11 @@ namespace StrDss.Api.Controllers
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete,
             int pageSize, int pageNumber, string orderBy = "ListingStatusSortNo", string direction = "asc")
         {
-            var statusArray = statuses == null ? null : statuses!.Split(',');
-            var listings = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicense, pageSize, pageNumber, orderBy, direction);
+            var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
+
+            var listings = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicense, 
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
+                pageSize, pageNumber, orderBy, direction);
 
             return Ok(listings);
         }

@@ -11,7 +11,8 @@ namespace StrDss.Data.Repositories
 {
     public interface IRentalListingRepository
     {
-        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? rentalListingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
         Task<List<long>> GetRentalListingIdsToExport();
@@ -35,8 +36,8 @@ namespace StrDss.Data.Repositories
         {
             _userRepo = userRepo;
         }
-        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, 
-            int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction)
         {
             var query = _dbSet.AsNoTracking();
 
@@ -83,6 +84,44 @@ namespace StrDss.Data.Repositories
             {
                 var businessLicenseLower = businessLicense.ToLower();
                 query = query.Where(x => x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(businessLicenseLower));
+            }
+
+            if (prRequirement != null)
+            {
+                query = query.Where(x => prRequirement.Value
+                    ? x.IsPrincipalResidenceRequired == true
+                    : x.IsPrincipalResidenceRequired == null || x.IsPrincipalResidenceRequired == false);
+            }
+
+            if (blRequirement != null)
+            {
+                query = query.Where(x => blRequirement.Value
+                    ? x.IsBusinessLicenceRequired == true
+                    : x.IsBusinessLicenceRequired == null || x.IsBusinessLicenceRequired == false);
+            }
+
+            if (reassigned != null)
+            {
+                query = query.Where(x => reassigned.Value
+                    ? x.IsLgTransferred == true
+                    : x.IsLgTransferred == null || x.IsLgTransferred == false);
+            }
+
+            if (takedownComplete != null)
+            {
+                query = query.Where(x => takedownComplete.Value
+                    ? x.IsTakenDown == true
+                    : x.IsTakenDown == null || x.IsTakenDown == false);
+            }
+
+            if (lgId != null)
+            {
+                query = query.Where(x => x.ManagingOrganizationId == lgId);
+            }
+
+            if (statusArray.Length > 0)
+            {
+                query = query.Where(x => statusArray.Contains(x.ListingStatusType));
             }
 
             var extraSort 

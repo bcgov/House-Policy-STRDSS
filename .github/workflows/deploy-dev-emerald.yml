@@ -1,4 +1,4 @@
-name: Deploy Dev Environment
+name: Deploy Dev Environment - Emerald
 
 on:
   workflow_dispatch:
@@ -147,7 +147,6 @@ jobs:
         repository: bcgov-c/tenant-gitops-b0471a
         ref: develop
         token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
-        path: /
     - name: Update Helm Values and Commit backend
       id: helm
       run: |

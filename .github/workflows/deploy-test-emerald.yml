@@ -1,0 +1,131 @@
+name: Deploy Test Environment - Emerald
+
+on:
+  push:
+    tags:
+    - v*.*.*
+
+jobs:
+  docker-build-backend:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
+
+    - name: Build Docker image
+      run: cd server && docker build -t strdss-backend -f Dockerfile .
+
+    - name: Tag Docker image
+      run: |
+        vtag=${{ github.ref_name }}
+        docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${vtag//v}
+
+    - name: Push Docker image to Artifactory
+      run: |
+        vtag=${{ github.ref_name }}
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:${vtag//v}
+
+  docker-build-hangfire:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
+
+    - name: Build Docker image
+      run: cd server && docker build -t strdss-hangfire -f Dockerfile.hangfire .
+
+    - name: Tag Docker image
+      run: |
+        vtag=${{ github.ref_name }}
+        docker tag strdss-hangfire artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-hangfire:${vtag//v}
+
+    - name: Push Docker image to Artifactory
+      run: |
+        vtag=${{ github.ref_name }}
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-hangfire:${vtag//v}
+      
+  docker-build-frontend:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
+
+    - name: Build Docker image
+      run: cd frontend && docker build -t strdss-frontend -f Dockerfile .
+
+    - name: Tag Docker image
+      run: |
+        vtag=${{ github.ref_name }}
+        docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:${vtag//v}
+
+    - name: Push Docker image to Artifactory
+      run: |
+        vtag=${{ github.ref_name }}
+        docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:${vtag//v}
+
+  deploy:
+    needs: [docker-build-frontend, docker-build-backend, docker-build-hangfire]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout ArgoCD Repo
+      id: gitops
+      uses: actions/checkout@v4
+      with:
+        repository: bcgov-c/tenant-gitops-b0471a
+        ref: test
+        token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+    - name: Update Helm Values and Commit backend
+      id: helm
+      run: |
+          pwd
+
+          # Get current date and time
+          DATETIME=$(date +'%Y-%m-%d %H:%M:%S')
+
+          # set image tag
+          sed -i "s/tag: .*/tag: ${vtag//v} # Image Updated on $DATETIME/" deploy/test_values.yaml
+
+          # Commit and push the changes
+          git config --global user.email "ychung-mot@github.com"
+          git config --global user.name "Young-Jin Chung"
+
+          git add deploy/test_values.yaml
+
+          pwd
+          # Repackage Helm Chart
+          cd charts/gitops/charts
+
+          helm package ../../frontend/
+          helm package ../../backend/
+          helm package ../../hangfire/
+
+          git add .
+
+          git commit -m "Update image tag to ${vtag//v} on $DATETIME"
+          git push origin test

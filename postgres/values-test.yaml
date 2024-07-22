@@ -4,7 +4,7 @@ primary:
   containerSecurityContext:
     enabled: false
   persistence:
-    size: 400Mi
+    size: 800Mi
   resources:
     limits:
       cpu: 150m

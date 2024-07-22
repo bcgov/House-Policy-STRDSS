@@ -87,7 +87,7 @@ jobs:
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:${vtag//v}
 
-  deploy:
+  package-h-charts:
     needs: [docker-build-frontend, docker-build-backend, docker-build-hangfire]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -107,9 +107,13 @@ jobs:
 
           # Get current date and time
           DATETIME=$(date +'%Y-%m-%d %H:%M:%S')
+          IMAGE_TAG = ${{ github.ref_name }}
+
+          echo "Image Tag:"
+          echo $IMAGE_TAG
 
           # set image tag
-          sed -i "s/tag: .*/tag: ${vtag//v} # Image Updated on $DATETIME/" deploy/test_values.yaml
+          sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/test_values.yaml
 
           # Commit and push the changes
           git config --global user.email "ychung-mot@github.com"

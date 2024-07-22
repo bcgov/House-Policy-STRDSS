@@ -122,3 +122,50 @@ jobs:
         IMAGE_TAG_BACKEND=${vtag//v} \
         IMAGE_TAG_HANGFIRE=${vtag//v} \
       working-directory: ./helm/main
+
+  package-h-charts:
+    needs: [docker-build-frontend, docker-build-backend, docker-build-hangfire]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout ArgoCD Repo
+      id: gitops
+      uses: actions/checkout@v4
+      with:
+        repository: bcgov-c/tenant-gitops-b0471a
+        ref: test
+        token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+    - name: Update Helm Values and Commit backend
+      id: helm
+      run: |
+          pwd
+
+          # Get current date and time
+          DATETIME=$(date +'%Y-%m-%d %H:%M:%S')
+          IMAGE_TAG = ${{ github.ref_name }}
+
+          echo "Image Tag:"
+          echo $IMAGE_TAG
+
+          # set image tag
+          sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/test_values.yaml
+
+          # Commit and push the changes
+          git config --global user.email "ychung-mot@github.com"
+          git config --global user.name "Young-Jin Chung"
+
+          git add deploy/test_values.yaml
+
+          pwd
+          # Repackage Helm Chart
+          cd charts/gitops/charts
+
+          helm package ../../frontend/
+          helm package ../../backend/
+          helm package ../../hangfire/
+
+          git add .
+
+          git commit -m "Update image tag to ${vtag//v} on $DATETIME"
+          git push origin test      

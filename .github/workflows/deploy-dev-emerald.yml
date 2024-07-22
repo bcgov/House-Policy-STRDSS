@@ -1,4 +1,4 @@
-name: Deploy Dev Environment
+name: Deploy Dev Environment - Emerald
 
 on:
   workflow_dispatch:

@@ -142,14 +142,14 @@ jobs:
           pwd
 
           # Get current date and time
-          DATETIME=$(date +'%Y-%m-%d %H:%M:%S')
-          IMAGE_TAG = ${{ github.ref_name }}
+          datetime=$(date +'%Y-%m-%d %H:%M:%S')
+          vtag=${{ github.ref_name }}
 
           echo "Image Tag:"
-          echo $IMAGE_TAG
+          echo ${vtag//v}
 
           # set image tag
-          sed -i "s/tag: .*/tag: $IMAGE_TAG # Image Updated on $DATETIME/" deploy/test_values.yaml
+          sed -i "s/tag: .*/tag: ${vtag//v} # Image Updated on $datetime/" deploy/test_values.yaml
 
           # Commit and push the changes
           git config --global user.email "ychung-mot@github.com"
@@ -167,5 +167,5 @@ jobs:
 
           git add .
 
-          git commit -m "Update image tag to ${vtag//v} on $DATETIME"
-          git push origin test      
+          git commit -m "Update image tag to ${vtag//v} on $datetime"
+          git push origin test

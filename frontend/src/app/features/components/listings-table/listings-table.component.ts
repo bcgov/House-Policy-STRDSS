@@ -14,7 +14,6 @@ import { PanelModule } from 'primeng/panel';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { User } from '../../../common/models/user';
-import { takedown_action } from '../../../common/consts/permissions.const';
 import { ListingDetailsComponent } from './listing-details/listing-details.component';
 import { ListingSearchRequest } from '../../../common/models/listing-search-request';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -23,6 +22,12 @@ import { environment } from '../../../../environments/environment';
 import { TooltipModule } from 'primeng/tooltip';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { TagModule } from 'primeng/tag';
+import { SidebarModule } from 'primeng/sidebar';
+import { ListingFilter } from '../../../common/models/listing-filter';
+import { AccordionModule } from 'primeng/accordion';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { RequestAccessService } from '../../../common/services/request-access.service';
+import { FilterPersistenceService } from '../../../common/services/filter-persistence.service';
 
 @Component({
   selector: 'app-listings-table',
@@ -41,6 +46,9 @@ import { TagModule } from 'primeng/tag';
     TooltipModule,
     ListingDetailsComponent,
     TagModule,
+    SidebarModule,
+    AccordionModule,
+    RadioButtonModule,
   ],
   templateUrl: './listings-table.component.html',
   styleUrl: './listings-table.component.scss'
@@ -55,8 +63,13 @@ export class ListingsTableComponent implements OnInit {
   searchTerm!: string;
   searchColumn: 'all' | 'address' | 'url' | 'listingId' | 'hostName' | 'businessLicense' = 'all';
   searchColumns = new Array<DropdownOption>();
+  communities = new Array<DropdownOption>();
+
   isCEU = false;
   isLegendShown = false;
+  isFilterOpened = false;
+  currentFilter!: ListingFilter;
+  cancelableFilter!: ListingFilter;
 
   readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
 
@@ -64,13 +77,17 @@ export class ListingsTableComponent implements OnInit {
     private listingService: ListingDataService,
     private userService: UserDataService,
     private router: Router,
+    private requestAccessService: RequestAccessService,
     private searchStateService: SelectedListingsStateService,
     private route: ActivatedRoute,
     private loaderService: GlobalLoaderService,
     private cd: ChangeDetectorRef,
+    private filterPersistenceService: FilterPersistenceService
   ) { }
 
   ngOnInit(): void {
+    this.getOrganizations();
+    this.initFilters();
     let page = 1;
     this.searchColumns = [
       { label: 'All', value: 'all' },
@@ -169,9 +186,93 @@ export class ListingsTableComponent implements OnInit {
     this.getListings(this.currentPage.pageNumber)
   }
 
+  get isFilterSet(): boolean {
+    if (this.currentFilter === null || this.currentFilter === undefined) {
+      return false;
+    }
+
+    const byCommunity = !!this.currentFilter.community;
+    const byStatus = Object.values(this.currentFilter.byStatus).some(x => x === true);
+    const byLocation = Object.values(this.currentFilter.byLocation).some(x => x !== '');
+
+    return byStatus || byLocation || byCommunity;
+  }
+
+  get isCancelableFilterSet(): boolean {
+    if (this.cancelableFilter === null || this.cancelableFilter === undefined) {
+      return false;
+    }
+
+    const byCommunity = !!this.cancelableFilter.community;
+    const byStatus = Object.values(this.cancelableFilter.byStatus).some(x => x === true);
+    const byLocation = Object.values(this.cancelableFilter.byLocation).some(x => x !== '');
+    return byStatus || byLocation || byCommunity;
+  }
+
+  openFilterSidebar(): void {
+    this.isFilterOpened = true;
+    this.cancelableFilter.byLocation = Object.assign({}, this.currentFilter.byLocation);
+    this.cancelableFilter.byStatus = Object.assign({}, this.currentFilter.byStatus);
+    this.cancelableFilter.community = this.currentFilter.community;
+  }
+
+  onClearSearchBox(): void {
+    this.searchTerm = '';
+  }
+
+  onClearFilters(): void {
+    this.filterPersistenceService.listingFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+    this.initFilters();
+    this.isFilterOpened = false;
+    this.onSearch();
+  }
+
+  onCancelFilters(): void {
+    this.cancelableFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+    this.filterPersistenceService.listingFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+    this.isFilterOpened = false;
+  }
+
+  onSubmitFilters(): void {
+    this.currentFilter.byLocation = Object.assign({}, this.cancelableFilter.byLocation);
+    this.currentFilter.byStatus = Object.assign({}, this.cancelableFilter.byStatus);
+    this.currentFilter.community = this.cancelableFilter.community;
+
+    if (!this.filterPersistenceService.listingFilter) {
+      this.filterPersistenceService.listingFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+    }
+
+    this.filterPersistenceService.listingFilter.byLocation = Object.assign({}, this.cancelableFilter.byLocation);
+    this.filterPersistenceService.listingFilter.byStatus = Object.assign({}, this.cancelableFilter.byStatus);
+    this.filterPersistenceService.listingFilter.community = this.cancelableFilter.community;
+
+    this.isFilterOpened = false;
+    this.onSearch();
+  }
+
   private cloakParams(): void {
     var newURL = location.href.split("?")[0];
     window.history.pushState('object', document.title, newURL);
+  }
+
+  private initFilters(): void {
+    if (this.filterPersistenceService.listingFilter) {
+      this.currentFilter = {
+        byLocation: this.filterPersistenceService.listingFilter.byLocation,
+        community: this.filterPersistenceService.listingFilter.community,
+        byStatus: this.filterPersistenceService.listingFilter.byStatus
+      };
+      this.cancelableFilter = {
+        byLocation: this.filterPersistenceService.listingFilter.byLocation,
+        community: this.filterPersistenceService.listingFilter.community,
+        byStatus: this.filterPersistenceService.listingFilter.byStatus
+      };
+    } else {
+      this.currentFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+      this.cancelableFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+    }
+
+    this.cd.detectChanges();
   }
 
   private getUrlFromState(): string {
@@ -195,6 +296,7 @@ export class ListingsTableComponent implements OnInit {
 
   private getListings(selectedPageNumber: number = 1): void {
     this.loaderService.loadingStart();
+
     const searchReq = {} as ListingSearchRequest;
     searchReq[this.searchColumn] = this.searchTerm;
 
@@ -203,7 +305,7 @@ export class ListingsTableComponent implements OnInit {
       this.currentPage?.pageSize || 25,
       this.sort?.prop || '',
       this.sort?.dir || 'asc',
-      searchReq).subscribe({
+      searchReq, this.currentFilter).subscribe({
         next: (res: PagingResponse<ListingTableRow>) => {
           this.currentPage = res.pageInfo;
           this.listings = res.sourceList;
@@ -213,5 +315,13 @@ export class ListingsTableComponent implements OnInit {
           this.cd.detectChanges();
         }
       });
+  }
+
+  private getOrganizations(): void {
+    this.requestAccessService.getOrganizations('LG').subscribe({
+      next: (orgs) => {
+        this.communities = orgs;
+      }
+    });
   }
 }

@@ -136,7 +136,7 @@ jobs:
         repository: bcgov-c/tenant-gitops-b0471a
         ref: test
         token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
-    - name: Update Helm Values and Commit backend
+    - name: Update Helm Values and Commit
       id: helm
       run: |
           pwd

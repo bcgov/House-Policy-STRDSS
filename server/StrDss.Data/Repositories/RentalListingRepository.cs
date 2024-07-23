@@ -127,6 +127,15 @@ namespace StrDss.Data.Repositories
             var extraSort 
                 = "AddressSort1ProvinceCd asc, AddressSort2LocalityNm asc, AddressSort3LocalityTypeDsc asc, AddressSort4StreetNm asc, AddressSort5StreetTypeDsc asc, AddressSort6StreetDirectionDsc asc, AddressSort7CivicNo asc, AddressSort8UnitNo asc";
 
+            if (orderBy == "lastActionDtm")
+            {
+                orderBy = "lastActionDtm == null, lastActionDtm";
+            }
+            else if (orderBy == "lastActionNm")
+            {
+                orderBy = "lastActionNm == null, lastActionNm";
+            }
+
             var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
 
             foreach (var listing in listings.SourceList)

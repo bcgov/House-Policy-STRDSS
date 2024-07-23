@@ -171,22 +171,45 @@ jobs:
         oc rollout status deployment/strdss-dev-frontend -n f4a30d-dev
       timeout-minutes: 5
 
-  zap-scan:
-    needs: [deploy]
+  package-h-charts:
+    needs: [test-frontend, test-backend, docker-build-frontend, docker-build-backend, docker-build-hangfire]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
-    permissions:
-      contents: read
-      issues: write
 
     steps:
-    - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-    - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+    - name: Checkout ArgoCD Repo
+      id: gitops
+      uses: actions/checkout@v4
       with:
-        ref: main
-    - name: ZAP Scan
-      uses: zaproxy/action-full-scan@v0.10.0
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        target: https://dev-strdata.apps.silver.devops.gov.bc.ca/
-        rules_file_name: '.zap/rules.tsv'
+        repository: bcgov-c/tenant-gitops-b0471a
+        ref: develop
+        token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+    - name: Update Helm Values and Commit backend
+      id: helm
+      run: |
+          pwd
+
+          # Get current date and time
+          DATETIME=$(date +'%Y-%m-%d %H:%M:%S')
+
+          # set image tag
+          sed -i "s/tag: .*/tag: dev # Image Updated on $DATETIME/" deploy/dev_values.yaml
+
+          # Commit and push the changes
+          git config --global user.email "ychung-mot@github.com"
+          git config --global user.name "Young-Jin Chung"
+
+          git add deploy/dev_values.yaml
+
+          pwd
+          # Repackage Helm Chart
+          cd charts/gitops/charts
+
+          helm package ../../frontend/
+          helm package ../../backend/
+          helm package ../../hangfire/
+
+          git add .
+
+          git commit -m "Update image tag to dev on $DATETIME"
+          git push origin develop

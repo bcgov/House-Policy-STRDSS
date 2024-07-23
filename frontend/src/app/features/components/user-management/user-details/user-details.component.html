@@ -81,8 +81,9 @@
         <div class="value-block">
             <div class="label"><strong>User Role(s) and Permission(s)</strong> </div>
             <div class="tags-block" *ngIf="isEdit">
-                <p-multiSelect [options]="roles" class="full-width-text-field" [(ngModel)]="user.roleCds"
-                    appendTo="body" (onChange)="onSelectedRolesChanged($event)"></p-multiSelect>
+                <p-multiSelect [options]="roles" class="full-width-text-field" [maxSelectedLabels]="2"
+                    [(ngModel)]="user.roleCds" appendTo="body"
+                    (onChange)="onSelectedRolesChanged($event)"></p-multiSelect>
                 <br>
                 <a class="link-to-roles" [routerLink]="'/roles'" target="_blank">View All Roles and Permissions</a>
                 <div class="tags-content">

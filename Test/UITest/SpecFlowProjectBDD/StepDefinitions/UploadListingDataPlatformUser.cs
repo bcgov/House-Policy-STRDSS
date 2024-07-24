@@ -36,6 +36,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private DssUploadDelivery _DssUploadDelivery;
         private DateTime _updateTime;
         private IUnitOfWork _UnitOfWork;
+        private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
 
         public UploadListingDataPlatformUser(SeleniumDriver Driver)
         {
@@ -49,9 +50,12 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _AppSettings = new AppSettings();
             DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
             _DssDBContext = new DssDbContext(dbContextOptions);
+
+            string dbConnectionString = _AppSettings.GetConnectionString(_Environment.ToString().ToLower()) ?? string.Empty;
+
+            _DssDBContext = new DssDbContext(dbContextOptions, dbConnectionString);
             _UnitOfWork = new UnitOfWork(_DssDBContext);
         }
-
 
         [Given(@"I am an authenticated platform representative ""([^""]*)"" with the necessary permissions and the expected result is ""([^""]*)"" and I am a ""([^""]*)"" user")]
         public void GivenIAmAnAuthenticatedPlatformRepresentativeWithTheNecessaryPermissionsAndTheExpectedResultIsAndIAmAUser(string UserName, string ExpectedResult, string UserType)
@@ -91,7 +95,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             if ((null != TOC) && (TOC.Displayed))
             {
                 //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
-                _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                _TermsAndConditionsPage.TermsAndConditionsCheckBox.JSExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
                 _TermsAndConditionsPage.ContinueButton.Click();
             }
         }
@@ -184,7 +188,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _UploadListingsPage.ReportingMonthDropDown.Click();
 
-            string listboxItems = _UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(@"return document.querySelector(""#month_list"").children.length").ToString();
+            string listboxItems = _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(@"document.querySelector(""#month_list"").children.length").ToString();
 
             int count = 0;
 
@@ -201,7 +205,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
                 //script = $@"document.querySelector(""#month_{i} > span"");";
                 script = "document.querySelector('#month_" + i + "');";
 
-                string result = _UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(script) == null ? string.Empty: _UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(script).ToString();
+                string result = _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(script) == null ? string.Empty: _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(script).ToString();
 
                 if (result.ToUpper().Contains(Month.ToUpper()))
                 {
@@ -213,7 +217,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             //_UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(@"document.querySelector(""#month_0 > span"").click()");
             //script = $@"document.querySelector(""#month_{index}"").click();";
             script = "document.querySelector('#month_1').click();";
-            _UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(script);
+            _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(script);
 
         }
 

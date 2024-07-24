@@ -73,7 +73,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             if ((null != TOC) && (TOC.Displayed))
             {
                 //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
-                _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                _TermsAndConditionsPage.TermsAndConditionsCheckBox.JSExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
                 _TermsAndConditionsPage.ContinueButton.Click();
             }
         }
@@ -88,9 +88,13 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a dedicated section for managing user access requests")]
         public void ThereShouldBeADedicatedSectionForManagingUserAccessRequests()
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-user-management > div.table-card-container"").checkVisibility()");
+            string selector = "body > app-root > app-layout > div.content > app-user-management > div.table-card-container";
+
+            bool result = (bool)_ManagingAccessPage.ManageAccessSection.JSCheckVisability(selector);
+
             ClassicAssert.IsTrue(result);
         }
+
 
         //#User Access Request List
 
@@ -103,33 +107,54 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should see a list displaying all user access requests, including relevant details such as the user's name, role request, and date of submission")]
         public void IShouldSeeAListDisplayingAllUserAccessRequestss()
         {
-            bool found = false;
             bool result = false;
+            string selector = "#pn_id_14-table";
+            result = (bool)_ManagingAccessPage.ManageAccessSection.JSCheckVisability(selector); ;
+            //result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_14-table"").checkVisibility()");
+            ClassicAssert.IsTrue(result);
 
-            while (found == false)
-            {
-                //wait for element to become visable
-                try
-                {
-                    result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table"").checkVisibility()");
-                    found = true;
-                }
-                catch (JavaScriptException ex)
-                {
-                    System.Threading.Thread.Sleep(1000);
-                }
+            selector = "#pn_id_14-table > tbody";
+            result = (bool)_ManagingAccessPage.ManageAccessSection.JSCheckVisability(selector);
+            //result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_14-table > tbody"").checkVisibility()");
+            ClassicAssert.IsTrue(result);
 
-            }
-            
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody"").checkVisibility()");
+            selector = "#pn_id_14-table > thead > tr > th:nth-child(3)";
+
+            IJavaScriptExecutor js = _Driver.Driver as IJavaScriptExecutor;
+            var script = @"
+                try {
+                    var elem = document.querySelector('" + selector + @"');
+                    console.log('Element:', elem);
+
+                    if (elem) {
+                        console.log('Element found');
+                        if (elem.textContent.toLowerCase().trim() === 'first name') {
+                            return(true);
+                        } else {
+                            console.error('FirstName Not Found');
+                            return false;
+                        }
+                    } else {
+                        console.error('Element not found');
+                        return false;
+                    }
+                } catch (e) {
+                    console.error('Error:', e);
+                    return false;
+                    }";
+
+           result = (bool)_ManagingAccessPage.ManageAccessSection.JSExecuteJavaScript(@"document.querySelector(""#pn_id_14-table > thead > tr > th:nth-child(3)"").textContent.toLowerCase().trim() === ""first name""");
+
+            //result = (bool)_ManagingAccessPage.ManageAccessSection.JSExecuteJavaScript(script);
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(3)"").textContent.toLowerCase().trim() === ""first name""");
+
+            result = (bool)_ManagingAccessPage.ManageAccessSection.JSExecuteJavaScript(@"document.querySelector('#pn_id_14-table > thead > tr > th:nth-child(4)').textContent.toLowerCase().trim() === 'last name'");
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(4)"").textContent.toLowerCase().trim() === ""last name""");
+
+            result = (bool)_ManagingAccessPage.ManageAccessSection.JSExecuteJavaScript(@"document.querySelector(""#pn_id_14-table > thead > tr > th:nth-child(7)"").textContent.toLowerCase().trim() === ""organization""");
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(7)"").textContent.toLowerCase().trim() === ""organization""");
-            ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(6)"").textContent.toLowerCase().trim() === ""email address""");
+
+            result = (bool)_ManagingAccessPage.ManageAccessSection.JSExecuteJavaScript(@"document.querySelector(""#pn_id_14-table > thead > tr > th:nth-child(6)"").textContent.toLowerCase().trim() === ""email address""");
             ClassicAssert.IsTrue(result);
         }
 
@@ -143,7 +168,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should be able to view detailed information provided by the user, including their role request and any justifications or additional comments")]
         public void ShouldBeAbleToViewDetailedInformationProvidedByTheUser()
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody > tr:nth-child(1)"").checkVisibility()");
+            bool result = (bool)_ManagingAccessPage.ManageAccessSection.JSExecuteJavaScript(@"document.querySelector(""#pn_id_14-table > tbody > tr:nth-child(1)"").checkVisibility()");
             ClassicAssert.IsTrue(result);
         }
 
@@ -156,7 +181,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a Grant Access button allowing me to approve the user's request")]
         public void ThereShouldBeAGrantAccessButton()
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div"").checkVisibility()");
+            bool result = (bool)_ManagingAccessPage.ManageAccessSection.JSExecuteJavaScript(@"document.querySelector(""#pn_id_14-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div"").checkVisibility()");
             ClassicAssert.IsTrue(result);
         }
 
@@ -192,7 +217,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a Remove Access option allowing me to remove the user's access if it is deemed inappropriate or unnecessary")]
         public void ThereShouldBeARemoveAccessOption()
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div"").checkVisibility()");
+            bool result = (bool)_ManagingAccessPage.ManageAccessSection.JSExecuteJavaScript(@"document.querySelector(""#pn_id_14-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div"").checkVisibility()");
             ClassicAssert.IsTrue(result);
         }
 

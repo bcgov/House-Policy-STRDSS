@@ -1,6 +1,8 @@
 ﻿using Configuration;
 using DataBase.Entities;
+using DataBase.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
@@ -30,14 +32,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private DssUserIdentity _UserIdentity;
         private bool _OriginalEnabledValue;
         AppSettings _AppSettings;
-
-
-        [BeforeScenario]
-        public void TestSetup()
-        {
-            DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
-            _DssDBContext = new DssDbContext(dbContextOptions);
-        }
+        private IUnitOfWork _UnitOfWork;
+        private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
 
 
         public DenyAccessToSystem(SeleniumDriver Driver)
@@ -48,6 +44,13 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _IDirPage = new IDirLoginPage(_Driver);
 
             _AppSettings = new AppSettings();
+
+            DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
+
+            string dbConnectionString = _AppSettings.GetConnectionString(_Environment.ToString().ToLower()) ?? string.Empty;
+
+            _DssDBContext = new DssDbContext(dbContextOptions, dbConnectionString);
+            _UnitOfWork = new UnitOfWork(_DssDBContext);
         }
 
         //User Authentication
@@ -58,11 +61,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _Driver.Url = _AppSettings.GetServer("default");
             _Driver.Navigate();
-
-            //_PathFinderPage.IDRButton.Click();
         }
 
-              //I attempt to access the Data Sharing System as "<UserName>" with email "<Email>" and RoleName "<RoleName>"
         //[When(@"I attempt to access the Data Sharing System as ""(.*)"" with email ""(.*)"" and Role ""(.*)""")]
         [When(@"I attempt to access the Data Sharing System as ""(.*)"" with email ""(.*)"" and Role ""(.*)""")]
         public void IAttemptToAccessTheDataSharingSystem(string UserName, string Email, string RoleName)

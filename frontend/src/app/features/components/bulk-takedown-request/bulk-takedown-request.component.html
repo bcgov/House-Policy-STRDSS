@@ -43,7 +43,7 @@
                     <th class="sortable-header" id="status_header"
                         [class.sorted]="this.sort && this.sort.prop === 'listingContactNamesTxt'"
                         (click)="onSort('listingContactNamesTxt')">
-                        Supplier host
+                        Host(s)
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'listingContactNamesTxt' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -77,7 +77,8 @@
         </p-table>
     </p-panel>
 
-    <p-panel class="bcc-panel" header="Add BCCs (Optional)">
+    <p-panel class="bcc-panel" header="Add any additional recipients to receive a confirmation of the request
+    (Optional)">
         <div class="form-group-row">
             <div class="form-group-row-col">
                 <span class="info-tooltip" pTooltip="Enter additional email addresses separated by commas."
@@ -143,9 +144,9 @@
             <strong>Please Note</strong>
         </div>
         <div class="content">
-            When you click submit, this email will be personalized and sent to the platform representatives and all
-            hosts for each listing (unless you have indicated a notice to the host has been sent through an alternative
-            delivery method).
+            When you click submit, this email confirmation message will be personalized and sent to you for your
+            records. Takedown Requests for all selected listings will be aggregated into CSV file(s) and sent to the
+            respective platform representative(s) at 11:50pm PST tonight.
         </div>
     </div>
 

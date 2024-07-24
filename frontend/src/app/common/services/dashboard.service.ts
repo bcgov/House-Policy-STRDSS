@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DashboardCard } from '../models/dashboard-card';
-import { ceu_action, listing_file_upload, listing_read, takedown_action, user_write } from '../consts/permissions.const';
+import { ceu_action, listing_file_upload, listing_read, role_read, takedown_action, upload_history_read, user_write } from '../consts/permissions.const';
 import { User } from '../models/user';
 
 @Injectable({
@@ -40,8 +40,28 @@ export class DashboardService {
   private initCards(): void {
     this.cards = [
       {
+        accessPermission: listing_read,
+        buttonIcon: '',
+        buttonText: 'View Listing Data',
+        description: 'View platform listing data for your community',
+        route: 'listings',
+        title: 'Listing Data',
+        boxId: 'listings_box',
+        buttonId: 'listings_btn',
+      },
+      {
+        accessPermission: listing_read,
+        buttonIcon: '',
+        buttonText: 'Download Listing Data',
+        description: 'Download listing data for your community',
+        route: 'export-listings',
+        title: 'Download Listing Data',
+        boxId: 'export-listings_box',
+        buttonId: 'export-listings_btn',
+      },
+      {
         title: 'Platform Upload History',
-        accessPermission: listing_file_upload,
+        accessPermission: upload_history_read,
         description: 'View all platform upload history here',
         buttonIcon: '',
         buttonText: 'Platform Upload History',
@@ -74,12 +94,22 @@ export class DashboardService {
       {
         accessPermission: user_write,
         buttonIcon: '',
-        buttonText: 'Manage Access Requests',
+        buttonText: 'User Management',
         description: 'Process new requests for system access',
         route: '/user-management',
-        title: 'Manage Access Requests',
+        title: 'User Management',
         boxId: 'manageAccessRequests_box',
         buttonId: 'manageAccessRequests_btn',
+      },
+      {
+        accessPermission: role_read,
+        buttonIcon: '',
+        buttonText: 'Manage Roles And Permissions',
+        description: 'Add or edit roles and permissions',
+        route: '/roles',
+        title: 'Manage Roles And Permissions',
+        boxId: 'roleManagement_box',
+        buttonId: 'roleManagement_btn',
       },
       {
         accessPermission: '',

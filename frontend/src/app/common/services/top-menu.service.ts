@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TopMenuItem } from '../models/top-menu-item';
-import { ceu_action, licence_file_upload, listing_file_upload, listing_read, takedown_action, user_write } from '../consts/permissions.const';
+import { ceu_action, licence_file_upload, listing_file_upload, listing_read, role_read, takedown_action, upload_history_read, user_write } from '../consts/permissions.const';
 import { User } from '../models/user';
 
 @Injectable({
@@ -42,10 +42,15 @@ export class TopMenuService {
       {
         accessPermission: listing_read,
         buttonId: 'listings_mi_btn',
-        route: '',
-        title: 'Listings',
-        disabled: true,
-        hidden: true,
+        route: '/listings',
+        title: 'View Listings',
+        folderName: 'Listings',
+      },
+      {
+        accessPermission: listing_read,
+        buttonId: 'export_listings_mi_btn',
+        route: '/export-listings',
+        title: 'Download Listing Data',
         folderName: 'Listings',
       },
       {
@@ -94,7 +99,7 @@ export class TopMenuService {
         folderName: 'Upload',
       },
       {
-        accessPermission: listing_file_upload,
+        accessPermission: upload_history_read,
         buttonId: 'platformUploadHistory_mi_btn',
         route: '/upload-listing-history',
         description: 'View all platform upload history here',
@@ -117,6 +122,14 @@ export class TopMenuService {
         route: '/user-management',
         description: 'Process new requests for system access',
         title: 'User Management',
+        folderName: 'Admin Tools',
+      },
+      {
+        accessPermission: role_read,
+        buttonId: 'roleManagement_mi_btn',
+        route: '/roles',
+        description: 'Add or edit roles and permissions',
+        title: 'Manage Roles & Permissions',
         folderName: 'Admin Tools',
       },
 

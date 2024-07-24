@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IO.Compression;
+using System.Reflection;
 
 namespace StrDss.Common
 {
@@ -52,12 +53,31 @@ namespace StrDss.Common
 
         public static short? StringToShort(string str)
         {
-            if (str == null)
+            if (string.IsNullOrWhiteSpace(str))
             {
                 return null;
             }
 
-            return Convert.ToInt16(str);
+            if (short.TryParse(str, out short result))
+            {
+                return result;
+            }
+
+            return null;
+        }
+        public static byte[] CreateZip(string csvContent, string fileName)
+        {
+            using var memoryStream = new MemoryStream();
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                var demoFile = archive.CreateEntry($"{fileName}.csv");
+
+                using var entryStream = demoFile.Open();
+                using var streamWriter = new StreamWriter(entryStream);
+                streamWriter.Write(csvContent);
+            }
+
+            return memoryStream.ToArray();
         }
     }
 }

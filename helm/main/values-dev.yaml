@@ -19,6 +19,7 @@ global:
     'BCEID_URL': 'https://gws1.development.bceid.ca/webservices/client/v10/bceidservice.asmx'
     'BCEID_CACHE_LIFESPAN': '600'
     'GEOCODER_URL': 'https://geocodertst.api.gov.bc.ca'
+    'ADDRESS_SCORE': '90'
 
 nameOverride: strdss-dev
 fullnameOverride: strdss-dev

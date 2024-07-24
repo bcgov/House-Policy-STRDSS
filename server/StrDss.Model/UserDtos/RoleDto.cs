@@ -4,6 +4,9 @@
     {
         public string UserRoleCd { get; set; } = null!;
         public string UserRoleNm { get; set; } = null!;
-        public virtual ICollection<PermissionDto> UserPrivilegeCds { get; set; } = new List<PermissionDto>();
+        public string? UserRoleDsc { get; set; } = null!;
+        public virtual ICollection<PermissionDto> Permissions { get; set; } = new List<PermissionDto>();
+        public bool IsReferenced { get; set; }
+        public DateTime? UpdDtm { get; set; }
     }
 }

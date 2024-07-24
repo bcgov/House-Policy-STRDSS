@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -26,22 +26,48 @@ export class LayoutComponent {
   showHeaderMenu = true;
   items: MenuItem[] | undefined;
 
-  constructor(public userDataService: UserDataService, private topMenuService: TopMenuService, private authService: AuthService, private messageService: MessageService, private errorHandlingService: ErrorHandlingService) { }
+  constructor(
+    public userDataService: UserDataService,
+    private topMenuService: TopMenuService,
+    private authService: AuthService,
+    private messageService: MessageService,
+    private errorHandlingService: ErrorHandlingService,
+    private cd: ChangeDetectorRef,
+  ) { }
 
   ngOnInit() {
-    this.errorHandlingService.errorSubject.subscribe({
+    this.errorHandlingService.backendErrorSubject.subscribe({
       next: (error) => {
-        this.showError(error);
+        this.showBackendError(error);
+      },
+      complete: () => {
+        this.cd.detectChanges();
       }
     });
 
     this.errorHandlingService.successSubject.subscribe({
       next: (message: string) => {
         this.showSuccess(message);
+      },
+      complete: () => {
+        this.cd.detectChanges();
+      }
+    });
+
+    this.errorHandlingService.errorSubject.subscribe({
+      next: (message: string) => {
+        this.showError(message);
+      },
+      complete: () => {
+        this.cd.detectChanges();
       }
     });
 
     this.items = [
+      {
+        label: 'Listings',
+        items: []
+      },
       {
         label: 'Forms',
         items: []
@@ -85,20 +111,13 @@ export class LayoutComponent {
       return !!item.items?.length;
     });
 
-    if (this.userDataService.currentUser.permissions.includes(listing_read)) {
-      this.items?.unshift({
-        label: 'Listings',
-        routerLink: '/listings',
-      });
-    }
-
     this.items?.unshift({
       label: 'Home',
       routerLink: '/',
     });
   }
 
-  private showError(error: ErrorBackEnd): void {
+  private showBackendError(error: ErrorBackEnd): void {
     if (!!error.errors) {
       Object.keys(error.errors).forEach(oneError => {
         this.messageService.add({ severity: 'error', summary: error.title, detail: error.errors[oneError].join(' ') });
@@ -117,6 +136,10 @@ export class LayoutComponent {
 
   showSuccess(message: string): void {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
+  }
+
+  showError(message: string): void {
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
   }
 
   logout(): void {

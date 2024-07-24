@@ -15,6 +15,7 @@ using StrDss.Service.Hangfire;
 using Hangfire.PostgreSql;
 using Npgsql;
 using StrDss.Hangfire;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,12 @@ var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={d
 builder.Services.AddHttpContextAccessor();
 
 Console.WriteLine("Hangfire");
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -161,7 +168,8 @@ app.MapControllers();
 app.UseHangfireDashboard();
 
 // make sure this is after app.UseHangfireDashboard()
-RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/3 * * * *");
+RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/2 * * * *");
 RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *");
+RecurringJob.AddOrUpdate<HangfireJobs>("Create Rental Listing Export Files", job => job.CreateRentalListingExportFiles(), "50 5 * * *");
 
 app.Run();

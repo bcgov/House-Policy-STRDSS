@@ -280,7 +280,7 @@ namespace StrDss.Service
                 return errors;
             }
 
-            await SendTakedownNoticesAsync(listings, templates, errors);
+            await SendTakedownNoticeEmailsFromListingAsync(listings, templates, errors);
 
             return errors;
         }
@@ -340,13 +340,13 @@ namespace StrDss.Service
                 Info = $"{rentalListing.OrganizationCd}-{rentalListing.PlatformListingNo}"
             };
         }
-        private async Task SendTakedownNoticesAsync(TakedownNoticesFromListingDto[] listings, List<TakedownNoticeFromListing> templates, Dictionary<string, List<string>> errors)
+        private async Task SendTakedownNoticeEmailsFromListingAsync(TakedownNoticesFromListingDto[] listings, List<TakedownNoticeFromListing> templates, Dictionary<string, List<string>> errors)
         {
             foreach (var template in templates)
             {
                 try
                 {
-                    await SendTakedownNoticeFromListingEmail(listings, template);
+                    await SendTakedownNoticeEmailFromListingAsync(listings, template);
                 }
                 catch (Exception ex)
                 {
@@ -356,7 +356,7 @@ namespace StrDss.Service
             }
         }
 
-        private async Task SendTakedownNoticeFromListingEmail(TakedownNoticesFromListingDto[] listings, TakedownNoticeFromListing template)
+        private async Task SendTakedownNoticeEmailFromListingAsync(TakedownNoticesFromListingDto[] listings, TakedownNoticeFromListing template)
         {
             var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
 
@@ -377,6 +377,7 @@ namespace StrDss.Service
                 InitiatingUserIdentityId = _currentUser.Id,
                 AffectedByUserIdentityId = null,
                 InvolvedInOrganizationId = listing.ProvidingPlatformId,
+                ConcernedWithRentalListingId = listing.RentalListingId,
             };
 
             await _emailRepo.AddEmailMessage(emailEntity);
@@ -436,7 +437,6 @@ namespace StrDss.Service
                 Content = template1.GetHtmlPreview()
             });
         }
-
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownRequestsFromListingAsync(TakedownRequestsFromListingDto[] listings)
         {
@@ -539,7 +539,7 @@ namespace StrDss.Service
             {
                 try
                 {
-                    await SendTakedownRequestEmailFromListing(listings, template);
+                    await SendTakedownRequestEmailFromListingAsync(listings, template);
                 }
                 catch (Exception ex)
                 {
@@ -549,47 +549,35 @@ namespace StrDss.Service
             }
         }
 
-        private async Task SendTakedownRequestEmailFromListing(TakedownRequestsFromListingDto[] listings, TakedownRequestFromListing template)
+        private async Task SendTakedownRequestEmailFromListingAsync(TakedownRequestsFromListingDto[] listings, TakedownRequestFromListing template)
         {
-            var emailEntities = new List<DssEmailMessage>();
+            var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
 
-            foreach (var listing in listings)
+            var emailEntity = new DssEmailMessage
             {
-                var emailEntity = new DssEmailMessage
-                {
-                    EmailMessageType = template.EmailMessageType,
-                    MessageDeliveryDtm = DateTime.UtcNow,
-                    MessageTemplateDsc = template.GetContent(),
-                    IsHostContactedExternally = false,
-                    LgPhoneNo = null,
-                    UnreportedListingNo = listing.ListingId,
-                    HostEmailAddressDsc = null,
-                    LgEmailAddressDsc = null,
-                    CcEmailAddressDsc = string.Join("; ", template.Cc),
-                    UnreportedListingUrl = listing.Url,
-                    LgStrBylawUrl = null,
-                    InitiatingUserIdentityId = _currentUser.Id,
-                    AffectedByUserIdentityId = null,
-                    InvolvedInOrganizationId = listing.ProvidingPlatformId,
-                    RequestingOrganizationId = _currentUser.OrganizationId,
-                    IsWithStandardDetail = listing.IsWithStandardDetail,
-                    CustomDetailTxt = listing.CustomDetailTxt,
-                    ConcernedWithRentalListingId = listing.RentalListingId,
-                };
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsHostContactedExternally = false,
+                LgPhoneNo = null,
+                UnreportedListingNo = listing.ListingId,
+                HostEmailAddressDsc = null,
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = string.Join("; ", template.Cc),
+                UnreportedListingUrl = listing.Url,
+                LgStrBylawUrl = null,
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = null,
+                InvolvedInOrganizationId = listing.ProvidingPlatformId,
+                RequestingOrganizationId = _currentUser.OrganizationId,
+                IsWithStandardDetail = listing.IsWithStandardDetail,
+                CustomDetailTxt = listing.CustomDetailTxt,
+                ConcernedWithRentalListingId = listing.RentalListingId,
+            };
 
-                emailEntities.Add(emailEntity);
+            await _emailRepo.AddEmailMessage(emailEntity);
 
-                await _emailRepo.AddEmailMessage(emailEntity);
-            }
-
-            await _emailRepo.AddEmailMessage(emailEntities.First());
-
-            var messageNo = await template.SendEmail();
-
-            foreach (var emailEntity in emailEntities)
-            {
-                emailEntity.ExternalMessageNo = messageNo;
-            }
+            emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
         }

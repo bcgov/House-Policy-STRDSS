@@ -9,7 +9,9 @@ public partial class DssRentalListingVw
 
     public string? ListingStatusType { get; set; }
 
-    public int? ListingStatusSortNo { get; set; }
+    public string? ListingStatusTypeNm { get; set; }
+
+    public short? ListingStatusSortNo { get; set; }
 
     public DateOnly? LatestReportPeriodYm { get; set; }
 
@@ -19,7 +21,13 @@ public partial class DssRentalListingVw
 
     public bool? IsTakenDown { get; set; }
 
+    public bool? IsLgTransferred { get; set; }
+
+    public bool? IsChangedAddress { get; set; }
+
     public long? OfferingOrganizationId { get; set; }
+
+    public string? OfferingOrganizationCd { get; set; }
 
     public string? OfferingOrganizationNm { get; set; }
 
@@ -28,6 +36,10 @@ public partial class DssRentalListingVw
     public string? PlatformListingUrl { get; set; }
 
     public string? OriginalAddressTxt { get; set; }
+
+    public bool? IsMatchCorrected { get; set; }
+
+    public bool? IsMatchVerified { get; set; }
 
     public short? MatchScoreAmt { get; set; }
 
@@ -55,6 +67,8 @@ public partial class DssRentalListingVw
 
     public string? ManagingOrganizationNm { get; set; }
 
+    public string? EconomicRegionDsc { get; set; }
+
     public bool? IsPrincipalResidenceRequired { get; set; }
 
     public bool? IsBusinessLicenceRequired { get; set; }
@@ -63,9 +77,9 @@ public partial class DssRentalListingVw
 
     public short? AvailableBedroomsQty { get; set; }
 
-    public long? NightsBookedYtdQty { get; set; }
+    public short? NightsBookedYtdQty { get; set; }
 
-    public long? SeparateReservationsYtdQty { get; set; }
+    public short? SeparateReservationsYtdQty { get; set; }
 
     public string? BusinessLicenceNo { get; set; }
 

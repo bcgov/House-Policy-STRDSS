@@ -18,7 +18,22 @@ public partial class DssUserRole
     /// </summary>
     public string UserRoleNm { get; set; } = null!;
 
-    public virtual ICollection<DssUserIdentity> UserIdentities { get; set; } = new List<DssUserIdentity>();
+    /// <summary>
+    /// The human-readable description that is given for the role
+    /// </summary>
+    public string? UserRoleDsc { get; set; }
 
-    public virtual ICollection<DssUserPrivilege> UserPrivilegeCds { get; set; } = new List<DssUserPrivilege>();
+    /// <summary>
+    /// Trigger-updated timestamp of last change
+    /// </summary>
+    public DateTime? UpdDtm { get; set; }
+
+    /// <summary>
+    /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
+    /// </summary>
+    public Guid? UpdUserGuid { get; set; }
+
+    public virtual ICollection<DssUserRoleAssignment> DssUserRoleAssignments { get; set; } = new List<DssUserRoleAssignment>();
+
+    public virtual ICollection<DssUserRolePrivilege> DssUserRolePrivileges { get; set; } = new List<DssUserRolePrivilege>();
 }

@@ -38,6 +38,18 @@ namespace StrDss.Api.Controllers
             return Ok(list);
         }
 
+        [ApiAuthorize(Permissions.UserRead)]
+        [HttpGet("{userId}", Name = "GetUser")]
+        public async Task<ActionResult<UserDto>> GetUser(long userId)
+        {
+            var user = await _userService.GetUserByIdAsync(userId);
+
+            if (user == null)
+                return NotFound();
+
+            return Ok(user);
+        }
+
         [ApiAuthorize]
         [HttpPost("accessrequests", Name = "CreateAccessRequest")]
         public async Task<ActionResult> CreateAccessRequest(AccessRequestCreateDto dto)
@@ -113,6 +125,30 @@ namespace StrDss.Api.Controllers
             }
 
             return Ok();
+        }
+
+        [ApiAuthorize(Permissions.UserWrite)]
+        [HttpPut("{userId}", Name = "UpdateUser")]
+        public async Task<ActionResult> UpdateUser(long userId, UserUpdateDto dto)
+        {
+            dto.UserIdentityId = userId;
+
+            var errors = await _userService.UpdateUserAsync(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
+        }
+
+        [ApiAuthorize]
+        [HttpGet("currentuser/bceiduserinfo", Name = "GetBceidUserInfo")]
+        public async Task<ActionResult> GetBceidUserInfo()
+        {
+            var userinfo = await _userService.GetBceidUserInfo();
+            return Ok(userinfo);
         }
     }
 }

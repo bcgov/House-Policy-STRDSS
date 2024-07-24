@@ -60,11 +60,23 @@ body {
     }
 
     p-dropdown,
+    p-multiSelect,
     input {
         &.full-width-text-field {
             width: 100%;
 
-            .p-dropdown {
+            .p-inputtext,
+            .p-dropdown,
+            .p-multiselect {
+                width: 100%;
+            }
+        }
+
+        &.auto-width {
+
+            .p-inputtext,
+            .p-dropdown,
+            .p-multiselect {
                 width: 100%;
             }
         }
@@ -73,7 +85,8 @@ body {
             width: 340px;
 
             .p-inputtext,
-            .p-dropdown {
+            .p-dropdown,
+            .p-multiselect {
                 width: 340px;
             }
         }
@@ -101,7 +114,6 @@ body {
             }
 
             .p-dropdown {
-
                 width: 200px;
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
@@ -118,6 +130,15 @@ body {
                         line-height: 22px;
                     }
                 }
+            }
+        }
+    }
+
+    p-tag {
+        &.updated-tag {
+            .p-tag {
+                background-color: #ECEAE8;
+                color: #2D2D2D;
             }
         }
     }
@@ -155,6 +176,12 @@ body {
         &.outline-btn {
             background-color: transparent;
             color: #053662;
+            border-color: #053662;
+
+            &.red {
+                color: #CE3E39;
+                border-color: #CE3E39;
+            }
         }
 
         &.p-button-link {
@@ -221,6 +248,12 @@ body {
                     background-color: #42814A;
                 }
             }
+        }
+    }
+
+    .p-checkbox-label {
+        &.warn {
+            color: #CE3E39;
         }
     }
 
@@ -305,9 +338,9 @@ body {
     }
 
     p-paginator {
-
         .p-paginator-rpp-options,
         .p-dropdown-label.p-inputtext,
+
         p-dropdown {
             width: 100px;
         }
@@ -331,7 +364,6 @@ body {
         }
     }
 
-
     .p-paginator.paging-right {
         justify-content: end
     }
@@ -348,7 +380,8 @@ body {
         font-family: 'BcSans-bold';
     }
 
-    .preview-dialog {
+    .preview-dialog,
+    .address-change-popup {
         .p-dialog-header {
             border-bottom: 1px solid #D8D8D8;
 
@@ -359,6 +392,12 @@ body {
 
         .p-dialog-footer {
             border-top: 1px solid #D8D8D8;
+        }
+
+        &.address-change-popup {
+            .p-dialog-footer {
+                padding: .75rem 1rem;
+            }
         }
     }
 }

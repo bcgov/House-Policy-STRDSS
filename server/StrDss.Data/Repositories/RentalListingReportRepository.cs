@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
 using System.Diagnostics;
 
@@ -22,6 +23,7 @@ namespace StrDss.Data.Repositories
         Task UpdateInactiveListings(long providingPlatformId);
         Task UpdateListingStatus(long providingPlatformId, long rentalListingId);
         Task<int> GetTotalNumberOfUploadLines(long uploadId);
+        Task<(short NightsBookedQty, short SeparateReservationsQty)> GetYtdValuesOfListingAsync(DateOnly reportPeriodYm, long offeringOrgId, string listingId);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
     {
@@ -75,6 +77,27 @@ namespace StrDss.Data.Repositories
             _logger.LogDebug($"GetRentalListingAsync = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
 
             return listing;
+        }
+
+        public async Task<(short NightsBookedQty, short SeparateReservationsQty)> GetYtdValuesOfListingAsync(DateOnly reportPeriodYm, long offeringOrgId, string listingId)
+        {
+            var startPeriodYm = new DateOnly(reportPeriodYm.Year, 1, 1);
+            var ytdValues = await _dbContext.DssRentalListings.AsNoTracking()
+                .Where(x => x.OfferingOrganizationId == offeringOrgId
+                    && x.PlatformListingNo == listingId
+                    && x.IncludingRentalListingReport.ReportPeriodYm >= startPeriodYm
+                    && x.IncludingRentalListingReport.ReportPeriodYm <= reportPeriodYm)
+                .GroupBy(x => 1)
+                .Select(g => new
+                {
+                    NightsBookedQty = (short)g.Sum(x => (short)x.NightsBookedQty),
+                    SeparateReservationsQty = (short)g.Sum(x => (short)x.SeparateReservationsQty)
+                })
+                .FirstOrDefaultAsync();
+
+            return ytdValues != null
+                ? (ytdValues.NightsBookedQty, ytdValues.SeparateReservationsQty)
+                : ((short)0, (short)0);
         }
 
         public void DeleteListingContacts(long rentalListingId)
@@ -144,7 +167,7 @@ namespace StrDss.Data.Repositories
             foreach (var listingId in inactiveListingIds)
             {
                 await _dbContext.Database.ExecuteSqlAsync(
-                    $"UPDATE dss_rental_listing SET is_active = false, is_new = false WHERE rental_listing_id = {listingId}");
+                    $"UPDATE dss_rental_listing SET is_active = false, is_new = false, listing_status_type = 'I' WHERE rental_listing_id = {listingId}");
             }
 
             stopwatch.Stop();
@@ -154,6 +177,8 @@ namespace StrDss.Data.Repositories
 
         public async Task UpdateListingStatus(long providingPlatformId, long rentalListingId)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var reports = await _dbSet.AsNoTracking()
                 .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
                 .ToListAsync();
@@ -167,6 +192,7 @@ namespace StrDss.Data.Repositories
             {
                 listing.IsActive = true;
                 listing.IsNew = true;
+                listing.ListingStatusType = "N";
             }
             else
             {
@@ -178,7 +204,12 @@ namespace StrDss.Data.Repositories
 
                 listing.IsActive = isActive;
                 listing.IsNew = isActive && count == 1;
+                listing.ListingStatusType = listing.IsNew.Value ? "N": "A";
             }
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"UpdateListingStatus = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
         }
 
         public async Task<int> GetTotalNumberOfUploadLines(long uploadId)

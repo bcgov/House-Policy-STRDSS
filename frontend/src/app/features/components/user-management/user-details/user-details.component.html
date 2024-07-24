@@ -1,0 +1,106 @@
+<h2>User Information</h2>
+
+<div class="card" *ngIf="user">
+    <div class="header">User Details</div>
+    <div class="content">
+        <div class="value-block">
+            <div class="label"><strong>Display Name</strong> </div>
+            <div class="value">{{user.displayNm || '-'}}</div>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>User Identity Provider</strong> </div>
+            <div class="value">{{user.identityProviderNm || '-'}}</div>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>Email</strong> </div>
+            <div class="value">{{user.emailAddressDsc || '-'}}</div>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>User Organization</strong> </div>
+            <div class="value">{{user.representedByOrganization.label || '-'}}</div>
+        </div>
+
+        <div class="value-block">
+            <div class="label"><strong>Given Name</strong> </div>
+            <div class="value">{{user.givenNm || '-'}}</div>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>Family Name</strong> </div>
+            <div class="value">{{user.familyNm || '-'}}</div>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>Access Request Status</strong> </div>
+            <div class="value">{{user.accessRequestStatusCd || '-'}}</div>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>Access Granted Date</strong> </div>
+            <div class="value">{{(user.accessGrantedDtm | date: 'dd/MM/yyyy') || '-'}}</div>
+        </div>
+
+        <div class="value-block">
+            <div class="label"><strong>Terms Acceptance</strong> </div>
+            <div class="value">{{(user.termsAcceptanceDtm | date: 'dd/MM/yyyy') || '-'}}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card" *ngIf="user">
+    <div class="header">Status, Roles and Permissions</div>
+    <div class="content">
+        <div class="value-block">
+            <div class="label"><strong>Organization Type</strong> </div>
+            <div class="value" *ngIf="!isEdit">{{user.representedByOrganization.organizationType || '-'}}</div>
+            <p-dropdown class="full-width-text-field" appendTo="body" *ngIf="isEdit" [options]="orgTypes"
+                [(ngModel)]="selectedOrgType" placeholder="Select a type" (onChange)="onOrgTypeChanged($event)">
+            </p-dropdown>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>Organization Name</strong> </div>
+            <div class="value" *ngIf="!isEdit">{{user.representedByOrganization.organizationCd || '-'}}</div>
+            <p-dropdown [filter]="true" class="full-width-text-field" appendTo="body" *ngIf="isEdit"
+                [options]="organizations" [(ngModel)]="selectedOrg" placeholder="Select a type">
+            </p-dropdown>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>Current Status</strong> </div>
+            <div class="value" *ngIf="!isEdit">{{user.isEnabled?'Active':'Disabled'}}</div>
+            <div class="status-checkboxes" *ngIf="isEdit">
+                <div class="radio">
+                    <p-radioButton name="active-radio" value="Active" [(ngModel)]="state"
+                        inputId="active-radio"></p-radioButton>
+                    <label for="active-radio" class="ml-2">Active</label>
+                </div>
+
+                <div class="radio">
+                    <p-radioButton name="disabled-radio" value="Disabled" [(ngModel)]="state"
+                        inputId="disabled-radio"></p-radioButton>
+                    <label for="disabled-radio" class="ml-2">Disabled</label>
+                </div>
+            </div>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>User Role(s) and Permission(s)</strong> </div>
+            <div class="tags-block" *ngIf="isEdit">
+                <p-multiSelect [options]="roles" class="full-width-text-field" [(ngModel)]="user.roleCds"
+                    appendTo="body" (onChange)="onSelectedRolesChanged($event)"></p-multiSelect>
+                <br>
+                <a class="link-to-roles" [routerLink]="'/roles'" target="_blank">View All Roles and Permissions</a>
+                <div class="tags-content">
+                    <p-tag [style]="{'background-color':'#D8EAFD', 'color':'#2D2D2D'}" *ngFor="let tag of tags"
+                        [value]="tag"></p-tag>
+                </div>
+            </div>
+            <div *ngIf="!isEdit" class="roles">
+                <span *ngFor="let tag of tags; let i=index">
+                    {{tags.length === i+1?tag:tag +', ' }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="actions">
+    <button pButton *ngIf="!isEdit" (click)="onUpdate()">Update</button>
+    <button pButton *ngIf="isEdit" (click)="onSave()">Save</button>
+    <button pButton class="outline-btn" (click)="onCancel()">Cancel</button>
+</div>

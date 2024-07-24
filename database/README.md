@@ -62,3 +62,16 @@ Each production release depends on the execution of a fixed set of scripts again
 - Sprint 7:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_7.sql`
   - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_7.sql`
+- Sprint 8:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_8.sql`
+  - `ddl/STR_DSS_Views_Sprint_8.sql`
+  - `seeding/STR_DSS_Data_Seeding_Sprint_8.sql`
+### Release 4 Scripts:
+- Sprint 9:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_9.sql`
+  - `ddl/STR_DSS_Views_Sprint_9.sql`
+  - `seeding/STR_DSS_Data_Seeding_Sprint_9.sql`
+  - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_9.sql`
+  - `utility/DSS-601_Correct_Rental_Listings_Sprint_9.sql`
+### Release 5 Scripts:
+- Sprint 10:

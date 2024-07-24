@@ -19,6 +19,7 @@ namespace StrDss.Model.UserDtos
         public string AccessRequestStatusCd { get; set; } = null!;
 
         public DateTime? AccessRequestDtm { get; set; }
+        public DateTime? AccessGrantedDtm { get; set; }
 
         public string? AccessRequestJustificationTxt { get; set; }
 
@@ -36,6 +37,6 @@ namespace StrDss.Model.UserDtos
 
         public DateTime UpdDtm { get; set; }
         public virtual OrganizationDto? RepresentedByOrganization { get; set; }
-        public virtual ICollection<RoleDto> UserRoleCds { get; set; } = new List<RoleDto>();
+        public List<string> RoleCds { get; set; } = new List<string>();
     }
 }

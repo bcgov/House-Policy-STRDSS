@@ -24,6 +24,9 @@ namespace StrDss.Service
         Task<List<DropdownStrDto>> GetAccessRequestStatuses();
         Task<Dictionary<string, List<string>>> AcceptTermsConditions();
         Task UpdateBceidUserInfo(long userId, string firstName, string LastName);
+        Task<UserDto?> GetUserByIdAsync(long userId);
+        Task<Dictionary<string, List<string>>> UpdateUserAsync(UserUpdateDto dto);
+        Task<BceidAccount?> GetBceidUserInfo();
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -32,9 +35,10 @@ namespace StrDss.Service
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
         private IBceidApi _bceid;
+        private IRoleRepository _roleRepo;
 
         public UserService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBceidApi bceid)
+            IUserRepository userRepo, IOrganizationRepository orgRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBceidApi bceid, IRoleRepository roleRepo)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _userRepo = userRepo;
@@ -42,6 +46,7 @@ namespace StrDss.Service
             _emailService = emailService;
             _emailRepo = emailRepo;
             _bceid = bceid;
+            _roleRepo = roleRepo;
         }
 
         public async Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction)
@@ -446,6 +451,70 @@ namespace StrDss.Service
             await _userRepo.UpdateUserNamesAsync(userId, firstName, LastName);
 
             _unitOfWork.Commit();
+        }
+
+        public async Task<UserDto?> GetUserByIdAsync(long userId)
+        {
+            return await _userRepo.GetUserById(userId);
+        }
+
+        public async Task<Dictionary<string, List<string>>> UpdateUserAsync(UserUpdateDto dto)
+        {
+            var errors = await ValidateUserUpdateDto(dto);
+            if (errors.Count > 0) return errors;
+
+            await _userRepo.UpdateUserAsync(dto);
+            _unitOfWork.Commit();
+
+            return errors;
+        }
+
+        public async Task<Dictionary<string, List<string>>> ValidateUserUpdateDto(UserUpdateDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var user = await _userRepo.GetUserById(dto.UserIdentityId);
+            if (user == null)
+            {
+                errors.AddItem("userIdentityId", $"User ({dto.UserIdentityId}) doesn't exist");
+                return errors;
+            }
+
+            var org = await _orgRepo.GetOrganizationByIdAsync(dto.RepresentedByOrganizationId);
+            if (org == null)
+            {
+                errors.AddItem("representedByOrganizationId", $"Organization ({dto.RepresentedByOrganizationId}) doesn't exist");
+            }
+
+            foreach (var roleCd in dto.RoleCds)
+            {
+                var exists = await _roleRepo.DoesRoleCdExist(roleCd);
+                if (!exists)
+                {
+                    errors.AddItem("roleCd", $"Role ({roleCd}) doesn't exist");
+                }
+            }
+
+            return errors;
+        }
+
+        public async Task<BceidAccount?> GetBceidUserInfo()
+        {
+            if (_currentUser.IdentityProviderNm == StrDssIdProviders.BceidBusiness)
+            {
+                try
+                {
+                    var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
+                    return account;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"BCeID Web call failed - {ex.Message}", ex);
+                    _logger.LogInformation("BCeID Web call failed - Skipping UpdateBceidUserInfo ");
+                }
+            }
+
+            return null;
         }
     }
 }

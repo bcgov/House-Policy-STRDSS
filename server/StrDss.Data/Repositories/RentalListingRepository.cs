@@ -11,18 +11,33 @@ namespace StrDss.Data.Repositories
 {
     public interface IRentalListingRepository
     {
-        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? rentalListingId, string? hostName, string? businessLicense, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<RentalListingViewDto?> GetRentalListing(long rentaListingId);
+        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
+        Task<List<long>> GetRentalListingIdsToExport();
+        Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId);
+        Task<DssRentalListingExtract> GetOrCreateRentalListingExtractByOrgId(long organizationId);
+        Task<DssRentalListingExtract> GetOrCreateRentalListingExtractByExtractNm(string name);
+        Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
+        Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
+        Task ConfirmAddressAsync(long rentalListingId);
+        Task<DssRentalListing> UpdateAddressAsync(UpdateListingAddressDto dto);
+        DateTime GetLatestRentalListingExportTime();
+        Task<bool> IsListingUploadProcessRunning();
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
-        public RentalListingRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger) 
+        private IUserRepository _userRepo;
+
+        public RentalListingRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger,
+            IUserRepository userRepo) 
             : base(dbContext, mapper, currentUser, logger)
         {
+            _userRepo = userRepo;
         }
-        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, 
-            int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction)
         {
             var query = _dbSet.AsNoTracking();
 
@@ -71,24 +86,71 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(businessLicenseLower));
             }
 
+            if (prRequirement != null)
+            {
+                query = query.Where(x => prRequirement.Value
+                    ? x.IsPrincipalResidenceRequired == true
+                    : x.IsPrincipalResidenceRequired == null || x.IsPrincipalResidenceRequired == false);
+            }
+
+            if (blRequirement != null)
+            {
+                query = query.Where(x => blRequirement.Value
+                    ? x.IsBusinessLicenceRequired == true
+                    : x.IsBusinessLicenceRequired == null || x.IsBusinessLicenceRequired == false);
+            }
+
+            if (reassigned != null)
+            {
+                query = query.Where(x => reassigned.Value
+                    ? x.IsLgTransferred == true
+                    : x.IsLgTransferred == null || x.IsLgTransferred == false);
+            }
+
+            if (takedownComplete != null)
+            {
+                query = query.Where(x => takedownComplete.Value
+                    ? x.IsTakenDown == true
+                    : x.IsTakenDown == null || x.IsTakenDown == false);
+            }
+
+            if (lgId != null)
+            {
+                query = query.Where(x => x.ManagingOrganizationId == lgId);
+            }
+
+            if (statusArray.Length > 0)
+            {
+                query = query.Where(x => statusArray.Contains(x.ListingStatusType));
+            }
+
             var extraSort 
                 = "AddressSort1ProvinceCd asc, AddressSort2LocalityNm asc, AddressSort3LocalityTypeDsc asc, AddressSort4StreetNm asc, AddressSort5StreetTypeDsc asc, AddressSort6StreetDirectionDsc asc, AddressSort7CivicNo asc, AddressSort8UnitNo asc";
 
+            if (orderBy == "lastActionDtm")
+            {
+                orderBy = "lastActionDtm == null, lastActionDtm";
+            }
+            else if (orderBy == "lastActionNm")
+            {
+                orderBy = "lastActionNm == null, lastActionNm";
+            }
+
             var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
 
-            //foreach (var listing in listings.SourceList)
-            //{
-            //    listing.Hosts =
-            //        _mapper.Map<List<RentalListingContactDto>>(await
-            //            _dbContext.DssRentalListingContacts
-            //                .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
-            //                .ToListAsync());
-            //}
+            foreach (var listing in listings.SourceList)
+            {
+                listing.Hosts =
+                    _mapper.Map<List<RentalListingContactDto>>(await
+                        _dbContext.DssRentalListingContacts
+                            .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
+                            .ToListAsync());
+            }
 
             return listings;
         }
 
-        public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId)
+        public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId, bool loadHistory = true)
         {
             var listing = _mapper.Map<RentalListingViewDto>(await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.RentalListingId == rentalListingId));
 
@@ -109,6 +171,8 @@ namespace StrDss.Data.Repositories
                 .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
                 .ToListAsync());
 
+            if (!loadHistory) return listing;
+
             listing.ListingHistory = (await
                 _dbContext.DssRentalListings.AsNoTracking()
                 .Include(x => x.IncludingRentalListingReport)
@@ -124,24 +188,24 @@ namespace StrDss.Data.Repositories
             listing.ActionHistory = (await
                 _dbContext.DssEmailMessages.AsNoTracking()
                     .Include(x => x.EmailMessageTypeNavigation)
+                    .Include(x => x.InitiatingUserIdentity)
                     .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
                     .OrderByDescending(x => x.MessageDeliveryDtm)
                     .Select(x => new ActionHistoryDto
                     {
                         Action = x.EmailMessageTypeNavigation.EmailMessageTypeNm,
                         Date = DateUtils.ConvertUtcToPacificTime((DateTime)x.MessageDeliveryDtm!),
-                        UserGuid = x.UpdUserGuid
+                        FirstName = x.InitiatingUserIdentity == null ? "" : x.InitiatingUserIdentity.GivenNm,
+                        LastName = x.InitiatingUserIdentity == null ? "" : x.InitiatingUserIdentity.FamilyNm
                     })
                     .ToListAsync());
 
-            foreach(var action in listing.ActionHistory)
+            foreach (var action in listing.ActionHistory)
             {
-                var user = await _dbContext.DssUserIdentities.FirstOrDefaultAsync(x => x.UserGuid == x.UpdUserGuid);
-
-                if (user == null) continue;
-
-                action.User = CommonUtils.GetFullName(user!.GivenNm ?? "", user!.FamilyNm ?? "");
+                action.User = CommonUtils.GetFullName(action.FirstName ?? "", action.LastName ?? "");
             }
+
+            listing.AddressChangeHistory = await GetAddressChangeHistoryAsync(rentalListingId);
 
             return listing;
         }
@@ -156,9 +220,6 @@ namespace StrDss.Data.Repositories
                 listing.HostEmails = await GetHostEmailsAsync(rentalListingId);
             }
 
-            var listingView = await _dbContext.DssRentalListingVws.FirstAsync(x => x.RentalListingId == rentalListingId);
-            listing.LocalGovernmentId = listingView.ManagingOrganizationId ?? 0;
-
             (listing.PlatformEmails, listing.ProvidingPlatformId) = await GetPlatformEmailsAsync(listing.OfferingPlatformId);
 
             return listing;
@@ -166,15 +227,16 @@ namespace StrDss.Data.Repositories
 
         private async Task<RentalListingForTakedownDto?> GetRentalListingAsync(long rentalListingId)
         {
-            return await _dbContext.DssRentalListings
+            return await _dbContext.DssRentalListingVws
                 .Where(x => x.RentalListingId == rentalListingId)
                 .Select(x => new RentalListingForTakedownDto
                 {
                     RentalListingId = rentalListingId,
-                    PlatformListingNo = x.PlatformListingNo,
+                    PlatformListingNo = x.PlatformListingNo ?? "",
                     PlatformListingUrl = x.PlatformListingUrl,
-                    OrganizationCd = x.OfferingOrganization.OrganizationCd,
-                    OfferingPlatformId = x.OfferingOrganizationId
+                    OrganizationCd = x.OfferingOrganizationCd ?? "",
+                    OfferingPlatformId = x.OfferingOrganizationId ?? 0,
+                    LocalGovernmentId = x.ManagingOrganizationId ?? 0,
                 })
                 .FirstOrDefaultAsync();
         }
@@ -220,5 +282,330 @@ namespace StrDss.Data.Repositories
             return (platformEmails.ToList(), providingPlatformId);
         }
 
+        public async Task<List<long>> GetRentalListingIdsToExport()
+        {
+            return await _dbSet
+                .OrderBy(x => x.ManagingOrganizationId)
+                .ThenBy(x => x.IsPrincipalResidenceRequired)
+                .Select(x => x.RentalListingId ?? 0)
+                .ToListAsync();
+        }
+
+        public async Task<RentalListingExportDto?> GetRentalListingToExport(long rentalListingId)
+        {
+            var listing = _mapper.Map<RentalListingExportDto>(await _dbSet.AsNoTracking().FirstAsync(x => x.RentalListingId == rentalListingId));
+
+            await LoadHistoryFields(listing);
+
+            await LoadPropertyHostsFields(listing);
+
+            await LoadActionsFields(listing);
+
+            return listing;
+        }
+
+        private async Task LoadActionsFields(RentalListingExportDto listing)
+        {
+            var actions = await _dbContext.DssEmailMessages
+                .AsNoTracking()
+                .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
+                .OrderByDescending(x => x.MessageDeliveryDtm)
+                .Skip(1)
+                .Take(2)
+                .Select(x => new
+                {
+                    x.MessageDeliveryDtm,
+                    x.EmailMessageTypeNavigation.EmailMessageTypeNm
+                })
+                .ToListAsync();
+
+            switch (actions.Count)
+            {
+                case 2:
+                    listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
+                    listing.LastActionNm1 = actions[0].EmailMessageTypeNm;
+                    listing.LastActionDtm2 = actions[1].MessageDeliveryDtm;
+                    listing.LastActionNm2 = actions[1].EmailMessageTypeNm;
+                    break;
+                case 1:
+                    listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
+                    listing.LastActionNm1 = actions[0].EmailMessageTypeNm;
+                    break;
+            }
+        }
+
+        private async Task LoadHistoryFields(RentalListingExportDto listing)
+        {
+            var reportMonths = GetLast12ReportMonths();
+            var listingHistory = await _dbContext.DssRentalListings
+                .AsNoTracking()
+                .Where(x => x.OfferingOrganizationId == listing.OfferingOrganizationId
+                    && x.PlatformListingNo == listing.PlatformListingNo
+                    && x.IncludingRentalListingReportId != null
+                    && reportMonths.Contains(x.IncludingRentalListingReport.ReportPeriodYm))
+                .Select(x => new
+                {
+                    x.IncludingRentalListingReport.ReportPeriodYm,
+                    x.NightsBookedQty,
+                    x.SeparateReservationsQty
+                })
+                .ToListAsync();
+
+            var historyDict = listingHistory
+                .GroupBy(x => x.ReportPeriodYm)
+                .ToDictionary(g => g.Key, g => g.First()); // Use the first entry in case of duplicates
+
+            for (int i = 0; i < reportMonths.Length; i++)
+            {
+                if (historyDict.TryGetValue(reportMonths[i], out var history))
+                {
+                    RentalListingExportDto.NightsBookedSetters[i](listing, history.NightsBookedQty);
+                    RentalListingExportDto.SeparateReservationsSetters[i](listing, history.SeparateReservationsQty);
+                }
+            }
+        }
+
+        private async Task LoadPropertyHostsFields(RentalListingExportDto listing)
+        {
+            var listingContacts = await _dbContext.DssRentalListingContacts
+                .AsNoTracking()
+                .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
+                .Select(x => new
+                {
+                    x.IsPropertyOwner,
+                    x.ListingContactNbr,
+                    x.FullNm,
+                    x.EmailAddressDsc,
+                    x.PhoneNo,
+                    x.FullAddressTxt
+                })
+                .ToListAsync();
+
+            var propertyHosts = new[]
+            {
+                listingContacts.FirstOrDefault(x => x.IsPropertyOwner),
+                listingContacts.FirstOrDefault(x => !x.IsPropertyOwner && x.ListingContactNbr == 1),
+                listingContacts.FirstOrDefault(x => !x.IsPropertyOwner && x.ListingContactNbr == 2),
+                listingContacts.FirstOrDefault(x => !x.IsPropertyOwner && x.ListingContactNbr == 3),
+                listingContacts.FirstOrDefault(x => !x.IsPropertyOwner && x.ListingContactNbr == 4),
+                listingContacts.FirstOrDefault(x => !x.IsPropertyOwner && x.ListingContactNbr == 5)
+            };
+
+            for (int i = 0; i < propertyHosts.Length; i++)
+            {
+                var host = propertyHosts[i];
+                if (host != null)
+                {
+                    RentalListingExportDto.PropertyHostNameSetters[i](listing, host.FullNm);
+                    RentalListingExportDto.PropertyHostEmailSetters[i](listing, host.EmailAddressDsc);
+                    RentalListingExportDto.PropertyHostPhoneNumberSetters[i](listing, host.PhoneNo);
+                    RentalListingExportDto.PropertyHostMailingAddressSetters[i](listing, host.FullAddressTxt);
+                }
+            }
+        }
+
+        private DateOnly[] GetLast12ReportMonths()
+        {
+            var today = DateTime.UtcNow;
+            var currentMonth = new DateOnly(today.Year, today.Month, 1);
+            var reportMonths = new DateOnly[12];
+
+            for (var i = 0; i < 12; i++)
+            {
+                reportMonths[i] = currentMonth.AddMonths(-1 * (i + 1));
+            }
+
+            return reportMonths;
+        }
+
+
+        public async Task<DssRentalListingExtract> GetOrCreateRentalListingExtractByOrgId(long organizationId)
+        {
+            var extract = await _dbContext.DssRentalListingExtracts.FirstOrDefaultAsync(x => x.FilteringOrganizationId == organizationId);
+
+            if (extract == null)
+            {
+                extract = new DssRentalListingExtract
+                {
+                    FilteringOrganizationId = organizationId,
+                    IsPrRequirementFiltered = false,
+                    UpdUserGuid = Guid.Empty,
+                };
+
+                _dbContext.DssRentalListingExtracts.Add(extract);
+            }
+
+            return extract;
+        }
+
+        public async Task<DssRentalListingExtract> GetOrCreateRentalListingExtractByExtractNm(string name)
+        {
+            var extract = await _dbContext.DssRentalListingExtracts.FirstOrDefaultAsync(x => x.RentalListingExtractNm == name);
+
+            if (extract == null)
+            {
+                extract = new DssRentalListingExtract
+                {
+                    RentalListingExtractNm = name,
+                    IsPrRequirementFiltered = false,
+                    UpdUserGuid = Guid.Empty,
+                };
+
+                _dbContext.DssRentalListingExtracts.Add(extract);
+            }
+
+            return extract;
+        }
+        public async Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId)
+        {
+            var extract = await _dbContext
+                .DssRentalListingExtracts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.RentalListingExtractId == extractId);
+
+            if (extract == null) return null;
+
+            return _mapper.Map<RentalListingExtractDto>(extract);
+        }
+
+        public async Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync()
+        {
+            var datasets = _mapper.Map<List<RentalListingExtractDto>>(await _dbContext.DssRentalListingExtracts.AsNoTracking().ToListAsync());
+
+            return datasets.Where(x => _currentUser.OrganizationType == OrganizationTypes.LG
+                                       ? x.FilteringOrganizationId == _currentUser.OrganizationId
+                                       : x.FilteringOrganizationId == null).ToList();
+        }
+
+        public async Task ConfirmAddressAsync(long rentalListingId)
+        {
+            var listing = await _dbContext
+                .DssRentalListings
+                .Include(x => x.LocatingPhysicalAddress)
+                .FirstAsync(x => x.RentalListingId == rentalListingId);
+
+            var newAddress = _mapper.Map<DssPhysicalAddress>(listing.LocatingPhysicalAddress);
+
+            newAddress.PhysicalAddressId = 0;
+            newAddress.IsMatchVerified = true;
+            newAddress.IsMatchCorrected = null;
+            newAddress.IsChangedOriginalAddress = null;
+            newAddress.IsSystemProcessing = true;
+
+            newAddress.ReplacingPhysicalAddressId = listing.LocatingPhysicalAddressId;
+
+            listing.LocatingPhysicalAddress = newAddress;
+
+            _dbContext.Entry(listing.LocatingPhysicalAddress).State = EntityState.Detached;
+            _dbContext.Entry(newAddress).State = EntityState.Added;
+        }
+
+        public async Task<List<AddressChangeHistoryDto>> GetAddressChangeHistoryAsync(long rentalListingId)
+        {
+            var history = new List<AddressChangeHistoryDto>();
+            var listing = await _dbContext.DssRentalListings
+                .Include(x => x.LocatingPhysicalAddress)
+                .FirstOrDefaultAsync(x => x.RentalListingId == rentalListingId);
+
+            if (listing?.LocatingPhysicalAddress == null)
+                return history;
+
+            var addressIds = new HashSet<long>();
+            await BuildAddressHistoryRecursivelyAsync(listing.LocatingPhysicalAddress, history, addressIds);
+            return history.OrderByDescending(x => x.Date).ToList();
+        }
+
+        private async Task BuildAddressHistoryRecursivelyAsync(DssPhysicalAddress address, List<AddressChangeHistoryDto> history, HashSet<long> processedAddressIds)
+        {
+            if (address == null || !processedAddressIds.Add(address.PhysicalAddressId))
+                return;
+
+            var addressDto = new AddressChangeHistoryDto
+            {
+                Type = GetAddressHistoryType(address),
+                PlatformAddress = address.OriginalAddressTxt,
+                BestMatchAddress = address.MatchAddressTxt ?? "",
+                Date = DateUtils.ConvertUtcToPacificTime(address.UpdDtm),
+                User = await GetUserNameAsync(address.UpdUserGuid)
+            };
+
+            history.Add(addressDto);
+
+            if (address.ReplacingPhysicalAddressId.HasValue)
+            {
+                var previousAddress = await _dbContext.DssPhysicalAddresses
+                    .FirstOrDefaultAsync(a => a.PhysicalAddressId == address.ReplacingPhysicalAddressId);
+                await BuildAddressHistoryRecursivelyAsync(previousAddress, history, processedAddressIds);
+            }
+        }
+
+        private async Task<string> GetUserNameAsync(Guid? userGuid)
+        {
+            if (userGuid == null || userGuid == Guid.Empty)
+                return "System";
+
+            var user = await _userRepo.GetUserByGuid(userGuid.Value);
+            return user == null ? "System" : CommonUtils.GetFullName(user.GivenNm ?? "", user.FamilyNm ?? "");
+        }
+
+        private string GetAddressHistoryType(DssPhysicalAddress address)
+        {
+            if (address == null)
+                return "Unknown";
+
+            if (address.IsChangedOriginalAddress != null && address.IsChangedOriginalAddress.Value)
+                return "Platform Data";
+
+            if (address.IsMatchVerified != null && address.IsMatchVerified.Value)
+                return "User Confirmation";
+
+            if (address.IsMatchCorrected != null && address.IsMatchCorrected.Value)
+                return "User Edit";
+
+            return "Platform Data";
+        }
+
+        public async Task<DssRentalListing> UpdateAddressAsync(UpdateListingAddressDto dto)
+        {
+            var listing = await _dbContext
+                .DssRentalListings
+                .Include(x => x.LocatingPhysicalAddress)
+                .FirstAsync(x => x.RentalListingId == dto.RentalListingId);
+
+            var newAddress = _mapper.Map<DssPhysicalAddress>(listing.LocatingPhysicalAddress);
+
+            newAddress.PhysicalAddressId = 0;
+            newAddress.IsMatchVerified = null;
+            newAddress.IsMatchCorrected = null;
+            newAddress.IsChangedOriginalAddress = null;
+            newAddress.IsSystemProcessing = true;
+
+            newAddress.ReplacingPhysicalAddressId = listing.LocatingPhysicalAddressId;
+
+            listing.LocatingPhysicalAddress = newAddress;
+
+            _dbContext.Entry(listing.LocatingPhysicalAddress).State = EntityState.Detached;
+            _dbContext.Entry(newAddress).State = EntityState.Added;
+
+            return listing;
+        }
+
+        public DateTime GetLatestRentalListingExportTime()
+        {
+            if (_dbContext.DssRentalListingExtracts.Any())
+            {
+                return _dbContext.DssRentalListingExtracts.Max(x => x.UpdDtm);
+            }
+            else
+            {
+                return DateTime.UtcNow.AddDays(-1);
+            }
+        }
+
+        public async Task<bool> IsListingUploadProcessRunning()
+        {
+            return await _dbContext.DssUploadLines
+                .AnyAsync(x => x.IncludingUploadDelivery.UploadDeliveryType == "rental_report" && x.IsProcessed == false);                
+        }
     }
 }

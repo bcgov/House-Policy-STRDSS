@@ -223,6 +223,7 @@
                     line-height: 20px;
                     color: #FFFFFF;
                     font-family: 'BcSans-bold';
+                    font-size: 14px;
 
                     &.status-new {
                         background-color: #F8BB47;
@@ -242,6 +243,22 @@
 
                     &.status-reassigned {
                         background-color: #255A90;
+                    }
+                }
+
+                .status-flag {
+                    width: 20px;
+                    height: 20px;
+                    background-position: center center;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+
+                    &.status-takedown-complete {
+                        background-image: url(../../../../assets/images/flag-black.svg);
+                    }
+
+                    &.status-reassigned {
+                        background-image: url(../../../../assets/images/flag-blue.svg);
                     }
                 }
             }

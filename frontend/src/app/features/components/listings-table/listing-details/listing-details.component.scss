@@ -70,10 +70,17 @@
             flex-direction: row;
 
             .last-updated-container,
-            .platform-container {
+            .platform-container,
+            .status-container,
+            .organization-container {
                 min-width: 350px;
                 display: flex;
                 gap: 8px;
+
+                .status-item {
+                    display: flex;
+                    gap: 4px;
+                }
             }
         }
     }
@@ -168,6 +175,7 @@
         line-height: 20px;
         color: #FFFFFF;
         font-family: 'BcSans-bold';
+        font-size: 14px;
 
         &.status-new {
             background-color: #F8BB47;
@@ -187,6 +195,23 @@
 
         &.status-reassigned {
             background-color: #255A90;
+        }
+    }
+
+    .status-flag {
+        display: flex;
+        width: 20px;
+        height: 20px;
+        background-position: center center;
+        background-size: contain;
+        background-repeat: no-repeat;
+
+        &.status-takedown-complete {
+            background-image: url(../../../../../assets/images/flag-black.svg);
+        }
+
+        &.status-reassigned {
+            background-image: url(../../../../../assets/images/flag-blue.svg);
         }
     }
 

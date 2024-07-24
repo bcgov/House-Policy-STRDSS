@@ -22,26 +22,46 @@
         </div>
     </div>
     <div class="row">
-        <div class="last-updated-container" [ngSwitch]="listing.listingStatusType">
-            <strong>Listing Status: </strong>
-            <div *ngSwitchCase="'N'" class="status-circle status-new">
-                N
-            </div>
-            <div *ngSwitchCase="'A'" class="status-circle status-active">
-                A
-            </div>
-            <div *ngSwitchCase="'I'" class="status-circle status-inactive">
-                I
-            </div>
-            <div *ngIf="listing.isTakenDown" class="status-circle status-takedown-complete">
-                T
-            </div>
-            <div *ngIf="listing.isLgTransferred" class="status-circle status-reassigned">
-                R
-            </div>
-        </div>
-        <div class="platform-container">
+        <div class="organization-container">
             <strong>Assigned to: </strong>{{listing.managingOrganizationNm || '-'}}
+        </div>
+        <div class="status-container" [ngSwitch]="listing.listingStatusType">
+            <strong>Listing Status: </strong>
+            <span class="status-item" *ngSwitchCase="'N'">New
+                <span class="status-circle status-new" pTooltip="New">
+                    N
+                </span>
+            </span>
+            <span class="status-item" *ngSwitchCase="'A'">
+                <span>
+                    Active
+                </span>
+                <span class="status-circle status-active" pTooltip="Active">
+                    A
+                </span>
+            </span>
+            <span class="status-item" *ngSwitchCase="'I'">
+                <span>
+                    Inactive
+                </span>
+                <span class="status-circle status-inactive" pTooltip="Inactive">
+                    I
+                </span>
+            </span>
+            <span class="status-item" *ngIf="listing.isLgTransferred">
+                <span>
+                    Reassigned
+                </span>
+                <span class="status-flag status-reassigned" pTooltip="Reassigned">
+                </span>
+            </span>
+            <span class="status-item" *ngIf="listing.isTakenDown">
+                <span>
+                    Takedown Complete
+                </span>
+                <span class="status-flag status-takedown-complete" pTooltip="Takedown Complete">
+                </span>
+            </span>
         </div>
     </div>
 </div>

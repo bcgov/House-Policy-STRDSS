@@ -165,13 +165,11 @@
                             <div *ngSwitchCase="'I'" class="status-circle status-inactive" pTooltip="Inactive">
                                 I
                             </div>
-                            <div *ngIf="row.isTakenDown" class="status-circle status-takedown-complete"
-                                pTooltip="Takedown Complete">
-                                T
-                            </div>
-                            <div *ngIf="row.isLgTransferred" class="status-circle status-reassigned"
+                            <div *ngIf="row.isLgTransferred" class="status-flag status-reassigned"
                                 pTooltip="Reassigned">
-                                R
+                            </div>
+                            <div *ngIf="row.isTakenDown" class="status-flag status-takedown-complete"
+                                pTooltip="Takedown Complete">
                             </div>
                         </div>
                     </td>

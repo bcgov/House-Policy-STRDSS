@@ -142,5 +142,13 @@ namespace StrDss.Api.Controllers
 
             return Ok();
         }
+
+        [ApiAuthorize]
+        [HttpGet("currentuser/bceiduserinfo", Name = "GetBceidUserInfo")]
+        public async Task<ActionResult> GetBceidUserInfo()
+        {
+            var userinfo = await _userService.GetBceidUserInfo();
+            return Ok(userinfo);
+        }
     }
 }

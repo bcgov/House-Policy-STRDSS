@@ -26,6 +26,7 @@ namespace StrDss.Service
         Task UpdateBceidUserInfo(long userId, string firstName, string LastName);
         Task<UserDto?> GetUserByIdAsync(long userId);
         Task<Dictionary<string, List<string>>> UpdateUserAsync(UserUpdateDto dto);
+        Task<BceidAccount?> GetBceidUserInfo();
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -495,6 +496,25 @@ namespace StrDss.Service
             }
 
             return errors;
+        }
+
+        public async Task<BceidAccount?> GetBceidUserInfo()
+        {
+            if (_currentUser.IdentityProviderNm == StrDssIdProviders.BceidBusiness)
+            {
+                try
+                {
+                    var (error, account) = await _bceid.GetBceidAccountCachedAsync(_currentUser.UserGuid, "", StrDssIdProviders.BceidBusiness, _currentUser.UserGuid, _currentUser.IdentityProviderNm);
+                    return account;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"BCeID Web call failed - {ex.Message}", ex);
+                    _logger.LogInformation("BCeID Web call failed");
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -9,10 +9,9 @@
     }
     public static class Entities
     {
-        public const string SystemUser = "SystemUser";
-        public const string StrApplication = "StrApplication";
-        public const string Audit = "Audit";
         public const string RentalListingRowUntyped = "RentalListingRowUntyped";
+        public const string Role = "Role";
+
     }
     public static class Fields
     {
@@ -84,6 +83,104 @@
         public const string SupplierHost5Id = "SupplierHost5Id";
     }
 
+    public static class RentalListingExport
+    {
+        public static readonly string[] Headers = new string[]
+        {
+            "Most Recent Platform Report Month",
+            "Status",
+            "Jurisdiction assigned to",
+            "economic_region_name",
+            "pr_requirement",
+            "BL_requirement",
+            "Platform Code",
+            "Listing ID",
+            "URL Address",
+            "Platform listing address",
+            "Geocoder Best match address (current month) - complete address",
+            "Geocoder Best match address (current month) -city only",
+            "Local Government Business Licence Number",
+            "Entire Unit",
+            "Number of Bedrooms available for STR",
+            "Current Month",
+            "Number of nights booked (Current month)",
+            "Number of nights booked (Current month - 1)",
+            "Number of nights booked (Current month - 2)",
+            "Number of nights booked (Current month - 3)",
+            "Number of nights booked (Current month - 4)",
+            "Number of nights booked (Current month - 5)",
+            "Number of nights booked (Current month - 6)",
+            "Number of nights booked (Current month - 7)",
+            "Number of nights booked (Current month - 8)",
+            "Number of nights booked (Current month - 9)",
+            "Number of nights booked (Current month - 10)",
+            "Number of nights booked (Current month - 11)",
+            "Number of separate reservations (Current month)",
+            "Number of separate reservations (Current month - 1)",
+            "Number of separate reservations (Current month - 2)",
+            "Number of separate reservations (Current month - 3)",
+            "Number of separate reservations (Current month - 4)",
+            "Number of separate reservations (Current month - 5)",
+            "Number of separate reservations (Current month - 6)",
+            "Number of separate reservations (Current month - 7)",
+            "Number of separate reservations (Current month - 8)",
+            "Number of separate reservations (Current month - 9)",
+            "Number of separate reservations (Current month - 10)",
+            "Number of separate reservations (Current month - 11)",
+            "Property Host name",
+            "Property Host email address",
+            "Property Host phone number",
+            "Property Host fax number",
+            "Property Host Mailing Address",
+            "Supplier Host 1 name",
+            "Supplier Host 1 email address",
+            "Supplier Host 1 phone number",
+            "Supplier Host 1 fax number",
+            "Supplier Host 1 Mailing Address",
+            "Host ID of Supplier Host 1",
+            "Supplier Host 2 name",
+            "Supplier Host 2 email address",
+            "Supplier Host 2 phone number",
+            "Supplier Host 2 fax number",
+            "Supplier Host 2 Mailing Address",
+            "Host ID of Supplier Host 2",
+            "Supplier Host 3 name",
+            "Supplier Host 3 email address",
+            "Supplier Host 3 phone number",
+            "Supplier Host 3 fax number",
+            "Supplier Host 3 Mailing Address",
+            "Host ID of Supplier Host 3",
+            "Supplier Host 4 name",
+            "Supplier Host 4 email address",
+            "Supplier Host 4 phone number",
+            "Supplier Host 4 fax number",
+            "Supplier Host 4 Mailing Address",
+            "Host ID of Supplier Host 4",
+            "Supplier Host 5 name",
+            "Supplier Host 5 email address",
+            "Supplier Host 5 phone number",
+            "Supplier Host 5 fax number",
+            "Supplier Host 5 Mailing Address",
+            "Host ID of Supplier Host 5",
+            "Last Action Taken",
+            "Date of Last Action Taken",
+            "Previous Action Taken 1",
+            "Date of Previous Action Taken 1",
+            "Previous Action Taken 2",
+            "Date of Previous Action Taken 2"
+        };
+
+        public static string GetHeadersAsCsv()
+        {
+            return string.Join(", ", Headers);
+        }
+    }
+
+    public static class RoleFields
+    {
+        public const string UserRoleCd = "UserRoleCd";
+        public const string UserRoleNm = "UserRoleNm";
+    }
 
     public static class AccessRequestStatuses
     {
@@ -198,14 +295,20 @@
 
     public static class Permissions
     {
-        public const string CeuAction = "ceu_action";
-        public const string AuditRead = "audit_read";
-        public const string ListingRead = "listing_read";
-        public const string TakedownAction = "takedown_action";
         public const string UserRead = "user_read";
+        public const string UserWrite = "user_write";
+        public const string RoleRead = "role_read";
+        public const string RoleWrite = "role_write";
+        public const string ListingRead = "listing_read";
+        public const string AddressWrite = "address_write";
         public const string LicenceFileUpload = "licence_file_upload";
         public const string ListingFileUpload = "listing_file_upload";
-        public const string UserWrite = "user_write";
+        public const string TakdownFileUpload = "takedown_file_upload";
+        public const string UploadHistoryRead = "upload_history_read";
+        public const string AuditRead = "audit_read";
+        public const string TakedownAction = "takedown_action";
+        public const string ProvinceAction = "province_action";
+        public const string CeuAction = "ceu_action";
     }
 
     public static class UploadDeliveryTypes
@@ -213,4 +316,9 @@
         public const string RentalReport = "rental_report";
     }
 
+    public static class ListingExportFileNames
+    {
+        public const string All = "BC";
+        public const string AllPr = "BC_PR";
+    }
 }

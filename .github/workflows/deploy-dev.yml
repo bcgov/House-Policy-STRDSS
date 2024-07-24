@@ -75,12 +75,12 @@ jobs:
       run: cd server && docker build -t strdss-backend -f Dockerfile .
 
     - name: Tag Docker image
-      run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
+      run: docker tag strdss-backend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:dev
 
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:latest
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-backend:dev
 
   docker-build-hangfire:
     runs-on: ubuntu-22.04
@@ -99,12 +99,12 @@ jobs:
       run: cd server && docker build -t strdss-hangfire -f Dockerfile.hangfire .
 
     - name: Tag Docker image
-      run: docker tag strdss-hangfire artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-hangfire:latest
+      run: docker tag strdss-hangfire artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-hangfire:dev
 
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-hangfire:latest
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-hangfire:dev
 
   docker-build-frontend:
     runs-on: ubuntu-22.04
@@ -127,14 +127,14 @@ jobs:
       run: cd frontend && docker build -t strdss-frontend -f Dockerfile .
 
     - name: Tag Docker image
-      run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
+      run: docker tag strdss-frontend artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:dev
 
     - name: Push Docker image to Artifactory
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
-        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:latest
+        docker push artifacts.developer.gov.bc.ca/sf4a-strdss/strdss-frontend:dev
 
-  deploy:
+  deploy-silver:
     needs: [test-frontend, test-backend, docker-build-frontend, docker-build-backend, docker-build-hangfire]
     runs-on: ubuntu-22.04
     timeout-minutes: 5
@@ -161,8 +161,9 @@ jobs:
         NAMESPACE=f4a30d-dev \
         NAME=strdss-dev \
         ENV_NAME=dev \
-        IMAGE_TAG_FRONTEND=latest \
-        IMAGE_TAG_BACKEND=latest \
+        IMAGE_TAG_FRONTEND=dev \
+        IMAGE_TAG_BACKEND=dev \
+        IMAGE_TAG_HANGFIRE=dev \
       working-directory: ./helm/main
 
     - name: Wait for deployment to be ready
@@ -170,22 +171,45 @@ jobs:
         oc rollout status deployment/strdss-dev-frontend -n f4a30d-dev
       timeout-minutes: 5
 
-  zap-scan:
-    needs: [deploy]
+  deploy-emerald:
+    needs: [test-frontend, test-backend, docker-build-frontend, docker-build-backend, docker-build-hangfire]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
-    permissions:
-      contents: read
-      issues: write
 
     steps:
-    - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a
-    - uses: actions/checkout@96f53100ba2a5449eb71d2e6604bbcd94b9449b5
+    - name: Checkout ArgoCD Repo
+      id: gitops
+      uses: actions/checkout@v4
       with:
-        ref: main
-    - name: ZAP Scan
-      uses: zaproxy/action-full-scan@v0.10.0
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        target: https://dev-strdata.apps.silver.devops.gov.bc.ca/
-        rules_file_name: '.zap/rules.tsv'
+        repository: bcgov-c/tenant-gitops-b0471a
+        ref: develop
+        token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+    - name: Update Helm Values and Commit backend
+      id: helm
+      run: |
+          pwd
+
+          # Get current date and time
+          DATETIME=$(date +'%Y-%m-%d %H:%M:%S')
+
+          # set image tag
+          sed -i "s/tag: .*/tag: dev # Image Updated on $DATETIME/" deploy/dev_values.yaml
+
+          # Commit and push the changes
+          git config --global user.email "ychung-mot@github.com"
+          git config --global user.name "Young-Jin Chung"
+
+          git add deploy/dev_values.yaml
+
+          pwd
+          # Repackage Helm Chart
+          cd charts/gitops/charts
+
+          helm package ../../frontend/
+          helm package ../../backend/
+          helm package ../../hangfire/
+
+          git add .
+
+          git commit -m "Update image tag to dev on $DATETIME"
+          git push origin develop

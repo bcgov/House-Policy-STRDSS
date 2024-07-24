@@ -17,6 +17,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-user-management',
@@ -34,6 +36,7 @@ import { ToastModule } from 'primeng/toast';
     ConfirmDialogModule,
     InputTextModule,
     ToastModule,
+    RouterModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './user-management.component.html',
@@ -67,7 +70,15 @@ export class UserManagementComponent implements OnInit {
 
   myForm!: FormGroup;
 
-  constructor(private requestAccessService: RequestAccessService, private userDataService: UserDataService, private fb: FormBuilder, private confirmationService: ConfirmationService, private messageService: MessageService) { }
+  constructor(
+    private requestAccessService: RequestAccessService,
+    private userDataService: UserDataService,
+    private fb: FormBuilder,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService,
+    private loaderService: GlobalLoaderService,
+    private router: Router,
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -116,6 +127,7 @@ export class UserManagementComponent implements OnInit {
     this.currentOrganizationSelected = undefined;
     this.currentOrganizationTypeSelected = undefined;
 
+    this.loaderService.loadingStart();
     this.requestAccessService.approveAccessRequest(model).subscribe({
       next: () => {
         this.getUsers();
@@ -129,6 +141,9 @@ export class UserManagementComponent implements OnInit {
         }
         console.error(msg);
         this.onPopupClose();
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
       }
     });
   }
@@ -138,7 +153,7 @@ export class UserManagementComponent implements OnInit {
       userIdentityId: this.currentTableItem.userIdentityId,
       updDtm: this.currentTableItem.updDtm,
     };
-
+    this.loaderService.loadingStart();
     this.requestAccessService.denyAccessRequest(model).subscribe({
       next: () => {
         this.getUsers();
@@ -153,6 +168,9 @@ export class UserManagementComponent implements OnInit {
         }
         console.error(msg);
         this.onPopupClose();
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
       }
     });
   }
@@ -188,6 +206,7 @@ export class UserManagementComponent implements OnInit {
       rejectLabel: 'Cancel',
       closeOnEscape: false,
       accept: () => {
+        this.loaderService.loadingStart();
         this.userDataService.updateIsEnabled(accessRequest.userIdentityId, !accessRequest.isEnabled, accessRequest.updDtm).subscribe({
           next: () => {
             this.getUsers();
@@ -200,6 +219,9 @@ export class UserManagementComponent implements OnInit {
               this.showErrorToast('Error', 'Unable to change user\'s active status. Check console for additional details')
             }
             console.error(msg);
+          },
+          complete: () => {
+            this.loaderService.loadingEnd();
           }
         })
         accessRequest.isEnabled = !accessRequest.isEnabled;
@@ -223,6 +245,7 @@ export class UserManagementComponent implements OnInit {
   }
 
   private initData(): void {
+    this.loaderService.loadingStart();
     this.userDataService.getStatuses().subscribe({
       next: (data: Array<DropdownOption>) => {
         this.statuses = [{ label: 'All', value: '' }, ...data];
@@ -231,8 +254,12 @@ export class UserManagementComponent implements OnInit {
         this.showErrorToast('Error', 'Unable to retrieve Statuses. Check console for additional details')
         console.error(error);
       },
+      complete: () => {
+        this.loaderService.loadingEnd();
+      }
     });
 
+    this.loaderService.loadingStart();
     this.requestAccessService.getOrganizations().subscribe({
       next: (data) => {
         this.organizations = data;
@@ -242,9 +269,13 @@ export class UserManagementComponent implements OnInit {
       error: (error: any) => {
         this.showErrorToast('Error', 'Unable to retrieve Organizations. Check console for additional details')
         console.error(error);
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
       }
     });
 
+    this.loaderService.loadingStart();
     this.requestAccessService.getOrganizationTypes().subscribe({
       next: (data) => {
         this.organizationTypes = data;
@@ -252,6 +283,9 @@ export class UserManagementComponent implements OnInit {
       error: (error: any) => {
         this.showErrorToast('Error', 'Unable to retrieve Organization Types. Check console for additional details')
         console.error(error);
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
       }
     });
 
@@ -266,6 +300,7 @@ export class UserManagementComponent implements OnInit {
     const pageNumber = selectedPageNumber ?? (this.currentPage?.pageNumber || 0);
     const orderBy = '';
     const direction = 'desc';
+    this.loaderService.loadingStart();
 
     this.userDataService.getUsers(status, search, organizationId, pageSize, pageNumber, orderBy, direction).subscribe({
       next: (response: PagingResponse<AccessRequestTableItem>) => {
@@ -276,6 +311,10 @@ export class UserManagementComponent implements OnInit {
       error: (error: any) => {
         this.showErrorToast('Error', 'Unable to retrieve users. Check console for additional details')
         console.error(error);
+
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
       }
     });
   }

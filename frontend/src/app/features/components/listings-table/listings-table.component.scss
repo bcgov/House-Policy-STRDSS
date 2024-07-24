@@ -60,8 +60,6 @@
                     border-radius: 6px;
                     border-top-left-radius: 0;
                     border-bottom-left-radius: 0;
-
-                    i.pi {}
                 }
 
                 input.search-input {
@@ -139,8 +137,34 @@
                     text-decoration: none;
                 }
 
-                &.align-center {
+                .align-center {
                     text-align: center;
+                }
+
+                .status-col {
+                    width: 100%;
+                    display: flex;
+                    gap: 8px;
+                }
+
+                .address-col {
+                    width: 100%;
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+                }
+
+                .address-text {
+                    display: flex;
+                    align-items: center;
+                }
+
+                &.low-address-score-match {
+                    color: #CE3E39;
+
+                    i {
+                        font-weight: 600;
+                    }
                 }
 
                 .status-circle {
@@ -167,8 +191,12 @@
                         background-color: #9F9D9C;
                     }
 
-                    &.status-removed {
+                    &.status-takedown-complete {
                         background-color: #2D2D2D;
+                    }
+
+                    &.status-reassigned {
+                        background-color: #255A90;
                     }
                 }
             }

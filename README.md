@@ -10,7 +10,7 @@ The procedure outlines the steps to initiate a release and manage version. Here'
 To initiate a release, please follow these steps:
 
 1. Ensure that the necessary changes intended for the release in the `main` environment are made and committed to the `main` branch.
-1. Go to a manual GitHub Action [Create Version Tag with Changelog PR](./.github/workflows/create-tag-changelog-pr.yml).
+1. Go to a manual GitHub Action [Create Version Tag](./.github/workflows/create-tag.yml).
 1. Click `Run workflow` button and Select branch `main`.
 1. Enter the tag version to create, without any prefixes, e.g. 1.2.3
 1. Click `Run workflow` green button to trigger the process.

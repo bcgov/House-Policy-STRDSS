@@ -19,6 +19,7 @@ namespace StrDss.Data.Repositories
         Task<List<string>> GetManagingOrgCdsAsync(long orgId);
         Task<OrganizationDto> GetOrganizationByOrgCdAsync(string orgCd);
         Task<long?> GetContainingOrganizationId(Point point);
+        Task<long?> GetManagingOrgId(long orgId);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -107,6 +108,12 @@ namespace StrDss.Data.Repositories
             var result = await command.ExecuteScalarAsync();
 
             return result == DBNull.Value ? null : (long)result!;
+        }
+
+        public async Task<long?> GetManagingOrgId(long orgId)
+        {
+            var org = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == orgId);
+            return org?.ManagingOrganizationId;
         }
     }
 }

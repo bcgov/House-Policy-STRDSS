@@ -5,7 +5,7 @@
         public long? RentalListingId { get; set; }
 
         public string? ListingStatusType { get; set; }
-
+        public string? ListingStatusTypeNm { get; set; }
         public int? ListingStatusSortNo { get; set; }
 
         public DateOnly? LatestReportPeriodYm { get; set; }
@@ -15,8 +15,12 @@
         public bool? IsNew { get; set; }
 
         public bool? IsTakenDown { get; set; }
+        public bool? IsLgTransferred { get; set; }
+
+        public bool? IsChangedAddress { get; set; }
 
         public long? OfferingOrganizationId { get; set; }
+        public string? OfferingOrganizationCd { get; set; }
 
         public string? OfferingOrganizationNm { get; set; }
 
@@ -25,6 +29,9 @@
         public string? PlatformListingUrl { get; set; }
 
         public string? OriginalAddressTxt { get; set; }
+        public bool? IsMatchCorrected { get; set; }
+
+        public bool? IsMatchVerified { get; set; }
 
         public short? MatchScoreAmt { get; set; }
 
@@ -51,6 +58,7 @@
         public long? ManagingOrganizationId { get; set; }
 
         public string? ManagingOrganizationNm { get; set; }
+        public string? EconomicRegionDsc { get; set; }
 
         public bool? IsPrincipalResidenceRequired { get; set; }
 
@@ -71,9 +79,18 @@
         public string? LastActionNm { get; set; }
 
         public DateTime? LastActionDtm { get; set; }
+        public bool HasAtLeastOneValidHostEmail { get; set; }
+        public List<HostInfo> HostsInfo { get; set; } = new List<HostInfo>();
 
         public virtual ICollection<RentalListingContactDto> Hosts { get; set; } = new List<RentalListingContactDto>();
         public virtual ICollection<ListingHistoryDto> ListingHistory { get; set; } = new List<ListingHistoryDto>();
         public virtual ICollection<ActionHistoryDto> ActionHistory { get; set; } = new List<ActionHistoryDto>();
+        public virtual ICollection<AddressChangeHistoryDto> AddressChangeHistory { get; set; } = new List<AddressChangeHistoryDto>();
+    }
+
+    public class HostInfo
+    {
+        public string Host { get; set; } = "";
+        public bool HasValidEmail { get; set; }
     }
 }

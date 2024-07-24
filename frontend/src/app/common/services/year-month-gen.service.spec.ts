@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { YearMonthGenService } from './year-month-gen.service';
 
-xdescribe('YearMonthGenService', () => {
+describe('YearMonthGenService', () => {
   let service: YearMonthGenService;
 
   beforeEach(() => {

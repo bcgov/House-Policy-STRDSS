@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ListingDataService } from '../../../common/services/listing-data.service';
 import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { ListingTableRow } from '../../../common/models/listing-table-row';
@@ -14,14 +14,15 @@ import { PanelModule } from 'primeng/panel';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { User } from '../../../common/models/user';
-import { ceu_action } from '../../../common/consts/permissions.const';
+import { takedown_action } from '../../../common/consts/permissions.const';
 import { ListingDetailsComponent } from './listing-details/listing-details.component';
 import { ListingSearchRequest } from '../../../common/models/listing-search-request';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { BulkComplianceNoticeComponent } from '../bulk-compliance-notice/bulk-compliance-notice.component';
-import { BulkTakedownRequestComponent } from '../bulk-takedown-request/bulk-takedown-request.component';
 import { SelectedListingsStateService } from '../../../common/services/selected-listings-state.service';
-import { ListingSearchState } from '../../../common/models/listing-search-state';
+import { environment } from '../../../../environments/environment';
+import { TooltipModule } from 'primeng/tooltip';
+import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-listings-table',
@@ -37,7 +38,9 @@ import { ListingSearchState } from '../../../common/models/listing-search-state'
     InputTextModule,
     PanelModule,
     RouterModule,
+    TooltipModule,
     ListingDetailsComponent,
+    TagModule,
   ],
   templateUrl: './listings-table.component.html',
   styleUrl: './listings-table.component.scss'
@@ -54,8 +57,8 @@ export class ListingsTableComponent implements OnInit {
   searchColumns = new Array<DropdownOption>();
   isCEU = false;
   isLegendShown = false;
-  // MOCK: 
-  isNotImplemented = true;
+
+  readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
 
   constructor(
     private listingService: ListingDataService,
@@ -63,6 +66,8 @@ export class ListingsTableComponent implements OnInit {
     private router: Router,
     private searchStateService: SelectedListingsStateService,
     private route: ActivatedRoute,
+    private loaderService: GlobalLoaderService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -73,9 +78,9 @@ export class ListingsTableComponent implements OnInit {
       { label: 'Listing Url', value: 'url' },
       { label: 'Listing ID', value: 'listingId' },
       { label: 'Host Name', value: 'hostName' },
-      { label: 'Business License', value: 'businessLicense' },
+      { label: 'Business Licence', value: 'businessLicense' },
     ]
-    const state = {} as ListingSearchState;
+
     this.route.queryParams.subscribe({
       next: (prms) => {
 
@@ -107,9 +112,9 @@ export class ListingsTableComponent implements OnInit {
 
         this.userService.getCurrentUser().subscribe({
           next: (currentUser: User) => {
-            this.isCEU = currentUser.permissions.includes(ceu_action);
+            this.isCEU = currentUser.organizationType === 'BCGov';
             this.getListings(page);
-          }
+          },
         });
       }
     });
@@ -119,8 +124,7 @@ export class ListingsTableComponent implements OnInit {
     if (this.sort) {
       if (this.sort.prop === property) {
         this.sort.dir = this.sort.dir === 'asc' ? 'desc' : 'asc';
-      }
-      else {
+      } else {
         this.sort.prop = property;
         this.sort.dir = 'asc';
       }
@@ -141,20 +145,13 @@ export class ListingsTableComponent implements OnInit {
   }
 
   onNoticeOpen(): void {
-  }
-
-  onNoticeClose(): void {
+    this.searchStateService.selectedListings = this.selectedListings;
+    this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } })
   }
 
   onTakedownOpen(): void {
     this.searchStateService.selectedListings = this.selectedListings;
     this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } })
-  }
-
-  onTakedownClose(reason: 'cancel' | 'submit'): void {
-    if (reason === 'cancel') {
-      this.selectedListings = [];
-    }
   }
 
   onPageChange(value: any): void {
@@ -171,6 +168,7 @@ export class ListingsTableComponent implements OnInit {
   onSearch(): void {
     this.getListings(this.currentPage.pageNumber)
   }
+
   private cloakParams(): void {
     var newURL = location.href.split("?")[0];
     window.history.pushState('object', document.title, newURL);
@@ -184,9 +182,9 @@ export class ListingsTableComponent implements OnInit {
       sortColumn: this.sort?.prop,
       searchBy: this.searchColumn,
       sortDirection: this.sort?.dir || 'asc'
-    }
+    };
 
-    let url = '/listings?'
+    let url = '/listings?';
     Object.keys(state).forEach((key: string, index: number, array: string[]) => {
       if ((state as any)[key]) {
         url += `${key}=${(state as any)[key]}${index + 1 == array.length ? '' : '&'}`;
@@ -196,6 +194,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   private getListings(selectedPageNumber: number = 1): void {
+    this.loaderService.loadingStart();
     const searchReq = {} as ListingSearchRequest;
     searchReq[this.searchColumn] = this.searchTerm;
 
@@ -208,6 +207,10 @@ export class ListingsTableComponent implements OnInit {
         next: (res: PagingResponse<ListingTableRow>) => {
           this.currentPage = res.pageInfo;
           this.listings = res.sourceList;
+        },
+        complete: () => {
+          this.loaderService.loadingEnd();
+          this.cd.detectChanges();
         }
       });
   }

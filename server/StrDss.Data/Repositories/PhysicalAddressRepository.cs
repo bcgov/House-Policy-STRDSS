@@ -11,6 +11,9 @@ namespace StrDss.Data.Repositories
     {
         Task AddPhysicalAddressAsync(DssPhysicalAddress address);
         Task<DssPhysicalAddress?> GetPhysicalAdderssFromMasterListingAsync(long offeringOrgId, string listingId, string address);
+        Task<List<DssPhysicalAddress>> GetPhysicalAddressesToCleanUpAsync();
+        Task ReloadAddressAsync(DssPhysicalAddress address);
+        void ReplaceAddress(DssRentalListing listing, DssPhysicalAddress newAddress);
     }
     public class PhysicalAddressRepository : RepositoryBase<DssPhysicalAddress>, IPhysicalAddressRepository
     {
@@ -35,10 +38,32 @@ namespace StrDss.Data.Repositories
             if (listing == null) 
                 return null;
 
-            if (listing.LocatingPhysicalAddress!.OriginalAddressTxt.ToLower().Trim() != address.ToLower().Trim()) 
-                return null;
-
             return listing.LocatingPhysicalAddress;
+        }
+
+        public async Task<List<DssPhysicalAddress>> GetPhysicalAddressesToCleanUpAsync()
+        {
+            return await _dbSet
+                .Where(x => x.IsSystemProcessing == null 
+                    && x.MatchScoreAmt < 90
+                    && (x.IsMatchCorrected == null || (x.IsMatchCorrected.HasValue && x.IsMatchCorrected.Value == false))
+                    && (x.IsMatchVerified == null || (x.IsMatchVerified.HasValue && x.IsMatchVerified.Value == false))
+                 )
+                .OrderBy(x => x.PhysicalAddressId)
+                .Take(300)
+                .ToListAsync();
+        }
+        public async Task ReloadAddressAsync(DssPhysicalAddress address)
+        {
+            await _dbContext.Entry(address).ReloadAsync();
+        }
+
+        public void ReplaceAddress(DssRentalListing listing, DssPhysicalAddress newAddress)
+        {
+            listing.LocatingPhysicalAddress = newAddress;
+
+            _dbContext.Entry(listing.LocatingPhysicalAddress).State = EntityState.Detached;
+            _dbContext.Entry(newAddress).State = EntityState.Added;
         }
     }
 }

@@ -34,16 +34,6 @@ public partial class DssRentalListing
     public string? BcRegistryNo { get; set; }
 
     /// <summary>
-    /// Indicates whether the RENTAL LISTING VERSION is a CURRENT RENTAL LISTING (if it is a copy of the most current REPORTED RENTAL LISTING (having the same listing number for the same offering platform)
-    /// </summary>
-    public bool IsCurrent { get; set; }
-
-    /// <summary>
-    /// Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform
-    /// </summary>
-    public bool? IsTakenDown { get; set; }
-
-    /// <summary>
     /// Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)
     /// </summary>
     public bool? IsEntireUnit { get; set; }
@@ -66,17 +56,12 @@ public partial class DssRentalListing
     /// <summary>
     /// Foreign key
     /// </summary>
-    public long OfferingOrganizationId { get; set; }
-
-    /// <summary>
-    /// Foreign key
-    /// </summary>
     public long? IncludingRentalListingReportId { get; set; }
 
     /// <summary>
     /// Foreign key
     /// </summary>
-    public long? DerivedFromRentalListingId { get; set; }
+    public long OfferingOrganizationId { get; set; }
 
     /// <summary>
     /// Foreign key
@@ -94,6 +79,21 @@ public partial class DssRentalListing
     public Guid? UpdUserGuid { get; set; }
 
     /// <summary>
+    /// Indicates whether the RENTAL LISTING VERSION is a CURRENT RENTAL LISTING (if it is a copy of the most current REPORTED RENTAL LISTING (having the same listing number for the same offering platform)
+    /// </summary>
+    public bool IsCurrent { get; set; }
+
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform
+    /// </summary>
+    public bool? IsTakenDown { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? DerivedFromRentalListingId { get; set; }
+
+    /// <summary>
     /// Indicates whether a CURRENT RENTAL LISTING was included in the most recent RENTAL LISTING REPORT
     /// </summary>
     public bool? IsActive { get; set; }
@@ -102,6 +102,26 @@ public partial class DssRentalListing
     /// Indicates whether a CURRENT RENTAL LISTING appeared for the first time in the last reporting period
     /// </summary>
     public bool? IsNew { get; set; }
+
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING has been subjected to address match changes by a user
+    /// </summary>
+    public bool? IsChangedAddress { get; set; }
+
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING has been transferred to a different Local Goverment Organization as a result of address changes
+    /// </summary>
+    public bool? IsLgTransferred { get; set; }
+
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING has received a different property address in the last reporting period
+    /// </summary>
+    public bool? IsChangedOriginalAddress { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public string? ListingStatusType { get; set; }
 
     public virtual DssRentalListing? DerivedFromRentalListing { get; set; }
 
@@ -112,6 +132,8 @@ public partial class DssRentalListing
     public virtual DssRentalListingReport? IncludingRentalListingReport { get; set; }
 
     public virtual ICollection<DssRentalListing> InverseDerivedFromRentalListing { get; set; } = new List<DssRentalListing>();
+
+    public virtual DssListingStatusType? ListingStatusTypeNavigation { get; set; }
 
     public virtual DssPhysicalAddress? LocatingPhysicalAddress { get; set; }
 

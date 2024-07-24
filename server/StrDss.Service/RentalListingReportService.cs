@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Index.Quadtree;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Entities;
@@ -13,7 +12,6 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
-using StrDss.Model.UserDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
@@ -30,6 +28,7 @@ namespace StrDss.Service
         Task ProcessRentalReportUploadAsync();
         Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<byte[]?> GetRentalListingErrorFile(long uploadId);
+        Task CleaupAddressAsync();
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
     {
@@ -301,6 +300,8 @@ namespace StrDss.Service
 
         private async Task ProcessRentalReportUploadAsync(DssUploadDelivery upload)
         {
+            var processStopwatch = Stopwatch.StartNew();
+
             _logger.LogInformation($"Processing Rental Listing Report {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
 
             var reportPeriodYm = (DateOnly)upload.ReportPeriodYm!;
@@ -350,11 +351,7 @@ namespace StrDss.Service
 
                 var exists = linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.ListingId == row.ListingId);
 
-                if (!exists)
-                {
-                    _logger.LogInformation($"Skipping listing - ({row.OrgCd} - {row.ListingId})");
-                    continue;
-                }
+                if (!exists) continue;
 
                 var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.ListingId);
 
@@ -372,12 +369,13 @@ namespace StrDss.Service
 
                 processedCount++;
 
-                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/100");
             }
 
             if (!isLastLine)
             {
-                _logger.LogInformation($"Processed {processedCount} lines: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
+                processStopwatch.Stop();
+                _logger.LogInformation($"Processed {processedCount} lines: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
                 return;
             }
 
@@ -437,7 +435,8 @@ namespace StrDss.Service
                 _unitOfWork.CommitTransaction(transaction);
             }
 
-            _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm}");
+            processStopwatch.Stop();
+            _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
         private async Task<bool> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, bool isLastLine)
@@ -549,25 +548,81 @@ namespace StrDss.Service
 
             var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, address);
 
+            // brandnew address
             var error = "";
             if (physicalAddress == null)
             {
-                physicalAddress = new DssPhysicalAddress
+                var newAddress = new DssPhysicalAddress
                 {
                     OriginalAddressTxt = row.RentalAddress,
                 };
 
-                error = await _geocoder.GetAddressAsync(physicalAddress);
+                error = await _geocoder.GetAddressAsync(newAddress);
 
-                if (error.IsEmpty() && physicalAddress.LocationGeometry is not null && physicalAddress.LocationGeometry is Point point)
+                if (error.IsEmpty() && newAddress.LocationGeometry is not null && newAddress.LocationGeometry is Point point)
                 {
-                    physicalAddress.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+                    newAddress.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
                 }
 
-                await _addressRepo.AddPhysicalAddressAsync(physicalAddress);
+                await _addressRepo.AddPhysicalAddressAsync(newAddress);
+                return (newAddress, error);
             }
 
-            return (physicalAddress, error);
+            // same address as before
+            if (physicalAddress!.OriginalAddressTxt.ToLower().Trim() == address.ToLower().Trim())
+            {
+                return (physicalAddress, "");
+            }
+
+            // different address after user edit or confirmation
+            if ((physicalAddress.IsMatchCorrected != null && physicalAddress.IsMatchCorrected.Value) 
+                || (physicalAddress.IsMatchVerified != null && physicalAddress.IsMatchVerified.Value))
+            {
+                //create a new physical address, link to the previous address, and flag is_changed_original_address
+                var newAddress = _mapper.Map<DssPhysicalAddress>(physicalAddress);
+                newAddress.OriginalAddressTxt = row.RentalAddress;
+                newAddress.PhysicalAddressId = 0;
+
+                newAddress.IsSystemProcessing = true;
+                newAddress.IsChangedOriginalAddress = true;
+                newAddress.ReplacingPhysicalAddressId = physicalAddress.PhysicalAddressId;
+
+                listing.IsChangedOriginalAddress = true;
+
+                _addressRepo.ReplaceAddress(listing, newAddress);
+
+                return (newAddress, error);
+            }
+            // different address without user edit or confirmation
+            else
+            {
+                var newAddress = new DssPhysicalAddress
+                {
+                    OriginalAddressTxt = row.RentalAddress,
+                };
+
+                error = await _geocoder.GetAddressAsync(newAddress);
+
+                if (error.IsEmpty() && newAddress.LocationGeometry is not null && newAddress.LocationGeometry is Point point)
+                {
+                    newAddress.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+                }
+
+                newAddress.IsSystemProcessing = true;
+                newAddress.IsChangedOriginalAddress = true;
+                newAddress.ReplacingPhysicalAddressId = physicalAddress.PhysicalAddressId;
+
+                listing.IsChangedOriginalAddress = true;
+
+                if (physicalAddress.ContainingOrganizationId != newAddress.ContainingOrganizationId)
+                {
+                    listing.IsLgTransferred = true;
+                }                
+
+                _addressRepo.ReplaceAddress(listing, newAddress);
+
+                return (newAddress, error);
+            }
         }
 
         private async Task<(bool needUpdate, DssRentalListing masterListing)> CreateOrUpdateMasterListing(DateOnly reportPeriodYm, DssRentalListing listing, OrganizationDto offeringOrg, RentalListingRowUntyped row, DssPhysicalAddress physicalAddress)
@@ -592,6 +647,13 @@ namespace StrDss.Service
             masterListing.OfferingOrganizationId = offeringOrg.OrganizationId;
             masterListing.DerivedFromRentalListingId = listing.RentalListingId;
             masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
+
+            (masterListing.NightsBookedQty, masterListing.SeparateReservationsQty) = 
+                await _reportRepo.GetYtdValuesOfListingAsync(reportPeriodYm, offeringOrg.OrganizationId, masterListing.PlatformListingNo);
+
+            //if these are changed, the master listing must be updated as well
+            masterListing.IsLgTransferred = listing.IsLgTransferred != null ? listing.IsLgTransferred : masterListing.IsLgTransferred;
+            masterListing.IsChangedOriginalAddress = listing.IsChangedOriginalAddress != null ? listing.IsChangedOriginalAddress : masterListing.IsChangedOriginalAddress;
 
             return (true, masterListing);
         }
@@ -660,5 +722,87 @@ namespace StrDss.Service
 
             return Encoding.UTF8.GetBytes(contents.ToString());
         }
+
+        public async Task CleaupAddressAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var addresses = await _addressRepo.GetPhysicalAddressesToCleanUpAsync();
+
+            var totalCount = addresses.Count;
+            var processedCount = 0;
+
+            foreach (var address in addresses)
+            {
+                var stopwatchForGeocoder = Stopwatch.StartNew();
+
+                var error = await _geocoder.GetAddressAsync(address);
+
+                if (error.IsEmpty() && address.LocationGeometry is not null && address.LocationGeometry is Point point)
+                {
+                    address.ContainingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+                    address.IsSystemProcessing = true;
+                }
+                else
+                {
+                    address.IsSystemProcessing = false; //system error
+                }
+
+                processedCount++;
+
+                stopwatchForGeocoder.Stop();
+
+                var validationErrors = ValidateStringLengths(address);
+                if (validationErrors.Any())
+                {
+                    _logger.LogWarning($"Address Cleanup: {address.OriginalAddressTxt} - Address validation errors: {string.Join(", ", validationErrors)}");
+
+                    await _addressRepo.ReloadAddressAsync(address);
+                    address.IsSystemProcessing = false;
+                }
+
+                _logger.LogInformation($"Address Cleanup (geocoder): {stopwatchForGeocoder.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/{totalCount}");
+
+                _unitOfWork.Commit();
+            }
+
+            stopwatch.Stop();
+            _logger.LogInformation($"Address Cleanup Finished: {stopwatch.Elapsed.TotalSeconds} seconds");
+        }
+
+        private static List<string> ValidateStringLengths(DssPhysicalAddress address)
+        {
+            var errors = new List<string>();
+            var maxLengths = new Dictionary<string, int>
+                {
+                    { nameof(DssPhysicalAddress.OriginalAddressTxt), 250 },
+                    { nameof(DssPhysicalAddress.MatchAddressTxt), 250 },
+                    { nameof(DssPhysicalAddress.SiteNo), 50 },
+                    { nameof(DssPhysicalAddress.BlockNo), 50 },
+                    { nameof(DssPhysicalAddress.UnitNo), 50 },
+                    { nameof(DssPhysicalAddress.CivicNo), 50 },
+                    { nameof(DssPhysicalAddress.StreetNm), 50 },
+                    { nameof(DssPhysicalAddress.StreetTypeDsc), 50 },
+                    { nameof(DssPhysicalAddress.StreetDirectionDsc), 50 },
+                    { nameof(DssPhysicalAddress.LocalityNm), 50 },
+                    { nameof(DssPhysicalAddress.LocalityTypeDsc), 50 },
+                    { nameof(DssPhysicalAddress.ProvinceCd), 5 }
+                };
+
+            foreach (var property in address.GetType().GetProperties())
+            {
+                if (property.PropertyType == typeof(string))
+                {
+                    var value = property.GetValue(address) as string;
+                    if (value != null && maxLengths.ContainsKey(property.Name) && value.Length > maxLengths[property.Name])
+                    {
+                        errors.Add($"{property.Name} exceeds maximum length of {maxLengths[property.Name]} characters.");
+                    }
+                }
+            }
+
+            return errors;
+        }
+
     }
 }

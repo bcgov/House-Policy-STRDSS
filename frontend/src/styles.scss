@@ -42,9 +42,21 @@ body {
         width: 760px;
     }
 
+    a {
+        color: #053662;
+
+        &:visited {
+            color: #3470B1;
+        }
+    }
+
     .p-dropdown,
     .p-inputtext {
         width: 368px;
+
+        &.p-multiselect-filter {
+            width: 100%;
+        }
 
         &.long-text-field {
             width: 760px;
@@ -59,8 +71,15 @@ body {
         }
     }
 
+    p-multiSelect {
+        &.auto-width {
+            .p-multiselect {
+                width: 100%;
+            }
+        }
+    }
+
     p-dropdown,
-    p-multiSelect,
     input {
         &.full-width-text-field {
             width: 100%;
@@ -190,6 +209,14 @@ body {
                 font-size: 16px;
             }
 
+            &.colorless {
+                color: #2D2D2D;
+            }
+
+            &.red {
+                color: #CE3E39;
+            }
+
             &.zero-padding {
                 padding: 0;
             }
@@ -204,6 +231,10 @@ body {
 
             &:hover {
                 text-decoration-line: underline;
+            }
+
+            .pi {
+                margin-right: 6px;
             }
         }
 
@@ -220,6 +251,61 @@ body {
         &.table-small-btn {
             padding: 5px 10px;
             font-size: 14px;
+        }
+    }
+
+    p-sidebar {
+        &.listing-filter {
+            .p-sidebar-header {
+                border-bottom: 1px solid #D8D8D8;
+            }
+
+            .p-sidebar-footer {
+                border-top: 1px solid #D8D8D8;
+                display: flex;
+                justify-content: space-between;
+
+                .right-side {
+                    display: flex;
+                    gap: 8px;
+                }
+            }
+
+            .p-sidebar-content {
+                .row {
+                    padding: 8px;
+                }
+            }
+        }
+
+        .p-sidebar-right {
+            width: 28rem;
+        }
+    }
+
+    p-accordion {
+        &.borderless {
+
+            .p-accordion-header-link,
+            .p-accordion-content {
+                border: none;
+            }
+        }
+
+        &.filter-sidebar {
+            .p-accordion-header-link {
+                padding-left: 4px;
+                padding-right: 4px;
+                background-color: transparent;
+
+                .p-accordion-header-text {
+                    font-family: 'BcSans-bold';
+                }
+            }
+
+            .p-accordion-content {
+                padding: 0 12px;
+            }
         }
     }
 
@@ -378,6 +464,10 @@ body {
     strong,
     b {
         font-family: 'BcSans-bold';
+
+        &.h2-big {
+            font-size: x-large;
+        }
     }
 
     .preview-dialog,

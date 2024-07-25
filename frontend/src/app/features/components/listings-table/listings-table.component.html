@@ -1,13 +1,26 @@
 <div class="top-block">
     <h2 class="title">Listings</h2>
     <div class="search-container">
+        <span class="vertical-spacer" *ngIf="isFilterSet"></span>
         <p-dropdown [options]="searchColumns" id="search-by-drd" [(ngModel)]="searchColumn"
             class="search-by-select"></p-dropdown>
         <span class="p-input-icon-right search-input-container">
-            <button pButton id="search-submit-btn" (click)="onSearch()"> <i class="pi pi-search"></i></button>
+            <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()"> <i
+                    class="pi pi-search"></i></button>
+            <button pButton *ngIf="!!searchTerm" class="colorless p-button-link search-clear-btn" icon="pi pi-times"
+                (click)="onClearSearchBox()"></button>
             <input type="text" id="search-term-inp" (keydown.enter)="onSearch()" class="search-input"
                 placeholder="Search" pInputText [(ngModel)]="searchTerm" />
         </span>
+        <button pButton id="filter-open-btn" class="filter-open-btn p-button-link" [class.colorless]="!isFilterSet"
+            icon="pi {{isFilterSet?'pi-filter-fill':'pi-filter'}}" (click)="openFilterSidebar()">
+            Filter Listings
+        </button>
+
+        <button *ngIf="isFilterSet" pButton id="filter-clear-btn" icon="pi pi-filter-slash" class="p-button-link red"
+            (click)="onClearFilters()">
+            Clear Filters
+        </button>
     </div>
     <div class="legend-container">
         <button pButton id="view-more-history-btn" class="p-button-link" (click)="showLegend()">
@@ -143,26 +156,27 @@
                     </td>
                     <td>
                         <div [ngSwitch]="row.listingStatusType" class="align-center status-col">
-                            <div *ngSwitchCase="'N'" class="status-circle status-new">
+                            <div *ngSwitchCase="'N'" class="status-circle status-new" pTooltip="New">
                                 N
                             </div>
-                            <div *ngSwitchCase="'A'" class="status-circle status-active">
+                            <div *ngSwitchCase="'A'" class="status-circle status-active" pTooltip="Active">
                                 A
                             </div>
-                            <div *ngSwitchCase="'I'" class="status-circle status-inactive">
+                            <div *ngSwitchCase="'I'" class="status-circle status-inactive" pTooltip="Inactive">
                                 I
                             </div>
-                            <div *ngIf="row.isTakenDown" class="status-circle status-takedown-complete">
-                                T
+                            <div *ngIf="row.isLgTransferred" class="status-flag status-reassigned"
+                                pTooltip="Reassigned">
                             </div>
-                            <div *ngIf="row.isLgTransferred" class="status-circle status-reassigned">
-                                R
+                            <div *ngIf="row.isTakenDown" class="status-flag status-takedown-complete"
+                                pTooltip="Takedown Complete">
                             </div>
                         </div>
                     </td>
                     <td>{{ row.offeringOrganizationNm }}</td>
                     <td>
-                        <a target="_blank" [href]="row.platformListingUrl">{{ row.platformListingNo }}</a>
+                        <a target="_blank" class="listing-id-link" [href]="row.platformListingUrl">{{
+                            row.platformListingNo }}</a>
                     </td>
                     <td class="align-center">
                         <a pButton class="details-button-with-icon" target="_blank"
@@ -251,3 +265,88 @@
         </p>
     </p-dialog>
 </div>
+
+<p-sidebar ngClass="listing-filter p-sidebar-lg" [title]="'Filter Listings'" [(visible)]="isFilterOpened"
+    [closeOnEscape]="false" position="right" [modal]="false">
+    <ng-template pTemplate="header">
+        <strong class="h2-big"> Filter Listings</strong>
+    </ng-template>
+    <ng-template pTemplate="content">
+        <p-accordion *ngIf="cancelableFilter" class="borderless filter-sidebar" [multiple]="true"
+            [activeIndex]="[0,1,2]">
+            <p-accordionTab *ngIf="isCEU" iconPos="end" header="By Location">
+                <div class="row"><strong>Principal Residence Requirement Applies?</strong></div>
+                <div class="row">
+                    <p-radioButton name="principalResidenceRequired" value="Yes"
+                        [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
+                        inputId="principalResidenceRequired_true" label="Yes"></p-radioButton>
+                    <p-radioButton name="principalResidenceRequired" value="No"
+                        [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
+                        inputId="principalResidenceRequired_false" label="No"></p-radioButton>
+                    <p-radioButton name="principalResidenceRequired" value=""
+                        [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
+                        inputId="principalResidenceRequired_null" label="Both"></p-radioButton>
+                </div>
+                <div class="row"><strong>Business Licence Required?</strong></div>
+                <div class="row">
+                    <p-radioButton name="businessLicenceRequired" value="Yes"
+                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenseRequired"
+                        inputId="businessLicenceRequired_true" label="Yes"></p-radioButton>
+                    <p-radioButton name="businessLicenceRequired" value="No"
+                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenseRequired"
+                        inputId="businessLicenceRequired_false" label="No"></p-radioButton>
+                    <p-radioButton name="businessLicenceRequired" value=""
+                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenseRequired"
+                        inputId="businessLicenceRequired_null" label="Both"></p-radioButton>
+                </div>
+            </p-accordionTab>
+            <p-accordionTab *ngIf="isCEU" iconPos="end" header="By Community ">
+                <p-dropdown placeholder="Select a Community" [appendTo]="'body'" [inputId]="'community-filter-dropdown'"
+                    [filter]="true" class="auto-width" [options]="communities"
+                    [(ngModel)]="cancelableFilter.community"></p-dropdown>
+
+            </p-accordionTab>
+            <p-accordionTab iconPos="end" header="By Status">
+                <div class="row"><strong>Primary Statuses</strong></div>
+                <div class="row">
+                    <p-checkbox label="New" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.new"
+                        inputId="n-filter-cb">
+                    </p-checkbox>
+                </div>
+                <div class="row">
+                    <p-checkbox label="Active" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.active"
+                        inputId="a-filter-cb">
+                    </p-checkbox>
+                </div>
+                <div class="row">
+                    <p-checkbox label="Inactive" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.inactive"
+                        inputId="i-filter-cb">
+                    </p-checkbox>
+                </div>
+                <div class="row"><strong>Secondary Statuses</strong></div>
+                <div class="row">
+                    <p-checkbox label="Reassigned" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.reassigned"
+                        inputId="i-filter-cb">
+                    </p-checkbox>
+                </div>
+                <div class="row">
+                    <p-checkbox label="Takedown Complete" [binary]="true"
+                        [(ngModel)]="cancelableFilter.byStatus.takedownComplete" inputId="t-filter-cb">
+                    </p-checkbox>
+                </div>
+            </p-accordionTab>
+        </p-accordion>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="left-side">
+            <button pButton label="Clear Filters" id="clear-filters-btn" class="p-button-transparent"
+                (click)="onClearFilters()"></button>
+        </div>
+        <div class="right-side">
+            <button pButton label="Submit" id="submit-filters-btn" [disabled]="!isCancelableFilterSet"
+                (click)="onSubmitFilters()"></button>
+            <button pButton label="Cancel" id="cancel-filters-btn" class="outline-btn"
+                (click)="onCancelFilters()"></button>
+        </div>
+    </ng-template>
+</p-sidebar>

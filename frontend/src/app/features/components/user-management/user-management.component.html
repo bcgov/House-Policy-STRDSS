@@ -33,24 +33,29 @@
     </div>
     <div class="table-container">
 
-        <p-table [styleClass]="'p-datatable-sm'" [value]="accessRequests" [rows]="10">
+        <p-table [id]="'user-table'" [styleClass]="'p-datatable-sm'" [value]="accessRequests" [rows]="10">
             <ng-template pTemplate="header">
-                <tr>
-                    <th pSortableColumn="accessRequestDtm">Requested Date<p-sortIcon
+                <tr id="table-header">
+                    <th id="accessRequestDtm_th" pSortableColumn="accessRequestDtm">Requested Date<p-sortIcon
                             field="accessRequestDtm"></p-sortIcon></th>
-                    <th pSortableColumn="identityProviderNm">ID Provider<p-sortIcon field="givenNm"></p-sortIcon></th>
-                    <th pSortableColumn="givenNm">First Name<p-sortIcon field="givenNm"></p-sortIcon></th>
-                    <th pSortableColumn="familyNm">Last Name<p-sortIcon field="familyNm"></p-sortIcon></th>
-                    <th pSortableColumn="code1">Org Type<p-sortIcon field="code1"></p-sortIcon></th>
-                    <th pSortableColumn="emailAddressDsc">Email Address<p-sortIcon field="emailAddressDsc"></p-sortIcon>
+                    <th id="identityProviderNm_th" pSortableColumn="identityProviderNm">ID Provider<p-sortIcon
+                            field="givenNm"></p-sortIcon></th>
+                    <th id="givenNm_th" pSortableColumn="givenNm">First Name<p-sortIcon field="givenNm"></p-sortIcon>
                     </th>
-                    <th pSortableColumn="code2">Organization<p-sortIcon field="code2"></p-sortIcon></th>
-                    <th pSortableColumn="code2">Status<p-sortIcon field="code2"></p-sortIcon></th>
-                    <th pSortableColumn="action" class="action">Action<p-sortIcon field="action"></p-sortIcon></th>
+                    <th id="familyNm_th" pSortableColumn="familyNm">Last Name<p-sortIcon field="familyNm"></p-sortIcon>
+                    </th>
+                    <th id="orgType_th" pSortableColumn="code1">Org Type<p-sortIcon field="code1"></p-sortIcon></th>
+                    <th id="emailAddressDsc_th" pSortableColumn="emailAddressDsc">Email Address<p-sortIcon
+                            field="emailAddressDsc"></p-sortIcon>
+                    </th>
+                    <th id="orgName_th" pSortableColumn="code2">Organization<p-sortIcon field="code2"></p-sortIcon></th>
+                    <th id="Status_th" pSortableColumn="code2">Status<p-sortIcon field="code2"></p-sortIcon></th>
+                    <th id="action_th" pSortableColumn="action" class="action">Action<p-sortIcon
+                            field="action"></p-sortIcon></th>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-accessRequest>
-                <tr>
+            <ng-template pTemplate="body" let-accessRequest let-index="rowIndex">
+                <tr id="row-{{index}}">
                     <td>{{ accessRequest.accessRequestDtm | dateFormat }}</td>
                     <td>{{ accessRequest.identityProviderNm }}</td>
                     <td>{{ accessRequest.givenNm }}</td>
@@ -67,10 +72,10 @@
                                 <span [style]="{'color':'#CE3E39'}">Denied</span>
                             </ng-container>
                             <ng-container *ngSwitchCase="'Requested'">
-                                <button pButton name="form-approve-btn" id="form-approve-btn"
+                                <button pButton name="form-approve-btn" id="form-approve-{{index}}-btn"
                                     (click)="onApprovePopup(accessRequest)" class="table-small-btn">Approve</button>
 
-                                <button pButton name="form-reject-bt" id="form-reject-bt"
+                                <button pButton name="form-reject-btn" id="form-reject-{{index}}-btn"
                                     class="outline-btn table-small-btn" (click)="onRejectPopup(accessRequest)">
                                     Deny
                                 </button>
@@ -80,30 +85,30 @@
                     <td class="action non-header-cell">
                         <span
                             (click)="accessRequest.accessRequestStatusCd === 'Requested' || onActivateDeactivateToggle($event, accessRequest)">
-                            <p-inputSwitch class="table-small-switch"
+                            <p-inputSwitch class="table-small-switch" id="access-status-{{index}}-insw"
+                                [inputId]="'access-status-{{index}}-input-insw'"
                                 [disabled]="accessRequest.accessRequestStatusCd ==='Requested'"
                                 [(ngModel)]="accessRequest.isEnabled" [readonly]="true"></p-inputSwitch>
                         </span>
 
-                        <span class="user-edit-icon" *ngIf="accessRequest.accessRequestStatusCd
+                        <span id="user-edit-{{index}}-icon" class="user-edit-icon" *ngIf="accessRequest.accessRequestStatusCd
                             !=='Requested'" [routerLink]="'/user/'+accessRequest.userIdentityId"
                             [class.disabled]="accessRequest.accessRequestStatusCd ==='Requested'"></span>
                         <span *ngIf=" accessRequest.accessRequestStatusCd==='Requested'"
                             class="user-edit-icon disabled"></span>
-
                     </td>
                 </tr>
             </ng-template>
         </p-table>
-        <p-paginator class="users-paginator" #paginator *ngIf="currentPage" (onPageChange)="onPageChange($event)"
-            [rows]="10" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
-            [showCurrentPageReport]="true" [showFirstLastIcon]="false"
+        <p-paginator id="users-paginator" class="users-paginator" #paginator *ngIf="currentPage"
+            (onPageChange)="onPageChange($event)" [rows]="10" [totalRecords]="currentPage.totalCount || 0"
+            [showPageLinks]="false" [showCurrentPageReport]="true" [showFirstLastIcon]="false"
             [currentPageReportTemplate]="'Rows per page: 10 &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
     </div>
 </div>
 
-<p-dialog *ngIf="currentTableItem" header="Approve Access Request" [modal]="true" [(visible)]="showApprovePopup"
-    [style]="{width: '50vw'}">
+<p-dialog *ngIf="currentTableItem" id="approve-popup-dialog" header="Approve Access Request" [modal]="true"
+    [(visible)]="showApprovePopup" [style]="{width: '50vw'}">
     <div class="form-group-row"><strong class="bold-text">User Email: </strong>{{currentTableItem.emailAddressDsc}}
     </div>
     <div class="form-group-row"><strong class="bold-text">ID Provider: </strong>
@@ -142,8 +147,8 @@
     </div>
 </p-dialog>
 
-<p-dialog *ngIf="currentTableItem" header="Reject Access Request" [modal]="true" [(visible)]="showRejectPopup"
-    [style]="{width: '50vw'}">
+<p-dialog id="reject-popup-dialog" *ngIf="currentTableItem" header="Reject Access Request" [modal]="true"
+    [(visible)]="showRejectPopup" [style]="{width: '50vw'}">
     <div class="form-group-row-col"><strong class="bold-text">User ID: </strong>{{currentTableItem.emailAddressDsc}}
     </div>
     <div class="form-group-row-col"><strong class="bold-text">Requested User
@@ -160,4 +165,4 @@
     </div>
 </p-dialog>
 
-<p-confirmDialog [closable]="false"></p-confirmDialog>
+<p-confirmDialog id="confirmation-dialog" [closable]="false"></p-confirmDialog>

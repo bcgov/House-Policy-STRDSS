@@ -8,6 +8,7 @@ import { ListingTableRow } from '../models/listing-table-row';
 import { ListingSearchRequest } from '../models/listing-search-request';
 import { ListingAddressCandidate, ListingDetails } from '../models/listing-details';
 import { ExportJurisdiction } from '../models/export-listing';
+import { ListingFilter } from '../models/listing-filter';
 
 @Injectable({
   providedIn: 'root'
@@ -65,7 +66,8 @@ export class ListingDataService {
     pageSize: number = 10,
     orderBy: string = '',
     direction: 'asc' | 'desc' = 'asc',
-    searchReq: ListingSearchRequest = {}
+    searchReq: ListingSearchRequest = {},
+    filter?: ListingFilter
   ): Observable<PagingResponse<ListingTableRow>> {
     let endpointUrl = `${environment.API_HOST}/rentallistings?pageSize=${pageSize}&pageNumber=${pageNumber}`;
 
@@ -90,6 +92,37 @@ export class ListingDataService {
     }
     if (searchReq.businessLicense) {
       endpointUrl += `&businessLicense=${searchReq.businessLicense}`;
+    }
+
+    if (filter) {
+      if (filter.byLocation) {
+        if (!!filter.byLocation?.isPrincipalResidenceRequired) {
+          endpointUrl += `&prRequirement=${filter.byLocation.isPrincipalResidenceRequired == 'Yes'}`;
+        }
+        if (!!filter.byLocation?.isBusinessLicenseRequired) {
+          endpointUrl += `&blRequirement=${filter.byLocation.isBusinessLicenseRequired == 'Yes'}`;
+        }
+      }
+      if (filter.byStatus) {
+        if (filter.byStatus.reassigned !== null && filter.byStatus.reassigned !== undefined) {
+          endpointUrl += `&reassigned=${!!filter.byStatus.reassigned}`;
+        }
+        if (filter.byStatus.takedownComplete !== null && filter.byStatus.takedownComplete !== undefined) {
+          endpointUrl += `&takedownComplete=${!!filter.byStatus.takedownComplete}`;
+        }
+
+        const statuses = new Array();
+        if (filter.byStatus.active) statuses.push('A')
+        if (filter.byStatus.inactive) statuses.push('I')
+        if (filter.byStatus.new) statuses.push('N')
+
+        if (statuses.length) {
+          endpointUrl += `&statuses=${statuses.join(',')}`;
+        }
+      }
+      if (!!filter.community) {
+        endpointUrl += `&lgId=${filter.community}`;
+      }
     }
 
     return this.httpClient.get<PagingResponse<ListingTableRow>>(endpointUrl);

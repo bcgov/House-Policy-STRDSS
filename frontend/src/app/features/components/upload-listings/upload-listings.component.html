@@ -40,8 +40,8 @@
             <app-upload-file #componentRef [extension]="'.csv'" [sizeLimit]="maxFileSize"
                 (filesSelected)="onFileSelected($event, componentRef)"
                 [disabled]="isFileUploadDisabled"></app-upload-file>
-            <p-button *ngIf="!!uploadedFile" (onClick)="onClear()" class="clean-file-btn"
-                [icon]="'pi pi-times'"></p-button>
+            <p-button *ngIf="!!uploadedFile" (onClick)="onClear()" class="clean-file-btn" [icon]="'pi pi-times'"
+                id="clear-btn"></p-button>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!fileControl.pristine && fileControl.errors">
             <small id="file-error-text" *ngIf="fileControl.errors?.['required']">File is required</small>

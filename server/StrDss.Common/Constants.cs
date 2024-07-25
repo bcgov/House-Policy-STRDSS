@@ -172,7 +172,7 @@
 
         public static string GetHeadersAsCsv()
         {
-            return string.Join(", ", Headers);
+            return string.Join(",", Headers);
         }
     }
 

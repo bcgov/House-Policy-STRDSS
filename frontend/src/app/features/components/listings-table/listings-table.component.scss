@@ -37,6 +37,12 @@
         align-items: center;
 
         .search-container {
+
+            .vertical-spacer {
+                height: 24px;
+                width: 150px;
+            }
+
             display: flex;
             align-items: center;
             height: 46px;
@@ -44,22 +50,43 @@
             .search-input-container {
                 height: 45px;
                 display: flex;
+                gap: 12px;
 
                 button {
-                    position: absolute;
-                    right: 0;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
+                    &.search-submit-btn {
+                        position: absolute;
+                        right: 0px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
 
-                    height: 100%;
-                    width: 45px;
-                    margin: 0;
-                    padding: 0;
+                        height: 100%;
+                        width: 45px;
+                        margin: 0;
+                        padding: 0;
 
-                    border-radius: 6px;
-                    border-top-left-radius: 0;
-                    border-bottom-left-radius: 0;
+                        border-radius: 6px;
+                        border-top-left-radius: 0;
+                        border-bottom-left-radius: 0;
+                    }
+
+                    &.search-clear-btn {
+                        position: absolute;
+                        right: 38px;
+
+                        &:hover {
+                            text-decoration: none;
+                        }
+                    }
+
+                    &.filter-open-btn {
+                        padding-left: 6px;
+                        padding-right: 6px;
+
+                        &.filter-set {
+                            color: #255A90;
+                        }
+                    }
                 }
 
                 input.search-input {
@@ -74,6 +101,7 @@
             width: 100px;
 
             button {
+                color: #053662;
                 font-size: 16px;
 
                 .pi {
@@ -132,12 +160,29 @@
             td {
                 font-size: 12px;
 
+                .listing-id-link {
+                    color: #053662;
+
+                    &:visited {
+                        color: #3470B1;
+                    }
+                }
+
                 .details-button-with-icon {
                     padding: 4px;
                     text-decoration: none;
+                    background-color: #053662;
+                    border-color: #053662;
+                    color: #FFFFFF;
+
+                    &:visited {
+                        background-color: #3470B1;
+                        border-color: #3470B1;
+                        color: #FFFFFF;
+                    }
                 }
 
-                .align-center {
+                &.align-center {
                     text-align: center;
                 }
 
@@ -178,6 +223,7 @@
                     line-height: 20px;
                     color: #FFFFFF;
                     font-family: 'BcSans-bold';
+                    font-size: 14px;
 
                     &.status-new {
                         background-color: #F8BB47;
@@ -199,6 +245,22 @@
                         background-color: #255A90;
                     }
                 }
+
+                .status-flag {
+                    width: 20px;
+                    height: 20px;
+                    background-position: center center;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+
+                    &.status-takedown-complete {
+                        background-image: url(../../../../assets/images/flag-black.svg);
+                    }
+
+                    &.status-reassigned {
+                        background-image: url(../../../../assets/images/flag-blue.svg);
+                    }
+                }
             }
         }
 
@@ -206,5 +268,10 @@
             display: flex;
             justify-content: end;
         }
+    }
+
+    .row {
+        display: flex;
+        gap: 8px;
     }
 }

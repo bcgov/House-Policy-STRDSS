@@ -49,6 +49,7 @@ namespace UITest.TestDriver
                         options.SetLoggingPreference(LogType.Driver, LogLevel.All);
                         options.AddArgument("--ignore-ssl-errors=yes");
                         options.AddArgument("--ignore-certificate-errors");
+                        options.AddArgument("--start-maximized");
                         //options.AddArgument("--headless");
 
                         Driver = new ChromeDriver(assemblyDirectory, options);

@@ -74,7 +74,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _UserType = userHelper.SetUserType(UserType);
             //Authenticate user using IDir or BCID depending on the user
-            authHelper.Authenticate(UserName, _UserType);
+            authHelper.Authenticate(_TestUserName, _TestPassword,  _UserType);
         }
 
         [When(@"I access the Data Sharing System")]

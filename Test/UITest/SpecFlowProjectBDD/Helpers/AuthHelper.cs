@@ -55,10 +55,10 @@ namespace SpecFlowProjectBDD.Helpers
             return (_LogonType);
         }
 
-        public LogonTypeEnum? Authenticate(string UserName, UserTypeEnum UserType)
+        public LogonTypeEnum? Authenticate(string UserName, string Password, UserTypeEnum UserType)
         {
             _TestUserName = UserName;
-            _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
+            _TestPassword = Password;
             _LogonType = SetLogonType(UserType);
 
             _Driver.Url = _AppSettings.GetServer("default");

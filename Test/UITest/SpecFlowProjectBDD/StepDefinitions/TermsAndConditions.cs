@@ -114,7 +114,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             AuthHelper authHelper = new AuthHelper(_Driver);
 
             //Authenticate user using IDir or BCID depending on the user
-            _LogonType = authHelper.Authenticate(_TestUserName, _UserType);
+            _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword,  _UserType);
             ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
 
             //TODO: Validate that the login was sucessfull

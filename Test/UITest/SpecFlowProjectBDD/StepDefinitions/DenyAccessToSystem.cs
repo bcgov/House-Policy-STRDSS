@@ -103,7 +103,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             AuthHelper authHelper = new AuthHelper(_Driver);
 
             //Authenticate user using IDir or BCID depending on the user
-            authHelper.Authenticate(_TestUserName, _UserType);
+            authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
 
         }
 

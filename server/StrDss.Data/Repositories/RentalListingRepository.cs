@@ -100,18 +100,28 @@ namespace StrDss.Data.Repositories
                     : x.IsBusinessLicenceRequired == null || x.IsBusinessLicenceRequired == false);
             }
 
-            if (reassigned != null)
+
+            if (reassigned != null && reassigned.Value == false)
             {
-                query = query.Where(x => reassigned.Value
-                    ? x.IsLgTransferred == true
-                    : x.IsLgTransferred == null || x.IsLgTransferred == false);
+                reassigned = null;
             }
 
-            if (takedownComplete != null)
+            if (takedownComplete != null && takedownComplete.Value == false)
             {
-                query = query.Where(x => takedownComplete.Value
-                    ? x.IsTakenDown == true
-                    : x.IsTakenDown == null || x.IsTakenDown == false);
+                takedownComplete = null;
+            }
+            
+            if (reassigned != null && takedownComplete != null)
+            {
+                query = query.Where(x => x.IsTakenDown == true || x.IsLgTransferred == true);
+            }
+            else if (reassigned != null)
+            {
+                query = query.Where(x => x.IsLgTransferred == true);
+            }
+            else if (takedownComplete != null)
+            {
+                query = query.Where(x => x.IsTakenDown == true);
             }
 
             if (lgId != null)

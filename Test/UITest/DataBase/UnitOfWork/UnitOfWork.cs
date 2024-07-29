@@ -14,18 +14,7 @@ namespace DataBase.UnitOfWork
         DbContext _context;
         bool _disposed;
 
-        //public GenericRepository<DssAccessRequestStatus> DssAccessRequestStatus { get; }
-        //public GenericRepository<DssDbContext> DssDbContext { get; }
-        //public GenericRepository<DssEmailMessage> DssEmailMessage { get; }
-        //public GenericRepository<DssEmailMessageType> DssEmailMessageType { get; }
-        //public GenericRepository<DssMessageReason> DssMessageReason { get; }
-        //public GenericRepository<DssOrganization> DssOrganization { get; }
-        //public GenericRepository<DssOrganizationContactPerson> DssOrganizationContactPerson { get; }
-        //public GenericRepository<DssOrganizationType> DssOrganizationType { get; }
-        //public GenericRepository<DssUserIdentity> DssUserIdentity { get; }
-        //public GenericRepository<DssUserIdentityView> DssUserIdentityView { get; }
-        //public GenericRepository<DssUserPrivilege> DssUserPrivilege { get; }
-        //GenericRepository<DssUserRole> DssUserRole { get; }
+
 
         private readonly GenericRepository<DssAccessRequestStatus> _DssAccessRequestStatusRepository;
         private readonly GenericRepository<DssEmailMessage> _DssEmailMessageRepository;
@@ -37,7 +26,8 @@ namespace DataBase.UnitOfWork
         private readonly GenericRepository<DssUserIdentity> _DssUserIdentityRepository;
         private readonly GenericRepository<DssUserIdentityView> _DssUserIdentityViewRepository;
         private readonly GenericRepository<DssUserPrivilege> _DssUserPrivilegeRepository;
-        //private readonly GenericRepository<DssMessageReason> _DssMessageReasonRepository;
+        private readonly GenericRepository<DssUploadDelivery> _DssUploadDeliveryRepository;
+        private readonly GenericRepository<DssUploadLine> _DssUploadLineRepository;
         private readonly GenericRepository<DssUserRole> _DssUserRoleRepository;
 
 
@@ -88,6 +78,17 @@ namespace DataBase.UnitOfWork
         {
             get => _DssUserIdentityViewRepository ?? new GenericRepository<DssUserIdentityView>(_context);
         }
+
+        public GenericRepository<DssUploadDelivery> DssUploadDeliveryRepository
+        {
+            get => _DssUploadDeliveryRepository ?? new GenericRepository<DssUploadDelivery>(_context);
+        }
+
+        public GenericRepository<DssUploadLine> DssUploadLineRepository
+        {
+            get => _DssUploadLineRepository ?? new GenericRepository<DssUploadLine>(_context);
+        }
+
         public GenericRepository<DssUserRole> DssUserRoleRepository
         {
             get => _DssUserRoleRepository ?? new GenericRepository<DssUserRole>(_context);

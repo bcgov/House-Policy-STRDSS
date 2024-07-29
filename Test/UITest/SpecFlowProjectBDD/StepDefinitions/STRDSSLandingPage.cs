@@ -25,7 +25,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private bool _ExpectedResult = false;
         private AppSettings _AppSettings;
         private SFEnums.UserTypeEnum _UserType;
-        private SFEnums.LogonTypeEnum _LogonType;
         private BCIDPage _BCIDPage;
 
         public STRDSSLandingPage(SeleniumDriver Driver)
@@ -58,7 +57,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _UserType = userHelper.SetUserType(UserType);
             //Authenticate user using IDir or BCID depending on the user
-            _LogonType = authHelper.Authenticate(UserName, _UserType);
+            authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
             
             IWebElement TOC = null;
 
@@ -75,7 +74,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             if ((null != TOC) && (TOC.Displayed))
             {
                 //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
-                _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                _TermsAndConditionsPage.TermsAndConditionsCheckBox.JSExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
                 _TermsAndConditionsPage.ContinueButton.Click();
             }
         }

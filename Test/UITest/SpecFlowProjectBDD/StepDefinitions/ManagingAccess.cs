@@ -1,9 +1,14 @@
 ﻿using Configuration;
+using DataBase.Entities;
+using DataBase.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using OpenQA.Selenium.DevTools.V118.Debugger;
 using SpecFlowProjectBDD.Helpers;
 using System.Reflection.Metadata;
+using TechTalk.SpecFlow.CommonModels;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
@@ -26,6 +31,12 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private string _TestPassword;
         private bool _ExpectedResult = false;
         AppSettings _AppSettings;
+        private DssUserIdentity _RequestingUserIdentity;
+        private bool _OriginalEnabledValue;
+        private string _OriginalAccessRequestStatusCd = string.Empty;
+        private DssDbContext _DssDBContext;
+        private IUnitOfWork _UnitOfWork;
+        private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
 
         public ManagingAccess(SeleniumDriver Driver)
         {
@@ -37,7 +48,30 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDirPage = new IDirLoginPage(_Driver);
             _AppSettings = new AppSettings();
+
+            DbContextOptions<DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
+
+            string dbConnectionString = _AppSettings.GetConnectionString(_Environment.ToString().ToLower()) ?? string.Empty;
+
+            _DssDBContext = new DssDbContext(dbContextOptions, dbConnectionString);
+            _UnitOfWork = new UnitOfWork(_DssDBContext);
         }
+
+        [SetUp]
+        public void Setup()
+        {
+        }
+
+        [AfterScenario("ManagingAccess")]
+        public void TearDown()
+        {
+            if (null != _RequestingUserIdentity)
+            {
+                _RequestingUserIdentity.AccessRequestStatusCd = _OriginalAccessRequestStatusCd;
+                _DssDBContext.SaveChanges();
+            }
+        }
+
 
         //User Authentication
         //[Given(@"I am an authenticated LG staff member and the expected result is ""(.*)""")]
@@ -46,6 +80,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _TestUserName = UserName;
             _TestPassword = _AppSettings.GetUser(_TestUserName) ?? string.Empty;
+
             _ExpectedResult = ExpectedResult.ToUpper() == "PASS" ? true : false;
 
             _Driver.Url = _AppSettings.GetServer("default");
@@ -55,7 +90,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             AuthHelper authHelper = new AuthHelper(_Driver);
 
             //Authenticate user using IDir or BCID depending on the user
-            authHelper.Authenticate(_TestUserName, UserTypeEnum.BCGOVERNMENTSTAFF);
+            authHelper.Authenticate(_TestUserName, _TestPassword, UserTypeEnum.BCGOVERNMENTSTAFF);
 
 
             IWebElement TOC = null;
@@ -73,7 +108,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             if ((null != TOC) && (TOC.Displayed))
             {
                 //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
-                _TermsAndConditionsPage.TermsAndConditionsCheckBox.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
+                _TermsAndConditionsPage.TermsAndConditionsCheckBox.JSExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
                 _TermsAndConditionsPage.ContinueButton.Click();
             }
         }
@@ -88,9 +123,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a dedicated section for managing user access requests")]
         public void ThereShouldBeADedicatedSectionForManagingUserAccessRequests()
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-user-management > div.table-card-container"").checkVisibility()");
+            string selector = "body > app-root > app-layout > div.content > app-user-management > div.table-card-container";
+
+            //bool result = (bool)_ManagingAccessPage.UserTable.JSCheckVisability(selector);
+            bool result = (bool)_ManagingAccessPage.UserTable.IsEnabled();
+
             ClassicAssert.IsTrue(result);
         }
+
 
         //#User Access Request List
 
@@ -103,39 +143,31 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should see a list displaying all user access requests, including relevant details such as the user's name, role request, and date of submission")]
         public void IShouldSeeAListDisplayingAllUserAccessRequestss()
         {
-            bool found = false;
             bool result = false;
 
-            while (found == false)
-            {
-                //wait for element to become visable
-                try
-                {
-                    result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table"").checkVisibility()");
-                    found = true;
-                }
-                catch (JavaScriptException ex)
-                {
-                    System.Threading.Thread.Sleep(1000);
-                }
+            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#user-table"").checkVisibility()");
+            ClassicAssert.IsTrue(result);
 
-            }
-            
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody"").checkVisibility()");
+            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#table-header"").checkVisibility()");
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(3)"").textContent.toLowerCase().trim() === ""first name""");
+
+            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#givenNm_th"").textContent.toLowerCase().trim() === ""first name""");
+
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(4)"").textContent.toLowerCase().trim() === ""last name""");
+
+            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#familyNm_th"").textContent.toLowerCase().trim() === 'last name'");
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(7)"").textContent.toLowerCase().trim() === ""organization""");
+
+            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#orgName_th"").textContent.toLowerCase().trim() === ""organization""");
             ClassicAssert.IsTrue(result);
-            result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > thead > tr > th:nth-child(6)"").textContent.toLowerCase().trim() === ""email address""");
+
+            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#emailAddressDsc_th"").textContent.toLowerCase().trim() === ""email address""");
             ClassicAssert.IsTrue(result);
         }
 
 
         //Request Details
-        [When("Reviewing a specific access request")]
+        [When(@"Reviewing a specific access request")]
         public void ReviewingASpecificAccessRequest()
         {
         }
@@ -143,7 +175,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should be able to view detailed information provided by the user, including their role request and any justifications or additional comments")]
         public void ShouldBeAbleToViewDetailedInformationProvidedByTheUser()
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody > tr:nth-child(1)"").checkVisibility()");
+            bool result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#row-0"").checkVisibility()");
             ClassicAssert.IsTrue(result);
         }
 
@@ -153,10 +185,43 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
         }
 
-        [Then("There should be a Grant Access button allowing me to approve the user's request")]
-        public void ThereShouldBeAGrantAccessButton()
+        [Then(@"There should be a Grant Access button allowing me to approve the user's request ""(.*)""")]
+        public void ThereShouldBeAGrantAccessButton(string RequestingAccessUserEmail)
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div"").checkVisibility()");
+
+            //Get email for first user in list
+            string email = (string)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#row-0 > td:nth-child(6)"").innerText");
+
+            //////////////////// DB Setup ////////////////////////////////////////
+            // Retrieve the user identity
+            _RequestingUserIdentity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == email);
+            if (null == _RequestingUserIdentity)
+            {
+                throw new NotFoundException($"{email} not found in Identities table");
+            }
+            _OriginalAccessRequestStatusCd = _RequestingUserIdentity.AccessRequestStatusCd;
+            _RequestingUserIdentity.AccessRequestStatusCd = "Requested";
+
+            _DssDBContext.SaveChanges();
+
+            /////////////////////////////////////////////////////////////
+
+            _ManagingAccessPage.Driver.Navigate().Refresh();
+
+            bool result = false;
+
+            //Wait for control to become visable
+            for (int i = 0; i <= 3; i++)
+            {
+                if ((bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#row-0 > td:nth-child(8)"").checkVisibility()"))
+                {
+                    result = true;
+                    break;
+                }
+                System.Threading.Thread.Sleep(1000);
+            }
+            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#row-0 > td:nth-child(8)"").checkVisibility()");
+
             ClassicAssert.IsTrue(result);
         }
 
@@ -164,11 +229,13 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When("Clicking the Grant Access button")]
         public void ClickingTheGrantAccessButton()
         {
+            _ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#form-approve-0-btn"").click()");
         }
 
         [Then("I should be prompted to assign the appropriate roles to the user based on their request and the system's role hierarchy")]
         public void IShouldBePromptedToAssignTheAppropriateRolesToTheUser()
         {
+            _ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#cancel-dialog-btn"").click()");
         }
 
 
@@ -192,7 +259,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a Remove Access option allowing me to remove the user's access if it is deemed inappropriate or unnecessary")]
         public void ThereShouldBeARemoveAccessOption()
         {
-            bool result = (bool)_ManagingAccessPage.ManageAccessSection.ExecuteJavaScript(@"document.querySelector(""#pn_id_12-table > tbody > tr:nth-child(1) > td:nth-child(9) > span > p-inputswitch > div"").checkVisibility()");
+            bool result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#access-status-0-insw"").checkVisibility()");
             ClassicAssert.IsTrue(result);
         }
 

@@ -71,7 +71,9 @@ Each production release depends on the execution of a fixed set of scripts again
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_9.sql`
   - `ddl/STR_DSS_Views_Sprint_9.sql`
   - `seeding/STR_DSS_Data_Seeding_Sprint_9.sql`
-  - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_9.sql`
+  - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_9.sql` **(TIP: run each MERGE statement independently)**
   - `utility/DSS-601_Correct_Rental_Listings_Sprint_9.sql`
 ### Release 5 Scripts:
 - Sprint 10:
+  - `seeding/STR_DSS_Data_Seeding_Platforms_Sprint_10.sql`
+  - `STR_DSS_Data_Seeding_PRODONLY_PRIVATE_Sprint_10.sql` **(PRD ONLY - not in repo) OR** `seeding/STR_DSS_Data_Seeding_NONPROD_Sprint_6.sql` **(not a typo)**

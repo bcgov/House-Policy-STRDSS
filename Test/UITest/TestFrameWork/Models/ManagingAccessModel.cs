@@ -2,11 +2,11 @@
 {
     public class ManagingAccessModel
     {
-        public static string ManageAccessSection
+        public static string UserTable
         {
             get
             {
-                return @"/html/body/app-root/app-layout/div[2]/app-user-management/div[2]";
+                return "user-table";
             }
         }
 

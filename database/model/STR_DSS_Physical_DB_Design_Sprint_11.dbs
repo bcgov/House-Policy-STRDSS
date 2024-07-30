@@ -157,6 +157,9 @@
 			<column name="organization_nm" prior="business_name" type="varchar" length="250" jt="12" mandatory="y" >
 				<comment><![CDATA[A human-readable name that identifies the organization (e.g. Corporate Enforecement Unit, City of Victoria)]]></comment>
 			</column>
+			<column name="local_government_type" type="varchar" length="50" jt="12" >
+				<comment><![CDATA[A sub-type of local government organization used for sorting and grouping or members]]></comment>
+			</column>
 			<column name="economic_region_dsc" type="varchar" length="100" jt="12" >
 				<comment><![CDATA[A free form description of the economic region to which a Local Government Subdivision belongs]]></comment>
 			</column>
@@ -180,9 +183,6 @@
 			</column>
 			<column name="upd_user_guid" type="uuid" jt="102" >
 				<comment><![CDATA[The globally unique identifier (assigned by the identity provider) for the most recent user to record a change]]></comment>
-			</column>
-			<column name="local_government_type" type="varchar" length="50" jt="12" >
-				<comment><![CDATA[A sub-type of local government organization used for sorting and grouping or members]]></comment>
 			</column>
 			<index name="dss_organization_pk" unique="PRIMARY_KEY" >
 				<column name="organization_id" />
@@ -593,6 +593,9 @@
 			<column name="source_bin" type="bytea" jt="-2" >
 				<comment><![CDATA[The binary image of the information that was uploaded]]></comment>
 			</column>
+			<column name="source_header_txt" type="varchar" length="32000" jt="12" >
+				<comment><![CDATA[Full text of the header line]]></comment>
+			</column>
 			<column name="providing_organization_id" type="bigint" jt="-5" mandatory="y" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
@@ -631,7 +634,7 @@
 				<comment><![CDATA[The immutable identification number for the source record, such as a rental listing number]]></comment>
 			</column>
 			<column name="source_line_txt" prior="platform_listing_url" type="varchar" length="32000" jt="12" mandatory="y" >
-				<comment><![CDATA[Full text of the uploaod line]]></comment>
+				<comment><![CDATA[Full text of the upload line]]></comment>
 			</column>
 			<column name="error_txt" prior="business_licence_no" type="varchar" length="32000" jt="12" >
 				<comment><![CDATA[Freeform description of the problem found while attempting to interpret the report line]]></comment>
@@ -644,7 +647,12 @@
 			</index>
 			<index name="dss_upload_line_uk" unique="UNIQUE_KEY" >
 				<column name="including_upload_delivery_id" />
+				<column name="source_organization_cd" />
 				<column name="source_record_no" />
+			</index>
+			<index name="dss_upload_line_i1" unique="NORMAL" >
+				<column name="is_processed" />
+				<column name="including_upload_delivery_id" />
 			</index>
 			<fk name="dss_upload_line_fk_included_in" to_schema="dss" to_table="dss_upload_delivery" >
 				<fk_column name="including_upload_delivery_id" pk="upload_delivery_id" />
@@ -1053,9 +1061,9 @@ END;$function$
 		<entity schema="dss" name="dss_rental_listing" color="C18A39" x="528" y="1280" />
 		<entity schema="dss" name="dss_rental_listing_contact" color="C18A39" x="1072" y="1488" />
 		<entity schema="dss" name="dss_rental_listing_extract" color="C0C139" x="976" y="384" />
-		<entity schema="dss" name="dss_rental_listing_report" color="C0C139" x="672" y="848" />
-		<entity schema="dss" name="dss_upload_delivery" color="C0C139" x="720" y="656" />
-		<entity schema="dss" name="dss_upload_line" color="C0C139" x="1152" y="672" />
+		<entity schema="dss" name="dss_rental_listing_report" color="C0C139" x="672" y="880" />
+		<entity schema="dss" name="dss_upload_delivery" color="C18A39" x="720" y="656" />
+		<entity schema="dss" name="dss_upload_line" color="C18A39" x="1152" y="672" />
 		<entity schema="dss" name="dss_user_identity" color="C0C139" x="1248" y="352" />
 		<entity schema="dss" name="dss_user_privilege" color="C0C139" x="1536" y="816" />
 		<entity schema="dss" name="dss_user_role" color="C0C139" x="1552" y="672" />

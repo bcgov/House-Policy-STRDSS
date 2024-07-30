@@ -81,7 +81,7 @@ export class LayoutComponent {
         items: []
       },
       {
-        label: 'Policy Guidance',
+        label: 'Support',
         items: []
       },
     ];

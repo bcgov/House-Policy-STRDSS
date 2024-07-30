@@ -187,29 +187,36 @@ namespace UITest.TestDriver
                 {
                     case Enums.FINDBY.NAME:
                         {
-                            //IWebElement element = wait.Until<IWebElement>(ExpectedConditions.ElementIsVisible(OpenQA.Selenium.By.Name(Locator)));
-
-                            IWebElement element = Driver.FindElement(OpenQA.Selenium.By.Name(Locator));
-                            wait.Until(d => element.Enabled);
+                            IWebElement element = wait.Until(drv => {
+                                var elem = drv.FindElement(OpenQA.Selenium.By.Name(Locator));
+                                return (elem.Displayed && elem.Enabled) ? elem : null;
+                            });
                             break;
                         }
                     case Enums.FINDBY.ID:
                         {
-                            IWebElement element = Driver.FindElement(OpenQA.Selenium.By.Id(Locator));
-                            wait.Until(d => element.Enabled);
+                            IWebElement element = wait.Until(drv => {
+                                var elem = drv.FindElement(OpenQA.Selenium.By.Id(Locator));
+                                return (elem.Displayed && elem.Enabled) ? elem : null;
+                            });
+
                             break;
                         }
                     case Enums.FINDBY.CSSSELECTOR:
                         {
-                            IWebElement element = Driver.FindElement(OpenQA.Selenium.By.CssSelector(Locator));
-                            wait.Until(d => element.Enabled);
-                            break;
+                        IWebElement element = wait.Until(drv => {
+                            var elem = drv.FindElement(OpenQA.Selenium.By.CssSelector(Locator));
+                            return (elem.Displayed && elem.Enabled) ? elem : null;
+                        });
+                        break;
                         }
                     case Enums.FINDBY.XPATH:
                         {
-                            IWebElement element = Driver.FindElement(OpenQA.Selenium.By.XPath(Locator));
-                            wait.Until(d => element.Enabled);
-                            break;
+                        IWebElement element = wait.Until(drv => {
+                            var elem = drv.FindElement(OpenQA.Selenium.By.XPath(Locator));
+                            return (elem.Displayed && elem.Enabled) ? elem : null;
+                        });
+                        break;
                         }
                 }
 

@@ -26,6 +26,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private AppSettings _AppSettings;
         private SFEnums.UserTypeEnum _UserType;
         private BCIDPage _BCIDPage;
+        private SFEnums.LogonTypeEnum? _LogonType;
 
         public STRDSSLandingPage(SeleniumDriver Driver)
         {
@@ -57,8 +58,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _UserType = userHelper.SetUserType(UserType);
             //Authenticate user using IDir or BCID depending on the user
-            authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
-            
+            _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
+            ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
+
             IWebElement TOC = null;
 
             try

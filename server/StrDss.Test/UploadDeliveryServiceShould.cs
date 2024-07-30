@@ -12,7 +12,7 @@ using System.IO;
 
 namespace StrDss.Test
 {
-    public class RentalListingReportServiceShould
+    public class UploadDeliveryServiceShould
     {
         private static StringReader GetCsvData(string reportPeriod)
         {
@@ -24,6 +24,9 @@ namespace StrDss.Test
             return textReader;
         }
 
+        private string[] mandatoryFields =  new string[] { "rpt_period", "org_cd", "listing_id" };
+        private string reportType = UploadDeliveryTypes.ListingData;
+
         [Theory]
         [AutoDomainData]
         public async Task ValidateAndParseUploadAsync_InvalidReportPeriod_ReturnsError(
@@ -33,7 +36,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "202403";
@@ -45,7 +48,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("ReportPeriod", result.Keys);
@@ -63,7 +66,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
              var reportPeriod = "";
@@ -75,7 +78,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("ReportPeriod", result.Keys);
@@ -92,7 +95,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = $"{DateTime.UtcNow.ToString("yyyy-MM")}";
@@ -103,7 +106,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("ReportPeriod", result.Keys);
@@ -120,7 +123,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -131,7 +134,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("File", result.Keys);
@@ -147,7 +150,7 @@ namespace StrDss.Test
            List<DssUploadLine> uploadLines,
            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-           RentalListingReportService listingService)
+           UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -162,7 +165,7 @@ namespace StrDss.Test
             using StringReader textReader = GetCsvData(reportPeriod);
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Empty(result);
@@ -178,7 +181,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -186,7 +189,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(It.IsAny<long>())).ReturnsAsync(null as OrganizationDto);
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("OrganizationId", result.Keys);
@@ -202,7 +205,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -216,7 +219,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("rpt_period", result.Keys);
@@ -232,7 +235,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -246,7 +249,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("rpt_period", result.Keys);
@@ -260,7 +263,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -274,7 +277,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("org_cd", result.Keys);
@@ -288,7 +291,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -303,7 +306,7 @@ namespace StrDss.Test
             using StringReader textReader = GetCsvData(reportPeriod);
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("org_cd", result.Keys);
@@ -318,7 +321,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -333,7 +336,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("listing_id", result.Keys);
@@ -348,7 +351,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -362,7 +365,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("listing_id", result.Keys);

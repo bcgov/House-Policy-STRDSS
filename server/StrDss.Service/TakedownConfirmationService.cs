@@ -50,7 +50,6 @@ namespace StrDss.Service
 
             _logger.LogInformation($"Processing Takedown Confirmation {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
 
-            var reportPeriodYm = (DateOnly)upload.ReportPeriodYm!;
             var lineCount = await _uploadRepo.GetTotalNumberOfUploadLines(upload.UploadDeliveryId);
             var count = 0;
 
@@ -60,73 +59,76 @@ namespace StrDss.Service
 
             foreach (var line in linesToProcess)
             {
+                var stopwatch = Stopwatch.StartNew();
+
                 count++;
                 var errors = new Dictionary<string, List<string>>();
                 var csvConfig = CsvHelperUtils.GetConfig(errors, false);
 
-                var csvString = header + Environment.NewLine + line.SourceLineTxt;
-                var textReader = new StringReader(csvString);
+                var csv = header + Environment.NewLine + line.SourceLineTxt;
+                var textReader = new StringReader(csv);
                 var csvReader = new CsvReader(textReader, csvConfig);
 
-                await ProcessLine(upload, header, line, textReader, csvReader);
+                var (orgCd, listingId) = await ProcessLine(upload, header, line, csvReader);
+
+                stopwatch.Stop();
+
+                _logger.LogInformation($"Finishing listing ({orgCd} - {listingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
             }
 
             processStopwatch.Stop();
+
             _logger.LogInformation($"Finished: {upload.ReportPeriodYm?.ToString("yyyy-MM")}, {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
-        private async Task ProcessLine(DssUploadDelivery upload, string header, DssUploadLine line, StringReader textReader, CsvReader csvReader)
+        private async Task<(string orgCd, string listingId)> ProcessLine(DssUploadDelivery upload, string header, DssUploadLine line, CsvReader csvReader)
         {
-            var stopwatch = Stopwatch.StartNew();
-
             csvReader.Read();
 
             csvReader.ReadHeader();
 
-            while (csvReader.Read())
+            csvReader.Read();
+
+            var row = csvReader.GetRecord<UploadLine>(); //it has been parsed once, so no exception expected.
+
+            _logger.LogInformation($"Processing listing ({row.OrgCd} - {row.ListingId})");
+
+            var org = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd);
+
+            var listing = await _listingRepo.GetMasterListingAsync(org.OrganizationId, row.ListingId);
+
+            if (listing == null)
             {
-                var row = csvReader.GetRecord<UploadLine>(); //it has been parsed once, so no exception expected.
-
-                _logger.LogInformation($"Processing listing ({row.OrgCd} - {row.ListingId})");
-
-                var org = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd);
-
-                var listing = await _listingRepo.GetMasterListingAsync(org.OrganizationId, row.ListingId);
-
-                if (listing == null)
-                {
-                    _logger.LogInformation($"Skipping listing - ({row.OrgCd} - {row.ListingId})");
-                    continue;
-                }
-
-                listing.IsTakenDown = true;
-                line.IsProcessed = true;
-
-                var emailEntity = new DssEmailMessage
-                {
-                    EmailMessageType = EmailMessageTypes.CompletedTakedown,
-                    MessageDeliveryDtm = DateTime.UtcNow,
-                    MessageTemplateDsc = "",
-                    IsHostContactedExternally = false,
-                    IsSubmitterCcRequired = false,
-                    LgPhoneNo = null,
-                    UnreportedListingNo = null,
-                    HostEmailAddressDsc = null,
-                    LgEmailAddressDsc = null,
-                    CcEmailAddressDsc = null,
-                    UnreportedListingUrl = null,
-                    LgStrBylawUrl = null,
-                    InvolvedInOrganizationId = upload.ProvidingOrganizationId,
-                    ConcernedWithRentalListingId = listing.RentalListingId
-                };
-
-                await _emailRepo.AddEmailMessage(emailEntity);
-
-                _unitOfWork.Commit();
-
-                stopwatch.Stop();
-                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+                _logger.LogInformation($"Skipping listing - ({row.OrgCd} - {row.ListingId})");
+                return (row.OrgCd, row.ListingId);
             }
+
+            listing.IsTakenDown = true;
+            line.IsProcessed = true;
+
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = EmailMessageTypes.CompletedTakedown,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = "",
+                IsHostContactedExternally = false,
+                IsSubmitterCcRequired = false,
+                LgPhoneNo = null,
+                UnreportedListingNo = null,
+                HostEmailAddressDsc = null,
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = null,
+                UnreportedListingUrl = null,
+                LgStrBylawUrl = null,
+                InvolvedInOrganizationId = upload.ProvidingOrganizationId,
+                ConcernedWithRentalListingId = listing.RentalListingId
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            _unitOfWork.Commit();
+
+            return (row.OrgCd, row.ListingId);
         }
     }
 }

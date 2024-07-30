@@ -124,6 +124,18 @@ export class DashboardService {
         buttonId: 'viewPolicyGuidance_btn',
       },
       {
+        accessPermission: '',
+        buttonIcon: '',
+        buttonText: 'View User Guide',
+        description: 'View User Guide',
+        route: 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/strdataportal-support',
+        title: 'User Guide',
+        isItOrgTypeBased: true,
+        orgType: 'LG',
+        boxId: 'viewUserGuide_box',
+        buttonId: 'viewUserGuide_btn',
+      },
+      {
         accessPermission: takedown_action,
         buttonIcon: '',
         buttonText: 'Escalate to CEU',

@@ -141,7 +141,17 @@ export class TopMenuService {
         isItOrgTypeBased: true,
         description: 'View the policy guidance for sending Notices, Takedown Requests and Escalations',
         title: 'Guidance for local governments',
-        folderName: 'Policy Guidance',
+        folderName: 'Support',
+      },
+      {
+        accessPermission: '',
+        buttonId: 'userGuide_mi_btn',
+        route: 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/strdataportal-support',
+        orgType: 'LG',
+        isItOrgTypeBased: true,
+        description: 'Additional information for Local Government users',
+        title: 'User Guide',
+        folderName: 'Support',
       },
       {
         accessPermission: '',
@@ -151,7 +161,7 @@ export class TopMenuService {
         isItOrgTypeBased: true,
         description: 'View the guidelines for uploading data and actioning takedown requests',
         title: 'Guideline for Platforms',
-        folderName: 'Policy Guidance',
+        folderName: 'Support',
       },
     ]
   }

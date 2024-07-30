@@ -43,7 +43,7 @@ namespace StrDss.Data.Repositories
         {
             return await _dbSet
                 .Include(x => x.ProvidingOrganization)
-                .Where(x => x.DssUploadLines.Any(line => !line.IsProcessed))
+                .Where(x => x.DssUploadLines.Any(line => !line.IsProcessed) && x.UploadDeliveryType == UploadDeliveryTypes.ListingData)
                 .OrderBy(x => x.ProvidingOrganizationId) 
                     .ThenBy(x => x.ReportPeriodYm)
                         .ThenBy(x => x.UpdDtm) //Users can upload the same listing multiple times. The processing of these listings follows a first-come, first-served approach.

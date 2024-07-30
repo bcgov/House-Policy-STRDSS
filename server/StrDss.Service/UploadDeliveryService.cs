@@ -17,7 +17,7 @@ namespace StrDss.Service
     public interface IUploadDeliveryService
     {
         Task<Dictionary<string, List<string>>> UploadPlatformData(string reportType, string reportPeriod, long orgId, Stream stream);
-        Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string hashValue, TextReader textReader, List<DssUploadLine> uploadLines);
+        Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines);
     }
     public class UploadDeliveryService : ServiceBase, IUploadDeliveryService
     {
@@ -49,7 +49,9 @@ namespace StrDss.Service
 
             var uploadLines = new List<DssUploadLine>();
 
-            var errors = await ValidateAndParseUploadAsync(reportPeriod, orgId, hashValue, textReader, uploadLines);
+            var mandatoryFields = GetMandatoryFields(reportType);
+
+            var errors = await ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             if (errors.Count > 0) return errors;
 
@@ -75,7 +77,23 @@ namespace StrDss.Service
             return errors;
         }
 
-        public async Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string hashValue, TextReader textReader, List<DssUploadLine> uploadLines)
+        private string[] GetMandatoryFields(string reportType)
+        {
+            if (reportType == UploadDeliveryTypes.ListingData)
+            {
+                return new string[] { "rpt_period", "org_cd", "listing_id" };
+            }
+            else if (reportType == UploadDeliveryTypes.TakedownData)
+            {
+                return new string[] { "rpt_period", "rpt_type", "org_cd", "listing_id" };
+            }
+            else
+            {
+                return Array.Empty<string>();
+            }
+        }
+
+        public async Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines)
         {
             var errors = new Dictionary<string, List<string>>();
 
@@ -117,9 +135,7 @@ namespace StrDss.Service
 
             var csvConfig = CsvHelperUtils.GetConfig(errors, false);
 
-            using var csv = new CsvReader(textReader, csvConfig);
-
-            var mandatoryFields = new string[] { "rpt_period", "org_cd", "listing_id" };
+            using var csv = new CsvReader(textReader, csvConfig);            
 
             csv.Read();
             var headerExists = csv.ReadHeader();
@@ -130,6 +146,12 @@ namespace StrDss.Service
                 return errors;
             }
 
+            if (reportType == UploadDeliveryTypes.ListingData && csv.HeaderRecord.Contains("rpt_type"))
+            {
+                errors.AddItem("File", "The listing data file contains an invalid column: 'rpt_type'. Please remove the 'rpt_type' column and try again.");
+                return errors;
+            }
+
             if (!CheckCommonMandatoryFields(csv.HeaderRecord, mandatoryFields, errors))
             {
                 return errors;
@@ -137,6 +159,7 @@ namespace StrDss.Service
 
             var reportPeriodMismatch = 0;
             var reportPeriodMissing = 0;
+            var reportTypeMismatch = 0;
             var orgCdMissing = 0;
             var invalidOrgCds = new List<string>();
             var listingIdMissing = 0;
@@ -157,6 +180,11 @@ namespace StrDss.Service
                     if (row.RptPeriod.IsEmpty()) reportPeriodMissing++;
                     if (row.OrgCd.IsEmpty()) orgCdMissing++;
                     if (row.ListingId.IsEmpty()) listingIdMissing++;
+
+                    if (mandatoryFields.Contains("rpt_type") && row.RptType != reportType)
+                    {
+                        reportTypeMismatch++;
+                    }
 
                     if (row.OrgCd.IsNotEmpty() && !orgCds.Contains(row.OrgCd.ToUpper())) orgCds.Add(row.OrgCd.ToUpper());
                     if (!listingIds.Contains($"{row.OrgCd}-{row.ListingId.ToLower()}"))
@@ -221,6 +249,11 @@ namespace StrDss.Service
             if (reportPeriodMissing > 0)
             {
                 errors.AddItem("rpt_period", $"Report period missing in {reportPeriodMissing} record(s). Please provide a report period.");
+            }
+
+            if (reportTypeMismatch > 0)
+            {
+                errors.AddItem("rpt_type", $"Report type  mismatch found in {reportTypeMismatch} record(s). The file contains report type other than the '{reportType}'");
             }
 
             if (orgCdMissing > 0)

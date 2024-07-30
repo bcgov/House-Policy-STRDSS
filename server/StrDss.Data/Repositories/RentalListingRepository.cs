@@ -615,7 +615,7 @@ namespace StrDss.Data.Repositories
         public async Task<bool> IsListingUploadProcessRunning()
         {
             return await _dbContext.DssUploadLines
-                .AnyAsync(x => x.IncludingUploadDelivery.UploadDeliveryType == "rental_report" && x.IsProcessed == false);                
+                .AnyAsync(x => x.IncludingUploadDelivery.UploadDeliveryType == UploadDeliveryTypes.ListingData && x.IsProcessed == false);                
         }
     }
 }

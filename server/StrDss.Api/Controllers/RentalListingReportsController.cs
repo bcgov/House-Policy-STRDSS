@@ -58,7 +58,7 @@ namespace StrDss.Api.Controllers
 
             using var stream = dto.File.OpenReadStream();
 
-            errors = await _uploadService.UploadPlatformData(UploadDeliveryTypes.RentalReport, dto.ReportPeriod, dto.OrganizationId, stream);
+            errors = await _uploadService.UploadPlatformData(UploadDeliveryTypes.ListingData, dto.ReportPeriod, dto.OrganizationId, stream);
 
             if (errors.Count > 0)
             {

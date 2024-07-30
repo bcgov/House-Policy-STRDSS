@@ -314,6 +314,7 @@
     public static class UploadDeliveryTypes
     {
         public const string RentalReport = "rental_report";
+        public const string TakedownReport = "takedown_report";
     }
 
     public static class ListingExportFileNames

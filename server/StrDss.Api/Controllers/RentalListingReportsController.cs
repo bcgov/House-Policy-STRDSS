@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using StrDss.Api.Authorization;
 using StrDss.Api.Models;
 using StrDss.Common;
+using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Service;
 using StrDss.Service.HttpClients;
@@ -15,20 +16,22 @@ namespace StrDss.Api.Controllers
     [ApiController]
     public class RentalListingReportsController : BaseApiController
     {
+        private IUploadDeliveryService _uploadService;
         private IRentalListingReportService _listingService;
         private IGeocoderApi _geocoderApi;
 
         public RentalListingReportsController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
-            IRentalListingReportService listingService, IGeocoderApi geocoderApi)
+            IUploadDeliveryService uploadService, IRentalListingReportService listingService, IGeocoderApi geocoderApi)
             : base(currentUser, mapper, config, logger)
         {
+            _uploadService = uploadService;
             _listingService = listingService;
             _geocoderApi = geocoderApi;
         }
 
         [ApiAuthorize(Permissions.ListingFileUpload)]
         [HttpPost]
-        public async Task<ActionResult> CreateRentalLisingReport([FromForm] RentalListingFileUploadDto dto)
+        public async Task<ActionResult> CreateRentalLisingReport([FromForm] PlatformDataUploadDto dto)
         {
             Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
 
@@ -55,7 +58,7 @@ namespace StrDss.Api.Controllers
 
             using var stream = dto.File.OpenReadStream();
 
-            errors = await _listingService.UploadRentalReport(dto.ReportPeriod, dto.OrganizationId, stream);
+            errors = await _uploadService.UploadPlatformData(UploadDeliveryTypes.RentalReport, dto.ReportPeriod, dto.OrganizationId, stream);
 
             if (errors.Count > 0)
             {

@@ -76,8 +76,8 @@ namespace SpecFlowProjectBDD.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("ManagingAccess")]
         [NUnit.Framework.CategoryAttribute("Access")]
-        [NUnit.Framework.TestCaseAttribute("CEUATST", "0", "ListingID - Boundary", "pass", "http://listingURL.com", "STRDSSVrboDev", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
-        public void ManagingAccess(string userName, string listingID, string description, string expectedResult, string listingURL, string requestingAccessUser, string additionalCCsTextBox, string govPhoneNumber, string takedownReason, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("CEUATST", "ceuatst@gov.bc.ca", "0", "ListingID - Boundary", "pass", "http://listingURL.com", "fiona.zhou@gov.bc.ca", "richard.anderson@dxc.com", "9991231234", "Get a business license", null)]
+        public void ManagingAccess(string userName, string userEmail, string listingID, string description, string expectedResult, string listingURL, string requestingAccessUserEmail, string additionalCCsTextBox, string govPhoneNumber, string takedownReason, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "Access"};
@@ -88,11 +88,12 @@ namespace SpecFlowProjectBDD.Features
             string[] tagsOfScenario = @__tags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("UserName", userName);
+            argumentsOfScenario.Add("UserEmail", userEmail);
             argumentsOfScenario.Add("ListingID", listingID);
             argumentsOfScenario.Add("Description", description);
             argumentsOfScenario.Add("ExpectedResult", expectedResult);
             argumentsOfScenario.Add("ListingURL", listingURL);
-            argumentsOfScenario.Add("RequestingAccessUser", requestingAccessUser);
+            argumentsOfScenario.Add("RequestingAccessUserEmail", requestingAccessUserEmail);
             argumentsOfScenario.Add("AdditionalCCsTextBox", additionalCCsTextBox);
             argumentsOfScenario.Add("GovPhoneNumber", govPhoneNumber);
             argumentsOfScenario.Add("TakedownReason", takedownReason);
@@ -136,7 +137,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 30
  testRunner.Then(string.Format("There should be a Grant Access button allowing me to approve the user\'s request \"" +
-                            "{0}\"", requestingAccessUser), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                            "{0}\"", userEmail), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 35
  testRunner.When("Clicking the Grant Access button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

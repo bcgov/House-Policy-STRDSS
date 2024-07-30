@@ -87,6 +87,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _Driver.Navigate();
 
             _PathFinderPage.IDRButton.Click();
+
             AuthHelper authHelper = new AuthHelper(_Driver);
 
             //Authenticate user using IDir or BCID depending on the user
@@ -125,7 +126,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             string selector = "body > app-root > app-layout > div.content > app-user-management > div.table-card-container";
 
-            //bool result = (bool)_ManagingAccessPage.UserTable.JSCheckVisability(selector);
             bool result = (bool)_ManagingAccessPage.UserTable.IsEnabled();
 
             ClassicAssert.IsTrue(result);
@@ -186,15 +186,35 @@ namespace SpecFlowProjectBDD.StepDefinitions
         }
 
         [Then(@"There should be a Grant Access button allowing me to approve the user's request ""(.*)""")]
-        public void ThereShouldBeAGrantAccessButton(string RequestingAccessUserEmail)
+        public void ThereShouldBeAGrantAccessButton(string UserEmail)
         {
+            if (string.IsNullOrWhiteSpace(UserEmail))
+                throw new ArgumentException("RequestingAccessUserEmail cannot be empty");
 
-            //Get email for first user in list
-            string email = (string)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#row-0 > td:nth-child(6)"").innerText");
+            //Get email for user not matching the logged in user
+
+            ///TODO: Get row max from control on page
+            int rowMax = 10;
+            string email = string.Empty;
+            string given_nm = string.Empty;
+            string family_nm = string.Empty;    
+
+            int row = 0;
+            for (int i = 0; i < rowMax; i++)
+            {
+                ///TODO: Remove hard codeding of column
+                email = (string)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@$"document.querySelector(""#row-{i}  > td:nth-child(6)"").innerText");
+
+                if (email.ToLower() != UserEmail.ToLower())
+                {
+                    row = i;
+                    break;
+                }
+            }
 
             //////////////////// DB Setup ////////////////////////////////////////
             // Retrieve the user identity
-            _RequestingUserIdentity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == email);
+            _RequestingUserIdentity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => (p.EmailAddressDsc == email));
             if (null == _RequestingUserIdentity)
             {
                 throw new NotFoundException($"{email} not found in Identities table");

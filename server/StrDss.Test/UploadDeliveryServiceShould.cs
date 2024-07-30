@@ -12,7 +12,7 @@ using System.IO;
 
 namespace StrDss.Test
 {
-    public class RentalListingReportServiceShould
+    public class UploadDeliveryServiceShould
     {
         private static StringReader GetCsvData(string reportPeriod)
         {
@@ -33,7 +33,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "202403";
@@ -63,7 +63,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
              var reportPeriod = "";
@@ -92,7 +92,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = $"{DateTime.UtcNow.ToString("yyyy-MM")}";
@@ -120,7 +120,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -147,7 +147,7 @@ namespace StrDss.Test
            List<DssUploadLine> uploadLines,
            [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
            [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-           RentalListingReportService listingService)
+           UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -178,7 +178,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -202,7 +202,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -232,7 +232,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -260,7 +260,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -288,7 +288,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -318,7 +318,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";
@@ -348,7 +348,7 @@ namespace StrDss.Test
             List<DssUploadLine> uploadLines,
             [Frozen] Mock<IUploadDeliveryRepository> uploadRepoMock,
             [Frozen] Mock<IOrganizationRepository> orgRepoMock,
-            RentalListingReportService listingService)
+            UploadDeliveryService listingService)
         {
             // Arrange
             var reportPeriod = "2024-03";

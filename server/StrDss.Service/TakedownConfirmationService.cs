@@ -50,12 +50,12 @@ namespace StrDss.Service
 
             _logger.LogInformation($"Processing Takedown Confirmation {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
 
-            var lineCount = await _uploadRepo.GetTotalNumberOfUploadLines(upload.UploadDeliveryId);
             var count = 0;
 
             var header = "rpt_period,org_cd,listing_id,rpt_type"; //todo: upload.Header
 
             var linesToProcess = await _uploadRepo.GetUploadLineEntitiesToProcessAsync(upload.UploadDeliveryId);
+            var lineCount = linesToProcess.Count;
 
             foreach (var line in linesToProcess)
             {
@@ -73,7 +73,7 @@ namespace StrDss.Service
 
                 stopwatch.Stop();
 
-                _logger.LogInformation($"Finishing listing ({orgCd} - {listingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+                _logger.LogInformation($"Finishing listing ({orgCd} - {listingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds. {count}/{lineCount}");
             }
 
             processStopwatch.Stop();
@@ -99,7 +99,12 @@ namespace StrDss.Service
 
             if (listing == null)
             {
-                _logger.LogInformation($"Skipping listing - ({row.OrgCd} - {row.ListingId})");
+                _logger.LogInformation($"Skipping listing (not found) - ({row.OrgCd} - {row.ListingId})");
+                return (row.OrgCd, row.ListingId);
+            }
+            else if (listing.IsTakenDown == true)
+            {
+                _logger.LogInformation($"Skipping listing (already taken down) - ({row.OrgCd} - {row.ListingId})");
                 return (row.OrgCd, row.ListingId);
             }
 

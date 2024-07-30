@@ -79,7 +79,7 @@ namespace StrDss.Data.Repositories
 
         public async Task<List<DssUploadLine>> GetUploadLineEntitiesToProcessAsync(long uploadId)
         {
-            return await _dbContext.DssUploadLines.AsNoTracking()
+            return await _dbContext.DssUploadLines
                 .Where(x => x.IncludingUploadDeliveryId == uploadId && x.IsProcessed == false)
                 .ToListAsync();
         }

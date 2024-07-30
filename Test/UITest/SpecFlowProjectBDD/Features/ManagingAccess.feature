@@ -19,7 +19,7 @@ Scenario: ManagingAccess
 
 #Request Details:
 
-	When Reviewing a specific access request 
+	When Reviewing a specific access request
 
 	Then I should be able to view detailed information provided by the user, including their role request and any justifications or additional comments
 
@@ -27,7 +27,7 @@ Scenario: ManagingAccess
 
 	When Reviewing an access request
 
-	Then There should be a Grant Access button allowing me to approve the user's request "<RequestingAccessUser>"
+	Then There should be a Grant Access button allowing me to approve the user's request "<UserEmail>"
 
 
 #Role Assignment:
@@ -63,8 +63,8 @@ Scenario: ManagingAccess
 #
 #
 Examples:
-	| UserName | ListingID | Description          | ExpectedResult | ListingURL            | RequestingAccessUser    |AdditionalCCsTextBox     | GovPhoneNumber | TakedownReason         |
-	| CEUATST  | 0         | ListingID - Boundary | pass           | http://listingURL.com | STRDSSVrboDev |richard.anderson@dxc.com | 9991231234     | Get a business license |
+	| UserName | UserEmail             | ListingID | Description          | ExpectedResult | ListingURL            | RequestingAccessUserEmail | AdditionalCCsTextBox     | GovPhoneNumber | TakedownReason         |
+	| CEUATST  | ceuatst@gov.bc.ca | 0         | ListingID - Boundary | pass           | http://listingURL.com | fiona.zhou@gov.bc.ca      | richard.anderson@dxc.com | 9991231234     | Get a business license |
 
 
 

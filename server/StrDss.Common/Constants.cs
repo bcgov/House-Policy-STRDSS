@@ -313,7 +313,8 @@
 
     public static class UploadDeliveryTypes
     {
-        public const string RentalReport = "rental_report";
+        public const string ListingData = "Listing Data";
+        public const string TakedownData = "Takedown Data";
     }
 
     public static class ListingExportFileNames

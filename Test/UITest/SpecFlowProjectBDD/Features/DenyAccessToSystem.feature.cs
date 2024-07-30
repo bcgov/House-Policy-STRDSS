@@ -109,14 +109,14 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given(string.Format("that I am an authenticated LG, CEU, Provincial Gov or Platform user and the expec" +
                             "ted result is \"{0}\"", expectedResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 11
+#line 10
  testRunner.When(string.Format("I attempt to access the Data Sharing System as \"{0}\" with email \"{1}\" and Role \"{" +
                             "2}\"", userName, email, roleName), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 13
+#line 12
  testRunner.Then("I dont have the required access permissions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 15
+#line 14
  testRunner.Then("I should see a specific message indicating that access is restricted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

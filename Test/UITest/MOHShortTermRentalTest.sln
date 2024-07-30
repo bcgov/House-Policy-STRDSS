@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigurationUnitTests", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataBase", "DataBase\DataBase.csproj", "{47E59E4B-9824-4E49-B1A6-C956402679A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsAutomation", "WinFormsLibrary1\WindowsAutomation.csproj", "{213BAB38-0602-4072-BA0A-8F3F3B85CF08}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{47E59E4B-9824-4E49-B1A6-C956402679A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47E59E4B-9824-4E49-B1A6-C956402679A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47E59E4B-9824-4E49-B1A6-C956402679A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{213BAB38-0602-4072-BA0A-8F3F3B85CF08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{213BAB38-0602-4072-BA0A-8F3F3B85CF08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{213BAB38-0602-4072-BA0A-8F3F3B85CF08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{213BAB38-0602-4072-BA0A-8F3F3B85CF08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

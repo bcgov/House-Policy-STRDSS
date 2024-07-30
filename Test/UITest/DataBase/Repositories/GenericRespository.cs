@@ -95,14 +95,8 @@ namespace DataBase.Repositories
             return (result);
         }
 
-        ///TODO: Implement GetByName()
-        //public virtual TEntity GetByName(TEntity entity, string Name)
-        //{
-        //}
-
         public virtual TEntity Insert(TEntity entity)
         {
-            var foo = _DbSet.Add(entity);
             return (_DbSet.Add(entity).Entity);
         }
 
@@ -114,8 +108,9 @@ namespace DataBase.Repositories
 
         public virtual void Delete(TEntity entityToDelete)
         {
-            if (_Context.Entry(entityToDelete).State == EntityState.Detached)
-                _DbSet.Attach(entityToDelete);
+            //Don't change state, just load entity
+            //if (_Context.Entry(entityToDelete).State == EntityState.Detached)
+            //    _DbSet.Attach(entityToDelete);
 
             _DbSet.Remove(entityToDelete);
         }

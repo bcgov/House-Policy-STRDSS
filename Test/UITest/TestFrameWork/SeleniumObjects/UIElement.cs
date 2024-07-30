@@ -69,17 +69,52 @@ namespace UITest.SeleniumObjects
             return (true);
         }
 
-        public bool ExecuteJavaScript(string JavaScript)
-        {
-            if (null == _Driver)
-                throw new ArgumentNullException("No driver defined");
-            else
-            {
-                IJavaScriptExecutor js = _Driver.Driver as IJavaScriptExecutor;
-                js.ExecuteScript(JavaScript);
-            }
 
-            return (true);
+        public bool JSCheckVisability(string Selector)
+        {
+            IJavaScriptExecutor js = _Driver.Driver as IJavaScriptExecutor;
+            var script = @"
+                try {
+                    var elem = document.querySelector('" + Selector + @"');
+                    console.log('Element:', elem);
+                    if (elem) {
+                        console.log('Element found');
+                        if (typeof elem.checkVisibility === 'function') {
+                            var visibilityResult = elem.checkVisibility();
+                            console.log('checkVisibility result:', visibilityResult);
+                            return visibilityResult;
+                        } else {
+                            console.error('checkVisibility is not a function');
+                            return false;
+                        }
+                    } else {
+                        console.error('Element not found');
+                        return false;
+                    }
+                } catch (e) {
+                    console.error('Error:', e);
+                    return false;
+                }
+                ";
+            bool result = (bool)js.ExecuteScript(script);
+            return (result);
+        }
+
+        public object JSExecuteJavaScript(string Script)
+        {
+            IJavaScriptExecutor js = _Driver.Driver as IJavaScriptExecutor;
+            var script = @"
+                try {
+                    var result = " + Script + @";
+                    console.log('Result:', result);
+                    return(result);
+                } catch (e) {
+                    console.error('Error:', e);
+                    return false;
+                }
+                ";
+            object result = js.ExecuteScript(script);
+            return (result);
         }
 
         /// <summary>

@@ -1,0 +1,48 @@
+global:
+  labels:
+    environment: dev
+    env: development
+    owner: "b0471a-team"
+    project: "b0471a-project"
+    DataClass: "Medium"
+
+nameOverride: strdssdev-backup
+fullnameOverride: strdssdev-backup
+
+image:
+  repository: bcgovimages/backup-container
+  pullPolicy: Always
+  tag: latest
+
+backupConfig: |
+  postgres=strdssdev:5432/strdssdev
+
+  0 1 * * * default ./backup.sh -s
+  0 4 * * * default ./backup.sh -s -v all
+
+db:
+  secretName: strdssdev
+  usernameKey: userName
+  passwordKey: postgres-password
+
+persistence:
+  backup:
+    size: 700Mi
+    mountPath: /backups/
+    storageClassName: netapp-block-standard
+    storageAccessMode: ReadWriteOnce
+  verification:
+    size: 512Mi
+    mountPath: /var/lib/pgsql/data
+    storageClassName: netapp-block-standard
+    storageAccessMode: ReadWriteOnce
+
+env:
+  DATABASE_SERVICE_NAME:
+    value: strdssdev
+  ENVIRONMENT_FRIENDLY_NAME:
+    value: "Strdssdev DB Backups"
+
+backup-storage:
+  labels:
+    DataClass: "Medium"

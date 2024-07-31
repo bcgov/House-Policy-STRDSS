@@ -1,0 +1,23 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: enable-{{ include "backup-storage.fullname" . }}-to-db
+  labels:
+    {{- include "backup-storage.labels" . | nindent 4 }}
+    {{- with .Values.global.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "backup-storage.fullname" . }}
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ .Values.dbService }}
+    - to:
+        - ipBlock:
+            cidr: 142.34.229.4/32
+  policyTypes:
+    - Egress

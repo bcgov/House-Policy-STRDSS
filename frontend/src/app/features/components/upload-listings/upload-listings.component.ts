@@ -4,7 +4,6 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { CommonModule } from '@angular/common';
-import { FileUploadModule } from 'primeng/fileupload';
 import { DelistingService } from '../../../common/services/delisting.service';
 import { ToastModule } from 'primeng/toast';
 import { ListingDataService } from '../../../common/services/listing-data.service';
@@ -25,11 +24,9 @@ import { UploadFileComponent } from '../../../common/components/upload-file/uplo
     DropdownModule,
     ButtonModule,
     CommonModule,
-    FileUploadModule,
     ToastModule,
     UploadFileComponent,
   ],
-  providers: [FileReader],
   templateUrl: './upload-listings.component.html',
   styleUrl: './upload-listings.component.scss'
 })

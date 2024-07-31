@@ -109,10 +109,9 @@ export class TopMenuService {
       {
         accessPermission: licence_file_upload,
         buttonId: 'businessLicenses_mi_btn',
-        route: '',
-        disabled: true,
-        description: '',
-        title: 'Business Licenses',
+        route: '/upload-business-licence-data',
+        description: 'Upload Business Licence Data',
+        title: 'Upload Business Licence Data',
         folderName: 'Upload',
       },
 

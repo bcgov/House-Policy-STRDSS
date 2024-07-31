@@ -7,5 +7,6 @@ export const environment = {
     SM_LOGOFF_URL: "https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi/%22",
     API_HOST: '/api',
     RENTAL_LISTING_REPORT_MAX_SIZE: "10",
+    BUISINESS_LICENSE_MAX_SIZE: '10',
     ADDRESS_SCORE: '90',
 };

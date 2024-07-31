@@ -9,7 +9,7 @@ import { PageNotFoundComponent } from './common/components/page-not-found/page-n
 import { approvedUserGuard } from './common/guards/approved-user.guard';
 import { activeUserGuard } from './common/guards/active-user.guard';
 import { accessRequestTokenGuard } from './common/guards/access-request-token.guard';
-import { listing_file_upload, listing_read, role_read, role_write, takedown_action, upload_history_read, user_read, user_write } from './common/consts/permissions.const';
+import { licence_file_upload, listing_file_upload, listing_read, role_read, role_write, takedown_action, upload_history_read, user_read, user_write } from './common/consts/permissions.const';
 import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 import { TermsAndConditionsComponent } from './common/components/terms-and-conditions/terms-and-conditions.component';
 import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
@@ -23,6 +23,7 @@ import { RolesListComponent } from './features/components/roles-list/roles-list.
 import { RoleDetailsComponent } from './features/components/roles-list/role-details/role-details.component';
 import { UserDetailsComponent } from './features/components/user-management/user-details/user-details.component';
 import { ExportListingsComponent } from './features/components/export-listings/export-listings.component';
+import { UploadBusinessLicenseComponent } from './features/components/upload-business-license/upload-business-license.component';
 
 export const routes: Routes = [
     {
@@ -35,6 +36,12 @@ export const routes: Routes = [
         canActivate: [approvedUserGuard, activeUserGuard, areTermsAceptedGuard, hasPermissionsGuard],
         component: UploadListingsComponent,
         data: { permissions: [listing_file_upload] }
+    },
+    {
+        path: 'upload-business-licence-data',
+        canActivate: [approvedUserGuard, activeUserGuard, areTermsAceptedGuard, hasPermissionsGuard],
+        component: UploadBusinessLicenseComponent,
+        data: { permissions: [licence_file_upload] }
     },
     {
         path: 'upload-listing-history',

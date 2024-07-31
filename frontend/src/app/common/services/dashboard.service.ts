@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DashboardCard } from '../models/dashboard-card';
-import { ceu_action, listing_file_upload, listing_read, role_read, takedown_action, upload_history_read, user_write } from '../consts/permissions.const';
+import { ceu_action, licence_file_upload, listing_file_upload, listing_read, role_read, takedown_action, upload_history_read, user_write } from '../consts/permissions.const';
 import { User } from '../models/user';
 
 @Injectable({
@@ -188,6 +188,16 @@ export class DashboardService {
         title: 'Upload Listing Data',
         boxId: 'uploadListingData_box',
         buttonId: 'uploadListingData_btn',
+      },
+      {
+        accessPermission: licence_file_upload,
+        buttonIcon: '',
+        buttonText: 'Upload Business Licence Data',
+        description: 'Upload your local government’s business licence data',
+        route: '/upload-business-licence-data',
+        title: 'Upload Business Licence Data',
+        boxId: 'uploadBlData_box',
+        buttonId: 'uploadBlData_btn',
       },
     ]
   }

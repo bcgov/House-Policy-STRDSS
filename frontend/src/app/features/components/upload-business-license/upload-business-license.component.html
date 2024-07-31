@@ -1,0 +1,91 @@
+<div class="title">Upload Business Licence Data</div>
+<div class="tile">
+    <div class="row">
+        <button pButton (click)="onUploadOpen()" icon="pi pi-upload">&nbsp;Upload Business Licence Data</button>
+    </div>
+    <div class="row">
+        <p-table [value]="uploadHistory" [paginator]="uploadHistory.length>12" [showPageLinks]="false"
+            currentPageReportTemplate="{first}-{last} of {totalRecords}" [showFirstLastIcon]="false"
+            [showCurrentPageReport]="true" paginatorStyleClass="paging-right" [rows]="12" styleClass="p-datatable-sm"
+            class="table-paging-right">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'status'"
+                        (click)="onSort('status')">
+                        Status
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'status' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'status' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'totalRecords'"
+                        (click)="onSort('totalRecords')">
+                        Total Records
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'totalRecords' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'totalRecords' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'uploadDate'"
+                        (click)="onSort('uploadDate')">
+                        Upload Date
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'uploadDate' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'uploadDate' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'uploadBy'"
+                        (click)="onSort('uploadBy')">
+                        Uploaded By
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'uploadBy' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'uploadBy' && this.sort.dir === 'asc'"></i>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-uploadHistory>
+                <tr>
+                    <td>
+                        <span *ngIf="uploadHistory.status==='Processed'; then processed; else pending"></span>
+                        <ng-template #processed> <span
+                                class="state-processed">{{uploadHistory.status}}</span></ng-template>
+                        <ng-template #pending><span class="state-pending">{{uploadHistory.status}}</span></ng-template>
+                    </td>
+                    <td>{{ uploadHistory.totalRecords }}</td>
+                    <td>{{ uploadHistory.uploadDate | date }}</td>
+                    <td>{{ uploadHistory.uploadBy }}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog header="Upload Business Licence Data" class="upload-bl-popup" [modal]="true" [closable]="true"
+    [(visible)]=" isUploadVisible" [style]="{width: '640px'}" clo>
+    <ng-template pTemplate="body">
+        <div class="row sub-header">
+            Upload Your Business Licence Data (.CSV File Only)
+        </div>
+        <div class="row file-select">
+            <app-upload-file #componentRef [extension]="'.csv'" [sizeLimit]="maxFileSize"
+                (filesSelected)="onFileSelected($event)"></app-upload-file>
+            <div class="fileName">{{selectedFile?.name || 'No file selected'}}</div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="actions popup-actions">
+            <button [disabled]="!selectedFile" pButton id="submit-preview-btn" class=""
+                (click)="onUploadFile()">Upload</button>
+            <button pButton id="cancel-preview-btn" class="outline-btn" (click)="onCancelUpload()">Cancel</button>
+        </div>
+    </ng-template>
+</p-dialog>

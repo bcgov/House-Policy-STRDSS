@@ -3,11 +3,12 @@
 # Declare variables to be passed into your templates.
 
 image:
-  repository: backup-patroni
-  pullPolicy: IfNotPresent
-  tag: latest
+  repository: artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container
+  pullPolicy: Always
+  tag: 16
 
-imagePullSecrets: []
+imagePullSecrets:
+  - name: jf-rg-secret
 nameOverride: ""
 fullnameOverride: ""
 

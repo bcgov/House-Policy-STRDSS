@@ -17,7 +17,6 @@ backupConfig: |
 
 db:
   secretName: strdssdev
-  usernameKey: userName
   passwordKey: postgres-password
 
 persistence:

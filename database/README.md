@@ -77,3 +77,8 @@ Each production release depends on the execution of a fixed set of scripts again
 - Sprint 10:
   - `seeding/STR_DSS_Data_Seeding_Platforms_Sprint_10.sql`
   - `STR_DSS_Data_Seeding_PRODONLY_PRIVATE_Sprint_10.sql` **(PRD ONLY - not in repo) OR** `seeding/STR_DSS_Data_Seeding_NONPROD_Sprint_6.sql` **(not a typo)**
+- Sprint 11:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_11.sql`
+  - `ddl/STR_DSS_Views_Sprint_9.sql` **(not a typo)**
+  - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_11.sql`
+  - `utility/DSS-627_Correct_UPLOAD_DELIVERY_Sprint_11.sql`

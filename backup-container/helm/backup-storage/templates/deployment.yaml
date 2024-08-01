@@ -59,10 +59,7 @@ spec:
           env:
           {{- with .Values.db }}
             - name: DATABASE_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .secretName }}
-                  key: {{ .usernameKey }}
+              value: postgres
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:

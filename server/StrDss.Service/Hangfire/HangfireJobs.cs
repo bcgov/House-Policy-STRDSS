@@ -7,12 +7,14 @@ namespace StrDss.Service.Hangfire
         private IRentalListingReportService _linstingReportService;
         private IDelistingService _delistingService;
         private IRentalListingService _listingService;
+        private ITakedownConfirmationService _tdcService;
 
-        public HangfireJobs(IRentalListingReportService listingReportService, IRentalListingService listingService, IDelistingService delistingService)
+        public HangfireJobs(IRentalListingReportService listingReportService, IRentalListingService listingService, IDelistingService delistingService, ITakedownConfirmationService tdcService)
         {
             _linstingReportService = listingReportService;
             _delistingService = delistingService;
             _listingService = listingService;
+            _tdcService = tdcService;
         }
 
         [Queue("default")]
@@ -31,13 +33,13 @@ namespace StrDss.Service.Hangfire
             await _delistingService.ProcessTakedownRequestBatchEmailsAsync();
         }
 
-        [Queue("default")]
-        [SkipSameJob]
-        [AutomaticRetry(Attempts = 0)]
-        public async Task CleanUpAddresses()
-        {
-            await _linstingReportService.CleaupAddressAsync();
-        }
+        //[Queue("default")]
+        //[SkipSameJob]
+        //[AutomaticRetry(Attempts = 0)]
+        //public async Task CleanUpAddresses()
+        //{
+        //    await _linstingReportService.CleaupAddressAsync();
+        //}
 
         [Queue("default")]
         [SkipSameJob]
@@ -46,5 +48,15 @@ namespace StrDss.Service.Hangfire
         {
             await _listingService.CreateRentalListingExportFiles();
         }
+
+        [Queue("default")]
+        [SkipSameJob]
+        [AutomaticRetry(Attempts = 0)]
+        public async Task ProcessTakedownConfirmation()
+        {
+            await _tdcService.ProcessTakedownConfrimationAsync();
+        }
+
+        
     }
 }

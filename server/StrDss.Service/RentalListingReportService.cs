@@ -56,7 +56,7 @@ namespace StrDss.Service
         }
         public async Task ProcessRentalReportUploadAsync()
         {
-            var upload = await _uploadRepo.GetRentalReportUploadToProcessAsync();
+            var upload = await _uploadRepo.GetUploadToProcessAsync(UploadDeliveryTypes.ListingData);
 
             if (upload != null)
             {
@@ -71,7 +71,7 @@ namespace StrDss.Service
             _logger.LogInformation($"Processing Rental Listing Report {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
 
             var reportPeriodYm = (DateOnly)upload.ReportPeriodYm!;
-            var lineCount = await _reportRepo.GetTotalNumberOfUploadLines(upload.UploadDeliveryId);
+            var lineCount = await _uploadRepo.GetTotalNumberOfUploadLines(upload.UploadDeliveryId);
             var count = 0;
 
             var report = await _reportRepo.GetRentalListingReportAsync(upload.ProvidingOrganizationId, reportPeriodYm);

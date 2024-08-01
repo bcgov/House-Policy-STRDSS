@@ -16,6 +16,7 @@ on:
       - localdb/**
       - postgres/**
       - crunchydb/**
+      - backup-container/**
 
 jobs:
   test-backend:

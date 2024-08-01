@@ -22,7 +22,6 @@ namespace StrDss.Data.Repositories
         Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
         Task UpdateInactiveListings(long providingPlatformId);
         Task UpdateListingStatus(long providingPlatformId, long rentalListingId);
-        Task<int> GetTotalNumberOfUploadLines(long uploadId);
         Task<(short NightsBookedQty, short SeparateReservationsQty)> GetYtdValuesOfListingAsync(DateOnly reportPeriodYm, long offeringOrgId, string listingId);
     }
     public class RentalListingReportRepository : RepositoryBase<DssRentalListingReport>, IRentalListingReportRepository
@@ -210,11 +209,6 @@ namespace StrDss.Data.Repositories
             stopwatch.Stop();
 
             _logger.LogDebug($"UpdateListingStatus = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
-        }
-
-        public async Task<int> GetTotalNumberOfUploadLines(long uploadId)
-        {
-            return await _dbContext.DssUploadLines.Where(x => x.IncludingUploadDeliveryId == uploadId).CountAsync();
         }
     }
 }

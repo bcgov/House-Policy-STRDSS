@@ -9,11 +9,6 @@ global:
 nameOverride: strdssdev-backup
 fullnameOverride: strdssdev-backup
 
-image:
-  repository: bcgovimages/backup-container
-  pullPolicy: Always
-  tag: latest
-
 backupConfig: |
   postgres=strdssdev:5432/strdssdev
 

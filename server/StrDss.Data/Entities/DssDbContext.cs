@@ -263,6 +263,10 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsPrincipalResidenceRequired)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions")
                 .HasColumnName("is_principal_residence_required");
+            entity.Property(e => e.LocalGovernmentType)
+                .HasMaxLength(50)
+                .HasComment("A sub-type of local government organization used for sorting and grouping or members")
+                .HasColumnName("local_government_type");
             entity.Property(e => e.ManagingOrganizationId)
                 .HasComment("Self-referential hierarchical foreign key")
                 .HasColumnName("managing_organization_id");
@@ -503,7 +507,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("The Short Term Registry issued permit number")
                 .HasColumnName("bc_registry_no");
             entity.Property(e => e.BusinessLicenceNo)
-                .HasMaxLength(100)
+                .HasMaxLength(230)
                 .HasComment("The local government issued licence number that applies to the rental offering")
                 .HasColumnName("business_licence_no");
             entity.Property(e => e.DerivedFromRentalListingId)
@@ -617,7 +621,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("Mailing address given for the contact")
                 .HasColumnName("full_address_txt");
             entity.Property(e => e.FullNm)
-                .HasMaxLength(100)
+                .HasMaxLength(230)
                 .HasComment("The full name of the contact person as inluded in the listing")
                 .HasColumnName("full_nm");
             entity.Property(e => e.IsPropertyOwner)
@@ -751,7 +755,7 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("bc_registry_no");
             entity.Property(e => e.BusinessLicenceNo)
-                .HasMaxLength(100)
+                .HasMaxLength(230)
                 .HasColumnName("business_licence_no");
             entity.Property(e => e.EconomicRegionDsc)
                 .HasMaxLength(100)
@@ -857,6 +861,10 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(256)
                 .HasComment("The hash value of the information that was uploaded")
                 .HasColumnName("source_hash_dsc");
+            entity.Property(e => e.SourceHeaderTxt)
+                .HasMaxLength(32000)
+                .HasComment("Full text of the header line")
+                .HasColumnName("source_header_txt");
             entity.Property(e => e.UpdDtm)
                 .HasComment("Trigger-updated timestamp of last change")
                 .HasColumnName("upd_dtm");
@@ -880,7 +888,9 @@ public partial class DssDbContext : DbContext
 
             entity.ToTable("dss_upload_line", tb => tb.HasComment("An upload delivery line that has been extracted from the source"));
 
-            entity.HasIndex(e => new { e.IncludingUploadDeliveryId, e.SourceRecordNo }, "dss_upload_line_uk").IsUnique();
+            entity.HasIndex(e => new { e.IsProcessed, e.IncludingUploadDeliveryId }, "dss_upload_line_i1");
+
+            entity.HasIndex(e => new { e.IncludingUploadDeliveryId, e.SourceOrganizationCd, e.SourceRecordNo }, "dss_upload_line_uk").IsUnique();
 
             entity.Property(e => e.UploadLineId)
                 .HasComment("Unique generated key")
@@ -904,7 +914,7 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("is_validation_failure");
             entity.Property(e => e.SourceLineTxt)
                 .HasMaxLength(32000)
-                .HasComment("Full text of the uploaod line")
+                .HasComment("Full text of the upload line")
                 .HasColumnName("source_line_txt");
             entity.Property(e => e.SourceOrganizationCd)
                 .HasMaxLength(25)

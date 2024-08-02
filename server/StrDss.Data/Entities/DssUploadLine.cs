@@ -34,7 +34,7 @@ public partial class DssUploadLine
     public string SourceRecordNo { get; set; } = null!;
 
     /// <summary>
-    /// Full text of the uploaod line
+    /// Full text of the upload line
     /// </summary>
     public string SourceLineTxt { get; set; } = null!;
 

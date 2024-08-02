@@ -22,8 +22,6 @@ namespace StrDss.Service
     public interface IRentalListingReportService
     {
         Task ProcessRentalReportUploadAsync();
-        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<byte[]?> GetRentalListingErrorFile(long uploadId);
         Task CleaupAddressAsync();
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
@@ -153,7 +151,7 @@ namespace StrDss.Service
 
                 if (user == null) return;
 
-                var history = await _reportRepo.GetRentalListingUpload(upload.UploadDeliveryId);
+                var history = await _uploadRepo.GetRentalListingUpload(upload.UploadDeliveryId);
 
                 if (history == null) return;
 
@@ -450,43 +448,6 @@ namespace StrDss.Service
                     EmailAddressDsc = email,
                 });
             }
-        }
-
-        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
-        {
-            return await _reportRepo.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
-        }
-
-        public async Task<byte[]?> GetRentalListingErrorFile(long uploadId)
-        {
-            var upload = await _uploadRepo.GetRentalListingUploadWithErrors(uploadId);
-
-            if (upload == null) return null;
-
-            var linesWithError = await _uploadRepo.GetUploadLineIdsWithErrors(uploadId);
-
-            var memoryStream = new MemoryStream(upload.SourceBin!);
-            using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
-
-            var errors = new Dictionary<string, List<string>>();
-            var csvConfig = CsvHelperUtils.GetConfig(errors, false);
-
-            using var csv = new CsvReader(textReader, csvConfig);
-
-            var contents = new StringBuilder();
-
-            csv.Read();
-            var header = csv.Parser.RawRecord.TrimEndNewLine() + ",errors";
-
-            contents.AppendLine(header);
-
-            foreach (var lineId in linesWithError)
-            {
-                var line = await _uploadRepo.GetUploadLineWithError(lineId);
-                contents.AppendLine(line.LineText.TrimEndNewLine() + $",\"{line.ErrorText ?? ""}\"");
-            }
-
-            return Encoding.UTF8.GetBytes(contents.ToString());
         }
 
         public async Task CleaupAddressAsync()

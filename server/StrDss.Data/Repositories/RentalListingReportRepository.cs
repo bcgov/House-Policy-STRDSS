@@ -18,8 +18,6 @@ namespace StrDss.Data.Repositories
         Task AddRentalListingAsync(DssRentalListing listing);
         Task<DssRentalListing?> GetMasterListingAsync(long offeringOrgId, string rentalListingId);
         void DeleteListingContacts(long rentalListingId);
-        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
         Task UpdateInactiveListings(long providingPlatformId);
         Task UpdateListingStatus(long providingPlatformId, long rentalListingId);
         Task<(short NightsBookedQty, short SeparateReservationsQty)> GetYtdValuesOfListingAsync(DateOnly reportPeriodYm, long offeringOrgId, string listingId);
@@ -112,37 +110,7 @@ namespace StrDss.Data.Repositories
             _logger.LogDebug($"GetRentalListingAsync = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
         }
 
-        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
-        {
-            var query = _dbContext.DssRentalUploadHistoryViews.AsNoTracking();
 
-            if (_currentUser.OrganizationType == OrganizationTypes.Platform)
-                query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
-
-            if (platformId != null)
-            {
-                query = query.Where(x => x.ProvidingOrganizationId == platformId);
-            }
-
-            var history = await Page<DssRentalUploadHistoryView, RentalUploadHistoryViewDto>(query, pageSize, pageNumber, orderBy, direction);
-
-            return history;
-        }
-
-        public async Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId)
-        {
-            var stopwatch = Stopwatch.StartNew();
-
-            var history = await _dbContext
-                .DssRentalUploadHistoryViews
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UploadDeliveryId == deliveryId);
-
-            stopwatch.Stop();
-            _logger.LogDebug($"GetRentalListingUpload = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
-
-            return history;
-        }
 
         public async Task UpdateInactiveListings(long providingPlatformId)
         {

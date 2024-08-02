@@ -52,7 +52,7 @@ namespace StrDss.Service
 
             var count = 0;
 
-            var header = "rpt_period,org_cd,listing_id,rpt_type"; //todo: upload.Header
+            var header = upload.SourceHeaderTxt ?? "";
 
             var linesToProcess = await _uploadRepo.GetUploadLineEntitiesToProcessAsync(upload.UploadDeliveryId);
             var lineCount = linesToProcess.Count;
@@ -102,34 +102,37 @@ namespace StrDss.Service
                 _logger.LogInformation($"Skipping listing (not found) - ({row.OrgCd} - {row.ListingId})");
                 return (row.OrgCd, row.ListingId);
             }
-            else if (listing.IsTakenDown == true)
+
+            if (listing.IsTakenDown == true)
             {
                 _logger.LogInformation($"Skipping listing (already taken down) - ({row.OrgCd} - {row.ListingId})");
-                return (row.OrgCd, row.ListingId);
+            }
+            else
+            {
+                listing.IsTakenDown = true;
+
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = EmailMessageTypes.CompletedTakedown,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = "",
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = false,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = null,
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = null,
+                    UnreportedListingUrl = null,
+                    LgStrBylawUrl = null,
+                    InvolvedInOrganizationId = upload.ProvidingOrganizationId,
+                    ConcernedWithRentalListingId = listing.RentalListingId
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
             }
 
-            listing.IsTakenDown = true;
             line.IsProcessed = true;
-
-            var emailEntity = new DssEmailMessage
-            {
-                EmailMessageType = EmailMessageTypes.CompletedTakedown,
-                MessageDeliveryDtm = DateTime.UtcNow,
-                MessageTemplateDsc = "",
-                IsHostContactedExternally = false,
-                IsSubmitterCcRequired = false,
-                LgPhoneNo = null,
-                UnreportedListingNo = null,
-                HostEmailAddressDsc = null,
-                LgEmailAddressDsc = null,
-                CcEmailAddressDsc = null,
-                UnreportedListingUrl = null,
-                LgStrBylawUrl = null,
-                InvolvedInOrganizationId = upload.ProvidingOrganizationId,
-                ConcernedWithRentalListingId = listing.RentalListingId
-            };
-
-            await _emailRepo.AddEmailMessage(emailEntity);
 
             _unitOfWork.Commit();
 

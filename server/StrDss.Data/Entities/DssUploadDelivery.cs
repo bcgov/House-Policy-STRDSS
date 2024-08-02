@@ -48,6 +48,11 @@ public partial class DssUploadDelivery
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
 
+    /// <summary>
+    /// Full text of the header line
+    /// </summary>
+    public string? SourceHeaderTxt { get; set; }
+
     public virtual ICollection<DssUploadLine> DssUploadLines { get; set; } = new List<DssUploadLine>();
 
     public virtual DssOrganization ProvidingOrganization { get; set; } = null!;

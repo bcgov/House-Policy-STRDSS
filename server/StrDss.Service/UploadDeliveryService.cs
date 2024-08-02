@@ -17,7 +17,7 @@ namespace StrDss.Service
     public interface IUploadDeliveryService
     {
         Task<Dictionary<string, List<string>>> UploadPlatformData(string reportType, string reportPeriod, long orgId, Stream stream);
-        Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines);
+        Task<(Dictionary<string, List<string>>, string header)> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines);
     }
     public class UploadDeliveryService : ServiceBase, IUploadDeliveryService
     {
@@ -51,7 +51,7 @@ namespace StrDss.Service
 
             var mandatoryFields = GetMandatoryFields(reportType);
 
-            var errors = await ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (errors, header) = await ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             if (errors.Count > 0) return errors;
 
@@ -62,7 +62,8 @@ namespace StrDss.Service
                 SourceHashDsc = hashValue,
                 SourceBin = sourceBin,
                 ProvidingOrganizationId = orgId,
-                UpdUserGuid = _currentUser.UserGuid
+                UpdUserGuid = _currentUser.UserGuid,
+                SourceHeaderTxt = header,
             };
 
             foreach (var line in uploadLines)
@@ -93,7 +94,7 @@ namespace StrDss.Service
             }
         }
 
-        public async Task<Dictionary<string, List<string>>> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines)
+        public async Task<(Dictionary<string, List<string>>, string header)> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines)
         {
             var errors = new Dictionary<string, List<string>>();
 
@@ -101,7 +102,7 @@ namespace StrDss.Service
             if (!Regex.IsMatch(reportPeriod, regex.Regex))
             {
                 errors.AddItem("ReportPeriod", regex.ErrorMessage);
-                return errors;
+                return (errors, "");
             }
 
             var firstDayOfReportMonth = new DateOnly(Convert.ToInt32(reportPeriod.Substring(0, 4)), Convert.ToInt32(reportPeriod.Substring(5, 2)), 1);
@@ -115,7 +116,7 @@ namespace StrDss.Service
             if (isDuplicate)
             {
                 errors.AddItem("File", "The file has already been uploaded");
-                return errors;
+                return (errors, "");
             }
 
             var platform = await _orgRepo.GetOrganizationByIdAsync(orgId);
@@ -130,7 +131,7 @@ namespace StrDss.Service
 
             if (errors.Count > 0)
             {
-                return errors;
+                return (errors, "");
             }
 
             var csvConfig = CsvHelperUtils.GetConfig(errors, false);
@@ -143,18 +144,20 @@ namespace StrDss.Service
             if (!headerExists)
             {
                 errors.AddItem("File", "Header deosn't exist.");
-                return errors;
+                return (errors, "");
             }
+
+            var header = csv.Parser.RawRecord;
 
             if (reportType == UploadDeliveryTypes.ListingData && csv.HeaderRecord.Contains("rpt_type"))
             {
                 errors.AddItem("File", "The listing data file contains an invalid column: 'rpt_type'. Please remove the 'rpt_type' column and try again.");
-                return errors;
+                return (errors, "");
             }
 
             if (!CheckCommonMandatoryFields(csv.HeaderRecord, mandatoryFields, errors))
             {
-                return errors;
+                return (errors, header);
             }
 
             var reportPeriodMismatch = 0;
@@ -276,7 +279,7 @@ namespace StrDss.Service
                 errors.AddItem("listing_id", $"Duplicate listing ID(s) found: {string.Join(", ", duplicateListingIds.ToArray())}. Each listing ID must be unique within an organization code.");
             }
 
-            return errors;
+            return (errors, header);
         }
 
         private bool CheckCommonMandatoryFields(string[] headers, string[] mandatoryFields, Dictionary<string, List<string>> errors)

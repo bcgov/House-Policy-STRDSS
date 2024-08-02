@@ -721,7 +721,7 @@
 					"formdata": [
 						{
 							"key": "ReportPeriod",
-							"value": "2024-04",
+							"value": "2024-06",
 							"type": "text"
 						},
 						{
@@ -732,7 +732,7 @@
 						{
 							"key": "File",
 							"type": "file",
-							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/listing-valid-2024-04.csv"
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/takedown-2024-06.csv"
 						}
 					]
 				},
@@ -744,6 +744,45 @@
 					"path": [
 						"api",
 						"rentallistingreports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Takedown Confirmation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "ReportPeriod",
+							"value": "2024-06",
+							"type": "text"
+						},
+						{
+							"key": "OrganizationId",
+							"value": "590",
+							"type": "text"
+						},
+						{
+							"key": "File",
+							"type": "file",
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/takedown-2024-06.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/api/rentallistings/takedownconfirmation",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"takedownconfirmation"
 					]
 				}
 			},
@@ -897,7 +936,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistings?prRequirement=true&blRequirement=true&lgId=36&reassigned=true&takedownComplete=true&statuses=A,I&pageSize=10&pageNumber=1&orderBy=platformListingNo&direction=desc",
+					"raw": "{{host}}/api/rentallistings?blRequirement=false&lgId=&reassigned=false&takedownComplete=false&statuses=I,A&pageSize=10&pageNumber=1&orderBy=platformListingNo&direction=desc",
 					"host": [
 						"{{host}}"
 					],
@@ -907,28 +946,24 @@
 					],
 					"query": [
 						{
-							"key": "prRequirement",
-							"value": "true"
-						},
-						{
 							"key": "blRequirement",
-							"value": "true"
+							"value": "false"
 						},
 						{
 							"key": "lgId",
-							"value": "36"
+							"value": ""
 						},
 						{
 							"key": "reassigned",
-							"value": "true"
+							"value": "false"
 						},
 						{
 							"key": "takedownComplete",
-							"value": "true"
+							"value": "false"
 						},
 						{
 							"key": "statuses",
-							"value": "A,I"
+							"value": "I,A"
 						},
 						{
 							"key": "pageSize",
@@ -1275,6 +1310,26 @@
 							"key": "addressString",
 							"value": "72 Switchmen St, Vancouver, BC, Canada"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bceid service call",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/users/currentuser/bceiduserinfo",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"currentuser",
+						"bceiduserinfo"
 					]
 				}
 			},

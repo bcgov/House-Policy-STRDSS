@@ -14,5 +14,7 @@
 
         public static string UploadListingsButton { get => "uploadListingData_btn"; }
 
+        public static string listingsButton { get => "viewListingData_btn"; }
+
     }
 }

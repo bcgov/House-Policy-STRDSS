@@ -57,7 +57,7 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.BusLicNo,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 25
+                MaxLength = 230
             });
 
             rules.Add(new FieldValidationRule
@@ -111,7 +111,7 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.PropertyHostNm,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 50
+                MaxLength = 230
             });
 
             rules.Add(new FieldValidationRule
@@ -158,7 +158,7 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.SupplierHost1Nm,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 50
+                MaxLength = 230
             });
 
             rules.Add(new FieldValidationRule
@@ -214,7 +214,7 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.SupplierHost2Nm,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 50
+                MaxLength = 230
             });
 
             rules.Add(new FieldValidationRule
@@ -270,7 +270,7 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.SupplierHost3Nm,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 50
+                MaxLength = 230
             });
 
             rules.Add(new FieldValidationRule
@@ -326,7 +326,7 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.SupplierHost4Nm,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 50
+                MaxLength = 230
             });
 
             rules.Add(new FieldValidationRule
@@ -382,7 +382,7 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.SupplierHost5Nm,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 50
+                MaxLength = 230
             });
 
             rules.Add(new FieldValidationRule

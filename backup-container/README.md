@@ -35,7 +35,17 @@ cat "${BACKUP_DIR}backup.sql" | gzip > ${_backupFile}
 rm "${BACKUP_DIR}backup.sql"
 ```
 
+```sh
+  # SET OWNER
+  if (( ${_rtnCd} == 0 )); then
+    psql -h "${_hostname}" ${_portArg} -ac "ALTER DATABASE \"${_database}\" OWNER TO \"${_database}\";"
+    _rtnCd=${?}
+  fi
+```
+
 ## Docker build and push to the Artifactory
+
+cd into [docker](./src/docker/)
 
 ```sh
 docker build -t backup-container .
@@ -45,6 +55,8 @@ docker push artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container:16
 ```
 
 ## Helm deploy
+
+cd into [docker](./helm/backup-storage/)
 
 ```sh
 helm upgrade --install strdssdev-backup --values ../dev-values.yaml .

@@ -23,19 +23,20 @@ FROM --platform=linux/amd64 quay.io/fedora/postgresql-16:16
 **Original:**
 
 ```sh
+pg_dump -Fp -h "${_hostname}" ${_portArg} -U "${_username}" "${_database}" > "${BACKUP_DIR}backup.sql"
 pg_dumpall -h "${_hostname}" ${_portArg} -U "${_username}" --roles-only --no-role-passwords > "${BACKUP_DIR}roles.sql"
-cat "${BACKUP_DIR}roles.sql" "${BACKUP_DIR}backup.sql" | gzip > ${_backupFile}
-rm "${BACKUP_DIR}roles.sql" && rm "${BACKUP_DIR}backup.sql
 ```
 
 **Updated:**
 
 ```sh
-cat "${BACKUP_DIR}backup.sql" | gzip > ${_backupFile}
-rm "${BACKUP_DIR}backup.sql"
+pg_dump -Fp -h "${_hostname}" ${_portArg} -U "${_username}" "${_database}" --clean > "${BACKUP_DIR}backup.sql"
+pg_dumpall -h "${_hostname}" ${_portArg} -U "${_username}" --clean --roles-only --no-role-passwords > "${BACKUP_DIR}roles.sql"
 ```
 
 ## Docker build and push to the Artifactory
+
+cd into [docker](./src/docker/)
 
 ```sh
 docker build -t backup-container .
@@ -45,6 +46,8 @@ docker push artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container:16
 ```
 
 ## Helm deploy
+
+cd into [docker](./helm/backup-storage/)
 
 ```sh
 helm upgrade --install strdssdev-backup --values ../dev-values.yaml .

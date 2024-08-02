@@ -12,6 +12,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="AppSettings.uat.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="AppSettings.test.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="AppSettings.dev.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="AppSettings.Local.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

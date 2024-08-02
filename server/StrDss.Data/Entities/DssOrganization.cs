@@ -69,6 +69,11 @@ public partial class DssOrganization
     /// </summary>
     public string? EconomicRegionDsc { get; set; }
 
+    /// <summary>
+    /// A sub-type of local government organization used for sorting and grouping or members
+    /// </summary>
+    public string? LocalGovernmentType { get; set; }
+
     public virtual ICollection<DssEmailMessage> DssEmailMessageInvolvedInOrganizations { get; set; } = new List<DssEmailMessage>();
 
     public virtual ICollection<DssEmailMessage> DssEmailMessageRequestingOrganizations { get; set; } = new List<DssEmailMessage>();

@@ -48,7 +48,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("ReportPeriod", result.Keys);
@@ -78,7 +78,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("ReportPeriod", result.Keys);
@@ -106,7 +106,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("ReportPeriod", result.Keys);
@@ -134,7 +134,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("File", result.Keys);
@@ -165,7 +165,7 @@ namespace StrDss.Test
             using StringReader textReader = GetCsvData(reportPeriod);
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Empty(result);
@@ -189,7 +189,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetOrganizationByIdAsync(It.IsAny<long>())).ReturnsAsync(null as OrganizationDto);
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("OrganizationId", result.Keys);
@@ -219,7 +219,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("rpt_period", result.Keys);
@@ -249,7 +249,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("rpt_period", result.Keys);
@@ -277,7 +277,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("org_cd", result.Keys);
@@ -306,7 +306,7 @@ namespace StrDss.Test
             using StringReader textReader = GetCsvData(reportPeriod);
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("org_cd", result.Keys);
@@ -336,7 +336,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("listing_id", result.Keys);
@@ -365,7 +365,7 @@ namespace StrDss.Test
             orgRepoMock.Setup(x => x.GetManagingOrgCdsAsync(orgId)).ReturnsAsync(new List<string>());
 
             // Act
-            var result = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
+            var (result, header) = await listingService.ValidateAndParseUploadAsync(reportPeriod, orgId, reportType, hashValue, mandatoryFields, textReader, uploadLines);
 
             // Assert
             Assert.Contains("listing_id", result.Keys);

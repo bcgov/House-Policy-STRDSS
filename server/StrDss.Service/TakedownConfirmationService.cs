@@ -36,9 +36,9 @@ namespace StrDss.Service
 
         public async Task ProcessTakedownConfrimationAsync()
         {
-            var upload = await _uploadRepo.GetUploadToProcessAsync(UploadDeliveryTypes.TakedownData);
+            var uploads = await _uploadRepo.GetUploadsToProcessAsync(UploadDeliveryTypes.TakedownData);
 
-            if (upload != null)
+            foreach (var upload in uploads)
             {
                 await ProcessTakedownConfirmationUploadAsync(upload);
             }

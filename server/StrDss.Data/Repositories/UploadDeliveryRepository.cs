@@ -13,6 +13,7 @@ namespace StrDss.Data.Repositories
         Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly periodYm, long orgId, string hashValue);
         Task AddUploadDeliveryAsync(DssUploadDelivery upload);
         Task<DssUploadDelivery?> GetUploadToProcessAsync(string reportType);
+        Task<DssUploadDelivery[]> GetUploadsToProcessAsync(string reportType);
         Task<DssUploadDelivery?> GetRentalListingUploadWithErrors(long uploadId);
         Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId);
         Task<List<UploadLineToProcess>> GetUploadLinesToProcessAsync(long uploadId);
@@ -50,6 +51,17 @@ namespace StrDss.Data.Repositories
                     .ThenBy(x => x.ReportPeriodYm)
                         .ThenBy(x => x.UpdDtm) //Users can upload the same listing multiple times. The processing of these listings follows a first-come, first-served approach.
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<DssUploadDelivery[]> GetUploadsToProcessAsync(string reportType)
+        {
+            return await _dbSet
+                .Include(x => x.ProvidingOrganization)
+                .Where(x => x.DssUploadLines.Any(line => !line.IsProcessed) && x.UploadDeliveryType == reportType)
+                .OrderBy(x => x.ProvidingOrganizationId)
+                    .ThenBy(x => x.ReportPeriodYm)
+                        .ThenBy(x => x.UpdDtm) //Users can upload the same listing multiple times. The processing of these listings follows a first-come, first-served approach.
+                .ToArrayAsync();
         }
 
         public async Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId)

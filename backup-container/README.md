@@ -23,15 +23,24 @@ FROM --platform=linux/amd64 quay.io/fedora/postgresql-16:16
 **Original:**
 
 ```sh
-pg_dump -Fp -h "${_hostname}" ${_portArg} -U "${_username}" "${_database}" > "${BACKUP_DIR}backup.sql"
 pg_dumpall -h "${_hostname}" ${_portArg} -U "${_username}" --roles-only --no-role-passwords > "${BACKUP_DIR}roles.sql"
+cat "${BACKUP_DIR}roles.sql" "${BACKUP_DIR}backup.sql" | gzip > ${_backupFile}
+rm "${BACKUP_DIR}roles.sql" && rm "${BACKUP_DIR}backup.sql
 ```
 
 **Updated:**
 
 ```sh
-pg_dump -Fp -h "${_hostname}" ${_portArg} -U "${_username}" "${_database}" --clean > "${BACKUP_DIR}backup.sql"
-pg_dumpall -h "${_hostname}" ${_portArg} -U "${_username}" --clean --roles-only --no-role-passwords > "${BACKUP_DIR}roles.sql"
+cat "${BACKUP_DIR}backup.sql" | gzip > ${_backupFile}
+rm "${BACKUP_DIR}backup.sql"
+```
+
+```sh
+  # SET OWNER
+  if (( ${_rtnCd} == 0 )); then
+    psql -h "${_hostname}" ${_portArg} -ac "ALTER DATABASE \"${_database}\" OWNER TO \"${_database}\";"
+    _rtnCd=${?}
+  fi
 ```
 
 ## Docker build and push to the Artifactory

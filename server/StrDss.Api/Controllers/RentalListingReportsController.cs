@@ -72,7 +72,7 @@ namespace StrDss.Api.Controllers
         [HttpGet("rentallistinghistory")]
         public async Task<ActionResult> GetRentalListingHistory(long? platformId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
-            var history = await _listingService.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
+            var history = await _uploadService.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
 
             return Ok(history);
         }
@@ -81,7 +81,7 @@ namespace StrDss.Api.Controllers
         [HttpGet("uploads/{uploadId}/errorfile")]
         public async Task<ActionResult> GetRentalListingErrorFile(long uploadId)
         {
-            var bytes = await _listingService.GetRentalListingErrorFile(uploadId);
+            var bytes = await _uploadService.GetRentalListingErrorFile(uploadId);
 
             if (bytes == null)
                 return NotFound();

@@ -24,7 +24,7 @@ export class ListingDataService {
 
   constructor(private httpClient: HttpClient) { }
 
-  uploadData(reportPeriod: string, organizationId: number, file: any): Observable<unknown> {
+  uploadListings(reportPeriod: string, organizationId: number, file: any): Observable<unknown> {
     const formData = new FormData();
     formData.append('reportPeriod', reportPeriod);
     formData.append('organizationId', organizationId.toString());
@@ -32,6 +32,18 @@ export class ListingDataService {
 
     return this.httpClient.post<any>(
       `${environment.API_HOST}/RentalListingReports`,
+      formData,
+    );
+  }
+
+  uploadTakedown(reportPeriod: string, organizationId: number, file: any): Observable<unknown> {
+    const formData = new FormData();
+    formData.append('reportPeriod', reportPeriod);
+    formData.append('organizationId', organizationId.toString());
+    formData.append('file', file);
+
+    return this.httpClient.post<any>(
+      `${environment.API_HOST}/RentalListings/takedownconfirmation`,
       formData,
     );
   }

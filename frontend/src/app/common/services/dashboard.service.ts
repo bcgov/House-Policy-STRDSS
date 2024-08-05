@@ -183,12 +183,12 @@ export class DashboardService {
         accessPermission: listing_file_upload,
         buttonIcon: '',
         buttonText: 'Upload data',
-        description: 'Upload listing data to the system ',
+        description: 'Upload platform data to the system ',
         route: 'upload-listing-data',
-        title: 'Upload Listing Data',
-        boxId: 'uploadListingData_box',
-        buttonId: 'uploadListingData_btn',
+        title: 'Upload Platform Data',
+        boxId: 'uploadPlatformData_box',
+        buttonId: 'uploadPlatformData_btn',
       },
-    ]
+    ];
   }
 }

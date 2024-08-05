@@ -22,6 +22,16 @@
                         *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'asc'"></i>
                 </th>
 
+                <th class="sortable-header" id="uploadDeliveryType_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'uploadDeliveryType'"
+                    (click)="onSort('uploadDeliveryType')">Report
+                    Type
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'uploadDeliveryType' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'uploadDeliveryType' && this.sort.dir === 'asc'"></i>
+                </th>
+
                 <th class="sortable-header" id="reportPeriodYM_header"
                     [class.sorted]="this.sort && this.sort.prop === 'reportPeriodYM'"
                     (click)="onSort('reportPeriodYM')">Reported Month
@@ -83,6 +93,7 @@
         <ng-template pTemplate="body" let-row>
             <tr>
                 <td>{{ row.organizationNm }}</td>
+                <td>{{ row.uploadDeliveryType }}</td>
                 <td>{{ row.reportPeriodYM }}</td>
                 <td>
                     <span *ngIf="row.status==='Processed'; then processed; else pending"></span>
@@ -98,7 +109,8 @@
                 <td>
                     <button *ngIf="row.errors>0; else zero" [id]="'downloadErrors_'+row.uploadDeliveryId" pButton
                         [disabled]="row.status!=='Processed'" class="p-button-link zero-padding"
-                        (click)="onDownloadErrors(row.uploadDeliveryId,row.organizationNm,row.reportPeriodYM)">{{row.errors}}&nbsp;
+                        (click)="onDownloadErrors(row.uploadDeliveryId,row.organizationNm,row.reportPeriodYM)">{{row.errors
+                        || '-'}}&nbsp;
                         <i class="pi pi-download" *ngIf="row.errors>0"></i></button>
                     <ng-template #zero>{{0}}</ng-template>
                 </td>

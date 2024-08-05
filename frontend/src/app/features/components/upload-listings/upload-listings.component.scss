@@ -19,14 +19,25 @@
     .form-group-row {
         width: 100%;
 
-        .upload-container {
-            width: 100%;
-            display: flex;
-            gap: 12px;
+        &.upload-row {
+            width: auto;
+        }
 
-            p-fileupload {
-                margin-right: 12px;
-                display: inline-block;
+        .form-group-row-col {
+            &.upload-container {
+                min-width: 366px;
+                width: fit-content;
+                display: flex;
+                gap: 12px;
+                padding: 4px !important;
+                border: 1px solid #353433;
+                border-radius: 4px;
+                align-items: center;
+                margin-top: 6px;
+
+                .file-name {
+                    padding-right: 8px;
+                }
             }
         }
 
@@ -78,7 +89,7 @@
                 padding-bottom: 16px;
             }
 
-            &:not(&.has-checkbox) {
+            &:not(&.has-checkbox, &.upload-container) {
                 width: 100%;
 
                 &:last-of-type {
@@ -91,11 +102,7 @@
     }
 
     .actions {
+        padding-top: 24px;
         display: flex;
-        justify-content: end;
-
-        .p-button:last-of-type {
-            margin-left: 8px;
-        }
     }
 }

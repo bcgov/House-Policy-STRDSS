@@ -18,6 +18,8 @@ export class UploadFileComponent {
   @Input() extension: string = '.csv';
   @Input() multiple: boolean = false;
   @Input() disabled: boolean = false;
+  @Input() buttonText = 'Select a File'
+  @Input() buttonIcon = 'pi pi-paperclip';
 
   @Output() filesSelected = new EventEmitter<File[]>();
 

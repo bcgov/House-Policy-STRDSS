@@ -92,10 +92,10 @@ export class TopMenuService {
 
       {
         accessPermission: listing_file_upload,
-        buttonId: 'uploadListingData_mi_btn',
+        buttonId: 'uploadPlatformData_mi_btn',
         route: '/upload-listing-data',
-        description: 'Upload listing data to the system',
-        title: 'Upload Listings',
+        description: 'Upload platform data to the system',
+        title: 'Upload Platform Data',
         folderName: 'Upload',
       },
       {

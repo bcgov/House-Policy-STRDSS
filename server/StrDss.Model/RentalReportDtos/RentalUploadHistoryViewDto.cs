@@ -9,9 +9,11 @@
             GivenNm = "";
             FamilyNm = "";
             Status = "";
+            UploadDeliveryType = "";
         }
 
         public long UploadDeliveryId { get; set; }
+        public string UploadDeliveryType { get; set; }
         public string ReportPeriodYM { get; set; }
         public long ProvidingOrganizationId { get; set; }
         public string OrganizationNm { get; set; }

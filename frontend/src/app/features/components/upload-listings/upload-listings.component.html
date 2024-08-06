@@ -1,8 +1,23 @@
-<div class="title">Upload Listing Data</div>
+<div class="title">Upload Platform Data</div>
 <div class="sub-title">
     All fields are required except where stated
 </div>
 <form [formGroup]="myForm" *ngIf="currentUser">
+    <div class="form-group-row">
+        <div class="form-group-row-col">
+            <label for="platformId">Select Report Type</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-dropdown [options]="uploadDeliveryTypes" formControlName="uploadDeliveryType"
+                placeholder="Select Report Type" id="uploadDeliveryType" name="uploadDeliveryType"
+                [required]="true"></p-dropdown>
+        </div>
+        <div class="form-group-row-col validation-errors"
+            *ngIf="!uploadDeliveryTypeControl.pristine && uploadDeliveryTypeControl.errors">
+            <small id="uploadDeliveryType" *ngIf="uploadDeliveryTypeControl.errors?.['required']">Report type is
+                required</small>
+        </div>
+    </div>
     <div class="form-group-row" *ngIf="currentUser.organizationType !== 'Platform'">
         <div class="form-group-row-col">
             <label for="platformId">Select Reporting Platform Name</label>
@@ -32,23 +47,21 @@
         </div>
     </div>
 
-    <div class="form-group-row">
+    <div class="form-group-row upload-row">
         <div class="form-group-row-col">
-            <label for="platformId">Upload Your Listing Data (.CSV File Only)</label>
+            <label for="platformId">Upload Your Platform Data (.CSV File Only)</label>
         </div>
         <div class="form-group-row-col upload-container">
             <app-upload-file #componentRef [extension]="'.csv'" [sizeLimit]="maxFileSize"
-                (filesSelected)="onFileSelected($event, componentRef)"
-                [disabled]="isFileUploadDisabled"></app-upload-file>
-            <p-button *ngIf="!!uploadedFile" (onClick)="onClear()" class="clean-file-btn" [icon]="'pi pi-times'"
-                id="clear-btn"></p-button>
+                (filesSelected)="onFileSelected($event, componentRef)"></app-upload-file>
+            <div class="file-name">{{uploadedFile?.name ||'No file selected'}}</div>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!fileControl.pristine && fileControl.errors">
             <small id="file-error-text" *ngIf="fileControl.errors?.['required']">File is required</small>
         </div>
     </div>
 
-    <div class="form-group-row">
+    <div class="form-group-row actions">
         <button [disabled]="myForm.invalid || isUploadStarted" pButton id="upload-btn" name="upload-btn"
             (click)="onUpload()">Upload</button>
     </div>

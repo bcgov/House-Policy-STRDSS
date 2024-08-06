@@ -11,6 +11,7 @@ using StrDss.Service.CsvHelpers;
 using System.Text;
 using StrDss.Data.Repositories;
 using System.Text.RegularExpressions;
+using StrDss.Model.RentalReportDtos;
 
 namespace StrDss.Service
 {
@@ -18,6 +19,8 @@ namespace StrDss.Service
     {
         Task<Dictionary<string, List<string>>> UploadPlatformData(string reportType, string reportPeriod, long orgId, Stream stream);
         Task<(Dictionary<string, List<string>>, string header)> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines);
+        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<byte[]?> GetRentalListingErrorFile(long uploadId);
     }
     public class UploadDeliveryService : ServiceBase, IUploadDeliveryService
     {
@@ -411,6 +414,43 @@ namespace StrDss.Service
             }
 
             return errors;
+        }
+
+        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            return await _uploadRepo.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
+        }
+
+        public async Task<byte[]?> GetRentalListingErrorFile(long uploadId)
+        {
+            var upload = await _uploadRepo.GetRentalListingUploadWithErrors(uploadId);
+
+            if (upload == null) return null;
+
+            var linesWithError = await _uploadRepo.GetUploadLineIdsWithErrors(uploadId);
+
+            var memoryStream = new MemoryStream(upload.SourceBin!);
+            using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
+
+            var errors = new Dictionary<string, List<string>>();
+            var csvConfig = CsvHelperUtils.GetConfig(errors, false);
+
+            using var csv = new CsvReader(textReader, csvConfig);
+
+            var contents = new StringBuilder();
+
+            csv.Read();
+            var header = csv.Parser.RawRecord.TrimEndNewLine() + ",errors";
+
+            contents.AppendLine(header);
+
+            foreach (var lineId in linesWithError)
+            {
+                var line = await _uploadRepo.GetUploadLineWithError(lineId);
+                contents.AppendLine(line.LineText.TrimEndNewLine() + $",\"{line.ErrorText ?? ""}\"");
+            }
+
+            return Encoding.UTF8.GetBytes(contents.ToString());
         }
     }
 }

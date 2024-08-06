@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using StrDss.Model.RentalReportDtos;
 using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
@@ -22,6 +23,8 @@ namespace StrDss.Data.Repositories
         Task<UploadLineError> GetUploadLineWithError(long lineId);
         Task<bool> UploadHasErrors(long uploadId);
         Task<int> GetTotalNumberOfUploadLines(long uploadId);
+        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
     }
 
     public class UploadDeliveryRepository : RepositoryBase<DssUploadDelivery>, IUploadDeliveryRepository
@@ -133,6 +136,38 @@ namespace StrDss.Data.Repositories
         public async Task<int> GetTotalNumberOfUploadLines(long uploadId)
         {
             return await _dbContext.DssUploadLines.Where(x => x.IncludingUploadDeliveryId == uploadId).CountAsync();
+        }
+
+        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            var query = _dbContext.DssRentalUploadHistoryViews.AsNoTracking();
+
+            if (_currentUser.OrganizationType == OrganizationTypes.Platform)
+                query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
+
+            if (platformId != null)
+            {
+                query = query.Where(x => x.ProvidingOrganizationId == platformId);
+            }
+
+            var history = await Page<DssRentalUploadHistoryView, RentalUploadHistoryViewDto>(query, pageSize, pageNumber, orderBy, direction);
+
+            return history;
+        }
+
+        public async Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var history = await _dbContext
+                .DssRentalUploadHistoryViews
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UploadDeliveryId == deliveryId);
+
+            stopwatch.Stop();
+            _logger.LogDebug($"GetRentalListingUpload = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+
+            return history;
         }
     }
 }

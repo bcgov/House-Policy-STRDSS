@@ -7,6 +7,8 @@ public partial class DssRentalUploadHistoryView
 {
     public long? UploadDeliveryId { get; set; }
 
+    public string? UploadDeliveryType { get; set; }
+
     public DateOnly? ReportPeriodYm { get; set; }
 
     public long? ProvidingOrganizationId { get; set; }

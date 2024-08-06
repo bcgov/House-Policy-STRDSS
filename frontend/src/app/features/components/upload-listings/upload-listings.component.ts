@@ -34,8 +34,11 @@ import { UploadFileComponent } from '../../../common/components/upload-file/uplo
   styleUrl: './upload-listings.component.scss'
 })
 export class UploadListingsComponent implements OnInit {
+  private readonly LISTING_TYPE = 0;
+  private readonly TAKEDOWN_TYPE = 1;
   platformOptions = new Array<DropdownOption>();
   monthsOptions = new Array<DropdownOption>();
+  uploadDeliveryTypes: Array<DropdownOption> = [{ label: 'Short-Term Rental Listing Data', value: this.LISTING_TYPE }, { label: 'Takedown Data', value: this.TAKEDOWN_TYPE }];
   maxFileSize = Number(environment.RENTAL_LISTING_REPORT_MAX_SIZE) * 1024 * 1024;
   uploadedFile: any;
   uploadElem!: any;
@@ -51,7 +54,8 @@ export class UploadListingsComponent implements OnInit {
   myForm = this.fb.group({
     platformId: [0, Validators.required],
     month: ['', Validators.required],
-    file: ['', Validators.required]
+    file: ['', Validators.required],
+    uploadDeliveryType: ['0', Validators.required],
   });
 
   public get platformIdControl(): AbstractControl {
@@ -64,6 +68,10 @@ export class UploadListingsComponent implements OnInit {
 
   public get fileControl(): AbstractControl {
     return this.myForm.controls['file'];
+  }
+
+  public get uploadDeliveryTypeControl(): AbstractControl {
+    return this.myForm.controls['uploadDeliveryType'];
   }
 
   constructor(
@@ -120,20 +128,23 @@ export class UploadListingsComponent implements OnInit {
     const formResult = this.myForm.value;
     this.loaderService.loadingStart('Uploading');
 
-    this.listingDataService.uploadData(formResult.month || '', formResult.platformId || 0, this.uploadedFile)
-      .subscribe({
-        next: (_res) => {
-          this.myForm.reset();
-          this.onClear();
+    const request = (formResult.uploadDeliveryType as any) === this.LISTING_TYPE ?
+      this.listingDataService.uploadListings(formResult.month || '', formResult.platformId || 0, this.uploadedFile) :
+      this.listingDataService.uploadTakedown(formResult.month || '', formResult.platformId || 0, this.uploadedFile);
 
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File has been uploaded successfully' });
-        },
-        complete: () => {
-          this.loaderService.loadingEnd();
-          setTimeout(() => {
-            this.isUploadStarted = false;
-          }, 300);
-        }
-      });
+    request.subscribe({
+      next: (_res) => {
+        this.myForm.reset();
+        this.onClear();
+
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File has been uploaded successfully' });
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+        setTimeout(() => {
+          this.isUploadStarted = false;
+        }, 300);
+      }
+    });
   }
 }

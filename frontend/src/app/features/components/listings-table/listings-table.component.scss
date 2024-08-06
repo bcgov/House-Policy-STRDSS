@@ -226,7 +226,8 @@
                     font-size: 14px;
 
                     &.status-new {
-                        background-color: #F8BB47;
+                        background-color: #F8BA47;
+                        color: #2D2D2D;
                     }
 
                     &.status-active {
@@ -234,7 +235,7 @@
                     }
 
                     &.status-inactive {
-                        background-color: #9F9D9C;
+                        background-color: #605E5C;
                     }
 
                     &.status-takedown-complete {

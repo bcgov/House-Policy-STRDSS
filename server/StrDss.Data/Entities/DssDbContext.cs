@@ -836,6 +836,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.Total).HasColumnName("total");
             entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
             entity.Property(e => e.UploadDeliveryId).HasColumnName("upload_delivery_id");
+            entity.Property(e => e.UploadDeliveryType)
+                .HasMaxLength(25)
+                .HasColumnName("upload_delivery_type");
         });
 
         modelBuilder.Entity<DssUploadDelivery>(entity =>

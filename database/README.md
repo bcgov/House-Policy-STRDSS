@@ -80,5 +80,6 @@ Each production release depends on the execution of a fixed set of scripts again
 - Sprint 11:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_11.sql`
   - `ddl/STR_DSS_Views_Sprint_9.sql` **(not a typo)**
+  - `ddl/STR_DSS_Views_Sprint_11.sql`
   - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_11.sql`
   - `utility/DSS-627_Correct_UPLOAD_DELIVERY_Sprint_11.sql`

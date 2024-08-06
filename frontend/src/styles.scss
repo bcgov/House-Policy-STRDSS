@@ -126,6 +126,14 @@ body {
         }
     }
 
+    .select-community {
+        p-dropdownitem {
+            .p-dropdown-item {
+                padding-left: 42px;
+            }
+        }
+    }
+
     p-dropdown {
         &.search-by-select {
             .p-dropdown {

@@ -171,12 +171,12 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 
+app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseMiddleware<ExceptionMiddleware>();
 
 app.Run();

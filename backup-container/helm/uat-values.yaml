@@ -1,0 +1,42 @@
+global:
+  labels:
+    environment: uat
+    env: uat
+    owner: "b0471a-team"
+    project: "b0471a-project"
+    DataClass: "Medium"
+
+nameOverride: strdssuat-backup
+fullnameOverride: strdssuat-backup
+
+backupConfig: |
+  postgres=strdssuat:5432/strdssuat
+
+  0 1 * * * default ./backup.sh -s
+  0 4 * * * default ./backup.sh -s -v all
+
+db:
+  secretName: strdssuat
+  passwordKey: postgres-password
+
+persistence:
+  backup:
+    size: 700Mi
+    mountPath: /backups/
+    storageClassName: netapp-block-standard
+    storageAccessMode: ReadWriteOnce
+  verification:
+    size: 512Mi
+    mountPath: /var/lib/pgsql/data
+    storageClassName: netapp-block-standard
+    storageAccessMode: ReadWriteOnce
+
+env:
+  DATABASE_SERVICE_NAME:
+    value: strdssuat
+  ENVIRONMENT_FRIENDLY_NAME:
+    value: "Strdssuat DB Backups"
+
+backup-storage:
+  labels:
+    DataClass: "Medium"

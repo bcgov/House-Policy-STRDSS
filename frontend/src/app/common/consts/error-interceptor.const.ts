@@ -16,7 +16,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                         return EMPTY;
                     case 500:
                         errorService.showErrorFromBackend(err as any);
-                        return EMPTY;
+                        return throwError(() => err);
 
                     default:
                         break;

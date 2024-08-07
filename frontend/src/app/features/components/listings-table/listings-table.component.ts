@@ -11,7 +11,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
-import { DropdownOption } from '../../../common/models/dropdown-option';
+import { DropdownOption, DropdownOptionOrganization } from '../../../common/models/dropdown-option';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { User } from '../../../common/models/user';
 import { ListingDetailsComponent } from './listing-details/listing-details.component';
@@ -63,7 +63,8 @@ export class ListingsTableComponent implements OnInit {
   searchTerm!: string;
   searchColumn: 'all' | 'address' | 'url' | 'listingId' | 'hostName' | 'businessLicense' = 'all';
   searchColumns = new Array<DropdownOption>();
-  communities = new Array<DropdownOption>();
+  communities = new Array<DropdownOptionOrganization>();
+  groupedCommunities = new Array();
 
   isCEU = false;
   isLegendShown = false;
@@ -320,8 +321,37 @@ export class ListingsTableComponent implements OnInit {
   private getOrganizations(): void {
     this.requestAccessService.getOrganizations('LG').subscribe({
       next: (orgs) => {
-        this.communities = orgs;
+        this.communities = orgs.map((org: DropdownOptionOrganization) => ({ label: org.label, value: org.value, localGovernmentType: org.localGovernmentType || 'Uncategorized' }));
+
+        const groupedData: Array<any> = this.communities.reduce((acc: any, curr: any) => {
+          const existingGroup = acc.find((group: any) => group.value === curr.localGovernmentType);
+          if (existingGroup) {
+            existingGroup.items.push({ label: curr.label, value: curr.value });
+          } else {
+            acc.push({
+              label: curr.localGovernmentType,
+              value: curr.localGovernmentType,
+              items: [{ label: curr.label, value: curr.value }]
+            });
+          }
+
+          return acc;
+        }, []);
+
+        groupedData.sort((a: any, b: any) => this.sortOrg(a.label, b.label));
+
+        this.groupedCommunities = groupedData;
       }
     });
+  }
+
+  private sortOrg(a: string, b: string): number {
+    if (a > b) {
+      return 1;
+    }
+    if (a < b) {
+      return -1;
+    }
+    return 0;
   }
 }

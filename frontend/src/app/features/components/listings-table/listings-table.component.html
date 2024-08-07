@@ -301,9 +301,13 @@
                 </div>
             </p-accordionTab>
             <p-accordionTab *ngIf="isCEU" iconPos="end" header="By Community ">
-                <p-dropdown placeholder="Select a Community" [appendTo]="'body'" [inputId]="'community-filter-dropdown'"
-                    [filter]="true" class="auto-width" [options]="communities"
-                    [(ngModel)]="cancelableFilter.community"></p-dropdown>
+                <p-dropdown placeholder="Select a Community" appendTo="body" panelStyleClass="select-community"
+                    [inputId]="'community-filter-dropdown'" [filter]="true" [filterBy]="'label'" class="auto-width"
+                    [options]="groupedCommunities" [group]="true" [(ngModel)]="cancelableFilter.community">
+                    <ng-template let-group pTemplate="group">
+                        <strong>{{group.label}}</strong>
+                    </ng-template>
+                </p-dropdown>
 
             </p-accordionTab>
             <p-accordionTab iconPos="end" header="By Status">

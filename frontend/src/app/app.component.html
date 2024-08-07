@@ -1,5 +1,17 @@
 <app-layout *ngIf="currentUserLoaded"></app-layout>
-<div *ngIf="!currentUserLoaded">Loading...</div>
+<div *ngIf="!currentUserLoaded && !isCurrentUserLoadedWithError">Loading...</div>
+<div class="error-block" *ngIf="isCurrentUserLoadedWithError">
+    <h2 class="error">
+        Internal error
+    </h2>
+    <h3 class="error"> Please try again later</h3>
+    <h4> If additional support is required, contact us at <a
+            href="mailto:DSSadmin@gov.bc.ca">{{'DSSadmin@gov.bc.ca'}}</a></h4>
+    <div class="error-details">
+        {{errorText}}
+    </div>
+</div>
+
 <div class="loader" *ngIf="isLoading">
     <div class="spinner">
         <div class="lds-ring">

@@ -1,0 +1,28 @@
+postgresql:
+  image:
+    tag: 16.3.0
+primary:
+  podSecurityContext:
+    enabled: false
+  containerSecurityContext:
+    enabled: false
+  persistence:
+    size: 900Mi
+  resources:
+    limits:
+      cpu: 150m
+      memory: 300Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi
+readReplicas:
+  persistence:
+    size: 400Mi
+nameOverride: strdssprod
+fullnameOverride: strdssprod
+annotations:
+  haproxy.router.openshift.io/balance: roundrobin
+  haproxy.router.openshift.io/disable_cookies: 'true'
+  haproxy.router.openshift.io/timeout: 180s
+commonLabels:
+  DataClass: "Medium"

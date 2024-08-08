@@ -21,9 +21,10 @@ namespace DataBase.UnitOfWork
         GenericRepository<DssUserIdentityView> DssUserIdentityViewRepository { get; }
         GenericRepository<DssUserPrivilege> DssUserPrivilegeRepository { get; }
         GenericRepository<DssUserRole> DssUserRoleRepository { get; }
+        GenericRepository<DssUserRoleAssignment> DssUserRoleAssignmentRepository { get; }
         GenericRepository<DssUploadDelivery> DssUploadDeliveryRepository { get; }
         GenericRepository<DssUploadLine> DssUploadLineRepository { get; }
-
+        void ResetDB();
         void Dispose();
         void Save();
     }

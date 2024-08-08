@@ -29,14 +29,14 @@ public partial class DssEmailMessage
     public string MessageTemplateDsc { get; set; } = null!;
 
     /// <summary>
-    /// Indicates whether the user initiating the message should receive a copy of the email
-    /// </summary>
-    public bool IsSubmitterCcRequired { get; set; }
-
-    /// <summary>
     /// Indicates whether the the property host has already been contacted by external means
     /// </summary>
     public bool? IsHostContactedExternally { get; set; }
+
+    /// <summary>
+    /// Indicates whether the user initiating the message should receive a copy of the email
+    /// </summary>
+    public bool IsSubmitterCcRequired { get; set; }
 
     /// <summary>
     /// A phone number associated with a Local Government contact
@@ -76,11 +76,6 @@ public partial class DssEmailMessage
     /// <summary>
     /// Foreign key
     /// </summary>
-    public long? ConcernedWithRentalListingId { get; set; }
-
-    /// <summary>
-    /// Foreign key
-    /// </summary>
     public long? InitiatingUserIdentityId { get; set; }
 
     /// <summary>
@@ -104,11 +99,6 @@ public partial class DssEmailMessage
     public long? RequestingOrganizationId { get; set; }
 
     /// <summary>
-    /// Foreign key
-    /// </summary>
-    public long? MessageReasonId { get; set; }
-
-    /// <summary>
     /// External identifier for tracking the message delivery progress
     /// </summary>
     public string? ExternalMessageNo { get; set; }
@@ -123,6 +113,21 @@ public partial class DssEmailMessage
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
 
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? ConcernedWithRentalListingId { get; set; }
+
+    /// <summary>
+    /// Indicates whether message body should include text a block of detail text that is standard for the message type
+    /// </summary>
+    public bool? IsWithStandardDetail { get; set; }
+
+    /// <summary>
+    /// Free form text that should be included in the message body
+    /// </summary>
+    public string? CustomDetailTxt { get; set; }
+
     public virtual DssUserIdentity? AffectedByUserIdentity { get; set; }
 
     public virtual DssEmailMessage? BatchingEmailMessage { get; set; }
@@ -136,8 +141,6 @@ public partial class DssEmailMessage
     public virtual ICollection<DssEmailMessage> InverseBatchingEmailMessage { get; } = new List<DssEmailMessage>();
 
     public virtual DssOrganization? InvolvedInOrganization { get; set; }
-
-    public virtual DssMessageReason? MessageReason { get; set; }
 
     public virtual DssOrganization? RequestingOrganization { get; set; }
 }

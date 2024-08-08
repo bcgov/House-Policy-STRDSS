@@ -13,17 +13,15 @@ public partial class DssRentalListingReport
     /// </summary>
     public long RentalListingReportId { get; set; }
 
-    public bool IsProcessed { get; set; }
+    /// <summary>
+    /// Indicates whether the rental listing version is the most recent one reported by the platform
+    /// </summary>
+    public bool IsCurrent { get; set; }
 
     /// <summary>
     /// The month to which the listing information is relevant (always set to the first day of the month)
     /// </summary>
     public DateOnly ReportPeriodYm { get; set; }
-
-    /// <summary>
-    /// The binary image of the information that was uploaded
-    /// </summary>
-    public byte[]? SourceBin { get; set; }
 
     /// <summary>
     /// Foreign key
@@ -39,8 +37,6 @@ public partial class DssRentalListingReport
     /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
-
-    public virtual ICollection<DssRentalListingLine> DssRentalListingLines { get; } = new List<DssRentalListingLine>();
 
     public virtual ICollection<DssRentalListing> DssRentalListings { get; } = new List<DssRentalListing>();
 

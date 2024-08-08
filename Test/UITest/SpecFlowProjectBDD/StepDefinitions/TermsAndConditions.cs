@@ -1,11 +1,14 @@
 ﻿using Configuration;
 using DataBase.Entities;
+using DataBase.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using OpenQA.Selenium.DevTools.V118.Debugger;
 using SpecFlowProjectBDD.Helpers;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
@@ -34,6 +37,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private DssDbContext _DssDBContext;
         private DssUserIdentity _UserIdentity;
         private DssUserIdentity _OriginalUserIdentity;
+        private IUnitOfWork _UnitOfWork;
         private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
 
         public TermsAndConditions(SeleniumDriver Driver)
@@ -52,7 +56,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
             string dbConnectionString = _AppSettings.GetConnectionString(_Environment.ToString().ToLower()) ?? string.Empty;
             DbContextOptions <DssDbContext> dbContextOptions = new DbContextOptions<DssDbContext>();
 
+
             _DssDBContext = new DssDbContext(dbContextOptions, dbConnectionString);
+            _UnitOfWork = new UnitOfWork(_DssDBContext);
         }
 
         [Given(@"User ""(.*)"" is enabled, approved, has the correct roles ""(.*)"", but has not accepted TOC")]
@@ -62,10 +68,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _TestUserType = UserType;
 
             // Retrieve the role
-            DssUserRole userRole = _DssDBContext.DssUserRoles.FirstOrDefault(p => p.UserRoleCd == _TestUserType);
+            var userRoles = _UnitOfWork.DssUserRoleRepository.Get(p => p.UserRoleCd == _TestUserType);
+            DssUserRole userRole = userRoles.FirstOrDefault();
 
             // Retrieve the user identity
-            _UserIdentity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == _TestEmail);
+            var userIdentites = _UnitOfWork.DssUserIdentityRepository.Get(p => p.EmailAddressDsc == _TestEmail);
+            _UserIdentity = userIdentites.FirstOrDefault();
+
+            _OriginalUserIdentity = (JsonSerializer.Deserialize<DssUserIdentity>((JsonSerializer.Serialize(_UserIdentity))));
 
             // Update properties of the identity
             _UserIdentity.AccessRequestStatusCd = "Approved";
@@ -73,25 +83,32 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _UserIdentity.TermsAcceptanceDtm = null;
             _UserIdentity.RepresentedByOrganizationId = 1;
 
-            _DssDBContext.SaveChanges();
+            _UnitOfWork.DssUserIdentityRepository.Update(_UserIdentity);
+            _UnitOfWork.Save();
 
-            userRole.UserIdentities.Add(_UserIdentity);
+            DssUserRoleAssignment dssUserRoleAsignment = new DssUserRoleAssignment();
+            dssUserRoleAsignment.UserIdentityId = _UserIdentity.UserIdentityId;
+            dssUserRoleAsignment.UserRoleCd = userRole.UserRoleCd;
+            dssUserRoleAsignment.UserIdentity = _UserIdentity;
+            dssUserRoleAsignment.UserRoleCdNavigation = userRole;
+            _UnitOfWork.DssUserRoleAssignmentRepository.Insert(dssUserRoleAsignment);
+
 
             // Add the identity to the CEU Admin role
             try
             {
                 // Save changes to persist the relationship
-                _DssDBContext.SaveChanges();
+                _UnitOfWork.Save();
             }
             catch (DbUpdateException ex)
             {
                 //Row already exists in User_role_assignment. Ignore
+                _UnitOfWork.ResetDB();
             }
         }
 
 
         //User Authentication
-        //[Given(@"that I am an authenticated user ""(.*)"" and the expected result is ""(.*)""")]
         [Given(@"that I am an authenticated User ""(.*)"" and the expected result is ""(.*)"" and I am a ""(.*)"" user")]
         public void GivenIAmAauthenticatedGovernmentUser(string UserName, string ExpectedResult, string RoleName)
         {
@@ -180,11 +197,10 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("the system should record and display the date and time of my acceptance")]
         public void TheSystemShouldRecordAndDisplayTheDateAndTimeofMyAcceptance()
         {
-            var identity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == _TestEmail);
-            _DssDBContext.Entry<DssUserIdentity>(identity).Reload();
+            _UnitOfWork.DssUserIdentityRepository.Reload(_UserIdentity);
 
             // DateTime stamp should have been updated
-            ClassicAssert.True(identity.TermsAcceptanceDtm != null);
+            ClassicAssert.True(_UserIdentity.TermsAcceptanceDtm != null);
         }
 
         //Access Restriction for Non-Acceptance
@@ -250,14 +266,17 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
         }
 
-        [TearDown]
+        [AfterScenario]
         public void TestTearDown()
         {
-            //restore original User Identity
+            //restore original User Identity values
+            _UserIdentity.AccessRequestStatusCd = _OriginalUserIdentity.AccessRequestStatusCd;
+            _UserIdentity.IsEnabled = _OriginalUserIdentity.IsEnabled;
+            _UserIdentity.TermsAcceptanceDtm = _OriginalUserIdentity.TermsAcceptanceDtm;
+            _UserIdentity.RepresentedByOrganizationId = _OriginalUserIdentity.RepresentedByOrganizationId;
 
-            _UserIdentity = _OriginalUserIdentity;
-
-            _DssDBContext.SaveChanges();
+            _UnitOfWork.DssUserIdentityRepository.Update(_UserIdentity);
+            _UnitOfWork.Save();
         }
     }
 }

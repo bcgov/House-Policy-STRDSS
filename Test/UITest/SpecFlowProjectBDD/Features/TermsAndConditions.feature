@@ -19,56 +19,56 @@ Scenario: TermsAndConditions
 
 #Terms and Conditions Page:
 
-When prompted to accept the terms and conditions
+	When prompted to accept the terms and conditions
 
-Then I should be directed to a dedicated page on the HOUS website in a new tab displaying the complete and updated terms and conditions of system usage
+	Then I should be directed to a dedicated page on the HOUS website in a new tab displaying the complete and updated terms and conditions of system usage
 
 #Acceptance Confirmation:
 
-When I return to the system after reviewing the terms and conditions
+	When I return to the system after reviewing the terms and conditions
 
-Then there should be a clear option, such as a checkbox or button, allowing me to confirm my acceptance
+	Then there should be a clear option, such as a checkbox or button, allowing me to confirm my acceptance
 
 #Date of Acceptance:
 
-When accepting the terms and conditions
+	When accepting the terms and conditions
 
-Then the system should record and display the date and time of my acceptance
+	Then the system should record and display the date and time of my acceptance
 
 #Access Restriction for Non-Acceptance:
 
-When I attempt to access system features
+	When I attempt to access system features
 
-And I haven't accepted the terms and conditions
+	And I haven't accepted the terms and conditions
 
-Then I should be restricted from performing certain actions until I complete the acceptance process
+	Then I should be restricted from performing certain actions until I complete the acceptance process
 
 #Accessible Language:
 
-When presenting the terms and conditions
+	When presenting the terms and conditions
 
-Then the language should be clear, concise, and accessible to ensure user understanding
+	Then the language should be clear, concise, and accessible to ensure user understanding
 
 #Confirmation Message:
 
-When I successfully accept the terms and conditions
+	When I successfully accept the terms and conditions
 
-Then I should receive a confirmation message indicating that my acceptance has been recorded
+	Then I should receive a confirmation message indicating that my acceptance has been recorded
 
-And I should be directed to the landing page for my role
+	And I should be directed to the landing page for my role
 
 #Bypass Terms and Conditions for CEU users
 
-Given I am an IDIR authenticated user
+	Given I am an IDIR authenticated user
 
-Then TOC flag will be set to true
+	Then TOC flag will be set to true
 
-Then I will not have to accept the TOC in order to access the system
+	Then I will not have to accept the TOC in order to access the system
 
 #RoleName is the value for user_role_cd in the public.dss_user_role DB table
 Examples:
-	| UserName     | RoleName  | Email             | Environment | ExpectedResult |
-	| CEUATST      | ceu_admin | ceuatst@gov.bc.ca | all         | pass           |
+	| UserName | RoleName  | Email             | Environment | ExpectedResult |
+	| CEUATST  | ceu_admin | ceuatst@gov.bc.ca | all         | pass           |
 	#| STRDSSLg1Dev | lg_staff  | ceuatst@gov.bc.ca | all         | pass           |
 
 

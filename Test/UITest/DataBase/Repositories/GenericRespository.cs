@@ -1,4 +1,5 @@
 ﻿
+using DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq.Expressions;
@@ -108,17 +109,17 @@ namespace DataBase.Repositories
 
         public virtual void Delete(TEntity entityToDelete)
         {
-            //Don't change state, just load entity
-            //if (_Context.Entry(entityToDelete).State == EntityState.Detached)
-            //    _DbSet.Attach(entityToDelete);
-
             _DbSet.Remove(entityToDelete);
         }
 
         public virtual void Update(TEntity entityToUpdate)
         {
-            _DbSet.Attach(entityToUpdate);
-            _Context.Entry(entityToUpdate).State = EntityState.Modified;
+            _DbSet.Update(entityToUpdate);
+        }
+
+        public virtual void Reload(TEntity entityToReload)
+        {
+            _Context.Entry<TEntity>(entityToReload).Reload();
         }
     }
 }

@@ -24,11 +24,6 @@ public partial class DssUploadLine
     public bool IsSystemFailure { get; set; }
 
     /// <summary>
-    /// Indicates that no further ingestion attempt is required for the upload line
-    /// </summary>
-    public bool IsProcessed { get; set; }
-
-    /// <summary>
     /// An immutable system code identifying the organization who created the information in the upload line (e.g. AIRBNB)
     /// </summary>
     public string SourceOrganizationCd { get; set; } = null!;
@@ -39,7 +34,7 @@ public partial class DssUploadLine
     public string SourceRecordNo { get; set; } = null!;
 
     /// <summary>
-    /// Full text of the uploaod line
+    /// Full text of the upload line
     /// </summary>
     public string SourceLineTxt { get; set; } = null!;
 
@@ -52,6 +47,11 @@ public partial class DssUploadLine
     /// Foreign key
     /// </summary>
     public long IncludingUploadDeliveryId { get; set; }
+
+    /// <summary>
+    /// Indicates that no further ingestion attempt is required for the upload line
+    /// </summary>
+    public bool IsProcessed { get; set; }
 
     public virtual DssUploadDelivery IncludingUploadDelivery { get; set; } = null!;
 }

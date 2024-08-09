@@ -50,12 +50,12 @@
             </div>
         </ng-template>
 
-        <p-table #table [value]="listings" [scrollable]="true" scrollHeight="{{isCEU?'550px':'500px'}}"
-            [(selection)]="selectedListings" styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }"
-            [selectionPageOnly]="true">
+        <p-table #table [ariaLabel]="'table-of-listings'" [value]="listings" [scrollable]="true"
+            scrollHeight="{{isCEU?'550px':'500px'}}" [(selection)]="selectedListings" styleClass="p-datatable-sm"
+            [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
             <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 4rem">
+                    <th [ariaLabel]="'select-listing'" style="width: 4rem">
                         <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                     </th>
                     <th class="sortable-header" id="status_header"
@@ -152,7 +152,7 @@
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td>
-                        <p-tableCheckbox [value]="row"></p-tableCheckbox>
+                        <p-tableCheckbox [ariaLabel]="'select-listing-row'" [value]="row"></p-tableCheckbox>
                     </td>
                     <td>
                         <div [ngSwitch]="row.listingStatusType" class="align-center status-col">
@@ -175,11 +175,12 @@
                     </td>
                     <td>{{ row.offeringOrganizationNm }}</td>
                     <td>
-                        <a target="_blank" class="listing-id-link" [href]="row.platformListingUrl">{{
+                        <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
+                            [href]="row.platformListingUrl">{{
                             row.platformListingNo }}</a>
                     </td>
                     <td class="align-center">
-                        <a pButton class="details-button-with-icon" target="_blank"
+                        <a [ariaLabel]="'open-listing-details'" pButton class="details-button-with-icon" target="_blank"
                             [routerLink]="'/listing/'+row.rentalListingId"><i class="pi pi-list"></i></a>
                     </td>
                     <td

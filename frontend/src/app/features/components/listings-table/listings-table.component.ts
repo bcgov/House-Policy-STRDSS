@@ -349,11 +349,18 @@ export class ListingsTableComponent implements OnInit {
           x.label !== 'First Nations Community'
         );
 
-        const sorted = [municipality, regional, other, firstNations];
+        const sorted = [];
 
-        if (uncategorized.length) {
+        if (municipality)
+          sorted.push(municipality);
+        if (regional)
+          sorted.push(regional);
+        if (other)
+          sorted.push(other);
+        if (firstNations)
+          sorted.push(firstNations);
+        if (uncategorized.length)
           sorted.push(...uncategorized);
-        }
 
         this.groupedCommunities = sorted;
       }

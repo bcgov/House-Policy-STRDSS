@@ -87,13 +87,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _TestEmail = Email;
             //////////////////// DB Setup ////////////////////////////////////////
             // Retrieve the user identity
-            _UserIdentity = _DssDBContext.DssUserIdentities.FirstOrDefault(p => p.EmailAddressDsc == _TestEmail);
+            IEnumerable<DssUserIdentity> userIdentities = _UnitOfWork.DssUserIdentityRepository.Get(p => p.EmailAddressDsc == _TestEmail);
+            _UserIdentity = userIdentities.FirstOrDefault();
             _OriginalEnabledValue = _UserIdentity.IsEnabled;
 
             // Update properties of the identity
             _UserIdentity.IsEnabled = false;
 
-            _DssDBContext.SaveChanges();
+            _UnitOfWork.Save();
             /////////////////////////////////////////////////////////////
             
             UserHelper userHelper = new UserHelper();
@@ -124,10 +125,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void TestTearDown()
         {
             //restore original User value
-
             _UserIdentity.IsEnabled = _OriginalEnabledValue;
 
-            _DssDBContext.SaveChanges();
+            _UnitOfWork.Save();
         }
     }
 }

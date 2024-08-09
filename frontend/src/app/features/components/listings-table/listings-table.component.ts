@@ -352,7 +352,7 @@ export class ListingsTableComponent implements OnInit {
         const sorted = [municipality, regional, other, firstNations];
 
         if (uncategorized.length) {
-          sorted.push(uncategorized);
+          sorted.push(...uncategorized);
         }
 
         this.groupedCommunities = sorted;

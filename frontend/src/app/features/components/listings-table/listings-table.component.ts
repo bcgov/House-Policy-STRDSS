@@ -321,7 +321,8 @@ export class ListingsTableComponent implements OnInit {
   private getOrganizations(): void {
     this.requestAccessService.getOrganizations('LG').subscribe({
       next: (orgs) => {
-        this.communities = orgs.map((org: DropdownOptionOrganization) => ({ label: org.label, value: org.value, localGovernmentType: org.localGovernmentType || 'Uncategorized' }));
+        console.log(orgs.filter((x: any) => (x.organizationCd as string).includes('LGXFN-Homalco')))
+        this.communities = orgs.map((org: DropdownOptionOrganization) => ({ label: org.label, value: org.value, localGovernmentType: org.localGovernmentType || 'Other' }));
 
         const groupedData: Array<any> = this.communities.reduce((acc: any, curr: any) => {
           const existingGroup = acc.find((group: any) => group.value === curr.localGovernmentType);
@@ -346,6 +347,9 @@ export class ListingsTableComponent implements OnInit {
   }
 
   private sortOrg(a: string, b: string): number {
+    if (b === 'Other') {
+      return -1;
+    }
     if (a > b) {
       return 1;
     }

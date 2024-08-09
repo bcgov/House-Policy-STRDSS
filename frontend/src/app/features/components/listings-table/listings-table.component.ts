@@ -338,24 +338,26 @@ export class ListingsTableComponent implements OnInit {
 
           return acc;
         }, []);
+        const municipality = groupedData.filter(x => x.label === 'Municipality')[0];
+        const regional = groupedData.filter(x => x.label === 'Regional District Electoral Area')[0];
+        const other = groupedData.filter(x => x.label === 'Other')[0];
+        const firstNations = groupedData.filter(x => x.label === 'First Nations Community')[0];
+        const uncategorized = groupedData.filter(x =>
+          x.label !== 'Municipality' &&
+          x.label !== 'Regional District Electoral Area' &&
+          x.label !== 'Other' &&
+          x.label !== 'First Nations Community'
+        );
 
-        groupedData.sort((a: any, b: any) => this.sortOrg(a.label, b.label));
+        const sorted = [municipality, regional, other, firstNations];
 
-        this.groupedCommunities = groupedData;
+        if (uncategorized.length) {
+          sorted.push(uncategorized);
+        }
+
+        this.groupedCommunities = sorted;
       }
     });
   }
 
-  private sortOrg(a: string, b: string): number {
-    if (b === 'Other') {
-      return -1;
-    }
-    if (a > b) {
-      return 1;
-    }
-    if (a < b) {
-      return -1;
-    }
-    return 0;
-  }
 }

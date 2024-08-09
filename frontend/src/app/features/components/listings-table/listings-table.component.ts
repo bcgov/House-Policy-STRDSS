@@ -321,7 +321,8 @@ export class ListingsTableComponent implements OnInit {
   private getOrganizations(): void {
     this.requestAccessService.getOrganizations('LG').subscribe({
       next: (orgs) => {
-        this.communities = orgs.map((org: DropdownOptionOrganization) => ({ label: org.label, value: org.value, localGovernmentType: org.localGovernmentType || 'Uncategorized' }));
+        this.communities = orgs.map((org: DropdownOptionOrganization) =>
+          ({ label: org.label, value: org.value, localGovernmentType: org.localGovernmentType || 'Other' }));
 
         const groupedData: Array<any> = this.communities.reduce((acc: any, curr: any) => {
           const existingGroup = acc.find((group: any) => group.value === curr.localGovernmentType);
@@ -337,21 +338,33 @@ export class ListingsTableComponent implements OnInit {
 
           return acc;
         }, []);
+        const municipality = groupedData.filter(x => x.label === 'Municipality')[0];
+        const regional = groupedData.filter(x => x.label === 'Regional District Electoral Area')[0];
+        const other = groupedData.filter(x => x.label === 'Other')[0];
+        const firstNations = groupedData.filter(x => x.label === 'First Nations Community')[0];
+        const uncategorized = groupedData.filter(x =>
+          x.label !== 'Municipality' &&
+          x.label !== 'Regional District Electoral Area' &&
+          x.label !== 'Other' &&
+          x.label !== 'First Nations Community'
+        );
 
-        groupedData.sort((a: any, b: any) => this.sortOrg(a.label, b.label));
+        const sorted = [];
 
-        this.groupedCommunities = groupedData;
+        if (municipality)
+          sorted.push(municipality);
+        if (regional)
+          sorted.push(regional);
+        if (other)
+          sorted.push(other);
+        if (firstNations)
+          sorted.push(firstNations);
+        if (uncategorized.length)
+          sorted.push(...uncategorized);
+
+        this.groupedCommunities = sorted;
       }
     });
   }
 
-  private sortOrg(a: string, b: string): number {
-    if (a > b) {
-      return 1;
-    }
-    if (a < b) {
-      return -1;
-    }
-    return 0;
-  }
 }

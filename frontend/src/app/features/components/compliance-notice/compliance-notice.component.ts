@@ -159,10 +159,13 @@ export class ComplianceNoticeComponent implements OnInit {
   }
 
   onAlternativeDeliveryChanged(value: CheckboxChangeEvent): void {
-    if (value.checked)
+    if (value.checked) {
+      this.hostEmailControl.setValue('');
       this.hostEmailControl.removeValidators([Validators.required]);
-    else
+    }
+    else {
       this.hostEmailControl.addValidators([Validators.required]);
+    }
 
     this.hostEmailControl.updateValueAndValidity();
     this.myForm.updateValueAndValidity();

@@ -4,10 +4,6 @@
     padding: 22px;
     background-color: #FFFFFF;
 
-    * {
-        font-family: 'BcSans-regular';
-    }
-
     .bold-text {
         font-family: 'BcSans-bold';
     }
@@ -69,6 +65,21 @@
             th {
                 font-size: 14px;
                 font-family: 'BcSans-bold';
+
+                &.sortable-header {
+                    -webkit-user-select: none;
+                    -ms-user-select: none;
+                    user-select: none;
+
+                    &:hover {
+                        text-decoration: underline;
+                        cursor: pointer;
+                    }
+
+                    i {
+                        vertical-align: middle;
+                    }
+                }
             }
 
             .action {

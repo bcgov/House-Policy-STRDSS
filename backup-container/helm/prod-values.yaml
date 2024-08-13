@@ -36,7 +36,8 @@ env:
     value: strdssprod
   ENVIRONMENT_FRIENDLY_NAME:
     value: "STRDSS PROD DB Backups"
-
+  ENVIRONMENT_NAME:
+    value: "prod"
 backup-storage:
   labels:
     DataClass: "Medium"

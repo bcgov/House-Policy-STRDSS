@@ -8,7 +8,7 @@ export function validateUrl(): ValidatorFn {
             return null;
         }
 
-        const urlRegex = new RegExp(/\b(?:[Hh][Tt][Tt][Pp][Ss]?):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]/);
+        const urlRegex = new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/);
         const validUrl = urlRegex.test(url.toLowerCase());
 
         return validUrl ? null : { invalidUrl: true };

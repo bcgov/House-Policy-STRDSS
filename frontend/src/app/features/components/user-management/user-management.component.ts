@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { CommonModule } from '@angular/common';
@@ -18,7 +18,7 @@ import { UserDataService } from '../../../common/services/user-data.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-user-management',
@@ -50,6 +50,7 @@ export class UserManagementComponent implements OnInit {
   organizations = new Array<DropdownOption>();
   filteredOrganizations = new Array<DropdownOption>();
   organizationDropdown = new Array<DropdownOption>();
+  sort!: { prop: string, dir: 'asc' | 'desc' }
 
   accessRequests = new Array<AccessRequestTableItem>();
   currentPage!: PagingResponsePageInfo;
@@ -77,7 +78,6 @@ export class UserManagementComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private loaderService: GlobalLoaderService,
-    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -232,6 +232,22 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
+  onSort(property: string): void {
+    if (this.sort) {
+      if (this.sort.prop === property) {
+        this.sort.dir = this.sort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sort.prop = property;
+        this.sort.dir = 'asc';
+      }
+    }
+    else {
+      this.sort = { prop: property, dir: 'asc' };
+    }
+
+    this.getUsers(this.currentPage.pageNumber);
+  }
+
   private handleConcurrencyError(errorMsg: any): void {
     let details = `${errorMsg.error.errors.entity[0]} Instance: ${errorMsg.error.instance}`;
     this.showErrorToast(errorMsg.error.title, details);
@@ -248,7 +264,7 @@ export class UserManagementComponent implements OnInit {
     this.loaderService.loadingStart();
     this.userDataService.getStatuses().subscribe({
       next: (data: Array<DropdownOption>) => {
-        this.statuses = [{ label: 'All', value: '' }, ...data];
+        this.statuses = [{ label: 'All', value: '' }, ...data.sort((a, b) => this.sortHandler(a.label, b.label))];
       },
       error: (error) => {
         this.showErrorToast('Error', 'Unable to retrieve Statuses. Check console for additional details')
@@ -262,9 +278,9 @@ export class UserManagementComponent implements OnInit {
     this.loaderService.loadingStart();
     this.requestAccessService.getOrganizations().subscribe({
       next: (data) => {
-        this.organizations = data;
-        this.filteredOrganizations = data;
-        this.organizationDropdown = [{ label: 'All', value: '' }, ...data];
+        this.organizations = data.sort((a, b) => this.sortHandler(a.label, b.label));
+        this.filteredOrganizations = data.sort((a, b) => this.sortHandler(a.label, b.label));
+        this.organizationDropdown = [{ label: 'All', value: '' }, ...data.sort((a, b) => this.sortHandler(a.label, b.label))];
       },
       error: (error: any) => {
         this.showErrorToast('Error', 'Unable to retrieve Organizations. Check console for additional details')
@@ -278,10 +294,10 @@ export class UserManagementComponent implements OnInit {
     this.loaderService.loadingStart();
     this.requestAccessService.getOrganizationTypes().subscribe({
       next: (data) => {
-        this.organizationTypes = data;
+        this.organizationTypes = data.sort((a, b) => this.sortHandler(a.label, b.label));
       },
       error: (error: any) => {
-        this.showErrorToast('Error', 'Unable to retrieve Organization Types. Check console for additional details')
+        this.showErrorToast('Error', 'Unable to retrieve Organization Types. Check console for additional details');
         console.error(error);
       },
       complete: () => {
@@ -292,26 +308,30 @@ export class UserManagementComponent implements OnInit {
     this.getUsers();
   }
 
+  private sortHandler(a: string, b: string): number {
+    if (a > b) return 1;
+    if (a < b) return -1;
+    return 0
+  }
+
   private getUsers(selectedPageNumber?: number): void {
     const status = this.searchParams.searchStatus;
     const search = this.searchParams.searchTerm;
     const organizationId = this.searchParams.searchOrganization;
     const pageSize = this.currentPage?.pageSize || 10;
     const pageNumber = selectedPageNumber ?? (this.currentPage?.pageNumber || 0);
-    const orderBy = '';
-    const direction = 'desc';
+    const orderBy = this.sort ? this.sort.prop : '';
+    const direction = this.sort ? this.sort.dir : 'asc';;
     this.loaderService.loadingStart();
 
     this.userDataService.getUsers(status, search, organizationId, pageSize, pageNumber, orderBy, direction).subscribe({
       next: (response: PagingResponse<AccessRequestTableItem>) => {
         this.accessRequests = response.sourceList;
         this.currentPage = response.pageInfo;
-
       },
       error: (error: any) => {
         this.showErrorToast('Error', 'Unable to retrieve users. Check console for additional details')
         console.error(error);
-
       },
       complete: () => {
         this.loaderService.loadingEnd();

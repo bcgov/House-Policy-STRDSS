@@ -1,6 +1,4 @@
-/* Master Script -- must be run from psql using the following command:
-   \i '<folder>/<script>'
-*/
+/* Sprint 11 Master Database Migration Script -- must be run from psql using the following command: \i '<folder>/<script>' (must use / rather than \) */
 \conninfo
 \encoding UTF8
 \set VERBOSITY terse
@@ -43,6 +41,19 @@ as org_has_lg_type
 	\echo 'Database migration state is unknown - Exiting without changes'
 \else
 	\echo 'Database has no DSS tables - Beginning complete build to Sprint 11'
+	\echo 'Calling STR_DSS_Physical_DB_DDL_Sprint_11.sql'
+	\ir '../ddl/STR_DSS_Physical_DB_DDL_Sprint_11.sql'
+	\echo 'Replacing views'
+	\ir '../ddl/STR_DSS_Views_Sprint_11.sql'
+	\echo 'Calling STR_DSS_Data_Seeding_Sprint_9.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_9.sql'
+	\echo 'Calling STR_DSS_Data_Seeding_Platforms_Sprint_10.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_Platforms_Sprint_10.sql'
+	\echo 'Platform contacts must be set manually'
+	\echo 'Calling STR_DSS_Data_Seeding_LGs_Sprint_11.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_LGs_Sprint_11.sql'
+	\echo 'Calling STR_DSS_Data_Seeding_Geometry_Sprint_9.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_Geometry_Sprint_9.sql'
 \endif
 \if :ERROR
 	/*commit cannot succeed because transaction was aborted due to an error*/

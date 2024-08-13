@@ -35,8 +35,9 @@ env:
   DATABASE_SERVICE_NAME:
     value: strdssdev
   ENVIRONMENT_FRIENDLY_NAME:
-    value: "Strdssdev DB Backups"
-
+    value: "STRDSS DEV DB Backups"
+  ENVIRONMENT_NAME:
+    value: "dev"
 backup-storage:
   labels:
     DataClass: "Medium"

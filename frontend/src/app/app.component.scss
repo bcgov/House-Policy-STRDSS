@@ -1,6 +1,13 @@
 :host {
     overflow: auto;
 
+    .error-block {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+    }
+
     .loader {
         position: fixed;
         top: 0;

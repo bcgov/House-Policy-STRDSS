@@ -36,22 +36,66 @@
         <p-table [id]="'user-table'" [styleClass]="'p-datatable-sm'" [value]="accessRequests" [rows]="10">
             <ng-template pTemplate="header">
                 <tr id="table-header">
-                    <th id="accessRequestDtm_th" pSortableColumn="accessRequestDtm">Requested Date<p-sortIcon
-                            field="accessRequestDtm"></p-sortIcon></th>
-                    <th id="identityProviderNm_th" pSortableColumn="identityProviderNm">ID Provider<p-sortIcon
-                            field="givenNm"></p-sortIcon></th>
-                    <th id="givenNm_th" pSortableColumn="givenNm">First Name<p-sortIcon field="givenNm"></p-sortIcon>
+                    <th [class.sorted]="this.sort && this.sort.prop === 'accessRequestDtm'"
+                        (click)="onSort('accessRequestDtm')" class="sortable-header" id="accessRequestDtm_th">Requested
+                        Date
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'accessRequestDtm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'accessRequestDtm' && this.sort.dir === 'asc'"></i>
                     </th>
-                    <th id="familyNm_th" pSortableColumn="familyNm">Last Name<p-sortIcon field="familyNm"></p-sortIcon>
+                    <th [class.sorted]="this.sort && this.sort.prop === 'identityProviderNm'"
+                        (click)="onSort('identityProviderNm')" class="sortable-header" id="identityProviderNm_th">ID
+                        Provider
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'identityProviderNm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'identityProviderNm' && this.sort.dir === 'asc'"></i>
                     </th>
-                    <th id="orgType_th" pSortableColumn="code1">Org Type<p-sortIcon field="code1"></p-sortIcon></th>
-                    <th id="emailAddressDsc_th" pSortableColumn="emailAddressDsc">Email Address<p-sortIcon
-                            field="emailAddressDsc"></p-sortIcon>
+                    <th [class.sorted]="this.sort && this.sort.prop === 'givenNm'" (click)="onSort('givenNm')"
+                        class="sortable-header" id="givenNm_th">First Name
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'givenNm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'givenNm' && this.sort.dir === 'asc'"></i>
                     </th>
-                    <th id="orgName_th" pSortableColumn="code2">Organization<p-sortIcon field="code2"></p-sortIcon></th>
-                    <th id="Status_th" pSortableColumn="code2">Status<p-sortIcon field="code2"></p-sortIcon></th>
-                    <th id="action_th" pSortableColumn="action" class="action">Action<p-sortIcon
-                            field="action"></p-sortIcon></th>
+                    <th [class.sorted]="this.sort && this.sort.prop === 'familyNm'" (click)="onSort('familyNm')"
+                        class="sortable-header" id="familyNm_th">Last Name
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'familyNm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'familyNm' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th [class.sorted]="this.sort && this.sort.prop === 'organizationType'"
+                        (click)="onSort('organizationType')" class="sortable-header" id="orgType_th">Org Type
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'organizationType' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'organizationType' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th [class.sorted]="this.sort && this.sort.prop === 'emailAddressDsc'"
+                        (click)="onSort('emailAddressDsc')" class="sortable-header" id="emailAddressDsc_th">Email
+                        Address
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'emailAddressDsc' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'emailAddressDsc' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th [class.sorted]="this.sort && this.sort.prop === 'organizationNm'"
+                        (click)="onSort('organizationNm')" class="sortable-header" id="orgName_th">Organization
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th [class.sorted]="this.sort && this.sort.prop === 'accessRequestStatusCd'"
+                        (click)="onSort('accessRequestStatusCd')" class="sortable-header" id="Status_th">Status
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'accessRequestStatusCd' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'accessRequestStatusCd' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th id="action_th" class="action">Action</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-accessRequest let-index="rowIndex">

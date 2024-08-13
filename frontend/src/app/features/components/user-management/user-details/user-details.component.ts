@@ -123,9 +123,9 @@ export class UserDetailsComponent implements OnInit {
     ]).subscribe({
       next: ([user, roles, orgTypes, organizations]) => {
         this.user = user;
-        this.orgTypes = orgTypes;
-        this.organizations = organizations;
-        this.organizationsRaw = organizations;
+        this.orgTypes = orgTypes.sort((a, b) => this.sortHandler(a.label, b.label));
+        this.organizations = organizations.sort((a, b) => this.sortHandler(a.label, b.label));
+        this.organizationsRaw = organizations.sort((a, b) => this.sortHandler(a.label, b.label));
         this.selectedOrg = this.organizationsRaw.find(x => (x as any)['organizationCd'] === this.user.representedByOrganization.organizationCd)?.value || '';
         this.selectedOrgType = this.user.representedByOrganization.organizationType;
         this.roles = roles.map((role) => ({ label: role.userRoleNm, value: role.userRoleCd, selected: user.roleCds.some(x => role.userRoleCd === x) }));
@@ -137,5 +137,11 @@ export class UserDetailsComponent implements OnInit {
         this.loaderService.loadingEnd();
       }
     });
+  }
+
+  private sortHandler(a: string, b: string): number {
+    if (a > b) return 1;
+    if (a < b) return -1;
+    return 0
   }
 }

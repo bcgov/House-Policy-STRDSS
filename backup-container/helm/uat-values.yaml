@@ -1,22 +1,22 @@
 global:
   labels:
-    environment: dev
-    env: development
+    environment: uat
+    env: uat
     owner: "b0471a-team"
     project: "b0471a-project"
     DataClass: "Medium"
 
-nameOverride: strdssdev-backup
-fullnameOverride: strdssdev-backup
+nameOverride: strdssuat-backup
+fullnameOverride: strdssuat-backup
 
 backupConfig: |
-  postgres=strdssdev:5432/strdssdev
+  postgres=strdssuat:5432/strdssuat
 
   0 1 * * * default ./backup.sh -s
   0 4 * * * default ./backup.sh -s -v all
 
 db:
-  secretName: strdssdev
+  secretName: strdssuat
   passwordKey: postgres-password
 
 persistence:
@@ -33,11 +33,11 @@ persistence:
 
 env:
   DATABASE_SERVICE_NAME:
-    value: strdssdev
+    value: strdssuat
   ENVIRONMENT_FRIENDLY_NAME:
-    value: "STRDSS DEV DB Backups"
+    value: "STRDSS UAT DB Backups"
   ENVIRONMENT_NAME:
-    value: "dev"
+    value: "uat"
 backup-storage:
   labels:
     DataClass: "Medium"

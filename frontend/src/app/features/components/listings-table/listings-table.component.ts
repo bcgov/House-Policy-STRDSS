@@ -11,7 +11,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
-import { DropdownOption } from '../../../common/models/dropdown-option';
+import { DropdownOption, DropdownOptionOrganization } from '../../../common/models/dropdown-option';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { User } from '../../../common/models/user';
 import { ListingDetailsComponent } from './listing-details/listing-details.component';
@@ -63,7 +63,8 @@ export class ListingsTableComponent implements OnInit {
   searchTerm!: string;
   searchColumn: 'all' | 'address' | 'url' | 'listingId' | 'hostName' | 'businessLicense' = 'all';
   searchColumns = new Array<DropdownOption>();
-  communities = new Array<DropdownOption>();
+  communities = new Array<DropdownOptionOrganization>();
+  groupedCommunities = new Array();
 
   isCEU = false;
   isLegendShown = false;
@@ -320,8 +321,50 @@ export class ListingsTableComponent implements OnInit {
   private getOrganizations(): void {
     this.requestAccessService.getOrganizations('LG').subscribe({
       next: (orgs) => {
-        this.communities = orgs;
+        this.communities = orgs.map((org: DropdownOptionOrganization) =>
+          ({ label: org.label, value: org.value, localGovernmentType: org.localGovernmentType || 'Other' }));
+
+        const groupedData: Array<any> = this.communities.reduce((acc: any, curr: any) => {
+          const existingGroup = acc.find((group: any) => group.value === curr.localGovernmentType);
+          if (existingGroup) {
+            existingGroup.items.push({ label: curr.label, value: curr.value });
+          } else {
+            acc.push({
+              label: curr.localGovernmentType,
+              value: curr.localGovernmentType,
+              items: [{ label: curr.label, value: curr.value }]
+            });
+          }
+
+          return acc;
+        }, []);
+        const municipality = groupedData.filter(x => x.label === 'Municipality')[0];
+        const regional = groupedData.filter(x => x.label === 'Regional District Electoral Area')[0];
+        const other = groupedData.filter(x => x.label === 'Other')[0];
+        const firstNations = groupedData.filter(x => x.label === 'First Nations Community')[0];
+        const uncategorized = groupedData.filter(x =>
+          x.label !== 'Municipality' &&
+          x.label !== 'Regional District Electoral Area' &&
+          x.label !== 'Other' &&
+          x.label !== 'First Nations Community'
+        );
+
+        const sorted = [];
+
+        if (municipality)
+          sorted.push(municipality);
+        if (regional)
+          sorted.push(regional);
+        if (other)
+          sorted.push(other);
+        if (firstNations)
+          sorted.push(firstNations);
+        if (uncategorized.length)
+          sorted.push(...uncategorized);
+
+        this.groupedCommunities = sorted;
       }
     });
   }
+
 }

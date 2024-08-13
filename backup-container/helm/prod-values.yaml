@@ -23,7 +23,7 @@ persistence:
   backup:
     size: 700Mi
     mountPath: /backups/
-    storageClassName: netapp-block-standard
+    storageClassName: netapp-file-backup
     storageAccessMode: ReadWriteOnce
   verification:
     size: 512Mi

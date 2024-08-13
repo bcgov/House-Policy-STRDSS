@@ -35,8 +35,9 @@ env:
   DATABASE_SERVICE_NAME:
     value: strdssuat
   ENVIRONMENT_FRIENDLY_NAME:
-    value: "Strdssuat DB Backups"
-
+    value: "STRDSS UAT DB Backups"
+  ENVIRONMENT_NAME:
+    value: "uat"
 backup-storage:
   labels:
     DataClass: "Medium"

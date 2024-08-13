@@ -62,6 +62,12 @@ cd into [docker](./helm/backup-storage/)
 helm upgrade --install strdssdev-backup --values ../dev-values.yaml .
 ```
 
+## RocketChat Integration
+
+A dedicated channel named [strdss-db-backup](https://chat.developer.gov.bc.ca/group/strdss-db-backup) has been established in RocketChat for backup notifications. The [rocketchat-script](./rocketchat-script.js) has been added to an incoming webhook integration for this channel.
+
+The webhook URL is securely stored in the `strdssprod-backup-secrets` secret within the production namespace.
+
 ## One-time backup
 
 ```sh

@@ -5,7 +5,7 @@ on:
     types: [published]
 
 jobs:
-  deploy:
+  deploy-silver:
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     permissions:
@@ -39,3 +39,49 @@ jobs:
         IMAGE_TAG_BACKEND=${vtag//v} \
         IMAGE_TAG_HANGFIRE=${vtag//v} \
       working-directory: ./helm/main
+
+  # deploy-emerald:
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 5
+
+  #   steps:
+  #   - name: Checkout ArgoCD Repo
+  #     id: gitops
+  #     uses: actions/checkout@v4
+  #     with:
+  #       repository: bcgov-c/tenant-gitops-b0471a
+  #       ref: main
+  #       token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+  #   - name: Update Helm Values and Commit
+  #     id: helm
+  #     run: |
+  #         pwd
+
+  #         # Get current date and time
+  #         datetime=$(date +'%Y-%m-%d %H:%M:%S')
+  #         vtag=${{ github.ref_name }}
+
+  #         echo "Image Tag:"
+  #         echo ${vtag//v}
+
+  #         # set image tag
+  #         sed -i "s/tag: .*/tag: ${vtag//v} # Image Updated on $datetime/" deploy/prod_values.yaml
+
+  #         # Commit and push the changes
+  #         git config --global user.email "ychung-mot@github.com"
+  #         git config --global user.name "Young-Jin Chung"
+
+  #         git add deploy/prod_values.yaml
+
+  #         pwd
+  #         # Repackage Helm Chart
+  #         cd charts/gitops/charts
+
+  #         helm package ../../frontend/
+  #         helm package ../../backend/
+  #         helm package ../../hangfire/
+
+  #         git add .
+
+  #         git commit -m "Update image tag to ${vtag//v} on $datetime"
+  #         git push origin prod

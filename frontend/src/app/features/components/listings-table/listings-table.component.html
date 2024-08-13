@@ -7,8 +7,8 @@
         <span class="p-input-icon-right search-input-container">
             <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()"> <i
                     class="pi pi-search"></i></button>
-            <button pButton *ngIf="!!searchTerm" class="colorless p-button-link search-clear-btn" icon="pi pi-times"
-                (click)="onClearSearchBox()"></button>
+            <button pButton *ngIf="!!searchTerm" id="clear-search-btn" class="colorless p-button-link search-clear-btn"
+                icon="pi pi-times" (click)="onClearSearchBox()"></button>
             <input type="text" id="search-term-inp" (keydown.enter)="onSearch()" class="search-input"
                 placeholder="Search" pInputText [(ngModel)]="searchTerm" />
         </span>
@@ -50,13 +50,13 @@
             </div>
         </ng-template>
 
-        <p-table #table [value]="listings" [scrollable]="true" scrollHeight="{{isCEU?'550px':'500px'}}"
-            [(selection)]="selectedListings" styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }"
-            [selectionPageOnly]="true">
+        <p-table #table [ariaLabel]="'table-of-listings'" id="listings-table" [value]="listings" [scrollable]="true"
+            scrollHeight="{{isCEU?'550px':'500px'}}" [(selection)]="selectedListings" styleClass="p-datatable-sm"
+            [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
             <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 4rem">
-                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    <th [ariaLabel]="'select-listing'" style="width: 4rem">
+                        <p-tableHeaderCheckbox inputId="select-all-chb"></p-tableHeaderCheckbox>
                     </th>
                     <th class="sortable-header" id="status_header"
                         [class.sorted]="this.sort && this.sort.prop === 'listingStatusType'"
@@ -149,10 +149,11 @@
                 </tr>
             </ng-template>
 
-            <ng-template pTemplate="body" let-row>
+            <ng-template pTemplate="body" let-row let-index="rowIndex">
                 <tr>
                     <td>
-                        <p-tableCheckbox [value]="row"></p-tableCheckbox>
+                        <p-tableCheckbox [ariaLabel]="'select-listing-row'" inputId="select-listing-row-{{index}}"
+                            [value]="row"></p-tableCheckbox>
                     </td>
                     <td>
                         <div [ngSwitch]="row.listingStatusType" class="align-center status-col">
@@ -175,11 +176,12 @@
                     </td>
                     <td>{{ row.offeringOrganizationNm }}</td>
                     <td>
-                        <a target="_blank" class="listing-id-link" [href]="row.platformListingUrl">{{
+                        <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
+                            [href]="row.platformListingUrl">{{
                             row.platformListingNo }}</a>
                     </td>
                     <td class="align-center">
-                        <a pButton class="details-button-with-icon" target="_blank"
+                        <a [ariaLabel]="'open-listing-details'" pButton class="details-button-with-icon" target="_blank"
                             [routerLink]="'/listing/'+row.rentalListingId"><i class="pi pi-list"></i></a>
                     </td>
                     <td
@@ -301,9 +303,13 @@
                 </div>
             </p-accordionTab>
             <p-accordionTab *ngIf="isCEU" iconPos="end" header="By Community ">
-                <p-dropdown placeholder="Select a Community" [appendTo]="'body'" [inputId]="'community-filter-dropdown'"
-                    [filter]="true" class="auto-width" [options]="communities"
-                    [(ngModel)]="cancelableFilter.community"></p-dropdown>
+                <p-dropdown placeholder="Select a Community" appendTo="body" panelStyleClass="select-community"
+                    [inputId]="'community-filter-dropdown'" [filter]="true" [filterBy]="'label'" class="auto-width"
+                    [options]="groupedCommunities" [group]="true" [(ngModel)]="cancelableFilter.community">
+                    <ng-template let-group pTemplate="group">
+                        <strong>{{group.label}}</strong>
+                    </ng-template>
+                </p-dropdown>
 
             </p-accordionTab>
             <p-accordionTab iconPos="end" header="By Status">

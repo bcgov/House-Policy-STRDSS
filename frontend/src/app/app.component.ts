@@ -18,6 +18,8 @@ export class AppComponent implements OnInit {
     currentUserLoaded = false;
     isLoading = true;
     loaderTitle? = 'Loading'
+    isCurrentUserLoadedWithError = false;
+    errorText = '';
 
     constructor(
         private userService: UserDataService,
@@ -37,6 +39,15 @@ export class AppComponent implements OnInit {
         this.userService.getCurrentUser().subscribe({
             next: (user) => {
                 this.currentUserLoaded = !!user;
+            },
+            error: (err) => {
+                if (err.error) {
+                    this.errorText = `${err.error.detail}: ${err.error.instance}`
+                }
+
+                this.isCurrentUserLoadedWithError = true;
+                this.loaderService.loadingEnd();
+                this.cd.detectChanges();
             },
             complete: () => {
                 this.loaderService.loadingEnd();

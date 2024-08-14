@@ -211,63 +211,82 @@
                         font-weight: 600;
                     }
                 }
-
-                .status-circle {
-                    background-color: #FFFFFF;
-                    width: 20px;
-                    height: 20px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    border-radius: 50%;
-                    line-height: 20px;
-                    color: #FFFFFF;
-                    font-family: 'BcSans-bold';
-                    font-size: 14px;
-
-                    &.status-new {
-                        background-color: #F8BA47;
-                        color: #2D2D2D;
-                    }
-
-                    &.status-active {
-                        background-color: #42814A;
-                    }
-
-                    &.status-inactive {
-                        background-color: #605E5C;
-                    }
-
-                    &.status-takedown-complete {
-                        background-color: #2D2D2D;
-                    }
-
-                    &.status-reassigned {
-                        background-color: #255A90;
-                    }
-                }
-
-                .status-flag {
-                    width: 20px;
-                    height: 20px;
-                    background-position: center center;
-                    background-size: contain;
-                    background-repeat: no-repeat;
-
-                    &.status-takedown-complete {
-                        background-image: url(../../../../assets/images/flag-black.svg);
-                    }
-
-                    &.status-reassigned {
-                        background-image: url(../../../../assets/images/flag-blue.svg);
-                    }
-                }
             }
         }
 
         p-paginator {
             display: flex;
             justify-content: end;
+        }
+    }
+
+    .status-circle {
+        background-color: #FFFFFF;
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        line-height: 20px;
+        color: #FFFFFF;
+        font-family: 'BcSans-bold';
+        font-size: 14px;
+
+        &.status-new {
+            background-color: #F8BA47;
+            color: #2D2D2D;
+        }
+
+        &.status-active {
+            background-color: #42814A;
+        }
+
+        &.status-inactive {
+            background-color: #605E5C;
+        }
+
+        &.status-takedown-complete {
+            background-color: #2D2D2D;
+        }
+
+        &.status-reassigned {
+            background-color: #255A90;
+        }
+    }
+
+    .status-flag {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 20px;
+        height: 20px;
+        background-position: center center;
+        background-size: contain;
+        background-repeat: no-repeat;
+
+        &span {
+            margin-right: 12px;
+        }
+
+        &.status-takedown-complete {
+            background-image: url(../../../../assets/images/flag-black.svg);
+        }
+
+        &.status-reassigned {
+            background-image: url(../../../../assets/images/flag-blue.svg);
+        }
+    }
+
+    ul {
+        &.statuses {
+            list-style-type: none;
+            padding: 0 14px;
+
+            .status-circle,
+            .status-flag {
+                margin-right: 12px;
+            }
         }
     }
 

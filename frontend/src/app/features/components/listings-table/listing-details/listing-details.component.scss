@@ -168,7 +168,7 @@
         background-color: #FFFFFF;
         width: 20px;
         height: 20px;
-        display: flex;
+        display: inline-flex;
         justify-content: center;
         align-items: center;
         border-radius: 50%;
@@ -200,12 +200,18 @@
     }
 
     .status-flag {
-        display: flex;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
         width: 20px;
         height: 20px;
         background-position: center center;
         background-size: contain;
         background-repeat: no-repeat;
+
+        &span {
+            margin-right: 12px;
+        }
 
         &.status-takedown-complete {
             background-image: url(../../../../../assets/images/flag-black.svg);
@@ -213,6 +219,18 @@
 
         &.status-reassigned {
             background-image: url(../../../../../assets/images/flag-blue.svg);
+        }
+    }
+
+    ul {
+        &.statuses {
+            list-style-type: none;
+            padding: 0 14px;
+
+            .status-circle,
+            .status-flag {
+                margin-right: 12px;
+            }
         }
     }
 

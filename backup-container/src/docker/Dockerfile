@@ -22,7 +22,6 @@ ADD https://github.com/$SOURCE_REPO/go-crond/releases/download/$GOCROND_VERSION/
 
 USER root
 
-# Install dependencies, PostgreSQL 16 client tools, and configure the environment
 RUN dnf install -y curl util-linux postgis && \
     curl https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/bin/mc && \
     chmod +x /usr/bin/mc /usr/bin/go-crond && \

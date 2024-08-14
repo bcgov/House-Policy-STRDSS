@@ -85,6 +85,13 @@ function onRestoreDatabase(){
       echo
     fi
 
+    # posgtis extension
+    if (( ${_rtnCd} == 0 )); then
+      psql -h "${_hostname}" ${_portArg} -ac "CREATE EXTENSION postgis;"
+      _rtnCd=0
+      echo
+    fi
+
     # Drop Patroni-specific schemas
     if (( ${_rtnCd} == 0 )); then
       psql -h "${_hostname}" ${_portArg} -a -d ${_database} <<EOF
@@ -141,8 +148,9 @@ function onStartServer(){
 
     # Start a local PostgreSql instance
     POSTGRESQL_DATABASE=$(getDatabaseName "${_databaseSpec}") \
-    POSTGRESQL_USER=$(getUsername "${_databaseSpec}") \
+    POSTGRESQL_USER=$(getDatabaseName "${_databaseSpec}") \
     POSTGRESQL_PASSWORD=$(getPassword "${_databaseSpec}") \
+    POSTGRESQL_EXTENSIONS=postgis \
     run-postgresql >/dev/null 2>&1 &
   )
 }

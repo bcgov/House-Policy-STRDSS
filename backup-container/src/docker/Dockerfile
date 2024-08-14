@@ -1,5 +1,5 @@
 # This image provides a postgres installation from which to run backups
-FROM --platform=linux/amd64 quay.io/fedora/postgresql-16:16
+FROM --platform=linux/amd64 quay.io/fedora/postgresql-15:20240814
 
 # Change timezone to PST for convenience
 ENV TZ=America/Los_Angeles
@@ -28,6 +28,12 @@ RUN dnf install -y curl util-linux postgis && \
     echo $TZ > /etc/timezone && \
     dnf clean all && \
     rm -rf /var/cache/dnf
+
+RUN mkdir -p /docker-entrypoint-initdb.d && \
+    echo '#!/bin/bash' > /docker-entrypoint-initdb.d/init-postgis.sh && \
+    echo 'psql -d postgres -c "CREATE EXTENSION IF NOT EXISTS postgis;"' >> /docker-entrypoint-initdb.d/init-postgis.sh && \
+    chmod +x /docker-entrypoint-initdb.d/init-postgis.sh
+
 # Important - Reset to the base image's user account.
 USER 26
 

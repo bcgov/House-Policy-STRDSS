@@ -40,4 +40,4 @@ RUN dnf install -y util-linux
 USER 26
 
 # Set the default CMD.
-CMD sh /backup.sh
+CMD ["bash", "/backup.sh"]

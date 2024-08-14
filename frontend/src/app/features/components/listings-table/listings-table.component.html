@@ -217,12 +217,17 @@
     <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
         <span>
             <strong>Status:</strong> Status of the listing using the following categories:
-            <ul>
-                <li>New (N): Listing reported for the first time in current monthly data</li>
-                <li>Active (A): Listing appeared in previous and current monthly data</li>
-                <li>Inactive (I): Listing appeared in previous but not current monthly data </li>
-                <li>Takedown Complete (T): Platform confirmed takedown of the listing</li>
-                <li>Reassigned (R): Address (best match) was updated to a new jurisdiction</li>
+            <ul class="statuses">
+                <li><span class="status-circle status-new">N</span>&nbsp;New: Listing reported for the first time in
+                    current monthly data</li>
+                <li><span class="status-circle status-active">A</span>&nbsp;Active: Listing appeared in previous and
+                    current monthly data</li>
+                <li><span class="status-circle status-inactive">I</span>&nbsp;Inactive: Listing appeared in previous
+                    but not current monthly data </li>
+                <li><span class="status-flag status-reassigned"></span>&nbsp;Takedown Complete: Platform confirmed
+                    takedown of the listing</li>
+                <li><span class="status-flag status-takedown-complete"></span>&nbsp;Reassigned: Address (best
+                    match) was updated to a new jurisdiction</li>
             </ul>
         </span>
         <p>

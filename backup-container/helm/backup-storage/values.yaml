@@ -31,12 +31,6 @@ persistence:
     mountPath: /backups/
     storageClassName: netapp-block-standard
     storageAccessMode: ReadWriteOnce
-  verification:
-    size: 2Gi
-    mountPath: /var/lib/pgsql/data
-    storageClassName: netapp-block-standard
-    storageAccessMode: ReadWriteOnce
-
 db:
   secretName: "patroni"
   usernameKey: "username-superuser"

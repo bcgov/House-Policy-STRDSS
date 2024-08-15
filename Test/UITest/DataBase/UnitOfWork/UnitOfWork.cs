@@ -29,6 +29,7 @@ namespace DataBase.UnitOfWork
         private readonly GenericRepository<DssUploadDelivery> _DssUploadDeliveryRepository;
         private readonly GenericRepository<DssUploadLine> _DssUploadLineRepository;
         private readonly GenericRepository<DssUserRole> _DssUserRoleRepository;
+        private readonly GenericRepository<DssUserRoleAssignment> _DssUserRoleAssignmentRepository;
 
 
         public GenericRepository<DssAccessRequestStatus> DssAccessRequestStatusRepository
@@ -94,12 +95,24 @@ namespace DataBase.UnitOfWork
             get => _DssUserRoleRepository ?? new GenericRepository<DssUserRole>(_context);
         }
 
+        public GenericRepository<DssUserRoleAssignment> DssUserRoleAssignmentRepository
+        {
+            get => _DssUserRoleAssignmentRepository ?? new GenericRepository<DssUserRoleAssignment>(_context);
+        }
 
         public UnitOfWork(DbContext context)
         {
             if (context != null)
             {
                 _context = context;
+            }
+        }
+
+        public void ResetDB()
+        {
+            foreach (var entry in _context.ChangeTracker.Entries().ToList())
+            {
+                entry.State = EntityState.Detached;
             }
         }
 

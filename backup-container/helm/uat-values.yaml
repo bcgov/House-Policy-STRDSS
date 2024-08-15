@@ -9,6 +9,8 @@ global:
 nameOverride: strdssuat-backup
 fullnameOverride: strdssuat-backup
 
+dbService: strdssuat
+
 backupConfig: |
   postgres=strdssuat:5432/strdssuat
 

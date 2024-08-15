@@ -9,6 +9,8 @@ global:
 nameOverride: strdssprod-backup
 fullnameOverride: strdssprod-backup
 
+dbService: strdssprod
+
 backupConfig: |
   postgres=strdssprod:5432/strdssprod
 

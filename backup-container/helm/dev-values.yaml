@@ -9,6 +9,8 @@ global:
 nameOverride: strdssdev-backup
 fullnameOverride: strdssdev-backup
 
+dbService: strdssdev
+
 backupConfig: |
   postgres=strdssdev:5432/strdssdev
 

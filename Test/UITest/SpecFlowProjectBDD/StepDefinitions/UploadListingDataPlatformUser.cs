@@ -74,7 +74,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _UserType = userHelper.SetUserType(UserType);
             //Authenticate user using IDir or BCID depending on the user
-            authHelper.Authenticate(_TestUserName, _TestPassword,  _UserType);
+            authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
         }
 
         [When(@"I access the Data Sharing System")]
@@ -159,27 +159,19 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             var dt = DateOnly.Parse(yearMonth);
             //var DSSUploadDeliverys = _DssDBContext.DssUploadDeliveries.Where(p => p.ReportPeriodYm == dt).ToList();
-            var DSSUploadDeliverys = _UnitOfWork.DssUploadDeliveryRepository.Get(p => p.ReportPeriodYm == dt).ToList(); ;
+            var DSSUploadDeliverys = _UnitOfWork.DssUploadDeliveryRepository.Get(p => p.ReportPeriodYm == dt).ToList();
 
 
             foreach (var DSSLoadDelivery in DSSUploadDeliverys)
             {
-                try
+                long id = DSSLoadDelivery.UploadDeliveryId;
+                _UnitOfWork.DssUploadDeliveryRepository.Delete(DSSLoadDelivery);
+                var DSSUploadDeliveryLines = _UnitOfWork.DssUploadLineRepository.Get(p => p.IncludingUploadDeliveryId == id);
+                foreach (var dSSDeliveryLine in DSSUploadDeliveryLines)
                 {
-                    long id = DSSLoadDelivery.UploadDeliveryId;
-                    _UnitOfWork.DssUploadDeliveryRepository.Delete(DSSLoadDelivery);
-                    var DSSUploadDeliveryLines = _UnitOfWork.DssUploadLineRepository.Get(p => p.IncludingUploadDeliveryId == id);
-                    foreach (var dSSDeliveryLine in DSSUploadDeliveryLines)
-                    {
-                        _UnitOfWork.DssUploadLineRepository.Delete(dSSDeliveryLine.UploadLineId);
-                    }
-                    _UnitOfWork.Save();
+                    _UnitOfWork.DssUploadLineRepository.Delete(dSSDeliveryLine.UploadLineId);
                 }
-                
-                catch(NpgsqlOperationInProgressException ex)
-                {
-                    //should not happen, but continue if it does for now
-                }
+                _UnitOfWork.Save();
             }
         }
 
@@ -205,7 +197,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
                 //script = $@"document.querySelector(""#month_{i} > span"");";
                 script = "document.querySelector('#month_" + i + "');";
 
-                string result = _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(script) == null ? string.Empty: _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(script).ToString();
+                string result = _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(script) == null ? string.Empty : _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(script).ToString();
 
                 if (result.ToUpper().Contains(Month.ToUpper()))
                 {
@@ -249,7 +241,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"a new entry on an upload log with a timestamp, username, and the number of records created\.")]
         public void ThenANewEntryOnAnUploadLogWithATimestampUsernameAndTheNumberOfRecordsCreated_()
         {
-            var updateTime  = _UnitOfWork.DssUploadDeliveryRepository.Get(p => p.UpdDtm >= _updateTime);
+            var updateTime = _UnitOfWork.DssUploadDeliveryRepository.Get(p => p.UpdDtm >= _updateTime);
             ClassicAssert.IsNotNull(updateTime);
         }
 

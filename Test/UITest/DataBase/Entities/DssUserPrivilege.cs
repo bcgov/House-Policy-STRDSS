@@ -18,5 +18,5 @@ public partial class DssUserPrivilege
     /// </summary>
     public string UserPrivilegeNm { get; set; } = null!;
 
-    public virtual ICollection<DssUserRole> UserRoleCds { get; } = new List<DssUserRole>();
+    public virtual ICollection<DssUserRolePrivilege> DssUserRolePrivileges { get; } = new List<DssUserRolePrivilege>();
 }

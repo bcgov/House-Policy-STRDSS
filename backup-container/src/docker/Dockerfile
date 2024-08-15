@@ -1,5 +1,5 @@
 # This image provides a postgres installation from which to run backups
-FROM --platform=linux/amd64 quay.io/fedora/postgresql-15:15
+FROM --platform=linux/amd64 quay.io/fedora/postgresql-16:16
 
 # Change timezone to PST for convenience
 ENV TZ=America/Los_Angeles
@@ -22,7 +22,7 @@ ADD https://github.com/$SOURCE_REPO/go-crond/releases/download/$GOCROND_VERSION/
 
 USER root
 
-RUN dnf install -y curl util-linux postgis && \
+RUN dnf install -y curl util-linux && \
     curl https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/bin/mc && \
     chmod +x /usr/bin/mc /usr/bin/go-crond && \
     dnf clean all && \

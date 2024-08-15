@@ -5,7 +5,7 @@
 image:
   repository: artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container
   pullPolicy: Always
-  tag: latest
+  tag: 16
 
 imagePullSecrets:
   - name: jf-rg-secret
@@ -16,7 +16,6 @@ backupConfig: |
   postgres=patroni-postgresql-gw:5432/gw
 
   0 1 * * * default ./backup.sh -s
-  0 4 * * * default ./backup.sh -s -v all
 
 config:
   []

@@ -1,6 +1,6 @@
 postgresql:
   image:
-    tag: 16.3.0
+    tag: 12.12.10
 primary:
   podSecurityContext:
     enabled: false

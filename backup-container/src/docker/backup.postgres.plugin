@@ -141,8 +141,9 @@ function onStartServer(){
 
     # Start a local PostgreSql instance
     POSTGRESQL_DATABASE=$(getDatabaseName "${_databaseSpec}") \
-    POSTGRESQL_USER=$(getUsername "${_databaseSpec}") \
+    POSTGRESQL_USER=$(getDatabaseName "${_databaseSpec}") \
     POSTGRESQL_PASSWORD=$(getPassword "${_databaseSpec}") \
+    POSTGRESQL_EXTENSIONS=postgis \
     run-postgresql >/dev/null 2>&1 &
   )
 }

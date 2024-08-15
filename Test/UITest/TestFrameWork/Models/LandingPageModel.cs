@@ -12,9 +12,9 @@
 
         public static string EscalateTakedownToCEUButton { get => "escalateToCeu_btn"; }
 
-        public static string UploadListingsButton { get => "uploadListingData_btn"; }
+        public static string UploadPlatformDataButton { get => "uploadPlatformData_btn"; }
 
-        public static string listingsButton { get => "viewListingData_btn"; }
+        public static string ViewListingsButton { get => "listings_btn"; }
 
     }
 }

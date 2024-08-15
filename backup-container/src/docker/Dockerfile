@@ -2,7 +2,7 @@
 FROM --platform=linux/amd64 quay.io/fedora/postgresql-15:15
 
 # Change timezone to PST for convenience
-ENV TZ=PST8PDT
+ENV TZ=America/Los_Angeles
 
 # Set the workdir to be root
 WORKDIR /

@@ -1,39 +1,32 @@
 # Backup Container
 
-Short Term Rental Data Sharing System (STRDSS) is using an updated version of the official [BCDevOps backup-container](https://github.com/BCDevOps/backup-container) for backing up DB.
+Short Term Rental Data Sharing System (STRDSS) is using an customized version of the official [BCDevOps backup-container](https://github.com/BCDevOps/backup-container) for backing up DB.
 
-## Modifications from the official backup-container
+## The main changes from the official backup-container
 
 ### 1. [Dockerfile](./src/docker/Dockerfile)
 
-**Original:**
+Installed postgis extension
 
-```Dockerfile
-FROM --platform=linux/amd64 quay.io/fedora/postgresql-15:15
-```
-
-**Updated:**
-
-```Dockerfile
-FROM --platform=linux/amd64 quay.io/fedora/postgresql-16:16
+```docker
+RUN dnf install -y curl util-linux postgis && \
+    curl https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/bin/mc && \
+    chmod +x /usr/bin/mc /usr/bin/go-crond && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf && \
+    echo $TZ > /etc/timezone
 ```
 
 ### 2. [backup.postgres.plugin](./src/docker/backup.postgres.plugin)
 
-**Original:**
-
-```sh
-pg_dumpall -h "${_hostname}" ${_portArg} -U "${_username}" --roles-only --no-role-passwords > "${BACKUP_DIR}roles.sql"
-cat "${BACKUP_DIR}roles.sql" "${BACKUP_DIR}backup.sql" | gzip > ${_backupFile}
-rm "${BACKUP_DIR}roles.sql" && rm "${BACKUP_DIR}backup.sql
-```
-
-**Updated:**
+Excluded roles backup
 
 ```sh
 cat "${BACKUP_DIR}backup.sql" | gzip > ${_backupFile}
 rm "${BACKUP_DIR}backup.sql"
 ```
+
+Set owner
 
 ```sh
   # SET OWNER
@@ -43,15 +36,26 @@ rm "${BACKUP_DIR}backup.sql"
   fi
 ```
 
+Added POSTGRESQL_EXTENSIONS for verification
+
+```sh
+# Start a local PostgreSql instance
+POSTGRESQL_DATABASE=$(getDatabaseName "${_databaseSpec}") \
+POSTGRESQL_USER=$(getDatabaseName "${_databaseSpec}") \
+POSTGRESQL_PASSWORD=$(getPassword "${_databaseSpec}") \
+POSTGRESQL_EXTENSIONS=postgis \
+run-postgresql >/dev/null 2>&1 &
+```
+
 ## Docker build and push to the Artifactory
 
 cd into [docker](./src/docker/)
 
 ```sh
 docker build -t backup-container .
-docker tag backup-container artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container:16
+docker tag backup-container artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container:latest
 docker login artifacts.developer.gov.bc.ca
-docker push artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container:16
+docker push artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container:latest
 ```
 
 ## Helm deploy

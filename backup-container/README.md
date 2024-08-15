@@ -6,15 +6,10 @@ Short Term Rental Data Sharing System (STRDSS) is using an customized version of
 
 ### 1. [Dockerfile](./src/docker/Dockerfile)
 
-Installed postgis extension
+Docker image to postgresql-16:16
 
 ```docker
-RUN dnf install -y curl util-linux postgis && \
-    curl https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/bin/mc && \
-    chmod +x /usr/bin/mc /usr/bin/go-crond && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf && \
-    echo $TZ > /etc/timezone
+FROM --platform=linux/amd64 quay.io/fedora/postgresql-16:16
 ```
 
 ### 2. [backup.postgres.plugin](./src/docker/backup.postgres.plugin)
@@ -34,17 +29,6 @@ Set owner
     psql -h "${_hostname}" ${_portArg} -ac "ALTER DATABASE \"${_database}\" OWNER TO \"${_database}\";"
     _rtnCd=${?}
   fi
-```
-
-Added POSTGRESQL_EXTENSIONS for verification
-
-```sh
-# Start a local PostgreSql instance
-POSTGRESQL_DATABASE=$(getDatabaseName "${_databaseSpec}") \
-POSTGRESQL_USER=$(getDatabaseName "${_databaseSpec}") \
-POSTGRESQL_PASSWORD=$(getPassword "${_databaseSpec}") \
-POSTGRESQL_EXTENSIONS=postgis \
-run-postgresql >/dev/null 2>&1 &
 ```
 
 ## Docker build and push to the Artifactory

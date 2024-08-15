@@ -15,7 +15,6 @@ backupConfig: |
   postgres=strdssuat:5432/strdssuat
 
   0 1 * * * default ./backup.sh -s
-  0 4 * * * default ./backup.sh -s -v all
 
 db:
   secretName: strdssuat

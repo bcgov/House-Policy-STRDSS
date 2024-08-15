@@ -94,7 +94,8 @@ namespace StrDss.Service.Bceid
 
             request.onlineServiceId = _client.Osid;
 
-            _client.Endpoint.EndpointBehaviors.Add(new LoggingEndpointBehavior());
+            // trace the call
+            //_client.Endpoint.EndpointBehaviors.Add(new LoggingEndpointBehavior());
 
             _logger.LogInformation($"[Egress] Calling BCeID web service: {_client.Endpoint.Address}");
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace DataBase.Entities;
 
 /// <summary>
-/// A private company or governing body that plays a role in short term rental reporting or enforcement
+/// A private company or governing body component that plays a role in short term rental reporting or enforcement
 /// </summary>
 public partial class DssOrganization
 {
@@ -43,6 +43,31 @@ public partial class DssOrganization
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
 
+    /// <summary>
+    /// Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing
+    /// </summary>
+    public bool? IsLgParticipating { get; set; }
+
+    /// <summary>
+    /// Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions
+    /// </summary>
+    public bool? IsPrincipalResidenceRequired { get; set; }
+
+    /// <summary>
+    /// Indicates whether a LOCAL GOVERNMENT SUBDIVISION requires a business licence for Short Term Rental operation
+    /// </summary>
+    public bool? IsBusinessLicenceRequired { get; set; }
+
+    /// <summary>
+    /// A free form description of the economic region to which a Local Government Subdivision belongs
+    /// </summary>
+    public string? EconomicRegionDsc { get; set; }
+
+    /// <summary>
+    /// A sub-type of local government organization used for sorting and grouping or members
+    /// </summary>
+    public string? LocalGovernmentType { get; set; }
+
     public virtual ICollection<DssEmailMessage> DssEmailMessageInvolvedInOrganizations { get; } = new List<DssEmailMessage>();
 
     public virtual ICollection<DssEmailMessage> DssEmailMessageRequestingOrganizations { get; } = new List<DssEmailMessage>();
@@ -50,6 +75,8 @@ public partial class DssOrganization
     public virtual ICollection<DssOrganizationContactPerson> DssOrganizationContactPeople { get; } = new List<DssOrganizationContactPerson>();
 
     public virtual ICollection<DssPhysicalAddress> DssPhysicalAddresses { get; } = new List<DssPhysicalAddress>();
+
+    public virtual ICollection<DssRentalListingExtract> DssRentalListingExtracts { get; } = new List<DssRentalListingExtract>();
 
     public virtual ICollection<DssRentalListingReport> DssRentalListingReports { get; } = new List<DssRentalListingReport>();
 

@@ -16,5 +16,6 @@ namespace DataBase.Repositories
         TEntity GetOrInsert(TEntity entity, bool updateReferenceData, Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "");
         TEntity Insert(TEntity entity);
         void Update(TEntity entityToUpdate);
+        void Reload(TEntity entityToReload);
     }
 }

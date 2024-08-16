@@ -18,50 +18,86 @@
 				<identity><![CDATA[GENERATED ALWAYS AS IDENTITY ]]></identity>
 				<comment><![CDATA[Unique generated key]]></comment>
 			</column>
-			<column name="platform_listing_no" type="varchar" length="50" jt="12" mandatory="y" >
-				<comment><![CDATA[The platform issued identification number for the listing]]></comment>
-			</column>
-			<column name="platform_listing_url" type="varchar" length="4000" jt="12" >
-				<comment><![CDATA[URL for the short-term rental platform listing]]></comment>
-			</column>
-			<column name="business_licence_no" type="varchar" length="320" jt="12" >
+			<column name="business_licence_no" type="varchar" length="50" jt="12" mandatory="y" >
 				<comment><![CDATA[The local government issued licence number that applies to the rental offering]]></comment>
 			</column>
-			<column name="bc_registry_no" type="varchar" length="50" jt="12" >
-				<comment><![CDATA[The Short Term Registry issued permit number]]></comment>
+			<column name="expiry_dt" prior="platform_listing_no" type="date" jt="91" mandatory="y" >
+				<comment><![CDATA[The date on which the business licence expires]]></comment>
 			</column>
-			<column name="is_current" type="boolean" jt="16" mandatory="y" >
-				<comment><![CDATA[Indicates whether the RENTAL LISTING VERSION is a CURRENT RENTAL LISTING (if it is a copy of the most current REPORTED RENTAL LISTING (having the same listing number for the same offering platform)]]></comment>
+			<column name="physical_rental_address_txt" type="varchar" length="250" jt="12" >
+				<comment><![CDATA[The full physical address of the location that is licenced as a short-term rental business]]></comment>
 			</column>
-			<column name="is_active" type="boolean" jt="16" >
-				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING was included in the most recent RENTAL LISTING REPORT]]></comment>
+			<column name="licence_type_txt" prior="licence_type" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[Free form description of the type of business licence issued (e.g. short-term rental, bed and breakfast, boarding and lodging, tourist accommodation)]]></comment>
 			</column>
-			<column name="is_new" type="boolean" jt="16" >
-				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING appeared for the first time in the last reporting period]]></comment>
+			<column name="restriction_txt" prior="bc_registry_no" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[Notes related to any restrictions associated with the licence]]></comment>
 			</column>
-			<column name="is_taken_down" type="boolean" jt="16" >
-				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform]]></comment>
+			<column name="business_nm" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[Official name of the business]]></comment>
 			</column>
-			<column name="is_changed_original_address" type="boolean" jt="16" >
-				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has received a different property address in the last reporting period]]></comment>
+			<column name="mailing_street_address_txt" type="varchar" length="100" jt="12" >
+				<comment><![CDATA[Street address component of the business mailing address]]></comment>
 			</column>
-			<column name="is_changed_address" type="boolean" jt="16" >
-				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has been subjected to address match changes by a user]]></comment>
+			<column name="mailing_city_nm" type="varchar" length="100" jt="12" >
+				<comment><![CDATA[City component of the business mailing address]]></comment>
 			</column>
-			<column name="is_lg_transferred" type="boolean" jt="16" >
-				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has been transferred to a different Local Goverment Organization as a result of address changes]]></comment>
+			<column name="mailing_province_cd" type="varchar" length="2" jt="12" >
+				<comment><![CDATA[Province component of the business mailing address]]></comment>
 			</column>
-			<column name="is_entire_unit" type="boolean" jt="16" >
-				<comment><![CDATA[Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)]]></comment>
+			<column name="mailing_postal_cd" type="varchar" length="10" jt="12" >
+				<comment><![CDATA[Postal code component of the business mailing address]]></comment>
+			</column>
+			<column name="business_owner_nm" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[Full name of the registered business owner]]></comment>
+			</column>
+			<column name="business_owner_phone_no" type="varchar" length="30" jt="12" >
+				<comment><![CDATA[Phone number of the business owner]]></comment>
+			</column>
+			<column name="business_owner_email_address_dsc" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[Email address of the business owner]]></comment>
+			</column>
+			<column name="business_operator_nm" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[Full name of the business operator or property manager]]></comment>
+			</column>
+			<column name="business_operator_phone_no" type="varchar" length="30" jt="12" >
+				<comment><![CDATA[Phone number of the business operator]]></comment>
+			</column>
+			<column name="business_operator_email_address_dsc" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[Email address of the business operator]]></comment>
+			</column>
+			<column name="infraction_txt" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[Description of an infraction]]></comment>
+			</column>
+			<column name="infraction_dt" type="date" jt="91" >
+				<comment><![CDATA[The date on which the described infraction occurred]]></comment>
+			</column>
+			<column name="property_zone_txt" type="varchar" length="100" jt="12" >
+				<comment><![CDATA[Description or name of the property zoning]]></comment>
 			</column>
 			<column name="available_bedrooms_qty" type="smallint" jt="5" >
 				<comment><![CDATA[The number of bedrooms in the dwelling unit that are available for short term rental]]></comment>
 			</column>
-			<column name="nights_booked_qty" type="smallint" jt="5" >
-				<comment><![CDATA[The number of nights that short term rental accommodation services were provided during the reporting period]]></comment>
+			<column name="max_guests_allowed_qty" prior="separate_reservations_qty" type="smallint" jt="5" >
+				<comment><![CDATA[The number of guests that can be accommodated]]></comment>
 			</column>
-			<column name="separate_reservations_qty" type="smallint" jt="5" >
-				<comment><![CDATA[The number of separate reservations that were taken during the reporting period]]></comment>
+			<column name="is_principal_residence" prior="is_changed_address" type="boolean" jt="16" >
+				<comment><![CDATA[Indicates whether the short term rental property is a principal residence]]></comment>
+			</column>
+			<column name="is_owner_living_onsite" prior="is_lg_transferred" type="boolean" jt="16" >
+				<comment><![CDATA[Indicates whether the owner lives on the property]]></comment>
+			</column>
+			<column name="is_owner_property_tenant" prior="is_entire_unit" type="boolean" jt="16" >
+				<comment><![CDATA[Indicates whether the business owner rents the property]]></comment>
+			</column>
+			<column name="property_folio_no" type="varchar" length="30" jt="12" >
+				<comment><![CDATA[The number used to identify the property]]></comment>
+			</column>
+			<column name="property_parcel_identifier_no" prior="pr" type="varchar" length="30" jt="12" >
+				<comment><![CDATA[The PID number assigned by the Land Title and Survey Authority that identifies the piece of land]]></comment>
+			</column>
+			<column name="property_legal_description_txt" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[The physical description of the property as it is registered with the Land Title and Survey Authority]]></comment>
 			</column>
 			<column name="licence_status_type" prior="listing_status_type" type="varchar" length="25" jt="12" mandatory="y" >
 				<comment><![CDATA[Foreign key]]></comment>
@@ -81,16 +117,18 @@
 			<index name="dss_business_licence_pk" unique="PRIMARY_KEY" >
 				<column name="business_licence_id" />
 			</index>
-			<index name="dss_rental_listing_i1_0" unique="NORMAL" >
-				<column name="providing_organization_id" />
-				<column name="platform_listing_no" />
-			</index>
-			<index name="dss_rental_listing_i4_0" unique="NORMAL" >
+			<index name="dss_business_licence_i2" unique="NORMAL" >
 				<column name="affected_by_physical_address_id" />
 			</index>
-			<index name="dss_rental_listing_i5_0" unique="NORMAL" >
-				<column name="licence_status_type" />
+			<index name="dss_business_licence_uk" unique="UNIQUE_KEY" >
 				<column name="providing_organization_id" />
+				<column name="business_licence_no" />
+			</index>
+			<index name="dss_business_licence_i1" unique="NORMAL" >
+				<column name="licence_status_type" />
+			</index>
+			<index name="dss_business_licence_i3" unique="NORMAL" >
+				<column name="physical_rental_address_txt" />
 			</index>
 			<fk name="dss_business_licence_fk_provided_by" to_schema="dss" to_table="dss_organization" >
 				<fk_column name="providing_organization_id" pk="organization_id" />
@@ -474,7 +512,13 @@
 				<comment><![CDATA[URL for the short-term rental platform listing]]></comment>
 			</column>
 			<column name="business_licence_no" prior="is_current" type="varchar" length="320" jt="12" >
-				<comment><![CDATA[The local government issued licence number that applies to the rental offering]]></comment>
+				<comment><![CDATA[The business licence number that is published for the rental offering]]></comment>
+			</column>
+			<column name="effective_business_licence_no" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[The local government issued licence number that should be used for compariing the rental offering with others]]></comment>
+			</column>
+			<column name="effective_host_nm" type="varchar" length="320" jt="12" >
+				<comment><![CDATA[The full name of the rental offering host that should be used for comparison with others]]></comment>
 			</column>
 			<column name="bc_registry_no" type="varchar" length="50" jt="12" >
 				<comment><![CDATA[The Short Term Registry issued permit number]]></comment>
@@ -500,6 +544,9 @@
 			<column name="is_lg_transferred" type="boolean" jt="16" >
 				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has been transferred to a different Local Goverment Organization as a result of address changes]]></comment>
 			</column>
+			<column name="is_changed_business_licence" type="boolean" jt="16" >
+				<comment><![CDATA[Indicates whether a CURRENT RENTAL LISTING has been subjected to business licence linking changes by a user]]></comment>
+			</column>
 			<column name="is_entire_unit" type="boolean" jt="16" >
 				<comment><![CDATA[Indicates whether the entire dwelling unit is offered for rental (as opposed to a single bedroom)]]></comment>
 			</column>
@@ -522,6 +569,9 @@
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
 			<column name="locating_physical_address_id" type="bigint" jt="-5" >
+				<comment><![CDATA[Foreign key]]></comment>
+			</column>
+			<column name="governing_business_licence_id" type="bigint" jt="-5" >
 				<comment><![CDATA[Foreign key]]></comment>
 			</column>
 			<column name="listing_status_type" type="varchar" length="2" jt="12" >
@@ -553,6 +603,18 @@
 				<column name="listing_status_type" />
 				<column name="offering_organization_id" />
 			</index>
+			<index name="dss_rental_listing_i6" unique="NORMAL" >
+				<column name="governing_business_licence_id" />
+			</index>
+			<index name="dss_rental_listing_i7" unique="NORMAL" >
+				<column name="business_licence_no" />
+			</index>
+			<index name="dss_rental_listing_i8" unique="NORMAL" >
+				<column name="effective_business_licence_no" />
+			</index>
+			<index name="dss_rental_listing_i9" unique="NORMAL" >
+				<column name="effective_host_nm" />
+			</index>
 			<fk name="dss_rental_listing_fk_offered_by" to_schema="dss" to_table="dss_organization" >
 				<fk_column name="offering_organization_id" pk="organization_id" />
 			</fk>
@@ -567,6 +629,9 @@
 			</fk>
 			<fk name="dss_rental_listing_fk_classified_as" to_schema="dss" to_table="dss_listing_status_type" >
 				<fk_column name="listing_status_type" pk="listing_status_type" />
+			</fk>
+			<fk name="dss_rental_listing_fk_governed_by" to_schema="dss" to_table="dss_business_licence" >
+				<fk_column name="governing_business_licence_id" pk="business_licence_id" />
 			</fk>
 		</table>
 		<table name="dss_rental_listing_contact" prior="dss_organization_contact_person_0" >
@@ -585,7 +650,7 @@
 				<comment><![CDATA[The platform identifier for the supplier host]]></comment>
 			</column>
 			<column name="full_nm" prior="given_nm" type="varchar" length="320" jt="12" >
-				<comment><![CDATA[The full name of the contact person as inluded in the listing]]></comment>
+				<comment><![CDATA[The full name of the contact person as included in the listing]]></comment>
 			</column>
 			<column name="phone_no" type="varchar" length="30" jt="12" >
 				<comment><![CDATA[Phone number given for the contact]]></comment>
@@ -1014,6 +1079,7 @@
 		</view>
 		<view name="dss_rental_upload_history_view" >
 			<view_script><![CDATA[CREATE OR REPLACE VIEW ${view} AS SELECT dud.upload_delivery_id,
+    dud.upload_delivery_type,
     dud.report_period_ym,
     dud.providing_organization_id,
     do2.organization_nm,
@@ -1033,10 +1099,11 @@
         END) AS errors,
     sum(
         CASE
-            WHEN ((dul.is_validation_failure = false) AND (dul.is_system_failure = false)) THEN 1
+            WHEN ((dul.is_processed = true) AND (dul.is_validation_failure = false) AND (dul.is_system_failure = false)) THEN 1
             ELSE 0
         END) AS success,
         CASE
+            WHEN ((dud.upload_delivery_type)::text = 'Takedown Data'::text) THEN 'Processed'::text
             WHEN (count(*) = sum(
             CASE
                 WHEN (dul.is_processed = true) THEN 1
@@ -1048,7 +1115,7 @@
      JOIN dss.dss_upload_line dul ON ((dul.including_upload_delivery_id = dud.upload_delivery_id)))
      JOIN dss.dss_user_identity dui ON ((dud.upd_user_guid = dui.user_guid)))
      JOIN dss.dss_organization do2 ON ((dud.providing_organization_id = do2.organization_id)))
-  GROUP BY dud.upload_delivery_id, dud.report_period_ym, dud.providing_organization_id, do2.organization_nm, dud.upd_dtm, dui.given_nm, dui.family_nm]]></view_script>
+  GROUP BY dud.upload_delivery_id, dud.upload_delivery_type, dud.report_period_ym, dud.providing_organization_id, do2.organization_nm, dud.upd_dtm, dui.given_nm, dui.family_nm]]></view_script>
 			<column name="upload_delivery_id" type="bigint" />
 			<column name="report_period_ym" type="date" />
 			<column name="providing_organization_id" type="bigint" />
@@ -1061,6 +1128,7 @@
 			<column name="errors" type="bigint" />
 			<column name="success" type="bigint" />
 			<column name="status" type="text" />
+			<column name="upload_delivery_type" type="varchar" />
 		</view>
 		<view name="dss_user_identity_view" >
 			<view_script><![CDATA[CREATE OR REPLACE VIEW ${view} AS SELECT u.user_identity_id,
@@ -1098,6 +1166,9 @@
 			<column name="organization_nm" type="varchar" />
 			<column name="upd_dtm" type="timestamptz" />
 		</view>
+		<trigger name="dss_business_licence_br_iu_tr" table="dss_business_licence" id="Trigger-20dd" isSystem="false" >
+			<string><![CDATA[CREATE TRIGGER dss_business_licence_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_business_licence FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
+		</trigger>
 		<trigger name="dss_email_message_br_iu_tr" table="dss_email_message" id="Trigger-15f3" isSystem="false" >
 			<string><![CDATA[CREATE TRIGGER dss_email_message_br_iu_tr BEFORE INSERT OR UPDATE ON dss.dss_email_message FOR EACH ROW EXECUTE FUNCTION dss.dss_update_audit_columns()]]></string>
 		</trigger>
@@ -1160,28 +1231,28 @@ END;$function$
 	</schema>
 	<layout name="Physical Data Diagram (Sprint 12)" id="Layout-662" show_column_type="y" show_relation="name" >
 		<comment><![CDATA[Physical Database Design (Sprint 12)]]></comment>
-		<entity schema="dss" name="dss_access_request_status" color="C0C139" x="832" y="560" />
-		<entity schema="dss" name="dss_business_licence" color="57C139" x="48" y="1152" />
-		<entity schema="dss" name="dss_business_licence_status_type" color="57C139" x="64" y="560" />
-		<entity schema="dss" name="dss_email_message" color="C0C139" x="1776" y="128" />
-		<entity schema="dss" name="dss_email_message_type" color="C0C139" x="800" y="208" />
-		<entity schema="dss" name="dss_listing_status_type" color="C0C139" x="80" y="1632" />
-		<entity schema="dss" name="dss_organization" color="C0C139" x="512" y="128" />
-		<entity schema="dss" name="dss_organization_contact_person" color="C0C139" x="1376" y="48" />
-		<entity schema="dss" name="dss_organization_type" color="C0C139" x="64" y="224" />
-		<entity schema="dss" name="dss_physical_address" color="C0C139" x="352" y="624" />
-		<entity schema="dss" name="dss_rental_listing" color="C18A39" x="544" y="1280" />
-		<entity schema="dss" name="dss_rental_listing_contact" color="C18A39" x="1088" y="1488" />
-		<entity schema="dss" name="dss_rental_listing_extract" color="C0C139" x="992" y="384" />
-		<entity schema="dss" name="dss_rental_listing_report" color="C0C139" x="688" y="880" />
-		<entity schema="dss" name="dss_upload_delivery" color="C0C139" x="736" y="656" />
-		<entity schema="dss" name="dss_upload_line" color="C0C139" x="1168" y="672" />
-		<entity schema="dss" name="dss_user_identity" color="C0C139" x="1264" y="352" />
-		<entity schema="dss" name="dss_user_privilege" color="C0C139" x="1552" y="816" />
-		<entity schema="dss" name="dss_user_role" color="C0C139" x="1568" y="672" />
-		<entity schema="dss" name="dss_user_role_assignment" color="C0C139" x="2064" y="608" />
-		<entity schema="dss" name="dss_user_role_privilege" color="C0C139" x="2048" y="768" />
-		<callout x="80" y="64" pointer="Round" >
+		<entity schema="dss" name="dss_access_request_status" color="C0C139" x="864" y="560" />
+		<entity schema="dss" name="dss_business_licence" color="57C139" x="48" y="1296" />
+		<entity schema="dss" name="dss_business_licence_status_type" color="57C139" x="48" y="960" />
+		<entity schema="dss" name="dss_email_message" color="C0C139" x="1808" y="128" />
+		<entity schema="dss" name="dss_email_message_type" color="C0C139" x="832" y="208" />
+		<entity schema="dss" name="dss_listing_status_type" color="C0C139" x="768" y="1072" />
+		<entity schema="dss" name="dss_organization" color="C0C139" x="544" y="128" />
+		<entity schema="dss" name="dss_organization_contact_person" color="C0C139" x="1408" y="48" />
+		<entity schema="dss" name="dss_organization_type" color="C0C139" x="96" y="160" />
+		<entity schema="dss" name="dss_physical_address" color="C0C139" x="384" y="624" />
+		<entity schema="dss" name="dss_rental_listing" color="C18A39" x="592" y="1392" />
+		<entity schema="dss" name="dss_rental_listing_contact" color="C18A39" x="1152" y="1456" />
+		<entity schema="dss" name="dss_rental_listing_extract" color="C0C139" x="1024" y="384" />
+		<entity schema="dss" name="dss_rental_listing_report" color="C0C139" x="720" y="880" />
+		<entity schema="dss" name="dss_upload_delivery" color="C0C139" x="768" y="656" />
+		<entity schema="dss" name="dss_upload_line" color="C0C139" x="1200" y="672" />
+		<entity schema="dss" name="dss_user_identity" color="C0C139" x="1296" y="352" />
+		<entity schema="dss" name="dss_user_privilege" color="C0C139" x="1584" y="816" />
+		<entity schema="dss" name="dss_user_role" color="C0C139" x="1600" y="672" />
+		<entity schema="dss" name="dss_user_role_assignment" color="C0C139" x="2096" y="608" />
+		<entity schema="dss" name="dss_user_role_privilege" color="C0C139" x="2080" y="768" />
+		<callout x="64" y="48" pointer="Round" >
 			<comment><![CDATA[Ministry of Housing
 Short Term Rental Data Sharing
 Physical Data Diagram (Sprint 12)

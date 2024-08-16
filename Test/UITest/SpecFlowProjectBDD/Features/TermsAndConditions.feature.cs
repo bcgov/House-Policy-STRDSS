@@ -121,60 +121,60 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("I should be prompted to accept the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 22
-testRunner.When("prompted to accept the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("prompted to accept the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 24
-testRunner.Then("I should be directed to a dedicated page on the HOUS website in a new tab display" +
+ testRunner.Then("I should be directed to a dedicated page on the HOUS website in a new tab display" +
                         "ing the complete and updated terms and conditions of system usage", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 28
-testRunner.When("I return to the system after reviewing the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I return to the system after reviewing the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 30
-testRunner.Then("there should be a clear option, such as a checkbox or button, allowing me to conf" +
+ testRunner.Then("there should be a clear option, such as a checkbox or button, allowing me to conf" +
                         "irm my acceptance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 34
-testRunner.When("accepting the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("accepting the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 36
-testRunner.Then("the system should record and display the date and time of my acceptance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the system should record and display the date and time of my acceptance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 40
-testRunner.When("I attempt to access system features", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I attempt to access system features", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 42
-testRunner.And("I haven\'t accepted the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I haven\'t accepted the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 44
-testRunner.Then("I should be restricted from performing certain actions until I complete the accep" +
+ testRunner.Then("I should be restricted from performing certain actions until I complete the accep" +
                         "tance process", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 48
-testRunner.When("presenting the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("presenting the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 50
-testRunner.Then("the language should be clear, concise, and accessible to ensure user understandin" +
+ testRunner.Then("the language should be clear, concise, and accessible to ensure user understandin" +
                         "g", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 54
-testRunner.When("I successfully accept the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I successfully accept the terms and conditions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 56
-testRunner.Then("I should receive a confirmation message indicating that my acceptance has been re" +
+ testRunner.Then("I should receive a confirmation message indicating that my acceptance has been re" +
                         "corded", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 58
-testRunner.And("I should be directed to the landing page for my role", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should be directed to the landing page for my role", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 62
-testRunner.Given("I am an IDIR authenticated user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I am an IDIR authenticated user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 64
-testRunner.Then("TOC flag will be set to true", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("TOC flag will be set to true", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 66
-testRunner.Then("I will not have to accept the TOC in order to access the system", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I will not have to accept the TOC in order to access the system", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

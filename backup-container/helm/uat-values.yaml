@@ -9,11 +9,12 @@ global:
 nameOverride: strdssuat-backup
 fullnameOverride: strdssuat-backup
 
+dbService: strdssuat
+
 backupConfig: |
   postgres=strdssuat:5432/strdssuat
 
   0 1 * * * default ./backup.sh -s
-  0 4 * * * default ./backup.sh -s -v all
 
 db:
   secretName: strdssuat
@@ -21,14 +22,9 @@ db:
 
 persistence:
   backup:
-    size: 700Mi
+    size: 1Gi
     mountPath: /backups/
     storageClassName: netapp-file-backup
-    storageAccessMode: ReadWriteOnce
-  verification:
-    size: 512Mi
-    mountPath: /var/lib/pgsql/data
-    storageClassName: netapp-block-standard
     storageAccessMode: ReadWriteOnce
 
 env:

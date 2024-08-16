@@ -39,7 +39,7 @@ namespace SpecFlowProjectBDD.Hooks
             _Container.RegisterInstanceAs<SeleniumDriver>(webDriver);
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 3)]
         public void DestroyDrivers()
         {
             var webDriver = _Container.Resolve<SeleniumDriver>();

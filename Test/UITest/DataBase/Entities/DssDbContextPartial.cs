@@ -15,9 +15,11 @@ namespace DataBase.Entities
         {
             _ConnectionString = ConnectionString;
         }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql(_ConnectionString);
+        {
+            optionsBuilder.UseNpgsql(_ConnectionString);
+            optionsBuilder.EnableSensitiveDataLogging();
+        }
 
     }
 }

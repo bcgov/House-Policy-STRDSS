@@ -88,4 +88,6 @@ public partial class DssRentalListingVw
     public string? LastActionNm { get; set; }
 
     public DateTime? LastActionDtm { get; set; }
+
+    public long? BusinessLicenceId { get; set; }
 }

@@ -956,6 +956,7 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.BcRegistryNo)
                 .HasMaxLength(50)
                 .HasColumnName("bc_registry_no");
+            entity.Property(e => e.BusinessLicenceId).HasColumnName("business_licence_id");
             entity.Property(e => e.BusinessLicenceNo)
                 .HasMaxLength(320)
                 .HasColumnName("business_licence_no");

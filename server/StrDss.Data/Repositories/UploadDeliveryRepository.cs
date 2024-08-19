@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
-using StrDss.Model.RentalReportDtos;
 using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
@@ -23,7 +22,7 @@ namespace StrDss.Data.Repositories
         Task<UploadLineError> GetUploadLineWithError(long lineId);
         Task<bool> UploadHasErrors(long uploadId);
         Task<int> GetTotalNumberOfUploadLines(long uploadId);
-        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string? reportType = null);
         Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
     }
 
@@ -138,19 +137,24 @@ namespace StrDss.Data.Repositories
             return await _dbContext.DssUploadLines.Where(x => x.IncludingUploadDeliveryId == uploadId).CountAsync();
         }
 
-        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string? reportType = null)
         {
             var query = _dbContext.DssRentalUploadHistoryViews.AsNoTracking();
 
-            if (_currentUser.OrganizationType == OrganizationTypes.Platform)
+            if (_currentUser.OrganizationType != OrganizationTypes.BCGov)
                 query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
 
-            if (platformId != null)
+            if (orgId != null)
             {
-                query = query.Where(x => x.ProvidingOrganizationId == platformId);
+                query = query.Where(x => x.ProvidingOrganizationId == orgId);
             }
 
-            var history = await Page<DssRentalUploadHistoryView, RentalUploadHistoryViewDto>(query, pageSize, pageNumber, orderBy, direction);
+            if (reportType != null)
+            {
+                query = query.Where(x => x.UploadDeliveryType == reportType);
+            }
+
+            var history = await Page<DssRentalUploadHistoryView, UploadHistoryViewDto>(query, pageSize, pageNumber, orderBy, direction);
 
             return history;
         }

@@ -29,7 +29,7 @@ public partial class DssRentalListingContact
     public string? SupplierHostNo { get; set; }
 
     /// <summary>
-    /// The full name of the contact person as inluded in the listing
+    /// The full name of the contact person as included in the listing
     /// </summary>
     public string? FullNm { get; set; }
 

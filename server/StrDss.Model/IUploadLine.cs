@@ -12,5 +12,7 @@ namespace StrDss.Model
         public string OrgCd { get; set; } = "";
         [Name("listing_id")]
         public string ListingId { get; set; } = "";
+        [Name("bus_lic_no")]
+        public string BusinessLicenceNo { get; set; } = "";
     }
 }

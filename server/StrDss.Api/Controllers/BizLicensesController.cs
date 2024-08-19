@@ -63,5 +63,14 @@ namespace StrDss.Api.Controllers
 
             return Ok();
         }
+
+        [ApiAuthorize(Permissions.UploadHistoryRead)]
+        [HttpGet("uploadhistory")]
+        public async Task<ActionResult> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
+        {
+            var history = await _uploadService.GetUploadHistory(orgId, pageSize, pageNumber, orderBy, direction, UploadDeliveryTypes.LicenseData);
+
+            return Ok(history);
+        }
     }
 }

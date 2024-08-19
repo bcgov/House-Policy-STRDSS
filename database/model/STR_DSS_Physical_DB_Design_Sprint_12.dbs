@@ -1248,10 +1248,10 @@ END;$function$
 		<entity schema="dss" name="dss_upload_delivery" color="C0C139" x="768" y="656" />
 		<entity schema="dss" name="dss_upload_line" color="C0C139" x="1200" y="672" />
 		<entity schema="dss" name="dss_user_identity" color="C0C139" x="1296" y="352" />
-		<entity schema="dss" name="dss_user_privilege" color="C0C139" x="1584" y="816" />
-		<entity schema="dss" name="dss_user_role" color="C0C139" x="1600" y="672" />
-		<entity schema="dss" name="dss_user_role_assignment" color="C0C139" x="2096" y="608" />
-		<entity schema="dss" name="dss_user_role_privilege" color="C0C139" x="2080" y="768" />
+		<entity schema="dss" name="dss_user_privilege" color="C0C139" x="2048" y="608" />
+		<entity schema="dss" name="dss_user_role" color="C0C139" x="1616" y="832" />
+		<entity schema="dss" name="dss_user_role_assignment" color="C0C139" x="1488" y="1200" />
+		<entity schema="dss" name="dss_user_role_privilege" color="C0C139" x="2064" y="928" />
 		<callout x="64" y="48" pointer="Round" >
 			<comment><![CDATA[Ministry of Housing
 Short Term Rental Data Sharing

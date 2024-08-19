@@ -218,6 +218,8 @@ namespace StrDss.Data.Repositories
 
             listing.AddressChangeHistory = await GetAddressChangeHistoryAsync(rentalListingId);
 
+            listing.BizLicenseDto = _mapper.Map<BizLicenseDto>(await _dbContext.DssBusinessLicences.AsNoTracking().FirstOrDefaultAsync(x => x.BusinessLicenceId == listing.BusinessLicenceId));
+
             return listing;
         }
 

@@ -72,7 +72,7 @@ namespace StrDss.Api.Controllers
         [HttpGet("rentallistinghistory")]
         public async Task<ActionResult> GetRentalListingHistory(long? platformId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
-            var history = await _uploadService.GetRentalListingUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
+            var history = await _uploadService.GetUploadHistory(platformId, pageSize, pageNumber, orderBy, direction);
 
             return Ok(history);
         }

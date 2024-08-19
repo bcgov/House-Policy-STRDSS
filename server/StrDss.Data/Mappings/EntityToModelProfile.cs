@@ -29,10 +29,10 @@ namespace StrDss.Data.Mappings
             CreateMap<DssUserPrivilege, PermissionDto>();
             CreateMap<DssUserIdentityView, UserListtDto>();
 
-            CreateMap<DssRentalUploadHistoryView, RentalUploadHistoryViewDto>()
-                .ForMember(o => o.ReportPeriodYM, opt => opt.MapFrom(i => ((DateOnly)i.ReportPeriodYm!).ToString("yyyy-MM")))
-                .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime((DateTime)i.UpdDtm!)))
-                ;
+            CreateMap<DssRentalUploadHistoryView, UploadHistoryViewDto>()
+                .ForMember(o => o.ReportPeriodYM, opt => opt.MapFrom(i => i.ReportPeriodYm.HasValue ? ((DateOnly)i.ReportPeriodYm.Value).ToString("yyyy-MM") : null))
+                .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime((DateTime)i.UpdDtm!)));
+
 
             CreateMap<DssRentalListingVw, RentalListingViewDto>();
             CreateMap<DssRentalListingContact, RentalListingContactDto>();

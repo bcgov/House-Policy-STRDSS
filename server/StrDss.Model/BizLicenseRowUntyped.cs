@@ -5,89 +5,91 @@ namespace StrDss.Model
     public class BizLicenseRowUntyped
     {
         [Name("org_cd")]
-        public string LocalGovernmentCode { get; set; }
+        public string OrgCd { get; set; }
 
         [Name("bus_lic_no")]
-        public string LicenceNumber { get; set; }
+        public string BusinessLicenceNo { get; set; }
 
         [Name("bus_lic_exp_dt")]
-        public string LicenceExpiryDate { get; set; }
+        public string ExpiryDt { get; set; } 
 
         [Name("rental_address")]
-        public string STRAddress { get; set; }
+        public string PhysicalRentalAddressTxt { get; set; }
 
         [Name("bus_lic_status")]
-        public string LicenceStatus { get; set; }
+        public string LicenceStatusType { get; set; }
 
         [Name("bus_lic_type")]
-        public string LicenceType { get; set; }
+        public string LicenceTypeTxt { get; set; }
 
         [Name("restriction_txt")]
-        public string RestrictionNote { get; set; }
+        public string RestrictionTxt { get; set; }
 
         [Name("business_nm")]
-        public string BusinessName { get; set; }
+        public string BusinessNm { get; set; }
 
         [Name("mail_street_addr_txt")]
-        public string MailingAddress { get; set; }
+        public string MailingStreetAddressTxt { get; set; }
+
         [Name("mail_city_nm")]
-        public string MailingCity { get; set; }
+        public string MailingCityNm { get; set; }
 
         [Name("mail_province_cd")]
-        public string MailingProvince { get; set; }
+        public string MailingProvinceCd { get; set; }
 
         [Name("postal_cd")]
-        public string MailingPostalCode { get; set; }
+        public string MailingPostalCd { get; set; }
 
         [Name("owner_nm")]
-        public string OwnerName { get; set; }
+        public string BusinessOwnerNm { get; set; }
 
         [Name("owner_phone")]
-        public string OwnerPhone { get; set; }
+        public string BusinessOwnerPhoneNo { get; set; }
 
         [Name("owner_email")]
-        public string OwnerEmail { get; set; }
+        public string BusinessOwnerEmailAddressDsc { get; set; }
 
         [Name("operator_nm")]
-        public string OperatorName { get; set; }
+        public string BusinessOperatorNm { get; set; }
 
         [Name("operator_phone")]
-        public string OperatorPhone { get; set; }
+        public string BusinessOperatorPhoneNo { get; set; }
 
         [Name("operator_email")]
-        public string OperatorEmail { get; set; }
+        public string BusinessOperatorEmailAddressDsc { get; set; }
 
         [Name("infraction_txt")]
-        public string Infraction { get; set; }
+        public string InfractionTxt { get; set; }
 
         [Name("infraction_dt")]
-        public string InfractionDate { get; set; }
+        public string InfractionDt { get; set; }
 
         [Name("property_zone_txt")]
-        public string PropertyZoning { get; set; }
+        public string PropertyZoneTxt { get; set; }
 
         [Name("bedrooms_qty")]
-        public string BedroomsAvailable { get; set; }
+        public string AvailableBedroomsQty { get; set; }
 
         [Name("max_guests_qty")]
-        public string GuestsAllowed { get; set; }
+        public string MaxGuestsAllowedQty { get; set; }
 
         [Name("is_principal_res_yn")]
         public string IsPrincipalResidence { get; set; }
 
         [Name("is_owner_onsite_yn")]
-        public string IsOwnerOnsite { get; set; }
+        public string IsOwnerLivingOnsite { get; set; }
 
         [Name("is_owner_tenant_yn")]
-        public string IsOwnerTenant { get; set; }
+        public string IsOwnerPropertyTenant { get; set; }
 
         [Name("folio_no")]
-        public string FolioNumber { get; set; }
+        public string PropertyFolioNo { get; set; }
 
         [Name("pid_no")]
-        public string ParcelIdentifier { get; set; }
+        public string PropertyParcelIdentifierNo { get; set; }
 
         [Name("legal_desc_txt")]
-        public string LegalDescription { get; set; }
+        public string PropertyLegalDescriptionTxt { get; set; }
     }
 }
+

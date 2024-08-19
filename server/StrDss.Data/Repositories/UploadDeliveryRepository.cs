@@ -11,7 +11,7 @@ namespace StrDss.Data.Repositories
 {
     public interface IUploadDeliveryRepository
     {
-        Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly periodYm, long orgId, string hashValue);
+        Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly? periodYm, long orgId, string hashValue);
         Task AddUploadDeliveryAsync(DssUploadDelivery upload);
         Task<DssUploadDelivery?> GetUploadToProcessAsync(string reportType);
         Task<DssUploadDelivery[]> GetUploadsToProcessAsync(string reportType);
@@ -39,7 +39,7 @@ namespace StrDss.Data.Repositories
             await _dbSet.AddAsync(upload);
         }
 
-        public async Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly periodYm, long orgId, string hashValue)
+        public async Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly? periodYm, long orgId, string hashValue)
         {
             return await _dbSet.AsNoTracking()
                 .AnyAsync(x => x.ReportPeriodYm == periodYm && x.ProvidingOrganizationId == orgId && x.SourceHashDsc == hashValue);

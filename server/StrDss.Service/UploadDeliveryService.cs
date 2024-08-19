@@ -38,6 +38,12 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> UploadPlatformData(string reportType, string reportPeriod, long orgId, Stream stream)
         {
+            if (_currentUser.OrganizationType != OrganizationTypes.BCGov && _currentUser.OrganizationId != orgId)
+            {
+                var authError = new Dictionary<string, List<string>>();
+                authError.AddItem("OrganizationId", $"The user is not authorized to upload the file. The user's organization ({_currentUser.OrganizationId}) is not {orgId}.");
+            }
+
             byte[] sourceBin;
             using (var memoryStream = new MemoryStream())
             {
@@ -58,10 +64,13 @@ namespace StrDss.Service
 
             if (errors.Count > 0) return errors;
 
+            DateOnly? reportPeriodYm = 
+                mandatoryFields.Contains("rpt_period") ? new DateOnly(Convert.ToInt32(reportPeriod.Substring(0, 4)), Convert.ToInt32(reportPeriod.Substring(5, 2)), 1) : null;
+
             var entity = new DssUploadDelivery
             {
                 UploadDeliveryType = reportType,
-                ReportPeriodYm = new DateOnly(Convert.ToInt32(reportPeriod.Substring(0, 4)), Convert.ToInt32(reportPeriod.Substring(5, 2)), 1),
+                ReportPeriodYm = reportPeriodYm,
                 SourceHashDsc = hashValue,
                 SourceBin = sourceBin,
                 ProvidingOrganizationId = orgId,
@@ -91,28 +100,38 @@ namespace StrDss.Service
             {
                 return new string[] { "rpt_period", "rpt_type", "org_cd", "listing_id" };
             }
+            else if (reportType == UploadDeliveryTypes.LicenseData)
+            {
+                return new string[] { "org_cd", "bus_lic_no", "bus_lic_exp_dt", "rental_address" };
+            }
             else
             {
                 return Array.Empty<string>();
             }
         }
 
-        public async Task<(Dictionary<string, List<string>>, string header)> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines)
+        public async Task<(Dictionary<string, List<string>>, string header)> ValidateAndParseUploadAsync(string reportPeriod, long orgId, 
+            string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines)
         {
             var errors = new Dictionary<string, List<string>>();
+            DateOnly? firstDayOfReportMonth = null;
 
-            var regex = RegexDefs.GetRegexInfo(RegexDefs.YearMonth);
-            if (!Regex.IsMatch(reportPeriod, regex.Regex))
+            if (mandatoryFields.Contains("rpt_period"))
             {
-                errors.AddItem("ReportPeriod", regex.ErrorMessage);
-                return (errors, "");
-            }
+                var regex = RegexDefs.GetRegexInfo(RegexDefs.YearMonth);
+                if (!Regex.IsMatch(reportPeriod, regex.Regex))
+                {
+                    errors.AddItem("ReportPeriod", regex.ErrorMessage);
+                    return (errors, "");
+                }
 
-            var firstDayOfReportMonth = new DateOnly(Convert.ToInt32(reportPeriod.Substring(0, 4)), Convert.ToInt32(reportPeriod.Substring(5, 2)), 1);
-            var firstDayOfCurrentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
-            if (firstDayOfReportMonth >= firstDayOfCurrentMonth)
-            {
-                errors.AddItem("ReportPeriod", "Report period cannot be current or future month.");
+                firstDayOfReportMonth = new DateOnly(Convert.ToInt32(reportPeriod.Substring(0, 4)), Convert.ToInt32(reportPeriod.Substring(5, 2)), 1);
+                var firstDayOfCurrentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+                if (firstDayOfReportMonth >= firstDayOfCurrentMonth)
+                {
+                    errors.AddItem("ReportPeriod", "Report period cannot be current or future month.");
+                    return (errors, "");
+                }
             }
 
             var isDuplicate = await _uploadRepo.IsDuplicateRentalReportUploadAsnyc(firstDayOfReportMonth, orgId, hashValue);
@@ -122,14 +141,26 @@ namespace StrDss.Service
                 return (errors, "");
             }
 
-            var platform = await _orgRepo.GetOrganizationByIdAsync(orgId);
-            if (platform == null)
+            var org = await _orgRepo.GetOrganizationByIdAsync(orgId);
+            if (org == null)
             {
                 errors.AddItem("OrganizationId", $"Organization ID [{orgId}] doesn't exist.");
+                return (errors, "");
             }
-            else if (platform.OrganizationType != OrganizationTypes.Platform)
+
+            if (reportType == UploadDeliveryTypes.LicenseData)
             {
-                errors.AddItem("OrganizationId", $"Organization type of the organization [{orgId}] is not {OrganizationTypes.Platform}.");
+                if (org.OrganizationType != OrganizationTypes.LG)
+                {
+                    errors.AddItem("OrganizationId", $"Organization type of the organization [{orgId}] is not {OrganizationTypes.LG}.");
+                }
+            }
+            else
+            {
+                if (org.OrganizationType != OrganizationTypes.Platform)
+                {
+                    errors.AddItem("OrganizationId", $"Organization type of the organization [{orgId}] is not {OrganizationTypes.Platform}.");
+                }
             }
 
             if (errors.Count > 0)
@@ -169,8 +200,13 @@ namespace StrDss.Service
             var orgCdMissing = 0;
             var invalidOrgCds = new List<string>();
             var listingIdMissing = 0;
+            var bizLicenseMissing = 0;
+
             var listingIds = new List<string>();
-            var duplicateListingIds = new List<string>();
+            var duplicateListingIds = new List<string>();            
+
+            var bizLicenses = new List<string>();
+            var duplicateBizLicenses = new List<string>();
 
             var orgCds = new List<string>();
 
@@ -182,10 +218,17 @@ namespace StrDss.Service
                 {
                     row = csv.GetRecord<UploadLine>();
 
-                    if (row.RptPeriod != reportPeriod) reportPeriodMismatch++;
-                    if (row.RptPeriod.IsEmpty()) reportPeriodMissing++;
+                    if (mandatoryFields.Contains("rpt_period"))
+                    {
+                        if (row.RptPeriod != reportPeriod) reportPeriodMismatch++;
+                        if (row.RptPeriod.IsEmpty()) reportPeriodMissing++;
+                    }
+
                     if (row.OrgCd.IsEmpty()) orgCdMissing++;
-                    if (row.ListingId.IsEmpty()) listingIdMissing++;
+
+                    if (mandatoryFields.Contains("listing_id") && row.ListingId.IsEmpty()) listingIdMissing++;
+
+                    if (mandatoryFields.Contains("bus_lic_no") && row.BusinessLicenceNo.IsEmpty()) bizLicenseMissing++;
 
                     if (mandatoryFields.Contains("rpt_type") && row.RptType != reportType)
                     {
@@ -193,23 +236,49 @@ namespace StrDss.Service
                     }
 
                     if (row.OrgCd.IsNotEmpty() && !orgCds.Contains(row.OrgCd.ToUpper())) orgCds.Add(row.OrgCd.ToUpper());
-                    if (!listingIds.Contains($"{row.OrgCd}-{row.ListingId.ToLower()}"))
+
+                    if (mandatoryFields.Contains("listing_id"))
                     {
-                        listingIds.Add($"{row.OrgCd}-{row.ListingId.ToLower()}");
-                        uploadLines.Add(new DssUploadLine
+                        if (!listingIds.Contains($"{row.OrgCd}-{row.ListingId.ToUpper()}"))
                         {
-                            IsValidationFailure = false,
-                            IsSystemFailure = false,
-                            IsProcessed = false,
-                            SourceOrganizationCd = row.OrgCd,
-                            SourceRecordNo = row.ListingId,
-                            SourceLineTxt = csv.Parser.RawRecord
-                        });
+                            listingIds.Add($"{row.OrgCd}-{row.ListingId.ToUpper()}");
+                            uploadLines.Add(new DssUploadLine
+                            {
+                                IsValidationFailure = false,
+                                IsSystemFailure = false,
+                                IsProcessed = false,
+                                SourceOrganizationCd = row.OrgCd,
+                                SourceRecordNo = row.ListingId,
+                                SourceLineTxt = csv.Parser.RawRecord
+                            });
+                        }
+                        else
+                        {
+                            duplicateListingIds.Add($"{row.OrgCd}-{row.ListingId.ToUpper()}");
+                        }
                     }
-                    else
+
+                    if (mandatoryFields.Contains("bus_lic_no"))
                     {
-                        duplicateListingIds.Add($"{row.OrgCd}-{row.ListingId.ToLower()}");
+                        if (!bizLicenses.Contains($"{row.OrgCd}-{row.BusinessLicenceNo.ToUpper()}"))
+                        {
+                            bizLicenses.Add($"{row.OrgCd}-{row.BusinessLicenceNo.ToUpper()}");
+                            uploadLines.Add(new DssUploadLine
+                            {
+                                IsValidationFailure = false,
+                                IsSystemFailure = false,
+                                IsProcessed = false,
+                                SourceOrganizationCd = row.OrgCd,
+                                SourceRecordNo = row.BusinessLicenceNo,
+                                SourceLineTxt = csv.Parser.RawRecord
+                            });
+                        }
+                        else
+                        {
+                            duplicateBizLicenses.Add($"{row.OrgCd}-{row.BusinessLicenceNo.ToUpper()}");
+                        }
                     }
+
                 }
                 catch (TypeConverterException ex)
                 {
@@ -239,11 +308,11 @@ namespace StrDss.Service
 
             var validOrgCds = await _orgRepo.GetManagingOrgCdsAsync(orgId);
 
-            foreach (var org in orgCds)
+            foreach (var orgCd in orgCds)
             {
-                if (!validOrgCds.Contains(org))
+                if (!validOrgCds.Contains(orgCd))
                 {
-                    invalidOrgCds.Add(org);
+                    invalidOrgCds.Add(orgCd);
                 }
             }
 
@@ -280,6 +349,16 @@ namespace StrDss.Service
             if (duplicateListingIds.Count > 0)
             {
                 errors.AddItem("listing_id", $"Duplicate listing ID(s) found: {string.Join(", ", duplicateListingIds.ToArray())}. Each listing ID must be unique within an organization code.");
+            }
+
+            if (bizLicenseMissing > 0)
+            {
+                errors.AddItem("bus_lic_no", $"Business Licence No missing in {bizLicenseMissing} record(s). Please provide a Business Licence No.");
+            }
+
+            if (duplicateBizLicenses.Count > 0)
+            {
+                errors.AddItem("bus_lic_no", $"Duplicate Business Licence No(s) found: {string.Join(", ", duplicateBizLicenses.ToArray())}. Each Business Licence No must be unique within an organization code.");
             }
 
             return (errors, header);

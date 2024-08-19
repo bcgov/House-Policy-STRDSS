@@ -11,6 +11,7 @@
     {
         public const string RentalListingRowUntyped = "RentalListingRowUntyped";
         public const string Role = "Role";
+        public const string BizLicenseRowUntyped = "BizLicenseRowUntyped";
 
     }
     public static class Fields
@@ -82,6 +83,40 @@
         public const string SupplierHost5Address = "SupplierHost5Address";
         public const string SupplierHost5Id = "SupplierHost5Id";
     }
+
+    public static class BizLicenseRowFields
+    {
+        public const string OrgCd = "OrgCd";
+        public const string BusinessLicenceNo = "BusinessLicenceNo";
+        public const string ExpiryDt = "ExpiryDt";
+        public const string PhysicalRentalAddressTxt = "PhysicalRentalAddressTxt";
+        public const string LicenceStatusType = "LicenceStatusType";
+        public const string LicenceTypeTxt = "LicenceTypeTxt";
+        public const string RestrictionTxt = "RestrictionTxt";
+        public const string BusinessNm = "BusinessNm";
+        public const string MailingStreetAddressTxt = "MailingStreetAddressTxt";
+        public const string MailingCityNm = "MailingCityNm";
+        public const string MailingProvinceCd = "MailingProvinceCd";
+        public const string MailingPostalCd = "MailingPostalCd";
+        public const string BusinessOwnerNm = "BusinessOwnerNm";
+        public const string BusinessOwnerPhoneNo = "BusinessOwnerPhoneNo";
+        public const string BusinessOwnerEmailAddressDsc = "BusinessOwnerEmailAddressDsc";
+        public const string BusinessOperatorNm = "BusinessOperatorNm";
+        public const string BusinessOperatorPhoneNo = "BusinessOperatorPhoneNo";
+        public const string BusinessOperatorEmailAddressDsc = "BusinessOperatorEmailAddressDsc";
+        public const string InfractionTxt = "InfractionTxt";
+        public const string InfractionDt = "InfractionDt";
+        public const string PropertyZoneTxt = "PropertyZoneTxt";
+        public const string AvailableBedroomsQty = "AvailableBedroomsQty";
+        public const string MaxGuestsAllowedQty = "MaxGuestsAllowedQty";
+        public const string IsPrincipalResidence = "IsPrincipalResidence";
+        public const string IsOwnerLivingOnsite = "IsOwnerLivingOnsite";
+        public const string IsOwnerPropertyTenant = "IsOwnerPropertyTenant";
+        public const string PropertyFolioNo = "PropertyFolioNo";
+        public const string PropertyParcelIdentifierNo = "PropertyParcelIdentifierNo";
+        public const string PropertyLegalDescriptionTxt = "PropertyLegalDescriptionTxt";
+    }
+
 
     public static class RentalListingExport
     {
@@ -316,6 +351,7 @@
     {
         public const string ListingData = "Listing Data";
         public const string TakedownData = "Takedown Data";
+        public const string LicenseData = "License Data";
     }
 
     public static class ListingExportFileNames

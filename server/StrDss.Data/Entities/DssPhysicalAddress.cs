@@ -136,6 +136,8 @@ public partial class DssPhysicalAddress
 
     public virtual DssOrganization? ContainingOrganization { get; set; }
 
+    public virtual ICollection<DssBusinessLicence> DssBusinessLicences { get; set; } = new List<DssBusinessLicence>();
+
     public virtual ICollection<DssRentalListing> DssRentalListings { get; set; } = new List<DssRentalListing>();
 
     public virtual ICollection<DssPhysicalAddress> InverseReplacingPhysicalAddress { get; set; } = new List<DssPhysicalAddress>();

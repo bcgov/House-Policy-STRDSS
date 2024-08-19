@@ -71,6 +71,13 @@ namespace StrDss.Data.Repositories
 
         public async Task<List<string>> GetManagingOrgCdsAsync(long orgId)
         {
+            var org = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == orgId);
+
+            if (org == null) return new List<string>();
+
+            if (org.OrganizationType != OrganizationTypes.Platform) 
+                return new List<string> { org.OrganizationCd };
+
             var orgCds = await _dbSet.AsNoTracking()
                 .Where(x => x.OrganizationId == orgId || x.ManagingOrganizationId == orgId)
                 .Select(x => x.OrganizationCd)

@@ -18,6 +18,9 @@ public partial class DssListingStatusType
     /// </summary>
     public string ListingStatusTypeNm { get; set; } = null!;
 
+    /// <summary>
+    /// Relative order in which the business prefers to see the status listed
+    /// </summary>
     public short ListingStatusSortNo { get; set; }
 
     public virtual ICollection<DssRentalListing> DssRentalListings { get; set; } = new List<DssRentalListing>();

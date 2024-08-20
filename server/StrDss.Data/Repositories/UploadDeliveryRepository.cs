@@ -66,19 +66,19 @@ namespace StrDss.Data.Repositories
                 .ToArrayAsync();
         }
 
-        public async Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId)
+        public async Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string sourceRecordNo)
         {
             var stopwatch = Stopwatch.StartNew();
 
             var line = await _dbContext.DssUploadLines.FirstOrDefaultAsync(x => 
                 x.IncludingUploadDeliveryId ==  uploadId && 
                 x.SourceOrganizationCd == orgCd && 
-                x.SourceRecordNo == listingId &&
+                x.SourceRecordNo == sourceRecordNo &&
                 x.IsProcessed == false);
 
             stopwatch.Stop();
 
-            _logger.LogDebug($"Fetched listing ({orgCd} - {listingId}) - {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+            _logger.LogDebug($"Fetched line ({orgCd} - {sourceRecordNo}) - {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
 
             return line;
         }
@@ -87,7 +87,7 @@ namespace StrDss.Data.Repositories
         {
             return await _dbContext.DssUploadLines.AsNoTracking()
                 .Where(x => x.IncludingUploadDeliveryId == uploadId && x.IsProcessed == false)
-                .Select(x => new UploadLineToProcess { ListingId = x.SourceRecordNo, OrgCd = x.SourceOrganizationCd })
+                .Select(x => new UploadLineToProcess { SourceRecordNo = x.SourceRecordNo, OrgCd = x.SourceOrganizationCd })
                 .ToListAsync();
         }
 

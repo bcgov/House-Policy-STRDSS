@@ -94,7 +94,13 @@ namespace StrDss.Data.Repositories
             var parameters = new List<NpgsqlParameter>
             {
                 new NpgsqlParameter("@businessLicenceNo", row.BusinessLicenceNo),
-                new NpgsqlParameter("@expiryDt", ConvertToDate(row.ExpiryDt)),
+                //new NpgsqlParameter("@expiryDt", ConvertToDate(row.ExpiryDt)),
+
+                new NpgsqlParameter("@expiryDt", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = ConvertToDate(row.ExpiryDt) ?? (object)DBNull.Value
+                },
+
                 new NpgsqlParameter("@physicalRentalAddressTxt", row.PhysicalRentalAddressTxt ?? (object)DBNull.Value),
                 new NpgsqlParameter("@licenceTypeTxt", row.LicenceTypeTxt ?? (object)DBNull.Value),
                 new NpgsqlParameter("@restrictionTxt", row.RestrictionTxt ?? (object)DBNull.Value),
@@ -110,7 +116,14 @@ namespace StrDss.Data.Repositories
                 new NpgsqlParameter("@businessOperatorPhoneNo", row.BusinessOperatorPhoneNo ?? (object)DBNull.Value),
                 new NpgsqlParameter("@businessOperatorEmailAddressDsc", row.BusinessOperatorEmailAddressDsc ?? (object)DBNull.Value),
                 new NpgsqlParameter("@infractionTxt", row.InfractionTxt ?? (object)DBNull.Value),
-                new NpgsqlParameter("@infractionDt", ConvertToDate(row.InfractionDt) ?? (object)DBNull.Value),
+
+                //new NpgsqlParameter("@infractionDt", ConvertToDate(row.InfractionDt) ?? (object)DBNull.Value),
+                new NpgsqlParameter("@infractionDt", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = ConvertToDate(row.InfractionDt) ?? (object)DBNull.Value
+                },
+
+
                 new NpgsqlParameter("@propertyZoneTxt", row.PropertyZoneTxt ?? (object)DBNull.Value),
                 new NpgsqlParameter("@availableBedroomsQty", ConvertToInt2(row.AvailableBedroomsQty) ?? (object)DBNull.Value),
                 new NpgsqlParameter("@maxGuestsAllowedQty", ConvertToInt2(row.MaxGuestsAllowedQty) ?? (object)DBNull.Value),

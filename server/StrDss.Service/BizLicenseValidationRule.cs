@@ -48,7 +48,7 @@ namespace StrDss.Service
                 FieldName = BizLicenseRowFields.LicenceStatusType,
                 FieldType = FieldTypes.String,
                 Required = false,
-                //AllowedValues = new List<string> { "Pending", "Issued", "Suspended", "Revoked", "Cancelled", "Expired" }
+                CodeSet = CodeSet.LicenseStatus,
             });
 
             rules.Add(new FieldValidationRule
@@ -165,6 +165,7 @@ namespace StrDss.Service
                 EntityName = Entities.BizLicenseRowUntyped,
                 FieldName = BizLicenseRowFields.AvailableBedroomsQty,
                 FieldType = FieldTypes.String,
+                Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Quantity)
             });
 

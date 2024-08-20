@@ -113,7 +113,7 @@ namespace StrDss.Service
 
                 var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
 
-                var exists = linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.ListingId == row.ListingId);
+                var exists = linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.SourceRecordNo == row.ListingId);
 
                 if (!exists) continue;
 
@@ -271,9 +271,9 @@ namespace StrDss.Service
             return true;
         }
 
-        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid, string systemError)
+        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, string systemError)
         {
-            uploadLine.IsValidationFailure = isValid;
+            uploadLine.IsValidationFailure = isValidationFailure;
             uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
 
             uploadLine.IsSystemFailure = systemError.IsNotEmpty();

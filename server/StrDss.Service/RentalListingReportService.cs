@@ -34,11 +34,12 @@ namespace StrDss.Service
         private IUserRepository _userRepo;
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
+        private IBizLicenseRepository _bizLicRepo;
         private IConfiguration _config;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
-            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo,
+            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBizLicenseRepository bizLicRepo,
             IConfiguration config, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
@@ -50,6 +51,7 @@ namespace StrDss.Service
             _userRepo = userRepo;
             _emailService = emailService;
             _emailRepo = emailRepo;
+            _bizLicRepo = bizLicRepo;
             _config = config;
         }
         public async Task ProcessRentalReportUploadAsync()
@@ -221,6 +223,9 @@ namespace StrDss.Service
                 _unitOfWork.Commit();
                 return false;
             }
+
+            row.EffectiveHostNm = CommonUtils.SanitizeAndUppercaseString(row.PropertyHostNm);
+            row.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(row.BusLicNo);
 
             var offeringOrg = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd); //already validated in the file upload
 
@@ -411,6 +416,12 @@ namespace StrDss.Service
             masterListing.OfferingOrganizationId = offeringOrg.OrganizationId;
             masterListing.DerivedFromRentalListingId = listing.RentalListingId;
             masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
+
+            if (physicalAddress.ContainingOrganizationId != null && (masterListing.IsChangedBusinessLicence == null || masterListing.IsChangedBusinessLicence.Value == false))
+            {
+                masterListing.GoverningBusinessLicenceId 
+                    = await _bizLicRepo.GetMatchingBusinessLicenseId(physicalAddress.ContainingOrganizationId.Value, row.EffectiveBusinessLicenceNo);
+            }
 
             (masterListing.NightsBookedQty, masterListing.SeparateReservationsQty) = 
                 await _reportRepo.GetYtdValuesOfListingAsync(reportPeriodYm, offeringOrg.OrganizationId, masterListing.PlatformListingNo);

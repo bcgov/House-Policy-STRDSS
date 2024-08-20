@@ -14,6 +14,7 @@ namespace StrDss.Data.Repositories
         Task CreateBizLicTempTable();
         Task InsertRowToBizLicTempTable(BizLicenseRowUntyped row, long providingOrganizationId);
         Task ProcessBizLicTempTable();
+        Task<long?> GetMatchingBusinessLicenseId(long orgId, string effectiveBizLicNo);
     }
 
     public class BizLicenseRepository : RepositoryBase<DssBusinessLicence>, IBizLicenseRepository
@@ -93,7 +94,7 @@ namespace StrDss.Data.Repositories
 
             var parameters = new List<NpgsqlParameter>
             {
-                new NpgsqlParameter("@businessLicenceNo", row.BusinessLicenceNo.ToUpper()),
+                new NpgsqlParameter("@businessLicenceNo", row.BusinessLicenceNo.Trim().ToUpper()),
 
                 new NpgsqlParameter("@expiryDt", NpgsqlTypes.NpgsqlDbType.Date)
                 {
@@ -140,6 +141,13 @@ namespace StrDss.Data.Repositories
         public async Task ProcessBizLicTempTable()
         {
             await _dbContext.Database.ExecuteSqlRawAsync("CALL dss_process_biz_lic_table();");
+        }
+
+        public async Task<long?> GetMatchingBusinessLicenseId(long orgId, string effectiveBizLicNo)
+        {
+            var bizLic = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.ProvidingOrganizationId == orgId && x.BusinessLicenceNo == effectiveBizLicNo);
+
+            return bizLic == null ? null : bizLic.BusinessLicenceId;
         }
     }
 }

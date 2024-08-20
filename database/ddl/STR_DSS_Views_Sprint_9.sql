@@ -45,6 +45,7 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS select drl.rental_listing_id
 	, drl.nights_booked_qty as nights_booked_ytd_qty
 	, drl.separate_reservations_qty as separate_reservations_ytd_qty
 	, drl.business_licence_no
+	, drl.
 	, drl.bc_registry_no
 	, demt.email_message_type_nm as last_action_nm
 	, dem.message_delivery_dtm as last_action_dtm

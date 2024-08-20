@@ -22,14 +22,16 @@ namespace StrDss.Service
         private IBizLicenseRepository _bizLicenseRepo;
         private IUploadDeliveryRepository _uploadRepo;
         private IOrganizationRepository _orgRepo;
+        private ICodeSetRepository _codeSetRepo;
 
         public BizLicenseService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IBizLicenseRepository bizLicenseRepo, IUploadDeliveryRepository uploadRepo, IOrganizationRepository orgRepo) 
+            IBizLicenseRepository bizLicenseRepo, IUploadDeliveryRepository uploadRepo, IOrganizationRepository orgRepo, ICodeSetRepository codeSetRepo) 
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _bizLicenseRepo = bizLicenseRepo;
             _uploadRepo = uploadRepo;
             _orgRepo = orgRepo;
+            _codeSetRepo = codeSetRepo;
         }
 
         public async Task<BizLicenseDto?> GetBizLicense(long businessLicenceId)
@@ -39,6 +41,11 @@ namespace StrDss.Service
 
         public async Task ProcessBizLicenseUploadAsync()
         {
+            if (!_validator.CommonCodes.Any())
+            {
+                _validator.CommonCodes = await _codeSetRepo.LoadCodeSetAsync();
+            }
+
             var upload = await _uploadRepo.GetUploadToProcessAsync(UploadDeliveryTypes.LicenseData);
 
             if (upload != null)
@@ -49,7 +56,19 @@ namespace StrDss.Service
 
                 await ProcessBizLicenseUploadAsync(upload);
 
-                await _bizLicenseRepo.ProcessBizLicTempTable();
+                _unitOfWork.Commit();
+
+                var errorCount = upload.DssUploadLines.Count(x => x.IsValidationFailure);
+
+                if (errorCount == 0)
+                {
+                    await _bizLicenseRepo.ProcessBizLicTempTable();
+                    _logger.LogInformation($"Success: Finished Business License Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
+                }
+                else
+                {
+                    _logger.LogInformation($"Fail: Finished Business License Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
+                }
 
                 transaction.Commit();
             }            
@@ -136,7 +155,7 @@ namespace StrDss.Service
                 uploadLine.ErrorTxt = systemError;
             }
 
-            uploadLine.IsProcessed = false;
+            uploadLine.IsProcessed = true;
         }
     }
 }

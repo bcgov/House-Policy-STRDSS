@@ -93,8 +93,7 @@ namespace StrDss.Data.Repositories
 
             var parameters = new List<NpgsqlParameter>
             {
-                new NpgsqlParameter("@businessLicenceNo", row.BusinessLicenceNo),
-                //new NpgsqlParameter("@expiryDt", ConvertToDate(row.ExpiryDt)),
+                new NpgsqlParameter("@businessLicenceNo", row.BusinessLicenceNo.ToUpper()),
 
                 new NpgsqlParameter("@expiryDt", NpgsqlTypes.NpgsqlDbType.Date)
                 {
@@ -117,12 +116,10 @@ namespace StrDss.Data.Repositories
                 new NpgsqlParameter("@businessOperatorEmailAddressDsc", row.BusinessOperatorEmailAddressDsc ?? (object)DBNull.Value),
                 new NpgsqlParameter("@infractionTxt", row.InfractionTxt ?? (object)DBNull.Value),
 
-                //new NpgsqlParameter("@infractionDt", ConvertToDate(row.InfractionDt) ?? (object)DBNull.Value),
                 new NpgsqlParameter("@infractionDt", NpgsqlTypes.NpgsqlDbType.Date)
                 {
                     Value = ConvertToDate(row.InfractionDt) ?? (object)DBNull.Value
                 },
-
 
                 new NpgsqlParameter("@propertyZoneTxt", row.PropertyZoneTxt ?? (object)DBNull.Value),
                 new NpgsqlParameter("@availableBedroomsQty", ConvertToInt2(row.AvailableBedroomsQty) ?? (object)DBNull.Value),

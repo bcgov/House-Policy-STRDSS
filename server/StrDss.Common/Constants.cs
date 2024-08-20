@@ -234,10 +234,7 @@
 
     public static class CodeSet
     {
-        public const string Role = "ROLE";
-        public const string ZoneType = "ZONE_TYPE";
-        public const string StrAffiliate = "STR_AFFILIATE";
-        public const string ComplianceStatus = "COMPLIANCE_STATUS";
+        public const string LicenseStatus = "License Status";
     }
 
     public static class StrDssIdProviders

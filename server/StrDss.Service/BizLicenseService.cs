@@ -137,6 +137,8 @@ namespace StrDss.Service
                 return (row.OrgCd, row.BusinessLicenceNo);
             }
 
+            row.LicenceStatusType = row.LicenceStatusType.IsEmpty() ? "ISSUED" : row.LicenceStatusType;
+
             await _bizLicenseRepo.InsertRowToBizLicTempTable(row, org.OrganizationId);
 
             SaveUploadLine(line, errors, false, "");

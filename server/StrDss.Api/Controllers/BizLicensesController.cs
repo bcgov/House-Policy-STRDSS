@@ -77,7 +77,6 @@ namespace StrDss.Api.Controllers
         //[HttpGet("process")]
         //public async Task<ActionResult> ProcessUpload()
         //{
-        //    // var info = await _bizLicenseService.GetMatchingBusinessLicenseIdAndNo(256, "X567B");
         //    await _bizLicenseService.ProcessBizLicenseUploadAsync();
         //    return Ok();
         //}

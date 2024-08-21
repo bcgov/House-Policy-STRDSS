@@ -416,26 +416,27 @@ namespace StrDss.Service
 
             masterListing.EffectiveHostNm = CommonUtils.SanitizeAndUppercaseString(row.PropertyHostNm);
 
-            if (masterListing.IsChangedBusinessLicence == true)
-            {
-                // keep the original effective business licence no and id
-            }
-            else if (!string.IsNullOrEmpty(masterListing.BusinessLicenceNo) && physicalAddress.ContainingOrganizationId.HasValue)
-            {
-                var sanitizedBizLicNo = CommonUtils.SanitizeAndUppercaseString(masterListing.BusinessLicenceNo);
+            var needBusinessLicenseLink = await this.NeedBusinessLicenseLink(masterListing, physicalAddress);
 
-                var (businessLicenceId, businessLicenceNo) = await _bizLicRepo.GetMatchingBusinessLicenseIdAndNo(
-                    physicalAddress.ContainingOrganizationId.Value,
-                    sanitizedBizLicNo
-                );
-
-                masterListing.GoverningBusinessLicenceId = businessLicenceId;
-                masterListing.EffectiveBusinessLicenceNo = businessLicenceNo ?? sanitizedBizLicNo;
-            }
-            else
+            if (needBusinessLicenseLink)
             {
-                masterListing.GoverningBusinessLicenceId = null;
-                masterListing.EffectiveBusinessLicenceNo = string.Empty;
+                if (!string.IsNullOrEmpty(masterListing.BusinessLicenceNo) && physicalAddress.ContainingOrganizationId.HasValue)
+                {
+                    var sanitizedBizLicNo = CommonUtils.SanitizeAndUppercaseString(masterListing.BusinessLicenceNo);
+
+                    var (businessLicenceId, businessLicenceNo) = await _bizLicRepo.GetMatchingBusinessLicenseIdAndNo(
+                        physicalAddress.ContainingOrganizationId.Value,
+                        sanitizedBizLicNo
+                    );
+
+                    masterListing.GoverningBusinessLicenceId = businessLicenceId;
+                    masterListing.EffectiveBusinessLicenceNo = businessLicenceNo ?? sanitizedBizLicNo;
+                }
+                else
+                {
+                    masterListing.GoverningBusinessLicenceId = null;
+                    masterListing.EffectiveBusinessLicenceNo = string.Empty;
+                }
             }
 
             (masterListing.NightsBookedQty, masterListing.SeparateReservationsQty) = 
@@ -446,6 +447,35 @@ namespace StrDss.Service
             masterListing.IsChangedOriginalAddress = listing.IsChangedOriginalAddress != null ? listing.IsChangedOriginalAddress : masterListing.IsChangedOriginalAddress;
 
             return (true, masterListing);
+        }
+
+        private async Task<bool> NeedBusinessLicenseLink(DssRentalListing masterListing, DssPhysicalAddress physicalAddress)
+        {
+            // If there's no existing link, a link is needed
+            if (masterListing.GoverningBusinessLicenceId == null)
+                return true;
+
+            // Get business license number and organization ID from the repository
+            var (blNo, orgId) = await _bizLicRepo.GetBizLicenseNoAndLgId(masterListing.GoverningBusinessLicenceId.Value);
+
+            // A link is needed if the business license number is null (not possible due to FK restriction)
+            if (string.IsNullOrEmpty(blNo))
+                return true;
+
+            // A de-link is needed if the listing has no jurisdiction
+            if (!physicalAddress.ContainingOrganizationId.HasValue)
+                return true;
+
+            // A re-link is needed if the listing has been reassigned to a different jurisdiction
+            if (physicalAddress.ContainingOrganizationId.Value != orgId)
+                return true;
+
+            // Keep the overridden link if the business license has been changed
+            if (masterListing.IsChangedBusinessLicence == true)
+                return false;
+
+            // A re-link is needed if the platform BL has been changed.
+            return CommonUtils.SanitizeAndUppercaseString(blNo) != CommonUtils.SanitizeAndUppercaseString(masterListing.BusinessLicenceNo ?? "");
         }
 
         private void AddContacts(DssRentalListing listing, RentalListingRowUntyped row)

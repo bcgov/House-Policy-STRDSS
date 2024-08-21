@@ -63,7 +63,7 @@ namespace StrDss.Service
 
                 if (errorCount == 0)
                 {
-                    await _bizLicenseRepo.ProcessBizLicTempTable();
+                    await _bizLicenseRepo.ProcessBizLicTempTable(upload.ProvidingOrganizationId);
                     _logger.LogInformation($"Success: Finished Business License Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
                 }
                 else

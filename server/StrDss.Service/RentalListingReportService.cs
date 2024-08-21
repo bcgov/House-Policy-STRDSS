@@ -224,9 +224,6 @@ namespace StrDss.Service
                 return false;
             }
 
-            row.EffectiveHostNm = CommonUtils.SanitizeAndUppercaseString(row.PropertyHostNm);
-            row.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(row.BusLicNo);
-
             var offeringOrg = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd); //already validated in the file upload
 
             using var tran = _unitOfWork.BeginTransaction();
@@ -417,10 +414,28 @@ namespace StrDss.Service
             masterListing.DerivedFromRentalListingId = listing.RentalListingId;
             masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
 
-            if (physicalAddress.ContainingOrganizationId != null && (masterListing.IsChangedBusinessLicence == null || masterListing.IsChangedBusinessLicence.Value == false))
+            masterListing.EffectiveHostNm = CommonUtils.SanitizeAndUppercaseString(row.PropertyHostNm);
+
+            if (masterListing.IsChangedBusinessLicence == true)
             {
-                masterListing.GoverningBusinessLicenceId 
-                    = await _bizLicRepo.GetMatchingBusinessLicenseId(physicalAddress.ContainingOrganizationId.Value, row.EffectiveBusinessLicenceNo);
+                // keep the original effective business licence no and id
+            }
+            else if (!string.IsNullOrEmpty(masterListing.BusinessLicenceNo) && physicalAddress.ContainingOrganizationId.HasValue)
+            {
+                var sanitizedBizLicNo = CommonUtils.SanitizeAndUppercaseString(masterListing.BusinessLicenceNo);
+
+                var (businessLicenceId, businessLicenceNo) = await _bizLicRepo.GetMatchingBusinessLicenseIdAndNo(
+                    physicalAddress.ContainingOrganizationId.Value,
+                    sanitizedBizLicNo
+                );
+
+                masterListing.GoverningBusinessLicenceId = businessLicenceId;
+                masterListing.EffectiveBusinessLicenceNo = businessLicenceNo ?? sanitizedBizLicNo;
+            }
+            else
+            {
+                masterListing.GoverningBusinessLicenceId = null;
+                masterListing.EffectiveBusinessLicenceNo = string.Empty;
             }
 
             (masterListing.NightsBookedQty, masterListing.SeparateReservationsQty) = 

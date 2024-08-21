@@ -5,6 +5,7 @@ using Npgsql;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using System.Text.RegularExpressions;
 
 namespace StrDss.Data.Repositories
 {
@@ -14,7 +15,7 @@ namespace StrDss.Data.Repositories
         Task CreateBizLicTempTable();
         Task InsertRowToBizLicTempTable(BizLicenseRowUntyped row, long providingOrganizationId);
         Task ProcessBizLicTempTable();
-        Task<long?> GetMatchingBusinessLicenseId(long orgId, string effectiveBizLicNo);
+        Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo);
     }
 
     public class BizLicenseRepository : RepositoryBase<DssBusinessLicence>, IBizLicenseRepository
@@ -143,13 +144,32 @@ namespace StrDss.Data.Repositories
             await _dbContext.Database.ExecuteSqlRawAsync("CALL dss_process_biz_lic_table();");
         }
 
-        public async Task<long?> GetMatchingBusinessLicenseId(long orgId, string effectiveBizLicNo)
-        {
-            //todo: need to use effectiveBizLicNo from the table
-            var bizLic = await _dbSet.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.ProvidingOrganizationId == orgId && x.BusinessLicenceNo == effectiveBizLicNo);
+        //public async Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo)
+        //{
+        //    var license = await _dbSet.AsNoTracking()
+        //        .Where(x => x.ProvidingOrganizationId == orgId && x.BusinessLicenceNo == effectiveBizLicNo)
+        //        .Select(x => new { x.BusinessLicenceId, x.BusinessLicenceNo })
+        //        .FirstOrDefaultAsync();
 
-            return bizLic == null ? null : bizLic.BusinessLicenceId;
+        //    return license == null ? (null, null) : (license.BusinessLicenceId, CommonUtils.SanitizeAndUppercaseString(license.BusinessLicenceNo));
+        //}
+
+        public async Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo)
+        {
+            // Raw SQL query using PostgreSQL regexp_replace to remove non-alphanumeric characters in the database query
+            var sqlQuery = @"
+                SELECT business_licence_id, business_licence_no
+                FROM dss_business_licence
+                WHERE providing_organization_id = @orgId 
+                  AND regexp_replace(business_licence_no, '[^a-zA-Z0-9]', '', 'g') = @sanitizedBizLicNo
+                LIMIT 1";
+
+            var license = await _dbContext.DssBusinessLicences
+                .FromSqlRaw(sqlQuery, new NpgsqlParameter("orgId", orgId), new NpgsqlParameter("sanitizedBizLicNo", effectiveBizLicNo))
+                .Select(x => new { x.BusinessLicenceId, x.BusinessLicenceNo })
+                .FirstOrDefaultAsync();
+
+            return license == null ? (null, null) : (license.BusinessLicenceId, CommonUtils.SanitizeAndUppercaseString(license.BusinessLicenceNo));
         }
     }
 }

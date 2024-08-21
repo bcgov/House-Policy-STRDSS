@@ -145,7 +145,9 @@ namespace StrDss.Data.Repositories
 
         public async Task<long?> GetMatchingBusinessLicenseId(long orgId, string effectiveBizLicNo)
         {
-            var bizLic = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.ProvidingOrganizationId == orgId && x.BusinessLicenceNo == effectiveBizLicNo);
+            //todo: need to use effectiveBizLicNo from the table
+            var bizLic = await _dbSet.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.ProvidingOrganizationId == orgId && x.BusinessLicenceNo == effectiveBizLicNo);
 
             return bizLic == null ? null : bizLic.BusinessLicenceId;
         }

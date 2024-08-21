@@ -34,11 +34,12 @@ namespace StrDss.Service
         private IUserRepository _userRepo;
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
+        private IBizLicenseRepository _bizLicRepo;
         private IConfiguration _config;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
-            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo,
+            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBizLicenseRepository bizLicRepo,
             IConfiguration config, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
@@ -50,6 +51,7 @@ namespace StrDss.Service
             _userRepo = userRepo;
             _emailService = emailService;
             _emailRepo = emailRepo;
+            _bizLicRepo = bizLicRepo;
             _config = config;
         }
         public async Task ProcessRentalReportUploadAsync()
@@ -411,6 +413,30 @@ namespace StrDss.Service
             masterListing.OfferingOrganizationId = offeringOrg.OrganizationId;
             masterListing.DerivedFromRentalListingId = listing.RentalListingId;
             masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
+
+            masterListing.EffectiveHostNm = CommonUtils.SanitizeAndUppercaseString(row.PropertyHostNm);
+
+            if (masterListing.IsChangedBusinessLicence == true)
+            {
+                // keep the original effective business licence no and id
+            }
+            else if (!string.IsNullOrEmpty(masterListing.BusinessLicenceNo) && physicalAddress.ContainingOrganizationId.HasValue)
+            {
+                var sanitizedBizLicNo = CommonUtils.SanitizeAndUppercaseString(masterListing.BusinessLicenceNo);
+
+                var (businessLicenceId, businessLicenceNo) = await _bizLicRepo.GetMatchingBusinessLicenseIdAndNo(
+                    physicalAddress.ContainingOrganizationId.Value,
+                    sanitizedBizLicNo
+                );
+
+                masterListing.GoverningBusinessLicenceId = businessLicenceId;
+                masterListing.EffectiveBusinessLicenceNo = businessLicenceNo ?? sanitizedBizLicNo;
+            }
+            else
+            {
+                masterListing.GoverningBusinessLicenceId = null;
+                masterListing.EffectiveBusinessLicenceNo = string.Empty;
+            }
 
             (masterListing.NightsBookedQty, masterListing.SeparateReservationsQty) = 
                 await _reportRepo.GetYtdValuesOfListingAsync(reportPeriodYm, offeringOrg.OrganizationId, masterListing.PlatformListingNo);

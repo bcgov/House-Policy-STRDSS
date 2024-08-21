@@ -1,18 +1,29 @@
-CREATE OR REPLACE PROCEDURE dss_process_biz_lic_table()
+CREATE OR REPLACE PROCEDURE dss_process_biz_lic_table(lg_id BIGINT)
 LANGUAGE plpgsql
 AS $$
 BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_tables
+        WHERE schemaname = 'public'
+        AND tablename = 'biz_lic_table'
+    ) THEN
+        RAISE NOTICE 'biz_lic_table does not exist. Exiting procedure.';
+        RETURN;
+    END IF;
+	
     -- Unlink before Deletion
 	MERGE INTO dss_rental_listing AS tgt
 	USING (
-		select business_licence_id
+		SELECT business_licence_id
 		FROM dss_business_licence
 		WHERE providing_organization_id IN (SELECT providing_organization_id FROM biz_lic_table)
 		  AND business_licence_no NOT IN (SELECT business_licence_no FROM biz_lic_table)
 	) AS src
-	ON (tgt.governing_business_licence_id=src.business_licence_id)
+	ON (tgt.governing_business_licence_id = src.business_licence_id)
     WHEN MATCHED THEN
-		UPDATE SET governing_business_licence_id=NULL;
+		UPDATE SET governing_business_licence_id = NULL;
 
     -- Deletion 
 	DELETE FROM dss_business_licence
@@ -22,8 +33,8 @@ BEGIN
     -- Insert into dss_business_licence from biz_lic_table or update if exists
 	MERGE INTO dss_business_licence AS tgt
 	USING (SELECT * FROM biz_lic_table) AS src
-	ON (tgt.providing_organization_id=src.providing_organization_id AND
-		tgt.business_licence_no=src.business_licence_no)
+	ON (tgt.providing_organization_id = src.providing_organization_id AND
+		tgt.business_licence_no = src.business_licence_no)
     WHEN MATCHED THEN UPDATE SET 
         expiry_dt = src.expiry_dt,
         physical_rental_address_txt = src.physical_rental_address_txt,
@@ -72,20 +83,24 @@ BEGIN
     -- Update dss_rental_listing if differing match found
 	MERGE INTO dss_rental_listing AS tgt
 	USING (
-		select drl.rental_listing_id, dbl.business_licence_id
+		SELECT drl.rental_listing_id, dbl.business_licence_id
 		FROM dss_rental_listing drl
-		JOIN dss_physical_address dpa on drl.locating_physical_address_id=dpa.physical_address_id
-		join dss_organization lgs on lgs.organization_id=dpa.containing_organization_id and dpa.match_score_amt>1
-		LEFT join dss_business_licence dbl on (regexp_replace(upper(drl.business_licence_no),'[^A-Z0-9]+','','g')=regexp_replace(upper(dbl.business_licence_no),'[^A-Z0-9]+','','g') AND lgs.managing_organization_id=dbl.providing_organization_id)
-		where drl.including_rental_listing_report_id is null and coalesce(drl.governing_business_licence_id,-1)!=coalesce(dbl.business_licence_id,-1)
+		JOIN dss_physical_address dpa ON drl.locating_physical_address_id = dpa.physical_address_id
+		JOIN dss_organization lgs ON lgs.organization_id = dpa.containing_organization_id AND dpa.match_score_amt > 1
+		LEFT JOIN dss_business_licence dbl ON (
+            regexp_replace(UPPER(drl.business_licence_no), '[^A-Z0-9]+', '', 'g') = regexp_replace(UPPER(dbl.business_licence_no), '[^A-Z0-9]+', '', 'g') 
+            AND lgs.managing_organization_id = dbl.providing_organization_id)
+		WHERE drl.including_rental_listing_report_id IS NULL 
+		  AND COALESCE(drl.governing_business_licence_id, -1) != COALESCE(dbl.business_licence_id, -1)
+		  AND dbl.providing_organization_id = lg_id
 	) AS src
-	ON (tgt.rental_listing_id=src.rental_listing_id)
+	ON (tgt.rental_listing_id = src.rental_listing_id)
     WHEN MATCHED THEN
 		UPDATE SET governing_business_licence_id = src.business_licence_id;
 
     -- Optional: Truncate the temporary table after processing
     TRUNCATE TABLE biz_lic_table;
-    
+
     -- Notify of completion
-    RAISE NOTICE 'Data has been processed from biz_lic_table to dss_business_licence';
+    RAISE NOTICE 'Data has been processed from biz_lic_table to dss_business_licence for lg_id %', lg_id;
 END $$;

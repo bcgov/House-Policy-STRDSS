@@ -12,6 +12,7 @@ namespace StrDss.Data.Repositories
     public interface IBizLicenseRepository
     {
         Task<BizLicenseDto?> GetBizLicense(long businessLicenceId);
+        Task<(string?, long?)> GetBizLicenseNoAndLgId(long businessLicenceId);
         Task CreateBizLicTempTable();
         Task InsertRowToBizLicTempTable(BizLicenseRowUntyped row, long providingOrganizationId);
         Task ProcessBizLicTempTable();
@@ -28,6 +29,16 @@ namespace StrDss.Data.Repositories
         public async Task<BizLicenseDto?> GetBizLicense(long businessLicenceId)
         {
             return _mapper.Map<BizLicenseDto>(await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.BusinessLicenceId == businessLicenceId));            
+        }
+
+        public async Task<(string?, long?)> GetBizLicenseNoAndLgId(long businessLicenceId)
+        {
+            var lincese = await _dbSet.AsNoTracking()
+                .Where(x => x.BusinessLicenceId == businessLicenceId)
+                .Select(x => new { x.BusinessLicenceNo, x.ProvidingOrganizationId })
+                .FirstOrDefaultAsync();
+
+            return lincese == null ? (null, null) : (lincese.BusinessLicenceNo, lincese.ProvidingOrganizationId);
         }
 
         public async Task CreateBizLicTempTable()

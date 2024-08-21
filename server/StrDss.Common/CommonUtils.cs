@@ -72,7 +72,7 @@ namespace StrDss.Common
             return memoryStream.ToArray();
         }
 
-        static string SanitizeAndUppercaseString(string input)
+        public static string SanitizeAndUppercaseString(string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return "";
 

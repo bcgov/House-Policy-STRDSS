@@ -22,9 +22,7 @@ BEGIN
         business_owner_nm, business_owner_phone_no, business_owner_email_address_dsc, business_operator_nm, 
         business_operator_phone_no, business_operator_email_address_dsc, infraction_txt, infraction_dt, 
         property_zone_txt, available_bedrooms_qty, max_guests_allowed_qty, 
-        CASE WHEN is_principal_residence = 'Y' THEN TRUE ELSE FALSE END, -- Convert 'Y'/'N' to boolean
-        CASE WHEN is_owner_living_onsite = 'Y' THEN TRUE ELSE FALSE END, -- Convert 'Y'/'N' to boolean
-        CASE WHEN is_owner_property_tenant = 'Y' THEN TRUE ELSE FALSE END, -- Convert 'Y'/'N' to boolean
+        is_principal_residence, is_owner_living_onsite, is_owner_property_tenant,
         property_folio_no, property_parcel_identifier_no, property_legal_description_txt, 
         licence_status_type, providing_organization_id,
         NOW() -- Set the current timestamp for upd_dtm

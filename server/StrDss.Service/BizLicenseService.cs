@@ -16,6 +16,7 @@ namespace StrDss.Service
     {
         Task<BizLicenseDto?> GetBizLicense(long businessLicenceId);
         Task ProcessBizLicenseUploadAsync();
+        Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo);
     }
     public class BizLicenseService : ServiceBase, IBizLicenseService
     {
@@ -137,6 +138,8 @@ namespace StrDss.Service
                 return (row.OrgCd, row.BusinessLicenceNo);
             }
 
+            row.LicenceStatusType = row.LicenceStatusType.IsEmpty() ? "ISSUED" : row.LicenceStatusType;
+
             await _bizLicenseRepo.InsertRowToBizLicTempTable(row, org.OrganizationId);
 
             SaveUploadLine(line, errors, false, "");
@@ -156,6 +159,11 @@ namespace StrDss.Service
             }
 
             uploadLine.IsProcessed = true;
+        }
+
+        public async Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo)
+        {
+            return await _bizLicenseRepo.GetMatchingBusinessLicenseIdAndNo(orgId, effectiveBizLicNo);
         }
     }
 }

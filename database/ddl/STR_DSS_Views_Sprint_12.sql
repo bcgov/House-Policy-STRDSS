@@ -1,4 +1,4 @@
-/* Sprint 9 View Changes to STR DSS */
+/* Sprint 12 View Changes to STR DSS */
 
 drop view if exists dss_rental_listing_vw;
 
@@ -48,6 +48,7 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS select drl.rental_listing_id
 	, drl.bc_registry_no
 	, demt.email_message_type_nm as last_action_nm
 	, dem.message_delivery_dtm as last_action_dtm
+	, dbl.business_licence_id
 FROM dss_rental_listing drl
 join dss_organization org on org.organization_id=drl.offering_organization_id
 LEFT JOIN dss_listing_status_type dlst on drl.listing_status_type=dlst.listing_status_type
@@ -56,4 +57,5 @@ left join dss_organization lgs on lgs.organization_id=dpa.containing_organizatio
 left join dss_organization lg on lgs.managing_organization_id=lg.organization_id
 LEFT JOIN dss_email_message dem on dem.email_message_id = (select msg.email_message_id from dss_email_message msg where msg.concerned_with_rental_listing_id=drl.rental_listing_id order by msg.message_delivery_dtm desc limit 1)
 LEFT JOIN dss_email_message_type demt on dem.email_message_type=demt.email_message_type
+LEFT join dss_business_licence dbl on drl.governing_business_licence_id = dbl.business_licence_id
 where drl.including_rental_listing_report_id is null;

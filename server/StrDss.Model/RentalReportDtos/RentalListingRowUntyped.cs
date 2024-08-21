@@ -142,7 +142,5 @@ namespace StrDss.Model.RentalReportDtos
 
         [Name("supplier_host_5_id")]
         public string SupplierHost5Id { get; set; } = "";
-        public string EffectiveBusinessLicenceNo { get; set; }
-        public string EffectiveHostNm { get; set; }
     }
 }

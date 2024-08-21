@@ -15,7 +15,7 @@ namespace StrDss.Data.Repositories
         Task<(string?, long?)> GetBizLicenseNoAndLgId(long businessLicenceId);
         Task CreateBizLicTempTable();
         Task InsertRowToBizLicTempTable(BizLicenseRowUntyped row, long providingOrganizationId);
-        Task ProcessBizLicTempTable();
+        Task ProcessBizLicTempTable(long lgId);
         Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo);
     }
 
@@ -150,9 +150,9 @@ namespace StrDss.Data.Repositories
             await _dbContext.Database.ExecuteSqlRawAsync(insertSql, parameters.ToArray());
         }
 
-        public async Task ProcessBizLicTempTable()
+        public async Task ProcessBizLicTempTable(long lgId)
         {
-            await _dbContext.Database.ExecuteSqlRawAsync("CALL dss_process_biz_lic_table();");
+            await _dbContext.Database.ExecuteSqlRawAsync($"CALL dss_process_biz_lic_table({lgId});");
         }
 
         //public async Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo)

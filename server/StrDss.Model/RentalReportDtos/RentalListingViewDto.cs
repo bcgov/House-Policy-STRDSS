@@ -80,6 +80,7 @@ namespace StrDss.Model.RentalReportDtos
 
         public string? LastActionNm { get; set; }
         public long? BusinessLicenceId { get; set; }
+        public string? BusinessLicenceNoMatched { get; set; }
         public DateTime? LastActionDtm { get; set; }
         public bool HasAtLeastOneValidHostEmail { get; set; }
         public List<HostInfo> HostsInfo { get; set; } = new List<HostInfo>();

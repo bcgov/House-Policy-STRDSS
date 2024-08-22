@@ -90,4 +90,6 @@ public partial class DssRentalListingVw
     public DateTime? LastActionDtm { get; set; }
 
     public long? BusinessLicenceId { get; set; }
+
+    public string? BusinessLicenceNoMatched { get; set; }
 }

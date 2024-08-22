@@ -7,8 +7,8 @@
         <div class="row">
             <p-dropdown placeholder="Select Jurisdiction" appendTo="body" panelStyleClass="select-jurisdiction-panel"
                 [inputId]="'jurisdiction-filter-dropdown'" [filter]="true" [filterBy]="'label'"
-                class="select-jurisdiction-dropdown" [disabled]="!uploadHistory.length" [options]="groupedCommunities"
-                [group]="true" [(ngModel)]="jurisdictionId" (onChange)="onJurisdictionChanged($event)">
+                class="select-jurisdiction-dropdown" [options]="groupedCommunities" [group]="true"
+                [(ngModel)]="jurisdictionId" (onChange)="onJurisdictionChanged($event)">
                 <ng-template let-group pTemplate="group">
                     <strong>{{group.label}}</strong>
                 </ng-template>

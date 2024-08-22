@@ -1,6 +1,6 @@
 ﻿namespace StrDss.Model
 {
-    public class BizLicenseDto
+    public class BizLicenceDto
     {
         public long BusinessLicenceId { get; set; }
         public string BusinessLicenceNo { get; set; } = null!;
@@ -35,6 +35,6 @@
         public long? AffectedByPhysicalAddressId { get; set; }
         public DateTime UpdDtm { get; set; }
         public Guid? UpdUserGuid { get; set; }
-        public virtual LicenseStatus LicenseStatus { get; set; } = null!;
+        public virtual LicenceStatus LicenceStatus { get; set; } = null!;
     }
 }

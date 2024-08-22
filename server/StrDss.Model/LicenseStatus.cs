@@ -1,6 +1,6 @@
 ﻿namespace StrDss.Model
 {
-    public class LicenseStatus
+    public class LicenceStatus
     {
         public string LicenceStatusType { get; set; } = null!;
 

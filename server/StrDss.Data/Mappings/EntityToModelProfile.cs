@@ -44,10 +44,10 @@ namespace StrDss.Data.Mappings
             CreateMap<DssRentalListingExtract, RentalListingExtractDto>()
                 .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime(i.UpdDtm)));
 
-            CreateMap<DssBusinessLicenceStatusType, LicenseStatus>();
+            CreateMap<DssBusinessLicenceStatusType, LicenceStatus>();
 
-            CreateMap<DssBusinessLicence, BizLicenseDto>()
-                .ForMember(o => o.LicenseStatus, opt => opt.MapFrom(i => i.LicenceStatusTypeNavigation))
+            CreateMap<DssBusinessLicence, BizLicenceDto>()
+                .ForMember(o => o.LicenceStatus, opt => opt.MapFrom(i => i.LicenceStatusTypeNavigation))
                 .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime(i.UpdDtm)));
         }
     }

@@ -9,29 +9,29 @@ using System.Text.RegularExpressions;
 
 namespace StrDss.Data.Repositories
 {
-    public interface IBizLicenseRepository
+    public interface IBizLicenceRepository
     {
-        Task<BizLicenseDto?> GetBizLicense(long businessLicenceId);
-        Task<(string?, long?)> GetBizLicenseNoAndLgId(long businessLicenceId);
+        Task<BizLicenceDto?> GetBizLicence(long businessLicenceId);
+        Task<(string?, long?)> GetBizLicenceNoAndLgId(long businessLicenceId);
         Task CreateBizLicTempTable();
-        Task InsertRowToBizLicTempTable(BizLicenseRowUntyped row, long providingOrganizationId);
+        Task InsertRowToBizLicTempTable(BizLicenceRowUntyped row, long providingOrganizationId);
         Task ProcessBizLicTempTable(long lgId);
-        Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo);
+        Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo);
     }
 
-    public class BizLicenseRepository : RepositoryBase<DssBusinessLicence>, IBizLicenseRepository
+    public class BizLicenceRepository : RepositoryBase<DssBusinessLicence>, IBizLicenceRepository
     {
-        public BizLicenseRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger) 
+        public BizLicenceRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger) 
             : base(dbContext, mapper, currentUser, logger)
         {
         }
 
-        public async Task<BizLicenseDto?> GetBizLicense(long businessLicenceId)
+        public async Task<BizLicenceDto?> GetBizLicence(long businessLicenceId)
         {
-            return _mapper.Map<BizLicenseDto>(await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.BusinessLicenceId == businessLicenceId));            
+            return _mapper.Map<BizLicenceDto>(await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.BusinessLicenceId == businessLicenceId));            
         }
 
-        public async Task<(string?, long?)> GetBizLicenseNoAndLgId(long businessLicenceId)
+        public async Task<(string?, long?)> GetBizLicenceNoAndLgId(long businessLicenceId)
         {
             var lincese = await _dbSet.AsNoTracking()
                 .Where(x => x.BusinessLicenceId == businessLicenceId)
@@ -78,7 +78,7 @@ namespace StrDss.Data.Repositories
                 ");
         }
 
-        public async Task InsertRowToBizLicTempTable(BizLicenseRowUntyped row, long providingOrganizationId)
+        public async Task InsertRowToBizLicTempTable(BizLicenceRowUntyped row, long providingOrganizationId)
         {
             var insertSql = @"
                 INSERT INTO biz_lic_table (
@@ -155,17 +155,7 @@ namespace StrDss.Data.Repositories
             await _dbContext.Database.ExecuteSqlRawAsync($"CALL dss_process_biz_lic_table({lgId});");
         }
 
-        //public async Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo)
-        //{
-        //    var license = await _dbSet.AsNoTracking()
-        //        .Where(x => x.ProvidingOrganizationId == orgId && x.BusinessLicenceNo == effectiveBizLicNo)
-        //        .Select(x => new { x.BusinessLicenceId, x.BusinessLicenceNo })
-        //        .FirstOrDefaultAsync();
-
-        //    return license == null ? (null, null) : (license.BusinessLicenceId, CommonUtils.SanitizeAndUppercaseString(license.BusinessLicenceNo));
-        //}
-
-        public async Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo)
+        public async Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo)
         {
             // Raw SQL query using PostgreSQL regexp_replace to remove non-alphanumeric characters in the database query
             var sqlQuery = @"
@@ -175,12 +165,12 @@ namespace StrDss.Data.Repositories
                   AND regexp_replace(business_licence_no, '[^a-zA-Z0-9]', '', 'g') = @sanitizedBizLicNo
                 LIMIT 1";
 
-            var license = await _dbContext.DssBusinessLicences
+            var licence = await _dbContext.DssBusinessLicences
                 .FromSqlRaw(sqlQuery, new NpgsqlParameter("orgId", orgId), new NpgsqlParameter("sanitizedBizLicNo", effectiveBizLicNo))
                 .Select(x => new { x.BusinessLicenceId, x.BusinessLicenceNo })
                 .FirstOrDefaultAsync();
 
-            return license == null ? (null, null) : (license.BusinessLicenceId, CommonUtils.SanitizeAndUppercaseString(license.BusinessLicenceNo));
+            return licence == null ? (null, null) : (licence.BusinessLicenceId, CommonUtils.SanitizeAndUppercaseString(licence.BusinessLicenceNo));
         }
     }
 }

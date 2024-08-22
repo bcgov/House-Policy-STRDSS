@@ -2,14 +2,14 @@
 
 namespace StrDss.Service
 {
-    public static class BizLicenseValidationRule
+    public static class BizLicenceValidationRule
     {
-        public static void LoadBizLicenseValidationRules(List<FieldValidationRule> rules)
+        public static void LoadBizLicenceValidationRules(List<FieldValidationRule> rules)
         {
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.OrgCd,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.OrgCd,
                 FieldType = FieldTypes.String,
                 Required = true,
                 MaxLength = 25,
@@ -17,8 +17,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.BusinessLicenceNo,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.BusinessLicenceNo,
                 FieldType = FieldTypes.String,
                 Required = true,
                 MaxLength = 50,
@@ -26,8 +26,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.ExpiryDt,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.ExpiryDt,
                 FieldType = FieldTypes.String,
                 Required = true,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.YearMonthDay) 
@@ -35,8 +35,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.PhysicalRentalAddressTxt,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.PhysicalRentalAddressTxt,
                 FieldType = FieldTypes.String,
                 Required = true,
                 MaxLength = 250,
@@ -44,26 +44,17 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.LicenceStatusType,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.LicenceStatusType,
                 FieldType = FieldTypes.String,
                 Required = false,
-                CodeSet = CodeSet.LicenseStatus,
+                CodeSet = CodeSet.LicenceStatus,
             });
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.LicenceTypeTxt,
-                FieldType = FieldTypes.String,
-                Required = false,
-                MaxLength = 320,
-            });
-
-            rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.RestrictionTxt,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.LicenceTypeTxt,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320,
@@ -71,8 +62,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.BusinessNm,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.RestrictionTxt,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320,
@@ -80,8 +71,17 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.MailingStreetAddressTxt,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.BusinessNm,
+                FieldType = FieldTypes.String,
+                Required = false,
+                MaxLength = 320,
+            });
+
+            rules.Add(new FieldValidationRule
+            {
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.MailingStreetAddressTxt,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 100,
@@ -89,8 +89,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.MailingCityNm,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.MailingCityNm,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 100,
@@ -98,8 +98,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.MailingProvinceCd,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.MailingProvinceCd,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 2,
@@ -107,8 +107,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.MailingPostalCd,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.MailingPostalCd,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 10,
@@ -116,8 +116,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.BusinessOwnerNm,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.BusinessOwnerNm,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320,
@@ -125,8 +125,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.BusinessOwnerPhoneNo,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.BusinessOwnerPhoneNo,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30,
@@ -134,8 +134,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.BusinessOwnerEmailAddressDsc,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.BusinessOwnerEmailAddressDsc,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320,
@@ -144,8 +144,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.InfractionTxt,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.InfractionTxt,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320,
@@ -153,8 +153,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.InfractionDt,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.InfractionDt,
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.YearMonthDay) 
@@ -162,8 +162,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.AvailableBedroomsQty,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.AvailableBedroomsQty,
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Quantity)
@@ -171,8 +171,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.MaxGuestsAllowedQty,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.MaxGuestsAllowedQty,
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Quantity)
@@ -180,8 +180,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.IsPrincipalResidence,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.IsPrincipalResidence,
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.YN)
@@ -189,8 +189,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.IsOwnerLivingOnsite,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.IsOwnerLivingOnsite,
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.YN)
@@ -198,8 +198,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.IsOwnerPropertyTenant,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.IsOwnerPropertyTenant,
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.YN)
@@ -207,8 +207,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.PropertyFolioNo,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.PropertyFolioNo,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30,
@@ -216,8 +216,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.PropertyParcelIdentifierNo,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.PropertyParcelIdentifierNo,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30,
@@ -225,8 +225,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.BizLicenseRowUntyped,
-                FieldName = BizLicenseRowFields.PropertyLegalDescriptionTxt,
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.PropertyLegalDescriptionTxt,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320,

@@ -2,7 +2,7 @@
 
 namespace StrDss.Model
 {
-    public class BizLicenseRowUntyped
+    public class BizLicenceRowUntyped
     {
         [Name("org_cd")]
         public string OrgCd { get; set; }

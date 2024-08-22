@@ -11,7 +11,7 @@
     {
         public const string RentalListingRowUntyped = "RentalListingRowUntyped";
         public const string Role = "Role";
-        public const string BizLicenseRowUntyped = "BizLicenseRowUntyped";
+        public const string BizLicenceRowUntyped = "BizLicenceRowUntyped";
 
     }
     public static class Fields
@@ -84,7 +84,7 @@
         public const string SupplierHost5Id = "SupplierHost5Id";
     }
 
-    public static class BizLicenseRowFields
+    public static class BizLicenceRowFields
     {
         public const string OrgCd = "OrgCd";
         public const string BusinessLicenceNo = "BusinessLicenceNo";
@@ -234,7 +234,7 @@
 
     public static class CodeSet
     {
-        public const string LicenseStatus = "License Status";
+        public const string LicenceStatus = "Licence Status";
     }
 
     public static class StrDssIdProviders
@@ -348,7 +348,7 @@
     {
         public const string ListingData = "Listing Data";
         public const string TakedownData = "Takedown Data";
-        public const string LicenseData = "License Data";
+        public const string LicenceData = "Licence Data";
     }
 
     public static class ListingExportFileNames

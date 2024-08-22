@@ -36,12 +36,12 @@ namespace StrDss.Service
         private IUserRepository _userRepo;
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
-        private IBizLicenseRepository _bizLicRepo;
+        private IBizLicenceRepository _bizLicRepo;
         private IConfiguration _config;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
-            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBizLicenseRepository bizLicRepo,
+            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBizLicenceRepository bizLicRepo,
             IConfiguration config, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
@@ -421,15 +421,15 @@ namespace StrDss.Service
             var managingOrgId = physicalAddress.ContainingOrganizationId.HasValue ?
                 await _orgRepo.GetManagingOrgId(physicalAddress.ContainingOrganizationId.Value) : null;
 
-            var needBusinessLicenseLink = await NeedBusinessLicenseLink(masterListing, managingOrgId);
+            var needBusinessLicenceLink = await NeedBusinessLicenceLink(masterListing, managingOrgId);
 
-            if (needBusinessLicenseLink)
+            if (needBusinessLicenceLink)
             {
                 if (!string.IsNullOrEmpty(masterListing.BusinessLicenceNo) && managingOrgId.HasValue)
                 {
                     var sanitizedBizLicNo = CommonUtils.SanitizeAndUppercaseString(masterListing.BusinessLicenceNo);
 
-                    var (businessLicenceId, businessLicenceNo) = await _bizLicRepo.GetMatchingBusinessLicenseIdAndNo(
+                    var (businessLicenceId, businessLicenceNo) = await _bizLicRepo.GetMatchingBusinessLicenceIdAndNo(
                         managingOrgId.Value,
                         sanitizedBizLicNo
                     );
@@ -454,16 +454,16 @@ namespace StrDss.Service
             return (true, masterListing);
         }
 
-        private async Task<bool> NeedBusinessLicenseLink(DssRentalListing masterListing, long? managingOrgId)
+        private async Task<bool> NeedBusinessLicenceLink(DssRentalListing masterListing, long? managingOrgId)
         {
             // If there's no existing link, a link is needed
             if (masterListing.GoverningBusinessLicenceId == null)
                 return true;
 
-            // Get business license number and organization ID from the repository
-            var (blNo, orgId) = await _bizLicRepo.GetBizLicenseNoAndLgId(masterListing.GoverningBusinessLicenceId.Value);
+            // Get business licence number and organization ID from the repository
+            var (blNo, orgId) = await _bizLicRepo.GetBizLicenceNoAndLgId(masterListing.GoverningBusinessLicenceId.Value);
 
-            // A link is needed if the business license number is null (not possible due to FK restriction)
+            // A link is needed if the business licence number is null (not possible due to FK restriction)
             if (string.IsNullOrEmpty(blNo))
                 return true;
 
@@ -475,7 +475,7 @@ namespace StrDss.Service
             if (managingOrgId.Value != orgId)
                 return true;
 
-            // Keep the overridden link if the business license has been changed
+            // Keep the overridden link if the business licence has been changed
             if (masterListing.IsChangedBusinessLicence == true)
                 return false;
 

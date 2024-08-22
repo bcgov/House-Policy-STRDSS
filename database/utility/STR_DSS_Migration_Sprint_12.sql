@@ -28,7 +28,9 @@ as org_has_lg_type
 	\echo 'Calling STR_DSS_Incremental_DB_DDL_Sprint_12.sql'
 	\ir '../ddl/STR_DSS_Incremental_DB_DDL_Sprint_12.sql'
 	\echo 'Replacing views'
-	\ir '../ddl/STR_DSS_Views_Sprint_9.sql'
+	\ir '../ddl/STR_DSS_Views_Sprint_12.sql'
+	\echo 'Creating routines'
+	\ir '../ddl/STR_DSS_Routines_Sprint_12.sql'
 	\echo 'Calling STR_DSS_Data_Seeding_Sprint_12.sql'
 	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_12.sql'
 \elif :db_has_dss_tab

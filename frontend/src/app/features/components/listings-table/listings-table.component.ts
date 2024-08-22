@@ -61,7 +61,7 @@ export class ListingsTableComponent implements OnInit {
   sort!: { prop: string, dir: 'asc' | 'desc' }
   currentPage!: PagingResponsePageInfo;
   searchTerm!: string;
-  searchColumn: 'all' | 'address' | 'url' | 'listingId' | 'hostName' | 'businessLicense' = 'all';
+  searchColumn: 'all' | 'address' | 'url' | 'listingId' | 'hostName' | 'businessLicence' = 'all';
   searchColumns = new Array<DropdownOption>();
   communities = new Array<DropdownOptionOrganization>();
   groupedCommunities = new Array();
@@ -96,7 +96,7 @@ export class ListingsTableComponent implements OnInit {
       { label: 'Listing Url', value: 'url' },
       { label: 'Listing ID', value: 'listingId' },
       { label: 'Host Name', value: 'hostName' },
-      { label: 'Business Licence', value: 'businessLicense' },
+      { label: 'Business Licence', value: 'businessLicence' },
     ]
 
     this.route.queryParams.subscribe({
@@ -155,7 +155,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   unselectAll(): void {
-    this.selectedListings = []
+    this.selectedListings = [];
   }
 
   onDetailsOpen(row: ListingTableRow): void {
@@ -164,12 +164,12 @@ export class ListingsTableComponent implements OnInit {
 
   onNoticeOpen(): void {
     this.searchStateService.selectedListings = this.selectedListings;
-    this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } })
+    this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } });
   }
 
   onTakedownOpen(): void {
     this.searchStateService.selectedListings = this.selectedListings;
-    this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } })
+    this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } });
   }
 
   onPageChange(value: any): void {
@@ -184,7 +184,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   onSearch(): void {
-    this.getListings(this.currentPage.pageNumber)
+    this.getListings(this.currentPage.pageNumber);
   }
 
   get isFilterSet(): boolean {
@@ -222,15 +222,15 @@ export class ListingsTableComponent implements OnInit {
   }
 
   onClearFilters(): void {
-    this.filterPersistenceService.listingFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+    this.filterPersistenceService.listingFilter = { byLocation: { isBusinessLicenceRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
     this.initFilters();
     this.isFilterOpened = false;
     this.onSearch();
   }
 
   onCancelFilters(): void {
-    this.cancelableFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
-    this.filterPersistenceService.listingFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+    this.cancelableFilter = { byLocation: { isBusinessLicenceRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+    this.filterPersistenceService.listingFilter = { byLocation: { isBusinessLicenceRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
     this.isFilterOpened = false;
   }
 
@@ -240,7 +240,7 @@ export class ListingsTableComponent implements OnInit {
     this.currentFilter.community = this.cancelableFilter.community;
 
     if (!this.filterPersistenceService.listingFilter) {
-      this.filterPersistenceService.listingFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+      this.filterPersistenceService.listingFilter = { byLocation: { isBusinessLicenceRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
     }
 
     this.filterPersistenceService.listingFilter.byLocation = Object.assign({}, this.cancelableFilter.byLocation);
@@ -261,16 +261,16 @@ export class ListingsTableComponent implements OnInit {
       this.currentFilter = {
         byLocation: this.filterPersistenceService.listingFilter.byLocation,
         community: this.filterPersistenceService.listingFilter.community,
-        byStatus: this.filterPersistenceService.listingFilter.byStatus
+        byStatus: this.filterPersistenceService.listingFilter.byStatus,
       };
       this.cancelableFilter = {
         byLocation: this.filterPersistenceService.listingFilter.byLocation,
         community: this.filterPersistenceService.listingFilter.community,
-        byStatus: this.filterPersistenceService.listingFilter.byStatus
+        byStatus: this.filterPersistenceService.listingFilter.byStatus,
       };
     } else {
-      this.currentFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
-      this.cancelableFilter = { byLocation: { isBusinessLicenseRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
+      this.currentFilter = { byLocation: { isBusinessLicenceRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {}, };
+      this.cancelableFilter = { byLocation: { isBusinessLicenceRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {}, };
     }
 
     this.cd.detectChanges();
@@ -306,16 +306,18 @@ export class ListingsTableComponent implements OnInit {
       this.currentPage?.pageSize || 25,
       this.sort?.prop || '',
       this.sort?.dir || 'asc',
-      searchReq, this.currentFilter).subscribe({
-        next: (res: PagingResponse<ListingTableRow>) => {
-          this.currentPage = res.pageInfo;
-          this.listings = res.sourceList;
-        },
-        complete: () => {
-          this.loaderService.loadingEnd();
-          this.cd.detectChanges();
-        }
-      });
+      searchReq,
+      this.currentFilter,
+    ).subscribe({
+      next: (res: PagingResponse<ListingTableRow>) => {
+        this.currentPage = res.pageInfo;
+        this.listings = res.sourceList;
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
+      }
+    });
   }
 
   private getOrganizations(): void {
@@ -332,7 +334,7 @@ export class ListingsTableComponent implements OnInit {
             acc.push({
               label: curr.localGovernmentType,
               value: curr.localGovernmentType,
-              items: [{ label: curr.label, value: curr.value }]
+              items: [{ label: curr.label, value: curr.value }],
             });
           }
 
@@ -366,5 +368,4 @@ export class ListingsTableComponent implements OnInit {
       }
     });
   }
-
 }

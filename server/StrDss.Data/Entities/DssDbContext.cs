@@ -960,6 +960,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.BusinessLicenceNo)
                 .HasMaxLength(320)
                 .HasColumnName("business_licence_no");
+            entity.Property(e => e.BusinessLicenceNoMatched)
+                .HasMaxLength(50)
+                .HasColumnName("business_licence_no_matched");
             entity.Property(e => e.EconomicRegionDsc)
                 .HasMaxLength(100)
                 .HasColumnName("economic_region_dsc");

@@ -18,7 +18,7 @@ namespace StrDss.Data.Repositories
         Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId);
         Task<List<UploadLineToProcess>> GetUploadLinesToProcessAsync(long uploadId);
         Task<List<DssUploadLine>> GetUploadLineEntitiesToProcessAsync(long uploadId);
-        Task<long[]> GetUploadLineIdsWithErrors(long uploadId);
+        Task<long[]> GetUploadLineIdsWithErrors(long uploadId, bool fullData);
         Task<UploadLineError> GetUploadLineWithError(long lineId);
         Task<bool> UploadHasErrors(long uploadId);
         Task<int> GetTotalNumberOfUploadLines(long uploadId);
@@ -111,10 +111,10 @@ namespace StrDss.Data.Repositories
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<long[]> GetUploadLineIdsWithErrors(long uploadId)
+        public async Task<long[]> GetUploadLineIdsWithErrors(long uploadId, bool fullData)
         {
             return await _dbContext.DssUploadLines.AsNoTracking()
-                .Where(x => x.IncludingUploadDeliveryId == uploadId && (x.IsValidationFailure || x.IsSystemFailure))
+                .Where(x => x.IncludingUploadDeliveryId == uploadId && (fullData || x.IsValidationFailure || x.IsSystemFailure))
                 .Select(x => x.UploadLineId)
                 .ToArrayAsync();
         }

@@ -505,7 +505,9 @@ namespace StrDss.Service
 
             if (upload == null) return null;
 
-            var linesWithError = await _uploadRepo.GetUploadLineIdsWithErrors(uploadId);
+            var fullData = upload.UploadDeliveryType == UploadDeliveryTypes.LicenceData;
+
+            var linesWithError = await _uploadRepo.GetUploadLineIdsWithErrors(uploadId, fullData);
 
             var memoryStream = new MemoryStream(upload.SourceBin!);
             using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);

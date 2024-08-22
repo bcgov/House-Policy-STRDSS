@@ -19,6 +19,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ErrorHandlingService } from '../../../../common/services/error-handling.service';
 import { TagModule } from 'primeng/tag';
+import { BusinessLicenceService } from '../../../../common/services/business-licence.service';
+import { BusinessLicence } from '../../../../common/models/business-licence';
 
 @Component({
   selector: 'app-listing-details',
@@ -52,6 +54,7 @@ export class ListingDetailsComponent implements OnInit {
   addressChangeCandidates = new Array<ListingAddressCandidate>();
   selectedCandidate!: ListingAddressCandidate;
   isJurisdictionDifferent = false;
+  blInfo!: BusinessLicence;
 
   constructor(
     private route: ActivatedRoute,
@@ -78,6 +81,10 @@ export class ListingDetailsComponent implements OnInit {
     });
 
     this.getListingDetailsById(this.id);
+  }
+
+  isBoolDefined(prop: boolean | undefined): boolean {
+    return typeof prop === 'boolean';
   }
 
   showLegend(): void {
@@ -167,6 +174,7 @@ export class ListingDetailsComponent implements OnInit {
     this.listingService.getListingDetailsById(id).subscribe({
       next: (response: ListingDetails) => {
         this.listing = response;
+        this.blInfo = response.bizLicenceInfo;
       },
       complete: () => {
         this.loaderService.loadingEnd();

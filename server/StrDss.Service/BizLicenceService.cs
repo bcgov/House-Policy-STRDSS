@@ -12,50 +12,50 @@ using System.Diagnostics;
 
 namespace StrDss.Service
 {
-    public interface IBizLicenseService
+    public interface IBizLicenceService
     {
-        Task<BizLicenseDto?> GetBizLicense(long businessLicenceId);
-        Task ProcessBizLicenseUploadAsync();
-        Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo);
+        Task<BizLicenceDto?> GetBizLicence(long businessLicenceId);
+        Task ProcessBizLicenceUploadAsync();
+        Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo);
     }
-    public class BizLicenseService : ServiceBase, IBizLicenseService
+    public class BizLicenceService : ServiceBase, IBizLicenceService
     {
-        private IBizLicenseRepository _bizLicenseRepo;
+        private IBizLicenceRepository _bizLicenceRepo;
         private IUploadDeliveryRepository _uploadRepo;
         private IOrganizationRepository _orgRepo;
         private ICodeSetRepository _codeSetRepo;
 
-        public BizLicenseService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IBizLicenseRepository bizLicenseRepo, IUploadDeliveryRepository uploadRepo, IOrganizationRepository orgRepo, ICodeSetRepository codeSetRepo) 
+        public BizLicenceService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
+            IBizLicenceRepository bizLicenceRepo, IUploadDeliveryRepository uploadRepo, IOrganizationRepository orgRepo, ICodeSetRepository codeSetRepo) 
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
-            _bizLicenseRepo = bizLicenseRepo;
+            _bizLicenceRepo = bizLicenceRepo;
             _uploadRepo = uploadRepo;
             _orgRepo = orgRepo;
             _codeSetRepo = codeSetRepo;
         }
 
-        public async Task<BizLicenseDto?> GetBizLicense(long businessLicenceId)
+        public async Task<BizLicenceDto?> GetBizLicence(long businessLicenceId)
         {
-            return await _bizLicenseRepo.GetBizLicense(businessLicenceId);
+            return await _bizLicenceRepo.GetBizLicence(businessLicenceId);
         }
 
-        public async Task ProcessBizLicenseUploadAsync()
+        public async Task ProcessBizLicenceUploadAsync()
         {
             if (!_validator.CommonCodes.Any())
             {
                 _validator.CommonCodes = await _codeSetRepo.LoadCodeSetAsync();
             }
 
-            var upload = await _uploadRepo.GetUploadToProcessAsync(UploadDeliveryTypes.LicenseData);
+            var upload = await _uploadRepo.GetUploadToProcessAsync(UploadDeliveryTypes.LicenceData);
 
             if (upload != null)
             {
                 using var transaction = _unitOfWork.BeginTransaction();
 
-                await _bizLicenseRepo.CreateBizLicTempTable();
+                await _bizLicenceRepo.CreateBizLicTempTable();
 
-                await ProcessBizLicenseUploadAsync(upload);
+                await ProcessBizLicenceUploadAsync(upload);
 
                 _unitOfWork.Commit();
 
@@ -63,23 +63,23 @@ namespace StrDss.Service
 
                 if (errorCount == 0)
                 {
-                    await _bizLicenseRepo.ProcessBizLicTempTable(upload.ProvidingOrganizationId);
-                    _logger.LogInformation($"Success: Finished Business License Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
+                    await _bizLicenceRepo.ProcessBizLicTempTable(upload.ProvidingOrganizationId);
+                    _logger.LogInformation($"Success: Finished Business Licence Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
                 }
                 else
                 {
-                    _logger.LogInformation($"Fail: Finished Business License Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
+                    _logger.LogInformation($"Fail: Finished Business Licence Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
                 }
 
                 transaction.Commit();
             }            
         }
 
-        private async Task ProcessBizLicenseUploadAsync(DssUploadDelivery upload)
+        private async Task ProcessBizLicenceUploadAsync(DssUploadDelivery upload)
         {
             var processStopwatch = Stopwatch.StartNew();
 
-            _logger.LogInformation($"Processing Business License Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
+            _logger.LogInformation($"Processing Business Licence Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
 
             var count = 0;
 
@@ -122,7 +122,7 @@ namespace StrDss.Service
 
             csvReader.Read();
 
-            var row = csvReader.GetRecord<BizLicenseRowUntyped>(); 
+            var row = csvReader.GetRecord<BizLicenceRowUntyped>(); 
 
             _logger.LogInformation($"Processing listing ({row.OrgCd} - {row.BusinessLicenceNo})");
 
@@ -130,7 +130,7 @@ namespace StrDss.Service
 
             var errors = new Dictionary<string, List<string>>();
 
-            _validator.Validate(Entities.BizLicenseRowUntyped, row, errors);
+            _validator.Validate(Entities.BizLicenceRowUntyped, row, errors);
 
             if (errors.Count > 0)
             {
@@ -140,7 +140,7 @@ namespace StrDss.Service
 
             row.LicenceStatusType = row.LicenceStatusType.IsEmpty() ? "ISSUED" : row.LicenceStatusType;
 
-            await _bizLicenseRepo.InsertRowToBizLicTempTable(row, org.OrganizationId);
+            await _bizLicenceRepo.InsertRowToBizLicTempTable(row, org.OrganizationId);
 
             SaveUploadLine(line, errors, false, "");
 
@@ -161,9 +161,9 @@ namespace StrDss.Service
             uploadLine.IsProcessed = true;
         }
 
-        public async Task<(long?, string?)> GetMatchingBusinessLicenseIdAndNo(long orgId, string effectiveBizLicNo)
+        public async Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo)
         {
-            return await _bizLicenseRepo.GetMatchingBusinessLicenseIdAndNo(orgId, effectiveBizLicNo);
+            return await _bizLicenceRepo.GetMatchingBusinessLicenceIdAndNo(orgId, effectiveBizLicNo);
         }
     }
 }

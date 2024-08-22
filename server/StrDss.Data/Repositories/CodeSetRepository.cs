@@ -28,7 +28,7 @@ namespace StrDss.Data.Repositories
                 .AsNoTracking()
                 .Select(x => new CommonCodeDto
                 {
-                    CodeSet = CodeSet.LicenseStatus,
+                    CodeSet = CodeSet.LicenceStatus,
                     CodeName = x.LicenceStatusType,
                     CodeValue = x.LicenceStatusTypeNm
                 }).ToListAsync()

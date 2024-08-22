@@ -49,6 +49,7 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS select drl.rental_listing_id
 	, demt.email_message_type_nm as last_action_nm
 	, dem.message_delivery_dtm as last_action_dtm
 	, dbl.business_licence_id
+	, dbl.business_licence_no as business_licence_no_matched
 FROM dss_rental_listing drl
 join dss_organization org on org.organization_id=drl.offering_organization_id
 LEFT JOIN dss_listing_status_type dlst on drl.listing_status_type=dlst.listing_status_type

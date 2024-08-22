@@ -15,6 +15,8 @@ using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
 using System.Diagnostics;
+using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace StrDss.Service
@@ -416,16 +418,19 @@ namespace StrDss.Service
 
             masterListing.EffectiveHostNm = CommonUtils.SanitizeAndUppercaseString(row.PropertyHostNm);
 
-            var needBusinessLicenseLink = await this.NeedBusinessLicenseLink(masterListing, physicalAddress);
+            var managingOrgId = physicalAddress.ContainingOrganizationId.HasValue ?
+                await _orgRepo.GetManagingOrgId(physicalAddress.ContainingOrganizationId.Value) : null;
+
+            var needBusinessLicenseLink = await NeedBusinessLicenseLink(masterListing, managingOrgId);
 
             if (needBusinessLicenseLink)
             {
-                if (!string.IsNullOrEmpty(masterListing.BusinessLicenceNo) && physicalAddress.ContainingOrganizationId.HasValue)
+                if (!string.IsNullOrEmpty(masterListing.BusinessLicenceNo) && managingOrgId.HasValue)
                 {
                     var sanitizedBizLicNo = CommonUtils.SanitizeAndUppercaseString(masterListing.BusinessLicenceNo);
 
                     var (businessLicenceId, businessLicenceNo) = await _bizLicRepo.GetMatchingBusinessLicenseIdAndNo(
-                        physicalAddress.ContainingOrganizationId.Value,
+                        managingOrgId.Value,
                         sanitizedBizLicNo
                     );
 
@@ -449,7 +454,7 @@ namespace StrDss.Service
             return (true, masterListing);
         }
 
-        private async Task<bool> NeedBusinessLicenseLink(DssRentalListing masterListing, DssPhysicalAddress physicalAddress)
+        private async Task<bool> NeedBusinessLicenseLink(DssRentalListing masterListing, long? managingOrgId)
         {
             // If there's no existing link, a link is needed
             if (masterListing.GoverningBusinessLicenceId == null)
@@ -463,11 +468,11 @@ namespace StrDss.Service
                 return true;
 
             // A de-link is needed if the listing has no jurisdiction
-            if (!physicalAddress.ContainingOrganizationId.HasValue)
+            if (!managingOrgId.HasValue)
                 return true;
 
             // A re-link is needed if the listing has been reassigned to a different jurisdiction
-            if (physicalAddress.ContainingOrganizationId.Value != orgId)
+            if (managingOrgId.Value != orgId)
                 return true;
 
             // Keep the overridden link if the business license has been changed

@@ -1,34 +1,57 @@
 CREATE OR REPLACE PROCEDURE dss_process_biz_lic_table(lg_id BIGINT)
 LANGUAGE plpgsql
 AS $$
+DECLARE
+	source_count int;
+	unlink_count int;
+	delete_count int;
+	merged_count int;
+	linked_count int;
 BEGIN
-
+    -- Exit if temporary table is missing
     IF NOT EXISTS (
         SELECT 1
         FROM pg_tables
-        WHERE schemaname = 'public'
-        AND tablename = 'biz_lic_table'
+        WHERE tablename = 'biz_lic_table'
     ) THEN
         RAISE NOTICE 'biz_lic_table does not exist. Exiting procedure.';
         RETURN;
     END IF;
-	
+
+	SELECT COUNT(1) INTO source_count
+	FROM biz_lic_table
+	WHERE providing_organization_id = lg_id;
+
+    RAISE NOTICE 'Found % source rows', source_count;
+
     -- Unlink before Deletion
 	MERGE INTO dss_rental_listing AS tgt
 	USING (
 		SELECT business_licence_id
-		FROM dss_business_licence
-		WHERE providing_organization_id IN (SELECT providing_organization_id FROM biz_lic_table)
-		  AND business_licence_no NOT IN (SELECT business_licence_no FROM biz_lic_table)
+		FROM dss_business_licence AS dbl
+		WHERE providing_organization_id = lg_id
+		  AND NOT EXISTS (
+					SELECT 1 FROM biz_lic_table AS blt
+					WHERE blt.business_licence_no = dbl.business_licence_no AND blt.providing_organization_id = lg_id)
 	) AS src
 	ON (tgt.governing_business_licence_id = src.business_licence_id)
     WHEN MATCHED THEN
 		UPDATE SET governing_business_licence_id = NULL;
 
+	GET DIAGNOSTICS unlink_count = ROW_COUNT;
+
+    RAISE NOTICE 'Unlinked business licences for % listings', unlink_count;
+
     -- Deletion 
-	DELETE FROM dss_business_licence
-	WHERE providing_organization_id IN (SELECT providing_organization_id FROM biz_lic_table)
-	  AND business_licence_no NOT IN (SELECT business_licence_no FROM biz_lic_table);
+	DELETE FROM dss_business_licence AS dbl
+	WHERE providing_organization_id = lg_id
+	  AND NOT EXISTS (
+				SELECT 1 FROM biz_lic_table AS blt
+				WHERE blt.business_licence_no = dbl.business_licence_no AND blt.providing_organization_id = lg_id);
+
+	GET DIAGNOSTICS delete_count = ROW_COUNT;
+
+    RAISE NOTICE 'Deleted % business licences', delete_count;
 
     -- Insert into dss_business_licence from biz_lic_table or update if exists
 	MERGE INTO dss_business_licence AS tgt
@@ -80,6 +103,10 @@ BEGIN
         src.is_owner_living_onsite, src.is_owner_property_tenant, src.property_folio_no, src.property_parcel_identifier_no,
         src.property_legal_description_txt, src.licence_status_type, src.providing_organization_id);
 
+	GET DIAGNOSTICS merged_count = ROW_COUNT;
+
+    RAISE NOTICE 'Created or refreshed % business licences', merged_count;
+
     -- Update dss_rental_listing if differing match found
 	MERGE INTO dss_rental_listing AS tgt
 	USING (
@@ -88,15 +115,19 @@ BEGIN
 		JOIN dss_physical_address dpa ON drl.locating_physical_address_id = dpa.physical_address_id
 		JOIN dss_organization lgs ON lgs.organization_id = dpa.containing_organization_id AND dpa.match_score_amt > 1
 		LEFT JOIN dss_business_licence dbl ON (
-            regexp_replace(UPPER(drl.business_licence_no), '[^A-Z0-9]+', '', 'g') = regexp_replace(UPPER(dbl.business_licence_no), '[^A-Z0-9]+', '', 'g') 
+            regexp_replace(UPPER(drl.business_licence_no), '[^A-Z0-9]+', '', 'g') = regexp_replace(UPPER(dbl.business_licence_no), '[^A-Z0-9]+', '', 'g')
             AND lgs.managing_organization_id = dbl.providing_organization_id)
 		WHERE drl.including_rental_listing_report_id IS NULL 
 		  AND COALESCE(drl.governing_business_licence_id, -1) != COALESCE(dbl.business_licence_id, -1)
-		  AND dbl.providing_organization_id = lg_id
+		  AND lgs.managing_organization_id = lg_id
 	) AS src
 	ON (tgt.rental_listing_id = src.rental_listing_id)
     WHEN MATCHED THEN
 		UPDATE SET governing_business_licence_id = src.business_licence_id;
+
+	GET DIAGNOSTICS linked_count = ROW_COUNT;
+
+    RAISE NOTICE 'Linked business licences for % listings', linked_count;
 
     -- Optional: Truncate the temporary table after processing
     TRUNCATE TABLE biz_lic_table;

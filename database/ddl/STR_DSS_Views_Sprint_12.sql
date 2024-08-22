@@ -79,10 +79,10 @@ SELECT
   SUM(CASE WHEN dul.is_processed = true AND dul.is_validation_failure = false AND dul.is_system_failure = false THEN 1 ELSE 0 END) AS success,
   CASE 
       WHEN dud.upload_delivery_type = 'Takedown Data' THEN 'Processed'
-      WHEN dud.upload_delivery_type = 'License Data' and COUNT(*) = SUM(CASE WHEN dul.is_processed = true THEN 1 ELSE 0 END) 
+      WHEN dud.upload_delivery_type = 'Licence Data' and COUNT(*) = SUM(CASE WHEN dul.is_processed = true THEN 1 ELSE 0 END) 
   		and COUNT(*) = SUM(CASE WHEN dul.is_processed = true THEN 1 ELSE 0 END) 
   		and SUM(CASE WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1 ELSE 0 END) = 0 THEN 'Processed'
-      WHEN dud.upload_delivery_type = 'License Data' and COUNT(*) = SUM(CASE WHEN dul.is_processed = true THEN 1 ELSE 0 END) 
+      WHEN dud.upload_delivery_type = 'Licence Data' and COUNT(*) = SUM(CASE WHEN dul.is_processed = true THEN 1 ELSE 0 END) 
   		and COUNT(*) = SUM(CASE WHEN dul.is_processed = true THEN 1 ELSE 0 END) 
   		and SUM(CASE WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1 ELSE 0 END) > 0 THEN 'Failed'      
 	  WHEN COUNT(*) = SUM(CASE WHEN dul.is_processed = true THEN 1 ELSE 0 END) THEN 'Processed' 

@@ -99,7 +99,7 @@ namespace StrDss.Service
             {
                 return new string[] { "rpt_period", "rpt_type", "org_cd", "listing_id" };
             }
-            else if (reportType == UploadDeliveryTypes.LicenseData)
+            else if (reportType == UploadDeliveryTypes.LicenceData)
             {
                 return new string[] { "org_cd", "bus_lic_no", "bus_lic_exp_dt", "rental_address" };
             }
@@ -147,7 +147,7 @@ namespace StrDss.Service
                 return (errors, "");
             }
 
-            if (reportType == UploadDeliveryTypes.LicenseData)
+            if (reportType == UploadDeliveryTypes.LicenceData)
             {
                 if (org.OrganizationType != OrganizationTypes.LG)
                 {
@@ -199,13 +199,13 @@ namespace StrDss.Service
             var orgCdMissing = 0;
             var invalidOrgCds = new List<string>();
             var listingIdMissing = 0;
-            var bizLicenseMissing = 0;
+            var bizLicenceMissing = 0;
 
             var listingIds = new List<string>();
             var duplicateListingIds = new List<string>();            
 
-            var bizLicenses = new List<string>();
-            var duplicateBizLicenses = new List<string>();
+            var bizLicences = new List<string>();
+            var duplicateBizLicences = new List<string>();
 
             var orgCds = new List<string>();
 
@@ -227,7 +227,7 @@ namespace StrDss.Service
 
                     if (mandatoryFields.Contains("listing_id") && row.ListingId.IsEmpty()) listingIdMissing++;
 
-                    if (mandatoryFields.Contains("bus_lic_no") && row.BusinessLicenceNo.IsEmpty()) bizLicenseMissing++;
+                    if (mandatoryFields.Contains("bus_lic_no") && row.BusinessLicenceNo.IsEmpty()) bizLicenceMissing++;
 
                     if (mandatoryFields.Contains("rpt_type") && row.RptType != reportType)
                     {
@@ -259,9 +259,9 @@ namespace StrDss.Service
 
                     if (mandatoryFields.Contains("bus_lic_no"))
                     {
-                        if (!bizLicenses.Contains($"{row.OrgCd}-{row.BusinessLicenceNo.ToUpper()}"))
+                        if (!bizLicences.Contains($"{row.OrgCd}-{row.BusinessLicenceNo.ToUpper()}"))
                         {
-                            bizLicenses.Add($"{row.OrgCd}-{row.BusinessLicenceNo.ToUpper()}");
+                            bizLicences.Add($"{row.OrgCd}-{row.BusinessLicenceNo.ToUpper()}");
                             uploadLines.Add(new DssUploadLine
                             {
                                 IsValidationFailure = false,
@@ -274,7 +274,7 @@ namespace StrDss.Service
                         }
                         else
                         {
-                            duplicateBizLicenses.Add($"{row.OrgCd}-{row.BusinessLicenceNo.ToUpper()}");
+                            duplicateBizLicences.Add($"{row.OrgCd}-{row.BusinessLicenceNo.ToUpper()}");
                         }
                     }
 
@@ -350,14 +350,14 @@ namespace StrDss.Service
                 errors.AddItem("listing_id", $"Duplicate listing ID(s) found: {string.Join(", ", duplicateListingIds.ToArray())}. Each listing ID must be unique within an organization code.");
             }
 
-            if (bizLicenseMissing > 0)
+            if (bizLicenceMissing > 0)
             {
-                errors.AddItem("bus_lic_no", $"Business Licence No missing in {bizLicenseMissing} record(s). Please provide a Business Licence No.");
+                errors.AddItem("bus_lic_no", $"Business Licence No missing in {bizLicenceMissing} record(s). Please provide a Business Licence No.");
             }
 
-            if (duplicateBizLicenses.Count > 0)
+            if (duplicateBizLicences.Count > 0)
             {
-                errors.AddItem("bus_lic_no", $"Duplicate Business Licence No(s) found: {string.Join(", ", duplicateBizLicenses.ToArray())}. Each Business Licence No must be unique within an organization code.");
+                errors.AddItem("bus_lic_no", $"Duplicate Business Licence No(s) found: {string.Join(", ", duplicateBizLicences.ToArray())}. Each Business Licence No must be unique within an organization code.");
             }
 
             return (errors, header);

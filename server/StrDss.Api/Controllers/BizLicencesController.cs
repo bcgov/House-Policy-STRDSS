@@ -12,22 +12,22 @@ namespace StrDss.Api.Controllers
     [ApiVersion("1.0")]
     [Route("api/[controller]")]
     [ApiController]
-    public class BizLicensesController : BaseApiController
+    public class BizLicencesController : BaseApiController
     {
         private IUploadDeliveryService _uploadService;
-        private IBizLicenseService _bizLicenseService;
+        private IBizLicenceService _bizLicenceService;
 
-        public BizLicensesController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
-            IUploadDeliveryService uploadService, IBizLicenseService bizLicenseService) 
+        public BizLicencesController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
+            IUploadDeliveryService uploadService, IBizLicenceService bizLicenceService) 
             : base(currentUser, mapper, config, logger)
         {
             _uploadService = uploadService;
-            _bizLicenseService = bizLicenseService;
+            _bizLicenceService = bizLicenceService;
         }
 
         [ApiAuthorize(Permissions.LicenceFileUpload)]
         [HttpPost]
-        public async Task<ActionResult> UploadBizLicenses([FromForm] PlatformDataUploadDto dto)
+        public async Task<ActionResult> UploadBizLicences([FromForm] PlatformDataUploadDto dto)
         {
             Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
 
@@ -54,7 +54,7 @@ namespace StrDss.Api.Controllers
 
             using var stream = dto.File.OpenReadStream();
 
-            errors = await _uploadService.UploadPlatformData(UploadDeliveryTypes.LicenseData, dto.ReportPeriod, dto.OrganizationId, stream);
+            errors = await _uploadService.UploadPlatformData(UploadDeliveryTypes.LicenceData, dto.ReportPeriod, dto.OrganizationId, stream);
 
             if (errors.Count > 0)
             {
@@ -68,7 +68,7 @@ namespace StrDss.Api.Controllers
         [HttpGet("uploadhistory")]
         public async Task<ActionResult> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
-            var history = await _uploadService.GetUploadHistory(orgId, pageSize, pageNumber, orderBy, direction, UploadDeliveryTypes.LicenseData);
+            var history = await _uploadService.GetUploadHistory(orgId, pageSize, pageNumber, orderBy, direction, UploadDeliveryTypes.LicenceData);
 
             return Ok(history);
         }
@@ -77,7 +77,7 @@ namespace StrDss.Api.Controllers
         //[HttpGet("process")]
         //public async Task<ActionResult> ProcessUpload()
         //{
-        //    await _bizLicenseService.ProcessBizLicenseUploadAsync();
+        //    await _bizLicenceService.ProcessBizLicenceUploadAsync();
         //    return Ok();
         //}
     }

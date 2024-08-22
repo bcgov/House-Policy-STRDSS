@@ -28,13 +28,13 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet]
-        public async Task<ActionResult> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+        public async Task<ActionResult> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete,
             int pageSize, int pageNumber, string orderBy = "ListingStatusSortNo", string direction = "asc")
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
-            var listings = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicense, 
+            var listings = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicence, 
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
                 pageSize, pageNumber, orderBy, direction);
 

@@ -11,7 +11,7 @@ namespace StrDss.Data.Repositories
 {
     public interface IRentalListingRepository
     {
-        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
@@ -36,7 +36,7 @@ namespace StrDss.Data.Repositories
         {
             _userRepo = userRepo;
         }
-        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction)
         {
             var query = _dbSet.AsNoTracking();
@@ -80,10 +80,10 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.ListingContactNamesTxt != null && x.ListingContactNamesTxt.ToLower().Contains(hostNameLower));
             }
 
-            if (businessLicense != null && businessLicense.IsNotEmpty())
+            if (businessLicence != null && businessLicence.IsNotEmpty())
             {
-                var businessLicenseLower = businessLicense.ToLower();
-                query = query.Where(x => x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(businessLicenseLower));
+                var businessLicenceLower = businessLicence.ToLower();
+                query = query.Where(x => x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(businessLicenceLower));
             }
 
             if (prRequirement != null)
@@ -218,7 +218,7 @@ namespace StrDss.Data.Repositories
 
             listing.AddressChangeHistory = await GetAddressChangeHistoryAsync(rentalListingId);
 
-            listing.BizLicenseInfo = _mapper.Map<BizLicenseDto>(
+            listing.BizLicenceInfo = _mapper.Map<BizLicenceDto>(
                 await _dbContext.DssBusinessLicences.AsNoTracking().Include(x => x.LicenceStatusTypeNavigation)
                     .FirstOrDefaultAsync(x => x.BusinessLicenceId == listing.BusinessLicenceId)
             );

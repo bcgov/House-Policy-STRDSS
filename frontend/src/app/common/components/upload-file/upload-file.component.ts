@@ -51,6 +51,7 @@ export class UploadFileComponent {
         }
 
         this.filesSelected.emit(validFiles);
+        (fileInput as any).value = null;
       }
     });
 

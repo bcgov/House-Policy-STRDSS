@@ -1,0 +1,114 @@
+<div class="title">Upload Business Licence Data</div>
+<div class="tile" *ngIf="currentUser">
+    <div class="row" *ngIf="!isCEU; else jurisdiction_block">
+        <button pButton (click)="onUploadOpen()" icon="pi pi-upload">&nbsp;Upload Business Licence Data</button>
+    </div>
+    <ng-template #jurisdiction_block>
+        <div class="row">
+            <p-dropdown placeholder="Select Jurisdiction" appendTo="body" panelStyleClass="select-jurisdiction-panel"
+                [inputId]="'jurisdiction-filter-dropdown'" [filter]="true" [filterBy]="'label'"
+                class="select-jurisdiction-dropdown" [options]="groupedCommunities" [group]="true"
+                [(ngModel)]="jurisdictionId" (onChange)="onJurisdictionChanged($event)">
+                <ng-template let-group pTemplate="group">
+                    <strong>{{group.label}}</strong>
+                </ng-template>
+            </p-dropdown>
+        </div>
+    </ng-template>
+    <div class="row table-row">
+        <p-table [value]="uploadHistory" [paginator]="uploadHistory.length>12" [showPageLinks]="false"
+            currentPageReportTemplate="{first}-{last} of {totalRecords}" [showFirstLastIcon]="false"
+            [showCurrentPageReport]="true" paginatorStyleClass="paging-right" [rows]="12" styleClass="p-datatable-sm"
+            class="table-paging-right">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'organizationNm'"
+                        (click)="onSort('status')">
+                        Jurisdiction
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'status'"
+                        (click)="onSort('status')">
+                        Status
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'status' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'status' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'total'"
+                        (click)="onSort('total')">
+                        Total Records
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'total' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'total' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'updDtm'"
+                        (click)="onSort('updDtm')">
+                        Upload Date
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'asc'"></i>
+                    </th>
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'givenNm'"
+                        (click)="onSort('givenNm')">
+                        Uploaded By
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'givenNm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'givenNm' && this.sort.dir === 'asc'"></i>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-uploadHistory>
+                <tr>
+                    <td>{{ uploadHistory.organizationNm }}</td>
+                    <td>
+                        <span *ngIf="uploadHistory.status==='Processed'; then processed; else pending"></span>
+                        <ng-template #processed> <span
+                                class="state-processed">{{uploadHistory.status}}</span></ng-template>
+                        <ng-template #pending><span class="state-pending">{{uploadHistory.status}}</span></ng-template>
+                    </td>
+                    <td>{{ uploadHistory.total }}</td>
+                    <td>{{ uploadHistory.updDtm | date }}</td>
+                    <td>{{ uploadHistory.givenNm }} {{uploadHistory.familyNm}}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="5">No records found</td>
+                </tr>
+            </ng-template>
+        </p-table>
+        <p-paginator class="bl-history-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)" [rows]="10"
+            [totalRecords]="currentPage.totalCount || 0"
+            currentPageReportTemplate="Rows per page {rows} {first}-{last} of {totalRecords}"
+            [showFirstLastIcon]="false" [showPageLinks]="false" [showCurrentPageReport]="true"></p-paginator>
+    </div>
+</div>
+
+<p-dialog header="Upload Business Licence Data" class="upload-bl-popup" [modal]="true" [closable]="true"
+    [(visible)]="isUploadVisible" [style]="{width: '640px'}" clo>
+    <ng-template pTemplate="body">
+        <div class="row sub-header">
+            Upload Your Business Licence Data (.CSV File Only)
+        </div>
+        <div class="row file-select">
+            <app-upload-file #componentRef [extension]="'.csv'" [sizeLimit]="maxFileSize"
+                (filesSelected)="onFileSelected($event,componentRef)"></app-upload-file>
+            <div class="fileName">{{selectedFile?.name || 'No file selected'}}</div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="actions popup-actions">
+            <button [disabled]="!selectedFile" pButton id="submit-preview-btn" (click)="onUploadFile()">Upload</button>
+            <button pButton id="cancel-preview-btn" class="outline-btn" (click)="onCancelUpload()">Cancel</button>
+        </div>
+    </ng-template>
+</p-dialog>

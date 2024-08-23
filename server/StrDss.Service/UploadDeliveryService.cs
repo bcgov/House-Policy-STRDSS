@@ -18,7 +18,7 @@ namespace StrDss.Service
     {
         Task<Dictionary<string, List<string>>> UploadPlatformData(string reportType, string reportPeriod, long orgId, Stream stream);
         Task<(Dictionary<string, List<string>>, string header)> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines);
-        Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string? reportType = null);
+        Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes);
         Task<byte[]?> GetRentalListingErrorFile(long uploadId);
     }
     public class UploadDeliveryService : ServiceBase, IUploadDeliveryService
@@ -494,9 +494,9 @@ namespace StrDss.Service
             return errors;
         }
 
-        public async Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string? reportType = null)
+        public async Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes)
         {
-            return await _uploadRepo.GetUploadHistory(orgId, pageSize, pageNumber, orderBy, direction, reportType);
+            return await _uploadRepo.GetUploadHistory(orgId, pageSize, pageNumber, orderBy, direction, reportTypes);
         }
 
         public async Task<byte[]?> GetRentalListingErrorFile(long uploadId)

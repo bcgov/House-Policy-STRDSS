@@ -24,15 +24,17 @@ namespace StrDss.Service
         private IUploadDeliveryRepository _uploadRepo;
         private IOrganizationRepository _orgRepo;
         private ICodeSetRepository _codeSetRepo;
+        private IRentalListingRepository _listingRepo;
 
         public BizLicenceService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IBizLicenceRepository bizLicenceRepo, IUploadDeliveryRepository uploadRepo, IOrganizationRepository orgRepo, ICodeSetRepository codeSetRepo) 
+            IBizLicenceRepository bizLicenceRepo, IUploadDeliveryRepository uploadRepo, IOrganizationRepository orgRepo, ICodeSetRepository codeSetRepo, IRentalListingRepository listingRepo) 
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _bizLicenceRepo = bizLicenceRepo;
             _uploadRepo = uploadRepo;
             _orgRepo = orgRepo;
             _codeSetRepo = codeSetRepo;
+            _listingRepo = listingRepo;
         }
 
         public async Task<BizLicenceDto?> GetBizLicence(long businessLicenceId)
@@ -42,6 +44,15 @@ namespace StrDss.Service
 
         public async Task ProcessBizLicenceUploadAsync()
         {
+            var isListingUploadProcessRunning = await _listingRepo.IsListingUploadProcessRunning();
+
+            if (isListingUploadProcessRunning)
+            {
+                _logger.LogInformation("Skipping ProcessBizLicenceUploadAsync: Rental Listing Upload Process is running");
+                return;
+            }
+
+
             if (!_validator.CommonCodes.Any())
             {
                 _validator.CommonCodes = await _codeSetRepo.LoadCodeSetAsync();
@@ -49,38 +60,37 @@ namespace StrDss.Service
 
             var upload = await _uploadRepo.GetUploadToProcessAsync(UploadDeliveryTypes.LicenceData);
 
-            if (upload != null)
-            {
-                using var transaction = _unitOfWork.BeginTransaction();
+            if (upload == null) return;
 
-                await _bizLicenceRepo.CreateBizLicTempTable();
+            var processStopwatch = Stopwatch.StartNew();
 
-                await ProcessBizLicenceUploadAsync(upload);
+            _logger.LogInformation($"Processing Business Licence Upload Id ({upload.UploadDeliveryId}): {upload.ProvidingOrganization.OrganizationNm}");
 
-                _unitOfWork.Commit();
+            using var transaction = _unitOfWork.BeginTransaction();
 
-                var errorCount = upload.DssUploadLines.Count(x => x.IsValidationFailure);
+            await _bizLicenceRepo.CreateBizLicTempTable();
 
-                if (errorCount == 0)
-                {
-                    await _bizLicenceRepo.ProcessBizLicTempTable(upload.ProvidingOrganizationId);
-                    _logger.LogInformation($"Success: Finished Business Licence Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
-                }
-                else
-                {
-                    _logger.LogInformation($"Fail: Finished Business Licence Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
-                }
+            await ProcessBizLicenceUploadAsync(upload);
 
-                transaction.Commit();
-            }            
+            _unitOfWork.Commit();
+
+            var errorCount = upload.DssUploadLines.Count(x => x.IsValidationFailure);
+
+            if (errorCount == 0) await _bizLicenceRepo.ProcessBizLicTempTable(upload.ProvidingOrganizationId);
+
+            transaction.Commit();
+
+            processStopwatch.Stop();
+
+            var msg = errorCount == 0 ?
+                $"Success: Finished Business Licence Upload Id ({upload.UploadDeliveryId}): {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds" :
+                $"Fail: Finished Business Licence Upload Id ({upload.UploadDeliveryId}): {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds";
+
+            _logger.LogInformation($"Finished: Business Licence Upload Id ({upload.UploadDeliveryId}): {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
         private async Task ProcessBizLicenceUploadAsync(DssUploadDelivery upload)
         {
-            var processStopwatch = Stopwatch.StartNew();
-
-            _logger.LogInformation($"Processing Business Licence Upload {upload.UploadDeliveryId} - {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
-
             var count = 0;
 
             var header = upload.SourceHeaderTxt ?? "";
@@ -90,8 +100,6 @@ namespace StrDss.Service
 
             foreach (var lineToProcess in linesToProcess)
             {
-                var stopwatch = Stopwatch.StartNew();
-
                 var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, lineToProcess.OrgCd, lineToProcess.SourceRecordNo);
 
                 count++;
@@ -103,15 +111,7 @@ namespace StrDss.Service
                 var csvReader = new CsvReader(textReader, csvConfig);
 
                 var (orgCd, sourceRecordNo) = await ProcessLine(upload, header, uploadLine, csvReader);
-
-                stopwatch.Stop();
-
-                _logger.LogInformation($"Finishing line ({orgCd} - {sourceRecordNo}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds. {count}/{lineCount}");
             }
-
-            processStopwatch.Stop();
-
-            _logger.LogInformation($"Finished: {upload.ReportPeriodYm?.ToString("yyyy-MM")}, {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
         private async Task<(string orgCd, string sourceRecordNo)> ProcessLine(DssUploadDelivery upload, string header, DssUploadLine line, CsvReader csvReader)
@@ -123,8 +123,6 @@ namespace StrDss.Service
             csvReader.Read();
 
             var row = csvReader.GetRecord<BizLicenceRowUntyped>(); 
-
-            _logger.LogInformation($"Processing listing ({row.OrgCd} - {row.BusinessLicenceNo})");
 
             var org = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd);
 

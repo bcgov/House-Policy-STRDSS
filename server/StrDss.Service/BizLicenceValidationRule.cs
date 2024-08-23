@@ -145,6 +145,34 @@ namespace StrDss.Service
             rules.Add(new FieldValidationRule
             {
                 EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.BusinessOperatorNm,
+                FieldType = FieldTypes.String,
+                Required = false,
+                MaxLength = 320,
+            });
+
+            rules.Add(new FieldValidationRule
+            {
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.BusinessOperatorPhoneNo,
+                FieldType = FieldTypes.String,
+                Required = false,
+                MaxLength = 30,
+            });
+
+            rules.Add(new FieldValidationRule
+            {
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.BusinessOperatorEmailAddressDsc,
+                FieldType = FieldTypes.String,
+                Required = false,
+                MaxLength = 320,
+                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Email)
+            });
+
+            rules.Add(new FieldValidationRule
+            {
+                EntityName = Entities.BizLicenceRowUntyped,
                 FieldName = BizLicenceRowFields.InfractionTxt,
                 FieldType = FieldTypes.String,
                 Required = false,
@@ -158,6 +186,15 @@ namespace StrDss.Service
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.YearMonthDay) 
+            });
+
+            rules.Add(new FieldValidationRule
+            {
+                EntityName = Entities.BizLicenceRowUntyped,
+                FieldName = BizLicenceRowFields.PropertyZoneTxt,
+                FieldType = FieldTypes.String,
+                Required = false,
+                MaxLength = 100,
             });
 
             rules.Add(new FieldValidationRule

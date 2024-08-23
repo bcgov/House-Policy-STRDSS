@@ -1,3 +1,5 @@
+import { BusinessLicence } from "./business-licence";
+
 export interface ListingDetails {
     rentalListingId: number;
     listingStatusType: 'N' | 'I' | 'R' | 'A' | 'T';
@@ -44,6 +46,7 @@ export interface ListingDetails {
     actionHistory: Array<ListingDetailsActionHistory>;
     hasAtLeastOneValidHostEmail: boolean;
     hostsInfo: Array<ListingDetailsHostInfo>;
+    bizLicenceInfo: BusinessLicence;
 }
 
 export interface ListingDetailsWithHostCheckboxExtension extends ListingDetails {

@@ -69,6 +69,10 @@ body {
                 width: 100%;
             }
         }
+
+        &.p-dropdown-filter {
+            width: 100%;
+        }
     }
 
     p-multiSelect {
@@ -112,16 +116,43 @@ body {
     }
 
     p-panel {
+        box-shadow: 0px 3.2px 7.2px 0px #00000021;
+        border-radius: 6px;
+
+        .p-panel-header {
+            background-color: #F6F9FC;
+            border: none;
+
+            .p-panel-title {
+                font-family: 'BcSans-bold';
+                font-size: large;
+            }
+        }
+
+        .p-panel-content {
+            border: none;
+            padding: 1rem;
+        }
+
         &.listing-table-panel {
             .p-panel-header {
                 padding: .6rem 1.2rem;
             }
         }
 
-        .p-panel-header {
-            .p-panel-title {
-                font-family: 'BcSans-bold';
-                font-size: large;
+        &.bl-info {
+            .p-panel-header {
+                background-color: #F3F2F1;
+            }
+
+            .p-panel-content {
+                padding-left: 0;
+                padding-right: 0;
+
+                .row {
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
             }
         }
     }
@@ -353,6 +384,7 @@ body {
 
     .p-card {
         border-radius: 4px;
+        box-shadow: 0px 3.2px 7.2px 0px #00000021;
 
         .p-card-body {
             padding: 23px 25px;
@@ -479,6 +511,7 @@ body {
     }
 
     .preview-dialog,
+    .upload-bl-popup,
     .address-change-popup {
         .p-dialog-header {
             border-bottom: 1px solid #D8D8D8;

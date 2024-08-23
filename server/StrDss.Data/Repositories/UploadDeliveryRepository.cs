@@ -22,7 +22,7 @@ namespace StrDss.Data.Repositories
         Task<UploadLineError> GetUploadLineWithError(long lineId);
         Task<bool> UploadHasErrors(long uploadId);
         Task<int> GetTotalNumberOfUploadLines(long uploadId);
-        Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string? reportType = null);
+        Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes);
         Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
     }
 
@@ -137,7 +137,7 @@ namespace StrDss.Data.Repositories
             return await _dbContext.DssUploadLines.Where(x => x.IncludingUploadDeliveryId == uploadId).CountAsync();
         }
 
-        public async Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string? reportType = null)
+        public async Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes)
         {
             var query = _dbContext.DssRentalUploadHistoryViews.AsNoTracking();
 
@@ -149,9 +149,9 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.ProvidingOrganizationId == orgId);
             }
 
-            if (reportType != null)
+            if (reportTypes.Any())
             {
-                query = query.Where(x => x.UploadDeliveryType == reportType);
+                query = query.Where(x => reportTypes.Contains(x.UploadDeliveryType));
             }
 
             var history = await Page<DssRentalUploadHistoryView, UploadHistoryViewDto>(query, pageSize, pageNumber, orderBy, direction);

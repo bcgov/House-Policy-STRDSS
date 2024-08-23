@@ -1,6 +1,23 @@
 /* STR DSS Sprint 12 Local Governments Data Seeding */
 
-UPDATE dss_organization set organization_cd=UPPER(organization_cd) where organization_cd!=UPPER(organization_cd);
+UPDATE dss_user_identity
+SET represented_by_organization_id = (select organization_id from dss_organization where upper(organization_cd) = 'LGXFN-HOMALCO')
+where represented_by_organization_id = (select organization_id from dss_organization where upper(organization_cd) like 'LGXFN-HOMALCO_');
+
+UPDATE dss_email_message
+SET requesting_organization_id = (select organization_id from dss_organization where upper(organization_cd) = 'LGXFN-HOMALCO')
+where requesting_organization_id = (select organization_id from dss_organization where upper(organization_cd) like 'LGXFN-HOMALCO_');
+
+UPDATE dss_rental_listing_extract
+SET filtering_organization_id = (select organization_id from dss_organization where upper(organization_cd) = 'LGXFN-HOMALCO')
+where filtering_organization_id = (select organization_id from dss_organization where upper(organization_cd) like 'LGXFN-HOMALCO_');
+
+DELETE FROM dss_organization
+where upper(organization_cd) like 'LGXFN-HOMALCO_';
+
+UPDATE dss_organization
+set organization_cd=UPPER(organization_cd)
+where organization_cd!=UPPER(organization_cd);
 
 MERGE INTO dss_organization AS tgt
 USING ( SELECT * FROM (VALUES

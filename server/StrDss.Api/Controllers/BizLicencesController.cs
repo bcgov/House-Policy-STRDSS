@@ -68,7 +68,7 @@ namespace StrDss.Api.Controllers
         [HttpGet("uploadhistory")]
         public async Task<ActionResult> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
-            var history = await _uploadService.GetUploadHistory(orgId, pageSize, pageNumber, orderBy, direction, UploadDeliveryTypes.LicenceData);
+            var history = await _uploadService.GetUploadHistory(orgId, pageSize, pageNumber, orderBy, direction, new string[] { UploadDeliveryTypes.LicenceData });
 
             return Ok(history);
         }

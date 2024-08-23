@@ -13,56 +13,60 @@
     </div>
 </div>
 <div class="subtitle" *ngIf="listing">
-    <div class="row">
-        <div class="last-updated-container">
-            <strong>Platform Report Month: </strong>{{listing.latestReportPeriodYm || '-'}}
+    <div class="column">
+        <div class="row">
+            <div class="last-updated-container">
+                <strong>Platform Report Month: </strong>{{listing.latestReportPeriodYm || '-'}}
+            </div>
+            <div class="platform-container">
+                <strong>Platform: </strong>{{listing.offeringOrganizationNm || '-'}}
+            </div>
         </div>
-        <div class="platform-container">
-            <strong>Platform: </strong>{{listing.offeringOrganizationNm || '-'}}
+        <div class="row">
+            <div class="organization-container">
+                <strong>Assigned to: </strong>{{listing.managingOrganizationNm || '-'}}
+            </div>
+            <div class="status-container" [ngSwitch]="listing.listingStatusType">
+                <strong>Listing Status: </strong>
+                <span class="status-item" *ngSwitchCase="'N'">New
+                    <span class="status-circle status-new">
+                        N
+                    </span>
+                </span>
+                <span class="status-item" *ngSwitchCase="'A'">
+                    <span>
+                        Active
+                    </span>
+                    <span class="status-circle status-active">
+                        A
+                    </span>
+                </span>
+                <span class="status-item" *ngSwitchCase="'I'">
+                    <span>
+                        Inactive
+                    </span>
+                    <span class="status-circle status-inactive">
+                        I
+                    </span>
+                </span>
+                <span class="status-item" *ngIf="listing.isLgTransferred">
+                    <span>
+                        Reassigned
+                    </span>
+                    <span class="status-flag status-reassigned">
+                    </span>
+                </span>
+                <span class="status-item" *ngIf="listing.isTakenDown">
+                    <span>
+                        Takedown Complete
+                    </span>
+                    <span class="status-flag status-takedown-complete">
+                    </span>
+                </span>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="organization-container">
-            <strong>Assigned to: </strong>{{listing.managingOrganizationNm || '-'}}
-        </div>
-        <div class="status-container" [ngSwitch]="listing.listingStatusType">
-            <strong>Listing Status: </strong>
-            <span class="status-item" *ngSwitchCase="'N'">New
-                <span class="status-circle status-new">
-                    N
-                </span>
-            </span>
-            <span class="status-item" *ngSwitchCase="'A'">
-                <span>
-                    Active
-                </span>
-                <span class="status-circle status-active">
-                    A
-                </span>
-            </span>
-            <span class="status-item" *ngSwitchCase="'I'">
-                <span>
-                    Inactive
-                </span>
-                <span class="status-circle status-inactive">
-                    I
-                </span>
-            </span>
-            <span class="status-item" *ngIf="listing.isLgTransferred">
-                <span>
-                    Reassigned
-                </span>
-                <span class="status-flag status-reassigned">
-                </span>
-            </span>
-            <span class="status-item" *ngIf="listing.isTakenDown">
-                <span>
-                    Takedown Complete
-                </span>
-                <span class="status-flag status-takedown-complete">
-                </span>
-            </span>
-        </div>
+    <div class="column">
     </div>
 </div>
 <div class="content" *ngIf="listing">
@@ -103,6 +107,7 @@
                 <span class="value">{{listing.businessLicenceNo}}</span>
             </div>
         </p-panel>
+
         <p-panel class="details-block" header="Hosts" *ngIf="listing.hosts">
             <ng-template ngFor let-host [ngForOf]="listing.hosts" let-i="index">
                 <div class="row">
@@ -238,6 +243,133 @@
                     </tr>
                 </ng-template>
             </p-table>
+        </p-panel>
+        <p-panel class="details-block bl-info" header="Business Licence Information">
+            <div *ngIf="!blInfo; else else_block" class="row no-bl-data">
+                <strong>We were unable to find a business licence that matched this listing in our system.</strong>
+            </div>
+            <ng-template #else_block>
+                <div *ngIf="blInfo?.updDtm" class="row">
+                    <strong>Last Update Date:</strong> <span>{{blInfo.updDtm |date:'YYYY-MM-dd' }}</span>
+                </div>
+
+                <div *ngIf="blInfo?.businessNm || 
+                blInfo?.physicalRentalAddressTxt" class="spacer-hr"></div>
+
+                <div *ngIf="blInfo?.businessNm" class="row">
+                    <strong>Business Name:</strong> <span>{{blInfo.businessNm ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.physicalRentalAddressTxt" class="row">
+                    <strong>STR Address:</strong> <span>{{blInfo.physicalRentalAddressTxt ||'-'}}</span>
+                </div>
+
+                <div *ngIf="blInfo?.businessLicenceNo ||
+                blInfo?.licenceTypeTxt || 
+                blInfo?.expiryDt || 
+                blInfo?.licenceStatusType || 
+                blInfo?.restrictionTxt
+                " class="spacer-hr"></div>
+
+                <div *ngIf="blInfo?.businessLicenceNo" class="row">
+                    <strong>Business Licence Number:</strong> <span>{{blInfo.businessLicenceNo ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.licenceTypeTxt" class="row">
+                    <strong>Licence Type:</strong> <span>{{blInfo.licenceTypeTxt ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.expiryDt" class="row">
+                    <strong>Expiry Date: </strong> <span>{{blInfo.expiryDt |date:'YYYY-MM-dd'}}</span>
+                </div>
+                <div *ngIf="blInfo?.licenceStatusType" class="row">
+                    <strong>Status:</strong> <span class="status-name"
+                        [class.status-red]="blInfo.licenceStatusType!=='ISSUED'">{{blInfo.licenceStatus.licenceStatusTypeNm}}</span>
+                </div>
+                <div *ngIf="blInfo?.restrictionTxt" class="row">
+                    <strong>Restriction Note:</strong> <span>{{blInfo.restrictionTxt || 'N/A'}}</span>
+                </div>
+
+                <div *ngIf="blInfo?.businessOwnerNm ||
+                blInfo?.mailingStreetAddressTxt ||
+                blInfo?.businessOwnerEmailAddressDsc ||
+                blInfo?.businessOwnerPhoneNo" class="spacer-hr"></div>
+
+                <div *ngIf="blInfo?.businessOwnerNm" class="row">
+                    <strong>Owner / Licencee Name:</strong> <span>{{blInfo.businessOwnerNm ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.mailingStreetAddressTxt" class="row">
+                    <strong>Mailing Address: </strong>
+                    <span>{{blInfo.mailingStreetAddressTxt}} {{blInfo.mailingCityNm}} {{blInfo.mailingProvinceCd}}
+                        {{blInfo.mailingPostalCd}}</span>
+                </div>
+                <div *ngIf="blInfo?.businessOwnerEmailAddressDsc" class="row">
+                    <strong>Email: </strong> <span>{{blInfo.businessOwnerEmailAddressDsc ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.businessOwnerPhoneNo" class="row">
+                    <strong>Phone: </strong> <span>{{blInfo.businessOwnerPhoneNo ||'-'}}</span>
+                </div>
+
+                <div *ngIf="blInfo?.businessOperatorNm || 
+                blInfo?.businessOperatorEmailAddressDsc || 
+                blInfo?.businessOperatorPhoneNo" class="spacer-hr"></div>
+
+                <div *ngIf="blInfo?.businessOperatorNm" class="row">
+                    <strong>Operator Name:</strong> <span>{{blInfo.businessOperatorNm ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.businessOperatorEmailAddressDsc" class="row">
+                    <strong>Email: </strong> <span>{{blInfo.businessOperatorEmailAddressDsc ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.businessOperatorPhoneNo" class="row">
+                    <strong>Phone: </strong> <span>{{blInfo.businessOperatorPhoneNo ||'-'}}</span>
+                </div>
+
+                <div *ngIf="blInfo?.propertyZoneTxt || 
+                blInfo?.availableBedroomsQty || 
+                blInfo?.maxGuestsAllowedQty || 
+                isBoolDefined(blInfo?.isPrincipalResidence) || 
+                isBoolDefined(blInfo?.isOwnerLivingOnsite) || 
+                isBoolDefined(blInfo?.isOwnerPropertyTenant) ||
+                blInfo?.infractionTxt ||
+                blInfo?.infractionDt " class="spacer-hr"></div>
+
+                <div *ngIf="blInfo?.propertyZoneTxt" class="row">
+                    <strong>Property Zoning:</strong> <span>{{blInfo.propertyZoneTxt ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.availableBedroomsQty" class="row">
+                    <strong>Bedrooms Available: </strong> <span>{{blInfo.availableBedroomsQty ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.maxGuestsAllowedQty" class="row">
+                    <strong>Guest Capacity / Maximum Occupancy: </strong> <span>{{blInfo.maxGuestsAllowedQty
+                        ||'-'}}</span>
+                </div>
+                <div *ngIf="isBoolDefined(blInfo?.isPrincipalResidence)" class="row">
+                    <strong>Principal Residence: </strong> <span>{{blInfo.isPrincipalResidence?'Yes':'No'}}</span>
+                </div>
+                <div *ngIf="isBoolDefined(blInfo?.isOwnerLivingOnsite)" class="row">
+                    <strong>Onsite Owner:</strong> <span>{{blInfo.isOwnerLivingOnsite?'Yes':'No'}}</span>
+                </div>
+                <div *ngIf="isBoolDefined(blInfo?.isOwnerPropertyTenant)" class="row">
+                    <strong>Building Rented: </strong> <span>{{blInfo.isOwnerPropertyTenant?'Yes':'No'}}</span>
+                </div>
+                <div *ngIf="blInfo?.infractionTxt" class="row">
+                    <strong>Infraction: </strong> <span>{{blInfo.infractionTxt ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.infractionDt" class="row">
+                    <strong>Infraction Date: </strong> <span>{{blInfo.infractionDt|date:'YYYY-MM-dd'}}</span>
+                </div>
+
+                <div *ngIf="blInfo?.propertyFolioNo || 
+                blInfo?.propertyParcelIdentifierNo || 
+                blInfo?.propertyLegalDescriptionTxt" class="spacer-hr"></div>
+
+                <div *ngIf="blInfo?.propertyFolioNo" class="row">
+                    <strong>Folio Number:</strong> <span>{{blInfo.propertyFolioNo ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.propertyParcelIdentifierNo" class="row">
+                    <strong>Parcel Identifier (PID): </strong> <span>{{blInfo.propertyParcelIdentifierNo ||'-'}}</span>
+                </div>
+                <div *ngIf="blInfo?.propertyLegalDescriptionTxt" class="row">
+                    <strong>Legal Description: </strong> <span>{{blInfo.propertyLegalDescriptionTxt ||'-'}}</span>
+                </div>
+            </ng-template>
         </p-panel>
     </div>
 </div>

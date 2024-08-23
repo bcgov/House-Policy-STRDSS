@@ -81,11 +81,13 @@ namespace StrDss.Common
 
         public static bool IsValidEmailAddress(string email)
         {
+            if (string.IsNullOrWhiteSpace(email)) return false;
+
             var valid = Regex.IsMatch(email, RegexDefs.GetRegexInfo(RegexDefs.Email).Regex);
 
             if (!valid) return false;
 
-            if (email.StartsWith(".") || email.Contains(".@")) return false;
+            if (email.StartsWith(".") || email.EndsWith(".") || email.Contains(".@") || email.Contains("@.")) return false;
 
             return true;
         }

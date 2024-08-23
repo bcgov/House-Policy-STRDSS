@@ -87,7 +87,7 @@ namespace StrDss.Common
 
             if (!valid) return false;
 
-            if (email.StartsWith(".") || email.EndsWith(".") || email.Contains(".@") || email.Contains("@.")) return false;
+            if (email.StartsWith(".") || email.EndsWith(".") || email.Contains(".@") || email.Contains("@.") || email.Contains("..")) return false;
 
             return true;
         }

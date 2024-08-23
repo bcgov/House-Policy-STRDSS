@@ -37,7 +37,7 @@ namespace StrDss.Api.Controllers
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
             }
 
-            var maxSizeInMb = _config.GetValue<int>("RENTAL_LISTING_REPORT_MAX_SIZE");
+            var maxSizeInMb = _config.GetValue<int>("BUISINESS_LICENCE_MAX_SIZE");
             var maxSizeInB = (maxSizeInMb == 0 ? 2 : maxSizeInMb) * 1024 * 1024;
 
             if (dto.File.Length > maxSizeInB)

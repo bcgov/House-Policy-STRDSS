@@ -71,13 +71,11 @@ namespace StrDss.Service
 
         private void ProcessHosts(RentalListingViewDto listing, bool clearHosts = false)
         {
-            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
-
             foreach (var host in listing.Hosts)
             {
                 if (host.EmailAddressDsc == null) continue;
 
-                var hasValidEmail = Regex.IsMatch(host.EmailAddressDsc, emailRegex.Regex);
+                var hasValidEmail = CommonUtils.IsValidEmailAddress(host.EmailAddressDsc);
 
                 var hostType = host.IsPropertyOwner ? "Property Owner" : "Supplier Host";
 

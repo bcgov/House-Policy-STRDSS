@@ -5,6 +5,7 @@ using Npgsql;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace StrDss.Data.Repositories
@@ -152,7 +153,13 @@ namespace StrDss.Data.Repositories
 
         public async Task ProcessBizLicTempTable(long lgId)
         {
+            var processStopwatch = Stopwatch.StartNew();
+
             await _dbContext.Database.ExecuteSqlRawAsync($"CALL dss_process_biz_lic_table({lgId});");
+
+            processStopwatch.Stop();
+
+            _logger.LogInformation($"Business Licence Link to Listings finished  - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
         public async Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo)

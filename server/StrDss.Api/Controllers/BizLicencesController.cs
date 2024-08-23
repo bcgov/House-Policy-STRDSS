@@ -72,13 +72,5 @@ namespace StrDss.Api.Controllers
 
             return Ok(history);
         }
-
-        //[ApiAuthorize()]
-        //[HttpGet("process")]
-        //public async Task<ActionResult> ProcessUpload()
-        //{
-        //    await _bizLicenceService.ProcessBizLicenceUploadAsync();
-        //    return Ok();
-        //}
     }
 }

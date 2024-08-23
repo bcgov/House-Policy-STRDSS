@@ -78,5 +78,18 @@ namespace StrDss.Common
 
             return Regex.Replace(input, @"[^a-zA-Z0-9]", "").ToUpper();
         }
+
+        public static bool IsValidEmailAddress(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return false;
+
+            var valid = Regex.IsMatch(email, RegexDefs.GetRegexInfo(RegexDefs.Email).Regex);
+
+            if (!valid) return false;
+
+            if (email.StartsWith(".") || email.EndsWith(".") || email.Contains(".@") || email.Contains("@.") || email.Contains("..")) return false;
+
+            return true;
+        }
     }
 }

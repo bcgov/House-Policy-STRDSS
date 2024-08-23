@@ -172,5 +172,6 @@ RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => j
 RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *");
 RecurringJob.AddOrUpdate<HangfireJobs>("Create Rental Listing Export Files", job => job.CreateRentalListingExportFiles(), "50 5 * * *");
 RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Confirmation Report", job => job.ProcessTakedownConfirmation(), "0 * * * *");
+RecurringJob.AddOrUpdate<HangfireJobs>("Process Business Licences", job => job.ProcessBusinessLicences(), "*/10 * * * *");
 
 app.Run();

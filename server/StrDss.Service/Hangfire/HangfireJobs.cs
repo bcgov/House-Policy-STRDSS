@@ -8,13 +8,16 @@ namespace StrDss.Service.Hangfire
         private IDelistingService _delistingService;
         private IRentalListingService _listingService;
         private ITakedownConfirmationService _tdcService;
+        private IBizLicenceService _bizLicService;
 
-        public HangfireJobs(IRentalListingReportService listingReportService, IRentalListingService listingService, IDelistingService delistingService, ITakedownConfirmationService tdcService)
+        public HangfireJobs(IRentalListingReportService listingReportService, IRentalListingService listingService, IDelistingService delistingService,
+            ITakedownConfirmationService tdcService, IBizLicenceService bizLicService)
         {
             _linstingReportService = listingReportService;
             _delistingService = delistingService;
             _listingService = listingService;
             _tdcService = tdcService;
+            _bizLicService = bizLicService;
         }
 
         [Queue("default")]
@@ -57,6 +60,14 @@ namespace StrDss.Service.Hangfire
             await _tdcService.ProcessTakedownConfrimationAsync();
         }
 
-        
+        [Queue("default")]
+        [SkipSameJob]
+        [AutomaticRetry(Attempts = 0)]
+        public async Task ProcessBusinessLicences()
+        {
+            await _bizLicService.ProcessBizLicenceUploadAsync();
+        }
+
+
     }
 }

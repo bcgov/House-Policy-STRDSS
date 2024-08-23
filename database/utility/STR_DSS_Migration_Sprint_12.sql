@@ -33,6 +33,11 @@ as org_has_lg_type
 	\ir '../ddl/STR_DSS_Routines_Sprint_12.sql'
 	\echo 'Calling STR_DSS_Data_Seeding_Sprint_12.sql'
 	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_12.sql'
+	\echo 'Calling STR_DSS_Data_Seeding_Geometry_Sprint_12.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_Geometry_Sprint_12.sql'
+	/* the above script must precede the subsequent as part of a data correction */
+	\echo 'Calling STR_DSS_Data_Seeding_LGs_Sprint_12.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_LGs_Sprint_12.sql'
 \elif :db_has_dss_tab
 	\echo 'Database migration state is unknown - Exiting without changes'
 \else
@@ -44,10 +49,10 @@ as org_has_lg_type
 	\echo 'Calling STR_DSS_Data_Seeding_Platforms_Sprint_10.sql'
 	\ir '../seeding/STR_DSS_Data_Seeding_Platforms_Sprint_10.sql'
 	\echo 'Platform contacts must be set manually'
-	\echo 'Calling STR_DSS_Data_Seeding_LGs_Sprint_11.sql'
-	\ir '../seeding/STR_DSS_Data_Seeding_LGs_Sprint_11.sql'
-	\echo 'Calling STR_DSS_Data_Seeding_Geometry_Sprint_9.sql'
-	\ir '../seeding/STR_DSS_Data_Seeding_Geometry_Sprint_9.sql'
+	\echo 'Calling STR_DSS_Data_Seeding_LGs_Sprint_12.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_LGs_Sprint_12.sql'
+	\echo 'Calling STR_DSS_Data_Seeding_Geometry_Sprint_12.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_Geometry_Sprint_12.sql'
 \endif
 \if :ERROR
 	/*commit cannot succeed because transaction was aborted due to an error*/

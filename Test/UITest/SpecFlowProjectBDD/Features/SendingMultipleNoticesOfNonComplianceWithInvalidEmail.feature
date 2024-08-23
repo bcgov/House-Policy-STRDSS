@@ -1,11 +1,11 @@
-﻿Feature: SendingMultipleNoticesOfTakeDown_NonComplianceFeature
+﻿Feature: SendingMultipleNoticesOfNonComplianceWithInvalidEmailFeature
 
-Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-675
+Link to a feature:  https://hous-hpb.atlassian.net/browse/DSS-677
 
 
 @Scenario
-@SendingMultipleNoticesOfTakeDown_NonCompliance
-Scenario: SendingMultipleNoticesOfTakeDown_NonCompliance
+@SendingMultipleNoticesOfNonComplianceWithInvalidEmail
+Scenario: SendingMultipleNoticesOfNonComplianceWithInvalidEmail
 
 #Preconditions:
 #•	LG user has valid login credentials.
@@ -29,8 +29,14 @@ Scenario: SendingMultipleNoticesOfTakeDown_NonCompliance
 	Then the Send Notices of Non-Compliance button is enabled
 
 #	Click Send Notices of Non-Compliance 
-	Then LG user clicks "<TypeOfNotice>" button
+	Then LG user clicks Non-Compliance button
 	Then system opens details to complete fields for sending notices
+
+#	Check valid/invalid email
+	And the emails with an invalid email address are flagged
+	And the button to send Notice to host is disabled if all invalid host email addresses
+	And the button to send notice to host is checked if there is at least one valid host email addresses
+	And the button to send Notice is checked for valid host emails
 
 #	Mandatory Fields Check: 
 	Then the “Review" button is disabled if any mandatory field is not completed
@@ -68,9 +74,7 @@ Scenario: SendingMultipleNoticesOfTakeDown_NonCompliance
 #	Scenarios 1:LG user selects multiple listings from available listing data .
 #	Scenario 2: LG user selects listings from different platforms
 Examples:
-	| UserName     | TypeOfNotice           | UserType | Email                      | BCC | Environment | ExpectedResult |
-
-	| STRDSSLg1Dev | TakeDown       | lg_staff | richard.anderson@gov.bc.ca |     | dev         | pass           |
+	| UserName     | TypeOfNotice   | UserType | Email                      | BCC | Environment | ExpectedResult |
 	| STRDSSLg1Dev | Non-Compliance | lg_staff | richard.anderson@gov.bc.ca |     | dev         | pass           |
 
 

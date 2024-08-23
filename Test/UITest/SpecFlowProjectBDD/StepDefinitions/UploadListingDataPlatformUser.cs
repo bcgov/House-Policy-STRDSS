@@ -10,7 +10,6 @@ using TestFrameWork.WindowsAutomation.Controls;
 using static SpecFlowProjectBDD.SFEnums;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
-using System.Data;
 using Npgsql;
 using DataBase.UnitOfWork;
 

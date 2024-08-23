@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Calculator - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\SendingMultipleNoticesOfNonCompliance - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\SendingMultipleNoticesOfTakeDown_NonCompliance - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\SendNoticeOfTakedownWithoutADSSlisting - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\STRDSSLandingPage - Copy.feature.cs" />
   </ItemGroup>
@@ -55,6 +57,14 @@
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\ManagingAccess.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\SendingMultipleNoticesOfNonComplianceWithInvalidEmail.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\SendingMultipleNoticesOfNonCompliance.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>

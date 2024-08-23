@@ -2,12 +2,10 @@
 using DataBase.Entities;
 using DataBase.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using OpenQA.Selenium.DevTools.V118.Debugger;
 using SpecFlowProjectBDD.Helpers;
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using TestFrameWork.Models;
 using UITest.PageObjects;

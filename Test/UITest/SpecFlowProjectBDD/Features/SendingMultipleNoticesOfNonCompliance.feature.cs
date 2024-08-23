@@ -20,22 +20,22 @@ namespace SpecFlowProjectBDD.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("SendingMultipleNoticesOfTakeDown_NonComplianceFeature")]
-    public partial class SendingMultipleNoticesOfTakeDown_NonComplianceFeatureFeature
+    [NUnit.Framework.DescriptionAttribute("SendingMultipleNoticesOfNonCompliance")]
+    public partial class SendingMultipleNoticesOfNonComplianceFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
         private static string[] featureTags = ((string[])(null));
         
-#line 1 "SendingMultipleNoticesOfTakeDown_NonCompliance.feature"
+#line 1 "SendingMultipleNoticesOfNonCompliance.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendingMultipleNoticesOfTakeDown_NonComplianceFeature", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-675", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendingMultipleNoticesOfNonCompliance", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-678", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -74,16 +74,15 @@ namespace SpecFlowProjectBDD.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("SendingMultipleNoticesOfTakeDown_NonCompliance")]
+        [NUnit.Framework.DescriptionAttribute("SendingMultipleNoticesOfNonCompliance")]
         [NUnit.Framework.CategoryAttribute("Scenario")]
-        [NUnit.Framework.CategoryAttribute("SendingMultipleNoticesOfTakeDown_NonCompliance")]
-        [NUnit.Framework.TestCaseAttribute("STRDSSLg1Dev", "TakeDown", "lg_staff", "richard.anderson@gov.bc.ca", "", "dev", "pass", null)]
+        [NUnit.Framework.CategoryAttribute("SendingMultipleNoticesOfNonCompliance")]
         [NUnit.Framework.TestCaseAttribute("STRDSSLg1Dev", "Non-Compliance", "lg_staff", "richard.anderson@gov.bc.ca", "", "dev", "pass", null)]
-        public void SendingMultipleNoticesOfTakeDown_NonCompliance(string userName, string typeOfNotice, string userType, string email, string bCC, string environment, string expectedResult, string[] exampleTags)
+        public void SendingMultipleNoticesOfNonCompliance(string userName, string typeOfNotice, string userType, string email, string bCC, string environment, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "Scenario",
-                    "SendingMultipleNoticesOfTakeDown_NonCompliance"};
+                    "SendingMultipleNoticesOfNonCompliance"};
             if ((exampleTags != null))
             {
                 @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
@@ -97,8 +96,8 @@ namespace SpecFlowProjectBDD.Features
             argumentsOfScenario.Add("BCC", bCC);
             argumentsOfScenario.Add("Environment", environment);
             argumentsOfScenario.Add("ExpectedResult", expectedResult);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("SendingMultipleNoticesOfTakeDown_NonCompliance", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 8
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("SendingMultipleNoticesOfNonCompliance", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 7
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -108,90 +107,90 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 17
+#line 16
  testRunner.Given(string.Format("that I am an authenticated User \"{0}\" and the expected result is \"{1}\" and I am a" +
                             " \"{2}\" user", userName, expectedResult, userType), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 20
+#line 19
  testRunner.Then("LG user is redirected to dashboard-> Hompage", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 23
+#line 22
  testRunner.When("LG user selects \'View Listings\' from menu to load listings data page. Or User nav" +
                         "igates to view listing data on homepage Screen", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 26
+#line 25
  testRunner.Then("the Send Notices of Non-Compliance button is disabled", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 28
+#line 27
  testRunner.When("LG User Select Multiple Listings", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 29
+#line 28
  testRunner.Then("the Send Notices of Non-Compliance button is enabled", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 32
- testRunner.Then(string.Format("LG user clicks \"{0}\" button", typeOfNotice), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 31
+ testRunner.Then("LG user clicks Non-Compliance button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 33
+#line 32
  testRunner.Then("system opens details to complete fields for sending notices", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 36
+#line 35
  testRunner.Then("the “Review\" button is disabled if any mandatory field is not completed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 37
+#line 36
  testRunner.Then("If LG user clicks Cancel,  system prompts with a re-confirmation message", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 38
+#line 37
  testRunner.Then("If user confirms cancellation, user is redirected back to listings data page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 39
+#line 38
  testRunner.And("the action history is not updated when the user cancels the action", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 40
+#line 39
  testRunner.When("user does not confirm, user remains on current page.", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 41
+#line 40
  testRunner.And("Action History Not Updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 45
+#line 44
  testRunner.When("LG user completes mandatory fields. ( Provide a LG email address to receive a cop" +
                         "y of the Notice)", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 48
+#line 47
  testRunner.Then("that LG user can add BCCs", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 52
+#line 51
  testRunner.When("the LG User enters an Email Address", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 53
+#line 52
  testRunner.Then("if user inputs an email that is not in the correct format the user is prompted to" +
                         " enter an email address in the correct format", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 56
+#line 55
  testRunner.And("the user can add multiple email addresses", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 57
+#line 56
  testRunner.And("Verify that if remove the listing checkbox is unchecked, review is also disabled", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 60
+#line 59
  testRunner.When("the LG user clicks “Review\" button to confirm details to be sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 61
+#line 60
  testRunner.And("the LG user selects the Submit button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 62
+#line 61
  testRunner.Then("Successful confirmation is displayed for user on top Right of the page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 63
+#line 62
  testRunner.Then("System immediately sends notices to platform/host for selected listings", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 64
+#line 63
  testRunner.And("A copy email is also sent to LG email address added to receive a copy of the noti" +
                         "ce same, a copy of email to bcc", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 65
+#line 64
  testRunner.And("Action history is updated immediately with action taken", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 66
+#line 65
  testRunner.And("On the listings page, last action and last action date should be updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

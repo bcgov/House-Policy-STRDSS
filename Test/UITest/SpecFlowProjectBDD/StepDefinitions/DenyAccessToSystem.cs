@@ -2,9 +2,6 @@
 using DataBase.Entities;
 using DataBase.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Newtonsoft.Json;
-using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using SpecFlowProjectBDD.Helpers;
 using TestFrameWork.Models;

@@ -2,27 +2,22 @@ using Configuration;
 using DataBase.Entities;
 using DataBase.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using OpenQA.Selenium.DevTools.V118.Debugger;
 using SpecFlowProjectBDD.Helpers;
 using System.Reflection.Metadata;
-using TechTalk.SpecFlow.CommonModels;
+using System.Xml.Linq;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
-using static SpecFlowProjectBDD.SFEnums;
-using TechTalk.SpecFlow;
-using OpenQA.Selenium.Support.Extensions;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
-    [Scope(Scenario = "SendingMultipleNoticesOfTakeDown_NonCompliance")]
-    public class SendingMultipleNoticesOfTakeDown_NonCompliance
+    [Scope(Scenario = "SendingMultipleNoticesOfNonComplianceWithInvalidEmail")]
+    public class SendingMultipleNoticesOfNonComplianceWithInvalidEmail
     {
-        private enum _NoticeTypeEnum { TAKEDOWN, NONCOMPLIANCE };
         private IDriver _Driver;
         private LandingPage _LandingPage;
         private ListingsPage _ListingsPage;
@@ -38,13 +33,16 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private SFEnums.UserTypeEnum _UserType;
         private SFEnums.LogonTypeEnum? _LogonType;
         private AppSettings _AppSettings;
+        private DssRentalListingContact _RentalListingPropertyOwnerContact;
+        private DssRentalListingContact _RentalListingNonPropertyOwnerContact;
+        private string _OriginalPropertyOwnerContactEmail = string.Empty;
+        private string _OriginalNonPropertyOwnerContactEmail = string.Empty; 
         private DateTime _updateTime;
         private DssDbContext _DssDBContext;
         private IUnitOfWork _UnitOfWork;
         private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
-        private _NoticeTypeEnum _NoticeType;
 
-        public SendingMultipleNoticesOfTakeDown_NonCompliance(SeleniumDriver Driver)
+        public SendingMultipleNoticesOfNonComplianceWithInvalidEmail(SeleniumDriver Driver)
         {
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
@@ -115,6 +113,64 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void WhenLGUserSelectsFromMenuToLoadListingsDataPage_OrUserNavigatesToViewListingDataOnHomepageScreen()
         {
             _LandingPage.ViewListingsButton.Click();
+
+
+            //get listingID for first listing and update email in DB with an invalid email
+
+            //Get ListingID
+
+            int row = 1;
+            int listingIDColumn = 4;
+            int organizationColumn = 3;
+
+            //var listingid = _ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#row-{row}  > td:nth-child({listingIDColumn})"").innerText");
+
+            bool result = false;
+            string listingNumber = string.Empty;
+            string organizationName = string.Empty;
+            string listingID = string.Empty;
+            long organizationID = 0;
+
+            try
+            {
+                listingNumber = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_17-table > tbody > tr:nth-child({row}) > td:nth-child({listingIDColumn}) > a"").innerText");
+            }
+            catch
+            {
+                throw new InvalidCastException($"Could not read Listing ID for Listings table:Row {row}");
+            }
+
+            try
+            {
+                organizationName = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_17-table > tbody > tr:nth-child({row}) > td:nth-child({organizationColumn})"").innerText");
+            }
+            catch
+            {
+                throw new InvalidCastException($"Could not read Plaform for Listings table:Row {row}");
+            }
+
+            //Get OrganizationID for Platform
+            var organization = _UnitOfWork.DssOrganizationRepository.Get(p => p.OrganizationNm.ToUpper() == organizationName.ToUpper()).First();
+            organizationID = organization.OrganizationId;
+
+
+            //Get existing Listing
+
+            var rentalListing = _UnitOfWork.DssRentalListingRepository.Get(p => (p.PlatformListingNo == listingNumber)&& (p.OfferingOrganizationId == organizationID)&&(p.IsActive == true)).First();
+            _RentalListingPropertyOwnerContact = _UnitOfWork.DssRentalListingContactRepository.Get(p => (p.ContactedThroughRentalListingId == rentalListing.RentalListingId)&&(p.IsPropertyOwner == true)).First();
+            _RentalListingNonPropertyOwnerContact = _UnitOfWork.DssRentalListingContactRepository.Get(p => (p.ContactedThroughRentalListingId == rentalListing.RentalListingId) && (p.IsPropertyOwner == false)).First();
+            //Save Original Email
+            _OriginalPropertyOwnerContactEmail = _RentalListingPropertyOwnerContact.EmailAddressDsc;
+            _OriginalNonPropertyOwnerContactEmail = _RentalListingNonPropertyOwnerContact.EmailAddressDsc;
+
+            //update Email address with Invalid EmailAddress
+
+            _RentalListingPropertyOwnerContact.EmailAddressDsc = "TestUserValid@email.com";
+            _RentalListingNonPropertyOwnerContact.EmailAddressDsc = "TestUserInValid@@email.com";
+            _UnitOfWork.Save();
+
+            //Refresh page to reread updated email values from DB
+            _ListingsPage.Driver.Navigate().Refresh();
         }
 
         [Then(@"the Send Notices of Non-Compliance button is disabled")]
@@ -135,71 +191,65 @@ namespace SpecFlowProjectBDD.StepDefinitions
             ClassicAssert.IsTrue(_ListingsPage.SendNoticeOfNonComplianceButton.IsEnabled());
         }
 
-        [Then(@"LG user clicks ""(.*)"" button")]
-        public void WhenLGUserClicksSendNoticesOfNon_ComplianceButton(string TypeOfNotice)
+        [Then(@"LG user clicks Non-Compliance button")]
+        public void WhenLGUserClicksSendNoticesOfNon_ComplianceButton()
         {
-            switch (TypeOfNotice.ToUpper())
-            {
-                case "TAKEDOWN":
-                    {
-                        _NoticeType = _NoticeTypeEnum.TAKEDOWN;
-                        _ListingsPage.SendTakedownRequestButton.Click();
-                        break;
-                    } 
-                case "NON-COMPLIANCE":
-                    {
-                        _NoticeType = _NoticeTypeEnum.NONCOMPLIANCE;
-                        _ListingsPage.SendNoticeOfNonComplianceButton.Click();
-                        break;
-                    } 
-                default:
-                    {
-                        throw new ArgumentException($"Unknown Notice Type - {TypeOfNotice}");
-                    }
-            }
-
+            _ListingsPage.SendNoticeOfNonComplianceButton.Click();
         }
 
         [Then(@"system opens details to complete fields for sending notices")]
         public void ThenSystemOpensDetailsToCompleteFieldsForSendingNotices()
         {
-            switch (_NoticeType)
-            {
-                case _NoticeTypeEnum.TAKEDOWN:
-                    {
-                        ClassicAssert.IsTrue(_BulkComplianceNoticePage.AddBCCsTextBox.IsEnabled());
-                        break;
-                    }
+            ClassicAssert.IsTrue(_BulkComplianceNoticePage.ContactEmailTextBox.IsEnabled());
+        }
 
-                case _NoticeTypeEnum.NONCOMPLIANCE:
-                    {
-                        ClassicAssert.IsTrue(_BulkComplianceNoticePage.ContactEmailTextBox.IsEnabled());
-                        break;
-                    }
+        [Then(@"the emails with an invalid email address are flagged")]
+        public void ThenTheEmailsWithAnInvalidEmailAddressAreFlagged()
+        {
+            string isListingSelected = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@"document.querySelector(""#binary"").ariaChecked");
+            
+            //ClassicAssert.IsFalse(bool.Parse(isListingSelected));
+        }
 
-            }
+        [Then(@"the button to send Notice to host is disabled if all invalid host email addresses")]
+        public void ThenTheButtonToSendNoticeToHostIsDisabledIfAllInvalidHostEmailAddresses()
+        {
+            _RentalListingPropertyOwnerContact.EmailAddressDsc = ".TestUserInValid@email.com";
+            _RentalListingNonPropertyOwnerContact.EmailAddressDsc = "TestUserInValid.@email.com";
+            _UnitOfWork.Save();
+
+            _ListingsPage.Driver.Navigate().Refresh();
+            _ListingsPage.SelectAllCheckbox.Click();
+            _ListingsPage.SendNoticeOfNonComplianceButton.Click();
+
+            ClassicAssert.IsFalse(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
+        }
+
+        [Then(@"the button to send notice to host is checked if there is at least one valid host email addresses")]
+        public void ThenTheButtonToSendNoticeToHostIsCheckedIfThereIsAtLeastOneValidHostEmailAddresses()
+        {
+            _RentalListingPropertyOwnerContact.EmailAddressDsc = "TestUserValid@email.com";
+            _RentalListingNonPropertyOwnerContact.EmailAddressDsc = "TestUserInValid.@email.com";
+            _UnitOfWork.Save();
+
+            _ListingsPage.Driver.Navigate().Refresh();
+            _ListingsPage.SelectAllCheckbox.Click();
+            _ListingsPage.SendNoticeOfNonComplianceButton.Click();
+
+            ClassicAssert.IsTrue(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
+        }
+
+        [Then(@"the button to send Notice is checked for valid host emails")]
+        public void ThenTheButtonToSendNoticeIsCheckedForValidHostEmails()
+        {
+            //throw new PendingStepException();
         }
 
         [Then(@"the “Review"" button is disabled if any mandatory field is not completed")]
         public void ThenTheReviewButtonIsDisabledIfAnyMandatoryFieldIsNotCompleted()
         {
             _BulkComplianceNoticePage.SubmitButton.JSExecuteJavaScript("window.scrollTo(0, document.body.scrollHeight);");
-
-            switch (_NoticeType)
-            {
-                case _NoticeTypeEnum.TAKEDOWN:
-                    {
-                        ClassicAssert.IsTrue(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
-                        break;
-                    }
-
-                case _NoticeTypeEnum.NONCOMPLIANCE:
-                    {
-                        ClassicAssert.IsFalse(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
-                        break;
-                    }
-
-            }
+            ClassicAssert.IsFalse(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
         }
 
         [Then(@"If LG user clicks Cancel,  system prompts with a re-confirmation message")]
@@ -217,19 +267,17 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"the action history is not updated when the user cancels the action")]
         public void ThenTheActionHistoryIsNotUpdatedWhenTheUserCancelsTheAction()
         {
-            
+
         }
 
         [When(@"user does not confirm, user remains on current page\.")]
         public void WhenUserDoesNotConfirmUserRemainsOnCurrentPage_()
         {
-            //throw new PendingStepException();
         }
 
         [When(@"Action History Not Updated")]
         public void WhenActionHistoryNotUpdated()
         {
-            //throw new PendingStepException();
         }
 
         [When(@"LG user completes mandatory fields\. \( Provide a LG email address to receive a copy of the Notice\)")]
@@ -237,33 +285,17 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _ListingsPage.SelectAllCheckbox.Click();
 
-            switch (_NoticeType)
-            {
-                case _NoticeTypeEnum.TAKEDOWN:
-                    {
-                        _ListingsPage.SendTakedownRequestButton.Click();
-                        break;
-                    }
-
-                case _NoticeTypeEnum.NONCOMPLIANCE:
-                    {
-                        _ListingsPage.SendNoticeOfNonComplianceButton.Click();
-                        break;
-                    }
-
-            }
+            _ListingsPage.SendNoticeOfNonComplianceButton.Click();
 
             _BulkComplianceNoticePage.SubmitButton.JSExecuteJavaScript("window.scrollTo(0, document.body.scrollHeight);");
-            if (_NoticeType == _NoticeTypeEnum.NONCOMPLIANCE)
-            {
-                _BulkComplianceNoticePage.ContactEmailTextBox.EnterText("richard.anderson@gov.bc.ca");
-            }
+
+            _BulkComplianceNoticePage.ContactEmailTextBox.EnterText("richard.anderson@gov.bc.ca");
         }
 
         [Then(@"that LG user can add BCCs")]
         public void ThenThatLGUserCanAddBCCs()
         {
- 
+
         }
 
         [When(@"the LG User enters an Email Address")]
@@ -275,7 +307,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"if user inputs an email that is not in the correct format the user is prompted to enter an email address in the correct format")]
         public void ThenIfUserInputsAnEmailThatIsNotInTheCorrectFormatTheUserIsPromptedToEnterAnEmailAddressInTheCorrectFormat()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"the user can add multiple email addresses")]
@@ -287,7 +319,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"Verify that if remove the listing checkbox is unchecked, review is also disabled")]
         public void ThenVerifyThatIfRemoveTheListingCheckboxIsUncheckedReviewIsAlsoDisabled()
         {
-            //throw new PendingStepException();
+
         }
 
         [When(@"the LG user clicks “Review"" button to confirm details to be sent")]
@@ -306,19 +338,19 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"Successful confirmation is displayed for user on top Right of the page")]
         public void ThenSuccessfulConfirmationIsDisplayedForUserOnTopRightOfThePage()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"System immediately sends notices to platform/host for selected listings")]
         public void ThenSystemImmediatelySendsNoticesToPlatformHostForSelectedListings()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"A copy email is also sent to LG email address added to receive a copy of the notice same, a copy of email to bcc")]
         public void ThenACopyEmailIsAlsoSentToLGEmailAddressAddedToReceiveACopyOfTheNoticeSameACopyOfEmailToBcc()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"Action history is updated immediately with action taken")]
@@ -331,7 +363,16 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"On the listings page, last action and last action date should be updated")]
         public void ThenOnTheListingsPageLastActionAndLastActionDateShouldBeUpdated()
         {
-            //throw new PendingStepException();
+
+        }
+
+        [AfterScenario]
+        public void TestTearDown()
+        {
+            //restore original email values
+            _RentalListingPropertyOwnerContact.EmailAddressDsc = _OriginalPropertyOwnerContactEmail;
+            _RentalListingNonPropertyOwnerContact.EmailAddressDsc = _OriginalNonPropertyOwnerContactEmail;
+            _UnitOfWork.Save();
         }
     }
 }

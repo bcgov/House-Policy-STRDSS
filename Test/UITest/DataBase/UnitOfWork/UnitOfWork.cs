@@ -30,6 +30,8 @@ namespace DataBase.UnitOfWork
         private readonly GenericRepository<DssUploadLine> _DssUploadLineRepository;
         private readonly GenericRepository<DssUserRole> _DssUserRoleRepository;
         private readonly GenericRepository<DssUserRoleAssignment> _DssUserRoleAssignmentRepository;
+        private readonly GenericRepository<DssRentalListingContact> _DssRentalListingContactRepository;
+        private readonly GenericRepository<DssRentalListing> _DssRentalListingRepository;
 
 
         public GenericRepository<DssAccessRequestStatus> DssAccessRequestStatusRepository
@@ -99,6 +101,18 @@ namespace DataBase.UnitOfWork
         {
             get => _DssUserRoleAssignmentRepository ?? new GenericRepository<DssUserRoleAssignment>(_context);
         }
+
+        public GenericRepository<DssRentalListingContact> DssRentalListingContactRepository
+        {
+            get => _DssRentalListingContactRepository ?? new GenericRepository<DssRentalListingContact>(_context);
+        }
+
+        public GenericRepository<DssRentalListing> DssRentalListingRepository
+        {
+            get => _DssRentalListingRepository ?? new GenericRepository<DssRentalListing>(_context);
+        }
+
+        
 
         public UnitOfWork(DbContext context)
         {

@@ -144,7 +144,17 @@ body {
             .p-panel-header {
                 background-color: #F3F2F1;
             }
+        }
 
+        &.address-history,
+        &.action-history {
+            .p-panel-header {
+                background-color: #FFF8E9;
+            }
+        }
+
+        &.bl-info,
+        &.prop-info {
             .p-panel-content {
                 padding-left: 0;
                 padding-right: 0;
@@ -197,6 +207,20 @@ body {
             .p-tag {
                 background-color: #ECEAE8;
                 color: #2D2D2D;
+            }
+        }
+
+        &.platform-report-month {
+            .p-tag {
+                background-color: #1E5189;
+                border-radius: 3px;
+            }
+        }
+
+        &.last-bl-update-date {
+            .p-tag {
+                background-color: #353433;
+                border-radius: 3px;
             }
         }
     }

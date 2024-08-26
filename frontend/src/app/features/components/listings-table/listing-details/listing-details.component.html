@@ -15,63 +15,78 @@
 <div class="subtitle" *ngIf="listing">
     <div class="column">
         <div class="row">
-            <div class="last-updated-container">
-                <strong>Platform Report Month: </strong>{{listing.latestReportPeriodYm || '-'}}
-            </div>
-            <div class="platform-container">
-                <strong>Platform: </strong>{{listing.offeringOrganizationNm || '-'}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="organization-container">
+            <div>
                 <strong>Assigned to: </strong>{{listing.managingOrganizationNm || '-'}}
-            </div>
-            <div class="status-container" [ngSwitch]="listing.listingStatusType">
-                <strong>Listing Status: </strong>
-                <span class="status-item" *ngSwitchCase="'N'">New
-                    <span class="status-circle status-new">
-                        N
-                    </span>
-                </span>
-                <span class="status-item" *ngSwitchCase="'A'">
-                    <span>
-                        Active
-                    </span>
-                    <span class="status-circle status-active">
-                        A
-                    </span>
-                </span>
-                <span class="status-item" *ngSwitchCase="'I'">
-                    <span>
-                        Inactive
-                    </span>
-                    <span class="status-circle status-inactive">
-                        I
-                    </span>
-                </span>
-                <span class="status-item" *ngIf="listing.isLgTransferred">
-                    <span>
-                        Reassigned
-                    </span>
-                    <span class="status-flag status-reassigned">
-                    </span>
-                </span>
-                <span class="status-item" *ngIf="listing.isTakenDown">
-                    <span>
-                        Takedown Complete
-                    </span>
-                    <span class="status-flag status-takedown-complete">
-                    </span>
-                </span>
             </div>
         </div>
     </div>
     <div class="column">
+        <button pButton (click)="sendNoticeOfNonCompliance()" class="p-button-outlined ">
+            <span class="nonc-icon"></span> Send Notice Of
+            Non-Compliance </button>
+        <button pButton (click)="sendTakedownRequest()" class="p-button-outlined"><span class="tdr-icon"></span> Send
+            Takedown
+            Request</button>
     </div>
 </div>
 <div class="content" *ngIf="listing">
     <div class="main-block">
-        <p-panel class="details-block" header="Property Information">
+        <p-panel class="details-block prop-info">
+            <ng-template pTemplate="header">
+                <div class="property-info-container">
+                    <strong class="panel-header-text">Property Information</strong>
+                    <p-tag class="platform-report-month">
+                        <strong class="tag-text">Platform Report Month:</strong>{{listing.latestReportPeriodYm || '-'}}
+                    </p-tag>
+                </div>
+            </ng-template>
+            <div class="row">
+                <span class="label">Platform:</span>
+                <span class="value">{{listing.offeringOrganizationNm || '-'}}</span>
+            </div>
+            <div class="row">
+                <div class="status-container" [ngSwitch]="listing.listingStatusType">
+                    <strong>Listing Status: </strong>
+                    <span class="status-item" *ngSwitchCase="'N'">New
+                        <span class="status-circle status-new">
+                            N
+                        </span>
+                    </span>
+                    <span class="status-item" *ngSwitchCase="'A'">
+                        <span>
+                            Active
+                        </span>
+                        <span class="status-circle status-active">
+                            A
+                        </span>
+                    </span>
+                    <span class="status-item" *ngSwitchCase="'I'">
+                        <span>
+                            Inactive
+                        </span>
+                        <span class="status-circle status-inactive">
+                            I
+                        </span>
+                    </span>
+                    <span class="status-item" *ngIf="listing.isLgTransferred">
+                        <span>
+                            Reassigned
+                        </span>
+                        <span class="status-flag status-reassigned">
+                        </span>
+                    </span>
+                    <span class="status-item" *ngIf="listing.isTakenDown">
+                        <span>
+                            Takedown Complete
+                        </span>
+                        <span class="status-flag status-takedown-complete">
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="spacer-hr"> </div>
+
             <div class="row address">
                 <span class="label">Address (Best Match):</span>
                 <span class="value"
@@ -100,15 +115,16 @@
                 <span class="label">Number of Bedrooms (Platform Listing):</span>
                 <span class="value">{{listing.availableBedroomsQty}}</span>
             </div>
-        </p-panel>
-        <p-panel class="details-block" header="Business Licence Information">
+
+            <div class="spacer-hr"> </div>
+
             <div class="row">
-                <span class="label">BL (Platform Listing):</span>
+                <span class="label">Business Licence on Listing:</span>
                 <span class="value">{{listing.businessLicenceNo}}</span>
             </div>
-        </p-panel>
 
-        <p-panel class="details-block" header="Hosts" *ngIf="listing.hosts">
+            <div class="spacer-hr"> </div>
+
             <ng-template ngFor let-host [ngForOf]="listing.hosts" let-i="index">
                 <div class="row">
                     <span class="label">{{host.isPropertyOwner?'Property':'STR'}} Host (Platform Listing):</span>
@@ -123,17 +139,20 @@
                     <span class="value">{{host.emailAddressDsc}}</span>
                 </div>
                 <div class="row">
-                    <span class="label">Phone</span>
+                    <span class="label">Phone:</span>
                     <span class="value">{{host.phoneNo}}</span>
                 </div>
                 <ng-template [ngIf]="i !== (listing.hosts.length-1)">
-                    <br>
+                    <div class="spacer-hr"> </div>
                 </ng-template>
             </ng-template>
-        </p-panel>
 
-        <p-panel class="details-block" header="Listing History (for This Listing ID)">
-            <div class="row">
+            <div class="spacer-hr"> </div>
+
+            <div class="row header-row">
+                Listing History (for This Listing ID)
+            </div>
+            <div class="row night-stayed-row">
                 <span class="label">Night Stayed YTD:</span>
                 <span class="value">{{listing.nightsBookedYtdQty}}</span>
             </div>
@@ -169,9 +188,10 @@
                     </ng-template>
                 </p-table>
             </div>
+
         </p-panel>
 
-        <p-panel class="details-block" header="Address History">
+        <p-panel class="details-block address-history" header="Address History">
             <div class="row">
                 <p-table [value]="listing.addressChangeHistory" [paginator]="listing.addressChangeHistory.length>12"
                     [showPageLinks]="false" currentPageReportTemplate="{first}-{last} of {totalRecords}"
@@ -209,17 +229,7 @@
         </p-panel>
     </div>
     <div class="sidebar">
-        <p-panel class="details-block" header="Actions" *ngIf="!isCEU">
-            <div class="row">
-                <button pButton (click)="sendNoticeOfNonCompliance()" class="p-button-link"> Send Notice Of
-                    Non-Compliance </button>
-            </div>
-            <div class="row">
-                <button pButton (click)="sendTakedownRequest()" class="p-button-link"> Send Takedown
-                    Request</button>
-            </div>
-        </p-panel>
-        <p-panel class="details-block" header="Action History">
+        <p-panel class="details-block action-history" header="Action History">
             <p-table [value]="listing.actionHistory" styleClass="p-datatable-sm">
                 <ng-template pTemplate="header">
                     <tr>
@@ -244,15 +254,19 @@
                 </ng-template>
             </p-table>
         </p-panel>
-        <p-panel class="details-block bl-info" header="Business Licence Information">
+        <p-panel class="details-block bl-info">
+            <ng-template pTemplate="header">
+                <div class="property-info-container">
+                    <strong class="panel-header-text">Business Licence Information</strong>
+                    <p-tag class="last-bl-update-date" *ngIf="blInfo?.updDtm">
+                        <strong class="tag-text">Last Update Date:</strong>{{blInfo.updDtm |date:'YYYY-MM-dd' }}
+                    </p-tag>
+                </div>
+            </ng-template>
             <div *ngIf="!blInfo; else else_block" class="row no-bl-data">
                 <strong>We were unable to find a business licence that matched this listing in our system.</strong>
             </div>
             <ng-template #else_block>
-                <div *ngIf="blInfo?.updDtm" class="row">
-                    <strong>Last Update Date:</strong> <span>{{blInfo.updDtm |date:'YYYY-MM-dd' }}</span>
-                </div>
-
                 <div *ngIf="blInfo?.businessNm || 
                 blInfo?.physicalRentalAddressTxt" class="spacer-hr"></div>
 

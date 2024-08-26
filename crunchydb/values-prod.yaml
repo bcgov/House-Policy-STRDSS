@@ -21,7 +21,7 @@ crunchy-postgres:
         memory: 128Mi
 
   pgBackRest:
-    retention: "30" # Ideally a larger number such as 30 backups/days
+    retention: "10" # Ideally a larger number such as 30 backups/days
     # If retention-full-type set to 'count' then the oldest backups will expire when the number of backups reach the number defined in retention
     # If retention-full-type set to 'time' then the number defined in retention will take that many days worth of full backups before expiration
     retentionFullType: time
@@ -30,7 +30,7 @@ crunchy-postgres:
         full: 0 10 * * *
       volume:
         accessModes: "ReadWriteOnce"
-        storage: 5Gi
+        storage: 10Gi
 crunchy-postgres-tools:
   networking:
     route:

@@ -40,6 +40,22 @@
         }
     }
 
+    .property-info-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        strong {
+            &.panel-header-text {
+                font-size: large;
+            }
+
+            &.tag-text {
+                padding-right: 4px;
+            }
+        }
+    }
+
     .header-container {
         display: flex;
         justify-content: space-between;
@@ -64,11 +80,36 @@
         width: 100%;
         display: flex;
         gap: 24px;
+        height: 42px;
+        align-items: center;
 
         .column {
             width: calc(50% - 24px);
             display: flex;
-            flex-direction: column;
+
+            &:last-child {
+                justify-content: end;
+                gap: 8px;
+
+                button {
+                    padding: 8px 12px;
+                    border-color: #353433;
+
+                    .nonc-icon {
+                        width: 20px;
+                        height: 20px;
+                        margin-right: 6px;
+                        background-image: url(../../../../../assets/images/nonc-icon.svg);
+                    }
+
+                    .tdr-icon {
+                        width: 20px;
+                        height: 20px;
+                        margin-right: 6px;
+                        background-image: url(../../../../../assets/images/tdr-icon.svg);
+                    }
+                }
+            }
 
             .row {
                 display: flex;
@@ -144,6 +185,16 @@
             }
 
             .row {
+                &.header-row {
+                    font-size: large;
+                    font-family: 'BcSans-bold';
+                    padding-bottom: 24px;
+                }
+
+                &.night-stayed-row {
+                    padding-bottom: 24px;
+                }
+
                 &:not(:last-of-type) {
                     margin-bottom: 6px;
                 }

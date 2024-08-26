@@ -12,14 +12,13 @@ import { UserDataService } from '../../../../common/services/user-data.service';
 import { environment } from '../../../../../environments/environment';
 import { SelectedListingsStateService } from '../../../../common/services/selected-listings-state.service';
 import { GlobalLoaderService } from '../../../../common/services/global-loader.service';
-import { address_write, takedown_action } from '../../../../common/consts/permissions.const';
+import { address_write } from '../../../../common/consts/permissions.const';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ErrorHandlingService } from '../../../../common/services/error-handling.service';
 import { TagModule } from 'primeng/tag';
-import { BusinessLicenceService } from '../../../../common/services/business-licence.service';
 import { BusinessLicence } from '../../../../common/models/business-licence';
 
 @Component({

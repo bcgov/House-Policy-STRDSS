@@ -206,9 +206,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"the emails with an invalid email address are flagged")]
         public void ThenTheEmailsWithAnInvalidEmailAddressAreFlagged()
         {
-            string isListingSelected = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@"document.querySelector(""#binary"").ariaChecked");
-            
-            //ClassicAssert.IsFalse(bool.Parse(isListingSelected));
+            string isInvalidEmail = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@"document.querySelector(""#pn_id_50-table > tbody > tr:nth-child(1) > td:nth-child(6)"").innerText");
+            ClassicAssert.IsTrue(isInvalidEmail.ToUpper() == "YES");
         }
 
         [Then(@"the button to send Notice to host is disabled if all invalid host email addresses")]
@@ -221,6 +220,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _ListingsPage.Driver.Navigate().Refresh();
             _ListingsPage.SelectAllCheckbox.Click();
             _ListingsPage.SendNoticeOfNonComplianceButton.Click();
+
+            string sendNoticeToHostIsChecked = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@"document.querySelector(""#binary"").ariaChecked");
+            ClassicAssert.IsFalse(bool.Parse(sendNoticeToHostIsChecked));
 
             ClassicAssert.IsFalse(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
         }
@@ -242,7 +244,15 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"the button to send Notice is checked for valid host emails")]
         public void ThenTheButtonToSendNoticeIsCheckedForValidHostEmails()
         {
-            //throw new PendingStepException();
+            _RentalListingPropertyOwnerContact.EmailAddressDsc = "TestUserValid@email.com";
+            _RentalListingNonPropertyOwnerContact.EmailAddressDsc = "TestUser2Valid@email.com";
+            _UnitOfWork.Save();
+
+            _ListingsPage.Driver.Navigate().Refresh();
+            _ListingsPage.SelectAllCheckbox.Click();
+            _ListingsPage.SendNoticeOfNonComplianceButton.Click();
+            string sendNoticeToHostIsChecked = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@"document.querySelector(""#pn_id_50-table > tbody > tr:nth-child(1) > td:nth-child(6)"").innerText");
+            ClassicAssert.IsTrue(sendNoticeToHostIsChecked.ToUpper() == "NO");
         }
 
         [Then(@"the “Review"" button is disabled if any mandatory field is not completed")]
@@ -313,7 +323,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"the user can add multiple email addresses")]
         public void ThenTheUserCanAddMultipleEmailAddresses()
         {
-            //_BulkComplianceNoticePage.AddBCCsTextBox.EnterText(", richard.anderson@gov.bc.ca");
+            
         }
 
         [Then(@"Verify that if remove the listing checkbox is unchecked, review is also disabled")]

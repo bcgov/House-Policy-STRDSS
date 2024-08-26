@@ -1,4 +1,6 @@
-﻿namespace StrDss.Model.RentalReportDtos
+﻿using Microsoft.VisualBasic;
+
+namespace StrDss.Model.RentalReportDtos
 {
     public class RentalListingViewDto
     {
@@ -77,15 +79,17 @@
         public string? BcRegistryNo { get; set; }
 
         public string? LastActionNm { get; set; }
-
+        public long? BusinessLicenceId { get; set; }
+        public string? BusinessLicenceNoMatched { get; set; }
         public DateTime? LastActionDtm { get; set; }
         public bool HasAtLeastOneValidHostEmail { get; set; }
         public List<HostInfo> HostsInfo { get; set; } = new List<HostInfo>();
-
+        public BizLicenceDto? BizLicenceInfo { get; set; }
         public virtual ICollection<RentalListingContactDto> Hosts { get; set; } = new List<RentalListingContactDto>();
         public virtual ICollection<ListingHistoryDto> ListingHistory { get; set; } = new List<ListingHistoryDto>();
         public virtual ICollection<ActionHistoryDto> ActionHistory { get; set; } = new List<ActionHistoryDto>();
         public virtual ICollection<AddressChangeHistoryDto> AddressChangeHistory { get; set; } = new List<AddressChangeHistoryDto>();
+
     }
 
     public class HostInfo

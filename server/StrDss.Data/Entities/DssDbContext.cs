@@ -13,6 +13,10 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssAccessRequestStatus> DssAccessRequestStatuses { get; set; }
 
+    public virtual DbSet<DssBusinessLicence> DssBusinessLicences { get; set; }
+
+    public virtual DbSet<DssBusinessLicenceStatusType> DssBusinessLicenceStatusTypes { get; set; }
+
     public virtual DbSet<DssEmailMessage> DssEmailMessages { get; set; }
 
     public virtual DbSet<DssEmailMessageType> DssEmailMessageTypes { get; set; }
@@ -73,6 +77,176 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(250)
                 .HasComment("Business term for the request status")
                 .HasColumnName("access_request_status_nm");
+        });
+
+        modelBuilder.Entity<DssBusinessLicence>(entity =>
+        {
+            entity.HasKey(e => e.BusinessLicenceId).HasName("dss_business_licence_pk");
+
+            entity.ToTable("dss_business_licence");
+
+            entity.HasIndex(e => e.LicenceStatusType, "dss_business_licence_i1");
+
+            entity.HasIndex(e => e.AffectedByPhysicalAddressId, "dss_business_licence_i2");
+
+            entity.HasIndex(e => e.PhysicalRentalAddressTxt, "dss_business_licence_i3");
+
+            entity.HasIndex(e => new { e.ProvidingOrganizationId, e.BusinessLicenceNo }, "dss_business_licence_uk").IsUnique();
+
+            entity.Property(e => e.BusinessLicenceId)
+                .HasComment("Unique generated key")
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("business_licence_id");
+            entity.Property(e => e.AffectedByPhysicalAddressId)
+                .HasComment("Foreign key")
+                .HasColumnName("affected_by_physical_address_id");
+            entity.Property(e => e.AvailableBedroomsQty)
+                .HasComment("The number of bedrooms in the dwelling unit that are available for short term rental")
+                .HasColumnName("available_bedrooms_qty");
+            entity.Property(e => e.BusinessLicenceNo)
+                .HasMaxLength(50)
+                .HasComment("The local government issued licence number that applies to the rental offering")
+                .HasColumnName("business_licence_no");
+            entity.Property(e => e.BusinessNm)
+                .HasMaxLength(320)
+                .HasComment("Official name of the business")
+                .HasColumnName("business_nm");
+            entity.Property(e => e.BusinessOperatorEmailAddressDsc)
+                .HasMaxLength(320)
+                .HasComment("Email address of the business operator")
+                .HasColumnName("business_operator_email_address_dsc");
+            entity.Property(e => e.BusinessOperatorNm)
+                .HasMaxLength(320)
+                .HasComment("Full name of the business operator or property manager")
+                .HasColumnName("business_operator_nm");
+            entity.Property(e => e.BusinessOperatorPhoneNo)
+                .HasMaxLength(30)
+                .HasComment("Phone number of the business operator")
+                .HasColumnName("business_operator_phone_no");
+            entity.Property(e => e.BusinessOwnerEmailAddressDsc)
+                .HasMaxLength(320)
+                .HasComment("Email address of the business owner")
+                .HasColumnName("business_owner_email_address_dsc");
+            entity.Property(e => e.BusinessOwnerNm)
+                .HasMaxLength(320)
+                .HasComment("Full name of the registered business owner")
+                .HasColumnName("business_owner_nm");
+            entity.Property(e => e.BusinessOwnerPhoneNo)
+                .HasMaxLength(30)
+                .HasComment("Phone number of the business owner")
+                .HasColumnName("business_owner_phone_no");
+            entity.Property(e => e.ExpiryDt)
+                .HasComment("The date on which the business licence expires")
+                .HasColumnName("expiry_dt");
+            entity.Property(e => e.InfractionDt)
+                .HasComment("The date on which the described infraction occurred")
+                .HasColumnName("infraction_dt");
+            entity.Property(e => e.InfractionTxt)
+                .HasMaxLength(320)
+                .HasComment("Description of an infraction")
+                .HasColumnName("infraction_txt");
+            entity.Property(e => e.IsOwnerLivingOnsite)
+                .HasComment("Indicates whether the owner lives on the property")
+                .HasColumnName("is_owner_living_onsite");
+            entity.Property(e => e.IsOwnerPropertyTenant)
+                .HasComment("Indicates whether the business owner rents the property")
+                .HasColumnName("is_owner_property_tenant");
+            entity.Property(e => e.IsPrincipalResidence)
+                .HasComment("Indicates whether the short term rental property is a principal residence")
+                .HasColumnName("is_principal_residence");
+            entity.Property(e => e.LicenceStatusType)
+                .HasMaxLength(25)
+                .HasComment("Foreign key")
+                .HasColumnName("licence_status_type");
+            entity.Property(e => e.LicenceTypeTxt)
+                .HasMaxLength(320)
+                .HasComment("Free form description of the type of business licence issued (e.g. short-term rental, bed and breakfast, boarding and lodging, tourist accommodation)")
+                .HasColumnName("licence_type_txt");
+            entity.Property(e => e.MailingCityNm)
+                .HasMaxLength(100)
+                .HasComment("City component of the business mailing address")
+                .HasColumnName("mailing_city_nm");
+            entity.Property(e => e.MailingPostalCd)
+                .HasMaxLength(10)
+                .HasComment("Postal code component of the business mailing address")
+                .HasColumnName("mailing_postal_cd");
+            entity.Property(e => e.MailingProvinceCd)
+                .HasMaxLength(2)
+                .HasComment("Province component of the business mailing address")
+                .HasColumnName("mailing_province_cd");
+            entity.Property(e => e.MailingStreetAddressTxt)
+                .HasMaxLength(100)
+                .HasComment("Street address component of the business mailing address")
+                .HasColumnName("mailing_street_address_txt");
+            entity.Property(e => e.MaxGuestsAllowedQty)
+                .HasComment("The number of guests that can be accommodated")
+                .HasColumnName("max_guests_allowed_qty");
+            entity.Property(e => e.PhysicalRentalAddressTxt)
+                .HasMaxLength(250)
+                .HasComment("The full physical address of the location that is licenced as a short-term rental business")
+                .HasColumnName("physical_rental_address_txt");
+            entity.Property(e => e.PropertyFolioNo)
+                .HasMaxLength(30)
+                .HasComment("The number used to identify the property")
+                .HasColumnName("property_folio_no");
+            entity.Property(e => e.PropertyLegalDescriptionTxt)
+                .HasMaxLength(320)
+                .HasComment("The physical description of the property as it is registered with the Land Title and Survey Authority")
+                .HasColumnName("property_legal_description_txt");
+            entity.Property(e => e.PropertyParcelIdentifierNo)
+                .HasMaxLength(30)
+                .HasComment("The PID number assigned by the Land Title and Survey Authority that identifies the piece of land")
+                .HasColumnName("property_parcel_identifier_no");
+            entity.Property(e => e.PropertyZoneTxt)
+                .HasMaxLength(100)
+                .HasComment("Description or name of the property zoning")
+                .HasColumnName("property_zone_txt");
+            entity.Property(e => e.ProvidingOrganizationId)
+                .HasComment("Foreign key")
+                .HasColumnName("providing_organization_id");
+            entity.Property(e => e.RestrictionTxt)
+                .HasMaxLength(320)
+                .HasComment("Notes related to any restrictions associated with the licence")
+                .HasColumnName("restriction_txt");
+            entity.Property(e => e.UpdDtm)
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
+                .HasColumnName("upd_user_guid");
+
+            entity.HasOne(d => d.AffectedByPhysicalAddress).WithMany(p => p.DssBusinessLicences)
+                .HasForeignKey(d => d.AffectedByPhysicalAddressId)
+                .HasConstraintName("dss_business_licence_fk_affecting");
+
+            entity.HasOne(d => d.LicenceStatusTypeNavigation).WithMany(p => p.DssBusinessLicences)
+                .HasForeignKey(d => d.LicenceStatusType)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_business_licence_fk_classified_as");
+
+            entity.HasOne(d => d.ProvidingOrganization).WithMany(p => p.DssBusinessLicences)
+                .HasForeignKey(d => d.ProvidingOrganizationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_business_licence_fk_provided_by");
+        });
+
+        modelBuilder.Entity<DssBusinessLicenceStatusType>(entity =>
+        {
+            entity.HasKey(e => e.LicenceStatusType).HasName("dss_business_licence_status_type_pk");
+
+            entity.ToTable("dss_business_licence_status_type", tb => tb.HasComment("A potential status for a BUSINESS LICENCE (e.g. Pending, Issued, Suspended, Revoked, Cancelled, Expired)"));
+
+            entity.Property(e => e.LicenceStatusType)
+                .HasMaxLength(25)
+                .HasComment("System-consistent code for the business licence status (e.g. Pending, Issued, Suspended, Revoked, Cancelled, Expired)")
+                .HasColumnName("licence_status_type");
+            entity.Property(e => e.LicenceStatusSortNo)
+                .HasComment("Relative order in which the business prefers to see the status listed")
+                .HasColumnName("licence_status_sort_no");
+            entity.Property(e => e.LicenceStatusTypeNm)
+                .HasMaxLength(50)
+                .HasComment("Business term for the licence status (e.g. Pending, Issued, Suspended, Revoked, Cancelled, Expired)")
+                .HasColumnName("licence_status_type_nm");
         });
 
         modelBuilder.Entity<DssEmailMessage>(entity =>
@@ -224,7 +398,9 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(2)
                 .HasComment("System-consistent code for the listing status (e.g. N, A, I, R, T)")
                 .HasColumnName("listing_status_type");
-            entity.Property(e => e.ListingStatusSortNo).HasColumnName("listing_status_sort_no");
+            entity.Property(e => e.ListingStatusSortNo)
+                .HasComment("Relative order in which the business prefers to see the status listed")
+                .HasColumnName("listing_status_sort_no");
             entity.Property(e => e.ListingStatusTypeNm)
                 .HasMaxLength(50)
                 .HasComment("Business term for the listing status (e.g. New, Active, Inactive, Reassigned, Taken Down)")
@@ -495,6 +671,14 @@ public partial class DssDbContext : DbContext
 
             entity.HasIndex(e => new { e.ListingStatusType, e.OfferingOrganizationId }, "dss_rental_listing_i5");
 
+            entity.HasIndex(e => e.GoverningBusinessLicenceId, "dss_rental_listing_i6");
+
+            entity.HasIndex(e => e.BusinessLicenceNo, "dss_rental_listing_i7");
+
+            entity.HasIndex(e => e.EffectiveBusinessLicenceNo, "dss_rental_listing_i8");
+
+            entity.HasIndex(e => e.EffectiveHostNm, "dss_rental_listing_i9");
+
             entity.Property(e => e.RentalListingId)
                 .HasComment("Unique generated key")
                 .UseIdentityAlwaysColumn()
@@ -507,12 +691,23 @@ public partial class DssDbContext : DbContext
                 .HasComment("The Short Term Registry issued permit number")
                 .HasColumnName("bc_registry_no");
             entity.Property(e => e.BusinessLicenceNo)
-                .HasMaxLength(230)
-                .HasComment("The local government issued licence number that applies to the rental offering")
+                .HasMaxLength(320)
+                .HasComment("The business licence number that is published for the rental offering")
                 .HasColumnName("business_licence_no");
             entity.Property(e => e.DerivedFromRentalListingId)
                 .HasComment("Foreign key")
                 .HasColumnName("derived_from_rental_listing_id");
+            entity.Property(e => e.EffectiveBusinessLicenceNo)
+                .HasMaxLength(320)
+                .HasComment("The local government issued licence number that should be used for compariing the rental offering with others")
+                .HasColumnName("effective_business_licence_no");
+            entity.Property(e => e.EffectiveHostNm)
+                .HasMaxLength(320)
+                .HasComment("The full name of the rental offering host that should be used for comparison with others")
+                .HasColumnName("effective_host_nm");
+            entity.Property(e => e.GoverningBusinessLicenceId)
+                .HasComment("Foreign key")
+                .HasColumnName("governing_business_licence_id");
             entity.Property(e => e.IncludingRentalListingReportId)
                 .HasComment("Foreign key")
                 .HasColumnName("including_rental_listing_report_id");
@@ -522,6 +717,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsChangedAddress)
                 .HasComment("Indicates whether a CURRENT RENTAL LISTING has been subjected to address match changes by a user")
                 .HasColumnName("is_changed_address");
+            entity.Property(e => e.IsChangedBusinessLicence)
+                .HasComment("Indicates whether a CURRENT RENTAL LISTING has been subjected to business licence linking changes by a user")
+                .HasColumnName("is_changed_business_licence");
             entity.Property(e => e.IsChangedOriginalAddress)
                 .HasComment("Indicates whether a CURRENT RENTAL LISTING has received a different property address in the last reporting period")
                 .HasColumnName("is_changed_original_address");
@@ -575,6 +773,10 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.DerivedFromRentalListingId)
                 .HasConstraintName("dss_rental_listing_fk_generating");
 
+            entity.HasOne(d => d.GoverningBusinessLicence).WithMany(p => p.DssRentalListings)
+                .HasForeignKey(d => d.GoverningBusinessLicenceId)
+                .HasConstraintName("dss_rental_listing_fk_governed_by");
+
             entity.HasOne(d => d.IncludingRentalListingReport).WithMany(p => p.DssRentalListings)
                 .HasForeignKey(d => d.IncludingRentalListingReportId)
                 .HasConstraintName("dss_rental_listing_fk_included_in");
@@ -621,8 +823,8 @@ public partial class DssDbContext : DbContext
                 .HasComment("Mailing address given for the contact")
                 .HasColumnName("full_address_txt");
             entity.Property(e => e.FullNm)
-                .HasMaxLength(230)
-                .HasComment("The full name of the contact person as inluded in the listing")
+                .HasMaxLength(320)
+                .HasComment("The full name of the contact person as included in the listing")
                 .HasColumnName("full_nm");
             entity.Property(e => e.IsPropertyOwner)
                 .HasComment("Indicates a person with the legal right to the unit being short-term rental")
@@ -754,9 +956,13 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.BcRegistryNo)
                 .HasMaxLength(50)
                 .HasColumnName("bc_registry_no");
+            entity.Property(e => e.BusinessLicenceId).HasColumnName("business_licence_id");
             entity.Property(e => e.BusinessLicenceNo)
-                .HasMaxLength(230)
+                .HasMaxLength(320)
                 .HasColumnName("business_licence_no");
+            entity.Property(e => e.BusinessLicenceNoMatched)
+                .HasMaxLength(50)
+                .HasColumnName("business_licence_no_matched");
             entity.Property(e => e.EconomicRegionDsc)
                 .HasMaxLength(100)
                 .HasColumnName("economic_region_dsc");

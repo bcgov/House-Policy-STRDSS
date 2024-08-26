@@ -20,6 +20,7 @@ namespace StrDss.Service
 
             RentalListingReportValidationRule.LoadReportValidationRules(_rules);
             RoleValidationRule.LoadReportValidationRules(_rules);
+            BizLicenceValidationRule.LoadBizLicenceValidationRules(_rules);
         }
 
         public IEnumerable<FieldValidationRule> GetFieldValidationRules(string entityName)
@@ -123,18 +124,33 @@ namespace StrDss.Service
 
             if (rule.CodeSet != null)
             {
-                if (decimal.TryParse(value, out decimal numValue))
-                {
-                    var exists = CommonCodes.Any(x => x.CodeSet == rule.CodeSet && x.Id == numValue);
+                //surrogate key
+                var hasId = CommonCodes.Any(x => x.CodeSet == rule.CodeSet && x.Id != 0);
 
-                    if (!exists)
+                if (hasId)
+                {
+                    if (decimal.TryParse(value, out decimal numValue))
+                    {
+                        var exists = CommonCodes.Any(x => x.CodeSet == rule.CodeSet && x.Id == numValue);
+
+                        if (!exists)
+                        {
+                            messages.Add($"{rowNumPrefix}Invalid value. [{value}] doesn't exist in the code set {rule.CodeSet}.");
+                        }
+                    }
+                    else
                     {
                         messages.Add($"{rowNumPrefix}Invalid value. [{value}] doesn't exist in the code set {rule.CodeSet}.");
                     }
                 }
                 else
                 {
-                    messages.Add($"{rowNumPrefix}Invalid value. [{value}] doesn't exist in the code set {rule.CodeSet}.");
+                    var exists = CommonCodes.Any(x => x.CodeSet == rule.CodeSet && x.CodeName == value);
+
+                    if (!exists)
+                    {
+                        messages.Add($"{rowNumPrefix}Invalid value. [{value}] doesn't exist in the code set {rule.CodeSet}.");
+                    }
                 }
             }
 

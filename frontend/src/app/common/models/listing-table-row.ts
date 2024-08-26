@@ -8,6 +8,7 @@ export interface ListingTableRow {
     isEntireUnit: boolean;
     nightsBookedYtdQty: number;
     businessLicenceNo: string;
+    businessLicenceNoMatched: string;
     lastActionNm: string;
     lastActionDtm: string;
 

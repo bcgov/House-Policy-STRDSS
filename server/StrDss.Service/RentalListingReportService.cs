@@ -15,6 +15,8 @@ using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
 using System.Diagnostics;
+using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace StrDss.Service
@@ -34,11 +36,12 @@ namespace StrDss.Service
         private IUserRepository _userRepo;
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
+        private IBizLicenceRepository _bizLicRepo;
         private IConfiguration _config;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
-            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo,
+            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBizLicenceRepository bizLicRepo,
             IConfiguration config, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
@@ -50,6 +53,7 @@ namespace StrDss.Service
             _userRepo = userRepo;
             _emailService = emailService;
             _emailRepo = emailRepo;
+            _bizLicRepo = bizLicRepo;
             _config = config;
         }
         public async Task ProcessRentalReportUploadAsync()
@@ -113,7 +117,7 @@ namespace StrDss.Service
 
                 var row = csv.GetRecord<RentalListingRowUntyped>(); //it has been parsed once, so no exception expected.
 
-                var exists = linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.ListingId == row.ListingId);
+                var exists = linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.SourceRecordNo == row.ListingId);
 
                 if (!exists) continue;
 
@@ -271,9 +275,9 @@ namespace StrDss.Service
             return true;
         }
 
-        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValid, string systemError)
+        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, string systemError)
         {
-            uploadLine.IsValidationFailure = isValid;
+            uploadLine.IsValidationFailure = isValidationFailure;
             uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
 
             uploadLine.IsSystemFailure = systemError.IsNotEmpty();
@@ -412,6 +416,34 @@ namespace StrDss.Service
             masterListing.DerivedFromRentalListingId = listing.RentalListingId;
             masterListing.LocatingPhysicalAddressId = physicalAddress.PhysicalAddressId;
 
+            masterListing.EffectiveHostNm = CommonUtils.SanitizeAndUppercaseString(row.PropertyHostNm);
+
+            var managingOrgId = physicalAddress.ContainingOrganizationId.HasValue ?
+                await _orgRepo.GetManagingOrgId(physicalAddress.ContainingOrganizationId.Value) : null;
+
+            var needBusinessLicenceLink = await NeedBusinessLicenceLink(masterListing, managingOrgId);
+
+            if (needBusinessLicenceLink)
+            {
+                if (!string.IsNullOrEmpty(masterListing.BusinessLicenceNo) && managingOrgId.HasValue)
+                {
+                    var sanitizedBizLicNo = CommonUtils.SanitizeAndUppercaseString(masterListing.BusinessLicenceNo);
+
+                    var (businessLicenceId, businessLicenceNo) = await _bizLicRepo.GetMatchingBusinessLicenceIdAndNo(
+                        managingOrgId.Value,
+                        sanitizedBizLicNo
+                    );
+
+                    masterListing.GoverningBusinessLicenceId = businessLicenceId;
+                    masterListing.EffectiveBusinessLicenceNo = businessLicenceNo ?? sanitizedBizLicNo;
+                }
+                else
+                {
+                    masterListing.GoverningBusinessLicenceId = null;
+                    masterListing.EffectiveBusinessLicenceNo = string.Empty;
+                }
+            }
+
             (masterListing.NightsBookedQty, masterListing.SeparateReservationsQty) = 
                 await _reportRepo.GetYtdValuesOfListingAsync(reportPeriodYm, offeringOrg.OrganizationId, masterListing.PlatformListingNo);
 
@@ -420,6 +452,35 @@ namespace StrDss.Service
             masterListing.IsChangedOriginalAddress = listing.IsChangedOriginalAddress != null ? listing.IsChangedOriginalAddress : masterListing.IsChangedOriginalAddress;
 
             return (true, masterListing);
+        }
+
+        private async Task<bool> NeedBusinessLicenceLink(DssRentalListing masterListing, long? managingOrgId)
+        {
+            // If there's no existing link, a link is needed
+            if (masterListing.GoverningBusinessLicenceId == null)
+                return true;
+
+            // Get business licence number and organization ID from the repository
+            var (blNo, orgId) = await _bizLicRepo.GetBizLicenceNoAndLgId(masterListing.GoverningBusinessLicenceId.Value);
+
+            // A link is needed if the business licence number is null (not possible due to FK restriction)
+            if (string.IsNullOrEmpty(blNo))
+                return true;
+
+            // A de-link is needed if the listing has no jurisdiction
+            if (!managingOrgId.HasValue)
+                return true;
+
+            // A re-link is needed if the listing has been reassigned to a different jurisdiction
+            if (managingOrgId.Value != orgId)
+                return true;
+
+            // Keep the overridden link if the business licence has been changed
+            if (masterListing.IsChangedBusinessLicence == true)
+                return false;
+
+            // A re-link is needed if the platform BL has been changed.
+            return CommonUtils.SanitizeAndUppercaseString(blNo) != CommonUtils.SanitizeAndUppercaseString(masterListing.BusinessLicenceNo ?? "");
         }
 
         private void AddContacts(DssRentalListing listing, RentalListingRowUntyped row)

@@ -19,7 +19,7 @@ namespace StrDss.Service
 {
     public interface IRentalListingService
     {
-        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense, 
+        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, 
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
         Task CreateRentalListingExportFiles();
@@ -43,10 +43,10 @@ namespace StrDss.Service
             _geocoder = geocoder;
             _orgRepo = orgRepo;
         }
-        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicense,
+        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction)
         {
-            var listings = await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicense,
+            var listings = await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicence,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
                 pageSize, pageNumber, orderBy, direction);
 
@@ -71,13 +71,11 @@ namespace StrDss.Service
 
         private void ProcessHosts(RentalListingViewDto listing, bool clearHosts = false)
         {
-            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
-
             foreach (var host in listing.Hosts)
             {
                 if (host.EmailAddressDsc == null) continue;
 
-                var hasValidEmail = Regex.IsMatch(host.EmailAddressDsc, emailRegex.Regex);
+                var hasValidEmail = CommonUtils.IsValidEmailAddress(host.EmailAddressDsc);
 
                 var hostType = host.IsPropertyOwner ? "Property Owner" : "Supplier Host";
 

@@ -281,7 +281,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"organiztionType\": \"BCGov\",\r\n  \"organiztionName\": \"Ministry of Housing\"\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -992,14 +992,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistings/408",
+					"raw": "{{host}}/api/rentallistings/612",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
 						"rentallistings",
-						"408"
+						"612"
 					]
 				}
 			},
@@ -1309,6 +1309,71 @@
 						{
 							"key": "addressString",
 							"value": "72 Switchmen St, Vancouver, BC, Canada"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Biz License",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "OrganizationId",
+							"value": "256",
+							"type": "text"
+						},
+						{
+							"key": "File",
+							"type": "file",
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/bl file/bl.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/api/bizlicenses",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"bizlicenses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "biz license upload history",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{host}}/api/bizlicenses/uploadhistory?orgId=256",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"bizlicenses",
+						"uploadhistory"
+					],
+					"query": [
+						{
+							"key": "orgId",
+							"value": "256"
 						}
 					]
 				}

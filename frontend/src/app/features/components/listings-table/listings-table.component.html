@@ -97,16 +97,6 @@
                             *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'asc'"></i>
                     </th>
 
-                    <th class="sortable-header" id="entireUnit_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'isEntireUnit'"
-                        (click)="onSort('isEntireUnit')">
-                        Entire Unit?
-                        <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'isEntireUnit' && this.sort.dir === 'desc'"></i>
-                        <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'isEntireUnit' && this.sort.dir === 'asc'"></i>
-                    </th>
-
                     <th class="sortable-header" id="nightsStayed_header"
                         [class.sorted]="this.sort && this.sort.prop === 'nightsBookedYtdQty'"
                         (click)="onSort('nightsBookedYtdQty')">Nights Stayed (YTD)
@@ -116,14 +106,23 @@
                             *ngIf="this.sort && this.sort.prop === 'nightsBookedYtdQty' && this.sort.dir === 'asc'"></i>
                     </th>
 
-                    <th class="sortable-header" id="license_header"
+                    <th class="sortable-header" id="licence_header"
                         [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNo'"
-                        (click)="onSort('businessLicenceNo')">Business
-                        Licence
+                        (click)="onSort('businessLicenceNo')">Listing’s Business Licence
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNo' && this.sort.dir === 'asc'"></i>
+                    </th>
+
+                    <th class="sortable-header" id="licence_matched_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNoMatched'"
+                        (click)="onSort('businessLicenceNoMatched')">LG's Business
+                        Licence
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'businessLicenceNoMatched' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'businessLicenceNoMatched' && this.sort.dir === 'asc'"></i>
                     </th>
 
                     <th class="sortable-header" id="lastAction_header"
@@ -195,9 +194,9 @@
                             <p-tag *ngIf="row.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
                         </div>
                     </td>
-                    <td>{{ row.isEntireUnit?'Yes':'No' }}</td>
                     <td>{{ row.nightsBookedYtdQty }}</td>
                     <td>{{ row.businessLicenceNo }}</td>
+                    <td>{{ row.businessLicenceNoMatched }}</td>
                     <td>{{ row.lastActionNm }}</td>
                     <td>{{ row.lastActionDtm |date }}</td>
                 </tr>
@@ -217,12 +216,17 @@
     <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
         <span>
             <strong>Status:</strong> Status of the listing using the following categories:
-            <ul>
-                <li>New (N): Listing reported for the first time in current monthly data</li>
-                <li>Active (A): Listing appeared in previous and current monthly data</li>
-                <li>Inactive (I): Listing appeared in previous but not current monthly data </li>
-                <li>Takedown Complete (T): Platform confirmed takedown of the listing</li>
-                <li>Reassigned (R): Address (best match) was updated to a new jurisdiction</li>
+            <ul class="statuses">
+                <li><span class="status-circle status-new">N</span>&nbsp;New: Listing reported for the first time in
+                    current monthly data</li>
+                <li><span class="status-circle status-active">A</span>&nbsp;Active: Listing appeared in previous and
+                    current monthly data</li>
+                <li><span class="status-circle status-inactive">I</span>&nbsp;Inactive: Listing appeared in previous
+                    but not current monthly data </li>
+                <li><span class="status-flag status-takedown-complete"></span>&nbsp;Takedown Complete: Platform
+                    confirmed takedown of the listing</li>
+                <li><span class="status-flag status-reassigned"></span>&nbsp;Reassigned: Address (best
+                    match) was updated to a new jurisdiction</li>
             </ul>
         </span>
         <p>
@@ -292,13 +296,13 @@
                 <div class="row"><strong>Business Licence Required?</strong></div>
                 <div class="row">
                     <p-radioButton name="businessLicenceRequired" value="Yes"
-                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenseRequired"
+                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
                         inputId="businessLicenceRequired_true" label="Yes"></p-radioButton>
                     <p-radioButton name="businessLicenceRequired" value="No"
-                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenseRequired"
+                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
                         inputId="businessLicenceRequired_false" label="No"></p-radioButton>
                     <p-radioButton name="businessLicenceRequired" value=""
-                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenseRequired"
+                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
                         inputId="businessLicenceRequired_null" label="Both"></p-radioButton>
                 </div>
             </p-accordionTab>

@@ -27,6 +27,7 @@
         public const string PhoneNumber = "PhoneNumber";
         public const string Url = "Url";
         public const string YearMonth = "YearMonth";
+        public const string YearMonthDay = "YearMonthDay";
 
         private static readonly Dictionary<string, RegexInfo> _regexInfos;
 
@@ -68,6 +69,12 @@
             {
                 Regex = @"^\d{4}-(0[1-9]|1[0-2])$",
                 ErrorMessage = "Invalid year-month format. Please use the yyyy-MM format (e.g., 2024-05)."
+            });
+
+            _regexInfos.Add(YearMonthDay, new RegexInfo
+            {
+                Regex = @"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",
+                ErrorMessage = "Invalid year-month-day format. Please use the yyyy-MM-dd format (e.g., 2024-05-01)."
             });
         }
 

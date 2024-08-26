@@ -2,7 +2,7 @@
 FROM --platform=linux/amd64 quay.io/fedora/postgresql-16:16
 
 # Change timezone to PST for convenience
-ENV TZ=PST8PDT
+ENV TZ=America/Los_Angeles
 
 # Set the workdir to be root
 WORKDIR /
@@ -22,22 +22,15 @@ ADD https://github.com/$SOURCE_REPO/go-crond/releases/download/$GOCROND_VERSION/
 
 USER root
 
-RUN curl https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/bin/mc
-RUN chmod +x /usr/bin/mc
-RUN chmod +x /usr/bin/go-crond
-# ========================================================================================================
-
-# ========================================================================================================
-# Perform operations that require root privilages here ...
-# --------------------------------------------------------------------------------------------------------
-RUN echo $TZ > /etc/timezone
-# ========================================================================================================
-
-# The column command is missing from quay.io/fedora/postgresql-14:14
-RUN dnf install -y util-linux
+RUN dnf install -y curl util-linux && \
+    curl https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/bin/mc && \
+    chmod +x /usr/bin/mc /usr/bin/go-crond && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf && \
+    echo $TZ > /etc/timezone
 
 # Important - Reset to the base image's user account.
 USER 26
 
 # Set the default CMD.
-CMD sh /backup.sh
+CMD ["bash", "/backup.sh"]

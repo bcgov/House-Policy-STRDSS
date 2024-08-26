@@ -4,14 +4,13 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
-using StrDss.Model.RentalReportDtos;
 using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
 {
     public interface IUploadDeliveryRepository
     {
-        Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly periodYm, long orgId, string hashValue);
+        Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly? periodYm, long orgId, string hashValue);
         Task AddUploadDeliveryAsync(DssUploadDelivery upload);
         Task<DssUploadDelivery?> GetUploadToProcessAsync(string reportType);
         Task<DssUploadDelivery[]> GetUploadsToProcessAsync(string reportType);
@@ -19,11 +18,11 @@ namespace StrDss.Data.Repositories
         Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId);
         Task<List<UploadLineToProcess>> GetUploadLinesToProcessAsync(long uploadId);
         Task<List<DssUploadLine>> GetUploadLineEntitiesToProcessAsync(long uploadId);
-        Task<long[]> GetUploadLineIdsWithErrors(long uploadId);
+        Task<long[]> GetUploadLineIdsWithErrors(long uploadId, bool fullData);
         Task<UploadLineError> GetUploadLineWithError(long lineId);
         Task<bool> UploadHasErrors(long uploadId);
         Task<int> GetTotalNumberOfUploadLines(long uploadId);
-        Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes);
         Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
     }
 
@@ -39,7 +38,7 @@ namespace StrDss.Data.Repositories
             await _dbSet.AddAsync(upload);
         }
 
-        public async Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly periodYm, long orgId, string hashValue)
+        public async Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly? periodYm, long orgId, string hashValue)
         {
             return await _dbSet.AsNoTracking()
                 .AnyAsync(x => x.ReportPeriodYm == periodYm && x.ProvidingOrganizationId == orgId && x.SourceHashDsc == hashValue);
@@ -67,19 +66,19 @@ namespace StrDss.Data.Repositories
                 .ToArrayAsync();
         }
 
-        public async Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId)
+        public async Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string sourceRecordNo)
         {
             var stopwatch = Stopwatch.StartNew();
 
             var line = await _dbContext.DssUploadLines.FirstOrDefaultAsync(x => 
                 x.IncludingUploadDeliveryId ==  uploadId && 
                 x.SourceOrganizationCd == orgCd && 
-                x.SourceRecordNo == listingId &&
+                x.SourceRecordNo == sourceRecordNo &&
                 x.IsProcessed == false);
 
             stopwatch.Stop();
 
-            _logger.LogDebug($"Fetched listing ({orgCd} - {listingId}) - {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
+            _logger.LogDebug($"Fetched line ({orgCd} - {sourceRecordNo}) - {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
 
             return line;
         }
@@ -88,7 +87,7 @@ namespace StrDss.Data.Repositories
         {
             return await _dbContext.DssUploadLines.AsNoTracking()
                 .Where(x => x.IncludingUploadDeliveryId == uploadId && x.IsProcessed == false)
-                .Select(x => new UploadLineToProcess { ListingId = x.SourceRecordNo, OrgCd = x.SourceOrganizationCd })
+                .Select(x => new UploadLineToProcess { SourceRecordNo = x.SourceRecordNo, OrgCd = x.SourceOrganizationCd })
                 .ToListAsync();
         }
 
@@ -112,10 +111,10 @@ namespace StrDss.Data.Repositories
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<long[]> GetUploadLineIdsWithErrors(long uploadId)
+        public async Task<long[]> GetUploadLineIdsWithErrors(long uploadId, bool fullData)
         {
             return await _dbContext.DssUploadLines.AsNoTracking()
-                .Where(x => x.IncludingUploadDeliveryId == uploadId && (x.IsValidationFailure || x.IsSystemFailure))
+                .Where(x => x.IncludingUploadDeliveryId == uploadId && (fullData || x.IsValidationFailure || x.IsSystemFailure))
                 .Select(x => x.UploadLineId)
                 .ToArrayAsync();
         }
@@ -138,19 +137,24 @@ namespace StrDss.Data.Repositories
             return await _dbContext.DssUploadLines.Where(x => x.IncludingUploadDeliveryId == uploadId).CountAsync();
         }
 
-        public async Task<PagedDto<RentalUploadHistoryViewDto>> GetRentalListingUploadHistory(long? platformId, int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes)
         {
             var query = _dbContext.DssRentalUploadHistoryViews.AsNoTracking();
 
-            if (_currentUser.OrganizationType == OrganizationTypes.Platform)
+            if (_currentUser.OrganizationType != OrganizationTypes.BCGov)
                 query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
 
-            if (platformId != null)
+            if (orgId != null)
             {
-                query = query.Where(x => x.ProvidingOrganizationId == platformId);
+                query = query.Where(x => x.ProvidingOrganizationId == orgId);
             }
 
-            var history = await Page<DssRentalUploadHistoryView, RentalUploadHistoryViewDto>(query, pageSize, pageNumber, orderBy, direction);
+            if (reportTypes.Any())
+            {
+                query = query.Where(x => reportTypes.Contains(x.UploadDeliveryType));
+            }
+
+            var history = await Page<DssRentalUploadHistoryView, UploadHistoryViewDto>(query, pageSize, pageNumber, orderBy, direction);
 
             return history;
         }

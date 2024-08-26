@@ -24,7 +24,7 @@ public partial class DssRentalListing
     public string? PlatformListingUrl { get; set; }
 
     /// <summary>
-    /// The local government issued licence number that applies to the rental offering
+    /// The business licence number that is published for the rental offering
     /// </summary>
     public string? BusinessLicenceNo { get; set; }
 
@@ -123,11 +123,33 @@ public partial class DssRentalListing
     /// </summary>
     public string? ListingStatusType { get; set; }
 
+    /// <summary>
+    /// The local government issued licence number that should be used for compariing the rental offering with others
+    /// </summary>
+    public string? EffectiveBusinessLicenceNo { get; set; }
+
+    /// <summary>
+    /// The full name of the rental offering host that should be used for comparison with others
+    /// </summary>
+    public string? EffectiveHostNm { get; set; }
+
+    /// <summary>
+    /// Indicates whether a CURRENT RENTAL LISTING has been subjected to business licence linking changes by a user
+    /// </summary>
+    public bool? IsChangedBusinessLicence { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? GoverningBusinessLicenceId { get; set; }
+
     public virtual DssRentalListing? DerivedFromRentalListing { get; set; }
 
     public virtual ICollection<DssEmailMessage> DssEmailMessages { get; set; } = new List<DssEmailMessage>();
 
     public virtual ICollection<DssRentalListingContact> DssRentalListingContacts { get; set; } = new List<DssRentalListingContact>();
+
+    public virtual DssBusinessLicence? GoverningBusinessLicence { get; set; }
 
     public virtual DssRentalListingReport? IncludingRentalListingReport { get; set; }
 

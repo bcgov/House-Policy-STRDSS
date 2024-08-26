@@ -16,7 +16,6 @@ backupConfig: |
   postgres=patroni-postgresql-gw:5432/gw
 
   0 1 * * * default ./backup.sh -s
-  0 4 * * * default ./backup.sh -s -v all
 
 config:
   []
@@ -32,12 +31,6 @@ persistence:
     mountPath: /backups/
     storageClassName: netapp-block-standard
     storageAccessMode: ReadWriteOnce
-  verification:
-    size: 2Gi
-    mountPath: /var/lib/pgsql/data
-    storageClassName: netapp-block-standard
-    storageAccessMode: ReadWriteOnce
-
 db:
   secretName: "patroni"
   usernameKey: "username-superuser"

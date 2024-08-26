@@ -1,8 +1,8 @@
-﻿namespace StrDss.Model.RentalReportDtos
+﻿namespace StrDss.Model
 {
-    public class RentalUploadHistoryViewDto
+    public class UploadHistoryViewDto
     {
-        public RentalUploadHistoryViewDto()
+        public UploadHistoryViewDto()
         {
             ReportPeriodYM = "";
             OrganizationNm = "";

@@ -102,8 +102,8 @@ export class ListingDataService {
     if (searchReq.hostName) {
       endpointUrl += `&hostName=${searchReq.hostName}`;
     }
-    if (searchReq.businessLicense) {
-      endpointUrl += `&businessLicense=${searchReq.businessLicense}`;
+    if (searchReq.businessLicence) {
+      endpointUrl += `&businessLicence=${searchReq.businessLicence}`;
     }
 
     if (filter) {
@@ -111,8 +111,8 @@ export class ListingDataService {
         if (!!filter.byLocation?.isPrincipalResidenceRequired) {
           endpointUrl += `&prRequirement=${filter.byLocation.isPrincipalResidenceRequired == 'Yes'}`;
         }
-        if (!!filter.byLocation?.isBusinessLicenseRequired) {
-          endpointUrl += `&blRequirement=${filter.byLocation.isBusinessLicenseRequired == 'Yes'}`;
+        if (!!filter.byLocation?.isBusinessLicenceRequired) {
+          endpointUrl += `&blRequirement=${filter.byLocation.isBusinessLicenceRequired == 'Yes'}`;
         }
       }
       if (filter.byStatus) {
@@ -153,7 +153,6 @@ export class ListingDataService {
       { responseType: 'arraybuffer' });
   }
 
-  // Note: Address change methods
   getAddressCandidates(addressString: string): Observable<Array<ListingAddressCandidate>> {
     return this.httpClient.get<Array<ListingAddressCandidate>>(`${environment.API_HOST}/rentallistings/addresses/candidates`, {
       params: {

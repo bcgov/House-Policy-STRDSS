@@ -29,10 +29,10 @@ namespace StrDss.Data.Mappings
             CreateMap<DssUserPrivilege, PermissionDto>();
             CreateMap<DssUserIdentityView, UserListtDto>();
 
-            CreateMap<DssRentalUploadHistoryView, RentalUploadHistoryViewDto>()
-                .ForMember(o => o.ReportPeriodYM, opt => opt.MapFrom(i => ((DateOnly)i.ReportPeriodYm!).ToString("yyyy-MM")))
-                .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime((DateTime)i.UpdDtm!)))
-                ;
+            CreateMap<DssRentalUploadHistoryView, UploadHistoryViewDto>()
+                .ForMember(o => o.ReportPeriodYM, opt => opt.MapFrom(i => i.ReportPeriodYm.HasValue ? ((DateOnly)i.ReportPeriodYm.Value).ToString("yyyy-MM") : null))
+                .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime((DateTime)i.UpdDtm!)));
+
 
             CreateMap<DssRentalListingVw, RentalListingViewDto>();
             CreateMap<DssRentalListingContact, RentalListingContactDto>();
@@ -42,6 +42,12 @@ namespace StrDss.Data.Mappings
 
             CreateMap<DssRentalListingVw, RentalListingExportDto>();
             CreateMap<DssRentalListingExtract, RentalListingExtractDto>()
+                .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime(i.UpdDtm)));
+
+            CreateMap<DssBusinessLicenceStatusType, LicenceStatus>();
+
+            CreateMap<DssBusinessLicence, BizLicenceDto>()
+                .ForMember(o => o.LicenceStatus, opt => opt.MapFrom(i => i.LicenceStatusTypeNavigation))
                 .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime(i.UpdDtm)));
         }
     }

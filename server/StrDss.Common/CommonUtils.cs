@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace StrDss.Common
 {
@@ -7,18 +8,9 @@ namespace StrDss.Common
     {
         public static string GetFullName(string firstName, string lastName)
         {
-            if (firstName.IsNotEmpty() && lastName.IsNotEmpty())
-            {
-                return $"{lastName}, {firstName}";
-            }
-            else if (firstName.IsNotEmpty())
-            {
-                return firstName;
-            }
-            else
-            {
-                return lastName;
-            }
+            return string.IsNullOrEmpty(lastName)
+                ? $"{firstName?.Trim() ?? string.Empty}"
+                : $"{lastName.Trim()}, {firstName?.Trim() ?? string.Empty}";
         }
 
         public static T CloneObject<T>(T obj)
@@ -78,6 +70,26 @@ namespace StrDss.Common
             }
 
             return memoryStream.ToArray();
+        }
+
+        public static string SanitizeAndUppercaseString(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return "";
+
+            return Regex.Replace(input, @"[^a-zA-Z0-9]", "").ToUpper();
+        }
+
+        public static bool IsValidEmailAddress(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return false;
+
+            var valid = Regex.IsMatch(email, RegexDefs.GetRegexInfo(RegexDefs.Email).Regex);
+
+            if (!valid) return false;
+
+            if (email.StartsWith(".") || email.EndsWith(".") || email.Contains(".@") || email.Contains("@.") || email.Contains("..")) return false;
+
+            return true;
         }
     }
 }

@@ -21,10 +21,11 @@
         </div>
     </div>
     <div class="column">
-        <button pButton (click)="sendNoticeOfNonCompliance()" class="p-button-outlined ">
+        <button *ngIf="!isCEU" pButton (click)="sendNoticeOfNonCompliance()" class="p-button-outlined ">
             <span class="nonc-icon"></span> Send Notice Of
             Non-Compliance </button>
-        <button pButton (click)="sendTakedownRequest()" class="p-button-outlined"><span class="tdr-icon"></span> Send
+        <button *ngIf="!isCEU" pButton (click)="sendTakedownRequest()" class="p-button-outlined"><span
+                class="tdr-icon"></span> Send
             Takedown
             Request</button>
     </div>
@@ -36,7 +37,8 @@
                 <div class="property-info-container">
                     <strong class="panel-header-text">Property Information</strong>
                     <p-tag class="platform-report-month">
-                        <strong class="tag-text">Platform Report Month:</strong>{{listing.latestReportPeriodYm || '-'}}
+                        <strong class="tag-text">Platform Report Month:</strong>{{listing.latestReportPeriodYm
+                        |date:'YYYY-MM' || '-'}}
                     </p-tag>
                 </div>
             </ng-template>
@@ -267,9 +269,6 @@
                 <strong>We were unable to find a business licence that matched this listing in our system.</strong>
             </div>
             <ng-template #else_block>
-                <div *ngIf="blInfo?.businessNm || 
-                blInfo?.physicalRentalAddressTxt" class="spacer-hr"></div>
-
                 <div *ngIf="blInfo?.businessNm" class="row">
                     <strong>Business Name:</strong> <span>{{blInfo.businessNm ||'-'}}</span>
                 </div>

@@ -11,6 +11,7 @@ namespace StrDss.Data.Repositories
         where TEntity : class
     {
         Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string orderDir, string extraSort = "");
+        Task<PagedDto<TOutput>> PageGrouped<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "");
     }
     public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
         where TEntity : class
@@ -87,5 +88,47 @@ namespace StrDss.Data.Repositories
 
             return pagedDTO;
         }
+
+        public async Task<PagedDto<TOutput>> PageGrouped<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "")
+        {
+            var totalRecords = list.Count();
+
+            if (pageNumber <= 0) pageNumber = 1;
+
+            var pagedList = list;
+
+            if (pageSize > 0)
+            {
+                var skipRecordCount = (pageNumber - 1) * pageSize;
+                pagedList = pagedList.Skip(skipRecordCount)
+                    .Take(pageSize);
+            }
+
+            var result = await pagedList.ToListAsync();
+
+            IEnumerable<TOutput> outputList;
+
+            if (typeof(TOutput) != typeof(TInput))
+                outputList = _mapper.Map<IEnumerable<TInput>, IEnumerable<TOutput>>(result);
+            else
+                outputList = (IEnumerable<TOutput>)result;
+
+            var pagedDTO = new PagedDto<TOutput>
+            {
+                SourceList = outputList,
+                PageInfo = new PageInfo
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalCount = totalRecords,
+                    OrderBy = orderBy,
+                    Direction = direction,
+                    ItemCount = outputList.Count()
+                }
+            };
+
+            return pagedDTO;
+        }
+
     }
 }

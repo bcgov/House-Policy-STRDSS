@@ -13,6 +13,8 @@ namespace StrDss.Data.Repositories
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
         Task<List<long>> GetRentalListingIdsToExport();
@@ -46,6 +48,65 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
             }
 
+            ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, ref reassigned, ref takedownComplete, ref query);
+
+            var extraSort
+                = "AddressSort1ProvinceCd asc, AddressSort2LocalityNm asc, AddressSort3LocalityTypeDsc asc, AddressSort4StreetNm asc, AddressSort5StreetTypeDsc asc, AddressSort6StreetDirectionDsc asc, AddressSort7CivicNo asc, AddressSort8UnitNo asc";
+
+            if (orderBy == "lastActionDtm")
+            {
+                orderBy = "lastActionDtm == null, lastActionDtm";
+            }
+            else if (orderBy == "lastActionNm")
+            {
+                orderBy = "lastActionNm == null, lastActionNm";
+            }
+
+            var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
+
+            foreach (var listing in listings.SourceList)
+            {
+                listing.Hosts =
+                    _mapper.Map<List<RentalListingContactDto>>(await
+                        _dbContext.DssRentalListingContacts
+                            .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
+                            .ToListAsync());
+            }
+
+            return listings;
+        }
+
+        public async Task<PagedDto<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            var query = _dbSet.AsNoTracking();
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG)
+            {
+                query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, ref reassigned, ref takedownComplete, ref query);
+
+            var groupedQuery = query
+                .GroupBy(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
+                .Select(g => new RentalListingGroupDto
+                {
+                    EffectiveBusinessLicenceNo = g.Key.EffectiveBusinessLicenceNo,
+                    EffectiveHostNm = g.Key.EffectiveHostNm,
+                    MatchAddressTxt = g.Key.MatchAddressTxt
+                })
+                .OrderBy(x => x.EffectiveHostNm)
+                .ThenBy(x => x.MatchAddressTxt)
+                .ThenBy(x => x.EffectiveBusinessLicenceNo);
+
+            var groupedListings = await PageGrouped<RentalListingGroupDto, RentalListingGroupDto>(groupedQuery, pageSize, pageNumber, orderBy, direction);
+
+            return groupedListings;
+        }
+
+        private static void ApplyFilters(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, ref bool? reassigned, ref bool? takedownComplete, ref IQueryable<DssRentalListingVw> query)
+        {
             if (all != null && all.IsNotEmpty())
             {
                 var allLower = all.ToLower();
@@ -110,7 +171,7 @@ namespace StrDss.Data.Repositories
             {
                 takedownComplete = null;
             }
-            
+
             if (reassigned != null && takedownComplete != null)
             {
                 query = query.Where(x => x.IsTakenDown == true || x.IsLgTransferred == true);
@@ -133,31 +194,6 @@ namespace StrDss.Data.Repositories
             {
                 query = query.Where(x => statusArray.Contains(x.ListingStatusType));
             }
-
-            var extraSort 
-                = "AddressSort1ProvinceCd asc, AddressSort2LocalityNm asc, AddressSort3LocalityTypeDsc asc, AddressSort4StreetNm asc, AddressSort5StreetTypeDsc asc, AddressSort6StreetDirectionDsc asc, AddressSort7CivicNo asc, AddressSort8UnitNo asc";
-
-            if (orderBy == "lastActionDtm")
-            {
-                orderBy = "lastActionDtm == null, lastActionDtm";
-            }
-            else if (orderBy == "lastActionNm")
-            {
-                orderBy = "lastActionNm == null, lastActionNm";
-            }
-
-            var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
-
-            foreach (var listing in listings.SourceList)
-            {
-                listing.Hosts =
-                    _mapper.Map<List<RentalListingContactDto>>(await
-                        _dbContext.DssRentalListingContacts
-                            .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
-                            .ToListAsync());
-            }
-
-            return listings;
         }
 
         public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId, bool loadHistory = true)

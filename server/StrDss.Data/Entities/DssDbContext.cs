@@ -966,6 +966,12 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.EconomicRegionDsc)
                 .HasMaxLength(100)
                 .HasColumnName("economic_region_dsc");
+            entity.Property(e => e.EffectiveBusinessLicenceNo)
+                .HasMaxLength(320)
+                .HasColumnName("effective_business_licence_no");
+            entity.Property(e => e.EffectiveHostNm)
+                .HasMaxLength(320)
+                .HasColumnName("effective_host_nm");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.IsBusinessLicenceRequired).HasColumnName("is_business_licence_required");
             entity.Property(e => e.IsChangedAddress).HasColumnName("is_changed_address");

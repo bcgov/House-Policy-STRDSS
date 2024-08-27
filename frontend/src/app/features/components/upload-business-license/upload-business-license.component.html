@@ -74,7 +74,7 @@
                         <ng-template #pending><span class="state-pending">{{uploadHistory.status}}</span></ng-template>
                     </td>
                     <td>{{ uploadHistory.total }}</td>
-                    <td>{{ uploadHistory.updDtm | date }}</td>
+                    <td>{{ uploadHistory.updDtm |date:'YYYY-MM-dd' }}</td>
                     <td>{{ uploadHistory.givenNm }} {{uploadHistory.familyNm}}</td>
                 </tr>
             </ng-template>

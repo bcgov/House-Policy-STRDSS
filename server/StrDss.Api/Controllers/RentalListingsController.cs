@@ -45,7 +45,7 @@ namespace StrDss.Api.Controllers
         [HttpGet("grouped")]
         public async Task<ActionResult> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete,
-            int pageSize, int pageNumber, string orderBy = "ListingStatusSortNo", string direction = "asc")
+            int pageSize, int pageNumber, string orderBy = "matchAddressTxt", string direction = "asc")
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 

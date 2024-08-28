@@ -66,7 +66,7 @@ namespace StrDss.Data.Repositories
 
             foreach (var listing in listings.SourceList)
             {
-                await LoadExtraProperties(listing);
+                await SetExtraProperties(listing);
             }
 
             return listings;
@@ -221,7 +221,7 @@ namespace StrDss.Data.Repositories
 
             foreach (var listing in listings)
             {
-                await LoadExtraProperties(listing);
+                await SetExtraProperties(listing);
 
                 listing.Filtered = filteredIds.Contains(listing.RentalListingId);
 
@@ -243,7 +243,7 @@ namespace StrDss.Data.Repositories
             return listings;
         }
 
-        private async Task LoadExtraProperties(RentalListingViewDto listing)
+        private async Task SetExtraProperties(RentalListingViewDto listing)
         {
             listing.LastActionDtm = listing.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(listing.LastActionDtm.Value);
             listing.Hosts =
@@ -264,15 +264,7 @@ namespace StrDss.Data.Repositories
                 return null;
             }
 
-            if (listing.LastActionDtm != null)
-            {
-                listing.LastActionDtm = DateUtils.ConvertUtcToPacificTime((DateTime)listing.LastActionDtm!);
-            }
-
-            listing.Hosts = _mapper.Map<List<RentalListingContactDto>>(await
-                _dbContext.DssRentalListingContacts.AsNoTracking()
-                .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
-                .ToListAsync());
+            await SetExtraProperties(listing);
 
             if (!loadHistory) return listing;
 

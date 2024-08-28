@@ -42,6 +42,21 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("grouped")]
+        public async Task<ActionResult> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+            bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete,
+            int pageSize, int pageNumber, string orderBy = "matchAddressTxt", string direction = "asc")
+        {
+            var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
+
+            var listings = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
+                pageSize, pageNumber, orderBy, direction);
+
+            return Ok(listings);
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet("{listingId}")]
         public async Task<ActionResult> GetRentalListing(long listingId)
         {

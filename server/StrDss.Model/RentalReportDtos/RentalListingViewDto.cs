@@ -79,12 +79,21 @@ namespace StrDss.Model.RentalReportDtos
         public string? BcRegistryNo { get; set; }
 
         public string? LastActionNm { get; set; }
-        public long? BusinessLicenceId { get; set; }
-        public string? BusinessLicenceNoMatched { get; set; }
+
         public DateTime? LastActionDtm { get; set; }
+
+        public long? BusinessLicenceId { get; set; }
+
+        public string? BusinessLicenceNoMatched { get; set; }
+
+        public string? EffectiveBusinessLicenceNo { get; set; }
+
+        public string? EffectiveHostNm { get; set; }
+
         public bool HasAtLeastOneValidHostEmail { get; set; }
         public List<HostInfo> HostsInfo { get; set; } = new List<HostInfo>();
         public BizLicenceDto? BizLicenceInfo { get; set; }
+        public bool Show { get; set; } = true;
         public virtual ICollection<RentalListingContactDto> Hosts { get; set; } = new List<RentalListingContactDto>();
         public virtual ICollection<ListingHistoryDto> ListingHistory { get; set; } = new List<ListingHistoryDto>();
         public virtual ICollection<ActionHistoryDto> ActionHistory { get; set; } = new List<ActionHistoryDto>();

@@ -70,9 +70,9 @@ namespace StrDss.Model.RentalReportDtos
 
         public short? AvailableBedroomsQty { get; set; }
 
-        public long? NightsBookedYtdQty { get; set; }
+        public int? NightsBookedYtdQty { get; set; }
 
-        public long? SeparateReservationsYtdQty { get; set; }
+        public int? SeparateReservationsYtdQty { get; set; }
 
         public string? BusinessLicenceNo { get; set; }
 
@@ -93,7 +93,7 @@ namespace StrDss.Model.RentalReportDtos
         public bool HasAtLeastOneValidHostEmail { get; set; }
         public List<HostInfo> HostsInfo { get; set; } = new List<HostInfo>();
         public BizLicenceDto? BizLicenceInfo { get; set; }
-        public bool Show { get; set; } = true;
+        public bool Filtered { get; set; } = true;
         public virtual ICollection<RentalListingContactDto> Hosts { get; set; } = new List<RentalListingContactDto>();
         public virtual ICollection<ListingHistoryDto> ListingHistory { get; set; } = new List<ListingHistoryDto>();
         public virtual ICollection<ActionHistoryDto> ActionHistory { get; set; } = new List<ActionHistoryDto>();

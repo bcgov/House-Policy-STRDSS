@@ -10,7 +10,7 @@ namespace StrDss.Data.Repositories
     public interface IRepositoryBase<TEntity> 
         where TEntity : class
     {
-        Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string orderDir, string extraSort = "");
+        Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction, string extraSort = "");
     }
     public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
         where TEntity : class

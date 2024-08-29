@@ -218,7 +218,9 @@ namespace StrDss.Data.Repositories
 
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
-            var filteredIds = await query.Select(x => x.RentalListingId).ToListAsync();
+            var filteredIds = await query.Select(x => x.RentalListingId ?? 0).ToListAsync();
+
+            var filteredIdSet = new HashSet<long>(filteredIds);
 
             stopwatch.Stop();
 
@@ -242,7 +244,7 @@ namespace StrDss.Data.Repositories
             {
                 await SetExtraProperties(listing);
 
-                listing.Filtered = filteredIds.Contains(listing.RentalListingId);
+                listing.Filtered = filteredIdSet.Contains(listing.RentalListingId ?? 0);
 
                 group.NightsBookedYtdQty += listing.NightsBookedYtdQty ?? 0;
             }

@@ -238,20 +238,21 @@ namespace StrDss.Data.Repositories
 
             group.NightsBookedYtdQty = 0;
 
+            stopwatch.Restart();
+
             foreach (var listing in listings)
             {
-                stopwatch.Restart();
-
                 await SetExtraProperties(listing);
 
                 listing.Filtered = filteredIdSet.Contains(listing.RentalListingId ?? 0);
 
                 group.NightsBookedYtdQty += listing.NightsBookedYtdQty ?? 0;
 
-                stopwatch.Stop();
-
-                _logger.LogInformation($"Get Grouped Listings (extra properties) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
             }
+
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Get Grouped Listings (extra properties) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             stopwatch.Restart();
 

@@ -104,8 +104,6 @@ namespace StrDss.Data.Repositories
 
             _logger.LogInformation($"Get Grouped Listings (group) - Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            stopwatch.Restart();
-
             foreach (var group in groupedListings.SourceList)
             {
                 group.Listings 
@@ -113,10 +111,6 @@ namespace StrDss.Data.Repositories
                         group.MatchAddressTxt, group.EffectiveHostNm, group.EffectiveBusinessLicenceNo, all, address, url, listingId, 
                         hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, group);
             }
-
-            _logger.LogInformation($"Get Grouped Listings (listings) - Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            stopwatch.Stop();
 
             return groupedListings;
         }
@@ -217,6 +211,8 @@ namespace StrDss.Data.Repositories
             string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, bool? prRequirement, bool? blRequirement, 
             long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, RentalListingGroupDto group)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var query = _dbSet.AsNoTracking()
                 .Where(x => x.MatchAddressTxt == effectiveAddress && x.EffectiveHostNm == effectiveHostName && x.EffectiveBusinessLicenceNo == effectiveBusinessLicenceNo);
 
@@ -224,11 +220,21 @@ namespace StrDss.Data.Repositories
 
             var filteredIds = await query.Select(x => x.RentalListingId).ToListAsync();
 
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Get Grouped Listings (filtered listing IDs) - Count: {filteredIds.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
+
             var listings = _mapper.Map<List<RentalListingViewDto>>(
                 await _dbSet.AsNoTracking()
                 .Where(x => x.MatchAddressTxt == effectiveAddress && x.EffectiveHostNm == effectiveHostName && x.EffectiveBusinessLicenceNo == effectiveBusinessLicenceNo)
                 .ToListAsync()
             );
+
+            _logger.LogInformation($"Get Grouped Listings (all listings) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
 
             group.NightsBookedYtdQty = 0;
 
@@ -252,6 +258,10 @@ namespace StrDss.Data.Repositories
                 group.LastActionNm = listingWithLatestAction.LastActionNm;
                 group.LastActionDtm = listingWithLatestAction.LastActionDtm;
             }
+
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Get Grouped Listings (extra properties) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return listings;
         }

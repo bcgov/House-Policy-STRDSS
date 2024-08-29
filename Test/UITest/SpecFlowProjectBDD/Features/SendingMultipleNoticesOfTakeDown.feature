@@ -1,10 +1,11 @@
-﻿Feature: SendingMultipleNoticesOfNonCompliance
+﻿Feature: SendingMultipleNoticesOfTakeDown
 
-Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-678
+Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-675
+
 
 @Scenario
-@SendingMultipleNoticesOfNonCompliance
-Scenario: SendingMultipleNoticesOfNonCompliance
+@SendingMultipleNoticesOfTakeDown
+Scenario: SendingMultipleNoticesOfTakeDown
 
 #Preconditions:
 #•	LG user has valid login credentials.
@@ -28,7 +29,7 @@ Scenario: SendingMultipleNoticesOfNonCompliance
 	Then the Send Notices of Non-Compliance button is enabled
 
 #	Click Send Notices of Non-Compliance 
-	Then LG user clicks Non-Compliance button
+	Then LG user clicks TakeDown button
 	Then system opens details to complete fields for sending notices
 
 #	Mandatory Fields Check: 
@@ -68,7 +69,8 @@ Scenario: SendingMultipleNoticesOfNonCompliance
 #	Scenario 2: LG user selects listings from different platforms
 Examples:
 	| UserName     | TypeOfNotice   | UserType | Email                      | BCC | Environment | ExpectedResult |
-	| STRDSSLg1Dev | Non-Compliance | lg_staff | richard.anderson@gov.bc.ca |     | dev         | pass           |
+	| STRDSSLg1Dev | TakeDown       | lg_staff | richard.anderson@gov.bc.ca |     | dev         | pass           |
+
 
 
 

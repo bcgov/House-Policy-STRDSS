@@ -1,10 +1,11 @@
-﻿Feature: SendingMultipleNoticesOfNonCompliance
+﻿Feature: SendingMultipleNoticesOfNonComplianceWithInvalidEmailFeature
 
-Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-678
+Link to a feature:  https://hous-hpb.atlassian.net/browse/DSS-677
+
 
 @Scenario
-@SendingMultipleNoticesOfNonCompliance
-Scenario: SendingMultipleNoticesOfNonCompliance
+@SendingMultipleNoticesOfNonComplianceWithInvalidEmail
+Scenario: SendingMultipleNoticesOfNonComplianceWithInvalidEmail
 
 #Preconditions:
 #•	LG user has valid login credentials.
@@ -30,6 +31,12 @@ Scenario: SendingMultipleNoticesOfNonCompliance
 #	Click Send Notices of Non-Compliance 
 	Then LG user clicks Non-Compliance button
 	Then system opens details to complete fields for sending notices
+
+#	Check valid/invalid email
+	And the emails with an invalid email address are flagged
+	And the button to send Notice to host is disabled if all invalid host email addresses
+	And the button to send notice to host is checked if there is at least one valid host email addresses
+	And the button to send Notice is checked for valid host emails
 
 #	Mandatory Fields Check: 
 	Then the “Review" button is disabled if any mandatory field is not completed

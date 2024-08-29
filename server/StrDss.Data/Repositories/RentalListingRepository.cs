@@ -236,18 +236,24 @@ namespace StrDss.Data.Repositories
 
             _logger.LogInformation($"Get Grouped Listings (all listings) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            stopwatch.Restart();
-
             group.NightsBookedYtdQty = 0;
 
             foreach (var listing in listings)
             {
+                stopwatch.Restart();
+
                 await SetExtraProperties(listing);
 
                 listing.Filtered = filteredIdSet.Contains(listing.RentalListingId ?? 0);
 
                 group.NightsBookedYtdQty += listing.NightsBookedYtdQty ?? 0;
+
+                stopwatch.Stop();
+
+                _logger.LogInformation($"Get Grouped Listings (extra properties) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
             }
+
+            stopwatch.Restart();
 
             var lastActionDtm = listings.Max(x => x.LastActionDtm);
 
@@ -263,7 +269,7 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Stop();
 
-            _logger.LogInformation($"Get Grouped Listings (extra properties) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogInformation($"Get Grouped Listings (group header properties) - Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return listings;
         }

@@ -6,6 +6,7 @@ using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.RentalReportDtos;
+using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
 {
@@ -66,11 +67,7 @@ namespace StrDss.Data.Repositories
 
             foreach (var listing in listings.SourceList)
             {
-                listing.Hosts =
-                    _mapper.Map<List<RentalListingContactDto>>(await
-                        _dbContext.DssRentalListingContacts
-                            .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
-                            .ToListAsync());
+                await SetExtraProperties(listing);
             }
 
             return listings;
@@ -99,23 +96,20 @@ namespace StrDss.Data.Repositories
 
             var extraSort = "";
 
+            var stopwatch = Stopwatch.StartNew();
+
             var groupedListings = await Page<RentalListingGroupDto, RentalListingGroupDto>(groupedQuery, pageSize, pageNumber, orderBy, direction, extraSort);
+
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Get Grouped Listings (group) - Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             foreach (var group in groupedListings.SourceList)
             {
                 group.Listings 
                     = await GetRentalListings(
                         group.MatchAddressTxt, group.EffectiveHostNm, group.EffectiveBusinessLicenceNo, all, address, url, listingId, 
-                        hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete);
-
-                foreach(var listing in group.Listings)
-                {
-                    listing.Hosts =
-                        _mapper.Map<List<RentalListingContactDto>>(await
-                            _dbContext.DssRentalListingContacts
-                                .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
-                                .ToListAsync());
-                }
+                        hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, group);
             }
 
             return groupedListings;
@@ -215,14 +209,24 @@ namespace StrDss.Data.Repositories
 
         private async Task<List<RentalListingViewDto>> GetRentalListings(string? effectiveAddress, string? effectiveHostName, string? effectiveBusinessLicenceNo,
             string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, bool? prRequirement, bool? blRequirement, 
-            long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete)
+            long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, RentalListingGroupDto group)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var query = _dbSet.AsNoTracking()
                 .Where(x => x.MatchAddressTxt == effectiveAddress && x.EffectiveHostNm == effectiveHostName && x.EffectiveBusinessLicenceNo == effectiveBusinessLicenceNo);
 
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
-            var filteredIds = query.Select(x => x.RentalListingId);
+            var filteredIds = await query.Select(x => x.RentalListingId ?? 0).ToListAsync();
+
+            var filteredIdSet = new HashSet<long>(filteredIds);
+
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Get Grouped Listings (filtered listing IDs) - Count: {filteredIds.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
 
             var listings = _mapper.Map<List<RentalListingViewDto>>(
                 await _dbSet.AsNoTracking()
@@ -230,15 +234,55 @@ namespace StrDss.Data.Repositories
                 .ToListAsync()
             );
 
+            _logger.LogInformation($"Get Grouped Listings (all listings) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            group.NightsBookedYtdQty = 0;
+
+            stopwatch.Restart();
+
             foreach (var listing in listings)
             {
-                if (filteredIds.Contains(listing.RentalListingId))
-                {
-                    listing.Show = true;
-                }
+                await SetExtraProperties(listing);
+
+                listing.Filtered = filteredIdSet.Contains(listing.RentalListingId ?? 0);
+
+                group.NightsBookedYtdQty += listing.NightsBookedYtdQty ?? 0;
+
             }
 
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Get Grouped Listings (extra properties) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
+
+            var lastActionDtm = listings.Max(x => x.LastActionDtm);
+
+            var listingWithLatestAction = listings.FirstOrDefault(x => x.LastActionDtm == lastActionDtm);
+
+            if (listingWithLatestAction != null)
+            {
+                group.BusinessLicenceNo = listingWithLatestAction.BusinessLicenceNoMatched ?? listingWithLatestAction.BusinessLicenceNo;
+                group.PrimaryHostNm = listingWithLatestAction.Hosts.Where(x => x.IsPropertyOwner).Select(x => x.FullNm).FirstOrDefault();
+                group.LastActionNm = listingWithLatestAction.LastActionNm;
+                group.LastActionDtm = listingWithLatestAction.LastActionDtm;
+            }
+
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Get Grouped Listings (group header properties) - Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
             return listings;
+        }
+
+        private async Task SetExtraProperties(RentalListingViewDto listing)
+        {
+            listing.LastActionDtm = listing.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(listing.LastActionDtm.Value);
+            listing.Hosts =
+                _mapper.Map<List<RentalListingContactDto>>(await
+                    _dbContext.DssRentalListingContacts
+                        .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
+                        .ToListAsync());
         }
 
         public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId, bool loadHistory = true)
@@ -252,15 +296,7 @@ namespace StrDss.Data.Repositories
                 return null;
             }
 
-            if (listing.LastActionDtm != null)
-            {
-                listing.LastActionDtm = DateUtils.ConvertUtcToPacificTime((DateTime)listing.LastActionDtm!);
-            }
-
-            listing.Hosts = _mapper.Map<List<RentalListingContactDto>>(await
-                _dbContext.DssRentalListingContacts.AsNoTracking()
-                .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
-                .ToListAsync());
+            await SetExtraProperties(listing);
 
             if (!loadHistory) return listing;
 

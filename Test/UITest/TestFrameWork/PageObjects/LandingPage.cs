@@ -12,20 +12,22 @@ namespace UITest.PageObjects
         private Button _SendTakedownLetterButton;
         private Button _ManageAccessRequestsButton;
         private Button _EscalateTakedownToCEUButton;
-        private Button _Upload_ListingsButton;
+        private Button _UploadPlatformDataButton;
         private Button _ViewPolicyGuidelinesButton;
+        private Button _ViewListingsButton;
 
         private IDriver _Driver;
 
+        public IDriver Driver { get => _Driver; }
         public string URL { get => _URL; set => _URL = value; }
         public Button ViewPolicyGuidenceButton { get => _ViewPolicyGuidenceButton; }
         public Button SendNoticeButton { get => _SendNoticeButton;  }
         public Button SendTakedownLetterButton { get => _SendTakedownLetterButton; }
         public Button EscalateTakedownToCEUButto { get => _EscalateTakedownToCEUButton; }
         public Button ManageAccessRequestsButton { get => _ManageAccessRequestsButton; }
-        public IDriver Driver { get => _Driver; }
-        public Button Upload_ListingsButton { get => _Upload_ListingsButton; }
+        public Button UploadPlatformDataButton { get => _UploadPlatformDataButton; }
         public Button ViewPolicyGuidelinesButton { get => _ViewPolicyGuidelinesButton;}
+        public Button ViewListingsButton { get => _ViewListingsButton; }
 
         public LandingPage(IDriver Driver)
         {
@@ -35,8 +37,9 @@ namespace UITest.PageObjects
             _SendTakedownLetterButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.SendTakeDownLetterButton);
             _ManageAccessRequestsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ManageAccessRequestsButton);
             _EscalateTakedownToCEUButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.EscalateTakedownToCEUButton);
-            _Upload_ListingsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.UploadListingsButton);
+            _UploadPlatformDataButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.UploadPlatformDataButton);
             _ViewPolicyGuidelinesButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ViewPolicyGuidenceButton);
+            _ViewListingsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ViewListingsButton);
 
         }
 

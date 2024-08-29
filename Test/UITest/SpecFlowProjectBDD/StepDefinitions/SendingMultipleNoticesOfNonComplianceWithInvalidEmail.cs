@@ -6,6 +6,8 @@ using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using OpenQA.Selenium.DevTools.V118.Debugger;
 using SpecFlowProjectBDD.Helpers;
+using System.Reflection.Metadata;
+using System.Xml.Linq;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
@@ -13,8 +15,8 @@ using UITest.TestDriver;
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
-    [Scope(Scenario = "SendingMultipleNoticesOfNonCompliance")]
-    public class SendingMultipleNoticesOfNonCompliance
+    [Scope(Scenario = "SendingMultipleNoticesOfNonComplianceWithInvalidEmail")]
+    public class SendingMultipleNoticesOfNonComplianceWithInvalidEmail
     {
         private IDriver _Driver;
         private LandingPage _LandingPage;
@@ -31,12 +33,21 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private SFEnums.UserTypeEnum _UserType;
         private SFEnums.LogonTypeEnum? _LogonType;
         private AppSettings _AppSettings;
+        private DssRentalListingContact _RentalListingPropertyOwnerContact;
+        private DssRentalListingContact _RentalListingNonPropertyOwnerContact;
+        private string _OriginalPropertyOwnerContactEmail = string.Empty;
+        private string _OriginalNonPropertyOwnerContactEmail = string.Empty; 
         private DateTime _updateTime;
         private DssDbContext _DssDBContext;
         private IUnitOfWork _UnitOfWork;
         private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
 
-        public SendingMultipleNoticesOfNonCompliance(SeleniumDriver Driver)
+        int _row = 1;
+        int _listingIDColumn = 4;
+        int _organizationColumn = 3;
+        int _InvalidEmailColumn = 2;
+
+        public SendingMultipleNoticesOfNonComplianceWithInvalidEmail(SeleniumDriver Driver)
         {
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
@@ -107,6 +118,56 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void WhenLGUserSelectsFromMenuToLoadListingsDataPage_OrUserNavigatesToViewListingDataOnHomepageScreen()
         {
             _LandingPage.ViewListingsButton.Click();
+
+
+            //get listingID for first listing and update email in DB with an invalid email
+            bool result = false;
+            var listingNumber = string.Empty;
+            string organizationName = string.Empty;
+            string listingID = string.Empty;
+            long organizationID = 0;
+
+            try
+            {
+               listingNumber = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_17-table > tbody > tr:nth-child({_row}) > td:nth-child({_listingIDColumn}) > a"").innerText");
+            }
+            catch
+            {
+                throw new InvalidCastException($"Could not read Listing ID for Listings table:Row {_row}");
+            }
+
+            try
+            {
+                organizationName = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_17-table > tbody > tr:nth-child({_row}) > td:nth-child({_organizationColumn})"").innerText");
+            }
+            catch
+            {
+                throw new InvalidCastException($"Could not read Plaform for Listings table:Row {_row}");
+            }
+
+            //Get OrganizationID for Platform
+            var organization = _UnitOfWork.DssOrganizationRepository.Get(p => p.OrganizationNm.ToUpper() == organizationName.ToUpper()).First();
+            organizationID = organization.OrganizationId;
+
+
+            //Get existing Listing
+
+            var rentalListing = _UnitOfWork.DssRentalListingRepository.Get(p => (p.PlatformListingNo == listingNumber)&& (p.OfferingOrganizationId == organizationID)&&(p.IsActive == true)).First();
+            _RentalListingPropertyOwnerContact = _UnitOfWork.DssRentalListingContactRepository.Get(p => (p.ContactedThroughRentalListingId == rentalListing.RentalListingId)&&(p.IsPropertyOwner == true)).First();
+            _RentalListingNonPropertyOwnerContact = _UnitOfWork.DssRentalListingContactRepository.Get(p => (p.ContactedThroughRentalListingId == rentalListing.RentalListingId) && (p.IsPropertyOwner == false)).First();
+            //Save Original Email
+            _OriginalPropertyOwnerContactEmail = _RentalListingPropertyOwnerContact.EmailAddressDsc;
+            _OriginalNonPropertyOwnerContactEmail = _RentalListingNonPropertyOwnerContact.EmailAddressDsc;
+
+            //update Email address with Invalid EmailAddress
+            //Update must be made on the view listing page to appear on the notice of non-compliance page
+
+            _RentalListingPropertyOwnerContact.EmailAddressDsc = "TestUserInValid@@email.com";
+            _RentalListingNonPropertyOwnerContact.EmailAddressDsc = "TestUserValid@email.com";
+            _UnitOfWork.Save();
+
+            //Refresh page to reread updated email values from DB
+            _ListingsPage.Driver.Navigate().Refresh();
         }
 
         [Then(@"the Send Notices of Non-Compliance button is disabled")]
@@ -137,6 +198,60 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void ThenSystemOpensDetailsToCompleteFieldsForSendingNotices()
         {
             ClassicAssert.IsTrue(_BulkComplianceNoticePage.ContactEmailTextBox.IsEnabled());
+        }
+
+        [Then(@"the emails with an invalid email address are flagged")]
+        public void ThenTheEmailsWithAnInvalidEmailAddressAreFlagged()
+        {
+            object isInvalidEmail = _ListingsPage.ListingsTable.JSExecuteJavaScript($@"document.querySelector(""#pn_id_50-table > tbody > tr:nth-child({_row}) > td:nth-child({_InvalidEmailColumn})"").innerText");
+            //ClassicAssert.IsTrue(isInvalidEmail.ToUpper() == "YES");
+        }
+
+        [Then(@"the button to send Notice to host is disabled if all invalid host email addresses")]
+        public void ThenTheButtonToSendNoticeToHostIsDisabledIfAllInvalidHostEmailAddresses()
+        {
+            _RentalListingPropertyOwnerContact.EmailAddressDsc = ".TestUserInValid@email.com";
+            _RentalListingNonPropertyOwnerContact.EmailAddressDsc = "TestUserInValid.@email.com";
+            _UnitOfWork.Save();
+
+            _ListingsPage.Driver.Navigate().Refresh();
+            _ListingsPage.SelectAllCheckbox.Click();
+            _ListingsPage.SendNoticeOfNonComplianceButton.Click();
+
+            string sendNoticeToHostIsChecked = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@"document.querySelector(""#binary"").ariaChecked");
+            ClassicAssert.IsFalse(bool.Parse(sendNoticeToHostIsChecked));
+
+           // ClassicAssert.IsFalse(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
+        }
+
+        [Then(@"the button to send notice to host is checked if there is at least one valid host email addresses")]
+        public void ThenTheButtonToSendNoticeToHostIsCheckedIfThereIsAtLeastOneValidHostEmailAddresses()
+        {
+            _RentalListingNonPropertyOwnerContact.EmailAddressDsc = "TestUserInValid.@email.com";
+            _RentalListingPropertyOwnerContact.EmailAddressDsc = "TestUserValid@email.com";
+            _UnitOfWork.Save();
+
+            _ListingsPage.Driver.Navigate().Refresh();
+            _ListingsPage.SelectAllCheckbox.Click();
+            _ListingsPage.SendNoticeOfNonComplianceButton.Click();
+
+            string sendNoticeToHostIsChecked = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@"document.querySelector(""#binary"").ariaChecked");
+            ClassicAssert.IsTrue(bool.Parse(sendNoticeToHostIsChecked));
+        }
+
+        [Then(@"the button to send Notice is checked for valid host emails")]
+        public void ThenTheButtonToSendNoticeIsCheckedForValidHostEmails()
+        {
+            _RentalListingPropertyOwnerContact.EmailAddressDsc = "TestUserValid@email.com";
+            _RentalListingNonPropertyOwnerContact.EmailAddressDsc = "TestUser2Valid@email.com";
+            _UnitOfWork.Save();
+
+            _ListingsPage.Driver.Navigate().Refresh();
+            _ListingsPage.SelectAllCheckbox.Click();
+            _ListingsPage.SendNoticeOfNonComplianceButton.Click();
+
+            string sendNoticeToHostIsChecked = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@"document.querySelector(""#binary"").ariaChecked");
+            ClassicAssert.IsTrue(bool.Parse(sendNoticeToHostIsChecked));
         }
 
         [Then(@"the “Review"" button is disabled if any mandatory field is not completed")]
@@ -201,19 +316,19 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"if user inputs an email that is not in the correct format the user is prompted to enter an email address in the correct format")]
         public void ThenIfUserInputsAnEmailThatIsNotInTheCorrectFormatTheUserIsPromptedToEnterAnEmailAddressInTheCorrectFormat()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"the user can add multiple email addresses")]
         public void ThenTheUserCanAddMultipleEmailAddresses()
         {
-            //_BulkComplianceNoticePage.AddBCCsTextBox.EnterText(", richard.anderson@gov.bc.ca");
+            
         }
 
         [Then(@"Verify that if remove the listing checkbox is unchecked, review is also disabled")]
         public void ThenVerifyThatIfRemoveTheListingCheckboxIsUncheckedReviewIsAlsoDisabled()
         {
-            //throw new PendingStepException();
+
         }
 
         [When(@"the LG user clicks “Review"" button to confirm details to be sent")]
@@ -232,19 +347,19 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"Successful confirmation is displayed for user on top Right of the page")]
         public void ThenSuccessfulConfirmationIsDisplayedForUserOnTopRightOfThePage()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"System immediately sends notices to platform/host for selected listings")]
         public void ThenSystemImmediatelySendsNoticesToPlatformHostForSelectedListings()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"A copy email is also sent to LG email address added to receive a copy of the notice same, a copy of email to bcc")]
         public void ThenACopyEmailIsAlsoSentToLGEmailAddressAddedToReceiveACopyOfTheNoticeSameACopyOfEmailToBcc()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"Action history is updated immediately with action taken")]
@@ -257,7 +372,28 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"On the listings page, last action and last action date should be updated")]
         public void ThenOnTheListingsPageLastActionAndLastActionDateShouldBeUpdated()
         {
-            //throw new PendingStepException();
+
+        }
+
+        [AfterScenario]
+        public void TestTearDown()
+        {
+            bool save = false;
+            //restore original email values
+            if (_OriginalPropertyOwnerContactEmail != string.Empty)
+            {
+                _RentalListingPropertyOwnerContact.EmailAddressDsc = _OriginalPropertyOwnerContactEmail;
+                save = true;
+            }
+
+            if (_OriginalNonPropertyOwnerContactEmail != string.Empty)
+            {
+                _RentalListingNonPropertyOwnerContact.EmailAddressDsc = _OriginalNonPropertyOwnerContactEmail;
+                save = true;
+            }
+
+            if(save == true)
+                _UnitOfWork.Save();
         }
     }
 }

@@ -112,7 +112,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             if (_UserType == UserTypeEnum.SHORTTERMRENTALPLATFORM)
             {
-                ClassicAssert.True(_LandingPage.Upload_ListingsButton.IsEnabled());
+                ClassicAssert.True(_LandingPage.UploadPlatformDataButton.IsEnabled());
             }
         }
 

@@ -10,7 +10,6 @@ using TestFrameWork.WindowsAutomation.Controls;
 using static SpecFlowProjectBDD.SFEnums;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
-using System.Data;
 using Npgsql;
 using DataBase.UnitOfWork;
 
@@ -105,7 +104,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             if (_UserType == UserTypeEnum.SHORTTERMRENTALPLATFORM)
             {
-                ClassicAssert.True(_LandingPage.Upload_ListingsButton.IsEnabled());
+                ClassicAssert.True(_LandingPage.UploadPlatformDataButton.IsEnabled());
             }
         }
 
@@ -118,7 +117,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"the upload data interface should load")]
         public void ThenTheUploadDataInterfaceShouldLoad()
         {
-            _LandingPage.Upload_ListingsButton.Click();
+            _LandingPage.UploadPlatformDataButton.Click();
         }
 
 
@@ -158,20 +157,28 @@ namespace SpecFlowProjectBDD.StepDefinitions
             }
 
             var dt = DateOnly.Parse(yearMonth);
-            //var DSSUploadDeliverys = _DssDBContext.DssUploadDeliveries.Where(p => p.ReportPeriodYm == dt).ToList();
             var DSSUploadDeliverys = _UnitOfWork.DssUploadDeliveryRepository.Get(p => p.ReportPeriodYm == dt).ToList();
 
 
             foreach (var DSSLoadDelivery in DSSUploadDeliverys)
             {
-                long id = DSSLoadDelivery.UploadDeliveryId;
-                _UnitOfWork.DssUploadDeliveryRepository.Delete(DSSLoadDelivery);
-                var DSSUploadDeliveryLines = _UnitOfWork.DssUploadLineRepository.Get(p => p.IncludingUploadDeliveryId == id);
-                foreach (var dSSDeliveryLine in DSSUploadDeliveryLines)
+                try
                 {
-                    _UnitOfWork.DssUploadLineRepository.Delete(dSSDeliveryLine.UploadLineId);
+                    long id = DSSLoadDelivery.UploadDeliveryId;
+                    _UnitOfWork.DssUploadDeliveryRepository.Delete(DSSLoadDelivery);
+                    var DSSUploadDeliveryLines = _UnitOfWork.DssUploadLineRepository.Get(p => p.IncludingUploadDeliveryId == id);
+                    foreach (var dSSDeliveryLine in DSSUploadDeliveryLines)
+                    {
+                        _UnitOfWork.DssUploadLineRepository.Delete(dSSDeliveryLine.UploadLineId);
+                    }
+                    _UnitOfWork.Save();
                 }
-                _UnitOfWork.Save();
+
+                catch (NpgsqlOperationInProgressException ex)
+                {
+                    //should not happen, but reset DB and continue if it does for now
+                    _UnitOfWork.ResetDB();
+                }
             }
         }
 
@@ -194,7 +201,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             for (int i = 0; i < count; i++)
             {
-                //script = $@"document.querySelector(""#month_{i} > span"");";
                 script = "document.querySelector('#month_" + i + "');";
 
                 string result = _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(script) == null ? string.Empty : _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(script).ToString();
@@ -206,8 +212,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
                 }
             }
 
-            //_UploadListingsPage.ReportingMonthDropDown.ExecuteJavaScript(@"document.querySelector(""#month_0 > span"").click()");
-            //script = $@"document.querySelector(""#month_{index}"").click();";
             script = "document.querySelector('#month_1').click();";
             _UploadListingsPage.ReportingMonthDropDown.JSExecuteJavaScript(script);
 

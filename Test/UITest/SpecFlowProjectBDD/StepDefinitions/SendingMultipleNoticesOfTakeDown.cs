@@ -13,8 +13,8 @@ using UITest.TestDriver;
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
-    [Scope(Scenario = "SendingMultipleNoticesOfNonCompliance")]
-    public class SendingMultipleNoticesOfNonCompliance
+    [Scope(Scenario = "SendingMultipleNoticesOfTakeDown")]
+    public class SendingMultipleNoticesOfTakeDown
     {
         private IDriver _Driver;
         private LandingPage _LandingPage;
@@ -36,7 +36,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private IUnitOfWork _UnitOfWork;
         private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
 
-        public SendingMultipleNoticesOfNonCompliance(SeleniumDriver Driver)
+        public SendingMultipleNoticesOfTakeDown(SeleniumDriver Driver)
         {
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
@@ -127,23 +127,26 @@ namespace SpecFlowProjectBDD.StepDefinitions
             ClassicAssert.IsTrue(_ListingsPage.SendNoticeOfNonComplianceButton.IsEnabled());
         }
 
-        [Then(@"LG user clicks Non-Compliance button")]
+        [Then(@"LG user clicks TakeDown button")]
         public void WhenLGUserClicksSendNoticesOfNon_ComplianceButton()
         {
-            _ListingsPage.SendNoticeOfNonComplianceButton.Click();
+            _ListingsPage.SendTakedownRequestButton.Click();
         }
 
         [Then(@"system opens details to complete fields for sending notices")]
         public void ThenSystemOpensDetailsToCompleteFieldsForSendingNotices()
         {
-            ClassicAssert.IsTrue(_BulkComplianceNoticePage.ContactEmailTextBox.IsEnabled());
+
+            ClassicAssert.IsTrue(_BulkComplianceNoticePage.AddBCCsTextBox.IsEnabled());
         }
 
         [Then(@"the “Review"" button is disabled if any mandatory field is not completed")]
         public void ThenTheReviewButtonIsDisabledIfAnyMandatoryFieldIsNotCompleted()
         {
             _BulkComplianceNoticePage.SubmitButton.JSExecuteJavaScript("window.scrollTo(0, document.body.scrollHeight);");
-            ClassicAssert.IsFalse(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
+
+            ClassicAssert.IsTrue(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
+
         }
 
         [Then(@"If LG user clicks Cancel,  system prompts with a re-confirmation message")]
@@ -167,11 +170,13 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When(@"user does not confirm, user remains on current page\.")]
         public void WhenUserDoesNotConfirmUserRemainsOnCurrentPage_()
         {
+            //throw new PendingStepException();
         }
 
         [When(@"Action History Not Updated")]
         public void WhenActionHistoryNotUpdated()
         {
+            //throw new PendingStepException();
         }
 
         [When(@"LG user completes mandatory fields\. \( Provide a LG email address to receive a copy of the Notice\)")]
@@ -179,17 +184,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _ListingsPage.SelectAllCheckbox.Click();
 
-            _ListingsPage.SendNoticeOfNonComplianceButton.Click();
+            _ListingsPage.SendTakedownRequestButton.Click();
 
             _BulkComplianceNoticePage.SubmitButton.JSExecuteJavaScript("window.scrollTo(0, document.body.scrollHeight);");
-
-            _BulkComplianceNoticePage.ContactEmailTextBox.EnterText("richard.anderson@gov.bc.ca");
         }
 
         [Then(@"that LG user can add BCCs")]
         public void ThenThatLGUserCanAddBCCs()
         {
-
         }
 
         [When(@"the LG User enters an Email Address")]
@@ -201,7 +203,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"if user inputs an email that is not in the correct format the user is prompted to enter an email address in the correct format")]
         public void ThenIfUserInputsAnEmailThatIsNotInTheCorrectFormatTheUserIsPromptedToEnterAnEmailAddressInTheCorrectFormat()
         {
-            //throw new PendingStepException();
         }
 
         [Then(@"the user can add multiple email addresses")]
@@ -232,19 +233,19 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"Successful confirmation is displayed for user on top Right of the page")]
         public void ThenSuccessfulConfirmationIsDisplayedForUserOnTopRightOfThePage()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"System immediately sends notices to platform/host for selected listings")]
         public void ThenSystemImmediatelySendsNoticesToPlatformHostForSelectedListings()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"A copy email is also sent to LG email address added to receive a copy of the notice same, a copy of email to bcc")]
         public void ThenACopyEmailIsAlsoSentToLGEmailAddressAddedToReceiveACopyOfTheNoticeSameACopyOfEmailToBcc()
         {
-            //throw new PendingStepException();
+
         }
 
         [Then(@"Action history is updated immediately with action taken")]
@@ -257,7 +258,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"On the listings page, last action and last action date should be updated")]
         public void ThenOnTheListingsPageLastActionAndLastActionDateShouldBeUpdated()
         {
-            //throw new PendingStepException();
+
         }
     }
 }

@@ -6,6 +6,7 @@ using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.RentalReportDtos;
+using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
 {
@@ -95,7 +96,15 @@ namespace StrDss.Data.Repositories
 
             var extraSort = "";
 
+            var stopwatch = Stopwatch.StartNew();
+
             var groupedListings = await Page<RentalListingGroupDto, RentalListingGroupDto>(groupedQuery, pageSize, pageNumber, orderBy, direction, extraSort);
+
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Get Grouped Listings (group) - Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
 
             foreach (var group in groupedListings.SourceList)
             {
@@ -104,6 +113,10 @@ namespace StrDss.Data.Repositories
                         group.MatchAddressTxt, group.EffectiveHostNm, group.EffectiveBusinessLicenceNo, all, address, url, listingId, 
                         hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, group);
             }
+
+            _logger.LogInformation($"Get Grouped Listings (listings) - Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Stop();
 
             return groupedListings;
         }

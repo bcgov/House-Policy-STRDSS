@@ -3,8 +3,7 @@ global:
     role: f4a30d-nonprod
     subPath: strdss-test
   env:
-    'Logging__LogLevel__Default': 'Warning'
-    'Logging__LogLevel__StrDss.Common.StrDssLogger': 'Information'
+    'Serilog__MinimumLevel__Override__StrDss.Common.StrDssLogger': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Test'
     'ENV_NAME': 'test'
     'APP_BASE_URL': 'https://test.strdata.gov.bc.ca'

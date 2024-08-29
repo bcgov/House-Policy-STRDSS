@@ -185,6 +185,12 @@
             }
 
             .row {
+                display: flex;
+
+                p-table {
+                    width: 100%;
+                }
+
                 &.header-row {
                     font-size: large;
                     font-family: 'BcSans-bold';
@@ -214,12 +220,17 @@
                     }
                 }
 
-                .label {
+                .label,
+                strong {
+                    white-space: nowrap;
                     font-family: 'BcSans-bold';
                 }
 
                 .value {
                     padding-left: 8px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
 
                     &.warning {
                         color: #CE3E39;

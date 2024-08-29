@@ -194,11 +194,25 @@
                             <p-tag *ngIf="row.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
                         </div>
                     </td>
-                    <td>{{ row.nightsBookedYtdQty }}</td>
-                    <td>{{ row.businessLicenceNo }}</td>
-                    <td>{{ row.businessLicenceNoMatched }}</td>
-                    <td>{{ row.lastActionNm }}</td>
-                    <td>{{ row.lastActionDtm |date }}</td>
+                    <td>
+                        {{ row.nightsBookedYtdQty }}
+                    </td>
+                    <td>
+                        <span>
+                            {{ row.businessLicenceNo }}
+                        </span>
+                    </td>
+                    <td>
+                        <span>
+                            {{ row.businessLicenceNoMatched }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ row.lastActionNm }}
+                    </td>
+                    <td>
+                        {{ row.lastActionDtm |date }}
+                    </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">

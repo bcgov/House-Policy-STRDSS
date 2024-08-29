@@ -284,20 +284,21 @@
                 " class="spacer-hr"></div>
 
                 <div *ngIf="blInfo?.businessLicenceNo" class="row">
-                    <strong>Business Licence Number:</strong> <span>{{blInfo.businessLicenceNo ||'-'}}</span>
+                    <strong>Business Licence Number:</strong>
+                    <span class="value">{{blInfo.businessLicenceNo ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.licenceTypeTxt" class="row">
-                    <strong>Licence Type:</strong> <span>{{blInfo.licenceTypeTxt ||'-'}}</span>
+                    <strong>Licence Type:</strong> <span class="value">{{blInfo.licenceTypeTxt ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.expiryDt" class="row">
-                    <strong>Expiry Date: </strong> <span>{{blInfo.expiryDt |date:'YYYY-MM-dd'}}</span>
+                    <strong>Expiry Date: </strong> <span class="value">{{blInfo.expiryDt |date:'YYYY-MM-dd'}}</span>
                 </div>
                 <div *ngIf="blInfo?.licenceStatusType" class="row">
-                    <strong>Status:</strong> <span class="status-name"
+                    <strong>Status:</strong> <span class="status-name value"
                         [class.status-red]="blInfo.licenceStatusType!=='ISSUED'">{{blInfo.licenceStatus.licenceStatusTypeNm}}</span>
                 </div>
                 <div *ngIf="blInfo?.restrictionTxt" class="row">
-                    <strong>Restriction Note:</strong> <span>{{blInfo.restrictionTxt || 'N/A'}}</span>
+                    <strong>Restriction Note:</strong> <span class="value">{{blInfo.restrictionTxt || 'N/A'}}</span>
                 </div>
 
                 <div *ngIf="blInfo?.businessOwnerNm ||
@@ -306,18 +307,19 @@
                 blInfo?.businessOwnerPhoneNo" class="spacer-hr"></div>
 
                 <div *ngIf="blInfo?.businessOwnerNm" class="row">
-                    <strong>Owner / Licencee Name:</strong> <span>{{blInfo.businessOwnerNm ||'-'}}</span>
+                    <strong>Owner / Licencee Name:</strong> <span class="value">{{blInfo.businessOwnerNm ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.mailingStreetAddressTxt" class="row">
                     <strong>Mailing Address: </strong>
-                    <span>{{blInfo.mailingStreetAddressTxt}} {{blInfo.mailingCityNm}} {{blInfo.mailingProvinceCd}}
+                    <span class="value">{{blInfo.mailingStreetAddressTxt}} {{blInfo.mailingCityNm}}
+                        {{blInfo.mailingProvinceCd}}
                         {{blInfo.mailingPostalCd}}</span>
                 </div>
                 <div *ngIf="blInfo?.businessOwnerEmailAddressDsc" class="row">
-                    <strong>Email: </strong> <span>{{blInfo.businessOwnerEmailAddressDsc ||'-'}}</span>
+                    <strong>Email: </strong> <span class="value">{{blInfo.businessOwnerEmailAddressDsc ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.businessOwnerPhoneNo" class="row">
-                    <strong>Phone: </strong> <span>{{blInfo.businessOwnerPhoneNo ||'-'}}</span>
+                    <strong>Phone: </strong> <span class="value">{{blInfo.businessOwnerPhoneNo ||'-'}}</span>
                 </div>
 
                 <div *ngIf="blInfo?.businessOperatorNm || 
@@ -325,13 +327,13 @@
                 blInfo?.businessOperatorPhoneNo" class="spacer-hr"></div>
 
                 <div *ngIf="blInfo?.businessOperatorNm" class="row">
-                    <strong>Operator Name:</strong> <span>{{blInfo.businessOperatorNm ||'-'}}</span>
+                    <strong>Operator Name:</strong> <span class="value">{{blInfo.businessOperatorNm ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.businessOperatorEmailAddressDsc" class="row">
-                    <strong>Email: </strong> <span>{{blInfo.businessOperatorEmailAddressDsc ||'-'}}</span>
+                    <strong>Email: </strong> <span class="value">{{blInfo.businessOperatorEmailAddressDsc ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.businessOperatorPhoneNo" class="row">
-                    <strong>Phone: </strong> <span>{{blInfo.businessOperatorPhoneNo ||'-'}}</span>
+                    <strong>Phone: </strong> <span class="value">{{blInfo.businessOperatorPhoneNo ||'-'}}</span>
                 </div>
 
                 <div *ngIf="blInfo?.propertyZoneTxt || 
@@ -344,29 +346,34 @@
                 blInfo?.infractionDt " class="spacer-hr"></div>
 
                 <div *ngIf="blInfo?.propertyZoneTxt" class="row">
-                    <strong>Property Zoning:</strong> <span>{{blInfo.propertyZoneTxt ||'-'}}</span>
+                    <strong>Property Zoning:</strong> <span class="value">{{blInfo.propertyZoneTxt ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.availableBedroomsQty" class="row">
-                    <strong>Bedrooms Available: </strong> <span>{{blInfo.availableBedroomsQty ||'-'}}</span>
+                    <strong>Bedrooms Available: </strong> <span class="value">{{blInfo.availableBedroomsQty
+                        ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.maxGuestsAllowedQty" class="row">
-                    <strong>Guest Capacity / Maximum Occupancy: </strong> <span>{{blInfo.maxGuestsAllowedQty
+                    <strong>Guest Capacity / Maximum Occupancy: </strong> <span
+                        class="value">{{blInfo.maxGuestsAllowedQty
                         ||'-'}}</span>
                 </div>
                 <div *ngIf="isBoolDefined(blInfo?.isPrincipalResidence)" class="row">
-                    <strong>Principal Residence: </strong> <span>{{blInfo.isPrincipalResidence?'Yes':'No'}}</span>
+                    <strong>Principal Residence: </strong> <span
+                        class="value">{{blInfo.isPrincipalResidence?'Yes':'No'}}</span>
                 </div>
                 <div *ngIf="isBoolDefined(blInfo?.isOwnerLivingOnsite)" class="row">
-                    <strong>Onsite Owner:</strong> <span>{{blInfo.isOwnerLivingOnsite?'Yes':'No'}}</span>
+                    <strong>Onsite Owner:</strong> <span class="value">{{blInfo.isOwnerLivingOnsite?'Yes':'No'}}</span>
                 </div>
                 <div *ngIf="isBoolDefined(blInfo?.isOwnerPropertyTenant)" class="row">
-                    <strong>Building Rented: </strong> <span>{{blInfo.isOwnerPropertyTenant?'Yes':'No'}}</span>
+                    <strong>Building Rented: </strong> <span
+                        class="value">{{blInfo.isOwnerPropertyTenant?'Yes':'No'}}</span>
                 </div>
                 <div *ngIf="blInfo?.infractionTxt" class="row">
-                    <strong>Infraction: </strong> <span>{{blInfo.infractionTxt ||'-'}}</span>
+                    <strong>Infraction: </strong> <span class="value">{{blInfo.infractionTxt ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.infractionDt" class="row">
-                    <strong>Infraction Date: </strong> <span>{{blInfo.infractionDt|date:'YYYY-MM-dd'}}</span>
+                    <strong>Infraction Date: </strong> <span
+                        class="value">{{blInfo.infractionDt|date:'YYYY-MM-dd'}}</span>
                 </div>
 
                 <div *ngIf="blInfo?.propertyFolioNo || 
@@ -374,13 +381,15 @@
                 blInfo?.propertyLegalDescriptionTxt" class="spacer-hr"></div>
 
                 <div *ngIf="blInfo?.propertyFolioNo" class="row">
-                    <strong>Folio Number:</strong> <span>{{blInfo.propertyFolioNo ||'-'}}</span>
+                    <strong>Folio Number:</strong> <span class="value">{{blInfo.propertyFolioNo ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.propertyParcelIdentifierNo" class="row">
-                    <strong>Parcel Identifier (PID): </strong> <span>{{blInfo.propertyParcelIdentifierNo ||'-'}}</span>
+                    <strong>Parcel Identifier (PID): </strong> <span class="value">{{blInfo.propertyParcelIdentifierNo
+                        ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.propertyLegalDescriptionTxt" class="row">
-                    <strong>Legal Description: </strong> <span>{{blInfo.propertyLegalDescriptionTxt ||'-'}}</span>
+                    <strong>Legal Description: </strong> <span class="value">{{blInfo.propertyLegalDescriptionTxt
+                        ||'-'}}</span>
                 </div>
             </ng-template>
         </p-panel>

@@ -102,7 +102,7 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Stop();
 
-            _logger.LogInformation($"Get Grouped Listings (group) - Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogDebug($"Get Grouped Listings (group) - Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             foreach (var group in groupedListings.SourceList)
             {
@@ -224,7 +224,7 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Stop();
 
-            _logger.LogInformation($"Get Grouped Listings (filtered listing IDs) - Count: {filteredIds.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogDebug($"Get Grouped Listings (filtered listing IDs) - Count: {filteredIds.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             stopwatch.Restart();
 
@@ -234,7 +234,7 @@ namespace StrDss.Data.Repositories
                 .ToListAsync()
             );
 
-            _logger.LogInformation($"Get Grouped Listings (all listings) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogDebug($"Get Grouped Listings (all listings) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             group.NightsBookedYtdQty = 0;
 
@@ -252,7 +252,7 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Stop();
 
-            _logger.LogInformation($"Get Grouped Listings (extra properties) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogDebug($"Get Grouped Listings (extra properties) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             stopwatch.Restart();
 
@@ -270,7 +270,7 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Stop();
 
-            _logger.LogInformation($"Get Grouped Listings (group header properties) - Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogDebug($"Get Grouped Listings (group header properties) - Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return listings;
         }

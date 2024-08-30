@@ -240,14 +240,19 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Restart();
 
+            var contacts = _mapper.Map<List<RentalListingContactDto>>(await _dbContext.DssRentalListingContacts
+                .AsNoTracking()
+                .Where(contact => listings
+                .Select(listing => listing.RentalListingId)
+                .Contains(contact.ContactedThroughRentalListingId))
+                .ToListAsync());
+            
             foreach (var listing in listings)
             {
-                await SetExtraProperties(listing);
-
+                listing.LastActionDtm = listing.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(listing.LastActionDtm.Value);
                 listing.Filtered = filteredIdSet.Contains(listing.RentalListingId ?? 0);
-
+                listing.Hosts = contacts.Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId).ToList();
                 group.NightsBookedYtdQty += listing.NightsBookedYtdQty ?? 0;
-
             }
 
             stopwatch.Stop();

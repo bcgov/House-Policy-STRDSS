@@ -3,7 +3,7 @@ global:
     role: f4a30d-prod
     subPath: strdss-prod
   env:
-    'Serilog_MinimumLevel_Override_StrDss__Common__StrDssLogger': 'Information'
+    'Serilog__MinimumLevel__Override_StrDss__Common__StrDssLogger': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Production'
     'ENV_NAME': 'prod'
     'APP_BASE_URL': 'https://strdata.gov.bc.ca'

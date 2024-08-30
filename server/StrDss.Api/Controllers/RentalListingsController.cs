@@ -173,5 +173,33 @@ namespace StrDss.Api.Controllers
 
             return Ok();
         }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpPut("{rentalListingId}/linkbl/{licenceId}")]
+        public async Task<ActionResult> LinkBizLicence(long rentalListingId, long licenceId)
+        {
+            var (errors, listing) = await _listingService.LinkBizLicence(rentalListingId, licenceId);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext, "One or more validation errors occurred in uploaded file.");
+            }
+
+            return Ok(listing);
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpPut("{rentalListingId}/unlinkbl")]
+        public async Task<ActionResult> UnLinkBizLicence(long rentalListingId)
+        {
+            var (errors, listing) = await _listingService.UnLinkBizLicence(rentalListingId);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext, "One or more validation errors occurred in uploaded file.");
+            }
+
+            return Ok(listing);
+        }
     }
 }

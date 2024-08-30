@@ -5,6 +5,8 @@ using Npgsql;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using StrDss.Model.RentalReportDtos;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
@@ -18,6 +20,8 @@ namespace StrDss.Data.Repositories
         Task InsertRowToBizLicTempTable(BizLicenceRowUntyped row, long providingOrganizationId);
         Task ProcessBizLicTempTable(long lgId);
         Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo);
+        Task<List<BizLicenceSearchDto>> SearchBizLicence(long orgId, string bizLicNo);
+
     }
 
     public class BizLicenceRepository : RepositoryBase<DssBusinessLicence>, IBizLicenceRepository
@@ -179,5 +183,17 @@ namespace StrDss.Data.Repositories
 
             return licence == null ? (null, null) : (licence.BusinessLicenceId, CommonUtils.SanitizeAndUppercaseString(licence.BusinessLicenceNo));
         }
+
+        public async Task<List<BizLicenceSearchDto>> SearchBizLicence(long orgId, string bizLicNo)
+        {
+            bizLicNo = bizLicNo.ToUpper();
+
+            var licences = await _dbSet.AsNoTracking()
+                .Where(x => x.BusinessLicenceNo.Contains(bizLicNo))
+                .ToListAsync();
+
+            return _mapper.Map<List<BizLicenceSearchDto>>(licences);
+        }
+
     }
 }

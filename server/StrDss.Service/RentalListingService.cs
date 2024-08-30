@@ -67,10 +67,13 @@ namespace StrDss.Service
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
                 pageSize, pageNumber, orderBy, direction);
 
-            //foreach (var listing in listings.SourceList)
-            //{
-            //    ProcessHosts(listing, true);
-            //}
+            foreach (var group in listings.SourceList)
+            {
+                foreach(var listing in group.Listings)
+                {
+                    ProcessHosts(listing, true);
+                }
+            }
 
             return listings;
         }

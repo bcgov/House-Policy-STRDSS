@@ -1,14 +1,12 @@
 ﻿using AutoMapper;
 using CsvHelper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Entities;
 using StrDss.Data.Repositories;
 using StrDss.Model;
-using StrDss.Model.RentalReportDtos;
 using StrDss.Service.CsvHelpers;
 using System.Diagnostics;
 
@@ -20,7 +18,7 @@ namespace StrDss.Service
         Task ProcessBizLicenceUploadAsync();
         Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo);
         Task<List<BizLicenceSearchDto>> SearchBizLicence(long orgId, string bizLicNo);
-        Task<(Dictionary<string, List<string>>, RentalListingViewDto?)> LinkBizLicence(long rentalListingId, long licenceId);
+
     }
     public class BizLicenceService : ServiceBase, IBizLicenceService
     {
@@ -174,45 +172,6 @@ namespace StrDss.Service
         public async Task<List<BizLicenceSearchDto>> SearchBizLicence(long orgId, string bizLicNo)
         {
             return await _bizLicenceRepo.SearchBizLicence(orgId, bizLicNo);
-        }
-
-        public async Task<(Dictionary<string, List<string>>, RentalListingViewDto?)> LinkBizLicence(long rentalListingId, long licenceId)
-        {
-            var errors = new Dictionary<string, List<string>>();
-
-            var listing = await _listingService.GetRentalListing(rentalListingId);
-
-            if (listing == null)
-            {
-                errors.AddItem("rentalListingId", $"Rental Listing with the rental listing ID {rentalListingId} does not exist or the user doesn't have access to the listing.");
-            }
-
-            var licence = await _bizLicenceRepo.GetBizLicence(licenceId);
-
-            if (licence == null)
-            {
-                errors.AddItem("licencdId", $"Business Licence with the business licence ID {licenceId} does not exist");
-            }
-
-            if (errors.Any())
-            {
-                return (errors, null);
-            }
-
-            if (_currentUser.OrganizationType != OrganizationTypes.BCGov && licence!.ProvidingOrganizationId != _currentUser.OrganizationId)
-            {
-                errors.AddItem("licenceId", $"The user doesn't have access to the licence data");
-            }
-
-            if (errors.Any())
-            {
-                return (errors, null);
-            }
-
-            await _bizLicenceRepo.LinkBizLicence(rentalListingId, licenceId);
-            _unitOfWork.Commit();
-
-            return (errors, await _listingService.GetRentalListing(rentalListingId));
         }
     }
 }

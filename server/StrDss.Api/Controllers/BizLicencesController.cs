@@ -95,19 +95,5 @@ namespace StrDss.Api.Controllers
 
             return Ok(licenceNos);
         }
-
-        [ApiAuthorize(Permissions.ListingRead)]
-        [HttpPut("{licenceId}/{rentalListingId}")]
-        public async Task<ActionResult> LinkBizLicence(long rentalListingId, long licenceId)
-        {
-            var (errors, listing) = await _bizLicenceService.LinkBizLicence(rentalListingId, licenceId);
-
-            if (errors.Any())
-            {
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext, "One or more validation errors occurred in uploaded file.");
-            }
-
-            return Ok(listing);
-        }
     }
 }

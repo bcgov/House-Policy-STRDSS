@@ -49,6 +49,8 @@ namespace StrDss.Data.Mappings
             CreateMap<DssBusinessLicence, BizLicenceDto>()
                 .ForMember(o => o.LicenceStatus, opt => opt.MapFrom(i => i.LicenceStatusTypeNavigation))
                 .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime(i.UpdDtm)));
+
+            CreateMap<DssBusinessLicence, BizLicenceSearchDto>();
         }
     }
 }

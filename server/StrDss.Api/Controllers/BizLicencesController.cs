@@ -72,5 +72,14 @@ namespace StrDss.Api.Controllers
 
             return Ok(history);
         }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("{orgId}/{licenceNo}")]
+        public async Task<ActionResult> SearchBizLicence(long orgId, string licenceNo)
+        {
+            var licenceNos = await _bizLicenceService.SearchBizLicence(orgId, licenceNo);
+
+            return Ok(licenceNos);
+        }
     }
 }

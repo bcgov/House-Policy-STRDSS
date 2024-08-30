@@ -17,6 +17,7 @@ namespace StrDss.Service
         Task<BizLicenceDto?> GetBizLicence(long businessLicenceId);
         Task ProcessBizLicenceUploadAsync();
         Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo);
+        Task<List<BizLicenceSearchDto>> SearchBizLicence(long orgId, string bizLicNo);
     }
     public class BizLicenceService : ServiceBase, IBizLicenceService
     {
@@ -162,6 +163,11 @@ namespace StrDss.Service
         public async Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo)
         {
             return await _bizLicenceRepo.GetMatchingBusinessLicenceIdAndNo(orgId, effectiveBizLicNo);
+        }
+
+        public async Task<List<BizLicenceSearchDto>> SearchBizLicence(long orgId, string bizLicNo)
+        {
+            return await _bizLicenceRepo.SearchBizLicence(orgId, bizLicNo);
         }
     }
 }

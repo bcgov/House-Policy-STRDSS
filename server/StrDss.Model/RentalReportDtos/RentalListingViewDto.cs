@@ -89,7 +89,7 @@ namespace StrDss.Model.RentalReportDtos
         public string? EffectiveBusinessLicenceNo { get; set; }
 
         public string? EffectiveHostNm { get; set; }
-
+        public bool? IsChangedBusinessLicence { get; set; }
         public bool HasAtLeastOneValidHostEmail { get; set; }
         public List<HostInfo> HostsInfo { get; set; } = new List<HostInfo>();
         public BizLicenceDto? BizLicenceInfo { get; set; }

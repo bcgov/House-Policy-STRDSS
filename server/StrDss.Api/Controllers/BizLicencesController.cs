@@ -6,6 +6,8 @@ using StrDss.Api.Models;
 using StrDss.Common;
 using StrDss.Model;
 using StrDss.Service;
+using System.Security.Cryptography;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace StrDss.Api.Controllers
 {
@@ -68,6 +70,11 @@ namespace StrDss.Api.Controllers
         [HttpGet("uploadhistory")]
         public async Task<ActionResult> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
+            if (_currentUser.OrganizationType != OrganizationTypes.BCGov)
+            {
+                orgId = _currentUser.OrganizationId;
+            }
+
             var history = await _uploadService.GetUploadHistory(orgId, pageSize, pageNumber, orderBy, direction, new string[] { UploadDeliveryTypes.LicenceData });
 
             return Ok(history);
@@ -77,9 +84,30 @@ namespace StrDss.Api.Controllers
         [HttpGet("{orgId}/{licenceNo}")]
         public async Task<ActionResult> SearchBizLicence(long orgId, string licenceNo)
         {
+            if (_currentUser.OrganizationType != OrganizationTypes.BCGov && _currentUser.OrganizationId != orgId)
+            {
+                var authError = new Dictionary<string, List<string>>();
+                authError.AddItem("OrganizationId", $"The user is not authorized to read the licence data. The user's organization ({_currentUser.OrganizationId}) is not {orgId}.");
+                return ValidationUtils.GetValidationErrorResult(authError, ControllerContext, "One or more validation errors occurred in uploaded file.");
+            }
+
             var licenceNos = await _bizLicenceService.SearchBizLicence(orgId, licenceNo);
 
             return Ok(licenceNos);
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpPut("{licenceId}/{rentalListingId}")]
+        public async Task<ActionResult> LinkBizLicence(long rentalListingId, long licenceId)
+        {
+            var (errors, listing) = await _bizLicenceService.LinkBizLicence(rentalListingId, licenceId);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext, "One or more validation errors occurred in uploaded file.");
+            }
+
+            return Ok(listing);
         }
     }
 }

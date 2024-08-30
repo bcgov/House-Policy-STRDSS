@@ -96,4 +96,6 @@ public partial class DssRentalListingVw
     public string? EffectiveBusinessLicenceNo { get; set; }
 
     public string? EffectiveHostNm { get; set; }
+
+    public bool? IsChangedBusinessLicence { get; set; }
 }

@@ -5,6 +5,7 @@ using Npgsql;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using StrDss.Model.RentalReportDtos;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
@@ -19,6 +20,7 @@ namespace StrDss.Data.Repositories
         Task ProcessBizLicTempTable(long lgId);
         Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo);
         Task<List<BizLicenceSearchDto>> SearchBizLicence(long orgId, string bizLicNo);
+        Task LinkBizLicence(long rentalListingId, long licenceId);
     }
 
     public class BizLicenceRepository : RepositoryBase<DssBusinessLicence>, IBizLicenceRepository
@@ -190,6 +192,17 @@ namespace StrDss.Data.Repositories
                 .ToListAsync();
 
             return _mapper.Map<List<BizLicenceSearchDto>>(licences);
+        }
+
+        public async Task LinkBizLicence(long rentalListingId, long licenceId)
+        {
+            //assume they exist - validated already
+            var licence = await _dbSet.FirstAsync(x => x.BusinessLicenceId == licenceId);
+            var listing = await _dbContext.DssRentalListings.FirstAsync(x => x.RentalListingId == rentalListingId);
+
+            listing.GoverningBusinessLicenceId = licenceId;
+            listing.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(licence.BusinessLicenceNo);
+            listing.IsChangedBusinessLicence = true;
         }
     }
 }

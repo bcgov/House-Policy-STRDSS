@@ -290,7 +290,7 @@ namespace StrDss.Data.Repositories
 
             if (listing == null) return listing;
 
-            if (_currentUser.OrganizationType == OrganizationTypes.LG && listing.ManagingOrganizationId != _currentUser.OrganizationId)
+            if (_currentUser.OrganizationType != OrganizationTypes.BCGov && listing.ManagingOrganizationId != _currentUser.OrganizationId)
             {
                 return null;
             }

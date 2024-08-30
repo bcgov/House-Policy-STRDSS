@@ -3,7 +3,7 @@ global:
     role: f4a30d-nonprod
     subPath: strdss-uat
   env:
-    'Serilog__MinimumLevel__Override__StrDss__Common__StrDssLogger': 'Information'
+    'Serilog__MinimumLevel__Override__StrDss': 'Information'
     'ASPNETCORE_ENVIRONMENT': 'Staging'
     'ENV_NAME': 'uat'
     'APP_BASE_URL': 'https://uat.strdata.gov.bc.ca'

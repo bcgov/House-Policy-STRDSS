@@ -4,6 +4,7 @@ namespace StrDss.Model
 {
     public class RentalListingGroupDto
     {
+        public int ListingCount => Listings.Count;
         public string? EffectiveBusinessLicenceNo { get; set; }
         public string? EffectiveHostNm { get; set; }
         public string? MatchAddressTxt { get; set; }

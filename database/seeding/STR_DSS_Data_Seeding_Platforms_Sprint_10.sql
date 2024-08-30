@@ -1,19 +1,21 @@
-/* STR DSS Sprint 10 Platforms Data Seeding */
+/* STR DSS Sprint 10 Platforms Data Seeding -- data re-ordered to match Confluence list */
 
 MERGE INTO dss_organization AS tgt
 USING ( SELECT * FROM (VALUES
+/* major platforms */
 (NULL      ,'PLAT-AIRBNB'   ,'Airbnb'),
+(NULL      ,'PLAT-BOOKING'  ,'Booking.com'),
+(NULL      ,'PLAT-EXP'      ,'Expedia'),
+('PLAT-EXP','PLAT-EXP-VRBO' ,'VRBO'),
+/* minor platforms */
 (NULL      ,'PLAT-ALLURA'   ,'alluraDirect Vacation Rentals'),
 (NULL      ,'PLAT-ARTIN'    ,'Artin Properties'),
 (NULL      ,'PLAT-BCCAB'    ,'BC Cabin and Cottage'),
 (NULL      ,'PLAT-BEACH'    ,'Beach Acres Resort'),
 (NULL      ,'PLAT-BLAC-PA'  ,'Blackcomb Peaks Accommodations'),
-(NULL      ,'PLAT-BOOKING'  ,'Booking.com'),
 (NULL      ,'PLAT-COHOST'   ,'Co-Hosts Vacation Rental Specialists'),
 (NULL      ,'PLAT-ELITE'    ,'Elite Vacation Homes Inc.'),
 (NULL      ,'PLAT-EMR-V'    ,'EMR VACATION RENTALS INC'),
-(NULL      ,'PLAT-EXP'      ,'Expedia'),
-('PLAT-EXP','PLAT-EXP-VRBO' ,'VRBO'),
 (NULL      ,'PLAT-HOMEGO'   ,'HomeToGo GmbH'),
 (NULL      ,'PLAT-HOMEST'   ,'Homestay.com'),
 (NULL      ,'PLAT-IRIS'     ,'Iris Properties'),

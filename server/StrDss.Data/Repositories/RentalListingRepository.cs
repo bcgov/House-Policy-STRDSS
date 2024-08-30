@@ -29,6 +29,8 @@ namespace StrDss.Data.Repositories
         Task<DssRentalListing> UpdateAddressAsync(UpdateListingAddressDto dto);
         DateTime GetLatestRentalListingExportTime();
         Task<bool> IsListingUploadProcessRunning();
+        Task LinkBizLicence(long rentalListingId, long licenceId);
+        Task UnLinkBizLicence(long rentalListingId);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -744,6 +746,31 @@ namespace StrDss.Data.Repositories
         {
             return await _dbContext.DssUploadLines
                 .AnyAsync(x => x.IncludingUploadDelivery.UploadDeliveryType == UploadDeliveryTypes.ListingData && x.IsProcessed == false);                
+        }
+
+
+        public async Task LinkBizLicence(long rentalListingId, long licenceId)
+        {
+            //assume they exist - validated already
+            var licence = await _dbContext.DssBusinessLicences.FirstAsync(x => x.BusinessLicenceId == licenceId);
+            var listing = await _dbContext.DssRentalListings.FirstAsync(x => x.RentalListingId == rentalListingId);
+
+            var blFromLg = CommonUtils.SanitizeAndUppercaseString(licence.BusinessLicenceNo);
+            var blFromPlatform = CommonUtils.SanitizeAndUppercaseString(listing.BusinessLicenceNo);
+
+            listing.GoverningBusinessLicenceId = licenceId;
+            listing.EffectiveBusinessLicenceNo = blFromLg;
+            listing.IsChangedBusinessLicence = blFromLg != blFromPlatform;
+        }
+
+        public async Task UnLinkBizLicence(long rentalListingId)
+        {
+            //assume it exists - validated already
+            var listing = await _dbContext.DssRentalListings.FirstAsync(x => x.RentalListingId == rentalListingId);
+
+            listing.GoverningBusinessLicenceId = null;
+            listing.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(listing.BusinessLicenceNo);
+            listing.IsChangedBusinessLicence = true;
         }
     }
 }

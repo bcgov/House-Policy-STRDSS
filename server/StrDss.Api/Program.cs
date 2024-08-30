@@ -24,6 +24,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel((context, options) =>
 {
     options.AddServerHeader = false;
+    options.Limits.MaxResponseBufferSize = 100 * 1024 * 1024;
 });
 
 var dbHost = builder.Configuration.GetValue<string>("DB_HOST");

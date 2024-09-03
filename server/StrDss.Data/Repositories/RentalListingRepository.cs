@@ -768,6 +768,9 @@ namespace StrDss.Data.Repositories
             //assume it exists - validated already
             var listing = await _dbContext.DssRentalListings.FirstAsync(x => x.RentalListingId == rentalListingId);
 
+            if (listing.GoverningBusinessLicenceId != null)
+                return;
+
             listing.GoverningBusinessLicenceId = null;
             listing.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(listing.BusinessLicenceNo);
             listing.IsChangedBusinessLicence = true;

@@ -26,6 +26,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private bool _ExpectedResult = false;
         private IDriver _Driver;
         private AppSettings _AppSettings;
+        private SFEnums.LogonTypeEnum? _LogonType;
 
         public SendTakeDownRequestWithoutADSSListing(SeleniumDriver Driver)
         {
@@ -53,7 +54,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             AuthHelper authHelper = new AuthHelper(_Driver);
 
             //Authenticate user using IDir or BCID depending on the user
-            authHelper.Authenticate(_TestUserName, _TestPassword, UserTypeEnum.LOCALGOVERNMENT);
+            _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword, UserTypeEnum.LOCALGOVERNMENT);
+            ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
 
             IWebElement TOC = null;
 
@@ -121,7 +123,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         }
 
         //ListingURLField
-        //[When(@"Entering the listing URL")]
         [When(@"Entering the listing URL ""(.*)""")]
         public void WhenEnteringTheListingURL(string URL)
         {

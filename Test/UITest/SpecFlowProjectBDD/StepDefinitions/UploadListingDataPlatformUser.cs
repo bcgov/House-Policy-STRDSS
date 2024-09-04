@@ -36,6 +36,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private DateTime _updateTime;
         private IUnitOfWork _UnitOfWork;
         private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
+        private SFEnums.LogonTypeEnum? _LogonType;
 
         public UploadListingDataPlatformUser(SeleniumDriver Driver)
         {
@@ -73,7 +74,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _UserType = userHelper.SetUserType(UserType);
             //Authenticate user using IDir or BCID depending on the user
-            authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
+            _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
+            ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
         }
 
         [When(@"I access the Data Sharing System")]

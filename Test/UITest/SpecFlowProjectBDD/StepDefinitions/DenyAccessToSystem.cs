@@ -16,7 +16,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
     {
         private IDriver _Driver;
         private LayoutPage _LayoutPage;
-        //private DelistingWarningPage _DelistingWarningPage;
         private PathFinderPage _PathFinderPage;
         private IDirLoginPage _IDirPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;

@@ -25,6 +25,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private string _TestPassword;
         private bool _ExpectedResult = false;
         private AppSettings _AppSettings;
+        private SFEnums.LogonTypeEnum? _LogonType;
 
         public SendNoticeOfTakedownWithoutADSSlisting(SeleniumDriver Driver)
         {
@@ -52,7 +53,9 @@ namespace SpecFlowProjectBDD.StepDefinitions
             AuthHelper authHelper = new AuthHelper(_Driver);
 
             //Authenticate user using IDir or BCID depending on the user
-            authHelper.Authenticate(_TestUserName, _TestPassword, UserTypeEnum.LOCALGOVERNMENT);
+            _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword, UserTypeEnum.LOCALGOVERNMENT);
+            //Authenticate user using IDir or BCID depending on the user
+            ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
 
             IWebElement TOC = null;
 
@@ -93,13 +96,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _DelistingWarningPage.PlatformReceipientDropdown.Click();
             _DelistingWarningPage.PlatformReceipientDropdown.Click();
         }
-
-        //[Then("I should be presented with a dropdown menu to select reason for delisting")]
-        //public void IShouldBePresentedWithADropdownMenuToSelectReasonForDelisting()
-        //{
-        //    _DelistingWarningPage.ReasonDropdown.Click();
-        //    _DelistingWarningPage.ReasonDropdown.Click();
-        //}
 
         [Then(@"I should see an optional field for Listing ID ""(.*)""")]
         public void IShouldSeeAnOptionalFieldForListingID(string ListingID)
@@ -152,20 +148,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void ThenTheSystemShouldValidateTheEmailFormat()
         {
         }
-
-        ////ReasonForDelisting
-        //[When("I select a reason for delisting")]
-        //public void WhenISelectAReasonForDelisting()
-        //{
-        //    _DelistingWarningPage.ReasonDropdown.Click();
-        //    _DelistingWarningPage.ReasonDropdown.ExecuteJavaScript(@"document.querySelector(""#reasonId_0"").click()");
-        //}
-
-        //[Then("the system should present a list of reasons for requesting delisting: No business licence provided, invalid business licence number, expired business licence, or suspended business license")]
-        //public void ThenTheSystemShouldPresentAListOfReasonsForRequestingDelisting()
-        //{
-
-        //}
 
         // CC and Send Copy Options:
         [When("submitting a notice")]

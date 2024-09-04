@@ -36,7 +36,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private DssRentalListingContact _RentalListingPropertyOwnerContact;
         private DssRentalListingContact _RentalListingNonPropertyOwnerContact;
         private string _OriginalPropertyOwnerContactEmail = string.Empty;
-        private string _OriginalNonPropertyOwnerContactEmail = string.Empty; 
+        private string _OriginalNonPropertyOwnerContactEmail = string.Empty;
         private DateTime _updateTime;
         private DssDbContext _DssDBContext;
         private IUnitOfWork _UnitOfWork;
@@ -129,11 +129,17 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             try
             {
-               listingNumber = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_17-table > tbody > tr:nth-child({_row}) > td:nth-child({_listingIDColumn}) > a"").innerText");
+                Thread.Sleep(2000);
+                listingNumber = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_17-table > tbody > tr:nth-child({_row}) > td:nth-child({_listingIDColumn}) > a"").innerText");
             }
-            catch
+            catch (ElementNotVisibleException ex)
             {
-                throw new InvalidCastException($"Could not read Listing ID for Listings table:Row {_row}");
+                Console.WriteLine($"Could not read Listing ID for Listings table:Row {_row}");
+                throw ex;
+            }
+            catch (Exception)
+            {
+                listingNumber = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_17-table > tbody > tr:nth-child({_row}) > td:nth-child({_listingIDColumn}) > a"").innerText");
             }
 
             try
@@ -152,8 +158,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             //Get existing Listing
 
-            var rentalListing = _UnitOfWork.DssRentalListingRepository.Get(p => (p.PlatformListingNo == listingNumber)&& (p.OfferingOrganizationId == organizationID)&&(p.IsActive == true)).First();
-            _RentalListingPropertyOwnerContact = _UnitOfWork.DssRentalListingContactRepository.Get(p => (p.ContactedThroughRentalListingId == rentalListing.RentalListingId)&&(p.IsPropertyOwner == true)).First();
+            var rentalListing = _UnitOfWork.DssRentalListingRepository.Get(p => (p.PlatformListingNo == listingNumber) && (p.OfferingOrganizationId == organizationID) && (p.IsActive == true)).First();
+            _RentalListingPropertyOwnerContact = _UnitOfWork.DssRentalListingContactRepository.Get(p => (p.ContactedThroughRentalListingId == rentalListing.RentalListingId) && (p.IsPropertyOwner == true)).First();
             _RentalListingNonPropertyOwnerContact = _UnitOfWork.DssRentalListingContactRepository.Get(p => (p.ContactedThroughRentalListingId == rentalListing.RentalListingId) && (p.IsPropertyOwner == false)).First();
             //Save Original Email
             _OriginalPropertyOwnerContactEmail = _RentalListingPropertyOwnerContact.EmailAddressDsc;
@@ -221,7 +227,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             string sendNoticeToHostIsChecked = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@"document.querySelector(""#binary"").ariaChecked");
             ClassicAssert.IsFalse(bool.Parse(sendNoticeToHostIsChecked));
 
-           // ClassicAssert.IsFalse(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
+            // ClassicAssert.IsFalse(_BulkComplianceNoticePage.SubmitButton.IsEnabled());
         }
 
         [Then(@"the button to send notice to host is checked if there is at least one valid host email addresses")]
@@ -322,7 +328,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"the user can add multiple email addresses")]
         public void ThenTheUserCanAddMultipleEmailAddresses()
         {
-            
+
         }
 
         [Then(@"Verify that if remove the listing checkbox is unchecked, review is also disabled")]
@@ -379,21 +385,22 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void TestTearDown()
         {
             bool save = false;
+
             //restore original email values
-            if (_OriginalPropertyOwnerContactEmail != string.Empty)
+            if (!string.IsNullOrEmpty(_OriginalPropertyOwnerContactEmail))
             {
                 _RentalListingPropertyOwnerContact.EmailAddressDsc = _OriginalPropertyOwnerContactEmail;
-                save = true;
+                                save = true;
             }
 
-            if (_OriginalNonPropertyOwnerContactEmail != string.Empty)
+            if (!string.IsNullOrEmpty(_OriginalNonPropertyOwnerContactEmail))
             {
                 _RentalListingNonPropertyOwnerContact.EmailAddressDsc = _OriginalNonPropertyOwnerContactEmail;
-                save = true;
+                               save = true;
             }
 
-            if(save == true)
-                _UnitOfWork.Save();
+          if(save == true)
+            _UnitOfWork.Save();
         }
     }
 }

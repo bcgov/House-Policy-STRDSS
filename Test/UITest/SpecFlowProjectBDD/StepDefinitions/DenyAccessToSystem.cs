@@ -16,7 +16,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
     {
         private IDriver _Driver;
         private LayoutPage _LayoutPage;
-        private DelistingWarningPage _DelistingWarningPage;
+        //private DelistingWarningPage _DelistingWarningPage;
         private PathFinderPage _PathFinderPage;
         private IDirLoginPage _IDirPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
@@ -31,6 +31,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         AppSettings _AppSettings;
         private IUnitOfWork _UnitOfWork;
         private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
+        private SFEnums.LogonTypeEnum? _LogonType;
 
 
         public DenyAccessToSystem(SeleniumDriver Driver)
@@ -93,7 +94,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _UnitOfWork.Save();
             /////////////////////////////////////////////////////////////
-            
+
             UserHelper userHelper = new UserHelper();
 
             _UserType = userHelper.SetUserType(RoleName);
@@ -101,7 +102,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             AuthHelper authHelper = new AuthHelper(_Driver);
 
             //Authenticate user using IDir or BCID depending on the user
-            authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
+            _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
+            ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
 
         }
 
@@ -115,6 +117,15 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void IShouldSeeASpecificMessageIndicatingThatAccessIsRestricted()
         {
             System.Threading.Thread.Sleep(1000);
+            try
+            {
+                ClassicAssert.IsTrue(_Driver.Url.Contains("/401"));
+            }
+            catch
+            {
+                Thread.Sleep(2000);
+            }
+
             ClassicAssert.IsTrue(_LayoutPage.Driver.PageSource.Contains("401 Access Denied"));
         }
 

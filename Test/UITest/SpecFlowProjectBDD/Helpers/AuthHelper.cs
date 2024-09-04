@@ -21,7 +21,6 @@ namespace SpecFlowProjectBDD.Helpers
         private string _TestUserName;
         private string _TestPassword;
         private AppSettings _AppSettings;
-        //private LogonTypeEnum? _LogonType;
         private BCIDPage _BCIDPage;
 
         public AuthHelper(IDriver Driver)
@@ -72,7 +71,8 @@ namespace SpecFlowProjectBDD.Helpers
             bool result = false;
             int i = 0;
 
-            //try twice in case text boxes are rendered, but not yet ready
+            //Sleep for 5 seconds and try twice in case text boxes are rendered, but not yet ready. Selenium WaitFor would be a better option than 
+            // Sleep, but it is not reliable for authentication
             while ((result == false) && (i++ < 2))
             {
                 switch (logonType)

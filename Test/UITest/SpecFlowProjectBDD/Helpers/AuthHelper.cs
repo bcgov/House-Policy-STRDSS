@@ -1,4 +1,5 @@
 ﻿using Configuration;
+using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,6 @@ namespace SpecFlowProjectBDD.Helpers
         private string _TestUserName;
         private string _TestPassword;
         private AppSettings _AppSettings;
-        private LogonTypeEnum? _LogonType;
         private BCIDPage _BCIDPage;
 
         public AuthHelper(IDriver Driver)
@@ -31,67 +31,99 @@ namespace SpecFlowProjectBDD.Helpers
             _BCIDPage = new BCIDPage(_Driver);
             _AppSettings = new AppSettings();
         }
-        public LogonTypeEnum SetLogonType(UserTypeEnum UserType)
+        private LogonTypeEnum? SetLogonType(UserTypeEnum UserType)
         {
-            LogonTypeEnum _LogonType;
+            LogonTypeEnum? logonType;
             switch (UserType)
             {
                 case UserTypeEnum.BCGOVERNMENTSTAFF:
                 case UserTypeEnum.CEUSTAFF:
                 case UserTypeEnum.CEUADMIN:
                     {
-                        _LogonType = SFEnums.LogonTypeEnum.IDIR;
+                        logonType = SFEnums.LogonTypeEnum.IDIR;
                         break;
                     }
                 case UserTypeEnum.LOCALGOVERNMENT:
                 case UserTypeEnum.SHORTTERMRENTALPLATFORM:
                     {
-                        _LogonType = SFEnums.LogonTypeEnum.BCID;
+                        logonType = SFEnums.LogonTypeEnum.BCID;
                         break;
                     }
                 default:
                     throw new ArgumentException("Unknown User Type (" + UserType + ")");
             }
-            return (_LogonType);
+            if (null == logonType)
+            {
+            }
+            return (logonType);
         }
 
         public LogonTypeEnum? Authenticate(string UserName, string Password, UserTypeEnum UserType)
         {
+            LogonTypeEnum? logonType;
             _TestUserName = UserName;
             _TestPassword = Password;
-            _LogonType = SetLogonType(UserType);
+            logonType = SetLogonType(UserType);
 
             _Driver.Url = _AppSettings.GetServer("default");
             _Driver.Navigate();
 
-            switch (_LogonType)
+            bool result = false;
+            int i = 0;
+
+            //Sleep for 5 seconds and try twice in case text boxes are rendered, but not yet ready. Selenium WaitFor would be a better option than 
+            // Sleep, but it is not reliable for authentication
+            while ((result == false) && (i++ < 2))
             {
-                case LogonTypeEnum.IDIR:
-                    {
-                        _PathFinderPage.IDRButton.Click();
-                        _IDRLoginPage.UserNameTextBox.WaitFor(5);
-                        _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
-                        _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
-                        _IDRLoginPage.ContinueButton.Click();
-                        break;
-                    }
-                case LogonTypeEnum.BCID:
-                    {
-                        _PathFinderPage.BCIDButton.Click();
-                        _BCIDPage.UserNameTextBox.WaitFor(5);
-                        _BCIDPage.UserNameTextBox.EnterText(_TestUserName);
-                        _BCIDPage.PasswordTextBox.EnterText(_TestPassword);
-                        _BCIDPage.ContinueButton.Click();
-                        break;
-                    }
+                switch (logonType)
+                {
+                    case LogonTypeEnum.IDIR:
+                        {
+                            try
+                            {
+                                _PathFinderPage.IDRButton.Click();
+                                Thread.Sleep(5000);
+                                //_IDRLoginPage.UserNameTextBox.WaitFor(30);
+                                _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
+                                _IDRLoginPage.PasswordTextBox.EnterText(_TestPassword);
+                                _IDRLoginPage.ContinueButton.Click();
+                                result = true;
+                            }
+                            catch (Exception ex) when (ex is NoSuchElementException || ex is WebDriverTimeoutException)
+                            {
+                                if (_Driver.GetCurrentURL().Contains(@"openid-connect/auth"))
+                                    continue;
+                            }
+
+                            break;
+                        }
+                    case LogonTypeEnum.BCID:
+                        {
+                            try
+                            {
+                                _PathFinderPage.BCIDButton.Click();
+                                Thread.Sleep(5000);
+                                _BCIDPage.UserNameTextBox.WaitFor(5);
+                                _BCIDPage.UserNameTextBox.EnterText(_TestUserName);
+                                _BCIDPage.PasswordTextBox.EnterText(_TestPassword);
+                                _BCIDPage.ContinueButton.Click();
+                                result = true;
+                            }
+                            catch (Exception ex) when (ex is NoSuchElementException || ex is WebDriverTimeoutException)
+                            {
+                                if (_Driver.GetCurrentURL().Contains(@"openid-connect/auth"))
+                                    continue;
+                            }
+
+                            break;
+                        }
+                }
             }
 
-            if (_Driver.Url.ToLower().Contains("logon.cgi"))
-            {
-                _LogonType = null;
-            }
+            if (result == false)
+                logonType = null;
 
-            return (_LogonType);
+            return (logonType);
         }
     }
 }

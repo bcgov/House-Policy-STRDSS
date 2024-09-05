@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using DataBase.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DataBase.Entities;
 
 namespace DataBase.UnitOfWork
@@ -112,7 +107,7 @@ namespace DataBase.UnitOfWork
             get => _DssRentalListingRepository ?? new GenericRepository<DssRentalListing>(_context);
         }
 
-        
+
 
         public UnitOfWork(DbContext context)
         {
@@ -120,6 +115,8 @@ namespace DataBase.UnitOfWork
             {
                 _context = context;
             }
+            else
+                throw new ArgumentNullException(nameof(context));
         }
 
         public void ResetDB()
@@ -132,7 +129,15 @@ namespace DataBase.UnitOfWork
 
         public void Save()
         {
-            _context.SaveChanges();
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine("Unable to save changes to database");
+                throw ex;
+            }
         }
 
         protected virtual void Dispose(bool disposing)

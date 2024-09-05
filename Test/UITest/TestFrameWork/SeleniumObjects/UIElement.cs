@@ -43,8 +43,15 @@ namespace UITest.SeleniumObjects
         {
             try
             {
-                FindElement(LocatorType, Locator);
-                Element.Click();
+                if (LocatorType == Enums.FINDBY.JAVASCRIPT)
+                {
+                    JSExecuteJavaScript(Locator);
+                }
+                else
+                {
+                    FindElement(LocatorType, Locator);
+                    Element.Click();
+                }
             }
             catch (Exception ex)
             {
@@ -65,7 +72,15 @@ namespace UITest.SeleniumObjects
 
         public bool FindElement(Enums.FINDBY By, string Locator)
         {
-            Element = _Driver.FindElement(By, Locator);
+            if (By == Enums.FINDBY.JAVASCRIPT)
+            {
+                //do not try to locate
+            }
+            else
+            {
+                Element = _Driver.FindElement(By, Locator);
+            }
+
             return (true);
         }
 
@@ -115,17 +130,6 @@ namespace UITest.SeleniumObjects
                 ";
             object result = js.ExecuteScript(script);
             return (result);
-        }
-
-        /// <summary>
-        /// Finds a Web Element of the current locator type (Use when a locator can change)
-        /// </summary>
-        /// <param name="Locator"></param>
-        /// <returns></returns>
-        public IWebElement FindElement(string Locator)
-        {
-            Element = _Driver.FindElement(LocatorType, Locator);
-            return (Element);
         }
 
         public ReadOnlyCollection<IWebElement> FindElements(Enums.FINDBY By, string Locator)

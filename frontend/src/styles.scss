@@ -138,6 +138,11 @@ body {
             .p-panel-header {
                 padding: .6rem 1.2rem;
             }
+
+            .p-panel-content {
+                padding-left: 0;
+                padding-right: 0;
+            }
         }
 
         &.bl-info {
@@ -207,6 +212,10 @@ body {
             .p-tag {
                 background-color: #ECEAE8;
                 color: #2D2D2D;
+
+                .p-tag-value {
+                    word-break: keep-all;
+                }
             }
         }
 
@@ -253,6 +262,14 @@ body {
                 border-color: #CE3E39;
                 color: #FFFFFF;
             }
+        }
+
+        &.round-42 {
+            width: 42px;
+            height: 42px;
+            justify-content: center;
+            border-radius: 50%;
+            outline: none !important;
         }
 
         &.outline-btn {

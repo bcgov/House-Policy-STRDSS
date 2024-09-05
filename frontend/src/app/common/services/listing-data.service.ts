@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
-import { ListingTableRow } from '../models/listing-table-row';
+import { AggregatedListingTableRow, ListingTableRow } from '../models/listing-table-row';
 import { ListingSearchRequest } from '../models/listing-search-request';
 import { ListingAddressCandidate, ListingDetails } from '../models/listing-details';
 import { ExportJurisdiction } from '../models/export-listing';
@@ -138,6 +138,73 @@ export class ListingDataService {
     }
 
     return this.httpClient.get<PagingResponse<ListingTableRow>>(endpointUrl);
+  }
+
+  getAggregatedListings(
+    pageNumber: number = 1,
+    pageSize: number = 10,
+    orderBy: string = '',
+    direction: 'asc' | 'desc' = 'asc',
+    searchReq: ListingSearchRequest = {},
+    filter?: ListingFilter
+  ): Observable<PagingResponse<AggregatedListingTableRow>> {
+    let endpointUrl = `${environment.API_HOST}/rentallistings/grouped?pageSize=${pageSize}&pageNumber=${pageNumber}`;
+
+    if (orderBy) {
+      endpointUrl += `&orderBy=${orderBy}&direction=${direction}`;
+    }
+
+    if (searchReq.all) {
+      endpointUrl += `&all=${searchReq.all}`;
+    }
+    if (searchReq.address) {
+      endpointUrl += `&address=${searchReq.address}`;
+    }
+    if (searchReq.url) {
+      endpointUrl += `&url=${searchReq.url}`;
+    }
+    if (searchReq.listingId) {
+      endpointUrl += `&listingId=${searchReq.listingId}`;
+    }
+    if (searchReq.hostName) {
+      endpointUrl += `&hostName=${searchReq.hostName}`;
+    }
+    if (searchReq.businessLicence) {
+      endpointUrl += `&businessLicence=${searchReq.businessLicence}`;
+    }
+
+    if (filter) {
+      if (filter.byLocation) {
+        if (!!filter.byLocation?.isPrincipalResidenceRequired) {
+          endpointUrl += `&prRequirement=${filter.byLocation.isPrincipalResidenceRequired == 'Yes'}`;
+        }
+        if (!!filter.byLocation?.isBusinessLicenceRequired) {
+          endpointUrl += `&blRequirement=${filter.byLocation.isBusinessLicenceRequired == 'Yes'}`;
+        }
+      }
+      if (filter.byStatus) {
+        if (filter.byStatus.reassigned !== null && filter.byStatus.reassigned !== undefined) {
+          endpointUrl += `&reassigned=${!!filter.byStatus.reassigned}`;
+        }
+        if (filter.byStatus.takedownComplete !== null && filter.byStatus.takedownComplete !== undefined) {
+          endpointUrl += `&takedownComplete=${!!filter.byStatus.takedownComplete}`;
+        }
+
+        const statuses = new Array();
+        if (filter.byStatus.active) statuses.push('A')
+        if (filter.byStatus.inactive) statuses.push('I')
+        if (filter.byStatus.new) statuses.push('N')
+
+        if (statuses.length) {
+          endpointUrl += `&statuses=${statuses.join(',')}`;
+        }
+      }
+      if (!!filter.community) {
+        endpointUrl += `&lgId=${filter.community}`;
+      }
+    }
+
+    return this.httpClient.get<PagingResponse<AggregatedListingTableRow>>(endpointUrl);
   }
 
   getListingDetailsById(id: number): Observable<ListingDetails> {

@@ -24,6 +24,7 @@ import { RoleDetailsComponent } from './features/components/roles-list/role-deta
 import { UserDetailsComponent } from './features/components/user-management/user-details/user-details.component';
 import { ExportListingsComponent } from './features/components/export-listings/export-listings.component';
 import { UploadBusinessLicenseComponent } from './features/components/upload-business-license/upload-business-license.component';
+import { AggregatedListingsTableComponent } from './features/components/listings-table/aggregated-listings-table/aggregated-listings-table.component';
 
 export const routes: Routes = [
     {
@@ -81,6 +82,12 @@ export const routes: Routes = [
     {
         path: 'listings',
         component: ListingsTableComponent,
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        data: { permissions: [listing_read] },
+    },
+    {
+        path: 'aggregated-listings',
+        component: AggregatedListingsTableComponent,
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         data: { permissions: [listing_read] },
     },

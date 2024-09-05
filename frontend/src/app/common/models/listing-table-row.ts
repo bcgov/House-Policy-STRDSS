@@ -38,5 +38,21 @@ export interface ListingTableRow {
     bcRegistryNo?: string;
 
     rentalListingContacts?: [];
+    selected?: boolean;
+
 }
 
+export interface AggregatedListingTableRow {
+    id?: string;
+    effectiveBusinessLicenceNo?: string;
+    effectiveHostNm?: string;
+    primaryHostNm: string;
+    matchAddressTxt: string;
+    nightsBookedYtdQty: number;
+    businessLicenceNo: string;
+    lastActionNm?: string;
+    lastActionDtm?: string;
+
+    listings: Array<ListingTableRow>;
+    selected?: boolean;
+}

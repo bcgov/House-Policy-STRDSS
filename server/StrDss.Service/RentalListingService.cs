@@ -469,12 +469,16 @@ namespace StrDss.Service
             if (addressEntity.ContainingOrganizationId != originalOrgId)
             {
                 listingEntity.IsLgTransferred = true;
-                listingEntity.GoverningBusinessLicenceId = null;
 
                 listingEntity.IsChangedBusinessLicence = false;
                 listingEntity.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(listingEntity.BusinessLicenceNo);
-                var (bizLicId, _) = await _bizLicenceRepo.GetMatchingBusinessLicenceIdAndNo(addressEntity.ContainingOrganizationId.Value, listingEntity.EffectiveBusinessLicenceNo);
-                listingEntity.GoverningBusinessLicenceId = bizLicId;
+                listingEntity.GoverningBusinessLicenceId = null;
+
+                if (addressEntity.ContainingOrganizationId != null && listingEntity.EffectiveBusinessLicenceNo.IsNotEmpty())
+                {
+                    var (bizLicId, _) = await _bizLicenceRepo.GetMatchingBusinessLicenceIdAndNo(addressEntity.ContainingOrganizationId.Value, listingEntity.BusinessLicenceNo);
+                    listingEntity.GoverningBusinessLicenceId = bizLicId;
+                }
             }
 
             listingEntity.IsChangedAddress = true;

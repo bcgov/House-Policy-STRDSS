@@ -151,7 +151,7 @@ namespace StrDss.Data.Repositories
             if (listingId != null && listingId.IsNotEmpty())
             {
                 var listingIdLower = listingId.ToLower();
-                query = query.Where(x => x.PlatformListingNo != null && x.PlatformListingNo.ToLower().Contains(listingIdLower));
+                query = query.Where(x => x.PlatformListingNo != null && x.PlatformListingNo.ToLower() == listingIdLower);
             }
 
             if (hostName != null && hostName.IsNotEmpty())

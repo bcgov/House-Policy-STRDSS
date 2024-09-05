@@ -37,6 +37,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private DssDbContext _DssDBContext;
         private IUnitOfWork _UnitOfWork;
         private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
+        private SFEnums.LogonTypeEnum? _LogonType;
 
         public ManagingAccess(SeleniumDriver Driver)
         {
@@ -91,7 +92,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             AuthHelper authHelper = new AuthHelper(_Driver);
 
             //Authenticate user using IDir or BCID depending on the user
-            authHelper.Authenticate(_TestUserName, _TestPassword, UserTypeEnum.BCGOVERNMENTSTAFF);
+            _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword, UserTypeEnum.BCGOVERNMENTSTAFF);
+            ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
 
 
             IWebElement TOC = null;

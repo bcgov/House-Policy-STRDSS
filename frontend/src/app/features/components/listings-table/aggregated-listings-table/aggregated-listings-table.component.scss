@@ -161,6 +161,12 @@
                 font-size: 12px;
                 word-break: break-word;
 
+                &.listings-count {
+                    font-size: smaller;
+                    color: #afadad;
+                    font-weight: 600;
+                }
+
                 span {
                     display: block;
                     white-space: nowrap;
@@ -280,11 +286,11 @@
         }
 
         &.status-takedown-complete {
-            background-image: url(../../../../assets/images/flag-black.svg);
+            background-image: url(../../../../../assets/images/flag-black.svg);
         }
 
         &.status-reassigned {
-            background-image: url(../../../../assets/images/flag-blue.svg);
+            background-image: url(../../../../../assets/images/flag-blue.svg);
         }
     }
 

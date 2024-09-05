@@ -1,0 +1,352 @@
+<div class="top-block">
+    <h2 class="title">Aggregated Listings</h2>
+    <div class="search-container">
+        <span class="vertical-spacer" *ngIf="isFilterSet"></span>
+        <p-dropdown [options]="searchColumns" id="search-by-drd" [(ngModel)]="searchColumn"
+            class="search-by-select"></p-dropdown>
+        <span class="p-input-icon-right search-input-container">
+            <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()"> <i
+                    class="pi pi-search"></i></button>
+            <button pButton *ngIf="!!searchTerm" id="clear-search-btn" class="colorless p-button-link search-clear-btn"
+                icon="pi pi-times" (click)="onClearSearchBox()"></button>
+            <input type="text" id="search-term-inp" (keydown.enter)="onSearch()" class="search-input"
+                placeholder="Search" pInputText [(ngModel)]="searchTerm" />
+        </span>
+        <button pButton id="filter-open-btn" class="filter-open-btn p-button-link" [class.colorless]="!isFilterSet"
+            icon="pi {{isFilterSet?'pi-filter-fill':'pi-filter'}}" (click)="openFilterSidebar()">
+            Filter Listings
+        </button>
+
+        <button *ngIf="isFilterSet" pButton id="filter-clear-btn" icon="pi pi-filter-slash" class="p-button-link red"
+            (click)="onClearFilters()">
+            Clear Filters
+        </button>
+    </div>
+    <div class="legend-container">
+        <button pButton id="view-more-history-btn" class="p-button-link" (click)="showLegend()">
+            <i class="pi pi-question-circle"></i>&nbsp;Legend
+        </button>
+    </div>
+</div>
+<div class="actions" *ngIf="!isCEU">
+    <button pButton [disabled]="!listingsSelected" id="send_delisting_notice_btn" (click)="onNoticeOpen()">
+        Send Notice of Non-Compliance
+    </button>
+    <button pButton [disabled]="!listingsSelected" id="send_takedown_request_btn" (click)="onTakedownOpen()">
+        Send Takedown Request
+    </button>
+</div>
+<div class="content">
+    <p-panel class="listing-table-panel">
+        <ng-template pTemplate="header">
+            <div class="rows-info-wrapper">
+                <span class="panel-header-small" [style.visibility]="listingsSelected ? 'visible' : 'hidden'">Selected
+                    {{listingsSelected}} items. <button pButton class="p-button-link zero-padding small-text"
+                        (click)="unselectAll()">Unselect All</button>
+                </span>
+                <span class="panel-header-small" *ngIf="currentPage">Showing {{ currentPage.itemCount}} of
+                    {{currentPage.totalCount || 0}} listings</span>
+            </div>
+        </ng-template>
+
+        <p-table dataKey="id" [value]="aggregatedListings" #table [ariaLabel]="'table-of-listings'" id="listings-table"
+            [scrollable]="true" scrollHeight="{{isCEU?'650px':'600px'}}" [(selection)]="selectedListings"
+            styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th [ariaLabel]="'expand-listing'" style="width: 2rem"> </th>
+                    <th class="sortable-header" id="primaryHostNm_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'effectiveHostNm'"
+                        (click)="onSort('effectiveHostNm')">Primary Host Name
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'effectiveHostNm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'effectiveHostNm' && this.sort.dir === 'asc'"></i>
+                    </th>
+
+                    <th class="sortable-header" id="addressNormalized_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"
+                        (click)="onSort('matchAddressTxt')">Address (Best Match)
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'asc'"></i>
+                    </th>
+
+                    <th>Nights Stayed (YTD) </th>
+
+                    <th class="sortable-header" id="licence_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo'"
+                        (click)="onSort('effectiveBusinessLicenceNo')">Listing’s Business Licence
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo' && this.sort.dir === 'asc'"></i>
+                    </th>
+
+                    <th> Last Action </th>
+
+                    <th> Last Action Date</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-row let-index="rowIndex" let-expanded="expanded">
+                <tr>
+                    <td>
+                        <button pButton id="expand-listing-row-{{index}}" class="p-button-transparent round-42"
+                            [pRowToggler]="row">
+                            <i class="pi" [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+                        </button>
+                    </td>
+                    <td>{{ row.primaryHostNm }}</td>
+                    <td>{{ row.matchAddressTxt }} </td>
+                    <td>{{ row.nightsBookedYtdQty }}</td>
+                    <td>{{ row.businessLicenceNo }}</td>
+                    <td>{{ row.lastActionNm }}</td>
+                    <td>{{ row.lastActionDtm |date }}</td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="rowexpansion" let-row>
+                <tr>
+                    <td colspan="8">
+                        <div class="expand">
+                            <p-table [value]="row.listings" dataKey="rentalListingId">
+                                <ng-template pTemplate="header" let-listing>
+                <tr>
+                    <th>
+                        <p-checkbox [(ngModel)]="row.selected" [inputId]="'group-select-chbx'" [binary]="true"
+                            (onChange)="onGroupRowSelected($event,row)"></p-checkbox>
+
+                    </th>
+                    <th>Status</th>
+                    <th>Platform</th>
+                    <th>Listing ID</th>
+                    <th>Listing Details</th>
+                    <th>Address (Best Match)</th>
+                    <th>Nights Stayed (YTD)</th>
+                    <th>Business Licence</th>
+                    <th>Last Action</th>
+                    <th>Last Action Date</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-listing let-index="rowIndex">
+                <tr>
+                    <td>
+                        <p-checkbox [(ngModel)]="listing.selected" [binary]="true" [inputId]="'listing-select-chbx'"
+                            (onChange)="onListingRowSelected($event,listing)"></p-checkbox>
+                    </td>
+                    <td>
+                        <div [ngSwitch]="listing.listingStatusType" class="align-center status-col">
+                            <div *ngSwitchCase="'N'" class="status-circle status-new" pTooltip="New">
+                                N
+                            </div>
+                            <div *ngSwitchCase="'A'" class="status-circle status-active" pTooltip="Active">
+                                A
+                            </div>
+                            <div *ngSwitchCase="'I'" class="status-circle status-inactive" pTooltip="Inactive">
+                                I
+                            </div>
+                            <div *ngIf="listing.isLgTransferred" class="status-flag status-reassigned"
+                                pTooltip="Reassigned">
+                            </div>
+                            <div *ngIf="listing.isTakenDown" class="status-flag status-takedown-complete"
+                                pTooltip="Takedown Complete">
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ listing.offeringOrganizationNm }}</td>
+                    <td> <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
+                            [href]="listing.platformListingUrl">{{
+                            listing.platformListingNo }}</a>
+                    </td>
+                    <td class="align-center"><a [ariaLabel]="'open-listing-details'" pButton
+                            class="details-button-with-icon" target="_blank"
+                            [routerLink]="'/listing/'+listing.rentalListingId"><i class="pi pi-list"></i></a></td>
+                    <td
+                        [class.low-address-score-match]="listing.matchScoreAmt<=addressLowScore && (!listing.isMatchVerified && !listing.isMatchCorrected)">
+                        <div class="address-col">
+                            <div class="address-text">
+                                {{ listing.matchAddressTxt }}
+                            </div>
+                            <i class="pi pi-info-circle" pTooltip="Low Address Match Confidence"
+                                *ngIf="listing.matchScoreAmt<=addressLowScore && (!listing.isMatchVerified && !listing.isMatchCorrected)"></i>
+                            <p-tag *ngIf="listing.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
+                        </div>
+                    </td>
+                    <td> {{ listing.nightsBookedYtdQty }}</td>
+                    <td><span>
+                            {{ listing.businessLicenceNo }}
+                        </span></td>
+                    <td>{{ listing.lastActionNm }}</td>
+                    <td>{{ listing.lastActionDtm |date }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+</div>
+</td>
+</tr>
+</ng-template>
+
+<ng-template pTemplate="emptymessage">
+    <tr>
+        <td></td>
+        <td colspan="6">No listings matched your search. Please try again. </td>
+    </tr>
+</ng-template>
+</p-table>
+
+<p-paginator class="listings-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
+    [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
+    [showCurrentPageReport]="true" [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
+    [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
+</p-panel>
+
+<p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
+    <span>
+        <strong>Status:</strong> Status of the listing using the following categories:
+        <ul class="statuses">
+            <li><span class="status-circle status-new">N</span>&nbsp;New: Listing reported for the first time in
+                current monthly data</li>
+            <li><span class="status-circle status-active">A</span>&nbsp;Active: Listing appeared in previous and
+                current monthly data</li>
+            <li><span class="status-circle status-inactive">I</span>&nbsp;Inactive: Listing appeared in previous
+                but not current monthly data </li>
+            <li><span class="status-flag status-takedown-complete"></span>&nbsp;Takedown Complete: Platform
+                confirmed takedown of the listing</li>
+            <li><span class="status-flag status-reassigned"></span>&nbsp;Reassigned: Address (best
+                match) was updated to a new jurisdiction</li>
+        </ul>
+    </span>
+    <p>
+        <strong>Listing ID:</strong> Platform ID number for the listing.
+    </p>
+    <p>
+        <strong>Address (Best Match):</strong> Best physical address match provided by the BC Address Geocoder based
+        on the address from the platform listing (accuracy of {{addressLowScore}}% or above).
+    </p>
+    <p>
+        <strong>Address (from platform listing):</strong> Property address of the short-term rental accommodation
+        provided to the platform by the host. May be incomplete or inaccurate.
+    </p>
+    <p>
+        <strong>Entire Unit:</strong> Is the listing for an entire dwelling unit or a bedroom within the dwelling
+        unit.
+    </p>
+    <p>
+        <strong>Nights Stayed:</strong> The number of nights short-term rental services were provided in the
+        reporting month.
+    </p>
+    <p>
+        <strong>Separate Reservations:</strong> The number of separate reservations that were "completed" in the
+        reporting month (ie. where the guest has checked out within the month). Reservations that span more than one
+        month will be reported in the month the guest checks out.
+    </p>
+    <p>
+        <strong>Business licence:</strong> Business licence number provided by the host on the listing, if
+        applicable.
+    </p>
+    <p>
+        <strong>Property Host:</strong> A person who is legally entitled to possession of the property where STR
+        accommodation is provided and acts as the STR operator responsible for arranging the short term rental
+        services.
+        <i>See Short-term Rental Accommodations Act</i> for definition.
+    </p>
+    <p>
+        <strong>STR Host:</strong> Any person who acts as the STR operator, including the property host and any
+        other persons who act on their behalf to arrange the short-term rental services (e.g., host, co-host,
+        property manager).
+        <i>See Short-term Rental Accommodations Act</i> for definition.
+    </p>
+</p-dialog>
+</div>
+
+<p-sidebar ngClass="listing-filter p-sidebar-lg" [title]="'Filter Listings'" [(visible)]="isFilterOpened"
+    [closeOnEscape]="false" position="right" [modal]="false">
+    <ng-template pTemplate="header">
+        <strong class="h2-big"> Filter Listings</strong>
+    </ng-template>
+    <ng-template pTemplate="content">
+        <p-accordion *ngIf="cancelableFilter" class="borderless filter-sidebar" [multiple]="true"
+            [activeIndex]="[0,1,2]">
+            <p-accordionTab *ngIf="isCEU" iconPos="end" header="By Location">
+                <div class="row"><strong>Principal Residence Requirement Applies?</strong></div>
+                <div class="row">
+                    <p-radioButton name="principalResidenceRequired" value="Yes"
+                        [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
+                        inputId="principalResidenceRequired_true" label="Yes"></p-radioButton>
+                    <p-radioButton name="principalResidenceRequired" value="No"
+                        [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
+                        inputId="principalResidenceRequired_false" label="No"></p-radioButton>
+                    <p-radioButton name="principalResidenceRequired" value=""
+                        [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
+                        inputId="principalResidenceRequired_null" label="Both"></p-radioButton>
+                </div>
+                <div class="row"><strong>Business Licence Required?</strong></div>
+                <div class="row">
+                    <p-radioButton name="businessLicenceRequired" value="Yes"
+                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
+                        inputId="businessLicenceRequired_true" label="Yes"></p-radioButton>
+                    <p-radioButton name="businessLicenceRequired" value="No"
+                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
+                        inputId="businessLicenceRequired_false" label="No"></p-radioButton>
+                    <p-radioButton name="businessLicenceRequired" value=""
+                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
+                        inputId="businessLicenceRequired_null" label="Both"></p-radioButton>
+                </div>
+            </p-accordionTab>
+            <p-accordionTab *ngIf="isCEU" iconPos="end" header="By Community ">
+                <p-dropdown placeholder="Select a Community" appendTo="body" panelStyleClass="select-community"
+                    [inputId]="'community-filter-dropdown'" [filter]="true" [filterBy]="'label'" class="auto-width"
+                    [options]="groupedCommunities" [group]="true" [(ngModel)]="cancelableFilter.community">
+                    <ng-template let-group pTemplate="group">
+                        <strong>{{group.label}}</strong>
+                    </ng-template>
+                </p-dropdown>
+
+            </p-accordionTab>
+            <p-accordionTab iconPos="end" header="By Status">
+                <div class="row"><strong>Primary Statuses</strong></div>
+                <div class="row">
+                    <p-checkbox label="New" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.new"
+                        inputId="n-filter-cb">
+                    </p-checkbox>
+                </div>
+                <div class="row">
+                    <p-checkbox label="Active" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.active"
+                        inputId="a-filter-cb">
+                    </p-checkbox>
+                </div>
+                <div class="row">
+                    <p-checkbox label="Inactive" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.inactive"
+                        inputId="i-filter-cb">
+                    </p-checkbox>
+                </div>
+                <div class="row"><strong>Secondary Statuses</strong></div>
+                <div class="row">
+                    <p-checkbox label="Reassigned" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.reassigned"
+                        inputId="i-filter-cb">
+                    </p-checkbox>
+                </div>
+                <div class="row">
+                    <p-checkbox label="Takedown Complete" [binary]="true"
+                        [(ngModel)]="cancelableFilter.byStatus.takedownComplete" inputId="t-filter-cb">
+                    </p-checkbox>
+                </div>
+            </p-accordionTab>
+        </p-accordion>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="left-side">
+            <button pButton label="Clear Filters" id="clear-filters-btn" class="p-button-transparent"
+                (click)="onClearFilters()"></button>
+        </div>
+        <div class="right-side">
+            <button pButton label="Submit" id="submit-filters-btn" [disabled]="!isCancelableFilterSet"
+                (click)="onSubmitFilters()"></button>
+            <button pButton label="Cancel" id="cancel-filters-btn" class="outline-btn"
+                (click)="onCancelFilters()"></button>
+        </div>
+    </ng-template>
+</p-sidebar>

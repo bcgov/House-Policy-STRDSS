@@ -8,6 +8,7 @@ namespace UITest.PageObjects
     public class TermsAndConditionsPage
     {
         private CheckBox _TermsAndConditionsCheckBox;
+
         private Button _ContinueButton;
         private IDriver _Driver;
 
@@ -18,8 +19,8 @@ namespace UITest.PageObjects
         public TermsAndConditionsPage(IDriver Driver)
         {
             _Driver = Driver;
-            _TermsAndConditionsCheckBox = new CheckBox(Driver, Enums.FINDBY.CSSSELECTOR, TermsAndConditionsModel.TermsAndCondititionsCheckBox);
             _ContinueButton = new Button(Driver, Enums.FINDBY.ID, TermsAndConditionsModel.ContinueButton);
+            _TermsAndConditionsCheckBox = new CheckBox(Driver, Enums.FINDBY.JAVASCRIPT, TermsAndConditionsModel.TermsAndCondititionsCheckBoxJS);
         }
     }
 }

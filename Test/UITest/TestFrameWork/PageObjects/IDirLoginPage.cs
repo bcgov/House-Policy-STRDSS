@@ -20,9 +20,7 @@ namespace TestFrameWork.Models
             _Driver = Driver;
             _UserNameTextBox = new TextBox(Driver, Enums.FINDBY.ID, IDirLogonModel.IDRUserName);
             _PasswordTextBox = new TextBox(Driver, Enums.FINDBY.ID, IDirLogonModel.IDRPassword);
-            _ContinueButton = new(Driver, Enums.FINDBY.CSSSELECTOR, IDirLogonModel.ContinueButton);
+            _ContinueButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, IDirLogonModel.ContinueButton);
         }
-
-
     }
 }

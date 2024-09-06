@@ -135,8 +135,24 @@ export class UploadBusinessLicenseComponent implements OnInit {
   }
 
   onPageChange(e: any): void {
-    console.log(e.page + 1);
     this.getHistoryRecords(e.page + 1);
+  }
+
+  onDownloadErrors(rowId: number, platform: string, date: string): void {
+    this.loaderService.loadingStart(' It may take several minutes to prepare your download file. Please do not close this tab until your download is complete.');
+    this.BLService.downloadErrors(rowId).subscribe({
+      next: (content) => {
+        const element = document.createElement('a');
+        element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(content)}`);
+        element.setAttribute('download', `errors_${platform}_${date}.csv`);
+
+        element.click();
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
+      },
+    });
   }
 
   private getHistoryRecords(selectedPageNumber: number = 1): void {

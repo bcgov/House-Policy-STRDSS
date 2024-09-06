@@ -17,6 +17,7 @@ import { DelistingService } from '../../../common/services/delisting.service';
 import { validateEmailListString } from '../../../common/consts/validators.const';
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { ListingTableRow } from '../../../common/models/listing-table-row';
 
 @Component({
   selector: 'app-bulk-takedown-request',
@@ -37,9 +38,10 @@ import { GlobalLoaderService } from '../../../common/services/global-loader.serv
   styleUrl: './bulk-takedown-request.component.scss'
 })
 export class BulkTakedownRequestComponent implements OnInit {
-  listings!: Array<ListingDetails>;
+  listings!: Array<ListingDetails | ListingTableRow>;
   returnUrl!: string;
   myForm!: FormGroup;
+  containsDisabledItems = false;
 
   previewText = '';
   showPreviewDialog = false;
@@ -51,7 +53,7 @@ export class BulkTakedownRequestComponent implements OnInit {
     customDetailTxt: any;
   }[]
 
-  selectedListings!: Array<ListingDetails>;
+  selectedListings!: Array<ListingDetails | ListingTableRow>;
   addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   sort!: { prop: string, dir: 'asc' | 'desc' }
 
@@ -85,11 +87,21 @@ export class BulkTakedownRequestComponent implements OnInit {
           this.returnUrl = param['returnUrl'];
           this.listings = [...this.searchStateService.selectedListings];
           this.searchStateService.selectedListings = new Array<ListingDetails>();
-          this.selectedListings = this.listings;
+          this.selectedListings = this.listings.filter(l => l.listingStatusType !== 'I');
+          this.containsDisabledItems = this.listings.some(l => l.listingStatusType !== 'I')
           this.initForm();
           this.cloakParams();
         }
       });
+  }
+
+  onListingSelected(e: any): void {
+    console.log(e);
+    if (e.checked) {
+      this.selectedListings = this.listings.filter(l => l.listingStatusType !== 'I');
+    } else {
+      this.selectedListings = [];
+    }
   }
 
   onSort(property: keyof ListingDetails): void {
@@ -158,7 +170,7 @@ export class BulkTakedownRequestComponent implements OnInit {
 
   private sendPreview(): void {
     const formValues = this.myForm.value;
-    this.submissionArray = this.selectedListings.map((x: ListingDetails) => ({
+    this.submissionArray = this.selectedListings.map((x: ListingDetails | ListingTableRow) => ({
       rentalListingId: x.rentalListingId,
       ccList: formValues.ccList.prototype === Array
         ? formValues

@@ -159,7 +159,7 @@ namespace StrDss.Data.Repositories
         {
             var processStopwatch = Stopwatch.StartNew();
 
-            _dbContext.Database.SetCommandTimeout(1200);
+            _dbContext.Database.SetCommandTimeout(2400);
 
             await _dbContext.Database.ExecuteSqlRawAsync($"CALL dss_process_biz_lic_table({lgId});");
 

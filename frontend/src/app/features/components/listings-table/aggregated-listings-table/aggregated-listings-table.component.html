@@ -50,7 +50,7 @@
         </ng-template>
 
         <p-table dataKey="id" [value]="aggregatedListings" #table [ariaLabel]="'table-of-listings'" id="listings-table"
-            [scrollable]="true" scrollHeight="{{isCEU?'650px':'600px'}}" [(selection)]="selectedListings"
+            [scrollable]="true" scrollHeight="{{isCEU?'635px':'585px'}}" [(selection)]="selectedListings"
             styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
 
             <ng-template pTemplate="header">
@@ -132,7 +132,7 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-listing let-index="rowIndex">
-                <tr>
+                <tr [class.filtered-out]="!listing.filtered">
                     <td>
                         <p-checkbox [(ngModel)]="listing.selected" [binary]="true" [inputId]="'listing-select-chbx'"
                             (onChange)="onListingRowSelected($event,listing)"></p-checkbox>

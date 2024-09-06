@@ -157,15 +157,48 @@ namespace StrDss.Data.Repositories
 
         public async Task ProcessBizLicTempTable(long lgId)
         {
+            await ProcessBizLicTempTableDelete(lgId);
+            await ProcessBizLicTempTableInsert(lgId);
+            await ProcessBizLicTempTableUpdate(lgId);
+        }
+
+        private async Task ProcessBizLicTempTableDelete(long lgId)
+        {
             var processStopwatch = Stopwatch.StartNew();
 
             _dbContext.Database.SetCommandTimeout(2400);
 
-            await _dbContext.Database.ExecuteSqlRawAsync($"CALL dss_process_biz_lic_table({lgId});");
+            await _dbContext.Database.ExecuteSqlRawAsync($"CALL dss_process_biz_lic_table_delete({lgId});");
 
             processStopwatch.Stop();
 
-            _logger.LogInformation($"Business Licence Link to Listings finished  - {processStopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogInformation($"Business Licence Process (Delete) finished  - {processStopwatch.Elapsed.TotalSeconds} seconds");
+        }
+
+        private async Task ProcessBizLicTempTableInsert(long lgId)
+        {
+            var processStopwatch = Stopwatch.StartNew();
+
+            _dbContext.Database.SetCommandTimeout(2400);
+
+            await _dbContext.Database.ExecuteSqlRawAsync($"CALL dss_process_biz_lic_table_insert({lgId});");
+
+            processStopwatch.Stop();
+
+            _logger.LogInformation($"Business Licence Process (Insert) finished  - {processStopwatch.Elapsed.TotalSeconds} seconds");
+        }
+
+        private async Task ProcessBizLicTempTableUpdate(long lgId)
+        {
+            var processStopwatch = Stopwatch.StartNew();
+
+            _dbContext.Database.SetCommandTimeout(2400);
+
+            await _dbContext.Database.ExecuteSqlRawAsync($"CALL dss_process_biz_lic_table_update({lgId});");
+
+            processStopwatch.Stop();
+
+            _logger.LogInformation($"Business Licence Process (Update) finished  - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
         public async Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo)

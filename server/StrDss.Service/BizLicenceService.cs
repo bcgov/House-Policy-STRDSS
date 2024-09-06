@@ -78,11 +78,7 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            processStopwatch.Stop();
-
             _logger.LogInformation($"Processed business licences and saved to a temporary table: {processStopwatch.Elapsed.TotalSeconds} seconds");
-
-            processStopwatch.Restart();
 
             var errorCount = upload.DssUploadLines.Count(x => x.IsValidationFailure);
 

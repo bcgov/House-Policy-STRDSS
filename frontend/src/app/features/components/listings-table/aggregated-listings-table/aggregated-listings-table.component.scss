@@ -137,6 +137,10 @@
         }
 
         tr {
+            &.filtered-out {
+                opacity: .4;
+            }
+
             th {
                 font-size: 14px;
                 font-family: 'BcSans-bold';

@@ -81,7 +81,7 @@ export class BulkTakedownRequestComponent implements OnInit {
     this.route.queryParams.subscribe(
       (param) => {
         if (!this.searchStateService?.selectedListings || !param['returnUrl']) {
-          this.router.navigateByUrl('/listings');
+          this.router.navigateByUrl('/');
         }
         else {
           this.returnUrl = param['returnUrl'];

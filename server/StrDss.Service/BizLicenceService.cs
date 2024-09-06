@@ -57,7 +57,6 @@ namespace StrDss.Service
                 return;
             }
 
-
             if (!_validator.CommonCodes.Any())
             {
                 _validator.CommonCodes = await _codeSetRepo.LoadCodeSetAsync();
@@ -78,6 +77,12 @@ namespace StrDss.Service
             await ProcessBizLicenceUploadAsync(upload);
 
             _unitOfWork.Commit();
+
+            processStopwatch.Stop();
+
+            _logger.LogInformation($"Processed business licences and saved to a temporary table: {processStopwatch.Elapsed.TotalSeconds} seconds");
+
+            processStopwatch.Restart();
 
             var errorCount = upload.DssUploadLines.Count(x => x.IsValidationFailure);
 

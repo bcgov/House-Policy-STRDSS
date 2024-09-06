@@ -152,7 +152,6 @@ export class BulkComplianceNoticeComponent implements OnInit {
   }
 
   onListingSelected(e: any): void {
-    console.log(e);
     if (e.checked) {
       this.selectedListings = this.listings.filter(l => l.listingStatusType !== 'I');
     } else {

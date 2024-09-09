@@ -108,7 +108,7 @@
 
                     <th class="sortable-header" id="licence_header"
                         [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNo'"
-                        (click)="onSort('businessLicenceNo')">Listing’s Business Licence
+                        (click)="onSort('businessLicenceNo')">Business Licence on Listing
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -117,8 +117,7 @@
 
                     <th class="sortable-header" id="licence_matched_header"
                         [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNoMatched'"
-                        (click)="onSort('businessLicenceNoMatched')">LG's Business
-                        Licence
+                        (click)="onSort('businessLicenceNoMatched')">Matched Business Licence
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNoMatched' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -187,7 +186,7 @@
                         [class.low-address-score-match]="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)">
                         <div class="address-col">
                             <div class="address-text">
-                                {{ row.matchAddressTxt }}
+                                {{ row.matchAddressTxt || '-'}}
                             </div>
                             <i class="pi pi-info-circle" pTooltip="Low Address Match Confidence"
                                 *ngIf="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)"></i>
@@ -195,23 +194,26 @@
                         </div>
                     </td>
                     <td>
-                        {{ row.nightsBookedYtdQty }}
+                        {{ row.nightsBookedYtdQty || '-'}}
                     </td>
                     <td>
                         <span>
-                            {{ row.businessLicenceNo }}
+                            {{ row.businessLicenceNo || '-'}}
                         </span>
                     </td>
                     <td>
-                        <span>
-                            {{ row.businessLicenceNoMatched }}
-                        </span>
+                        <div class="bl-matched-col">
+                            <span>
+                                {{ row.businessLicenceNoMatched || '-' }}
+                            </span>
+                            <p-tag *ngIf="row.isChangedBusinessLicence" value="Updated" class="updated-tag"></p-tag>
+                        </div>
                     </td>
                     <td>
-                        {{ row.lastActionNm }}
+                        {{ row.lastActionNm || '-'}}
                     </td>
                     <td>
-                        {{ row.lastActionDtm |date }}
+                        {{ row.lastActionDtm || '-' |date }}
                     </td>
                 </tr>
             </ng-template>

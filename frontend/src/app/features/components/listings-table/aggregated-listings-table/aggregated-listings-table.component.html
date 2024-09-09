@@ -126,7 +126,8 @@
                     <th>Listing Details</th>
                     <th>Address (Best Match)</th>
                     <th>Nights Stayed (YTD)</th>
-                    <th>Business Licence</th>
+                    <th>Business Licence on Listing</th>
+                    <th>Matched Business Licence</th>
                     <th>Last Action</th>
                     <th>Last Action Date</th>
                 </tr>
@@ -177,8 +178,17 @@
                     </td>
                     <td> {{ listing.nightsBookedYtdQty }}</td>
                     <td><span>
-                            {{ listing.businessLicenceNo }}
-                        </span></td>
+                            {{ listing.businessLicenceNo || '-' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="bl-matched-col">
+                            <span>
+                                {{ listing.businessLicenceNoMatched || '-' }}
+                            </span>
+                            <p-tag *ngIf="listing.isChangedBusinessLicence" value="Updated" class="updated-tag"></p-tag>
+                        </div>
+                    </td>
                     <td>{{ listing.lastActionNm }}</td>
                     <td>{{ listing.lastActionDtm |date }}</td>
                 </tr>

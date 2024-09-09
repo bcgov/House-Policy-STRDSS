@@ -159,6 +159,20 @@
                     display: flex;
                     gap: 8px;
 
+                    &.no-bl-data {
+                        flex-direction: column;
+
+                        .bl-description {
+                            strong {
+                                white-space: normal;
+                            }
+
+                            button {
+                                color: #053662;
+                            }
+                        }
+                    }
+
                     .status-name {
                         color: #42814A;
 
@@ -186,6 +200,19 @@
 
             .row {
                 display: flex;
+
+                &.search-row {
+                    position: relative;
+
+                    input {
+                        padding-right: 30px;
+                    }
+
+                    button {
+                        position: absolute;
+                        right: 0;
+                    }
+                }
 
                 p-table {
                     width: 100%;
@@ -244,6 +271,47 @@
                     }
                 }
             }
+        }
+    }
+
+    .search-label {
+        padding: 12px 0;
+    }
+
+    .search-row {
+        position: relative;
+
+        input {
+            padding-right: 70px;
+        }
+
+        button {
+            &.search-bl-btn {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+
+            position: absolute;
+            right: 0;
+            height: 100%;
+        }
+    }
+
+    .no-bl-found {
+        padding: 12px;
+        padding-top: 18px;
+    }
+
+    .search-results {
+        padding: 12px;
+        padding-top: 18px;
+
+        .search-result-row {
+            margin-top: 12px;
+        }
+
+        strong {
+            margin-bottom: 12px;
         }
     }
 

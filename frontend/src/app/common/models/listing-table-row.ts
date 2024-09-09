@@ -31,6 +31,7 @@ export interface ListingTableRow {
     listingContactNamesTxt?: string;
     managingOrganizationId?: number;
     managingOrganizationNm?: string;
+    isChangedBusinessLicence: boolean;
     isPrincipalResidenceRequired?: boolean;
     isBusinessLicenceRequired?: boolean;
     availableBedroomsQty?: number;

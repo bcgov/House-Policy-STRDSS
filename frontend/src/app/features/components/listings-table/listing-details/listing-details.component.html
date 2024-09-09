@@ -265,8 +265,34 @@
                     </p-tag>
                 </div>
             </ng-template>
+
             <div *ngIf="!blInfo; else else_block" class="row no-bl-data">
-                <strong>We were unable to find a business licence that matched this listing in our system.</strong>
+
+
+                <div *ngIf="!listing.isChangedBusinessLicence; else changed" class="bl-description">
+                    <strong>
+                        This listing could not be matched to a business licence record. Listings may not match
+                        for one of the following reasons:
+                    </strong>
+                    <ul>
+                        <li>Host error—the host may not have entered their business licence number on their listing,
+                            or
+                            may have provided it in a format that could not be automatically matched to a local
+                            government business licence record.</li>
+                        <li>
+                            Up-to-date business licence records have not been uploaded to the Portal. Please check
+                            the
+                            Business licence upload history to confirm when records were last updated.
+                        </li>
+                        <li>Host does not have a business licence.</li>
+                    </ul>
+                </div>
+                <ng-template #changed>
+                    <strong>Business Licence Information was removed from this listing.</strong>
+                </ng-template>
+                <button pButton (click)="showBlMatchPopup()" class="p-button-link">Click here to link this listing
+                    to a business licence record</button>
+
             </div>
             <ng-template #else_block>
                 <div *ngIf="blInfo?.businessNm" class="row">
@@ -391,10 +417,65 @@
                     <strong>Legal Description: </strong> <span class="value">{{blInfo.propertyLegalDescriptionTxt
                         ||'-'}}</span>
                 </div>
+
+                <div class="spacer-hr">
+                </div>
+                <div class="row">
+                    <button pButton (click)="showBlUnlinkPopup()" class="p-button-link">Click here to unlink this
+                        listing from this business licence record</button>
+                </div>
             </ng-template>
         </p-panel>
     </div>
 </div>
+
+<p-dialog header="Match a Business Licence to Listing" class="bl-match-popup" [modal]="true" [closable]="false"
+    [(visible)]="isMatchBlShown" [style]="{width: '50vw'}">
+    <div class="search-label"><strong>Enter a Business Licence Number</strong></div>
+    <div class="search-row">
+        <input pInputText type="text" class="full-width-text-field" [(ngModel)]="searchBlText"
+            placeholder="Enter value..." (keyup.enter)="onSearchBl()">
+        <button pButton class="search-bl-btn" id="search-bl-btn" (click)="onSearchBl()"
+            [disabled]="isSearchBlDisabled"><i class="pi pi-search"></i></button>
+    </div>
+    <div class="no-bl-found" *ngIf="noBlsFound">
+        No match was found for this business licence number in our system.
+    </div>
+    <div class="search-results" *ngIf="blSearchResults.length">
+        <strong>Best Match Candidate</strong>
+
+        <div class="search-result-row" *ngFor="let blRow of blSearchResults">
+            <p-radioButton [inputId]="'bl'+blRow.businessLicenceId" name="bl-search-result-row" [value]="blRow"
+                [(ngModel)]="selectedBl"></p-radioButton>
+            <label [for]="'bl'+blRow.businessLicenceId" class="ml-2">
+                {{ blRow.businessLicenceNo }}, {{blRow.physicalRentalAddressTxt}}
+            </label>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton name="submit-dialog-btn" id="submit-dialog-btn" (click)="onUpdateBl()"
+            [disabled]="!selectedBl">Update</button>
+        <button pButton name="cancel-dialog-btn" id="cancel-dialog-btn" class="outline-btn"
+            (click)="onCancelUpdateBl()">Cancel</button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="Unlink a business licence from Listing" class="bl-unlink-popup" [modal]="true" [closable]="false"
+    [(visible)]="isUnlinkBlShow" [style]="{width: '50vw'}">
+    <div class="search-label" *ngIf="this.listing && this.listing.bizLicenceInfo"><strong>Are you sure you want to
+            unlink business
+            licence number
+            {{this.listing.bizLicenceInfo.businessLicenceNo}} from this
+            listing?</strong></div>
+
+    <ng-template pTemplate="footer">
+        <button pButton name="submit-dialog-btn" id="submit-dialog-btn" (click)="onUnlinkBl()">Yes, Unlink this Business
+            Licence Number</button>
+        <button pButton name="cancel-dialog-btn" id="cancel-dialog-btn" class="outline-btn"
+            (click)="onCancelUnlinkBl()">Cancel</button>
+    </ng-template>
+</p-dialog>
 
 <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
     <span>

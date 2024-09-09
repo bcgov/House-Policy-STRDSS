@@ -20,6 +20,8 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { ErrorHandlingService } from '../../../../common/services/error-handling.service';
 import { TagModule } from 'primeng/tag';
 import { BusinessLicence } from '../../../../common/models/business-licence';
+import { BusinessLicenceService } from '../../../../common/services/business-licence.service';
+import { BLSearchResultRow } from '../../../../common/models/bl-search-result-row';
 
 @Component({
   selector: 'app-listing-details',
@@ -45,8 +47,11 @@ export class ListingDetailsComponent implements OnInit {
   listing!: ListingDetails;
   isLegendShown = false;
   isEditAddressShown = false;
+  isMatchBlShown = false;
+  isUnlinkBlShow = false;
   addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   isCEU = false;
+  orgId!: number;
 
   canUserEditAddress = false;
   confirmTheBestMatchAddress = false;
@@ -54,12 +59,17 @@ export class ListingDetailsComponent implements OnInit {
   selectedCandidate!: ListingAddressCandidate;
   isJurisdictionDifferent = false;
   blInfo!: BusinessLicence;
+  blSearchResults = new Array<BLSearchResultRow>();
+  selectedBl!: BLSearchResultRow | null;
+  searchBlText = '';
+  noBlsFound = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private listingService: ListingDataService,
     private userDataService: UserDataService,
+    private blService: BusinessLicenceService,
     private searchStateService: SelectedListingsStateService,
     private loaderService: GlobalLoaderService,
     private cd: ChangeDetectorRef,
@@ -73,6 +83,7 @@ export class ListingDetailsComponent implements OnInit {
     this.userDataService.getCurrentUser().subscribe({
       next: (user) => {
         this.isCEU = user.organizationType === 'BCGov';
+        this.orgId = user.organizationId;
         this.canUserEditAddress = user.permissions.includes(address_write);
       }, complete: () => {
         this.loaderService.loadingEnd();
@@ -82,12 +93,78 @@ export class ListingDetailsComponent implements OnInit {
     this.getListingDetailsById(this.id);
   }
 
+  get isSearchBlDisabled(): boolean {
+    return !this.searchBlText.trim();
+  }
+
   isBoolDefined(prop: boolean | undefined): boolean {
     return typeof prop === 'boolean';
   }
 
   showLegend(): void {
     this.isLegendShown = true;
+  }
+
+  showBlMatchPopup(): void {
+    this.isMatchBlShown = true;
+  }
+
+  showBlUnlinkPopup(): void {
+    this.isUnlinkBlShow = true;
+  }
+
+  onSearchBl(): void {
+    this.loaderService.loadingStart();
+
+    this.blService.searchBls(this.orgId, this.searchBlText.trim()).subscribe({
+      next: (result) => {
+        this.blSearchResults = result;
+        this.noBlsFound = !result.length;
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+      }
+    });
+  }
+
+  onUpdateBl(): void {
+    if (this.selectedBl) {
+      this.loaderService.loadingStart();
+      this.blService.linkBl(this.listing.rentalListingId, this.selectedBl.businessLicenceId).subscribe({
+        next: () => {
+          this.errorService.showSuccess('The Business Licence was Successfully Updated.');
+          this.cleanupBl();
+          this.isMatchBlShown = false;
+          this.getListingDetailsById(this.id);
+        },
+        complete: () => {
+          this.loaderService.loadingEnd();
+        }
+      });
+    }
+  }
+
+  onUnlinkBl(): void {
+    this.loaderService.loadingStart();
+    this.blService.unLinkBl(this.listing.rentalListingId).subscribe({
+      next: () => {
+        this.errorService.showSuccess('The Business Licence was Successfully Unlinked.');
+        this.cleanupBl();
+        this.isUnlinkBlShow = false;
+        this.getListingDetailsById(this.id);
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+      }
+    });
+  }
+
+  onCancelUpdateBl(): void {
+    this.isMatchBlShown = false;
+  }
+
+  onCancelUnlinkBl(): void {
+    this.isUnlinkBlShow = false;
   }
 
   sendTakedownRequest(): void {
@@ -162,6 +239,12 @@ export class ListingDetailsComponent implements OnInit {
         this.cd.detectChanges();
       }
     });
+  }
+
+  private cleanupBl(): void {
+    this.blSearchResults = [];
+    this.searchBlText = '';
+    this.selectedBl = null;
   }
 
   private getUrlFromState(): string {

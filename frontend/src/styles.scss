@@ -250,10 +250,10 @@ body {
             &.p-button-transparent {
                 background-color: transparent;
                 border-color: transparent;
-                color: #353433;
+                color: #053662;
 
                 &:hover {
-                    border-color: #353433;
+                    border-color: #053662;
                 }
             }
 
@@ -284,6 +284,8 @@ body {
         }
 
         &.p-button-link {
+            color: #053662;
+
             .p-button-label {
                 color: #FFFFFF;
                 font-size: 16px;
@@ -311,6 +313,7 @@ body {
 
             &:hover {
                 text-decoration-line: underline;
+                color: #1E5189;
             }
 
             .pi {
@@ -553,6 +556,8 @@ body {
 
     .preview-dialog,
     .upload-bl-popup,
+    .bl-match-popup,
+    .bl-unlink-popup,
     .address-change-popup {
         .p-dialog-header {
             border-bottom: 1px solid #D8D8D8;
@@ -566,7 +571,9 @@ body {
             border-top: 1px solid #D8D8D8;
         }
 
-        &.address-change-popup {
+        &.address-change-popup,
+        &.bl-unlink-popup,
+        &.bl-match-popup {
             .p-dialog-footer {
                 padding: .75rem 1rem;
             }

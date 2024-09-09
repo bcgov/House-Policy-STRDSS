@@ -766,9 +766,10 @@ namespace StrDss.Data.Repositories
         public async Task UnLinkBizLicence(long rentalListingId)
         {
             //assume it exists - validated already
-            var listing = await _dbContext.DssRentalListings.FirstAsync(x => x.RentalListingId == rentalListingId);
+            var listing = await _dbContext.DssRentalListings
+                .FirstAsync(x => x.RentalListingId == rentalListingId);
 
-            if (listing.GoverningBusinessLicenceId != null)
+            if (listing.GoverningBusinessLicenceId == null)
                 return;
 
             listing.GoverningBusinessLicenceId = null;

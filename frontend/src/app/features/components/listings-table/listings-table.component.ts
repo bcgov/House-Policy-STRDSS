@@ -7,7 +7,7 @@ import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { CheckboxModule } from 'primeng/checkbox';
-import { PaginatorModule } from 'primeng/paginator';
+import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
@@ -54,7 +54,7 @@ import { FilterPersistenceService } from '../../../common/services/filter-persis
   styleUrl: './listings-table.component.scss'
 })
 export class ListingsTableComponent implements OnInit {
-  @ViewChild('listingsTableMain') listingsTableMain!: Table;
+  @ViewChild('pagingRef') pagingRef!: Paginator;
 
   selectedListings = []
   listings = new Array<ListingTableRow>();
@@ -87,6 +87,10 @@ export class ListingsTableComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    setInterval(() => {
+      this.cd.detectChanges();
+    }, 250);
+
     this.getOrganizations();
     this.initFilters();
     let page = 1;
@@ -225,6 +229,7 @@ export class ListingsTableComponent implements OnInit {
     this.filterPersistenceService.listingFilter = { byLocation: { isBusinessLicenceRequired: '', isPrincipalResidenceRequired: '' }, community: 0, byStatus: {} };
     this.initFilters();
     this.isFilterOpened = false;
+    this.currentPage.pageNumber = 1;
     this.onSearch();
   }
 
@@ -312,6 +317,7 @@ export class ListingsTableComponent implements OnInit {
       next: (res: PagingResponse<ListingTableRow>) => {
         this.currentPage = res.pageInfo;
         this.listings = res.sourceList;
+        this.pagingRef.updateFirst();
       },
       complete: () => {
         this.loaderService.loadingEnd();

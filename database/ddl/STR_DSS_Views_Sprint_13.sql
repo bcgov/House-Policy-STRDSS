@@ -1,4 +1,4 @@
-/* Sprint 12 View Changes to STR DSS */
+/* Sprint 13 View Changes to STR DSS */
 
 drop view if exists dss_rental_listing_vw;
 

@@ -22,7 +22,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
     {
         private IDriver _Driver;
         private LandingPage _LandingPage;
-        private TermsAndConditionsPage _TermsAndConditionsPage;
         private ManagingAccessPage _ManagingAccessPage;
         private PathFinderPage _PathFinderPage;
         private IDirLoginPage _IDirPage;
@@ -43,7 +42,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
-            _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
             _ManagingAccessPage = new ManagingAccessPage(_Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
@@ -95,24 +93,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword, UserTypeEnum.BCGOVERNMENTSTAFF);
             ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
 
-
-            IWebElement TOC = null;
-
-            try
-            {
-                TOC = _LandingPage.Driver.FindElement(Enums.FINDBY.CSSSELECTOR, TermsAndConditionsModel.TermsAndCondititionsCheckBox);
-            }
-            catch (NoSuchElementException ex)
-            {
-                //no Terms and Conditions. Continue
-            }
-
-
-            if ((null != TOC) && (TOC.Displayed))
-            {
-                _TermsAndConditionsPage.TermsAndConditionsCheckBox.Click();
-                _TermsAndConditionsPage.ContinueButton.Click();
-            }
+            TermsAndConditionsHelper termsAndConditionsHelper = new TermsAndConditionsHelper(_Driver);
+            termsAndConditionsHelper.HandleTermsAndConditions();
         }
 
 
@@ -198,7 +180,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             int rowMax = 10;
             string email = string.Empty;
             string given_nm = string.Empty;
-            string family_nm = string.Empty;    
+            string family_nm = string.Empty;
 
             int row = 0;
             for (int i = 0; i < rowMax; i++)

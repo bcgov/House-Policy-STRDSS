@@ -21,7 +21,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private ListingsPage _ListingsPage;
         private BulkComplianceNoticePage _BulkComplianceNoticePage;
         private DelistingWarningPage _DelistingWarningPage;
-        private TermsAndConditionsPage _TermsAndConditionsPage;
         private PathFinderPage _PathFinderPage;
         private BCIDPage _BCIDPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
@@ -43,7 +42,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _ListingsPage = new ListingsPage(_Driver);
             _BulkComplianceNoticePage = new BulkComplianceNoticePage(_Driver);
             _DelistingWarningPage = new DelistingWarningPage(_Driver);
-            _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
             _BCIDPage = new BCIDPage(_Driver);
@@ -77,23 +75,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
             ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
 
-            IWebElement TOC = null;
-
-            try
-            {
-                TOC = _LandingPage.Driver.FindElement(Enums.FINDBY.CSSSELECTOR, TermsAndConditionsModel.TermsAndCondititionsCheckBox);
-            }
-            catch (NoSuchElementException ex)
-            {
-                //no Terms and Conditions. Continue
-            }
-
-
-            if ((null != TOC) && (TOC.Displayed))
-            {
-                _TermsAndConditionsPage.TermsAndConditionsCheckBox.Click();
-                _TermsAndConditionsPage.ContinueButton.Click();
-            }
+            TermsAndConditionsHelper termsAndConditionsHelper = new TermsAndConditionsHelper(_Driver);
+            termsAndConditionsHelper.HandleTermsAndConditions();
         }
 
         [Then(@"LG user is redirected to dashboard-> Hompage")]

@@ -15,7 +15,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
     public sealed class SendTakeDownRequestWithoutADSSListing
     {
         private LandingPage _LandingPage;
-        private TermsAndConditionsPage _TermsAndConditionsPage;
         private DelistingRequestPage _DelistingRequestPage;
         private TakeDownRequestPage _TakeDownRequestPage;
         private PathFinderPage _PathFinderPage;
@@ -32,7 +31,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
-            _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
             _DelistingRequestPage = new DelistingRequestPage(_Driver);
             _TakeDownRequestPage = new TakeDownRequestPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
@@ -57,25 +55,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword, UserTypeEnum.LOCALGOVERNMENT);
             ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
 
-            IWebElement TOC = null;
-
-            try
-            {
-                TOC = _LandingPage.Driver.FindElement(Enums.FINDBY.CSSSELECTOR, TermsAndConditionsModel.TermsAndCondititionsCheckBox);
-            }
-            catch (NoSuchElementException ex)
-            {
-                //no Terms and Conditions. Continue
-            }
-
-
-            if ((null != TOC) && (TOC.Displayed))
-            {
-                //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
-                _TermsAndConditionsPage.TermsAndConditionsCheckBox.Click();
-
-                _TermsAndConditionsPage.ContinueButton.Click();
-            }
+            TermsAndConditionsHelper termsAndConditionsHelper = new TermsAndConditionsHelper(_Driver);
+            termsAndConditionsHelper.HandleTermsAndConditions();
         }
 
 

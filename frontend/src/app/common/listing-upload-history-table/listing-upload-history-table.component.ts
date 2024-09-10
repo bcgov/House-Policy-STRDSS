@@ -53,7 +53,6 @@ export class ListingUploadHistoryTableComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loaderService.loadingStart();
     const getCurrentUser = this.userDataService.getCurrentUser()
     const getPlatforms = this.delistingService.getPlatforms();
 
@@ -66,7 +65,6 @@ export class ListingUploadHistoryTableComponent implements OnInit {
         }
       },
       complete: () => {
-        this.loaderService.loadingEnd();
         this.cd.detectChanges();
       }
     });

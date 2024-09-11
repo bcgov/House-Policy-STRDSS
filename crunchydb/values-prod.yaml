@@ -4,7 +4,7 @@ crunchy-postgres:
     name: ha # high availability
     replicas: 2
     dataVolumeClaimSpec:
-      storage: 20Gi
+      storage: 25Gi
       storageClassName: netapp-block-standard
     requests:
       cpu: 20m

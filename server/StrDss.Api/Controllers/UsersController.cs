@@ -150,5 +150,19 @@ namespace StrDss.Api.Controllers
             var userinfo = await _userService.GetBceidUserInfo();
             return Ok(userinfo);
         }
+
+        [ApiAuthorize(Permissions.UserWrite)]
+        [HttpPost("aps", Name = "CreateApsUser")]
+        public async Task<ActionResult> CreateApsUser(ApsUserCreateDto dto)
+        {
+            var errors = await _userService.CreateApsUserAsync(dto);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
+        }
     }
 }

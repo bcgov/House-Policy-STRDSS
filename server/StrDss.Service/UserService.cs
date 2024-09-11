@@ -27,6 +27,7 @@ namespace StrDss.Service
         Task<UserDto?> GetUserByIdAsync(long userId);
         Task<Dictionary<string, List<string>>> UpdateUserAsync(UserUpdateDto dto);
         Task<BceidAccount?> GetBceidUserInfo();
+        Task<Dictionary<string, List<string>>> CreateApsUserAsync(ApsUserCreateDto dto);
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -480,6 +481,13 @@ namespace StrDss.Service
                 return errors;
             }
 
+            await ValidateOrgAndRoles(dto, errors);
+
+            return errors;
+        }
+
+        private async Task ValidateOrgAndRoles(IOrgRoles dto, Dictionary<string, List<string>> errors)
+        {
             var org = await _orgRepo.GetOrganizationByIdAsync(dto.RepresentedByOrganizationId);
             if (org == null)
             {
@@ -494,8 +502,6 @@ namespace StrDss.Service
                     errors.AddItem("roleCd", $"Role ({roleCd}) doesn't exist");
                 }
             }
-
-            return errors;
         }
 
         public async Task<BceidAccount?> GetBceidUserInfo()
@@ -515,6 +521,26 @@ namespace StrDss.Service
             }
 
             return null;
+        }
+
+        public async Task<Dictionary<string, List<string>>> CreateApsUserAsync(ApsUserCreateDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            if (string.IsNullOrEmpty(dto.DisplayNm))
+            {
+                errors.AddItem("client_id", "Client ID is mandatory.");
+            }
+
+            await ValidateOrgAndRoles(dto, errors);
+            
+            if (errors.Count > 0) return errors;
+
+            await _userRepo.CreateApsUserAsync(dto);
+            
+            _unitOfWork.Commit();
+
+            return errors;
         }
     }
 }

@@ -23,8 +23,7 @@ services:
     tags: [ns.strdata]
     enabled: true
     config:
-      allowed_iss:
-      - https://loginproxy.gov.bc.ca/auth/realms/apigw
+      allowed_iss: [https://loginproxy.gov.bc.ca/auth/realms/apigw, https://dev.loginproxy.gov.bc.ca/auth/realms/apigw, https://test.loginproxy.gov.bc.ca/auth/realms/apigw]
       allowed_aud: gateway-strdata
       run_on_preflight: true
       iss_key_grace_period: 10

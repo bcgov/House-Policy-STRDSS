@@ -11,6 +11,7 @@ namespace StrDss.Data.Mappings
         public ModelToEntityProfile()
         {
             CreateMap<UserCreateDto, DssUserIdentity>();
+            CreateMap<ApsUserCreateDto, DssUserIdentity>();
             CreateMap<UserDto, DssUserIdentity>();
             CreateMap<UserUpdateDto, DssUserIdentity>();
             CreateMap<AccessRequestDenyDto, DssUserIdentity>();

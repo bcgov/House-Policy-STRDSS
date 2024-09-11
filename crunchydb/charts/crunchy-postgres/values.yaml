@@ -36,7 +36,6 @@ pgBackRest:
   repos:
     schedules:
       full: 0 8 * * *
-      incremental: 0 0,4,12,16,20 * * *
     volume:
       accessModes: "ReadWriteOnce"
       storage: 64Mi

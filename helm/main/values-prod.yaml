@@ -20,6 +20,8 @@ global:
     'BCEID_CACHE_LIFESPAN': '600'
     'GEOCODER_URL': 'https://geocoder.api.gov.bc.ca'
     'ADDRESS_SCORE': '90'
+    'APS_AUTHORITY': 'https://loginproxy.gov.bc.ca/auth/realms/apigw'
+    'APS_GW_JWT_JWKS_URL': 'https://aps-jwks-upstream-jwt.api.gov.bc.ca/certs'
 
 nameOverride: strdss-prod
 fullnameOverride: strdss-prod

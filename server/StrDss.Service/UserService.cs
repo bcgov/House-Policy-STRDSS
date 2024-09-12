@@ -28,6 +28,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> UpdateUserAsync(UserUpdateDto dto);
         Task<BceidAccount?> GetBceidUserInfo();
         Task<Dictionary<string, List<string>>> CreateApsUserAsync(ApsUserCreateDto dto);
+        Task<(UserDto? user, List<string> permissions)> GetUserByDisplayNameAsync(string displayName);
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -58,6 +59,11 @@ namespace StrDss.Service
         public async Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid)
         {
             return await _userRepo.GetUserAndPermissionsByGuidAsync(guid);
+        }
+
+        public async Task<(UserDto? user, List<string> permissions)> GetUserByDisplayNameAsync(string displayName)
+        {
+            return await _userRepo.GetUserAndPermissionsByDisplayNameAsync(displayName);
         }
 
         public async Task<Dictionary<string, List<string>>> CreateAccessRequestAsync(AccessRequestCreateDto dto)

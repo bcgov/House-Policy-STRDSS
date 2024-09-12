@@ -1,9 +1,9 @@
 services:
 - name: strdata
-  host: strdss-dev-backend.b0471a-dev.svc
+  host: dev.strdata.gov.bc.ca
   tags: [ns.strdata]
-  port: 8080
-  protocol: http
+  port: 443
+  protocol: https
   retries: 0
   routes:
   - name: strdata

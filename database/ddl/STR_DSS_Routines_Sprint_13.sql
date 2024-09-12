@@ -37,6 +37,7 @@ BEGIN
 	ON (tgt.governing_business_licence_id = src.business_licence_id)
     WHEN MATCHED THEN
 		UPDATE SET
+			effective_business_licence_no = regexp_replace(UPPER(tgt.business_licence_no), '[^A-Z0-9]+', '', 'g'),
 			governing_business_licence_id = NULL,
 			is_changed_business_licence = false;
 
@@ -146,7 +147,7 @@ BEGIN
     -- Update dss_rental_listing if differing match found
 	MERGE INTO dss_rental_listing AS tgt
 	USING (
-		SELECT drl.rental_listing_id, dbl.business_licence_id
+		SELECT drl.rental_listing_id, dbl.business_licence_id, regexp_replace(UPPER(drl.business_licence_no), '[^A-Z0-9]+', '', 'g') AS normalized_business_licence_no
 		FROM dss_rental_listing drl
 		JOIN dss_physical_address dpa ON drl.locating_physical_address_id = dpa.physical_address_id
 		JOIN dss_organization lgs ON lgs.organization_id = dpa.containing_organization_id AND dpa.match_score_amt > 1
@@ -160,7 +161,9 @@ BEGIN
 	) AS src
 	ON (tgt.rental_listing_id = src.rental_listing_id)
     WHEN MATCHED THEN
-		UPDATE SET governing_business_licence_id = src.business_licence_id;
+		UPDATE SET
+			effective_business_licence_no = src.normalized_business_licence_no,
+			governing_business_licence_id = src.business_licence_id;
 
 	GET DIAGNOSTICS linked_count = ROW_COUNT;
 

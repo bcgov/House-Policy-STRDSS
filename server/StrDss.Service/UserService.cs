@@ -533,8 +533,13 @@ namespace StrDss.Service
             }
 
             await ValidateOrgAndRoles(dto, errors);
-            
-            if (errors.Count > 0) return errors;
+
+            if (!errors.Any() && await _userRepo.ApsUserExists(dto.DisplayNm))
+            {
+                errors.AddItem("client_id", $"The client ID {dto.DisplayNm} already exists.");
+            }
+
+            if (errors.Any()) return errors;
 
             await _userRepo.CreateApsUserAsync(dto);
             

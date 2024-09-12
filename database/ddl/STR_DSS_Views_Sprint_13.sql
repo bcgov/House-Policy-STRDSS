@@ -50,6 +50,8 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS select drl.rental_listing_id
 	, dem.message_delivery_dtm as last_action_dtm
 	, dbl.business_licence_id
 	, dbl.business_licence_no as business_licence_no_matched
+  , dbl.expiry_dt as business_licence_expiry_dt
+  , dbl.licence_status_type
 	, drl.effective_business_licence_no
 	, drl.effective_host_nm
 	, drl.is_changed_business_licence

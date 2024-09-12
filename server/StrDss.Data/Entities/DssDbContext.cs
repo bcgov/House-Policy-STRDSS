@@ -956,7 +956,6 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.BcRegistryNo)
                 .HasMaxLength(50)
                 .HasColumnName("bc_registry_no");
-            entity.Property(e => e.BusinessLicenceExpiryDt).HasColumnName("business_licence_expiry_dt");
             entity.Property(e => e.BusinessLicenceId).HasColumnName("business_licence_id");
             entity.Property(e => e.BusinessLicenceNo)
                 .HasMaxLength(320)
@@ -989,9 +988,6 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(250)
                 .HasColumnName("last_action_nm");
             entity.Property(e => e.LatestReportPeriodYm).HasColumnName("latest_report_period_ym");
-            entity.Property(e => e.LicenceStatusType)
-                .HasMaxLength(25)
-                .HasColumnName("licence_status_type");
             entity.Property(e => e.ListingContactNamesTxt).HasColumnName("listing_contact_names_txt");
             entity.Property(e => e.ListingStatusSortNo).HasColumnName("listing_status_sort_no");
             entity.Property(e => e.ListingStatusType)

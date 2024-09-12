@@ -24,6 +24,7 @@ namespace StrDss.Data.Repositories
         Task<List<DropdownStrDto>> GetAccessRequestStatuses();
         Task AcceptTermsConditions();
         Task UpdateUserNamesAsync(long userId, string firstName, string lastName);
+        Task CreateApsUserAsync(ApsUserCreateDto dto);
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
     {
@@ -206,6 +207,21 @@ namespace StrDss.Data.Repositories
             var entity = await _dbSet.FirstAsync(x => x.UserIdentityId == userId);
             entity.FamilyNm = lastName;
             entity.GivenNm = firstName;
+        }
+
+        public async Task CreateApsUserAsync(ApsUserCreateDto dto)
+        {
+            var userEntity = _mapper.Map<DssUserIdentity>(dto);
+            
+            var roleCds = dto.RoleCds.Distinct();
+
+            foreach (var roleCd in roleCds)
+            {
+                userEntity.DssUserRoleAssignments
+                    .Add(new DssUserRoleAssignment { UserRoleCd = roleCd });
+            }
+
+            await _dbContext.AddAsync(userEntity);
         }
     }
 }

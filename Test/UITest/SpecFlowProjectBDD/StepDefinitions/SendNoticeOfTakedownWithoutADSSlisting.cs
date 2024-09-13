@@ -3,6 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
 using SpecFlowProjectBDD.Helpers;
+using System.Diagnostics;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
@@ -17,7 +18,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private IDriver _Driver;
         private LandingPage _LandingPage;
         private DelistingWarningPage _DelistingWarningPage;
-        private TermsAndConditionsPage _TermsAndConditionsPage;
         private PathFinderPage _PathFinderPage;
         private BCIDPage _BCIDPage;
         private NoticeOfTakeDownPage _NoticeOfTakeDownPage;
@@ -32,7 +32,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
             _DelistingWarningPage = new DelistingWarningPage(_Driver);
-            _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
             _BCIDPage = new BCIDPage(_Driver);
@@ -57,23 +56,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             //Authenticate user using IDir or BCID depending on the user
             ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
 
-            IWebElement TOC = null;
-
-            try
-            {
-                TOC = _LandingPage.Driver.FindElement(Enums.FINDBY.CSSSELECTOR, TermsAndConditionsModel.TermsAndCondititionsCheckBox);
-            }
-            catch (NoSuchElementException ex)
-            {
-                //no Terms and Conditions. Continue
-            }
-
-
-            if ((null != TOC) && (TOC.Displayed))
-            {
-                _TermsAndConditionsPage.TermsAndConditionsCheckBox.Click();
-                _TermsAndConditionsPage.ContinueButton.Click();
-            }
+            TermsAndConditionsHelper termsAndConditionsHelper = new TermsAndConditionsHelper(_Driver);
+            termsAndConditionsHelper.HandleTermsAndConditions();
         }
 
         [When("I navigate to the delisting warning feature")]

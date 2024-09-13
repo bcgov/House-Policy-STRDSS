@@ -52,9 +52,6 @@ namespace SpecFlowProjectBDD.Helpers
                 default:
                     throw new ArgumentException("Unknown User Type (" + UserType + ")");
             }
-            if (null == logonType)
-            {
-            }
             return (logonType);
         }
 

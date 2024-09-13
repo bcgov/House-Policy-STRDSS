@@ -36,16 +36,11 @@ namespace StrDss.Api.Authentication
         //    return base.Challenge(context);
         //}
 
-        //public override Task AuthenticationFailed(AuthenticationFailedContext context)
-        //{
-        //    var username = context.HttpContext.User?.Identity?.Name ?? "Unknown";
-        //    var ipAddress = context.HttpContext.Connection.RemoteIpAddress;
-        //    var ip = ipAddress == null ? "Unknown" : ipAddress.ToString();
-
-        //    _logger.LogInformation($"[AUTH] Authentication failed for user '{username}' from IP address '{ip}'.");
-
-        //    return base.AuthenticationFailed(context);
-        //}
+        public override async Task AuthenticationFailed(AuthenticationFailedContext context)
+        {
+            _logger.LogWarning("KcJwt Authentication failed: " + context.Exception.Message);
+            await base.AuthenticationFailed(context);
+        }
 
         public override async Task TokenValidated(TokenValidatedContext context)
         {

@@ -25,29 +25,19 @@ namespace StrDss.Api.Authentication
             _memoryCache = memoryCache;
         }
 
-        //public override async Task AuthenticationFailed(AuthenticationFailedContext context)
-        //{
-        //    var clientId = context.HttpContext.User?.FindFirst(StrDssClaimTypes.ClientId)?.Value ?? "Unknown";
-        //    var ipAddress = context.HttpContext.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP";
-
-        //    clientId = clientId == "" ? "" : clientId;
-
-        //    _logger.LogWarning($"[AUTH] Aps Authentication failed for user '{clientId}' from IP address '{ipAddress}'.");
-
-        //    await base.AuthenticationFailed(context);
-        //}
-
         public override async Task TokenValidated(TokenValidatedContext context)
         {
             _logger.LogDebug($"[AUTH] Token Validated with APS JWT");
 
             _currentUser.LoadApsSession(context!.Principal!);
 
-            var (user, permissions) = await _userService.GetUserByGuidAsync(_currentUser.UserGuid);
+            var (user, permissions) = await _userService.GetUserByDisplayNameAsync(_currentUser.DisplayName);
 
             if (user == null)
             {
                 var errorMessage = $"{_currentUser.DisplayName} is not registered.";
+                _logger.LogWarning(errorMessage);
+
                 context.Response.StatusCode = 401;
                 context.Fail($"Unauthorized: {errorMessage}");
                 return;

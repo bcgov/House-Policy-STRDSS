@@ -284,7 +284,7 @@
         public const string SecurityIdentifierId = "security_identifier_id";
         public const string Expired = "expired";
         public const string StrDssCred = "str_dss_cred";
-        public const string ClientId = "clientId";
+        public const string ClientId = "client_id";
 
         public static string GetSimpleName(string fullName)
         {

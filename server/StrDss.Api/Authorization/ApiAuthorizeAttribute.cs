@@ -35,20 +35,23 @@ namespace StrDss.Api.Authorization
             var identityProviderNm = user.GetCustomClaim(StrDssClaimTypes.IdentityProvider);
             var displayName = user.GetCustomClaim(StrDssClaimTypes.DisplayName);
             
-            Guid userGuid;
+            string userGuid;
             switch (identityProviderNm)
             {
                 case StrDssIdProviders.Idir:
-                    userGuid = new Guid(user.GetCustomClaim(StrDssClaimTypes.IdirUserGuid));
+                    userGuid = user.GetCustomClaim(StrDssClaimTypes.IdirUserGuid);
                     break;
                 case StrDssIdProviders.BceidBusiness:
-                    userGuid = new Guid(user.GetCustomClaim(StrDssClaimTypes.BceidUserGuid));
+                    userGuid = user.GetCustomClaim(StrDssClaimTypes.BceidUserGuid);
                     break;
                 case StrDssIdProviders.StrDss:
-                    userGuid = new Guid(user.GetCustomClaim(StrDssClaimTypes.StrDssUserGuid));
+                    userGuid = user.GetCustomClaim(StrDssClaimTypes.StrDssUserGuid);
+                    break;
+                case StrDssIdProviders.Aps:
+                    userGuid = user.GetCustomClaim(StrDssClaimTypes.ClientId);
                     break;
                 default:
-                    userGuid = Guid.Empty;
+                    userGuid = "";
                     break;
             }
 

@@ -18,6 +18,7 @@ using StrDss.Api;
 using StrDss.Service.Bceid;
 using Npgsql;
 using Serilog;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -96,6 +97,8 @@ builder.Services.AddSingleton<IFieldValidatorService, FieldValidatorService>();
 builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddBceidSoapClient(builder.Configuration);
 
+builder.Services.AddMemoryCache();
+
 var mappingConfig = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile(new EntityToModelProfile());
@@ -108,8 +111,9 @@ var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 builder.Services.AddScoped<KcJwtBearerEvents>();
+builder.Services.AddScoped<ApsJwtBearerEvents>();
 
-//var strDssAuthScheme = "str_dss";
+var apsAuthScheme = "aps";
 
 //Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -127,12 +131,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAlgorithms = new List<string>() { "RS256" },
         };
     })
+    .AddJwtBearer(apsAuthScheme, options =>
+    {
+        options.Authority = builder.Configuration.GetValue<string>("APS_AUTHORITY");
+        options.IncludeErrorDetails = true;
+        options.EventsType = typeof(ApsJwtBearerEvents);
+        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidAlgorithms = new List<string>() { "RS256" },
+        };
+    })
 ;
 
 builder.Services.AddAuthorization(options =>
 {
     var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
-        JwtBearerDefaults.AuthenticationScheme);
+        JwtBearerDefaults.AuthenticationScheme, apsAuthScheme);
     defaultAuthorizationPolicyBuilder =
         defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
     options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
@@ -177,6 +195,26 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+//app.Use(async (context, next) =>
+//{
+//    var result = await context.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
+
+//    if (!result.Succeeded)
+//    {
+//        // Try to authenticate with the second scheme
+//        result = await context.AuthenticateAsync(apsAuthScheme);
+
+//        if (!result.Succeeded)
+//        {
+//            // Authentication failed for both schemes, challenge the user
+//            await context.ChallengeAsync(apsAuthScheme);
+//            return;
+//        }
+//    }
+
+//    await next();
+//});
 
 app.MapControllers();
 

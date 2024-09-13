@@ -106,6 +106,8 @@ var mappingConfig = new MapperConfiguration(cfg =>
 var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
+builder.Services.AddMemoryCache();
+
 builder.Services
     .AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)

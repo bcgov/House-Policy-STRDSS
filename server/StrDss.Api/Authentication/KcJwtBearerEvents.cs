@@ -4,6 +4,7 @@ using StrDss.Model;
 using StrDss.Model.UserDtos;
 using StrDss.Service;
 using StrDss.Service.Bceid;
+using System.Net;
 
 namespace StrDss.Api.Authentication
 {
@@ -22,33 +23,34 @@ namespace StrDss.Api.Authentication
             _logger = logger;
         }
 
-        public override Task Challenge(JwtBearerChallengeContext context)
-        {
-            var username = context.HttpContext.User?.Identity?.Name ?? "Unknown";
-            var ipAddress = context.HttpContext.Connection.RemoteIpAddress;
-            var ip = ipAddress == null ? "Unknown" : ipAddress.ToString();
+        //public override async Task AuthenticationFailed(AuthenticationFailedContext context)
+        //{
+        //    try
+        //    {
+        //        var username = context.HttpContext.User?.Identity?.Name ?? "Unknown";
+        //        var ipAddress = context.HttpContext.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP";
 
-            if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
-            {
-                _logger.LogWarning($"[AUTH] Authentication failed for user '{username}' from IP address '{ip}'. Authorization header is missing.");
-            }
+        //        if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
+        //        {
+        //            _logger.LogWarning($"[AUTH] KC Authentication failed for user '{username}' from IP address '{ipAddress}'. Authorization header is missing.");
+        //        }
+        //        else
+        //        {
+        //            _logger.LogDebug($"[AUTH] Authorization header present. Proceeding with Aps authentication for user '{username}' from IP address '{ipAddress}'.");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An error occurred while processing the authentication failure.");
+        //    }
 
-            return base.Challenge(context);
-        }
-
-        public override Task AuthenticationFailed(AuthenticationFailedContext context)
-        {
-            var username = context.HttpContext.User?.Identity?.Name ?? "Unknown";
-            var ipAddress = context.HttpContext.Connection.RemoteIpAddress;
-            var ip = ipAddress == null ? "Unknown" : ipAddress.ToString();
-
-            _logger.LogInformation($"[AUTH] Authentication failed for user '{username}' from IP address '{ip}'.");
-
-            return base.AuthenticationFailed(context);
-        }
+        //    await base.AuthenticationFailed(context);
+        //}
 
         public override async Task TokenValidated(TokenValidatedContext context)
         {
+            _logger.LogDebug($"[AUTH] Token Validated with KC JWT");
+
             _currentUser.LoadUserSession(context!.Principal!);
 
             var (user, permissions) = await _userService.GetUserByGuidAsync(_currentUser.UserGuid);

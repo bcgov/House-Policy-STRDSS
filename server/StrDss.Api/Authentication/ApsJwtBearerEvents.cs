@@ -27,7 +27,13 @@ namespace StrDss.Api.Authentication
 
         public override async Task AuthenticationFailed(AuthenticationFailedContext context)
         {
-            _logger.LogWarning("ApsJwt Authentication failed: " + context.Exception.Message);
+            var clientId = context.HttpContext.User?.FindFirst(StrDssClaimTypes.ClientId)?.Value ?? "Unknown";
+            var ipAddress = context.HttpContext.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP";
+
+            clientId = clientId == "" ? "" : clientId;
+
+            _logger.LogWarning($"[AUTH] Aps Authentication failed for user '{clientId}' from IP address '{ipAddress}'.");
+
             await base.AuthenticationFailed(context);
         }
 

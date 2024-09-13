@@ -17,6 +17,7 @@ namespace StrDss.Service
         Task<List<DropdownNumDto>> GetOrganizationsDropdownAsync(string? type);
         Task<OrganizationDto?> GetOrganizationByIdAsync(long id);
         Task<long?> GetContainingOrganizationId(Point point);
+        Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -52,6 +53,11 @@ namespace StrDss.Service
         public async Task<long?> GetContainingOrganizationId(Point point)
         {
             return await _orgRepo.GetContainingOrganizationId(point);
+        }
+
+        public async Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude)
+        {
+            return await _orgRepo.GetStrRequirements(longitude, latitude);
         }
     }
 }

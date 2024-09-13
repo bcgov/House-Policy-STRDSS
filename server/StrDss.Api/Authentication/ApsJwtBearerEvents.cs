@@ -25,20 +25,22 @@ namespace StrDss.Api.Authentication
             _memoryCache = memoryCache;
         }
 
-        public override async Task AuthenticationFailed(AuthenticationFailedContext context)
-        {
-            var clientId = context.HttpContext.User?.FindFirst(StrDssClaimTypes.ClientId)?.Value ?? "Unknown";
-            var ipAddress = context.HttpContext.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP";
+        //public override async Task AuthenticationFailed(AuthenticationFailedContext context)
+        //{
+        //    var clientId = context.HttpContext.User?.FindFirst(StrDssClaimTypes.ClientId)?.Value ?? "Unknown";
+        //    var ipAddress = context.HttpContext.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP";
 
-            clientId = clientId == "" ? "" : clientId;
+        //    clientId = clientId == "" ? "" : clientId;
 
-            _logger.LogWarning($"[AUTH] Aps Authentication failed for user '{clientId}' from IP address '{ipAddress}'.");
+        //    _logger.LogWarning($"[AUTH] Aps Authentication failed for user '{clientId}' from IP address '{ipAddress}'.");
 
-            await base.AuthenticationFailed(context);
-        }
+        //    await base.AuthenticationFailed(context);
+        //}
 
         public override async Task TokenValidated(TokenValidatedContext context)
         {
+            _logger.LogDebug($"[AUTH] Token Validated with APS JWT");
+
             _currentUser.LoadApsSession(context!.Principal!);
 
             var (user, permissions) = await _userService.GetUserByGuidAsync(_currentUser.UserGuid);

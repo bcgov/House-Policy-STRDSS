@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,7 @@ namespace StrDss.Data.Repositories
         Task<OrganizationDto> GetOrganizationByOrgCdAsync(string orgCd);
         Task<long?> GetContainingOrganizationId(Point point);
         Task<long?> GetManagingOrgId(long orgId);
+        Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -121,6 +123,28 @@ namespace StrDss.Data.Repositories
         {
             var org = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == orgId);
             return org?.ManagingOrganizationId;
+        }
+
+        public async Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude)
+        {
+            var point = new Point(longitude, latitude) { SRID = 4326 };
+
+            var strRequirement = await _dbContext.DssOrganizations
+                .FromSqlRaw(@"
+                    SELECT organization_nm, is_principal_residence_required, is_business_licence_required 
+                    FROM dss_organization
+                    WHERE organization_id = dss_containing_organization_id({0})", point)
+
+                .Select(o => new StrRequirementsDto
+                {
+                    OrganizationNm = o.OrganizationNm,
+                    IsPrincipalResidenceRequired = o.IsPrincipalResidenceRequired,
+                    IsBusinessLicenceRequired = o.IsBusinessLicenceRequired,
+                    IsStrProhibited = null
+                })
+                .FirstOrDefaultAsync();
+
+            return strRequirement;
         }
     }
 }

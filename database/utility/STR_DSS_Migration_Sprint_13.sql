@@ -31,6 +31,8 @@ as db_has_new_proc
 	\ir '../ddl/STR_DSS_Views_Sprint_13.sql'
 	\echo 'Creating routines'
 	\ir '../ddl/STR_DSS_Routines_Sprint_13.sql'
+	\echo 'Calling Correct_Rental_Listings_Sprint_13.sql'
+	\ir '../utility/Correct_Rental_Listings_Sprint_13.sql'
 \elif :db_has_dss_tab
 	\echo 'Database migration state is unknown - Exiting without changes'
 \else

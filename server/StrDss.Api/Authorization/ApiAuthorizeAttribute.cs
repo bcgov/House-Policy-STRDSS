@@ -32,32 +32,40 @@ namespace StrDss.Api.Authorization
                 return;
             }
 
+            var clientId = user.GetCustomClaim(StrDssClaimTypes.ClientId);
+
             var identityProviderNm = user.GetCustomClaim(StrDssClaimTypes.IdentityProvider);
+
+            if (identityProviderNm == "" && clientId != "")
+            {
+                identityProviderNm = StrDssIdProviders.Aps;
+            }
+
             var displayName = user.GetCustomClaim(StrDssClaimTypes.DisplayName);
             
-            string userGuid;
+            string userId;
             switch (identityProviderNm)
             {
                 case StrDssIdProviders.Idir:
-                    userGuid = user.GetCustomClaim(StrDssClaimTypes.IdirUserGuid);
+                    userId = user.GetCustomClaim(StrDssClaimTypes.IdirUserGuid);
                     break;
                 case StrDssIdProviders.BceidBusiness:
-                    userGuid = user.GetCustomClaim(StrDssClaimTypes.BceidUserGuid);
+                    userId = user.GetCustomClaim(StrDssClaimTypes.BceidUserGuid);
                     break;
                 case StrDssIdProviders.StrDss:
-                    userGuid = user.GetCustomClaim(StrDssClaimTypes.StrDssUserGuid);
+                    userId = user.GetCustomClaim(StrDssClaimTypes.StrDssUserGuid);
                     break;
                 case StrDssIdProviders.Aps:
-                    userGuid = user.GetCustomClaim(StrDssClaimTypes.ClientId);
+                    userId = clientId;
                     break;
                 default:
-                    userGuid = "";
+                    userId = "Unknown";
                     break;
             }
 
             if (_permissions.Length == 0)
             {
-                _logger.LogInformation($"[AUTH] User '{userGuid}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
+                _logger.LogInformation($"[AUTH] User '{userId}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
                 return;
             }
 
@@ -74,12 +82,12 @@ namespace StrDss.Api.Authorization
 
             if (!hasPermission)
             {
-                _logger.LogInformation($"[AUTH] User '{userGuid}' does not have permission to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
+                _logger.LogInformation($"[AUTH] User '{userId}' does not have permission to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
                 context.Result = new UnauthorizedResult(); //401
                 return;
             }
 
-            _logger.LogInformation($"[AUTH] User '{userGuid}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
+            _logger.LogInformation($"[AUTH] User '{userId}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
         }
     }
 }

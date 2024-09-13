@@ -142,6 +142,7 @@ namespace StrDss.Data.Repositories
                     IsBusinessLicenceRequired = o.IsBusinessLicenceRequired,
                     IsStrProhibited = null
                 })
+                .OrderBy(o => o.OrganizationNm)
                 .FirstOrDefaultAsync();
 
             return strRequirement;

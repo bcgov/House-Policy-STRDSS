@@ -43,5 +43,30 @@ namespace StrDss.Api.Controllers
         {
             return Ok(await _orgService.GetOrganizationsDropdownAsync(type));
         }
+
+        [ApiAuthorize]
+        [HttpGet("strrequirements", Name = "GetStrRequirements")]
+        public async Task<ActionResult<StrRequirementsDto>> GetStrRequirements(double longitude, double latitude)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            if (longitude < -180 || longitude > 180)
+                errors.AddItem("logitude", "Longitude must be between -180 and 180 degrees.");
+
+            if (latitude < -90 || latitude > 90)
+                errors.AddItem("latitude", "Longitude must be between -180 and 180 degrees.");
+
+            if (errors.Any())
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext, "One or more validation errors occurred.");
+
+            var strRequirement = await _orgService.GetStrRequirements(longitude, latitude);
+
+            if (strRequirement == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(await _orgService.GetStrRequirements(longitude, latitude));
+        }
     }
 }

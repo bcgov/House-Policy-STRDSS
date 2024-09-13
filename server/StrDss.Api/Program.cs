@@ -196,26 +196,6 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-//app.Use(async (context, next) =>
-//{
-//    var result = await context.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
-
-//    if (!result.Succeeded)
-//    {
-//        // Try to authenticate with the second scheme
-//        result = await context.AuthenticateAsync(apsAuthScheme);
-
-//        if (!result.Succeeded)
-//        {
-//            // Authentication failed for both schemes, challenge the user
-//            await context.ChallengeAsync(apsAuthScheme);
-//            return;
-//        }
-//    }
-
-//    await next();
-//});
-
 app.MapControllers();
 
 app.Run();

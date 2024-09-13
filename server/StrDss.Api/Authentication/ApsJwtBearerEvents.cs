@@ -43,11 +43,13 @@ namespace StrDss.Api.Authentication
 
             _currentUser.LoadApsSession(context!.Principal!);
 
-            var (user, permissions) = await _userService.GetUserByGuidAsync(_currentUser.UserGuid);
+            var (user, permissions) = await _userService.GetUserByDisplayNameAsync(_currentUser.DisplayName);
 
             if (user == null)
             {
                 var errorMessage = $"{_currentUser.DisplayName} is not registered.";
+                _logger.LogWarning(errorMessage);
+
                 context.Response.StatusCode = 401;
                 context.Fail($"Unauthorized: {errorMessage}");
                 return;

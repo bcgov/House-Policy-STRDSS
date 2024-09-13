@@ -277,6 +277,9 @@ namespace StrDss.Data.Repositories
                 group.PrimaryHostNm = listingWithLatestAction.Hosts.Where(x => x.IsPropertyOwner).Select(x => x.FullNm).FirstOrDefault();
                 group.LastActionNm = listingWithLatestAction.LastActionNm;
                 group.LastActionDtm = listingWithLatestAction.LastActionDtm;
+                group.BusinessLicenceId = listingWithLatestAction.BusinessLicenceId;
+                group.BusinessLicenceExpiryDt = listingWithLatestAction.BusinessLicenceExpiryDt;
+                group.LicenceStatusType = listingWithLatestAction.LicenceStatusType;
             }
 
             stopwatch.Stop();

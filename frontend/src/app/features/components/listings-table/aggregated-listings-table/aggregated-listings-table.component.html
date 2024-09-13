@@ -74,7 +74,7 @@
                             *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'asc'"></i>
                     </th>
 
-                    <th>Nights Stayed (YTD) </th>
+                    <th>Nights stayed (12M)</th>
 
                     <th class="sortable-header" id="licence_header"
                         [class.sorted]="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo'"
@@ -101,8 +101,20 @@
                     </td>
                     <td>{{ row.primaryHostNm }}</td>
                     <td>{{ row.matchAddressTxt }} </td>
-                    <td>{{ row.nightsBookedYtdQty }}</td>
-                    <td>{{ row.businessLicenceNo }}</td>
+                    <td>
+                        <span [class.night-stayed-exceeded]="row.nightsBookedYtdQty>90">
+                            {{ row.nightsBookedYtdQty }}
+                            <i class="pi pi-info-circle" pTooltip="Over 90 nights stayed"
+                                *ngIf="row.nightsBookedYtdQty>90"></i>
+                        </span>
+                    </td>
+                    <td>
+                        <span [class.invalid-bl]="row">
+                            {{ row.businessLicenceNo }}
+                            <i class="pi pi-info-circle" pTooltip="May Not Have a Valid Business Licence"
+                                *ngIf="row"></i>
+                        </span>
+                    </td>
                     <td>{{ row.lastActionNm }}</td>
                     <td>{{ row.lastActionDtm |date }}</td>
                 </tr>
@@ -125,7 +137,7 @@
                     <th>Listing ID</th>
                     <th>Listing Details</th>
                     <th>Address (Best Match)</th>
-                    <th>Nights Stayed (YTD)</th>
+                    <th>Nights stayed (12M)</th>
                     <th>Business Licence on Listing</th>
                     <th>Matched Business Licence</th>
                     <th>Last Action</th>
@@ -186,6 +198,8 @@
                             <span>
                                 {{ listing.businessLicenceNoMatched || '-' }}
                             </span>
+                            <!-- <i class="pi pi-info-circle" pTooltip="No Business Licence Match Found"
+                                *ngIf="listing.matchScoreAmt<=addressLowScore && (!listing.isMatchVerified && !listing.isMatchCorrected)"></i> -->
                             <p-tag *ngIf="listing.isChangedBusinessLicence" value="Updated" class="updated-tag"></p-tag>
                         </div>
                     </td>

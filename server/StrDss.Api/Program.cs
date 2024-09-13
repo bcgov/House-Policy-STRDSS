@@ -18,6 +18,7 @@ using StrDss.Api;
 using StrDss.Service.Bceid;
 using Npgsql;
 using Serilog;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -194,6 +195,26 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+//app.Use(async (context, next) =>
+//{
+//    var result = await context.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
+
+//    if (!result.Succeeded)
+//    {
+//        // Try to authenticate with the second scheme
+//        result = await context.AuthenticateAsync(apsAuthScheme);
+
+//        if (!result.Succeeded)
+//        {
+//            // Authentication failed for both schemes, challenge the user
+//            await context.ChallengeAsync(apsAuthScheme);
+//            return;
+//        }
+//    }
+
+//    await next();
+//});
 
 app.MapControllers();
 

@@ -122,7 +122,10 @@
 
             <div class="row">
                 <span class="label">Business Licence on Listing:</span>
-                <span class="value">{{listing.businessLicenceNo}}</span>
+                <span class="value" [class.status-red]="!listing.businessLicenceNo">{{listing.businessLicenceNo || '-'}}
+                    <i class="pi pi-info-circle" pTooltip="No Business Licence Match Found"
+                        *ngIf="!listing.businessLicenceNo"></i>
+                </span>
             </div>
 
             <div class="spacer-hr"> </div>
@@ -317,11 +320,18 @@
                     <strong>Licence Type:</strong> <span class="value">{{blInfo.licenceTypeTxt ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.expiryDt" class="row">
-                    <strong>Expiry Date: </strong> <span class="value">{{blInfo.expiryDt |date:'YYYY-MM-dd'}}</span>
+                    <strong>Expiry Date: </strong> <span class="value"
+                        [class.status-red]="blInfo.licenceStatusType =='EXPIRED'">{{blInfo.expiryDt
+                        |date:'YYYY-MM-dd'}}</span>
                 </div>
                 <div *ngIf="blInfo?.licenceStatusType" class="row">
                     <strong>Status:</strong> <span class="status-name value"
-                        [class.status-red]="blInfo.licenceStatusType!=='ISSUED'">{{blInfo.licenceStatus.licenceStatusTypeNm}}</span>
+                        [class.status-red]="blInfo.licenceStatusType!=='ISSUED'">{{blInfo.licenceStatus.licenceStatusTypeNm}}
+                        <i class="pi pi-info-circle" pTooltip="Business Licence Status may be Invalid"
+                            *ngIf="blInfo.licenceStatusType!=='ISSUED' && blInfo.licenceStatusType!=='EXPIRED'"></i>
+                        <i class="pi pi-info-circle" pTooltip="Business Licence is expired"
+                            *ngIf="blInfo.licenceStatusType==='EXPIRED'"></i>
+                    </span>
                 </div>
                 <div *ngIf="blInfo?.restrictionTxt" class="row">
                     <strong>Restriction Note:</strong> <span class="value">{{blInfo.restrictionTxt || 'N/A'}}</span>

@@ -109,10 +109,10 @@
                         </span>
                     </td>
                     <td>
-                        <span [class.invalid-bl]="row">
+                        <span [class.invalid-bl]="row.licenceStatusType !== 'ISSUED'">
                             {{ row.businessLicenceNo }}
                             <i class="pi pi-info-circle" pTooltip="May Not Have a Valid Business Licence"
-                                *ngIf="row"></i>
+                                *ngIf="row.licenceStatusType !== 'ISSUED'"></i>
                         </span>
                     </td>
                     <td>{{ row.lastActionNm }}</td>
@@ -195,12 +195,15 @@
                     </td>
                     <td>
                         <div class="bl-matched-col">
-                            <span>
+                            <span [class.invalid-bl]="listing.licenceStatusType !== 'ISSUED'">
                                 {{ listing.businessLicenceNoMatched || '-' }}
+                                <i class="pi pi-info-circle"
+                                    [pTooltip]="listing.businessLicenceId?'Business Licence May Be Expired, Suspended or Cancelled':'No Business Licence Match Found'"
+                                    *ngIf="listing.licenceStatusType !== 'ISSUED'"></i>
+                                <p-tag *ngIf="listing.isChangedBusinessLicence" value="Updated"
+                                    class="updated-tag"></p-tag>
                             </span>
-                            <!-- <i class="pi pi-info-circle" pTooltip="No Business Licence Match Found"
-                                *ngIf="listing.matchScoreAmt<=addressLowScore && (!listing.isMatchVerified && !listing.isMatchCorrected)"></i> -->
-                            <p-tag *ngIf="listing.isChangedBusinessLicence" value="Updated" class="updated-tag"></p-tag>
+
                         </div>
                     </td>
                     <td>{{ listing.lastActionNm }}</td>

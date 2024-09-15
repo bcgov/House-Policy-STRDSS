@@ -1,6 +1,6 @@
 <div class="title">Send Takedown Request</div>
 <p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
-<div *ngIf="!hideForm" class="sub-title">Complete the following fields to send a Takedown Request to an STR Platform
+<div class="sub-title">Complete the following fields to send a Takedown Request to an STR Platform
     representative.
     <br>
     <br>
@@ -9,7 +9,7 @@
     where stated.
 </div>
 
-<form *ngIf="!hideForm" [formGroup]="myForm" (ngSubmit)="onPreview()">
+<form [formGroup]="myForm" (ngSubmit)="onPreview()">
     <div class="form-group-row">
         <div class="form-group-row-col">
             <label for="platformId">Select a Platform Representative for</label>
@@ -115,5 +115,3 @@
             (click)="onPreviewClose()">Cancel</button>
     </div>
 </p-dialog>
-<button *ngIf="hideForm" pButton id="return-home-btn" name="return-home-btn" (click)="onReturnHome()">Return
-    Home</button>

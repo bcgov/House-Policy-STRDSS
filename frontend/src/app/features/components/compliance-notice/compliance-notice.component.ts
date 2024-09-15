@@ -20,6 +20,7 @@ import { MessagesModule } from 'primeng/messages';
 import { Router } from '@angular/router';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { ErrorHandlingService } from '../../../common/services/error-handling.service';
 
 @Component({
   selector: 'app-compliance-notice',
@@ -48,7 +49,6 @@ export class ComplianceNoticeComponent implements OnInit {
   platformOptions = new Array<DropdownOption>();
 
   isPreviewVisible = false;
-  hideForm = false;
   previewText = 'No preview'
 
   messages = new Array<Message>();
@@ -84,6 +84,7 @@ export class ComplianceNoticeComponent implements OnInit {
     private router: Router,
     private loaderService: GlobalLoaderService,
     private cd: ChangeDetectorRef,
+    private messageService: ErrorHandlingService,
   ) { }
 
   ngOnInit(): void {
@@ -137,7 +138,7 @@ export class ComplianceNoticeComponent implements OnInit {
       this.delistingService.createComplianceNotice(model)
         .subscribe({
           next: (_) => {
-            this.showSuccessMessage();
+            this.messageService.showSuccess('Your Notice of Non-Compliance was Successfully Submitted!');
           },
           error: (error) => {
             this.showErrors(error);
@@ -173,15 +174,6 @@ export class ComplianceNoticeComponent implements OnInit {
 
   cleanupPopupComment(commentTextArea: HTMLTextAreaElement): void {
     commentTextArea.value = '';
-  }
-
-  onReturnHome(): void {
-    this.router.navigateByUrl('/');
-  }
-
-  showSuccessMessage(): void {
-    this.hideForm = true;
-    this.messages = [{ severity: 'success', summary: '', detail: 'Your Notice of Non-Compliance was Successfully Submitted!' }];
   }
 
   private prepareFormModel(form: FormGroup): ComplianceNotice {

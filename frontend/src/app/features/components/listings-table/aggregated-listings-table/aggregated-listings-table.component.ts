@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
@@ -7,7 +7,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
-import { PaginatorModule } from 'primeng/paginator';
+import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { PanelModule } from 'primeng/panel';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SidebarModule } from 'primeng/sidebar';
@@ -55,6 +55,7 @@ import { ListingDetails } from '../../../../common/models/listing-details';
   styleUrl: './aggregated-listings-table.component.scss'
 })
 export class AggregatedListingsTableComponent implements OnInit {
+  @ViewChild("paginator") paginator!: Paginator;
 
   selectedListings: { [key: string]: ListingTableRow } = {};
   aggregatedListings = new Array<AggregatedListingTableRow>();
@@ -146,7 +147,7 @@ export class AggregatedListingsTableComponent implements OnInit {
       group.listings.forEach(l => {
         l.selected = true;
         this.selectedListings[l.rentalListingId] = l;
-      })
+      });
     } else {
       group.listings.forEach(l => {
         l.selected = false;
@@ -184,7 +185,7 @@ export class AggregatedListingsTableComponent implements OnInit {
       this.sort = { prop: property, dir: 'asc' };
     }
 
-    this.getListings(this.currentPage.pageNumber);
+    this.paginator.changePage(0);
   }
 
   unselectAll(): void {

@@ -1,0 +1,62 @@
+<h2>Add APS User Information</h2>
+
+<div class="card">
+    <div class="header">User Details, Status, Roles and Permissions</div>
+    <div class="content">
+        <div class="value-block">
+            <div class="label"><strong>Client ID</strong> </div>
+            <div class="value">
+                <input type="text" placeholder="Enter Client ID" pInputText class="width320px"
+                    [(ngModel)]="user.displayNm">
+            </div>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>Organization Type</strong> </div>
+            <p-dropdown class="full-width-text-field" appendTo="body" [options]="orgTypes" [(ngModel)]="selectedOrgType"
+                placeholder="Please Select" (onChange)="onOrgTypeChanged($event)">
+            </p-dropdown>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>Organization Name</strong> </div>
+            <p-dropdown [filter]="true" class="full-width-text-field" appendTo="body" [options]="organizations"
+                [(ngModel)]="selectedOrg" placeholder="Please Select">
+            </p-dropdown>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>Current Status</strong> </div>
+            <div class="status-checkboxes">
+                <div class="radio">
+                    <p-radioButton name="active-radio" value="Active" [(ngModel)]="state"
+                        inputId="active-radio"></p-radioButton>
+                    <label for="active-radio" class="ml-2">Active</label>
+                </div>
+
+                <div class="radio">
+                    <p-radioButton name="disabled-radio" value="Disabled" [(ngModel)]="state"
+                        inputId="disabled-radio"></p-radioButton>
+                    <label for="disabled-radio" class="ml-2">Disabled</label>
+                </div>
+            </div>
+        </div>
+        <div class="value-block">
+            <div class="label"><strong>User Role(s) and Permission(s)</strong> </div>
+            <div class="tags-block">
+                <p-multiSelect placeholder="Please Select" [options]="roles" class="width320px" [maxSelectedLabels]="2"
+                    [(ngModel)]="user.roleCds" appendTo="body"
+                    (onChange)="onSelectedRolesChanged($event)"></p-multiSelect>
+                <br>
+                <a class="link-to-roles" [routerLink]="'/roles'" target="_blank">View All Roles and Permissions</a>
+                <div class="tags-content">
+                    <p-tag [style]="{'background-color':'#D8EAFD', 'color':'#2D2D2D'}" *ngFor="let tag of tags"
+                        [value]="tag"></p-tag>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="actions">
+    <button pButton [disabled]="!user.displayNm || !selectedOrg ||!user.roleCds.length" (click)="onSave()">Save</button>
+    <button pButton class="outline-btn" (click)="onCancel()">Cancel</button>
+</div>

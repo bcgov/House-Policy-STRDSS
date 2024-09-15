@@ -81,6 +81,12 @@ body {
                 width: 100%;
             }
         }
+
+        &.width320px {
+            .p-multiselect {
+                width: 320px;
+            }
+        }
     }
 
     p-dropdown,
@@ -102,6 +108,10 @@ body {
             .p-multiselect {
                 width: 100%;
             }
+        }
+
+        &.width320px {
+            width: 320px;
         }
 
         &.width340px {

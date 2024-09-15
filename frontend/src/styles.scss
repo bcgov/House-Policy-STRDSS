@@ -28,6 +28,12 @@
     font-weight: 400;
 }
 
+@media print {
+    .do-not-print-it {
+        display: none !important;
+    }
+}
+
 body {
     margin: 0;
 

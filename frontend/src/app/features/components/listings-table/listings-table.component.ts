@@ -54,7 +54,7 @@ import { FilterPersistenceService } from '../../../common/services/filter-persis
   styleUrl: './listings-table.component.scss'
 })
 export class ListingsTableComponent implements OnInit {
-  @ViewChild('pagingRef') pagingRef!: Paginator;
+  @ViewChild("paginator") paginator!: Paginator;
 
   selectedListings = []
   listings = new Array<ListingTableRow>();
@@ -155,7 +155,7 @@ export class ListingsTableComponent implements OnInit {
       this.sort = { prop: property, dir: 'asc' };
     }
 
-    this.getListings(this.currentPage.pageNumber);
+    this.paginator.changePage(0);
   }
 
   unselectAll(): void {
@@ -317,7 +317,6 @@ export class ListingsTableComponent implements OnInit {
       next: (res: PagingResponse<ListingTableRow>) => {
         this.currentPage = res.pageInfo;
         this.listings = res.sourceList;
-        this.pagingRef.updateFirst();
       },
       complete: () => {
         this.loaderService.loadingEnd();

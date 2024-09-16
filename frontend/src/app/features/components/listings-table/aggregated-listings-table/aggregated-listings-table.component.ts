@@ -227,7 +227,12 @@ export class AggregatedListingsTableComponent implements OnInit {
   }
 
   onSearch(): void {
-    this.getListings(this.currentPage.pageNumber);
+    this.paginator.changePage(0);
+  }
+
+  clearSearchBy(_event: any): void {
+    this.searchColumn = 'all';
+    this.cd.detectChanges();
   }
 
   get isFilterSet(): boolean {

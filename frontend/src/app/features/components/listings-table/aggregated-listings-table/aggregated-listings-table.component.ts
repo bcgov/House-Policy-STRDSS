@@ -230,6 +230,11 @@ export class AggregatedListingsTableComponent implements OnInit {
     this.getListings(this.currentPage.pageNumber);
   }
 
+  clearSearchBy(_event: any): void {
+    this.searchColumn = 'all';
+    this.cd.detectChanges();
+  }
+
   get isFilterSet(): boolean {
     if (this.currentFilter === null || this.currentFilter === undefined) {
       return false;

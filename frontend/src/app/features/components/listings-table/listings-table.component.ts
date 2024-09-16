@@ -158,6 +158,11 @@ export class ListingsTableComponent implements OnInit {
     this.paginator.changePage(0);
   }
 
+  clearSearchBy(_event: any): void {
+    this.searchColumn = 'all';
+    this.cd.detectChanges();
+  }
+
   unselectAll(): void {
     this.selectedListings = [];
   }

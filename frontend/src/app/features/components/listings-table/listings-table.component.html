@@ -2,8 +2,8 @@
     <h2 class="title">Listings</h2>
     <div class="search-container">
         <span class="vertical-spacer" *ngIf="isFilterSet"></span>
-        <p-dropdown [options]="searchColumns" id="search-by-drd" [(ngModel)]="searchColumn"
-            class="search-by-select"></p-dropdown>
+        <p-dropdown [options]="searchColumns" [showClear]="searchColumn !== 'all'" (onClear)="clearSearchBy($event)"
+            id="search-by-drd" [(ngModel)]="searchColumn" class="search-by-select"></p-dropdown>
         <span class="p-input-icon-right search-input-container">
             <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()"> <i
                     class="pi pi-search"></i></button>
@@ -213,7 +213,7 @@
                         {{ row.lastActionNm || '-'}}
                     </td>
                     <td>
-                        {{ row.lastActionDtm || '-' |date }}
+                        {{ row.lastActionDtm? '-': row.lastActionDtm |date }}
                     </td>
                 </tr>
             </ng-template>

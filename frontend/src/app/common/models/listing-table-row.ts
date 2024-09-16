@@ -44,7 +44,6 @@ export interface ListingTableRow {
 }
 
 export interface AggregatedListingTableRow {
-    id?: string;
     effectiveBusinessLicenceNo?: string;
     effectiveHostNm?: string;
     primaryHostNm: string;
@@ -53,7 +52,12 @@ export interface AggregatedListingTableRow {
     businessLicenceNo: string;
     lastActionNm?: string;
     lastActionDtm?: string;
-
+    businessLicenceExpiryDt?: string;
+    businessLicenceId?: number;
+    licenceStatusType?: 'EXPIRED' | 'REVOKED' | 'ISSUED' | 'CANCELLED' | 'PENDING' | 'SUSPENDED';
+    listingCount: number;
     listings: Array<ListingTableRow>;
+
     selected?: boolean;
+    id?: string;
 }

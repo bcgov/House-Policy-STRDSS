@@ -27,7 +27,8 @@ namespace StrDss.Service
         Task<UserDto?> GetUserByIdAsync(long userId);
         Task<Dictionary<string, List<string>>> UpdateUserAsync(UserUpdateDto dto);
         Task<BceidAccount?> GetBceidUserInfo();
-        Task<Dictionary<string, List<string>>> CreateApsUserAsync(ApsUserCreateDto dto);
+        Task<(Dictionary<string, List<string>>, long)> CreateApsUserAsync(ApsUserCreateDto dto);
+        Task<(UserDto? user, List<string> permissions)> GetUserByDisplayNameAsync(string displayName);
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -58,6 +59,11 @@ namespace StrDss.Service
         public async Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid)
         {
             return await _userRepo.GetUserAndPermissionsByGuidAsync(guid);
+        }
+
+        public async Task<(UserDto? user, List<string> permissions)> GetUserByDisplayNameAsync(string displayName)
+        {
+            return await _userRepo.GetUserAndPermissionsByDisplayNameAsync(displayName);
         }
 
         public async Task<Dictionary<string, List<string>>> CreateAccessRequestAsync(AccessRequestCreateDto dto)
@@ -523,7 +529,7 @@ namespace StrDss.Service
             return null;
         }
 
-        public async Task<Dictionary<string, List<string>>> CreateApsUserAsync(ApsUserCreateDto dto)
+        public async Task<(Dictionary<string, List<string>>, long)> CreateApsUserAsync(ApsUserCreateDto dto)
         {
             var errors = new Dictionary<string, List<string>>();
 
@@ -539,13 +545,13 @@ namespace StrDss.Service
                 errors.AddItem("client_id", $"The client ID {dto.DisplayNm} already exists.");
             }
 
-            if (errors.Any()) return errors;
+            if (errors.Any()) return (errors, 0);
 
-            await _userRepo.CreateApsUserAsync(dto);
+            var entity = await _userRepo.CreateApsUserAsync(dto);
             
             _unitOfWork.Commit();
 
-            return errors;
+            return (errors, entity.UserIdentityId);
         }
     }
 }

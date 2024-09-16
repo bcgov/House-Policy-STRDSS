@@ -26,6 +26,7 @@ namespace StrDss.Model
         public string OrganizationName { get; set; }
         public DateTime? TermsAcceptanceDtm { get; set; }
         void LoadUserSession(ClaimsPrincipal user);
+        void LoadApsSession(ClaimsPrincipal user);
         void AddClaim(ClaimsPrincipal user, string claimType, string value);
     }
 
@@ -85,6 +86,17 @@ namespace StrDss.Model
             }
 
             FullName = CommonUtils.GetFullName(FirstName, LastName);
+        }
+
+        public void LoadApsSession(ClaimsPrincipal user)
+        {
+            if (user == null)
+                return;
+
+            var textInfo = new CultureInfo("en-US", false).TextInfo;
+
+            IdentityProviderNm = StrDssIdProviders.Aps;
+            DisplayName = user.GetCustomClaim(StrDssClaimTypes.ClientId);
         }
 
         public void AddClaim(ClaimsPrincipal user, string claimType, string value)

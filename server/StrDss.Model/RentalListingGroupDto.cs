@@ -13,6 +13,9 @@ namespace StrDss.Model
         public string? BusinessLicenceNo { get; set; }
         public string? LastActionNm { get; set; }
         public DateTime? LastActionDtm { get; set; }
+        public long? BusinessLicenceId { get; set; }
+        public DateOnly? BusinessLicenceExpiryDt { get; set; }
+        public string? LicenceStatusType { get; set; }
         public List<RentalListingViewDto> Listings { get; set; } = new List<RentalListingViewDto>();
     }
 }

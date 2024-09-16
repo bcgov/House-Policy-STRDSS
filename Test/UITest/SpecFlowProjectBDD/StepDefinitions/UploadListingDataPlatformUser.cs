@@ -20,7 +20,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
     {
         private IDriver _Driver;
         private LandingPage _LandingPage;
-        private TermsAndConditionsPage _TermsAndConditionsPage;
         private PathFinderPage _PathFinderPage;
         private IDirLoginPage _IDRLoginPage;
         private UploadListingsPage _UploadListingsPage;
@@ -42,7 +41,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
-            _TermsAndConditionsPage = new TermsAndConditionsPage(Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDRLoginPage = new IDirLoginPage(_Driver);
             _BCIDPage = new BCIDPage(_Driver);
@@ -76,29 +74,15 @@ namespace SpecFlowProjectBDD.StepDefinitions
             //Authenticate user using IDir or BCID depending on the user
             _LogonType = authHelper.Authenticate(_TestUserName, _TestPassword, _UserType);
             ClassicAssert.IsNotNull(_LogonType, "Logon FAILED");
+
+            TermsAndConditionsHelper termsAndConditionsHelper = new TermsAndConditionsHelper(_Driver);
+            termsAndConditionsHelper.HandleTermsAndConditions();
         }
 
         [When(@"I access the Data Sharing System")]
         public void WhenIAccessTheDataSharingSystem()
         {
-            IWebElement TOC = null;
 
-            try
-            {
-                TOC = _LandingPage.Driver.FindElement(Enums.FINDBY.CSSSELECTOR, TermsAndConditionsModel.TermsAndCondititionsCheckBox);
-            }
-            catch (NoSuchElementException ex)
-            {
-                //no Terms and Conditions. Continue
-            }
-
-
-            if ((null != TOC) && (TOC.Displayed))
-            {
-                //Nested Angular controls obscure the TermsAndConditionsCheckbox. Need JS 
-                _TermsAndConditionsPage.TermsAndConditionsCheckBox.JSExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-terms-and-conditions > p-card > div > div.p-card-body > div > div > div.checkbox-container > p-checkbox > div > div.p-checkbox-box"").click()");
-                _TermsAndConditionsPage.ContinueButton.Click();
-            }
         }
 
         [Then("I should have the option to upload short-term listing data")]

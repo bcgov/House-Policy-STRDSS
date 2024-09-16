@@ -13,6 +13,7 @@ namespace StrDss.Data.Repositories
         Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction);
         Task CreateUserAsync(UserCreateDto dto);
         Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByGuidAsync(Guid guid);
+        Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByDisplayNameAsync(string displayName);
         Task<UserDto?> GetUserById(long id);
         Task<UserDto?> GetUserByGuid(Guid guid);
         Task UpdateUserAsync(UserDto dto);
@@ -24,7 +25,7 @@ namespace StrDss.Data.Repositories
         Task<List<DropdownStrDto>> GetAccessRequestStatuses();
         Task AcceptTermsConditions();
         Task UpdateUserNamesAsync(long userId, string firstName, string lastName);
-        Task CreateApsUserAsync(ApsUserCreateDto dto);
+        Task<DssUserIdentity> CreateApsUserAsync(ApsUserCreateDto dto);
         Task<bool> ApsUserExists(string clientId);
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
@@ -93,6 +94,30 @@ namespace StrDss.Data.Repositories
             return (user, permssions);
         }
 
+        public async Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByDisplayNameAsync(string displayName)
+        {
+            var query = await _dbSet.AsNoTracking()
+                .Include(x => x.DssUserRoleAssignments)
+                .Include(x => x.RepresentedByOrganization)
+                .FirstOrDefaultAsync(x => x.DisplayNm == displayName);
+
+            if (query == null)
+                return (null, new List<string>());
+
+            var user = _mapper.Map<UserDto>(query);
+
+            var roles = query.DssUserRoleAssignments.Select(x => x.UserRoleCd).ToList();
+
+            var permssions = _dbContext.DssUserRoles
+                .Where(x => roles.Contains(x.UserRoleCd))
+                .SelectMany(x => x.DssUserRolePrivileges)
+                .ToLookup(x => x.UserPrivilegeCd)
+                .Select(x => x.First())
+                .Select(x => x.UserPrivilegeCd)
+                .ToList();
+
+            return (user, permssions);
+        }
         public async Task<UserDto?> GetUserById(long id)
         {
             var entity = await _dbSet.AsNoTracking()
@@ -210,11 +235,13 @@ namespace StrDss.Data.Repositories
             entity.GivenNm = firstName;
         }
 
-        public async Task CreateApsUserAsync(ApsUserCreateDto dto)
+        public async Task<DssUserIdentity> CreateApsUserAsync(ApsUserCreateDto dto)
         {
             dto.FamilyNm = dto.DisplayNm;
 
             var userEntity = _mapper.Map<DssUserIdentity>(dto);
+
+            userEntity.UserGuid = Guid.NewGuid();
             
             var roleCds = dto.RoleCds.Distinct();
 
@@ -225,6 +252,8 @@ namespace StrDss.Data.Repositories
             }
 
             await _dbContext.AddAsync(userEntity);
+
+            return userEntity;
         }
 
         public async Task<bool> ApsUserExists(string clientId)

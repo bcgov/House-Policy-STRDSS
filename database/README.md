@@ -90,3 +90,8 @@ Each production release depends on the execution of a fixed set of scripts again
   - `seeding/STR_DSS_Data_Seeding_Sprint_12.sql`
   - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_12.sql` **(TIP: run each MERGE statement independently)**
   - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_12.sql` **(includes data corrections)**
+- Sprint 13:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_13.sql`
+  - `ddl/STR_DSS_Views_Sprint_13.sql`
+  - `ddl/STR_DSS_Routines_Sprint_13.sql`
+  - `utility/Correct_Rental_Listings_Sprint_13.sql`

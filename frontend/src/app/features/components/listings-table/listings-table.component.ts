@@ -87,10 +87,6 @@ export class ListingsTableComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    setInterval(() => {
-      this.cd.detectChanges();
-    }, 250);
-
     this.getOrganizations();
     this.initFilters();
     let page = 1;

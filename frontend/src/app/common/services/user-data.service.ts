@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { DropdownOption } from '../models/dropdown-option';
 import { User, UserDetails } from '../models/user';
 import { Router } from '@angular/router';
+import { ApsUser } from '../models/aps-user';
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +43,10 @@ export class UserDataService {
     updDtm: string
   }): Observable<any> {
     return this.httpClient.put<UserDetails>(`${environment.API_HOST}/users/${data.userIdentityId}`, data)
+  }
+
+  createApsUser(user: ApsUser): Observable<any> {
+    return this.httpClient.post(`${environment.API_HOST}/users/aps`, user)
   }
 
   updateIsEnabled(userIdentityId: number, isEnabled: boolean, updDtm: string): Observable<void> {

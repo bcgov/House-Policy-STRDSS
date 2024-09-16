@@ -4,10 +4,10 @@
 
         <a target="_blank" class="listing-url-lnk"
             [href]="listing.platformListingUrl">{{listing.platformListingNo}}</a>&nbsp; <i
-            class="pi pi-external-link"></i>
+            class="pi pi-external-link do-not-print-it"></i>
     </div>
     <div class="legend-container">
-        <button pButton id="view-more-history-btn" class="p-button-link" (click)="showLegend()">
+        <button pButton id="view-more-history-btn" class="p-button-link do-not-print-it" (click)="showLegend()">
             <i class="pi pi-question-circle"></i>&nbsp;Legend
         </button>
     </div>
@@ -21,10 +21,10 @@
         </div>
     </div>
     <div class="column">
-        <button *ngIf="!isCEU" pButton (click)="sendNoticeOfNonCompliance()" class="p-button-outlined ">
+        <button *ngIf="!isCEU" pButton (click)="sendNoticeOfNonCompliance()" class="p-button-outlined do-not-print-it">
             <span class="nonc-icon"></span> Send Notice Of
             Non-Compliance </button>
-        <button *ngIf="!isCEU" pButton (click)="sendTakedownRequest()" class="p-button-outlined"><span
+        <button *ngIf="!isCEU" pButton (click)="sendTakedownRequest()" class="p-button-outlined do-not-print-it"><span
                 class="tdr-icon"></span> Send
             Takedown
             Request</button>
@@ -293,7 +293,8 @@
                 <ng-template #changed>
                     <strong>Business Licence Information was removed from this listing.</strong>
                 </ng-template>
-                <button pButton (click)="showBlMatchPopup()" class="p-button-link">Click here to link this listing
+                <button pButton (click)="showBlMatchPopup()" class="p-button-link do-not-print-it">Click here to link
+                    this listing
                     to a business licence record</button>
 
             </div>
@@ -431,7 +432,8 @@
                 <div class="spacer-hr">
                 </div>
                 <div class="row">
-                    <button pButton (click)="showBlUnlinkPopup()" class="p-button-link">Click here to unlink this
+                    <button pButton (click)="showBlUnlinkPopup()" class="p-button-link do-not-print-it">Click here to
+                        unlink this
                         listing from this business licence record</button>
                 </div>
             </ng-template>

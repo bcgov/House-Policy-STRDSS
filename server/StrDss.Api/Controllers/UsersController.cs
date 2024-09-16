@@ -155,14 +155,14 @@ namespace StrDss.Api.Controllers
         [HttpPost("aps", Name = "CreateApsUser")]
         public async Task<ActionResult> CreateApsUser(ApsUserCreateDto dto)
         {
-            var errors = await _userService.CreateApsUserAsync(dto);
+            var (errors, userId) = await _userService.CreateApsUserAsync(dto);
 
             if (errors.Count > 0)
             {
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
             }
 
-            return Ok();
+            return Ok(userId);
         }
     }
 }

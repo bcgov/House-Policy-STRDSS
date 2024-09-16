@@ -17,13 +17,13 @@
             Filter Listings
         </button>
 
-        <button *ngIf="isFilterSet" pButton id="filter-clear-btn" icon="pi pi-filter-slash" class="p-button-link red"
-            (click)="onClearFilters()">
+        <button *ngIf="isFilterSet" pButton id="filter-clear-btn" icon="pi pi-filter-slash"
+            class="filter-clear-btn p-button-link red" (click)="onClearFilters()">
             Clear Filters
         </button>
     </div>
     <div class="legend-container">
-        <button pButton id="view-more-history-btn" class="p-button-link" (click)="showLegend()">
+        <button pButton id="view-more-history-btn" class="p-button-link legend-open-btn" (click)="showLegend()">
             <i class="pi pi-question-circle"></i>&nbsp;Legend
         </button>
     </div>

@@ -6,6 +6,21 @@
     align-items: center;
 }
 
+@media print {
+    .header {
+        .header-top {
+            padding: 0 !important;
+
+            .logo-container {
+                display: none !important;
+            }
+        }
+    }
+    .content {
+        width: 100%;
+    }
+}
+
 .header {
     width: 100%;
     position: sticky;

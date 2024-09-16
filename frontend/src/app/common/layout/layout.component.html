@@ -5,15 +5,15 @@
             <div class="main-title">Short-Term Rental Data Portal</div>
         </div>
         <div *ngIf="userDataService.currentUser" class="user-container">
-            {{userDataService.currentUser.displayName || 'Unknown User'}} <button pButton icon="pi pi-angle-down"
-                (click)="op.toggle($event)"></button>
+            {{userDataService.currentUser.displayName || 'Unknown User'}} <button pButton class="do-not-print-it"
+                icon="pi pi-angle-down" (click)="op.toggle($event)"></button>
             <p-overlayPanel #op>
                 <button pButton [iconPos]="'right'" class="p-button-transparent" icon="pi pi-sign-out"
                     (click)="logout()">Logout</button>
             </p-overlayPanel>
         </div>
     </div>
-    <div class="header-menu">
+    <div class="header-menu do-not-print-it">
         <div class="menu-container">
             <p-menubar [model]="items"></p-menubar>
         </div>
@@ -23,7 +23,7 @@
 <div class="content">
     <router-outlet />
 </div>
-<div class="footer">
+<div class="footer do-not-print-it">
     <div class="cc">© 2024 Government of British Columbia.</div>
 </div>
 

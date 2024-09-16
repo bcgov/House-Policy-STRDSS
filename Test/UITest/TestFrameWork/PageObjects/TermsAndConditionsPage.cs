@@ -13,14 +13,14 @@ namespace UITest.PageObjects
         private IDriver _Driver;
 
         public CheckBox TermsAndConditionsCheckBox { get => _TermsAndConditionsCheckBox; }
-        public Button ContinueButton { get => _ContinueButton;  }
+        public Button ContinueButton { get => _ContinueButton; }
         public IDriver Driver { get => _Driver; }
 
         public TermsAndConditionsPage(IDriver Driver)
         {
             _Driver = Driver;
             _ContinueButton = new Button(Driver, Enums.FINDBY.ID, TermsAndConditionsModel.ContinueButton);
-            _TermsAndConditionsCheckBox = new CheckBox(Driver, Enums.FINDBY.JAVASCRIPT, TermsAndConditionsModel.TermsAndCondititionsCheckBoxJS);
+            _TermsAndConditionsCheckBox = new CheckBox(Driver, Enums.FINDBY.JAVASCRIPT, TermsAndConditionsModel.TermsAndCondititionsCheckBox);
         }
     }
 }

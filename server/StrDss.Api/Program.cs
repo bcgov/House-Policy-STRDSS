@@ -18,7 +18,9 @@ using StrDss.Api;
 using StrDss.Service.Bceid;
 using Npgsql;
 using Serilog;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using StrDss.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -158,7 +160,15 @@ builder.Services.AddAuthorization(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations();
+    options.UseAllOfToExtendReferenceSchemas();
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+});
 
 var healthCheck = new HealthCheck(connString);
 builder.Services.AddHealthChecks().AddCheck("DbConnection", healthCheck);
@@ -168,8 +178,18 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger(option =>
+    {
+        option.RouteTemplate = "api/swagger/{documentName}/swagger.json";
+    });
+
+    app.UseSwaggerUI(option =>
+    {
+        option.SwaggerEndpoint($"/api/swagger/{ApiTags.Default}/swagger.json", ApiTags.Default);
+        option.SwaggerEndpoint($"/api/swagger/{ApiTags.Aps}/swagger.json", ApiTags.Aps);
+
+        option.RoutePrefix = "api/swagger";
+    });
 }
 
 app.UseHealthChecks("/healthz");

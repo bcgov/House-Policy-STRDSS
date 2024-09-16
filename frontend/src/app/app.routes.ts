@@ -25,6 +25,7 @@ import { UserDetailsComponent } from './features/components/user-management/user
 import { ExportListingsComponent } from './features/components/export-listings/export-listings.component';
 import { UploadBusinessLicenseComponent } from './features/components/upload-business-license/upload-business-license.component';
 import { AggregatedListingsTableComponent } from './features/components/listings-table/aggregated-listings-table/aggregated-listings-table.component';
+import { AddApsUserComponent } from './features/components/user-management/add-aps-user/add-aps-user.component';
 
 export const routes: Routes = [
     {
@@ -112,6 +113,12 @@ export const routes: Routes = [
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: UserDetailsComponent,
         data: { permissions: [user_read] }
+    },
+    {
+        path: 'add-aps-user',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: AddApsUserComponent,
+        data: { permissions: [user_read, user_write] }
     },
     {
         path: 'roles',

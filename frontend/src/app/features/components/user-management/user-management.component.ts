@@ -18,7 +18,7 @@ import { UserDataService } from '../../../common/services/user-data.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-user-management',
@@ -78,6 +78,7 @@ export class UserManagementComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private loaderService: GlobalLoaderService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -246,6 +247,10 @@ export class UserManagementComponent implements OnInit {
     }
 
     this.getUsers(this.currentPage.pageNumber);
+  }
+
+  onAddApsUserClicked(): void {
+    this.router.navigateByUrl('/add-aps-user')
   }
 
   private handleConcurrencyError(errorMsg: any): void {

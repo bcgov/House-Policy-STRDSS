@@ -1,4 +1,5 @@
-<div class="title extra-space-bottom">User Management</div>
+<div class="title extra-space-bottom"><span class="title-text">User Management</span> <button pButton
+        icon="pi pi-user-plus" (click)="onAddApsUserClicked()">&nbsp;Add APS User</button> </div>
 <div class="table-card-container">
     <div class="search-filter-container extra-space-bottom">
         <div class="form-row">
@@ -101,12 +102,12 @@
             <ng-template pTemplate="body" let-accessRequest let-index="rowIndex">
                 <tr id="row-{{index}}">
                     <td>{{ accessRequest.accessRequestDtm | dateFormat }}</td>
-                    <td>{{ accessRequest.identityProviderNm }}</td>
-                    <td>{{ accessRequest.givenNm }}</td>
-                    <td>{{ accessRequest.familyNm }}</td>
-                    <td>{{ accessRequest.organizationType }}</td>
-                    <td>{{ accessRequest.emailAddressDsc }}</td>
-                    <td>{{ accessRequest.organizationNm }}</td>
+                    <td>{{ accessRequest.identityProviderNm || '-'}}</td>
+                    <td>{{ accessRequest.givenNm || '-' }}</td>
+                    <td>{{ accessRequest.familyNm || '-'}}</td>
+                    <td>{{ accessRequest.organizationType || '-'}}</td>
+                    <td>{{ accessRequest.emailAddressDsc || '-'}}</td>
+                    <td>{{ accessRequest.organizationNm || '-'}}</td>
                     <td>
                         <ng-container [ngSwitch]="accessRequest.accessRequestStatusCd">
                             <ng-container *ngSwitchCase="'Approved'">

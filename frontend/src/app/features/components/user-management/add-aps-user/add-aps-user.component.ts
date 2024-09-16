@@ -83,11 +83,8 @@ export class AddApsUserComponent implements OnInit {
     this.user.isEnabled = this.state === 'Active'
     this.userService.createApsUser(this.user).subscribe({
       next: (response: any) => {
-        this.errorService.showSuccess('APS user created successfully')
-        // NOTE: Next line routes user to the User Management page
-        this.router.navigateByUrl('/user-management');
-        // NOTE: get User ID from the response and redirect to the user details page:
-        // this.router.navigateByUrl(`/user/${response.userId}`);
+        this.errorService.showSuccess('APS user created successfully');
+        this.router.navigateByUrl(`/user/${response}`);
       },
       complete: () => {
         this.cd.detectChanges();

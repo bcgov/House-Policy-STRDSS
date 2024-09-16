@@ -18,10 +18,15 @@ namespace StrDss.Api
 
                     if (operation != null && operation.Tags.Any(t => Common.ApiTags.ApsTagList.Contains(t.Name)))
                     {
-                        filteredPaths.Add(path.Key, path.Value);
+                        filteredPaths.Add(path.Key.ToLowerInvariant(), path.Value);
                         TrackSchemasInOperations(operation, referencedSchemas);
                     }
                 }
+
+                //swaggerDoc.Servers = new List<OpenApiServer>
+                //{
+                //    new OpenApiServer { Url = "https://strdata.dev.api.gov.bc.ca" }
+                //};
             }
             else
             {

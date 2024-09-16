@@ -193,7 +193,6 @@ builder.Services.AddSwaggerGen(options =>
                 Array.Empty<string>()
             }
         });
-
 });
 
 var healthCheck = new HealthCheck(connString);

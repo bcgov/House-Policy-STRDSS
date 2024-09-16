@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { CommonModule } from '@angular/common';
@@ -78,6 +78,7 @@ export class UserManagementComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private loaderService: GlobalLoaderService,
+    public cd: ChangeDetectorRef,
     private router: Router,
   ) { }
 
@@ -246,7 +247,7 @@ export class UserManagementComponent implements OnInit {
       this.sort = { prop: property, dir: 'asc' };
     }
 
-    this.getUsers(this.currentPage.pageNumber);
+    this.paginator.changePage(0);
   }
 
   onAddApsUserClicked(): void {

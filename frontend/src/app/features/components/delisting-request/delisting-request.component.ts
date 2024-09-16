@@ -21,6 +21,7 @@ import { Router } from '@angular/router';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { forkJoin } from 'rxjs';
+import { ErrorHandlingService } from '../../../common/services/error-handling.service';
 
 @Component({
   selector: 'app-delisting-request',
@@ -50,7 +51,6 @@ export class DelistingRequestComponent implements OnInit {
   initiatorsOptions = new Array<DropdownOption>();
 
   isPreviewVisible = false;
-  hideForm = false;
   previewText = 'No preview'
 
   messages = new Array<Message>();
@@ -80,6 +80,7 @@ export class DelistingRequestComponent implements OnInit {
     private router: Router,
     private loaderService: GlobalLoaderService,
     private cd: ChangeDetectorRef,
+    private messageService: ErrorHandlingService,
   ) { }
 
   ngOnInit(): void {
@@ -134,7 +135,8 @@ export class DelistingRequestComponent implements OnInit {
       this.delistingService.createDelistingRequest(this.prepareFormModel(this.myForm))
         .subscribe({
           next: (_) => {
-            this.showSuccessMessage();
+            this.messageService.showSuccess('Your Takedown Request was Successfully Submitted!');
+            this.myForm.reset();
           },
           error: (error) => {
             this.showErrors(error);
@@ -151,15 +153,6 @@ export class DelistingRequestComponent implements OnInit {
 
   onPreviewClose(): void {
     this.isPreviewVisible = false;
-  }
-
-  onReturnHome(): void {
-    this.router.navigateByUrl('/');
-  }
-
-  showSuccessMessage(): void {
-    this.hideForm = true;
-    this.messages = [{ severity: 'success', summary: '', detail: 'Your Takedown Request was Successfully Submitted!' }];
   }
 
   onWithStandardDetailChanged(value: CheckboxChangeEvent): void {

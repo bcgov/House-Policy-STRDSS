@@ -25,7 +25,7 @@ namespace StrDss.Data.Repositories
         Task<List<DropdownStrDto>> GetAccessRequestStatuses();
         Task AcceptTermsConditions();
         Task UpdateUserNamesAsync(long userId, string firstName, string lastName);
-        Task CreateApsUserAsync(ApsUserCreateDto dto);
+        Task<DssUserIdentity> CreateApsUserAsync(ApsUserCreateDto dto);
         Task<bool> ApsUserExists(string clientId);
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
@@ -235,7 +235,7 @@ namespace StrDss.Data.Repositories
             entity.GivenNm = firstName;
         }
 
-        public async Task CreateApsUserAsync(ApsUserCreateDto dto)
+        public async Task<DssUserIdentity> CreateApsUserAsync(ApsUserCreateDto dto)
         {
             dto.FamilyNm = dto.DisplayNm;
 
@@ -252,6 +252,8 @@ namespace StrDss.Data.Repositories
             }
 
             await _dbContext.AddAsync(userEntity);
+
+            return userEntity;
         }
 
         public async Task<bool> ApsUserExists(string clientId)

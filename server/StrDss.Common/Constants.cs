@@ -356,4 +356,11 @@
         public const string All = "BC";
         public const string AllPr = "BC_PR";
     }
+
+    public static class ApiTags
+    {
+        public const string Default = "stadata";
+        public const string Aps = "aps";
+        public static readonly string[] ApsTagList = { "aps" };
+    }
 }

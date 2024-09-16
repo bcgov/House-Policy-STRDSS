@@ -6,6 +6,7 @@ using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Service;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace StrDss.Api.Controllers
 {
@@ -44,7 +45,15 @@ namespace StrDss.Api.Controllers
             return Ok(await _orgService.GetOrganizationsDropdownAsync(type));
         }
 
-        [ApiAuthorize]
+        /// <summary>
+        /// Retrieves the Short-Term Rental (STR) requirements for a specified location based on longitude and latitude coordinates.
+        /// Validates the geographical boundaries of the input values to ensure they fall within acceptable ranges.
+        /// </summary>
+        /// <param name="longitude">The longitude of the location, must be between -180 and 180 degrees.</param>
+        /// <param name="latitude">The latitude of the location, must be between -90 and 90 degrees.</param>
+        /// <returns>An object containing STR requirements for the given location, or a validation error if the input is invalid.</returns>
+        [ApiAuthorize] //todo: specify permission
+        [SwaggerOperation(Tags = new string[] { Common.ApiTags.Aps })]
         [HttpGet("strrequirements", Name = "GetStrRequirements")]
         public async Task<ActionResult<StrRequirementsDto>> GetStrRequirements(double longitude, double latitude)
         {

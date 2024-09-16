@@ -3,7 +3,7 @@ import { ListingDataService } from '../../../common/services/listing-data.servic
 import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { ListingTableRow } from '../../../common/models/listing-table-row';
 import { CommonModule } from '@angular/common';
-import { Table, TableModule } from 'primeng/table';
+import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -189,7 +189,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   onSearch(): void {
-    this.getListings(this.currentPage.pageNumber);
+    this.paginator.changePage(0);
   }
 
   get isFilterSet(): boolean {

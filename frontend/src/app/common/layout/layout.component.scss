@@ -6,6 +6,18 @@
     align-items: center;
 }
 
+@media print {
+    .header {
+        .header-top {
+            padding: 0 !important;
+
+            .logo-container {
+                display: none !important;
+            }
+        }
+    }
+}
+
 .header {
     width: 100%;
     position: sticky;
@@ -91,4 +103,10 @@
     position: sticky;
     bottom: 0;
     z-index: 10;
+}
+
+@media print {
+    .content {
+        width: 100%;
+    }
 }

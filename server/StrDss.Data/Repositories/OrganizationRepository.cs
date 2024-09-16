@@ -140,7 +140,7 @@ namespace StrDss.Data.Repositories
                     OrganizationNm = o.OrganizationNm,
                     IsPrincipalResidenceRequired = o.IsPrincipalResidenceRequired,
                     IsBusinessLicenceRequired = o.IsBusinessLicenceRequired,
-                    IsStrProhibited = null
+                    IsStrProhibited = null //todo: map with the new column
                 })
                 .OrderBy(o => o.OrganizationNm)
                 .FirstOrDefaultAsync();

@@ -42,6 +42,16 @@ export class DashboardService {
       {
         accessPermission: listing_read,
         buttonIcon: '',
+        buttonText: 'View Aggregated Listing Data',
+        description: 'View aggregated platform listing data for your community',
+        route: 'aggregated-listings',
+        title: 'Aggregated Listing Data',
+        boxId: 'aggregated_listings_box',
+        buttonId: 'aggregated_listings_btn',
+      },
+      {
+        accessPermission: listing_read,
+        buttonIcon: '',
         buttonText: 'View Listing Data',
         description: 'View platform listing data for your community',
         route: 'listings',

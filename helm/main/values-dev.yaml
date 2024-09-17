@@ -3,8 +3,7 @@ global:
     role: f4a30d-nonprod
     subPath: strdss-dev
   env:
-    'Logging__LogLevel__Default': 'Warning'
-    'Logging__LogLevel__StrDss.Common.StrDssLogger': 'Debug'
+    'Serilog__MinimumLevel__Override__StrDss': 'Debug'
     'ASPNETCORE_ENVIRONMENT': 'Development'
     'ENV_NAME': 'dev'
     'APP_BASE_URL': 'https://dev.strdata.gov.bc.ca'
@@ -21,6 +20,8 @@ global:
     'BCEID_CACHE_LIFESPAN': '600'
     'GEOCODER_URL': 'https://geocodertst.api.gov.bc.ca'
     'ADDRESS_SCORE': '90'
+    'APS_AUTHORITY': 'https://dev.loginproxy.gov.bc.ca/auth/realms/apigw'
+    'APS_GW_JWT_JWKS_URL': 'https://aps-jwks-upstream-jwt.api.gov.bc.ca/certs'
 
 nameOverride: strdss-dev
 fullnameOverride: strdss-dev

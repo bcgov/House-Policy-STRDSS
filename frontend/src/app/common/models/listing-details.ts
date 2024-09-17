@@ -30,6 +30,7 @@ export interface ListingDetails {
     isPrincipalResidenceRequired: boolean;
     isBusinessLicenceRequired: boolean;
     isEntireUnit: boolean;
+    isChangedBusinessLicence: boolean;
     isChangedAddress: boolean;
     isLgTransferred: boolean;
     isMatchVerified: boolean;

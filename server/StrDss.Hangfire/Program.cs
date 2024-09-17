@@ -30,7 +30,7 @@ var dbUser = builder.Configuration.GetValue<string>("DB_USER");
 var dbPass = builder.Configuration.GetValue<string>("DB_PASS");
 var dbPort = builder.Configuration.GetValue<string>("DB_PORT");
 
-var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
+var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};CommandTimeout=2400";
 
 builder.Services.AddHttpContextAccessor();
 
@@ -105,6 +105,8 @@ var mappingConfig = new MapperConfiguration(cfg =>
 
 var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
+
+builder.Services.AddMemoryCache();
 
 builder.Services
     .AddHangfire(configuration => configuration

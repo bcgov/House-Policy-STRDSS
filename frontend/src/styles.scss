@@ -138,13 +138,28 @@ body {
             .p-panel-header {
                 padding: .6rem 1.2rem;
             }
+
+            .p-panel-content {
+                padding-left: 0;
+                padding-right: 0;
+            }
         }
 
         &.bl-info {
             .p-panel-header {
                 background-color: #F3F2F1;
             }
+        }
 
+        &.address-history,
+        &.action-history {
+            .p-panel-header {
+                background-color: #FFF8E9;
+            }
+        }
+
+        &.bl-info,
+        &.prop-info {
             .p-panel-content {
                 padding-left: 0;
                 padding-right: 0;
@@ -197,6 +212,24 @@ body {
             .p-tag {
                 background-color: #ECEAE8;
                 color: #2D2D2D;
+
+                .p-tag-value {
+                    word-break: keep-all;
+                }
+            }
+        }
+
+        &.platform-report-month {
+            .p-tag {
+                background-color: #1E5189;
+                border-radius: 3px;
+            }
+        }
+
+        &.last-bl-update-date {
+            .p-tag {
+                background-color: #353433;
+                border-radius: 3px;
             }
         }
     }
@@ -217,10 +250,10 @@ body {
             &.p-button-transparent {
                 background-color: transparent;
                 border-color: transparent;
-                color: #353433;
+                color: #053662;
 
                 &:hover {
-                    border-color: #353433;
+                    border-color: #053662;
                 }
             }
 
@@ -229,6 +262,14 @@ body {
                 border-color: #CE3E39;
                 color: #FFFFFF;
             }
+        }
+
+        &.round-42 {
+            width: 42px;
+            height: 42px;
+            justify-content: center;
+            border-radius: 50%;
+            outline: none !important;
         }
 
         &.outline-btn {
@@ -243,6 +284,8 @@ body {
         }
 
         &.p-button-link {
+            color: #053662;
+
             .p-button-label {
                 color: #FFFFFF;
                 font-size: 16px;
@@ -270,6 +313,7 @@ body {
 
             &:hover {
                 text-decoration-line: underline;
+                color: #1E5189;
             }
 
             .pi {
@@ -512,6 +556,8 @@ body {
 
     .preview-dialog,
     .upload-bl-popup,
+    .bl-match-popup,
+    .bl-unlink-popup,
     .address-change-popup {
         .p-dialog-header {
             border-bottom: 1px solid #D8D8D8;
@@ -525,7 +571,9 @@ body {
             border-top: 1px solid #D8D8D8;
         }
 
-        &.address-change-popup {
+        &.address-change-popup,
+        &.bl-unlink-popup,
+        &.bl-match-popup {
             .p-dialog-footer {
                 padding: .75rem 1rem;
             }

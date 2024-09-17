@@ -17,6 +17,8 @@ namespace StrDss.Service
         Task<BizLicenceDto?> GetBizLicence(long businessLicenceId);
         Task ProcessBizLicenceUploadAsync();
         Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo);
+        Task<List<BizLicenceSearchDto>> SearchBizLicence(long orgId, string bizLicNo);
+
     }
     public class BizLicenceService : ServiceBase, IBizLicenceService
     {
@@ -25,9 +27,11 @@ namespace StrDss.Service
         private IOrganizationRepository _orgRepo;
         private ICodeSetRepository _codeSetRepo;
         private IRentalListingRepository _listingRepo;
+        private IRentalListingService _listingService;
 
         public BizLicenceService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IBizLicenceRepository bizLicenceRepo, IUploadDeliveryRepository uploadRepo, IOrganizationRepository orgRepo, ICodeSetRepository codeSetRepo, IRentalListingRepository listingRepo) 
+            IBizLicenceRepository bizLicenceRepo, IUploadDeliveryRepository uploadRepo, IOrganizationRepository orgRepo, ICodeSetRepository codeSetRepo, IRentalListingRepository listingRepo,
+            IRentalListingService listingService) 
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _bizLicenceRepo = bizLicenceRepo;
@@ -35,6 +39,7 @@ namespace StrDss.Service
             _orgRepo = orgRepo;
             _codeSetRepo = codeSetRepo;
             _listingRepo = listingRepo;
+            _listingService = listingService;
         }
 
         public async Task<BizLicenceDto?> GetBizLicence(long businessLicenceId)
@@ -51,7 +56,6 @@ namespace StrDss.Service
                 _logger.LogInformation("Skipping ProcessBizLicenceUploadAsync: Rental Listing Upload Process is running");
                 return;
             }
-
 
             if (!_validator.CommonCodes.Any())
             {
@@ -73,6 +77,8 @@ namespace StrDss.Service
             await ProcessBizLicenceUploadAsync(upload);
 
             _unitOfWork.Commit();
+
+            _logger.LogInformation($"Processed business licences and saved to a temporary table: {processStopwatch.Elapsed.TotalSeconds} seconds");
 
             var errorCount = upload.DssUploadLines.Count(x => x.IsValidationFailure);
 
@@ -162,6 +168,11 @@ namespace StrDss.Service
         public async Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo)
         {
             return await _bizLicenceRepo.GetMatchingBusinessLicenceIdAndNo(orgId, effectiveBizLicNo);
+        }
+
+        public async Task<List<BizLicenceSearchDto>> SearchBizLicence(long orgId, string bizLicNo)
+        {
+            return await _bizLicenceRepo.SearchBizLicence(orgId, bizLicNo);
         }
     }
 }

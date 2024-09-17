@@ -114,13 +114,13 @@
                         <i class="pi pi-download" *ngIf="row.errors>0"></i></button>
                     <ng-template #zero>{{0}}</ng-template>
                 </td>
-                <td>{{ row.updDtm |date }}</td>
+                <td>{{ row.updDtm |date:'YYYY-MM-dd' }}</td>
                 <td>{{ row.uploadedBy }}</td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="8">No records found</td>
+                <td colspan="9">No records found</td>
             </tr>
         </ng-template>
     </p-table>

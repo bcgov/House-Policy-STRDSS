@@ -19,6 +19,7 @@ import { ErrorHandlingService } from '../../../common/services/error-handling.se
 import { ComplianceNoticeBulk } from '../../../common/models/compliance-notice';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { ListingTableRow } from '../../../common/models/listing-table-row';
 
 @Component({
   selector: 'app-bulk-compliance-notice',
@@ -41,17 +42,19 @@ import { GlobalLoaderService } from '../../../common/services/global-loader.serv
   styleUrl: './bulk-compliance-notice.component.scss'
 })
 export class BulkComplianceNoticeComponent implements OnInit {
-  listings!: Array<ListingDetails>;
+  listings!: Array<ListingDetails | ListingTableRow>;
   returnUrl!: string;
   myForm!: FormGroup;
-  extendedListings = new Array<ListingDetailsWithHostCheckboxExtension>();
+  containsDisabledItems = false;
+
+  extendedListings = new Array<ListingDetailsWithHostCheckboxExtension | any>();
 
   previewText = '';
   showPreviewDialog = false;
 
   submissionArray!: Array<ComplianceNoticeBulk>;
 
-  selectedListings!: Array<ListingDetailsWithHostCheckboxExtension>;
+  selectedListings!: Array<ListingDetails | ListingTableRow>;
   addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   sort!: { prop: string, dir: 'asc' | 'desc' }
 
@@ -76,14 +79,17 @@ export class BulkComplianceNoticeComponent implements OnInit {
     this.route.queryParams.subscribe(
       (param) => {
         if (!this.searchStateService?.selectedListings || !param['returnUrl']) {
-          this.router.navigateByUrl('/listings');
+          this.router.navigateByUrl('/');
         }
         else {
           this.returnUrl = param['returnUrl'];
           this.listings = [...this.searchStateService.selectedListings];
-          this.extendedListings = this.listings.map((listing) => ({ ...listing, sendNoticeToHosts: listing.hasAtLeastOneValidHostEmail }));
+          this.containsDisabledItems = this.listings.some(l => l.listingStatusType !== 'I')
+
+          this.extendedListings = this.listings.map((listing) => ({ ...listing, sendNoticeToHosts: (listing as any).hasAtLeastOneValidHostEmail }));
           this.searchStateService.selectedListings = new Array<ListingDetailsWithHostCheckboxExtension>();
-          this.selectedListings = this.extendedListings;
+          this.selectedListings = this.extendedListings.filter(l => l.listingStatusType !== 'I')
+            ;
 
           this.initForm();
           this.cloakParams();
@@ -145,9 +151,17 @@ export class BulkComplianceNoticeComponent implements OnInit {
     this.showPreviewDialog = false;
   }
 
+  onListingSelected(e: any): void {
+    if (e.checked) {
+      this.selectedListings = this.listings.filter(l => l.listingStatusType !== 'I');
+    } else {
+      this.selectedListings = [];
+    }
+  }
+
   private sendPreview(): void {
     const formValues = this.myForm.value;
-    this.submissionArray = this.selectedListings.map((x: ListingDetailsWithHostCheckboxExtension) => ({
+    this.submissionArray = this.selectedListings.map((x: ListingDetailsWithHostCheckboxExtension | any) => ({
       rentalListingId: x.rentalListingId,
       ccList: formValues.ccList.prototype === Array
         ? formValues

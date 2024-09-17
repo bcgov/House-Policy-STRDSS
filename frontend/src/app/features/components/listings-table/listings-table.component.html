@@ -50,7 +50,7 @@
             </div>
         </ng-template>
 
-        <p-table #table [ariaLabel]="'table-of-listings'" id="listings-table" [value]="listings" [scrollable]="true"
+        <p-table [ariaLabel]="'table-of-listings'" id="listings-table" [value]="listings" [scrollable]="true"
             scrollHeight="{{isCEU?'550px':'500px'}}" [(selection)]="selectedListings" styleClass="p-datatable-sm"
             [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
             <ng-template pTemplate="header">
@@ -108,7 +108,7 @@
 
                     <th class="sortable-header" id="licence_header"
                         [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNo'"
-                        (click)="onSort('businessLicenceNo')">Listing’s Business Licence
+                        (click)="onSort('businessLicenceNo')">Business Licence on Listing
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -117,8 +117,7 @@
 
                     <th class="sortable-header" id="licence_matched_header"
                         [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNoMatched'"
-                        (click)="onSort('businessLicenceNoMatched')">LG's Business
-                        Licence
+                        (click)="onSort('businessLicenceNoMatched')">Matched Business Licence
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNoMatched' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -187,18 +186,35 @@
                         [class.low-address-score-match]="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)">
                         <div class="address-col">
                             <div class="address-text">
-                                {{ row.matchAddressTxt }}
+                                {{ row.matchAddressTxt || '-'}}
                             </div>
                             <i class="pi pi-info-circle" pTooltip="Low Address Match Confidence"
                                 *ngIf="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)"></i>
                             <p-tag *ngIf="row.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
                         </div>
                     </td>
-                    <td>{{ row.nightsBookedYtdQty }}</td>
-                    <td>{{ row.businessLicenceNo }}</td>
-                    <td>{{ row.businessLicenceNoMatched }}</td>
-                    <td>{{ row.lastActionNm }}</td>
-                    <td>{{ row.lastActionDtm |date }}</td>
+                    <td>
+                        {{ row.nightsBookedYtdQty || '-'}}
+                    </td>
+                    <td>
+                        <span>
+                            {{ row.businessLicenceNo || '-'}}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="bl-matched-col">
+                            <span>
+                                {{ row.businessLicenceNoMatched || '-' }}
+                            </span>
+                            <p-tag *ngIf="row.isChangedBusinessLicence" value="Updated" class="updated-tag"></p-tag>
+                        </div>
+                    </td>
+                    <td>
+                        {{ row.lastActionNm || '-'}}
+                    </td>
+                    <td>
+                        {{ row.lastActionDtm || '-' |date }}
+                    </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
@@ -207,7 +223,7 @@
                 </tr>
             </ng-template>
         </p-table>
-        <p-paginator class="listings-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
+        <p-paginator #pagingRef class="listings-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
             [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
             [showCurrentPageReport]="true" [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
             [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>

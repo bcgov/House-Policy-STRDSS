@@ -46,6 +46,14 @@
                         <i class="pi pi-angle-up"
                             *ngIf="this.sort && this.sort.prop === 'total' && this.sort.dir === 'asc'"></i>
                     </th>
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'errors'"
+                        (click)="onSort('errors')">
+                        Errors
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'errors' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'errors' && this.sort.dir === 'asc'"></i>
+                    </th>
                     <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'updDtm'"
                         (click)="onSort('updDtm')">
                         Upload Date
@@ -74,7 +82,18 @@
                         <ng-template #pending><span class="state-pending">{{uploadHistory.status}}</span></ng-template>
                     </td>
                     <td>{{ uploadHistory.total }}</td>
-                    <td>{{ uploadHistory.updDtm | date }}</td>
+                    <td>
+
+                        <button *ngIf="uploadHistory.errors>0; else zero"
+                            [id]="'downloadErrors_'+uploadHistory.uploadDeliveryId" pButton
+                            class="p-button-link zero-padding"
+                            (click)="onDownloadErrors(uploadHistory.uploadDeliveryId,uploadHistory.organizationNm,uploadHistory.reportPeriodYM)">{{uploadHistory.errors
+                            || '-'}}&nbsp;
+                            <i class="pi pi-download" *ngIf="uploadHistory.errors>0"></i></button>
+                        <ng-template #zero>{{0}}</ng-template>
+
+                    </td>
+                    <td>{{ uploadHistory.updDtm |date:'YYYY-MM-dd' }}</td>
                     <td>{{ uploadHistory.givenNm }} {{uploadHistory.familyNm}}</td>
                 </tr>
             </ng-template>

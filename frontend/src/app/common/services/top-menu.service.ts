@@ -41,6 +41,13 @@ export class TopMenuService {
     this.menuItems = [
       {
         accessPermission: listing_read,
+        buttonId: 'aggregated_listings_mi_btn',
+        route: '/aggregated-listings',
+        title: 'Aggregated Listing Data',
+        folderName: 'Listings',
+      },
+      {
+        accessPermission: listing_read,
         buttonId: 'listings_mi_btn',
         route: '/listings',
         title: 'View Listings',

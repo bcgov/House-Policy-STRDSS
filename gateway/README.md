@@ -77,11 +77,13 @@ https://bcgov.github.io/aps-infra-platform/guides/owner-journey-v1/
 
 1. Create a product if it doesn't exist.
 
+## Consumption
+
 ### Consumer Request & Approval
 
 Refer to [Public Short-Term Rental Data API.pdf](./Public%20Short-Term%20Rental%20Data%20API.pdf):
 
-### Consuming API
+### Calling API
 
 1. Get a token with client ID and secret.
 

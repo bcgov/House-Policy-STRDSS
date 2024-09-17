@@ -158,7 +158,19 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should be able to view detailed information provided by the user, including their role request and any justifications or additional comments")]
         public void ShouldBeAbleToViewDetailedInformationProvidedByTheUser()
         {
+            //Finicky element. Added loop to ensure that the control is ready
+            int trys = 0;
             bool result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#row-0"").checkVisibility()");
+
+            if (!result)
+            {
+                while ((!result) && (trys < 3))
+                {
+                    Thread.Sleep(2000);
+                    result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#row-0"").checkVisibility()");
+                }
+            }
+
             ClassicAssert.IsTrue(result);
         }
 

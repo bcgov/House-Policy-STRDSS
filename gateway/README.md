@@ -81,7 +81,7 @@ https://bcgov.github.io/aps-infra-platform/guides/owner-journey-v1/
 
 Refer to [Public Short-Term Rental Data API.pdf](./Public%20Short-Term%20Rental%20Data%20API.pdf):
 
-### Calling API
+### Consuming API
 
 1. Get a token with client ID and secret.
 

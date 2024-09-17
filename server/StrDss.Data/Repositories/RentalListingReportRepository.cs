@@ -76,9 +76,17 @@ namespace StrDss.Data.Repositories
             return listing;
         }
 
+        /// <summary>
+        /// The definition of YTD has been changed to the current month and the past 11 months
+        /// </summary>
+        /// <param name="reportPeriodYm"></param>
+        /// <param name="offeringOrgId"></param>
+        /// <param name="listingId"></param>
+        /// <returns></returns>
         public async Task<(short NightsBookedQty, short SeparateReservationsQty)> GetYtdValuesOfListingAsync(DateOnly reportPeriodYm, long offeringOrgId, string listingId)
         {
-            var startPeriodYm = new DateOnly(reportPeriodYm.Year, 1, 1);
+            var startPeriodYm = reportPeriodYm.AddMonths(-11);
+
             var ytdValues = await _dbContext.DssRentalListings.AsNoTracking()
                 .Where(x => x.OfferingOrganizationId == offeringOrgId
                     && x.PlatformListingNo == listingId

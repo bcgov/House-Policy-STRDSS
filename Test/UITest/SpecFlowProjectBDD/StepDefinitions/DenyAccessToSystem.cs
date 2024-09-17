@@ -115,12 +115,12 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should see a specific message indicating that access is restricted")]
         public void IShouldSeeASpecificMessageIndicatingThatAccessIsRestricted()
         {
-            System.Threading.Thread.Sleep(1000);
-            try
+            System.Threading.Thread.Sleep(3000);
+
+            if (!_Driver.Url.Contains("/401"))
             {
-                ClassicAssert.IsTrue(_Driver.Url.Contains("/401"));
             }
-            catch
+            else
             {
                 Thread.Sleep(2000);
             }

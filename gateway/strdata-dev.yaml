@@ -1,0 +1,56 @@
+services:
+- name: strdata
+  host: dev.strdata.gov.bc.ca
+  tags: [ns.strdata]
+  port: 443
+  protocol: https
+  retries: 0
+  routes:
+  - name: strdata
+    tags: [ns.strdata]
+    hosts:
+    - dev.strdata.api.gov.bc.ca
+    methods:
+    - GET
+    paths: [/api/organizations/strrequirements]
+    strip_path: false
+    https_redirect_status_code: 426
+    path_handling: v0
+    request_buffering: true
+    response_buffering: true
+  plugins:
+  - name: jwt-keycloak
+    tags: [ns.strdata]
+    enabled: true
+    config:
+      allowed_iss: [https://loginproxy.gov.bc.ca/auth/realms/apigw, https://dev.loginproxy.gov.bc.ca/auth/realms/apigw, https://test.loginproxy.gov.bc.ca/auth/realms/apigw]
+      allowed_aud: gateway-strdata
+      run_on_preflight: true
+      iss_key_grace_period: 10
+      maximum_expiration: 0
+      algorithm: RS256
+      claims_to_verify:
+      - exp
+      uri_param_names:
+      - jwt
+      cookie_names: []
+      scope:
+      roles:
+      realm_roles:
+      client_roles:
+      anonymous:
+      consumer_match: true
+      consumer_match_claim: azp
+      consumer_match_claim_custom_id: true
+      consumer_match_ignore_not_found: false
+  - name: request-transformer
+    tags: [ns.strdata]
+    enabled: true
+    config:
+      http_method:
+  - name: kong-upstream-jwt
+    enabled: true
+    tags: [ns.strdata]
+    config:
+      header: GW-JWT
+      include_credential_type: false

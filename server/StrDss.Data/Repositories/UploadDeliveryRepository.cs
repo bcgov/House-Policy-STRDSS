@@ -103,7 +103,7 @@ namespace StrDss.Data.Repositories
             var query = _dbSet.AsNoTracking()
                 .Where(x => x.UploadDeliveryId == uploadId && x.DssUploadLines.Any(x => x.IsSystemFailure || x.IsValidationFailure));
                 
-            if (_currentUser.OrganizationType == OrganizationTypes.Platform)
+            if (_currentUser.OrganizationType != OrganizationTypes.BCGov)
             {
                 query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
             }

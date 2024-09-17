@@ -92,4 +92,14 @@ public partial class DssRentalListingVw
     public long? BusinessLicenceId { get; set; }
 
     public string? BusinessLicenceNoMatched { get; set; }
+
+    public DateOnly? BusinessLicenceExpiryDt { get; set; }
+
+    public string? LicenceStatusType { get; set; }
+
+    public string? EffectiveBusinessLicenceNo { get; set; }
+
+    public string? EffectiveHostNm { get; set; }
+
+    public bool? IsChangedBusinessLicence { get; set; }
 }

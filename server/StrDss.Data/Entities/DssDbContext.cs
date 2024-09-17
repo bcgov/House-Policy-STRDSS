@@ -956,6 +956,7 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.BcRegistryNo)
                 .HasMaxLength(50)
                 .HasColumnName("bc_registry_no");
+            entity.Property(e => e.BusinessLicenceExpiryDt).HasColumnName("business_licence_expiry_dt");
             entity.Property(e => e.BusinessLicenceId).HasColumnName("business_licence_id");
             entity.Property(e => e.BusinessLicenceNo)
                 .HasMaxLength(320)
@@ -966,9 +967,16 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.EconomicRegionDsc)
                 .HasMaxLength(100)
                 .HasColumnName("economic_region_dsc");
+            entity.Property(e => e.EffectiveBusinessLicenceNo)
+                .HasMaxLength(320)
+                .HasColumnName("effective_business_licence_no");
+            entity.Property(e => e.EffectiveHostNm)
+                .HasMaxLength(320)
+                .HasColumnName("effective_host_nm");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.IsBusinessLicenceRequired).HasColumnName("is_business_licence_required");
             entity.Property(e => e.IsChangedAddress).HasColumnName("is_changed_address");
+            entity.Property(e => e.IsChangedBusinessLicence).HasColumnName("is_changed_business_licence");
             entity.Property(e => e.IsEntireUnit).HasColumnName("is_entire_unit");
             entity.Property(e => e.IsLgTransferred).HasColumnName("is_lg_transferred");
             entity.Property(e => e.IsMatchCorrected).HasColumnName("is_match_corrected");
@@ -981,6 +989,9 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(250)
                 .HasColumnName("last_action_nm");
             entity.Property(e => e.LatestReportPeriodYm).HasColumnName("latest_report_period_ym");
+            entity.Property(e => e.LicenceStatusType)
+                .HasMaxLength(25)
+                .HasColumnName("licence_status_type");
             entity.Property(e => e.ListingContactNamesTxt).HasColumnName("listing_contact_names_txt");
             entity.Property(e => e.ListingStatusSortNo).HasColumnName("listing_status_sort_no");
             entity.Property(e => e.ListingStatusType)

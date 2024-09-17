@@ -6,12 +6,16 @@ using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.RentalReportDtos;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace StrDss.Data.Repositories
 {
     public interface IRentalListingRepository
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
@@ -25,6 +29,8 @@ namespace StrDss.Data.Repositories
         Task<DssRentalListing> UpdateAddressAsync(UpdateListingAddressDto dto);
         DateTime GetLatestRentalListingExportTime();
         Task<bool> IsListingUploadProcessRunning();
+        Task LinkBizLicence(long rentalListingId, long licenceId);
+        Task UnLinkBizLicence(long rentalListingId);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -46,6 +52,80 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
             }
 
+            ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+
+            var extraSort
+                = "AddressSort1ProvinceCd asc, AddressSort2LocalityNm asc, AddressSort3LocalityTypeDsc asc, AddressSort4StreetNm asc, AddressSort5StreetTypeDsc asc, AddressSort6StreetDirectionDsc asc, AddressSort7CivicNo asc, AddressSort8UnitNo asc";
+
+            if (orderBy == "lastActionDtm")
+            {
+                orderBy = "lastActionDtm == null, lastActionDtm";
+            }
+            else if (orderBy == "lastActionNm")
+            {
+                orderBy = "lastActionNm == null, lastActionNm";
+            }
+
+            var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
+
+            var contacts = _mapper.Map<List<RentalListingContactDto>>(await _dbContext.DssRentalListingContacts
+                .AsNoTracking()
+                .Where(contact => listings.SourceList.Select(listing => listing.RentalListingId).Contains(contact.ContactedThroughRentalListingId))
+                .ToListAsync());            
+
+            foreach (var listing in listings.SourceList)            {
+                listing.LastActionDtm = listing.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(listing.LastActionDtm.Value);
+                listing.Hosts = contacts.Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId).ToList();
+            }
+
+            return listings;
+        }
+
+        public async Task<PagedDto<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            var query = _dbSet.AsNoTracking();
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG)
+            {
+                query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+
+            var groupedQuery = query
+                .GroupBy(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
+                .Select(g => new RentalListingGroupDto
+                {
+                    EffectiveBusinessLicenceNo = g.Key.EffectiveBusinessLicenceNo,
+                    EffectiveHostNm = g.Key.EffectiveHostNm,
+                    MatchAddressTxt = g.Key.MatchAddressTxt
+                });
+
+            var extraSort = "";
+
+            var stopwatch = Stopwatch.StartNew();
+
+            var groupedListings = await Page<RentalListingGroupDto, RentalListingGroupDto>(groupedQuery, pageSize, pageNumber, orderBy, direction, extraSort);
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"Get Grouped Listings (group) - Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            foreach (var group in groupedListings.SourceList)
+            {
+                group.Listings 
+                    = await GetRentalListings(
+                        group.MatchAddressTxt, group.EffectiveHostNm, group.EffectiveBusinessLicenceNo, all, address, url, listingId, 
+                        hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, group);
+            }
+
+            return groupedListings;
+        }
+
+        private static void ApplyFilters(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, 
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, ref IQueryable<DssRentalListingVw> query)
+        {
             if (all != null && all.IsNotEmpty())
             {
                 var allLower = all.ToLower();
@@ -71,7 +151,7 @@ namespace StrDss.Data.Repositories
             if (listingId != null && listingId.IsNotEmpty())
             {
                 var listingIdLower = listingId.ToLower();
-                query = query.Where(x => x.PlatformListingNo != null && x.PlatformListingNo.ToLower().Contains(listingIdLower));
+                query = query.Where(x => x.PlatformListingNo != null && x.PlatformListingNo.ToLower() == listingIdLower);
             }
 
             if (hostName != null && hostName.IsNotEmpty())
@@ -110,7 +190,7 @@ namespace StrDss.Data.Repositories
             {
                 takedownComplete = null;
             }
-            
+
             if (reassigned != null && takedownComplete != null)
             {
                 query = query.Where(x => x.IsTakenDown == true || x.IsLgTransferred == true);
@@ -133,29 +213,78 @@ namespace StrDss.Data.Repositories
             {
                 query = query.Where(x => statusArray.Contains(x.ListingStatusType));
             }
+        }
 
-            var extraSort 
-                = "AddressSort1ProvinceCd asc, AddressSort2LocalityNm asc, AddressSort3LocalityTypeDsc asc, AddressSort4StreetNm asc, AddressSort5StreetTypeDsc asc, AddressSort6StreetDirectionDsc asc, AddressSort7CivicNo asc, AddressSort8UnitNo asc";
+        private async Task<List<RentalListingViewDto>> GetRentalListings(string? effectiveAddress, string? effectiveHostName, string? effectiveBusinessLicenceNo,
+            string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, bool? prRequirement, bool? blRequirement, 
+            long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, RentalListingGroupDto group)
+        {
+            var stopwatch = Stopwatch.StartNew();
 
-            if (orderBy == "lastActionDtm")
+            var query = _dbSet.AsNoTracking()
+                .Where(x => x.MatchAddressTxt == effectiveAddress && x.EffectiveHostNm == effectiveHostName && x.EffectiveBusinessLicenceNo == effectiveBusinessLicenceNo);
+
+            ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+
+            var filteredIds = await query.Select(x => x.RentalListingId ?? 0).ToListAsync();
+
+            var filteredIdSet = new HashSet<long>(filteredIds);
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"Get Grouped Listings (filtered listing IDs) - Count: {filteredIds.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
+
+            var listings = _mapper.Map<List<RentalListingViewDto>>(
+                await _dbSet.AsNoTracking()
+                .Where(x => x.MatchAddressTxt == effectiveAddress && x.EffectiveHostNm == effectiveHostName && x.EffectiveBusinessLicenceNo == effectiveBusinessLicenceNo)
+                .ToListAsync()
+            );
+
+            _logger.LogDebug($"Get Grouped Listings (all listings) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            group.NightsBookedYtdQty = 0;
+
+            stopwatch.Restart();
+
+            var contacts = _mapper.Map<List<RentalListingContactDto>>(await _dbContext.DssRentalListingContacts
+                .AsNoTracking()
+                .Where(contact => listings.Select(listing => listing.RentalListingId).Contains(contact.ContactedThroughRentalListingId))
+                .ToListAsync());
+            
+            foreach (var listing in listings)
             {
-                orderBy = "lastActionDtm == null, lastActionDtm";
-            }
-            else if (orderBy == "lastActionNm")
-            {
-                orderBy = "lastActionNm == null, lastActionNm";
+                listing.LastActionDtm = listing.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(listing.LastActionDtm.Value);
+                listing.Filtered = filteredIdSet.Contains(listing.RentalListingId ?? 0);
+                listing.Hosts = contacts.Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId).ToList();
+                group.NightsBookedYtdQty += listing.NightsBookedYtdQty ?? 0;
             }
 
-            var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
+            stopwatch.Stop();
 
-            foreach (var listing in listings.SourceList)
+            _logger.LogDebug($"Get Grouped Listings (extra properties) - Count: {listings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
+
+            var lastActionDtm = listings.Max(x => x.LastActionDtm);
+
+            var listingWithLatestAction = listings.FirstOrDefault(x => x.LastActionDtm == lastActionDtm);
+
+            if (listingWithLatestAction != null)
             {
-                listing.Hosts =
-                    _mapper.Map<List<RentalListingContactDto>>(await
-                        _dbContext.DssRentalListingContacts
-                            .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
-                            .ToListAsync());
+                group.BusinessLicenceNo = listingWithLatestAction.BusinessLicenceNoMatched ?? listingWithLatestAction.BusinessLicenceNo;
+                group.PrimaryHostNm = listingWithLatestAction.Hosts.Where(x => x.IsPropertyOwner).Select(x => x.FullNm).FirstOrDefault();
+                group.LastActionNm = listingWithLatestAction.LastActionNm;
+                group.LastActionDtm = listingWithLatestAction.LastActionDtm;
+                group.BusinessLicenceId = listingWithLatestAction.BusinessLicenceId;
+                group.BusinessLicenceExpiryDt = listingWithLatestAction.BusinessLicenceExpiryDt;
+                group.LicenceStatusType = listingWithLatestAction.LicenceStatusType;
             }
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"Get Grouped Listings (group header properties) - Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return listings;
         }
@@ -166,20 +295,18 @@ namespace StrDss.Data.Repositories
 
             if (listing == null) return listing;
 
-            if (_currentUser.OrganizationType == OrganizationTypes.LG && listing.ManagingOrganizationId != _currentUser.OrganizationId)
+            if (_currentUser.OrganizationType != OrganizationTypes.BCGov && listing.ManagingOrganizationId != _currentUser.OrganizationId)
             {
                 return null;
             }
 
-            if (listing.LastActionDtm != null)
-            {
-                listing.LastActionDtm = DateUtils.ConvertUtcToPacificTime((DateTime)listing.LastActionDtm!);
-            }
+            listing.LastActionDtm = listing.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(listing.LastActionDtm.Value);
 
-            listing.Hosts = _mapper.Map<List<RentalListingContactDto>>(await
-                _dbContext.DssRentalListingContacts.AsNoTracking()
-                .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
-                .ToListAsync());
+            listing.Hosts =
+                _mapper.Map<List<RentalListingContactDto>>(await
+                    _dbContext.DssRentalListingContacts
+                        .Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId)
+                        .ToListAsync());
 
             if (!loadHistory) return listing;
 
@@ -622,6 +749,35 @@ namespace StrDss.Data.Repositories
         {
             return await _dbContext.DssUploadLines
                 .AnyAsync(x => x.IncludingUploadDelivery.UploadDeliveryType == UploadDeliveryTypes.ListingData && x.IsProcessed == false);                
+        }
+
+
+        public async Task LinkBizLicence(long rentalListingId, long licenceId)
+        {
+            //assume they exist - validated already
+            var licence = await _dbContext.DssBusinessLicences.FirstAsync(x => x.BusinessLicenceId == licenceId);
+            var listing = await _dbContext.DssRentalListings.FirstAsync(x => x.RentalListingId == rentalListingId);
+
+            var blFromLg = CommonUtils.SanitizeAndUppercaseString(licence.BusinessLicenceNo);
+            var blFromPlatform = CommonUtils.SanitizeAndUppercaseString(listing.BusinessLicenceNo);
+
+            listing.GoverningBusinessLicenceId = licenceId;
+            listing.EffectiveBusinessLicenceNo = blFromLg;
+            listing.IsChangedBusinessLicence = blFromLg != blFromPlatform;
+        }
+
+        public async Task UnLinkBizLicence(long rentalListingId)
+        {
+            //assume it exists - validated already
+            var listing = await _dbContext.DssRentalListings
+                .FirstAsync(x => x.RentalListingId == rentalListingId);
+
+            if (listing.GoverningBusinessLicenceId == null)
+                return;
+
+            listing.GoverningBusinessLicenceId = null;
+            listing.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(listing.BusinessLicenceNo);
+            listing.IsChangedBusinessLicence = true;
         }
     }
 }

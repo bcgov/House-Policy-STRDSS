@@ -30,11 +30,26 @@ namespace StrDss.Api.Controllers
         [HttpGet]
         public async Task<ActionResult> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete,
-            int pageSize, int pageNumber, string orderBy = "ListingStatusSortNo", string direction = "asc")
+            int pageSize = 10, int pageNumber = 1, string orderBy = "ListingStatusSortNo", string direction = "asc")
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
             var listings = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicence, 
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
+                pageSize, pageNumber, orderBy, direction);
+
+            return Ok(listings);
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("grouped")]
+        public async Task<ActionResult> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+            bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete,
+            int pageSize = 10, int pageNumber = 1, string orderBy = "matchAddressTxt", string direction = "asc")
+        {
+            var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
+
+            var listings = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
                 pageSize, pageNumber, orderBy, direction);
 
@@ -157,6 +172,34 @@ namespace StrDss.Api.Controllers
             }
 
             return Ok();
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpPut("{rentalListingId}/linkbl/{licenceId}")]
+        public async Task<ActionResult> LinkBizLicence(long rentalListingId, long licenceId)
+        {
+            var (errors, listing) = await _listingService.LinkBizLicence(rentalListingId, licenceId);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext, "One or more validation errors occurred in uploaded file.");
+            }
+
+            return Ok(listing);
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpPut("{rentalListingId}/unlinkbl")]
+        public async Task<ActionResult> UnLinkBizLicence(long rentalListingId)
+        {
+            var (errors, listing) = await _listingService.UnLinkBizLicence(rentalListingId);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext, "One or more validation errors occurred in uploaded file.");
+            }
+
+            return Ok(listing);
         }
     }
 }

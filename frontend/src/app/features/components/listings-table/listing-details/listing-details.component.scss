@@ -40,6 +40,22 @@
         }
     }
 
+    .property-info-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        strong {
+            &.panel-header-text {
+                font-size: large;
+            }
+
+            &.tag-text {
+                padding-right: 4px;
+            }
+        }
+    }
+
     .header-container {
         display: flex;
         justify-content: space-between;
@@ -64,11 +80,36 @@
         width: 100%;
         display: flex;
         gap: 24px;
+        height: 42px;
+        align-items: center;
 
         .column {
             width: calc(50% - 24px);
             display: flex;
-            flex-direction: column;
+
+            &:last-child {
+                justify-content: end;
+                gap: 8px;
+
+                button {
+                    padding: 8px 12px;
+                    border-color: #353433;
+
+                    .nonc-icon {
+                        width: 20px;
+                        height: 20px;
+                        margin-right: 6px;
+                        background-image: url(../../../../../assets/images/nonc-icon.svg);
+                    }
+
+                    .tdr-icon {
+                        width: 20px;
+                        height: 20px;
+                        margin-right: 6px;
+                        background-image: url(../../../../../assets/images/tdr-icon.svg);
+                    }
+                }
+            }
 
             .row {
                 display: flex;
@@ -118,6 +159,20 @@
                     display: flex;
                     gap: 8px;
 
+                    &.no-bl-data {
+                        flex-direction: column;
+
+                        .bl-description {
+                            strong {
+                                white-space: normal;
+                            }
+
+                            button {
+                                color: #053662;
+                            }
+                        }
+                    }
+
                     .status-name {
                         color: #42814A;
 
@@ -144,6 +199,35 @@
             }
 
             .row {
+                display: flex;
+
+                &.search-row {
+                    position: relative;
+
+                    input {
+                        padding-right: 30px;
+                    }
+
+                    button {
+                        position: absolute;
+                        right: 0;
+                    }
+                }
+
+                p-table {
+                    width: 100%;
+                }
+
+                &.header-row {
+                    font-size: large;
+                    font-family: 'BcSans-bold';
+                    padding-bottom: 24px;
+                }
+
+                &.night-stayed-row {
+                    padding-bottom: 24px;
+                }
+
                 &:not(:last-of-type) {
                     margin-bottom: 6px;
                 }
@@ -163,12 +247,17 @@
                     }
                 }
 
-                .label {
+                .label,
+                strong {
+                    white-space: nowrap;
                     font-family: 'BcSans-bold';
                 }
 
                 .value {
                     padding-left: 8px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
 
                     &.warning {
                         color: #CE3E39;
@@ -182,6 +271,47 @@
                     }
                 }
             }
+        }
+    }
+
+    .search-label {
+        padding: 12px 0;
+    }
+
+    .search-row {
+        position: relative;
+
+        input {
+            padding-right: 70px;
+        }
+
+        button {
+            &.search-bl-btn {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+
+            position: absolute;
+            right: 0;
+            height: 100%;
+        }
+    }
+
+    .no-bl-found {
+        padding: 12px;
+        padding-top: 18px;
+    }
+
+    .search-results {
+        padding: 12px;
+        padding-top: 18px;
+
+        .search-result-row {
+            margin-top: 12px;
+        }
+
+        strong {
+            margin-bottom: 12px;
         }
     }
 

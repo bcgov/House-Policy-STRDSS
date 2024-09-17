@@ -1,6 +1,6 @@
 ﻿namespace StrDss.Model.UserDtos
 {
-    public class UserUpdateDto
+    public class UserUpdateDto : IOrgRoles
     {
         public long UserIdentityId { get; set; }
         public long RepresentedByOrganizationId { get; set; }

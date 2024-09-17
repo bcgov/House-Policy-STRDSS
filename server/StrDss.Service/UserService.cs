@@ -27,6 +27,8 @@ namespace StrDss.Service
         Task<UserDto?> GetUserByIdAsync(long userId);
         Task<Dictionary<string, List<string>>> UpdateUserAsync(UserUpdateDto dto);
         Task<BceidAccount?> GetBceidUserInfo();
+        Task<Dictionary<string, List<string>>> CreateApsUserAsync(ApsUserCreateDto dto);
+        Task<(UserDto? user, List<string> permissions)> GetUserByDisplayNameAsync(string displayName);
     }
     public class UserService : ServiceBase, IUserService
     {
@@ -57,6 +59,11 @@ namespace StrDss.Service
         public async Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid)
         {
             return await _userRepo.GetUserAndPermissionsByGuidAsync(guid);
+        }
+
+        public async Task<(UserDto? user, List<string> permissions)> GetUserByDisplayNameAsync(string displayName)
+        {
+            return await _userRepo.GetUserAndPermissionsByDisplayNameAsync(displayName);
         }
 
         public async Task<Dictionary<string, List<string>>> CreateAccessRequestAsync(AccessRequestCreateDto dto)
@@ -480,6 +487,13 @@ namespace StrDss.Service
                 return errors;
             }
 
+            await ValidateOrgAndRoles(dto, errors);
+
+            return errors;
+        }
+
+        private async Task ValidateOrgAndRoles(IOrgRoles dto, Dictionary<string, List<string>> errors)
+        {
             var org = await _orgRepo.GetOrganizationByIdAsync(dto.RepresentedByOrganizationId);
             if (org == null)
             {
@@ -494,8 +508,6 @@ namespace StrDss.Service
                     errors.AddItem("roleCd", $"Role ({roleCd}) doesn't exist");
                 }
             }
-
-            return errors;
         }
 
         public async Task<BceidAccount?> GetBceidUserInfo()
@@ -515,6 +527,31 @@ namespace StrDss.Service
             }
 
             return null;
+        }
+
+        public async Task<Dictionary<string, List<string>>> CreateApsUserAsync(ApsUserCreateDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            if (string.IsNullOrEmpty(dto.DisplayNm))
+            {
+                errors.AddItem("client_id", "Client ID is mandatory.");
+            }
+
+            await ValidateOrgAndRoles(dto, errors);
+
+            if (!errors.Any() && await _userRepo.ApsUserExists(dto.DisplayNm))
+            {
+                errors.AddItem("client_id", $"The client ID {dto.DisplayNm} already exists.");
+            }
+
+            if (errors.Any()) return errors;
+
+            await _userRepo.CreateApsUserAsync(dto);
+            
+            _unitOfWork.Commit();
+
+            return errors;
         }
     }
 }

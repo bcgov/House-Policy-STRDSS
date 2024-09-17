@@ -732,7 +732,7 @@
 						{
 							"key": "File",
 							"type": "file",
-							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/takedown-2024-06.csv"
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/listing files/listing-valida-2024-06.csv"
 						}
 					]
 				},
@@ -827,7 +827,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistingreports/uploads/19/errorfile",
+					"raw": "{{host}}/api/rentallistingreports/uploads/65/errorfile",
 					"host": [
 						"{{host}}"
 					],
@@ -835,7 +835,7 @@
 						"api",
 						"rentallistingreports",
 						"uploads",
-						"19",
+						"65",
 						"errorfile"
 					]
 				}
@@ -936,7 +936,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/rentallistings?blRequirement=false&lgId=&reassigned=false&takedownComplete=false&statuses=I,A&pageSize=10&pageNumber=1&orderBy=platformListingNo&direction=desc",
+					"raw": "{{host}}/api/rentallistings?orderBy=matchAddressTxt&listingId=1100002",
 					"host": [
 						"{{host}}"
 					],
@@ -946,40 +946,12 @@
 					],
 					"query": [
 						{
-							"key": "blRequirement",
-							"value": "false"
-						},
-						{
-							"key": "lgId",
-							"value": ""
-						},
-						{
-							"key": "reassigned",
-							"value": "false"
-						},
-						{
-							"key": "takedownComplete",
-							"value": "false"
-						},
-						{
-							"key": "statuses",
-							"value": "I,A"
-						},
-						{
-							"key": "pageSize",
-							"value": "10"
-						},
-						{
-							"key": "pageNumber",
-							"value": "1"
-						},
-						{
 							"key": "orderBy",
-							"value": "platformListingNo"
+							"value": "matchAddressTxt"
 						},
 						{
-							"key": "direction",
-							"value": "desc"
+							"key": "listingId",
+							"value": "1100002"
 						}
 					]
 				}
@@ -1316,7 +1288,7 @@
 			"response": []
 		},
 		{
-			"name": "Upload Biz License",
+			"name": "Upload Biz Licence",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -1331,25 +1303,25 @@
 						{
 							"key": "File",
 							"type": "file",
-							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/bl file/bl.csv"
+							"src": "/C:/Users/chungy/OneDrive - Advanced Solutions, a DXC Technology Company/Documents/STR/bl file/bl3 - error.csv"
 						}
 					]
 				},
 				"url": {
-					"raw": "{{host}}/api/bizlicenses",
+					"raw": "{{host}}/api/bizlicences",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"bizlicenses"
+						"bizlicences"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "biz license upload history",
+			"name": "biz licence upload history",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -1361,20 +1333,90 @@
 					"formdata": []
 				},
 				"url": {
-					"raw": "{{host}}/api/bizlicenses/uploadhistory?orgId=256",
+					"raw": "{{host}}/api/bizlicences/uploadhistory",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"bizlicenses",
+						"bizlicences",
 						"uploadhistory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search biz licence",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{host}}/api/bizlicences/256/6789",
+					"host": [
+						"{{host}}"
 					],
-					"query": [
-						{
-							"key": "orgId",
-							"value": "256"
-						}
+					"path": [
+						"api",
+						"bizlicences",
+						"256",
+						"6789"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "link biz id",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{host}}/api/rentallistings/636/linkbl/6",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"636",
+						"linkbl",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "imlink biz id",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{host}}/api/rentallistings/636/unlinkbl",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"636",
+						"unlinkbl"
 					]
 				}
 			},
@@ -1395,6 +1437,43 @@
 						"users",
 						"currentuser",
 						"bceiduserinfo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Listings Grouped",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistings/grouped?orderBy=effectiveBusinessLicenceNo&pageSize=10&pageNumber=1&businessLicence=112",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"grouped"
+					],
+					"query": [
+						{
+							"key": "orderBy",
+							"value": "effectiveBusinessLicenceNo"
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						},
+						{
+							"key": "businessLicence",
+							"value": "112"
+						}
 					]
 				}
 			},

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using StrDss.Common;
@@ -10,16 +9,15 @@ using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service.HttpClients;
 using System.Diagnostics;
-using System.Net.NetworkInformation;
 using System.Text;
-using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace StrDss.Service
 {
     public interface IRentalListingService
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, 
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
         Task CreateRentalListingExportFiles();
@@ -28,20 +26,24 @@ namespace StrDss.Service
         Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults);
         Task<Dictionary<string, List<string>>> ConfirmAddressAsync(long rentalListingId);
         Task<Dictionary<string, List<string>>> UpdateAddressAsync(UpdateListingAddressDto dto);
+        Task<(Dictionary<string, List<string>>, RentalListingViewDto?)> LinkBizLicence(long rentalListingId, long licenceId);
+        Task<(Dictionary<string, List<string>>, RentalListingViewDto?)> UnLinkBizLicence(long rentalListingId);
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
         private IRentalListingRepository _listingRepo;
         private IGeocoderApi _geocoder;
         private IOrganizationRepository _orgRepo;
+        private IBizLicenceRepository _bizLicenceRepo;
 
         public RentalListingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IRentalListingRepository listingRep, IGeocoderApi geocoder, IOrganizationRepository orgRepo)
+            IRentalListingRepository listingRep, IGeocoderApi geocoder, IOrganizationRepository orgRepo, IBizLicenceRepository bizLicenceRepo)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _listingRepo = listingRep;
             _geocoder = geocoder;
             _orgRepo = orgRepo;
+            _bizLicenceRepo = bizLicenceRepo;
         }
         public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction)
@@ -53,6 +55,24 @@ namespace StrDss.Service
             foreach (var listing in listings.SourceList)
             {
                 ProcessHosts(listing, true);
+            }
+
+            return listings;
+        }
+
+        public async Task<PagedDto<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            var listings = await _listingRepo.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
+                pageSize, pageNumber, orderBy, direction);
+
+            foreach (var group in listings.SourceList)
+            {
+                foreach(var listing in group.Listings)
+                {
+                    ProcessHosts(listing, true);
+                }
             }
 
             return listings;
@@ -449,6 +469,16 @@ namespace StrDss.Service
             if (addressEntity.ContainingOrganizationId != originalOrgId)
             {
                 listingEntity.IsLgTransferred = true;
+
+                listingEntity.IsChangedBusinessLicence = false;
+                listingEntity.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(listingEntity.BusinessLicenceNo);
+                listingEntity.GoverningBusinessLicenceId = null;
+
+                if (addressEntity.ContainingOrganizationId != null && listingEntity.EffectiveBusinessLicenceNo.IsNotEmpty())
+                {
+                    var (bizLicId, _) = await _bizLicenceRepo.GetMatchingBusinessLicenceIdAndNo(addressEntity.ContainingOrganizationId.Value, listingEntity.BusinessLicenceNo);
+                    listingEntity.GoverningBusinessLicenceId = bizLicId;
+                }
             }
 
             listingEntity.IsChangedAddress = true;
@@ -456,6 +486,67 @@ namespace StrDss.Service
             _unitOfWork.Commit();
 
             return errors;
+        }
+
+        public async Task<(Dictionary<string, List<string>>, RentalListingViewDto?)> LinkBizLicence(long rentalListingId, long licenceId)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var listing = await GetRentalListing(rentalListingId);
+
+            if (listing == null)
+            {
+                errors.AddItem("rentalListingId", $"Rental Listing with the rental listing ID {rentalListingId} does not exist or the user doesn't have access to the listing.");
+            }
+
+            var licence = await _bizLicenceRepo.GetBizLicence(licenceId);
+
+            if (licence == null)
+            {
+                errors.AddItem("licencdId", $"Business Licence with the business licence ID {licenceId} does not exist");
+            }
+
+            if (errors.Any())
+            {
+                return (errors, null);
+            }
+
+            if (_currentUser.OrganizationType != OrganizationTypes.BCGov && licence!.ProvidingOrganizationId != _currentUser.OrganizationId)
+            {
+                errors.AddItem("licenceId", $"The user doesn't have access to the licence data");
+            }
+
+            if (errors.Any())
+            {
+                return (errors, null);
+            }
+
+            await _listingRepo.LinkBizLicence(rentalListingId, licenceId);
+            _unitOfWork.Commit();
+
+            return (errors, await GetRentalListing(rentalListingId));
+        }
+
+        public async Task<(Dictionary<string, List<string>>, RentalListingViewDto?)> UnLinkBizLicence(long rentalListingId)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var listing = await GetRentalListing(rentalListingId);
+
+            if (listing == null)
+            {
+                errors.AddItem("rentalListingId", $"Rental Listing with the rental listing ID {rentalListingId} does not exist or the user doesn't have access to the listing.");
+            }
+
+            if (errors.Any())
+            {
+                return (errors, null);
+            }
+
+            await _listingRepo.UnLinkBizLicence(rentalListingId);
+            _unitOfWork.Commit();
+
+            return (errors, await GetRentalListing(rentalListingId));
         }
     }
 }

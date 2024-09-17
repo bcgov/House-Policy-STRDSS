@@ -39,8 +39,6 @@ export class ExportListingsComponent implements OnInit {
     this.loaderService.loadingStart();
     this.listingService.getJurisdictions().subscribe({
       next: (jurisdictions) => {
-        console.log(jurisdictions);
-
         if (jurisdictions) {
           this.jurisdictions = jurisdictions;
           this.dateLastUpdated = this.jurisdictions[0].updDtm;

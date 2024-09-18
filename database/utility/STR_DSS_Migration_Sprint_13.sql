@@ -36,18 +36,18 @@ as db_has_new_proc
 \elif :db_has_dss_tab
 	\echo 'Database migration state is unknown - Exiting without changes'
 \else
-	\echo 'Database has no DSS tables - Beginning complete build to Sprint 13 - NEEDS CODE'
-/*	\echo 'Calling STR_DSS_Physical_DB_DDL_Sprint_12.sql'
-	\ir '../ddl/STR_DSS_Physical_DB_DDL_Sprint_12.sql'
-	\echo 'Calling STR_DSS_Data_Seeding_Sprint_12.sql'
-	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_12.sql'
+	\echo 'Database has no DSS tables - Beginning complete build to Sprint 13'
+	\echo 'Calling STR_DSS_Physical_DB_DDL_Sprint_13.sql'
+	\ir '../ddl/STR_DSS_Physical_DB_DDL_Sprint_13.sql'
+	\echo 'Calling STR_DSS_Data_Seeding_Sprint_13.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_13.sql'
 	\echo 'Calling STR_DSS_Data_Seeding_Platforms_Sprint_10.sql'
 	\ir '../seeding/STR_DSS_Data_Seeding_Platforms_Sprint_10.sql'
 	\echo 'Platform contacts must be set manually'
 	\echo 'Calling STR_DSS_Data_Seeding_LGs_Sprint_12.sql'
 	\ir '../seeding/STR_DSS_Data_Seeding_LGs_Sprint_12.sql'
 	\echo 'Calling STR_DSS_Data_Seeding_Geometry_Sprint_12.sql'
-	\ir '../seeding/STR_DSS_Data_Seeding_Geometry_Sprint_12.sql' */
+	\ir '../seeding/STR_DSS_Data_Seeding_Geometry_Sprint_12.sql'
 \endif
 \if :ERROR
 	/*commit cannot succeed because transaction was aborted due to an error*/

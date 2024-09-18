@@ -1208,7 +1208,9 @@
 			<column name="upd_dtm" type="timestamptz" />
 		</view>
 		<procedure name="dss_process_biz_lic_table_delete" id="Procedure-24d" isSystem="false" params_known="n" >
-			<string><![CDATA[create function dss_process_biz_lic_table_delete 
+			<string><![CDATA[CREATE OR REPLACE PROCEDURE dss_process_biz_lic_table_delete(lg_id BIGINT)
+LANGUAGE plpgsql
+AS $$
 DECLARE
  source_count int;
  unlink_count int;
@@ -1253,10 +1255,12 @@ BEGIN
     WHERE blt.business_licence_no = dbl.business_licence_no AND blt.providing_organization_id = lg_id);
  GET DIAGNOSTICS delete_count = ROW_COUNT;
     RAISE NOTICE 'Deleted % business licences', delete_count;
-END ;]]></string>
+END $$;]]></string>
 		</procedure>
 		<procedure name="dss_process_biz_lic_table_insert" id="Procedure-a5" isSystem="false" params_known="n" >
-			<string><![CDATA[create function dss_process_biz_lic_table_insert 
+			<string><![CDATA[CREATE OR REPLACE PROCEDURE dss_process_biz_lic_table_insert(lg_id BIGINT)
+LANGUAGE plpgsql
+AS $$
 DECLARE
  source_count int;
  merged_count int;
@@ -1327,10 +1331,12 @@ BEGIN
     RAISE NOTICE 'Created or refreshed % business licences', merged_count;
     -- Optional: Truncate the temporary table after processing
     TRUNCATE TABLE biz_lic_table;
-END ;]]></string>
+END $$;]]></string>
 		</procedure>
 		<procedure name="dss_process_biz_lic_table_update" id="Procedure-7fd" isSystem="false" params_known="n" >
-			<string><![CDATA[create function dss_process_biz_lic_table_update 
+			<string><![CDATA[CREATE OR REPLACE PROCEDURE dss_process_biz_lic_table_update(lg_id BIGINT)
+LANGUAGE plpgsql
+AS $$ 
 DECLARE
  linked_count int;
 BEGIN
@@ -1356,7 +1362,7 @@ BEGIN
    governing_business_licence_id = src.business_licence_id;
  GET DIAGNOSTICS linked_count = ROW_COUNT;
     RAISE NOTICE 'Linked business licences for % listings', linked_count;
-END ;]]></string>
+END $$;]]></string>
 		</procedure>
 		<function name="dss_containing_organization_id" id="Function-12c" isSystem="false" params_known="y" >
 			<string><![CDATA[CREATE OR REPLACE FUNCTION dss.dss_containing_organization_id(p_point geometry)

@@ -14,7 +14,6 @@ namespace UITest.PageObjects
         private DropDownList _StatusDropDown;
         private DropDownList _OrganizationDropDown;
         private TextBox _SearchTextBox;
-        private RowList _RequestList;
         private Button _BackButton;
         private Button _ForwardButton;
         private WebElement _UserTable;
@@ -24,7 +23,6 @@ namespace UITest.PageObjects
         public DropDownList StatusDropDown { get => _StatusDropDown; set => _StatusDropDown = value; }
         public DropDownList OrganizationDropDown { get => _OrganizationDropDown; set => _OrganizationDropDown = value; }
         public TextBox SearchTextBox { get => _SearchTextBox; set => _SearchTextBox = value; }
-        public RowList RequestList { get => _RequestList; set => _RequestList = value; }
         public Button BackButton { get => _BackButton; }
         public Button ForwardButton { get => _ForwardButton; }
         public WebElement UserTable { get => _UserTable; }
@@ -36,7 +34,6 @@ namespace UITest.PageObjects
             _StatusDropDown = new DropDownList(Driver, Enums.FINDBY.ID, ManagingAccessModel.StatusDropDown);
             _OrganizationDropDown = new DropDownList(Driver, Enums.FINDBY.ID, ManagingAccessModel.OrganizationDropDown);
             _SearchTextBox = new TextBox(Driver, Enums.FINDBY.ID, ManagingAccessModel.SearchTextBox);
-            _RequestList = new RowList(Driver, Enums.FINDBY.ID, ManagingAccessModel.RequestList);
             _BackButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ManagingAccessModel.BackButton);
             _ForwardButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ManagingAccessModel.ForwardButton);
             _UserTable = new WebElement(Driver, Enums.FINDBY.ID, ManagingAccessModel.UserTable);

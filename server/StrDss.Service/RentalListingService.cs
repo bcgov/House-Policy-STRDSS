@@ -146,7 +146,6 @@ namespace StrDss.Service
             var lg = string.Empty;
 
             var stopWatchForAll = Stopwatch.StartNew();
-            //var stopWatch = Stopwatch.StartNew();
 
             var currentMonth = DateUtils.ConvertUtcToPacificTime(new DateTime(currentTime.Year, currentTime.Month, 1)).AddDays(-1).ToString("yyyy-MM");
 
@@ -175,8 +174,6 @@ namespace StrDss.Service
                 {
                     prExport.Add(line);
                 }
-
-                //LogProgress(count, totalCount, stopWatch);
             }
 
             await CreateFinalExports(allExport, prExport, lgExport, lg, lgId);
@@ -202,15 +199,6 @@ namespace StrDss.Service
                 extract.RentalListingExtractNm = orgName ?? string.Empty;
                 extract.FilteringOrganizationId = orgId;
                 _unitOfWork.Commit();
-            }
-        }
-
-        private void LogProgress(int count, int totalCount, Stopwatch stopWatch)
-        {
-            if (count % 10 == 0)
-            {
-                _logger.LogInformation($"Rental Listing Export - {count}/{totalCount} - {stopWatch.Elapsed.TotalSeconds} seconds ");
-                stopWatch.Restart();
             }
         }
 

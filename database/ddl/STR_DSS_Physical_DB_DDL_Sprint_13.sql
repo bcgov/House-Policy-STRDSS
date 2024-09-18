@@ -243,15 +243,13 @@ CREATE  TABLE dss_business_licence (
 	CONSTRAINT dss_business_licence_uk UNIQUE ( providing_organization_id, business_licence_no ) 
  );
 
+CREATE INDEX IF NOT EXISTS dss_business_licence_i4 ON dss_business_licence  ( regexp_replace(UPPER(business_licence_no), '[^A-Z0-9]+', '', 'g') ) ;
+
 CREATE INDEX dss_business_licence_i2 ON dss_business_licence  ( affected_by_physical_address_id );
 
 CREATE INDEX dss_business_licence_i1 ON dss_business_licence  ( licence_status_type );
 
 CREATE INDEX dss_business_licence_i3 ON dss_business_licence  ( physical_rental_address_txt );
-
-/* custom script begins */
-CREATE INDEX dss_business_licence_i4 ON dss_business_licence  ( regexp_replace(UPPER(business_licence_no), '[^A-Z0-9]+', '', 'g') );
-/* custom script ends */
 
 CREATE  TABLE dss_rental_listing ( 
 	rental_listing_id    bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
@@ -284,6 +282,8 @@ CREATE  TABLE dss_rental_listing (
 	CONSTRAINT dss_rental_listing_pk PRIMARY KEY ( rental_listing_id )
  );
 
+CREATE INDEX IF NOT EXISTS dss_rental_listing_i10 ON dss_rental_listing  ( regexp_replace(UPPER(business_licence_no), '[^A-Z0-9]+', '', 'g') ) ;
+
 CREATE INDEX dss_rental_listing_i1 ON dss_rental_listing  ( offering_organization_id, platform_listing_no );
 
 CREATE INDEX dss_rental_listing_i2 ON dss_rental_listing  ( including_rental_listing_report_id );
@@ -301,10 +301,6 @@ CREATE INDEX dss_rental_listing_i7 ON dss_rental_listing  ( business_licence_no 
 CREATE INDEX dss_rental_listing_i8 ON dss_rental_listing  ( effective_business_licence_no );
 
 CREATE INDEX dss_rental_listing_i9 ON dss_rental_listing  ( effective_host_nm );
-
-/* custom script begins */
-CREATE INDEX dss_rental_listing_i10 ON dss_rental_listing  ( regexp_replace(UPPER(business_licence_no), '[^A-Z0-9]+', '', 'g') );
-/* custom script ends */
 
 CREATE  TABLE dss_rental_listing_contact ( 
 	rental_listing_contact_id bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,

@@ -107,8 +107,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a dedicated section for managing user access requests")]
         public void ThereShouldBeADedicatedSectionForManagingUserAccessRequests()
         {
-            string selector = "body > app-root > app-layout > div.content > app-user-management > div.table-card-container";
-
             bool result = (bool)_ManagingAccessPage.UserTable.IsEnabled();
 
             ClassicAssert.IsTrue(result);

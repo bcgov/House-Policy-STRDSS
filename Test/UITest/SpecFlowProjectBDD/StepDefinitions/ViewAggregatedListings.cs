@@ -17,7 +17,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
     {
         private IDriver _Driver;
         private LandingPage _LandingPage;
-        private ListingsPage _ListingsPage;
+        private AggregatedListingsPage _AggregatedListingsPage;
         private BulkComplianceNoticePage _BulkComplianceNoticePage;
         private DelistingWarningPage _DelistingWarningPage;
         private PathFinderPage _PathFinderPage;
@@ -38,7 +38,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         {
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
-            _ListingsPage = new ListingsPage(_Driver);
+            _AggregatedListingsPage = new AggregatedListingsPage(_Driver);
             _BulkComplianceNoticePage = new BulkComplianceNoticePage(_Driver);
             _DelistingWarningPage = new DelistingWarningPage(_Driver);
             _NoticeOfTakeDownPage = new NoticeOfTakeDownPage(_Driver);
@@ -87,6 +87,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Given(@"that I am on the aggregated listing page")]
         public void GivenThatIAmOnTheAggregatedListingPage()
         {
+
             //throw new PendingStepException();
         }
 

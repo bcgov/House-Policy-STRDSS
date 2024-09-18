@@ -139,6 +139,7 @@
 			<fk name="dss_business_licence_fk_classified_as" to_schema="dss" to_table="dss_business_licence_status_type" >
 				<fk_column name="licence_status_type" pk="licence_status_type" />
 			</fk>
+			<post_script><![CDATA[CREATE INDEX IF NOT EXISTS dss_business_licence_i4 ON dss_business_licence  ( regexp_replace(UPPER(business_licence_no), '[^A-Z0-9]+', '', 'g') ) ;]]></post_script>
 		</table>
 		<table name="dss_business_licence_status_type" prior="dss_listing_status_type_0" >
 			<comment><![CDATA[A potential status for a BUSINESS LICENCE (e.g. Pending, Issued, Suspended, Revoked, Cancelled, Expired)]]></comment>
@@ -633,6 +634,7 @@
 			<fk name="dss_rental_listing_fk_governed_by" to_schema="dss" to_table="dss_business_licence" >
 				<fk_column name="governing_business_licence_id" pk="business_licence_id" />
 			</fk>
+			<post_script><![CDATA[CREATE INDEX IF NOT EXISTS dss_rental_listing_i10 ON dss_rental_listing  ( regexp_replace(UPPER(business_licence_no), '[^A-Z0-9]+', '', 'g') ) ;]]></post_script>
 		</table>
 		<table name="dss_rental_listing_contact" prior="dss_organization_contact_person_0" >
 			<comment><![CDATA[A person who has been identified as a notable contact for a particular rental listing]]></comment>
@@ -1455,7 +1457,7 @@ END;$function$
 Short Term Rental Data Sharing
 Physical Data Diagram (Sprint 13)
 Leif Larsen, DXC Technology
-August 15, 2024]]></comment>
+September 18, 2024]]></comment>
 		</callout>
 	</layout>
 </project>

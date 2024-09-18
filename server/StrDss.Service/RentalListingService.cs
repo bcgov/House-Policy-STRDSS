@@ -146,7 +146,7 @@ namespace StrDss.Service
             var lg = string.Empty;
 
             var stopWatchForAll = Stopwatch.StartNew();
-            var stopWatch = Stopwatch.StartNew();
+            //var stopWatch = Stopwatch.StartNew();
 
             var currentMonth = DateUtils.ConvertUtcToPacificTime(new DateTime(currentTime.Year, currentTime.Month, 1)).AddDays(-1).ToString("yyyy-MM");
 
@@ -176,7 +176,7 @@ namespace StrDss.Service
                     prExport.Add(line);
                 }
 
-                LogProgress(count, totalCount, stopWatch);
+                //LogProgress(count, totalCount, stopWatch);
             }
 
             await CreateFinalExports(allExport, prExport, lgExport, lg, lgId);

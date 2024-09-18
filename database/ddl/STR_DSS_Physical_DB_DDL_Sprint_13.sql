@@ -616,7 +616,9 @@ CREATE OR REPLACE FUNCTION dss_containing_organization_id(p_point geometry)
 RETURN (SELECT do1.organization_id FROM dss_organization do1 WHERE (st_intersects(dss_containing_organization_id.p_point, do1.area_geometry) AND (NOT (EXISTS (SELECT do2.organization_nm FROM dss_organization do2 WHERE (st_intersects(dss_containing_organization_id.p_point, do2.area_geometry) AND (do2.organization_id <> do1.organization_id) AND (st_area(do2.area_geometry) < st_area(do1.area_geometry))))))))
 ;
 
-create function dss_process_biz_lic_table_delete 
+CREATE OR REPLACE PROCEDURE dss_process_biz_lic_table_delete(lg_id BIGINT)
+LANGUAGE plpgsql
+AS $$
 DECLARE
  source_count int;
  unlink_count int;
@@ -661,9 +663,11 @@ BEGIN
     WHERE blt.business_licence_no = dbl.business_licence_no AND blt.providing_organization_id = lg_id);
  GET DIAGNOSTICS delete_count = ROW_COUNT;
     RAISE NOTICE 'Deleted % business licences', delete_count;
-END ;
+END $$;
 
-create function dss_process_biz_lic_table_insert 
+CREATE OR REPLACE PROCEDURE dss_process_biz_lic_table_insert(lg_id BIGINT)
+LANGUAGE plpgsql
+AS $$
 DECLARE
  source_count int;
  merged_count int;
@@ -734,9 +738,11 @@ BEGIN
     RAISE NOTICE 'Created or refreshed % business licences', merged_count;
     -- Optional: Truncate the temporary table after processing
     TRUNCATE TABLE biz_lic_table;
-END ;
+END $$;
 
-create function dss_process_biz_lic_table_update 
+CREATE OR REPLACE PROCEDURE dss_process_biz_lic_table_update(lg_id BIGINT)
+LANGUAGE plpgsql
+AS $$ 
 DECLARE
  linked_count int;
 BEGIN
@@ -762,7 +768,7 @@ BEGIN
    governing_business_licence_id = src.business_licence_id;
  GET DIAGNOSTICS linked_count = ROW_COUNT;
     RAISE NOTICE 'Linked business licences for % listings', linked_count;
-END ;
+END $$;
 
 COMMENT ON TABLE dss_access_request_status IS 'A potential status for a user access request (e.g. Requested, Approved, or Denied)';
 

@@ -1,4 +1,4 @@
-/* STR DSS Sprint 12 Mandatory Data Seeding */
+/* STR DSS Sprint 14 Mandatory Data Seeding */
 
 MERGE INTO dss_access_request_status AS tgt
 USING ( SELECT * FROM (VALUES
@@ -78,6 +78,7 @@ VALUES (src.listing_status_type, src.listing_status_type_nm, src.listing_status_
 
 MERGE INTO dss_organization_type AS tgt
 USING ( SELECT * FROM (VALUES
+('APS','API Program Service Consumer'),
 ('BCGov','BC Government Staff'),
 ('LG','Local Government'),
 ('LGSub','Local Government Subdivision'),
@@ -179,6 +180,8 @@ VALUES (src.user_role_cd, src.user_privilege_cd);
 
 MERGE INTO dss_organization AS tgt
 USING ( SELECT * FROM (VALUES
+('APS','MFIN','Ministry of Finance'),
+('APS','SBCC','Service BC Connect'),
 ('BCGov','CEU','Provincial Compliance and Enforcement Unit'),
 ('BCGov','BC','BC Government Staff'))
 AS s (organization_type, organization_cd, organization_nm)

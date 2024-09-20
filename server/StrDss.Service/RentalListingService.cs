@@ -28,6 +28,8 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> UpdateAddressAsync(UpdateListingAddressDto dto);
         Task<(Dictionary<string, List<string>>, RentalListingViewDto?)> LinkBizLicence(long rentalListingId, long licenceId);
         Task<(Dictionary<string, List<string>>, RentalListingViewDto?)> UnLinkBizLicence(long rentalListingId);
+        Task ResetLgTransferFlag();
+        Task<bool> ListingDataToProcessExists();
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
@@ -126,9 +128,9 @@ namespace StrDss.Service
                 return;
             }
 
-            var isListingUploadProcessRunning = await _listingRepo.IsListingUploadProcessRunning();
+            var ListingDataToProcessExists = await this.ListingDataToProcessExists();
 
-            if (isListingUploadProcessRunning)
+            if (ListingDataToProcessExists)
             {
                 _logger.LogInformation("Skipping CreateRentalListingExportFiles: Rental Listing Upload Process is running");
                 return;
@@ -457,6 +459,7 @@ namespace StrDss.Service
             if (addressEntity.ContainingOrganizationId != originalOrgId)
             {
                 listingEntity.IsLgTransferred = true;
+                listingEntity.LgTransferDtm = DateTime.UtcNow;
 
                 listingEntity.IsChangedBusinessLicence = false;
                 listingEntity.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(listingEntity.BusinessLicenceNo);
@@ -535,6 +538,16 @@ namespace StrDss.Service
             _unitOfWork.Commit();
 
             return (errors, await GetRentalListing(rentalListingId));
+        }
+
+        public async Task ResetLgTransferFlag()
+        {
+            await _listingRepo.ResetLgTransferFlag();
+        }
+
+        public async Task<bool> ListingDataToProcessExists()
+        {
+            return await _listingRepo.ListingDataToProcessExists();
         }
     }
 }

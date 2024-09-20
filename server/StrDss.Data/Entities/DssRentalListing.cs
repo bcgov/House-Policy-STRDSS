@@ -143,6 +143,11 @@ public partial class DssRentalListing
     /// </summary>
     public long? GoverningBusinessLicenceId { get; set; }
 
+    /// <summary>
+    /// Indicates when a CURRENT RENTAL LISTING was most recently transferred to a different Local Goverment Organization as a result of address changes
+    /// </summary>
+    public DateTime? LgTransferDtm { get; set; }
+
     public virtual DssRentalListing? DerivedFromRentalListing { get; set; }
 
     public virtual ICollection<DssEmailMessage> DssEmailMessages { get; set; } = new List<DssEmailMessage>();

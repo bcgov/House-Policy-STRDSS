@@ -439,6 +439,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsPrincipalResidenceRequired)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions")
                 .HasColumnName("is_principal_residence_required");
+            entity.Property(e => e.IsStrProhibited)
+                .HasComment("Indicates whether a LOCAL GOVERNMENT ORGANIZATION entirely prohibits short term housing rentals")
+                .HasColumnName("is_str_prohibited");
             entity.Property(e => e.LocalGovernmentType)
                 .HasMaxLength(50)
                 .HasComment("A sub-type of local government organization used for sorting and grouping or members")
@@ -663,6 +666,8 @@ public partial class DssDbContext : DbContext
 
             entity.HasIndex(e => new { e.OfferingOrganizationId, e.PlatformListingNo }, "dss_rental_listing_i1");
 
+            entity.HasIndex(e => e.LgTransferDtm, "dss_rental_listing_i11");
+
             entity.HasIndex(e => e.IncludingRentalListingReportId, "dss_rental_listing_i2");
 
             entity.HasIndex(e => e.DerivedFromRentalListingId, "dss_rental_listing_i3");
@@ -738,6 +743,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsTakenDown)
                 .HasComment("Indicates whether a CURRENT RENTAL LISTING has been reported as taken down by the offering platform")
                 .HasColumnName("is_taken_down");
+            entity.Property(e => e.LgTransferDtm)
+                .HasComment("Indicates when a CURRENT RENTAL LISTING was most recently transferred to a different Local Goverment Organization as a result of address changes")
+                .HasColumnName("lg_transfer_dtm");
             entity.Property(e => e.ListingStatusType)
                 .HasMaxLength(2)
                 .HasComment("Foreign key")
@@ -989,6 +997,7 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(250)
                 .HasColumnName("last_action_nm");
             entity.Property(e => e.LatestReportPeriodYm).HasColumnName("latest_report_period_ym");
+            entity.Property(e => e.LgTransferDtm).HasColumnName("lg_transfer_dtm");
             entity.Property(e => e.LicenceStatusType)
                 .HasMaxLength(25)
                 .HasColumnName("licence_status_type");

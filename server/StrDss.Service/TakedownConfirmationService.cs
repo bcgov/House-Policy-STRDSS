@@ -14,7 +14,7 @@ namespace StrDss.Service
 {
     public interface ITakedownConfirmationService
     {
-        Task ProcessTakedownConfrimationAsync();
+        Task ProcessTakedownConfirmationUploadAsync(DssUploadDelivery upload);
     }
     public class TakedownConfirmationService : ServiceBase, ITakedownConfirmationService
     {
@@ -34,17 +34,7 @@ namespace StrDss.Service
             _orgRepo = orgRepo;
         }
 
-        public async Task ProcessTakedownConfrimationAsync()
-        {
-            var uploads = await _uploadRepo.GetUploadsToProcessAsync(UploadDeliveryTypes.TakedownData);
-
-            foreach (var upload in uploads)
-            {
-                await ProcessTakedownConfirmationUploadAsync(upload);
-            }
-        }
-
-        private async Task ProcessTakedownConfirmationUploadAsync(DssUploadDelivery upload)
+        public async Task ProcessTakedownConfirmationUploadAsync(DssUploadDelivery upload)
         {
             var processStopwatch = Stopwatch.StartNew();
 
@@ -59,8 +49,6 @@ namespace StrDss.Service
 
             foreach (var line in linesToProcess)
             {
-                var stopwatch = Stopwatch.StartNew();
-
                 count++;
                 var errors = new Dictionary<string, List<string>>();
                 var csvConfig = CsvHelperUtils.GetConfig(errors, false);
@@ -70,15 +58,11 @@ namespace StrDss.Service
                 var csvReader = new CsvReader(textReader, csvConfig);
 
                 var (orgCd, listingId) = await ProcessLine(upload, header, line, csvReader);
-
-                stopwatch.Stop();
-
-                _logger.LogInformation($"Finishing listing ({orgCd} - {listingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds. {count}/{lineCount}");
             }
 
             processStopwatch.Stop();
 
-            _logger.LogInformation($"Finished: {upload.ReportPeriodYm?.ToString("yyyy-MM")}, {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogInformation($"Finished Takedown Confirmation: {upload.ReportPeriodYm?.ToString("yyyy-MM")}, {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
         private async Task<(string orgCd, string listingId)> ProcessLine(DssUploadDelivery upload, string header, DssUploadLine line, CsvReader csvReader)
@@ -91,7 +75,7 @@ namespace StrDss.Service
 
             var row = csvReader.GetRecord<UploadLine>(); //it has been parsed once, so no exception expected.
 
-            _logger.LogInformation($"Processing listing ({row.OrgCd} - {row.ListingId})");
+            _logger.LogInformation($"Takedown Confirmation - Processing listing ({row.OrgCd} - {row.ListingId})");
 
             var org = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd);
 
@@ -99,13 +83,13 @@ namespace StrDss.Service
 
             if (listing == null)
             {
-                _logger.LogInformation($"Skipping listing (not found) - ({row.OrgCd} - {row.ListingId})");
+                _logger.LogInformation($"Takedown Confirmation - Skipping listing (not found) - ({row.OrgCd} - {row.ListingId})");
                 return (row.OrgCd, row.ListingId);
             }
 
             if (listing.IsTakenDown == true)
             {
-                _logger.LogInformation($"Skipping listing (already taken down) - ({row.OrgCd} - {row.ListingId})");
+                _logger.LogInformation($"Takedown Confirmation - Skipping listing (already taken down) - ({row.OrgCd} - {row.ListingId})");
             }
             else
             {

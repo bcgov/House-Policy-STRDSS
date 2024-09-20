@@ -19,7 +19,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> UploadPlatformData(string reportType, string reportPeriod, long orgId, Stream stream);
         Task<(Dictionary<string, List<string>>, string header)> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines);
         Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes);
-        Task<byte[]?> GetRentalListingErrorFile(long uploadId);
+        Task<(byte[]?, bool hasAccess)> GetRentalListingErrorFile(long uploadId);
     }
     public class UploadDeliveryService : ServiceBase, IUploadDeliveryService
     {
@@ -499,15 +499,25 @@ namespace StrDss.Service
             return await _uploadRepo.GetUploadHistory(orgId, pageSize, pageNumber, orderBy, direction, reportTypes);
         }
 
-        public async Task<byte[]?> GetRentalListingErrorFile(long uploadId)
+        public async Task<(byte[]?, bool hasAccess)> GetRentalListingErrorFile(long uploadId)
         {
             var upload = await _uploadRepo.GetRentalListingUploadWithErrors(uploadId);
 
-            if (upload == null) return null;
+            if (upload == null) return (null, true);
 
-            var fullData = upload.UploadDeliveryType == UploadDeliveryTypes.LicenceData;
+            // so far, there are two types of error files - ListingData and LicenceData
+            var licenceData = upload.UploadDeliveryType == UploadDeliveryTypes.LicenceData;
 
-            var linesWithError = await _uploadRepo.GetUploadLineIdsWithErrors(uploadId, fullData);
+            var hasPermission = licenceData
+                ? _currentUser.Permissions.Contains(Permissions.LicenceFileUpload)
+                : _currentUser.Permissions.Contains(Permissions.ListingFileUpload);
+
+            if (!hasPermission)
+            {
+                return (null, false);
+            }
+
+            var linesWithError = await _uploadRepo.GetUploadLineIdsWithErrors(uploadId, licenceData);
 
             var memoryStream = new MemoryStream(upload.SourceBin!);
             using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
@@ -530,7 +540,7 @@ namespace StrDss.Service
                 contents.AppendLine(line.LineText.TrimEndNewLine() + $",\"{line.ErrorText ?? ""}\"");
             }
 
-            return Encoding.UTF8.GetBytes(contents.ToString());
+            return (Encoding.UTF8.GetBytes(contents.ToString()), hasPermission);
         }
     }
 }

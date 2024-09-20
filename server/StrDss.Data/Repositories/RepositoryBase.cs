@@ -11,7 +11,7 @@ namespace StrDss.Data.Repositories
     public interface IRepositoryBase<TEntity>
         where TEntity : class
     {
-        Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction, string extraSort = "");
+        Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction, string extraSort = "", bool count = true);
     }
     public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
         where TEntity : class
@@ -34,44 +34,60 @@ namespace StrDss.Data.Repositories
             _logger = logger;
         }
 
-        public async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "", string extraSort = "")
+        public async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "", string extraSort = "", bool count = true)
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var sort = string.IsNullOrEmpty(extraSort)
-                ? $"{orderBy} {direction}"
-                : $"{orderBy} {direction}, {extraSort}";
+            var totalRecords = await list.CountAsync();
 
-            var pagedList = list.DynamicOrderBy(sort) as IQueryable<TInput>;
+            if (pageNumber <= 0) pageNumber = 1;
+
+            var sort = "";
+
+            if (extraSort.IsEmpty())
+            {
+                sort = $"{orderBy} {direction}";
+            }
+            else if (orderBy.IsNotEmpty())
+            {
+                sort = $"{orderBy} {direction}, {extraSort}";
+            }
+            else
+            {
+                sort = $"{extraSort}";
+            }
+
+            var pagedList = list.DynamicOrderBy($"{sort}") as IQueryable<TInput>;
 
             if (pageSize > 0)
             {
                 var skipRecordCount = (pageNumber - 1) * pageSize;
-                pagedList = pagedList.Skip(skipRecordCount).Take(pageSize);
+                pagedList = pagedList.Skip(skipRecordCount)
+                    .Take(pageSize);
             }
 
-            // Run the counting and fetching data in parallel
-            var countTask = list.CountAsync();
-            var fetchTask = pagedList.ToListAsync();
+            stopwatch.Stop();
 
-            // Await both tasks in parallel
-            await Task.WhenAll(countTask, fetchTask);
+            _logger.LogDebug($"Get Grouped Listings (group) - Counting groups. Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            var totalRecords = countTask.Result;
-            var result = fetchTask.Result;
+            stopwatch.Restart();
+
+            var result = await pagedList.ToListAsync();
 
             stopwatch.Stop();
-            _logger.LogDebug($"Mapping groups to DTO. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            _logger.LogDebug($"Get Grouped Listings (group) - Getting groups. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
 
             IEnumerable<TOutput> outputList;
 
-            // Map the result if necessary
             if (typeof(TOutput) != typeof(TInput))
                 outputList = _mapper.Map<IEnumerable<TInput>, IEnumerable<TOutput>>(result);
             else
                 outputList = (IEnumerable<TOutput>)result;
 
-            return new PagedDto<TOutput>
+            var pagedDTO = new PagedDto<TOutput>
             {
                 SourceList = outputList,
                 PageInfo = new PageInfo
@@ -84,7 +100,12 @@ namespace StrDss.Data.Repositories
                     ItemCount = outputList.Count()
                 }
             };
-        }
 
+            stopwatch.Stop();
+
+            _logger.LogDebug($"Get Grouped Listings (group) - Mapping groups to DTO. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            return pagedDTO;
+        }
     }
 }

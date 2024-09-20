@@ -109,7 +109,7 @@ namespace StrDss.Data.Repositories
             var extraSort = "";
 
 
-            var groupedListings = await Page<RentalListingGroupDto, RentalListingGroupDto>(groupedQuery, pageSize, pageNumber, orderBy, direction, extraSort);
+            var groupedListings = await Page<RentalListingGroupDto, RentalListingGroupDto>(groupedQuery, pageSize, pageNumber, orderBy, direction, extraSort, false);
 
 
             foreach (var group in groupedListings.SourceList)

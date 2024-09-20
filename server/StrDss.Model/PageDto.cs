@@ -16,7 +16,7 @@
 
         public int PageSize { get; set; }
         public int ItemCount { get; set; }
-        public int TotalCount { get; set; }
+        public int? TotalCount { get; set; }
         public int PageCount => PageSize == 0 ? 1 : ((int)(TotalCount / PageSize) + (TotalCount % PageSize == 0 ? 0 : 1));
         public bool HasPreviousPage => PageNumber != 1;
         public bool HasNextPage => PageNumber < PageCount;

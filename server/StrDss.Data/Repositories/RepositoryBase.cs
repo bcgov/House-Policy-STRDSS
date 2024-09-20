@@ -38,56 +38,40 @@ namespace StrDss.Data.Repositories
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var totalRecords = list.Count();
+            var sort = string.IsNullOrEmpty(extraSort)
+                ? $"{orderBy} {direction}"
+                : $"{orderBy} {direction}, {extraSort}";
 
-            if (pageNumber <= 0) pageNumber = 1;
-
-            var sort = "";
-
-            if (extraSort.IsEmpty())
-            {
-                sort = $"{orderBy} {direction}";
-            }
-            else if (orderBy.IsNotEmpty())
-            {
-                sort = $"{orderBy} {direction}, {extraSort}";
-            }
-            else
-            {
-                sort = $"{extraSort}";
-            }
-
-            var pagedList = list.DynamicOrderBy($"{sort}") as IQueryable<TInput>;
+            var pagedList = list.DynamicOrderBy(sort) as IQueryable<TInput>;
 
             if (pageSize > 0)
             {
                 var skipRecordCount = (pageNumber - 1) * pageSize;
-                pagedList = pagedList.Skip(skipRecordCount)
-                    .Take(pageSize);
+                pagedList = pagedList.Skip(skipRecordCount).Take(pageSize);
             }
 
+            // Run the counting and fetching data in parallel
+            var countTask = list.CountAsync();
+            var fetchTask = pagedList.ToListAsync();
+
+            // Await both tasks in parallel
+            await Task.WhenAll(countTask, fetchTask);
+
+            var totalRecords = countTask.Result;
+            var result = fetchTask.Result;
+
             stopwatch.Stop();
-
-            _logger.LogDebug($"Get Grouped Listings (group) - Counting groups. Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            stopwatch.Restart();
-
-            var result = await pagedList.ToListAsync();
-
-            stopwatch.Stop();
-
-            _logger.LogDebug($"Get Grouped Listings (group) - Getting groups. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            stopwatch.Restart();
+            _logger.LogDebug($"Mapping groups to DTO. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             IEnumerable<TOutput> outputList;
 
+            // Map the result if necessary
             if (typeof(TOutput) != typeof(TInput))
                 outputList = _mapper.Map<IEnumerable<TInput>, IEnumerable<TOutput>>(result);
             else
                 outputList = (IEnumerable<TOutput>)result;
 
-            var pagedDTO = new PagedDto<TOutput>
+            return new PagedDto<TOutput>
             {
                 SourceList = outputList,
                 PageInfo = new PageInfo
@@ -100,12 +84,7 @@ namespace StrDss.Data.Repositories
                     ItemCount = outputList.Count()
                 }
             };
-
-            stopwatch.Stop();
-
-            _logger.LogDebug($"Get Grouped Listings (group) - Mapping groups to DTO. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            return pagedDTO;
         }
+
     }
 }

@@ -4,10 +4,11 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
 {
-    public interface IRepositoryBase<TEntity> 
+    public interface IRepositoryBase<TEntity>
         where TEntity : class
     {
         Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction, string extraSort = "");
@@ -35,7 +36,15 @@ namespace StrDss.Data.Repositories
 
         public async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "", string extraSort = "")
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var totalRecords = list.Count();
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"Get Grouped Listings (group) - Counting groups. Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
 
             if (pageNumber <= 0) pageNumber = 1;
 
@@ -49,7 +58,7 @@ namespace StrDss.Data.Repositories
             {
                 sort = $"{orderBy} {direction}, {extraSort}";
             }
-            else 
+            else
             {
                 sort = $"{extraSort}";
             }
@@ -65,6 +74,12 @@ namespace StrDss.Data.Repositories
 
             var result = await pagedList.ToListAsync();
 
+            stopwatch.Stop();
+
+            _logger.LogDebug($"Get Grouped Listings (group) - Getting groups. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
+
             IEnumerable<TOutput> outputList;
 
             if (typeof(TOutput) != typeof(TInput))
@@ -75,7 +90,8 @@ namespace StrDss.Data.Repositories
             var pagedDTO = new PagedDto<TOutput>
             {
                 SourceList = outputList,
-                PageInfo = new PageInfo {
+                PageInfo = new PageInfo
+                {
                     PageNumber = pageNumber,
                     PageSize = pageSize,
                     TotalCount = totalRecords,
@@ -84,6 +100,10 @@ namespace StrDss.Data.Repositories
                     ItemCount = outputList.Count()
                 }
             };
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"Get Grouped Listings (group) - Mapping groups to DTO. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return pagedDTO;
         }

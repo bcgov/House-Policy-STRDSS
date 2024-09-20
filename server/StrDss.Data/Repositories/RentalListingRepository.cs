@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.RentalReportDtos;
 using System.Diagnostics;
-using System.Reflection;
 
 namespace StrDss.Data.Repositories
 {
@@ -28,9 +28,10 @@ namespace StrDss.Data.Repositories
         Task ConfirmAddressAsync(long rentalListingId);
         Task<DssRentalListing> UpdateAddressAsync(UpdateListingAddressDto dto);
         DateTime GetLatestRentalListingExportTime();
-        Task<bool> IsListingUploadProcessRunning();
+        Task<bool> ListingDataToProcessExists();
         Task LinkBizLicence(long rentalListingId, long licenceId);
         Task UnLinkBizLicence(long rentalListingId);
+        Task ResetLgTransferFlag();
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -746,7 +747,7 @@ namespace StrDss.Data.Repositories
             }
         }
 
-        public async Task<bool> IsListingUploadProcessRunning()
+        public async Task<bool> ListingDataToProcessExists()
         {
             return await _dbContext.DssUploadLines
                 .AnyAsync(x => x.IncludingUploadDelivery.UploadDeliveryType == UploadDeliveryTypes.ListingData && x.IsProcessed == false);                
@@ -779,6 +780,24 @@ namespace StrDss.Data.Repositories
             listing.GoverningBusinessLicenceId = null;
             listing.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(listing.BusinessLicenceNo);
             listing.IsChangedBusinessLicence = true;
+        }
+
+        public async Task ResetLgTransferFlag()
+        {
+            var sql = "UPDATE dss_rental_listing SET is_lg_transferred = null, lg_transfer_dtm = null WHERE lg_transfer_dtm <= @twomonth";
+
+            var parameters = new List<NpgsqlParameter>
+            {
+                new NpgsqlParameter("@twomonth", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = DateTime.UtcNow.Date.AddMonths(-2)
+                },
+            };
+
+            var rowsAffected = await _dbContext.Database.ExecuteSqlRawAsync(sql, parameters.ToArray());
+
+            if (rowsAffected > 0)
+                _logger.LogInformation("{RowsAffected} rental listings had the lg_transfer_dtm and is_lg_transferred fields reset.", rowsAffected);
         }
     }
 }

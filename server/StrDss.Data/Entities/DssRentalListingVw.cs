@@ -102,4 +102,6 @@ public partial class DssRentalListingVw
     public string? EffectiveHostNm { get; set; }
 
     public bool? IsChangedBusinessLicence { get; set; }
+
+    public DateTime? LgTransferDtm { get; set; }
 }

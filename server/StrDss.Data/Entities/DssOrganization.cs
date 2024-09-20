@@ -74,6 +74,11 @@ public partial class DssOrganization
     /// </summary>
     public string? LocalGovernmentType { get; set; }
 
+    /// <summary>
+    /// Indicates whether a LOCAL GOVERNMENT ORGANIZATION entirely prohibits short term housing rentals
+    /// </summary>
+    public bool? IsStrProhibited { get; set; }
+
     public virtual ICollection<DssBusinessLicence> DssBusinessLicences { get; set; } = new List<DssBusinessLicence>();
 
     public virtual ICollection<DssEmailMessage> DssEmailMessageInvolvedInOrganizations { get; set; } = new List<DssEmailMessage>();

@@ -40,12 +40,6 @@ namespace StrDss.Data.Repositories
 
             var totalRecords = list.Count();
 
-            stopwatch.Stop();
-
-            _logger.LogDebug($"Get Grouped Listings (group) - Counting groups. Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            stopwatch.Restart();
-
             if (pageNumber <= 0) pageNumber = 1;
 
             var sort = "";
@@ -71,6 +65,12 @@ namespace StrDss.Data.Repositories
                 pagedList = pagedList.Skip(skipRecordCount)
                     .Take(pageSize);
             }
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"Get Grouped Listings (group) - Counting groups. Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            stopwatch.Restart();
 
             var result = await pagedList.ToListAsync();
 

@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace StrDss.Data.Repositories
 {
-    public interface IRepositoryBase<TEntity> 
+    public interface IRepositoryBase<TEntity>
         where TEntity : class
     {
         Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction, string extraSort = "");
@@ -58,7 +58,7 @@ namespace StrDss.Data.Repositories
             {
                 sort = $"{orderBy} {direction}, {extraSort}";
             }
-            else 
+            else
             {
                 sort = $"{extraSort}";
             }
@@ -90,7 +90,8 @@ namespace StrDss.Data.Repositories
             var pagedDTO = new PagedDto<TOutput>
             {
                 SourceList = outputList,
-                PageInfo = new PageInfo {
+                PageInfo = new PageInfo
+                {
                     PageNumber = pageNumber,
                     PageSize = pageSize,
                     TotalCount = totalRecords,

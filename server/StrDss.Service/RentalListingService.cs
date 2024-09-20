@@ -457,6 +457,7 @@ namespace StrDss.Service
             if (addressEntity.ContainingOrganizationId != originalOrgId)
             {
                 listingEntity.IsLgTransferred = true;
+                listingEntity.LgTransferDtm = DateTime.UtcNow;
 
                 listingEntity.IsChangedBusinessLicence = false;
                 listingEntity.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(listingEntity.BusinessLicenceNo);

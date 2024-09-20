@@ -11,7 +11,7 @@ namespace StrDss.Data.Repositories
     public interface IRepositoryBase<TEntity>
         where TEntity : class
     {
-        Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction, string extraSort = "");
+        Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction, string extraSort = "", bool count = true);
     }
     public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
         where TEntity : class
@@ -34,11 +34,11 @@ namespace StrDss.Data.Repositories
             _logger = logger;
         }
 
-        public async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "", string extraSort = "")
+        public async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "", string extraSort = "", bool count = true)
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var totalRecords = list.Count();
+            var totalRecords = await list.CountAsync();
 
             if (pageNumber <= 0) pageNumber = 1;
 

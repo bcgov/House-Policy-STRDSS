@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using StrDss.Common;
 
 namespace StrDss.Service.Hangfire
 {
@@ -9,23 +10,17 @@ namespace StrDss.Service.Hangfire
         private IRentalListingService _listingService;
         private ITakedownConfirmationService _tdcService;
         private IBizLicenceService _bizLicService;
+        private IUploadDeliveryService _uploadService;
 
         public HangfireJobs(IRentalListingReportService listingReportService, IRentalListingService listingService, IDelistingService delistingService,
-            ITakedownConfirmationService tdcService, IBizLicenceService bizLicService)
+            ITakedownConfirmationService tdcService, IBizLicenceService bizLicService, IUploadDeliveryService uploadService)
         {
             _linstingReportService = listingReportService;
             _delistingService = delistingService;
             _listingService = listingService;
             _tdcService = tdcService;
             _bizLicService = bizLicService;
-        }
-
-        [Queue("default")]
-        [SkipSameJob]
-        [AutomaticRetry(Attempts = 0)]
-        public async Task ProcessRentalListingReports()
-        {
-            await _linstingReportService.ProcessRentalReportUploadAsync();
+            _uploadService = uploadService;
         }
 
         [Queue("default")]
@@ -35,14 +30,6 @@ namespace StrDss.Service.Hangfire
         {
             await _delistingService.ProcessTakedownRequestBatchEmailsAsync();
         }
-
-        //[Queue("default")]
-        //[SkipSameJob]
-        //[AutomaticRetry(Attempts = 0)]
-        //public async Task CleanUpAddresses()
-        //{
-        //    await _linstingReportService.CleaupAddressAsync();
-        //}
 
         [Queue("default")]
         [SkipSameJob]
@@ -55,19 +42,28 @@ namespace StrDss.Service.Hangfire
         [Queue("default")]
         [SkipSameJob]
         [AutomaticRetry(Attempts = 0)]
-        public async Task ProcessTakedownConfirmation()
+        public async Task ProcessUpload()
         {
-            await _tdcService.ProcessTakedownConfrimationAsync();
+            var upload = await _uploadService.GetUploadToProcessAsync();
+
+            if (upload == null) return;
+
+            var reportType = upload.UploadDeliveryType;
+
+            switch (reportType)
+            {
+                case UploadDeliveryTypes.ListingData:
+                    await _linstingReportService.ProcessRentalReportUploadAsync(upload);
+                    break;
+                case UploadDeliveryTypes.TakedownData:
+                    await _tdcService.ProcessTakedownConfirmationUploadAsync(upload);
+                    break;
+                case UploadDeliveryTypes.LicenceData:
+                    await _bizLicService.ProcessBizLicenceUploadMainAsync(upload);
+                    break;
+                default:
+                    break;
+            }
         }
-
-        [Queue("default")]
-        [SkipSameJob]
-        [AutomaticRetry(Attempts = 0)]
-        public async Task ProcessBusinessLicences()
-        {
-            await _bizLicService.ProcessBizLicenceUploadAsync();
-        }
-
-
     }
 }

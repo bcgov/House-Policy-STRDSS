@@ -15,15 +15,13 @@ using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
 using System.Diagnostics;
-using System.Net;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace StrDss.Service
 {
     public interface IRentalListingReportService
     {
-        Task ProcessRentalReportUploadAsync();
+        Task ProcessRentalReportUploadAsync(DssUploadDelivery upload);
         Task CleaupAddressAsync();
     }
     public class RentalListingReportService : ServiceBase, IRentalListingReportService
@@ -56,17 +54,8 @@ namespace StrDss.Service
             _bizLicRepo = bizLicRepo;
             _config = config;
         }
-        public async Task ProcessRentalReportUploadAsync()
-        {
-            var upload = await _uploadRepo.GetUploadToProcessAsync(UploadDeliveryTypes.ListingData);
 
-            if (upload != null)
-            {
-                await ProcessRentalReportUploadAsync(upload);
-            }
-        }
-
-        private async Task ProcessRentalReportUploadAsync(DssUploadDelivery upload)
+        public async Task ProcessRentalReportUploadAsync(DssUploadDelivery upload)
         {
             var processStopwatch = Stopwatch.StartNew();
 
@@ -107,10 +96,11 @@ namespace StrDss.Service
             var hasError = false;
             var isLastLine = false;
             var processedCount = 0;
+            var linesPerJob = 1000;
 
             while (csv.Read())
             {
-                if (processedCount >= 100) break; //To process 100 lines per job
+                if (processedCount >= linesPerJob) break; //To process x lines per job
 
                 count++;
                 isLastLine = count == lineCount;
@@ -137,7 +127,7 @@ namespace StrDss.Service
 
                 processedCount++;
 
-                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/100");
+                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/{linesPerJob}");
             }
 
             if (!isLastLine)
@@ -593,6 +583,8 @@ namespace StrDss.Service
 
             return errors;
         }
+
+
 
     }
 }

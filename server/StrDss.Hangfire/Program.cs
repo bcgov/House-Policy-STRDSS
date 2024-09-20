@@ -170,10 +170,14 @@ app.MapControllers();
 app.UseHangfireDashboard();
 
 // make sure this is after app.UseHangfireDashboard()
-RecurringJob.AddOrUpdate<HangfireJobs>("Process Rental Listing Report", job => job.ProcessRentalListingReports(), "*/2 * * * *");
+
+// process uploads
+RecurringJob.AddOrUpdate<HangfireJobs>("Process Business Licences", job => job.ProcessUpload(), "*/5 * * * *");
+
+// process nightly job of sending takedown request emails to plaforms
 RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *");
+
+// daily export
 RecurringJob.AddOrUpdate<HangfireJobs>("Create Rental Listing Export Files", job => job.CreateRentalListingExportFiles(), "50 5 * * *");
-RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Confirmation Report", job => job.ProcessTakedownConfirmation(), "0 * * * *");
-RecurringJob.AddOrUpdate<HangfireJobs>("Process Business Licences", job => job.ProcessBusinessLicences(), "*/10 * * * *");
 
 app.Run();

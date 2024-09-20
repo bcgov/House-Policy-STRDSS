@@ -20,6 +20,7 @@ namespace StrDss.Service
         Task<(Dictionary<string, List<string>>, string header)> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines);
         Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes);
         Task<byte[]?> GetRentalListingErrorFile(long uploadId);
+        Task<DssUploadDelivery?> GetUploadToProcessAsync();
     }
     public class UploadDeliveryService : ServiceBase, IUploadDeliveryService
     {
@@ -531,6 +532,11 @@ namespace StrDss.Service
             }
 
             return Encoding.UTF8.GetBytes(contents.ToString());
+        }
+
+        public async Task<DssUploadDelivery?> GetUploadToProcessAsync()
+        {
+            return await _uploadRepo.GetUploadToProcessAsync();
         }
     }
 }

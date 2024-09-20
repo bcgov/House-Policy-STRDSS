@@ -37,8 +37,9 @@ namespace StrDss.Data.Repositories
         public async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "", string extraSort = "", bool count = true)
         {
             var stopwatch = Stopwatch.StartNew();
+            int? totalRecords = null;
 
-            var totalRecords = await list.CountAsync();
+            if (count) totalRecords = await list.CountAsync();
 
             if (pageNumber <= 0) pageNumber = 1;
 

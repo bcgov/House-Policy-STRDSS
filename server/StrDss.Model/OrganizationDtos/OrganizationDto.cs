@@ -26,6 +26,7 @@ namespace StrDss.Model.OrganizationDtos
         public bool? IsLgParticipating { get; set; }
         public bool? IsPrincipalResidenceRequired { get; set; }
         public bool? IsBusinessLicenceRequired { get; set; }
+        public bool? IsStrProhibited { get; set; }
         public virtual ICollection<ContactPersonDto> ContactPeople { get; set; } = new List<ContactPersonDto>();
 
     }

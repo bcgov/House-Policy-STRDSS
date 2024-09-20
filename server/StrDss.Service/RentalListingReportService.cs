@@ -385,6 +385,7 @@ namespace StrDss.Service
                 if (physicalAddress.ContainingOrganizationId != newAddress.ContainingOrganizationId)
                 {
                     listing.IsLgTransferred = true;
+                    listing.LgTransferDtm = DateTime.UtcNow;
                 }                
 
                 _addressRepo.ReplaceAddress(listing, newAddress);
@@ -449,6 +450,7 @@ namespace StrDss.Service
 
             //if these are changed, the master listing must be updated as well
             masterListing.IsLgTransferred = listing.IsLgTransferred != null ? listing.IsLgTransferred : masterListing.IsLgTransferred;
+            masterListing.LgTransferDtm = listing.LgTransferDtm != null ? listing.LgTransferDtm : masterListing.LgTransferDtm;
             masterListing.IsChangedOriginalAddress = listing.IsChangedOriginalAddress != null ? listing.IsChangedOriginalAddress : masterListing.IsChangedOriginalAddress;
 
             return (true, masterListing);

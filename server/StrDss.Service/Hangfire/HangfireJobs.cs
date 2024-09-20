@@ -44,7 +44,18 @@ namespace StrDss.Service.Hangfire
         [AutomaticRetry(Attempts = 0)]
         public async Task ProcessUpload()
         {
-            var upload = await _uploadService.GetUploadToProcessAsync();
+            var listingDataToProcessExists = await _listingService.ListingDataToProcessExists();
+
+            if (!listingDataToProcessExists)
+            {
+                await _listingService.ResetLgTransferFlag();
+            }
+
+            var upload = await _uploadService.GetNonTakedownUploadToProcessAsync();
+
+            // takedown upload can have not-found listings which never gets processed until the listings exist
+            // so process it only when there's nothing to process
+            upload ??= await _uploadService.GetUploadToProcessAsync(UploadDeliveryTypes.TakedownData);
 
             if (upload == null) return;
 

@@ -16,6 +16,7 @@ using Hangfire.PostgreSql;
 using Npgsql;
 using StrDss.Hangfire;
 using Serilog;
+using Hangfire.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -171,8 +172,17 @@ app.UseHangfireDashboard();
 
 // make sure this is after app.UseHangfireDashboard()
 
+// Retrieve all recurring jobs
+var recurringJobs = JobStorage.Current.GetConnection().GetRecurringJobs();
+
+// Remove each recurring job
+foreach (var job in recurringJobs)
+{
+    RecurringJob.RemoveIfExists(job.Id);
+}
+
 // process uploads
-RecurringJob.AddOrUpdate<HangfireJobs>("Process Business Licences", job => job.ProcessUpload(), "*/5 * * * *");
+RecurringJob.AddOrUpdate<HangfireJobs>("Process Uploaded Data", job => job.ProcessUpload(), "*/5 * * * *");
 
 // process nightly job of sending takedown request emails to plaforms
 RecurringJob.AddOrUpdate<HangfireJobs>("Process Takedown Request Batch Emails", job => job.ProcessTakedownRequestBatchEmails(), "50 6 * * *");

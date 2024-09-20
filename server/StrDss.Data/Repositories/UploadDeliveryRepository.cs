@@ -13,7 +13,7 @@ namespace StrDss.Data.Repositories
         Task<bool> IsDuplicateRentalReportUploadAsnyc(DateOnly? periodYm, long orgId, string hashValue);
         Task AddUploadDeliveryAsync(DssUploadDelivery upload);
         Task<DssUploadDelivery?> GetUploadToProcessAsync(string reportType);
-        Task<DssUploadDelivery?> GetUploadToProcessAsync();
+        Task<DssUploadDelivery?> GetNonTakedownUploadToProcessAsync();
         Task<DssUploadDelivery[]> GetUploadsToProcessAsync(string reportType);
         Task<DssUploadDelivery?> GetRentalListingUploadWithErrors(long uploadId);
         Task<DssUploadLine?> GetUploadLineAsync(long uploadId, string orgCd, string listingId);
@@ -56,11 +56,11 @@ namespace StrDss.Data.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<DssUploadDelivery?> GetUploadToProcessAsync()
+        public async Task<DssUploadDelivery?> GetNonTakedownUploadToProcessAsync()
         {
             return await _dbSet
                 .Include(x => x.ProvidingOrganization)
-                .Where(x => x.DssUploadLines.Any(line => !line.IsProcessed))
+                .Where(x => x.UploadDeliveryType != UploadDeliveryTypes.TakedownData && x.DssUploadLines.Any(line => !line.IsProcessed))
                 .OrderBy(x => x.UpdDtm)
                 .FirstOrDefaultAsync();
         }

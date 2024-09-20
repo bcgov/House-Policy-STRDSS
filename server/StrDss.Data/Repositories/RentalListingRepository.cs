@@ -94,14 +94,14 @@ namespace StrDss.Data.Repositories
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
             var groupedQuery = query
-                .AsNoTracking()
                 .GroupBy(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
                 .Select(g => new RentalListingGroupDto
                 {
                     EffectiveBusinessLicenceNo = g.Key.EffectiveBusinessLicenceNo,
                     EffectiveHostNm = g.Key.EffectiveHostNm,
                     MatchAddressTxt = g.Key.MatchAddressTxt
-                });
+                })
+                .AsNoTracking();
 
             var extraSort = "";
 

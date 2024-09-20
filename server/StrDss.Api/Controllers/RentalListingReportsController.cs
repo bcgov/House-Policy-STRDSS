@@ -78,11 +78,14 @@ namespace StrDss.Api.Controllers
             return Ok(history);
         }
 
-        [ApiAuthorize(Permissions.UploadHistoryRead)]
+        [ApiAuthorize(Permissions.LicenceFileUpload, Permissions.ListingFileUpload)]
         [HttpGet("uploads/{uploadId}/errorfile")]
         public async Task<ActionResult> GetRentalListingErrorFile(long uploadId)
         {
-            var bytes = await _uploadService.GetRentalListingErrorFile(uploadId);
+            var (bytes, hasPermission) = await _uploadService.GetRentalListingErrorFile(uploadId);
+
+            if (!hasPermission)
+                return Unauthorized();
 
             if (bytes == null)
                 return NotFound();

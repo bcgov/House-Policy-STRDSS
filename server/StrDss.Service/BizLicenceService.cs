@@ -15,7 +15,7 @@ namespace StrDss.Service
     public interface IBizLicenceService
     {
         Task<BizLicenceDto?> GetBizLicence(long businessLicenceId);
-        Task ProcessBizLicenceUploadAsync();
+        Task ProcessBizLicenceUploadMainAsync(DssUploadDelivery upload);
         Task<(long?, string?)> GetMatchingBusinessLicenceIdAndNo(long orgId, string effectiveBizLicNo);
         Task<List<BizLicenceSearchDto>> SearchBizLicence(long orgId, string bizLicNo);
 
@@ -47,24 +47,12 @@ namespace StrDss.Service
             return await _bizLicenceRepo.GetBizLicence(businessLicenceId);
         }
 
-        public async Task ProcessBizLicenceUploadAsync()
+        public async Task ProcessBizLicenceUploadMainAsync(DssUploadDelivery upload)
         {
-            var isListingUploadProcessRunning = await _listingRepo.IsListingUploadProcessRunning();
-
-            if (isListingUploadProcessRunning)
-            {
-                _logger.LogInformation("Skipping ProcessBizLicenceUploadAsync: Rental Listing Upload Process is running");
-                return;
-            }
-
             if (!_validator.CommonCodes.Any())
             {
                 _validator.CommonCodes = await _codeSetRepo.LoadCodeSetAsync();
             }
-
-            var upload = await _uploadRepo.GetUploadToProcessAsync(UploadDeliveryTypes.LicenceData);
-
-            if (upload == null) return;
 
             var processStopwatch = Stopwatch.StartNew();
 
@@ -74,7 +62,7 @@ namespace StrDss.Service
 
             await _bizLicenceRepo.CreateBizLicTempTable();
 
-            await ProcessBizLicenceUploadAsync(upload);
+            await ProcessBizLicenceUploadSubAsync(upload);
 
             _unitOfWork.Commit();
 
@@ -95,7 +83,7 @@ namespace StrDss.Service
             _logger.LogInformation($"Finished: Business Licence Upload Id ({upload.UploadDeliveryId}): {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
-        private async Task ProcessBizLicenceUploadAsync(DssUploadDelivery upload)
+        private async Task ProcessBizLicenceUploadSubAsync(DssUploadDelivery upload)
         {
             var count = 0;
 

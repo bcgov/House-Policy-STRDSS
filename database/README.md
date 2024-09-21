@@ -95,3 +95,8 @@ Each production release depends on the execution of a fixed set of scripts again
   - `ddl/STR_DSS_Views_Sprint_13.sql`
   - `ddl/STR_DSS_Routines_Sprint_13.sql`
   - `utility/Correct_Rental_Listings_Sprint_13.sql`
+- Sprint 14:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_14.sql`
+  - `ddl/STR_DSS_Views_Sprint_14.sql`
+  - `seeding/STR_DSS_Data_Seeding_Sprint_14.sql`
+  - `utility/Correct_Rental_Listings_Sprint_14.sql`

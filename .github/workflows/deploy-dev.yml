@@ -17,6 +17,7 @@ on:
       - postgres/**
       - crunchydb/**
       - backup-container/**
+      - gateway/**
 
 jobs:
   test-backend:

@@ -216,7 +216,7 @@
                             <td>{{ addressChange.type }}</td>
                             <td>{{ addressChange.platformAddress }}</td>
                             <td>{{ addressChange.bestMatchAddress }}</td>
-                            <td>{{ addressChange.date |date:'YYYY-MM-dd' }}</td>
+                            <td>{{ addressChange.date |date:'yyyy-MM-dd' }}</td>
                             <td>{{ addressChange.user }}</td>
                         </tr>
                     </ng-template>
@@ -264,7 +264,7 @@
                 <div class="property-info-container">
                     <strong class="panel-header-text">Business Licence Information</strong>
                     <p-tag class="last-bl-update-date" *ngIf="blInfo?.updDtm">
-                        <strong class="tag-text">BL Records Last Uploaded:</strong>{{blInfo.updDtm |date:'YYYY-MM-dd' }}
+                        <strong class="tag-text">BL Records Last Uploaded:</strong>{{blInfo.updDtm |date:'yyyy-MM-dd' }}
                     </p-tag>
                 </div>
             </ng-template>
@@ -307,9 +307,9 @@
                 </div>
 
                 <div *ngIf="blInfo?.businessLicenceNo ||
-                blInfo?.licenceTypeTxt || 
-                blInfo?.expiryDt || 
-                blInfo?.licenceStatusType || 
+                blInfo?.licenceTypeTxt ||
+                blInfo?.expiryDt ||
+                blInfo?.licenceStatusType ||
                 blInfo?.restrictionTxt
                 " class="spacer-hr"></div>
 
@@ -321,9 +321,7 @@
                     <strong>Licence Type:</strong> <span class="value">{{blInfo.licenceTypeTxt ||'-'}}</span>
                 </div>
                 <div *ngIf="blInfo?.expiryDt" class="row">
-                    <strong>Expiry Date: </strong> <span class="value"
-                        [class.status-red]="blInfo.licenceStatusType =='EXPIRED'">{{blInfo.expiryDt
-                        |date:'YYYY-MM-dd'}}</span>
+                    <strong>Expiry Date: </strong> <span class="value">{{blInfo.expiryDt |date:'yyyy-MM-dd'}}</span>
                 </div>
                 <div *ngIf="blInfo?.licenceStatusType" class="row">
                     <strong>Status:</strong> <span class="status-name value"
@@ -359,8 +357,8 @@
                     <strong>Phone: </strong> <span class="value">{{blInfo.businessOwnerPhoneNo ||'-'}}</span>
                 </div>
 
-                <div *ngIf="blInfo?.businessOperatorNm || 
-                blInfo?.businessOperatorEmailAddressDsc || 
+                <div *ngIf="blInfo?.businessOperatorNm ||
+                blInfo?.businessOperatorEmailAddressDsc ||
                 blInfo?.businessOperatorPhoneNo" class="spacer-hr"></div>
 
                 <div *ngIf="blInfo?.businessOperatorNm" class="row">
@@ -373,11 +371,11 @@
                     <strong>Phone: </strong> <span class="value">{{blInfo.businessOperatorPhoneNo ||'-'}}</span>
                 </div>
 
-                <div *ngIf="blInfo?.propertyZoneTxt || 
-                blInfo?.availableBedroomsQty || 
-                blInfo?.maxGuestsAllowedQty || 
-                isBoolDefined(blInfo?.isPrincipalResidence) || 
-                isBoolDefined(blInfo?.isOwnerLivingOnsite) || 
+                <div *ngIf="blInfo?.propertyZoneTxt ||
+                blInfo?.availableBedroomsQty ||
+                blInfo?.maxGuestsAllowedQty ||
+                isBoolDefined(blInfo?.isPrincipalResidence) ||
+                isBoolDefined(blInfo?.isOwnerLivingOnsite) ||
                 isBoolDefined(blInfo?.isOwnerPropertyTenant) ||
                 blInfo?.infractionTxt ||
                 blInfo?.infractionDt " class="spacer-hr"></div>
@@ -410,11 +408,11 @@
                 </div>
                 <div *ngIf="blInfo?.infractionDt" class="row">
                     <strong>Infraction Date: </strong> <span
-                        class="value">{{blInfo.infractionDt|date:'YYYY-MM-dd'}}</span>
+                        class="value">{{blInfo.infractionDt|date:'yyyy-MM-dd'}}</span>
                 </div>
 
-                <div *ngIf="blInfo?.propertyFolioNo || 
-                blInfo?.propertyParcelIdentifierNo || 
+                <div *ngIf="blInfo?.propertyFolioNo ||
+                blInfo?.propertyParcelIdentifierNo ||
                 blInfo?.propertyLegalDescriptionTxt" class="spacer-hr"></div>
 
                 <div *ngIf="blInfo?.propertyFolioNo" class="row">

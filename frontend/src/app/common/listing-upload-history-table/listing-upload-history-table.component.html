@@ -114,7 +114,7 @@
                         <i class="pi pi-download" *ngIf="row.errors>0"></i></button>
                     <ng-template #zero>{{0}}</ng-template>
                 </td>
-                <td>{{ row.updDtm |date:'YYYY-MM-dd' }}</td>
+                <td>{{ row.updDtm |date:'yyyy-MM-dd' }}</td>
                 <td>{{ row.uploadedBy }}</td>
             </tr>
         </ng-template>

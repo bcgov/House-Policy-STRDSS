@@ -60,7 +60,7 @@ namespace UITest.PageObjects
             _ErrorMessageBox = new MessageBox(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.ErrorMessageBox);
             _ListingsTypeDropDown = new DropDownList(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.ListingsTypeDropDown);
             _SelectAllCheckbox = new CheckBox(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.SelectAllCheckbox);
-            _AggregatedListingsTable = new Table(Driver, Enums.FINDBY.ID, AggregatedListingsPageModel.AggregatedListingsTable);
+            _AggregatedListingsTable = new Table(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.AggregatedListingsTable);
         }
     }
 }

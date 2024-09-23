@@ -16,7 +16,7 @@ namespace UITest.PageObjects
         private TextBox _SearchTextBox;
         private Button _BackButton;
         private Button _ForwardButton;
-        private WebElement _UserTable;
+        private Table _UserTable;
 
 
         public string URL { get => _URL; set => _URL = value; }
@@ -25,7 +25,7 @@ namespace UITest.PageObjects
         public TextBox SearchTextBox { get => _SearchTextBox; set => _SearchTextBox = value; }
         public Button BackButton { get => _BackButton; }
         public Button ForwardButton { get => _ForwardButton; }
-        public WebElement UserTable { get => _UserTable; }
+        public Table UserTable { get => _UserTable; }
         public IDriver Driver { get => _Driver; }
 
         public ManagingAccessPage(IDriver Driver)
@@ -36,7 +36,7 @@ namespace UITest.PageObjects
             _SearchTextBox = new TextBox(Driver, Enums.FINDBY.ID, ManagingAccessModel.SearchTextBox);
             _BackButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ManagingAccessModel.BackButton);
             _ForwardButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ManagingAccessModel.ForwardButton);
-            _UserTable = new WebElement(Driver, Enums.FINDBY.ID, ManagingAccessModel.UserTable);
+            _UserTable = new Table(Driver, Enums.FINDBY.ID, ManagingAccessModel.UserTable);
         }
     }
 }

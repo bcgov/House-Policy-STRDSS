@@ -91,21 +91,20 @@ Refer to [Public Short-Term Rental Data API.pdf](./Public%20Short-Term%20Rental%
    export CLIENT_ID="your_client_id"
    export CLIENT_SECRET="your_secret"
 
-   curl -X POST https://dev.loginproxy.gov.bc.ca/auth/realms/apigw/protocol/openid-connect/token \
+   RESPONSE=$(curl -X POST https://dev.loginproxy.gov.bc.ca/auth/realms/apigw/protocol/openid-connect/token \
    -H "Content-Type: application/x-www-form-urlencoded" \
    -H "Authorization: Basic $(echo -n $CLIENT_ID:$CLIENT_SECRET | base64)" \
    -H "Accept: application/json" \
    -H "Cache-Control: no-cache" \
    -H "Connection: keep-alive" \
    --data-urlencode "grant_type=client_credentials" \
-   --compressed
-   ```
+   --compressed)
 
-1. Call API with the token.
+   TOKEN=$(echo $RESPONSE | jq -r .access_token)
+   echo "TOKEN: $TOKEN"
 
-   ```sh
    curl -X GET "https://strdata.dev.api.gov.bc.ca/api/organizations/strrequirements?longitude=-123.3709161&latitude=48.4177006" \
-   -H "Authorization: Bearer your_token" \
+   -H "Authorization: Bearer ${TOKEN}" \
    -H "Accept: application/json" \
    -H "Accept-Encoding: gzip, deflate, br" \
    -H "Connection: keep-alive" \

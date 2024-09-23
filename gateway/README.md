@@ -20,7 +20,7 @@ https://bcgov.github.io/aps-infra-platform/guides/owner-journey-v1/
 1. In the namespace, authorization profile has been created as follows:
     * Flow: Client Credential Flow, using Client ID and Secret
     * Mode: Automatic
-    * Client Mappers (Audience): gateway-awp
+    * Client Mappers (Audience): gateway-strdata
 
 
 ### Publication

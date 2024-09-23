@@ -132,6 +132,8 @@ namespace StrDss.Data.Repositories
         public async Task<int> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var query = _dbSet.AsNoTracking();
 
             if (_currentUser.OrganizationType == OrganizationTypes.LG)
@@ -150,6 +152,10 @@ namespace StrDss.Data.Repositories
                     MatchAddressTxt = g.Key.MatchAddressTxt
                 })
                 .CountAsync();
+
+            stopwatch.Stop();
+
+            _logger.LogDebug($"Get Grouped Listings Count - Total Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return count;
         }

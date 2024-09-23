@@ -69,7 +69,7 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Stop();
 
-            _logger.LogDebug($"Get Grouped Listings (group) - Counting groups. Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogDebug($"Get Data - Counting Data. Page Size: {pageSize}, Page Number: {pageNumber}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             stopwatch.Restart();
 
@@ -77,7 +77,7 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Stop();
 
-            _logger.LogDebug($"Get Grouped Listings (group) - Getting groups. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogDebug($"Get Data  Getting Data. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             stopwatch.Restart();
 
@@ -104,7 +104,7 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Stop();
 
-            _logger.LogDebug($"Get Grouped Listings (group) - Mapping groups to DTO. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogDebug($"Get Data - Mapping Data to DTO. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return pagedDTO;
         }

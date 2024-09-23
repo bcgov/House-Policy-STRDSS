@@ -21,7 +21,7 @@ namespace UITest.PageObjects
         private Button _SendNoticeOfNonComplianceButton;
         private Button _SendTakedownRequestButton;
         private CheckBox _SelectAllCheckbox;
-        private WebElement _ListingsTable;
+        private Table _ListingsTable;
 
         public string URL { get => _URL; set => _URL = value; }
 
@@ -44,7 +44,7 @@ namespace UITest.PageObjects
 
         public CheckBox SelectAllCheckbox { get => _SelectAllCheckbox; set => _SelectAllCheckbox = value; }
 
-        public WebElement ListingsTable { get => _ListingsTable; }
+        public Table ListingsTable { get => _ListingsTable; }
         public IDriver Driver { get => _Driver; }
 
         public ListingsPage(IDriver Driver)
@@ -60,7 +60,7 @@ namespace UITest.PageObjects
             _ErrorMessageBox = new MessageBox(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.ErrorMessageBox);
             _ListingsTypeDropDown = new DropDownList(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.ListingsTypeDropDown);
             _SelectAllCheckbox = new CheckBox(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.SelectAllCheckbox);
-            _ListingsTable = new WebElement(Driver, Enums.FINDBY.ID, ListingsPageModel.ListingsTable);
+            _ListingsTable = new Table(Driver, Enums.FINDBY.ID, ListingsPageModel.ListingsTable);
         }
     }
 }

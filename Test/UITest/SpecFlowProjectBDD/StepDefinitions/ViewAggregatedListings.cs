@@ -54,7 +54,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _UnitOfWork = new UnitOfWork(_DssDBContext);
 
         }
-        //[Given(@"that I am an authenticated user ""(.*)"" with the necessary permissions to view listings View listings (listing_read)  and the expected result is ""(.*)"" and I am a ""(.*)"" user")]
 
         [Given(@"that I am an authenticated user ""(.*)"" with the necessary permissions to view listings and the expected result is ""(.*)"" and I am a ""(.*)"" user")]
         public void GivenIAmAauthenticatedLGStaffMemberUser(string UserName, string ExpectedResult = "pass", string UserType = "")
@@ -81,20 +80,26 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When(@"I access the Data Portal")]
         public void WhenIAccessTheDataPortal()
         {
-            //throw new PendingStepException();
+
         }
 
         [Given(@"that I am on the aggregated listing page")]
         public void GivenThatIAmOnTheAggregatedListingPage()
         {
 
-            //throw new PendingStepException();
+            _LandingPage.AggregatedListingsButton.Click();
         }
 
         [Then(@"I should see a parent row for each STR “property grouping “with information that is common to all listings associated with the group")]
         public void ThenIShouldSeeAParentRowForEachSTRPropertyGroupingWithInformationThatIsCommonToAllListingsAssociatedWithTheGroup()
         {
-            //throw new PendingStepException();
+            var rowData = _AggregatedListingsPage.AggregatedListingsTable.GetHeaderRow();
+            ClassicAssert.AreEqual("Primary Host Name", rowData[1]);
+            ClassicAssert.AreEqual("Address (Best Match)", rowData[2]);
+            ClassicAssert.AreEqual("Nights Stayed (YTD)", rowData[3]);
+            ClassicAssert.AreEqual("Listing’s Business Licence", rowData[4]);
+            ClassicAssert.AreEqual("Last Action", rowData[5]);
+            ClassicAssert.AreEqual("Last Action Date", rowData[6]);
         }
 
         [Then(@"the ability to view drop down child rows under each parent row  so that I can review all listings that are associated with a property grouping")]

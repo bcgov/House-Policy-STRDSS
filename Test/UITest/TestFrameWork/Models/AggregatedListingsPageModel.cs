@@ -20,7 +20,7 @@
         public static string SendNoticeOfNonComplianceButton { get => "send_delisting_notice_btn"; }
         public static string SendTakedownRequestButton { get => "send_takedown_request_btn"; }
 
-        public static string AggregatedListingsTable { get => "listings-table"; }
+        public static string AggregatedListingsTable { get => "[id^='pn_id_'][id$='-table']"; }
 
         public static string SelectAllCheckbox {get => "[id^='pn_id_'][id$='-table'] > thead > tr > th:nth-child(1) > p-tableheadercheckbox > div > div.p-checkbox-box"; }
 

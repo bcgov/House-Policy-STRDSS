@@ -27,7 +27,8 @@ namespace UITest.SeleniumObjects
             try
             {
                 // Locate the table using the provided CSS selector
-                var table = _Driver.FindElement(By.CssSelector(Locator));
+                bool result = FindElement(LocatorType, Locator);
+                var table = Element;
 
                 // Locate the specified row and column cell within the table
                 var cell = table.FindElement(By.CssSelector($"tr:nth-child({row + 1}) td:nth-child({column + 1})"));
@@ -42,18 +43,27 @@ namespace UITest.SeleniumObjects
             }
         }
 
-        public List<string> GetRow(int row)
+        public List<string> GetHeaderRow()
+        {
+            return(GetRowValues(0, "th"));
+        }
+
+
+        public List<string> GetRowValues(int row, string TagName = "td")
         {
             try
             {
                 // Locate the table using the provided CSS selector
-                var table = _Driver.FindElement(By.CssSelector(Locator));
+                bool result = FindElement(LocatorType, Locator);
+                var table = Element;
 
                 // Locate the specified row within the table
                 var rowElement = table.FindElement(By.CssSelector($"tr:nth-child({row + 1})"));
+                var txt = rowElement.Text;
 
                 // Retrieve all cell elements (td) within the specified row
-                var cells = rowElement.FindElements(By.TagName("td"));
+                var cells = rowElement.FindElements(By.TagName(TagName));
+                var txts = cells.ToList();
 
                 // Return the text content of each cell in the row as a list of strings
                 return cells.Select(cell => cell.Text).ToList();
@@ -65,12 +75,36 @@ namespace UITest.SeleniumObjects
             }
         }
 
-        public List<List<string>> GetAllTableData(string tableLocator)
+        public List<IWebElement> GetRow(int row)
+        {
+
+            // Locate the table using the provided CSS selector
+            //var table = _Driver.FindElement(By.CssSelector(Locator));
+            bool result = FindElement(LocatorType, Locator);
+            var table = Element;
+
+            // Locate the specified row within the table
+            var rowElement = table.FindElement(By.CssSelector($"tr:nth-child({row + 1})"));
+            var txt = rowElement.Text;
+
+            // Retrieve all cell elements (td) within the specified row
+            var cells = rowElement.FindElements(By.TagName("td"));
+            var txts = cells.ToList();
+
+            // Return the text content of each cell in the row as a list of strings
+            //return cells.Select(cell => cell.Text).ToList();
+            return cells.Select(cell => cell).ToList();
+
+        }
+
+        public List<List<string>> GetAllTableData()
         {
             try
             {
                 // Locate the table
-                var table = _Driver.FindElement(By.CssSelector(tableLocator));
+                //var table = _Driver.FindElement(By.CssSelector(Locator));
+                bool result = FindElement(LocatorType, Locator);
+                var table = Element;
 
                 // Locate all rows within the table
                 var rows = table.FindElements(By.CssSelector("tr"));
@@ -99,12 +133,14 @@ namespace UITest.SeleniumObjects
         }
 
         // Method to get the number of rows in the table
-        public int GetRowCount(string tableLocator)
+        public int GetRowCount()
         {
             try
             {
                 // Locate the table
-                var table = _Driver.FindElement(By.CssSelector(tableLocator));
+                //var table = _Driver.FindElement(By.CssSelector(Locator));
+                bool result = FindElement(LocatorType, Locator);
+                var table = Element;
 
                 // Count the number of rows
                 var rows = table.FindElements(By.CssSelector("tr"));
@@ -118,12 +154,14 @@ namespace UITest.SeleniumObjects
         }
 
         // Method to get the number of columns in the first row of the table
-        public int GetColumnCount(string tableLocator)
+        public int GetColumnCount()
         {
             try
             {
                 // Locate the table
-                var table = _Driver.FindElement(By.CssSelector(tableLocator));
+                //var table = _Driver.FindElement(By.CssSelector(Locator));
+                bool result = FindElement(LocatorType, Locator);
+                var table = Element;
 
                 // Locate the first row and count the number of columns (cells)
                 var firstRow = table.FindElement(By.CssSelector("tr:nth-child(1)"));
@@ -141,7 +179,9 @@ namespace UITest.SeleniumObjects
         {
             try
             {
-                var table = _Driver.FindElement(By.CssSelector(Locator));
+                //var table = _Driver.FindElement(By.CssSelector(Locator));
+                bool result = FindElement(LocatorType, Locator);
+                var table = Element;
                 var cell = table.FindElement(By.CssSelector($"tr:nth-child({row + 1}) td:nth-child({column + 1})"));
 
                 // Find an input element inside the cell

@@ -132,18 +132,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
             result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#table-header"").checkVisibility()");
             ClassicAssert.IsTrue(result);
 
-            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#givenNm_th"").textContent.toLowerCase().trim() === ""first name""");
+            var headerRow = _ManagingAccessPage.UserTable.GetHeaderRow();
 
-            ClassicAssert.IsTrue(result);
-
-            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#familyNm_th"").textContent.toLowerCase().trim() === 'last name'");
-            ClassicAssert.IsTrue(result);
-
-            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#orgName_th"").textContent.toLowerCase().trim() === ""organization""");
-            ClassicAssert.IsTrue(result);
-
-            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#emailAddressDsc_th"").textContent.toLowerCase().trim() === ""email address""");
-            ClassicAssert.IsTrue(result);
+            //2
+            //result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#givenNm_th"").textContent.toLowerCase().trim() === ""first name""");
+            ClassicAssert.AreEqual(headerRow[2],"First Name");
+            ClassicAssert.AreEqual(headerRow[3], "Last Name");
+            ClassicAssert.AreEqual(headerRow[6], "Organization");
+            ClassicAssert.AreEqual(headerRow[5], "Email Address");
         }
 
 

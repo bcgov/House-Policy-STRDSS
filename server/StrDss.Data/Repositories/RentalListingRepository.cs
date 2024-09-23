@@ -17,6 +17,8 @@ namespace StrDss.Data.Repositories
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
         Task<PagedDto<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
+        Task<int> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
         Task<List<long>> GetRentalListingIdsToExport();
@@ -125,6 +127,31 @@ namespace StrDss.Data.Repositories
             _logger.LogDebug($"Get Grouped Listings (group) - Page Size: {pageSize}, Page Number: {pageNumber}, Total Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return groupedListings;
+        }
+
+        public async Task<int> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete)
+        {
+            var query = _dbSet.AsNoTracking();
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG)
+            {
+                query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+
+            var count = await query
+                .GroupBy(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
+                .Select(g => new RentalListingGroupDto
+                {
+                    EffectiveBusinessLicenceNo = g.Key.EffectiveBusinessLicenceNo,
+                    EffectiveHostNm = g.Key.EffectiveHostNm,
+                    MatchAddressTxt = g.Key.MatchAddressTxt
+                })
+                .CountAsync();
+
+            return count;
         }
 
         private static void ApplyFilters(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, 

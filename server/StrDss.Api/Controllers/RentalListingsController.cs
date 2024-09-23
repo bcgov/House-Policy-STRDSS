@@ -57,6 +57,19 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("grouped/count")]
+        public async Task<ActionResult> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+            bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete)
+        {
+            var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
+
+            var count = await _listingService.GetGroupedRentalListingsCount(all, address, url, listingId, hostName, businessLicence,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete);
+
+            return Ok(count);
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet("{listingId}")]
         public async Task<ActionResult> GetRentalListing(long listingId)
         {

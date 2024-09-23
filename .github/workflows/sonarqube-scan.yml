@@ -15,6 +15,7 @@ on:
       - localdb/**
       - postgres/**
       - crunchydb/**
+      - gateway/**
 
 jobs:
   backend-scan:

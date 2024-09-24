@@ -5,9 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework.Legacy;
 using SpecFlowProjectBDD.Helpers;
 using System;
+using System.Reflection.Metadata;
+using System.Xml.Linq;
 using TechTalk.SpecFlow;
 using TestFrameWork.Models;
 using UITest.PageObjects;
+using UITest.SeleniumObjects;
 using UITest.TestDriver;
 
 namespace SpecFlowProjectBDD.StepDefinitions
@@ -105,6 +108,10 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"the ability to view drop down child rows under each parent row  so that I can review all listings that are associated with a property grouping")]
         public void ThenTheAbilityToViewDropDownChildRowsUnderEachParentRowSoThatICanReviewAllListingsThatAreAssociatedWithAPropertyGrouping()
         {
+            var rowData = _AggregatedListingsPage.AggregatedListingsTable.GetRow(1);
+
+            _AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#expand-listing-row-0\").click()");
+
             //throw new PendingStepException();
         }
 
@@ -117,6 +124,18 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"I should see information that is “common” to all listings associated with a property, including:")]
         public void ThenIShouldSeeInformationThatIsCommonToAllListingsAssociatedWithAPropertyIncluding()
         {
+
+            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(2)\").innerText") , "Status");
+            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(3)\").innerText") , "Platform");
+            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(4)\").innerText") , "Listing ID");
+            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(5)\").innerText") , "Listing Details");
+            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(6)\").innerText") , "Address (Best Match)");
+            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(7)\").innerText") , "Nights Stayed (YTD)");
+            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(8)\").innerText") , "Business Licence on Listing");
+            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(9)\").innerText") , "Matched Business Licence");
+            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(10)\").innerText") , "Last Action");
+            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(11)\").innerText") , "Last Action Date");
+            //document.querySelector("#pn_id_26-table > thead > tr > th:nth-child(2)")
             //throw new PendingStepException();
         }
 

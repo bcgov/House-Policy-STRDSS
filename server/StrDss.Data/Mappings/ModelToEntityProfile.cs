@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using StrDss.Common;
 using StrDss.Data.Entities;
+using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Model.UserDtos;
 
@@ -29,6 +30,7 @@ namespace StrDss.Data.Mappings
                 .ForMember(dest => dest.SeparateReservationsQty, opt => opt.MapFrom(src => CommonUtils.StringToShort(src.ReservationsQty)));
 
             CreateMap<RoleUpdateDto, DssUserRole>();
+            CreateMap<PlatformCreateDto, DssOrganization>();
         }
     }
 }

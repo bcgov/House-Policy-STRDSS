@@ -77,5 +77,15 @@ namespace StrDss.Api.Controllers
 
             return Ok(await _orgService.GetStrRequirements(longitude, latitude));
         }
+
+
+        [ApiAuthorize()]
+        [HttpGet("platforms")]
+        public async Task<ActionResult> GetPlatforms(int pageSize = 10, int pageNumber = 1, string orderBy = "OrganizationNm", string direction = "asc")
+        {
+            var platforms = await _orgService.GetPlatforms(pageSize, pageNumber, orderBy, direction);
+            return Ok(platforms);
+        }
+
     }
 }

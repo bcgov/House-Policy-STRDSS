@@ -24,6 +24,7 @@ namespace StrDss.Data.Repositories
         Task<long?> GetManagingOrgId(long orgId);
         Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude);
         Task<PagedDto<PlatformViewDto>> GetPlatforms(int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PlatformViewDto?> GetPlatform(long id);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -164,5 +165,15 @@ namespace StrDss.Data.Repositories
 
             return platforms;
         }
+
+        public async Task<PlatformViewDto?> GetPlatform(long id)
+        {
+            var platform = _mapper.Map<PlatformViewDto>(await _dbContext.DssPlatformVws.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == id));
+
+            platform.Subsidiaries = _mapper.Map<List<PlatformViewDto>>(await _dbContext.DssPlatformVws.AsNoTracking().Where(x => x.ManagingOrganizationId == id).ToListAsync());
+
+            return platform;
+        }
+
     }
 }

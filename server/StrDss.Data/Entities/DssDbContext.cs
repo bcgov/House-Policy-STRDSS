@@ -667,10 +667,14 @@ public partial class DssDbContext : DbContext
                 .ToView("dss_platform_vw");
 
             entity.Property(e => e.ManagingOrganizationId).HasColumnName("managing_organization_id");
-            entity.Property(e => e.NoticeOfTakedownContactEmail)
+            entity.Property(e => e.NoticeOfTakedownContactEmail1)
                 .HasMaxLength(320)
-                .HasColumnName("notice_of_takedown_contact_email");
-            entity.Property(e => e.NoticeOfTakedownContactId).HasColumnName("notice_of_takedown_contact_id");
+                .HasColumnName("notice_of_takedown_contact_email_1");
+            entity.Property(e => e.NoticeOfTakedownContactEmail2)
+                .HasMaxLength(320)
+                .HasColumnName("notice_of_takedown_contact_email_2");
+            entity.Property(e => e.NoticeOfTakedownContactId1).HasColumnName("notice_of_takedown_contact_id_1");
+            entity.Property(e => e.NoticeOfTakedownContactId2).HasColumnName("notice_of_takedown_contact_id_2");
             entity.Property(e => e.OrganizationCd)
                 .HasMaxLength(25)
                 .HasColumnName("organization_cd");
@@ -678,10 +682,17 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.OrganizationNm)
                 .HasMaxLength(250)
                 .HasColumnName("organization_nm");
-            entity.Property(e => e.TakedownRequestContactEmail)
+            entity.Property(e => e.OrganizationType)
+                .HasMaxLength(25)
+                .HasColumnName("organization_type");
+            entity.Property(e => e.TakedownRequestContactEmail1)
                 .HasMaxLength(320)
-                .HasColumnName("takedown_request_contact_email");
-            entity.Property(e => e.TakedownRequestContactId).HasColumnName("takedown_request_contact_id");
+                .HasColumnName("takedown_request_contact_email_1");
+            entity.Property(e => e.TakedownRequestContactEmail2)
+                .HasMaxLength(320)
+                .HasColumnName("takedown_request_contact_email_2");
+            entity.Property(e => e.TakedownRequestContactId1).HasColumnName("takedown_request_contact_id_1");
+            entity.Property(e => e.TakedownRequestContactId2).HasColumnName("takedown_request_contact_id_2");
             entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
             entity.Property(e => e.UpdUserGuid).HasColumnName("upd_user_guid");
         });

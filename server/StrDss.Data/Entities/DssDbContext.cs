@@ -31,6 +31,8 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssPhysicalAddress> DssPhysicalAddresses { get; set; }
 
+    public virtual DbSet<DssPlatformVw> DssPlatformVws { get; set; }
+
     public virtual DbSet<DssRentalListing> DssRentalListings { get; set; }
 
     public virtual DbSet<DssRentalListingContact> DssRentalListingContacts { get; set; }
@@ -656,6 +658,32 @@ public partial class DssDbContext : DbContext
             entity.HasOne(d => d.ReplacingPhysicalAddress).WithMany(p => p.InverseReplacingPhysicalAddress)
                 .HasForeignKey(d => d.ReplacingPhysicalAddressId)
                 .HasConstraintName("dss_physical_address_fk_replaced_by");
+        });
+
+        modelBuilder.Entity<DssPlatformVw>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("dss_platform_vw");
+
+            entity.Property(e => e.ManagingOrganizationId).HasColumnName("managing_organization_id");
+            entity.Property(e => e.NoticeOfTakedownContactEmail)
+                .HasMaxLength(320)
+                .HasColumnName("notice_of_takedown_contact_email");
+            entity.Property(e => e.NoticeOfTakedownContactId).HasColumnName("notice_of_takedown_contact_id");
+            entity.Property(e => e.OrganizationCd)
+                .HasMaxLength(25)
+                .HasColumnName("organization_cd");
+            entity.Property(e => e.OrganizationId).HasColumnName("organization_id");
+            entity.Property(e => e.OrganizationNm)
+                .HasMaxLength(250)
+                .HasColumnName("organization_nm");
+            entity.Property(e => e.TakedownRequestContactEmail)
+                .HasMaxLength(320)
+                .HasColumnName("takedown_request_contact_email");
+            entity.Property(e => e.TakedownRequestContactId).HasColumnName("takedown_request_contact_id");
+            entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserGuid).HasColumnName("upd_user_guid");
         });
 
         modelBuilder.Entity<DssRentalListing>(entity =>

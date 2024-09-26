@@ -87,5 +87,12 @@ namespace StrDss.Api.Controllers
             return Ok(platforms);
         }
 
+        [ApiAuthorize()]
+        [HttpGet("platforms/{id}")]
+        public async Task<ActionResult> GetPlatform(long id)
+        {
+            var platform = await _orgService.GetPlatform(id);
+            return Ok(platform);
+        }
     }
 }

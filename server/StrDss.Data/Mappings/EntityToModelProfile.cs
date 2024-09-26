@@ -52,6 +52,7 @@ namespace StrDss.Data.Mappings
 
             CreateMap<DssBusinessLicence, BizLicenceSearchDto>();
             CreateMap<DssOrganization, PlatformCreateDto>();
+            CreateMap<DssPlatformVw, PlatformViewDto>();
         }
     }
 }

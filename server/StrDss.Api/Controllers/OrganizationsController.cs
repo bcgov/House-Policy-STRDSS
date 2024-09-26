@@ -81,7 +81,7 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize()]
         [HttpGet("platforms")]
-        public async Task<ActionResult> GetPlatforms(int pageSize = 10, int pageNumber = 1, string orderBy = "OrganizationNm", string direction = "asc")
+        public async Task<ActionResult<List<PlatformViewDto>>> GetPlatforms(int pageSize = 10, int pageNumber = 1, string orderBy = "OrganizationNm", string direction = "asc")
         {
             var platforms = await _orgService.GetPlatforms(pageSize, pageNumber, orderBy, direction);
             return Ok(platforms);
@@ -89,9 +89,15 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize()]
         [HttpGet("platforms/{id}")]
-        public async Task<ActionResult> GetPlatform(long id)
+        public async Task<ActionResult<PlatformViewDto>> GetPlatform(long id)
         {
             var platform = await _orgService.GetPlatform(id);
+
+            if (platform == null)
+            {
+                return NotFound();
+            }
+
             return Ok(platform);
         }
     }

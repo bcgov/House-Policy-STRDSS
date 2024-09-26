@@ -18,6 +18,7 @@ namespace StrDss.Service
         Task<OrganizationDto?> GetOrganizationByIdAsync(long id);
         Task<long?> GetContainingOrganizationId(Point point);
         Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude);
+        Task<PagedDto<PlatformViewDto>> GetPlatforms(int pageSize, int pageNumber, string orderBy, string direction);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -58,6 +59,11 @@ namespace StrDss.Service
         public async Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude)
         {
             return await _orgRepo.GetStrRequirements(longitude, latitude);
+        }
+
+        public async Task<PagedDto<PlatformViewDto>> GetPlatforms(int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            return await _orgRepo.GetPlatforms(pageSize, pageNumber, orderBy, direction);
         }
     }
 }

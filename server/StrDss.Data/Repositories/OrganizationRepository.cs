@@ -9,6 +9,7 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
+using StrDss.Model.RentalReportDtos;
 
 namespace StrDss.Data.Repositories
 {
@@ -22,6 +23,7 @@ namespace StrDss.Data.Repositories
         Task<long?> GetContainingOrganizationId(Point point);
         Task<long?> GetManagingOrgId(long orgId);
         Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude);
+        Task<PagedDto<PlatformViewDto>> GetPlatforms(int pageSize, int pageNumber, string orderBy, string direction);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -146,6 +148,21 @@ namespace StrDss.Data.Repositories
                 .FirstOrDefaultAsync();
 
             return strRequirement;
+        }
+
+        public async Task<PagedDto<PlatformViewDto>> GetPlatforms(int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            var query = _dbContext.DssPlatformVws.AsNoTracking().Where(x => x.ManagingOrganizationId == null);
+
+            var platforms = await Page<DssPlatformVw, PlatformViewDto>(query, pageSize, pageNumber, orderBy, direction);
+
+            foreach (var platform in platforms.SourceList)
+            {
+                platform.Subsidiaries = _mapper.Map <List<PlatformViewDto>>
+                    (await _dbContext.DssPlatformVws.AsNoTracking().Where(x => x.ManagingOrganizationId == platform.OrganizationId).ToListAsync());
+            }
+
+            return platforms;
         }
     }
 }

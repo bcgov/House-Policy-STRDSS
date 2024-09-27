@@ -13,14 +13,14 @@
         public string OrganizationNm { get; set; } = null!;
         public DateTime UpdDtm { get; set; }
         public Guid? UpdUserGuid { get; set; }
-        public long? NoticeOfTakedownContactId1 { get; set; }
-        public string? NoticeOfTakedownContactEmail1 { get; set; }
-        public long? TakedownRequestContactId1 { get; set; }
-        public string? TakedownRequestContactEmail1 { get; set; }
-        public long? NoticeOfTakedownContactId2 { get; set; }
-        public string? NoticeOfTakedownContactEmail2 { get; set; }
-        public long? TakedownRequestContactId2 { get; set; }
-        public string? TakedownRequestContactEmail2 { get; set; }
+        public long? PrimaryNoticeOfTakedownContactId { get; set; }
+        public string? PrimaryNoticeOfTakedownContactEmail { get; set; }
+        public long? PrimaryTakedownRequestContactId { get; set; }
+        public string? PrimaryTakedownRequestContactEmail { get; set; }
+        public long? SecondaryNoticeOfTakedownContactId { get; set; }
+        public string? SecondaryNoticeOfTakedownContactEmail { get; set; }
+        public long? SecondaryTakedownRequestContactId { get; set; }
+        public string? SecondaryTakedownRequestContactEmail { get; set; }
         public virtual ICollection<PlatformViewDto> Subsidiaries { get; set; }
     }
 }

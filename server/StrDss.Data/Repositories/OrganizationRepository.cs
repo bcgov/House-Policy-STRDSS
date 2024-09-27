@@ -190,10 +190,10 @@ namespace StrDss.Data.Repositories
 
             await _dbSet.AddAsync(entity);
 
-            CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.NoticeOfTakedownContactEmail1, true);
-            CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.NoticeOfTakedownContactEmail2, false);
-            CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.TakedownRequestContactEmail1, true);
-            CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.TakedownRequestContactEmail2, false);
+            CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.PrimaryNoticeOfTakedownContactEmail, true);
+            CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.SecondaryNoticeOfTakedownContactEmail, false);
+            CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
+            CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
 
             return entity;
         }
@@ -224,10 +224,10 @@ namespace StrDss.Data.Repositories
 
             _mapper.Map(dto, entity);
 
-            UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.NoticeOfTakedownContactEmail1, true);
-            UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.NoticeOfTakedownContactEmail2, false);
-            UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.TakedownRequestContactEmail1, true);
-            UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.TakedownRequestContactEmail2, false);
+            UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.PrimaryNoticeOfTakedownContactEmail, true);
+            UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.SecondaryNoticeOfTakedownContactEmail, false);
+            UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
+            UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
         }
 
         private void UpdateContact(DssOrganization entity, string messageType, string? emailAddress, bool isPrimary)

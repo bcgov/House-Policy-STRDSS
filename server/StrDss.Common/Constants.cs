@@ -112,10 +112,10 @@
         public const string OrganizationId = "OrganizationId";
         public const string OrganizationCd = "OrganizationCd";
         public const string OrganizationNm = "OrganizationNm";
-        public const string NoticeOfTakedownContactEmail1 = "NoticeOfTakedownContactEmail1";
-        public const string TakedownRequestContactEmail1 = "TakedownRequestContactEmail1";
-        public const string NoticeOfTakedownContactEmail2 = "NoticeOfTakedownContactEmail2";
-        public const string TakedownRequestContactEmail2 = "TakedownRequestContactEmail2";
+        public const string PrimaryNoticeOfTakedownContactEmail = "PrimaryNoticeOfTakedownContactEmail";
+        public const string PrimaryTakedownRequestContactEmail = "PrimaryTakedownRequestContactEmail";
+        public const string SecondaryNoticeOfTakedownContactEmail = "SecondaryNoticeOfTakedownContactEmail";
+        public const string SecondaryTakedownRequestContactEmail = "SecondaryTakedownRequestContactEmail";
     }
 
     public static class RentalListingExport

@@ -130,5 +130,35 @@ namespace StrDss.Api.Controllers
 
             return Ok();
         }
+
+        [ApiAuthorize(Permissions.UserWrite)] //todo: use platform_write permission when it's ready in the database
+        [HttpPost("platforms/subsidiaries", Name = "CreatePlatformSub")]
+        public async Task<ActionResult> CreatePlatformSub(PlatformSubCreateDto dto)
+        {
+            var (errors, id) = await _orgService.CreatePlatformSubAsync(dto);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok(id);
+        }
+
+        [ApiAuthorize(Permissions.UserWrite)] //todo: use platform_write permission when it's ready in the database
+        [HttpPut("platforms/subsidiaries/{id}", Name = "UpdatePlatformSub")]
+        public async Task<ActionResult> UpdatePlatformSub(PlatformSubUpdateDto dto, long id)
+        {
+            dto.OrganizationId = id;
+
+            var errors = await _orgService.UpdatePlatformSubAsync(dto);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
+        }
     }
 }

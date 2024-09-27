@@ -1,6 +1,6 @@
 ﻿namespace StrDss.Model.OrganizationDtos
 {
-    public class PlatformCreateDto
+    public class PlatformCreateDto : IPlatformCreateDto
     {
         public string OrganizationCd { get; set; } = null!;
         public string OrganizationNm { get; set; } = null!;

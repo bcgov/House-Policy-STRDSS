@@ -24,6 +24,8 @@ namespace StrDss.Service
         Task<PlatformViewDto?> GetPlatform(long id);
         Task<(Dictionary<string, List<string>>, long)> CreatePlatformAsync(PlatformCreateDto dto);
         Task<Dictionary<string, List<string>>> UpdatePlatformAsync(PlatformUpdateDto dto);
+        Task<(Dictionary<string, List<string>>, long)> CreatePlatformSubAsync(PlatformSubCreateDto dto);
+        Task<Dictionary<string, List<string>>> UpdatePlatformSubAsync(PlatformSubUpdateDto dto);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -94,7 +96,7 @@ namespace StrDss.Service
             return (errors, entity.OrganizationId);            
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidatePlatformCreateDto(PlatformCreateDto dto, Dictionary<string, List<string>> errors)
+        private async Task<Dictionary<string, List<string>>> ValidatePlatformCreateDto(IPlatformCreateDto dto, Dictionary<string, List<string>> errors)
         {
             _validator.Validate(Entities.Platform, dto, errors);
 
@@ -115,14 +117,6 @@ namespace StrDss.Service
         {
             var errors = new Dictionary<string, List<string>>();
 
-            var platformDto = await _orgRepo.GetPlatform(dto.OrganizationId);
-
-            if (platformDto == null)
-            {
-                errors.AddItem("OrganizationId", $"Platform with ID {dto.OrganizationId} does not exist");
-                return errors;
-            }
-
             await ValidatePlatformUpdateDto(dto, errors);
 
             if (errors.Any())
@@ -137,11 +131,90 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidatePlatformUpdateDto(PlatformUpdateDto dto, Dictionary<string, List<string>> errors)
+        private async Task<Dictionary<string, List<string>>> ValidatePlatformUpdateDto(IPlatformUpdateDto dto, Dictionary<string, List<string>> errors)
         {
-            await Task.CompletedTask;
+            var platformDto = await _orgRepo.GetPlatform(dto.OrganizationId);
+
+            if (platformDto == null)
+            {
+                errors.AddItem("OrganizationId", $"Platform with ID {dto.OrganizationId} does not exist");
+                return errors;
+            }
 
             _validator.Validate(Entities.Platform, dto, errors);
+
+            return errors;
+        }
+
+        public async Task<(Dictionary<string, List<string>>, long)> CreatePlatformSubAsync(PlatformSubCreateDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            await ValidateParentPlatform(errors, dto.ManagingOrganizationId);
+
+            if (errors.Any())
+            {
+                return (errors, 0);
+            }
+
+            await ValidatePlatformCreateDto(dto, errors);
+
+            if (errors.Any())
+            {
+                return (errors, 0);
+            }
+
+            var entity = await _orgRepo.CreatePlatformSubAsync(dto);
+
+            _unitOfWork.Commit();
+
+            return (errors, entity.OrganizationId);
+        }
+
+        private async Task<Dictionary<string, List<string>>> ValidateParentPlatform(Dictionary<string, List<string>> errors, long parentPlatformId)
+        {
+            var parentPlatform = await _orgRepo.GetOrganizationByIdAsync(parentPlatformId);
+
+            if (parentPlatform == null)
+            {
+                errors.AddItem("ManagingOrganizationId", $"No parent platform found with ID {parentPlatformId}.");
+                return errors;
+            }
+
+            if (parentPlatform.OrganizationType != OrganizationTypes.Platform)
+            {
+                errors.AddItem("ManagingOrganizationId", $"The organization with ID {parentPlatformId} is not a platform (current type: {parentPlatform.OrganizationType}).");
+            }
+
+            if (parentPlatform.ManagingOrganizationId != null)
+            {
+                errors.AddItem("ManagingOrganizationId", $"The parent platform with ID {parentPlatformId} is a subsidiary and a subsidiary cannot be added to a subsidiary platform.");
+            }
+
+            return errors;
+        }
+
+        public async Task<Dictionary<string, List<string>>> UpdatePlatformSubAsync(PlatformSubUpdateDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            await ValidateParentPlatform(errors, dto.ManagingOrganizationId);
+
+            if (errors.Any())
+            {
+                return errors;
+            }
+
+            await ValidatePlatformUpdateDto(dto, errors);
+
+            if (errors.Any())
+            {
+                return errors;
+            }
+
+            await _orgRepo.UpdatePlatformSubAsync(dto);
+
+            _unitOfWork.Commit();
 
             return errors;
         }

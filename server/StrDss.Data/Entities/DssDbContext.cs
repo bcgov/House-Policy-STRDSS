@@ -667,14 +667,6 @@ public partial class DssDbContext : DbContext
                 .ToView("dss_platform_vw");
 
             entity.Property(e => e.ManagingOrganizationId).HasColumnName("managing_organization_id");
-            entity.Property(e => e.NoticeOfTakedownContactEmail1)
-                .HasMaxLength(320)
-                .HasColumnName("notice_of_takedown_contact_email_1");
-            entity.Property(e => e.NoticeOfTakedownContactEmail2)
-                .HasMaxLength(320)
-                .HasColumnName("notice_of_takedown_contact_email_2");
-            entity.Property(e => e.NoticeOfTakedownContactId1).HasColumnName("notice_of_takedown_contact_id_1");
-            entity.Property(e => e.NoticeOfTakedownContactId2).HasColumnName("notice_of_takedown_contact_id_2");
             entity.Property(e => e.OrganizationCd)
                 .HasMaxLength(25)
                 .HasColumnName("organization_cd");
@@ -685,14 +677,22 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.OrganizationType)
                 .HasMaxLength(25)
                 .HasColumnName("organization_type");
-            entity.Property(e => e.TakedownRequestContactEmail1)
+            entity.Property(e => e.PrimaryNoticeOfTakedownContactEmail)
                 .HasMaxLength(320)
-                .HasColumnName("takedown_request_contact_email_1");
-            entity.Property(e => e.TakedownRequestContactEmail2)
+                .HasColumnName("primary_notice_of_takedown_contact_email");
+            entity.Property(e => e.PrimaryNoticeOfTakedownContactId).HasColumnName("primary_notice_of_takedown_contact_id");
+            entity.Property(e => e.PrimaryTakedownRequestContactEmail)
                 .HasMaxLength(320)
-                .HasColumnName("takedown_request_contact_email_2");
-            entity.Property(e => e.TakedownRequestContactId1).HasColumnName("takedown_request_contact_id_1");
-            entity.Property(e => e.TakedownRequestContactId2).HasColumnName("takedown_request_contact_id_2");
+                .HasColumnName("primary_takedown_request_contact_email");
+            entity.Property(e => e.PrimaryTakedownRequestContactId).HasColumnName("primary_takedown_request_contact_id");
+            entity.Property(e => e.SecondaryNoticeOfTakedownContactEmail)
+                .HasMaxLength(320)
+                .HasColumnName("secondary_notice_of_takedown_contact_email");
+            entity.Property(e => e.SecondaryNoticeOfTakedownContactId).HasColumnName("secondary_notice_of_takedown_contact_id");
+            entity.Property(e => e.SecondaryTakedownRequestContactEmail)
+                .HasMaxLength(320)
+                .HasColumnName("secondary_takedown_request_contact_email");
+            entity.Property(e => e.SecondaryTakedownRequestContactId).HasColumnName("secondary_takedown_request_contact_id");
             entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
             entity.Property(e => e.UpdUserGuid).HasColumnName("upd_user_guid");
         });

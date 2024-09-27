@@ -41,9 +41,10 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private IUnitOfWork _UnitOfWork;
         private SFEnums.Environment _Environment = SFEnums.Environment.LOCAL;
 
+        //want to get first row (0), but row 0 returns and empty list instead of the values of row 0
         int _row = 1;
-        int _listingIDColumn = 4;
-        int _organizationColumn = 3;
+        int _listingIDColumn = 3;
+        int _organizationColumn = 2;
         int _InvalidEmailColumn = 2;
 
         public SendingMultipleNoticesOfNonComplianceWithInvalidEmail(SeleniumDriver Driver)
@@ -64,7 +65,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             _DssDBContext = new DssDbContext(dbContextOptions, dbConnectionString);
             _UnitOfWork = new UnitOfWork(_DssDBContext);
-
         }
 
 
@@ -104,29 +104,29 @@ namespace SpecFlowProjectBDD.StepDefinitions
 
             //get listingID for first listing and update email in DB with an invalid email
             bool result = false;
-            var listingNumber = string.Empty;
+            string listingNumber = string.Empty; 
             string organizationName = string.Empty;
             string listingID = string.Empty;
             long organizationID = 0;
+            List<string> listingsRow = new List<string>();
 
             try
             {
                 Thread.Sleep(2000);
-                listingNumber = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_17-table > tbody > tr:nth-child({_row}) > td:nth-child({_listingIDColumn}) > a"").innerText");
+                listingsRow = _ListingsPage.ListingsTable.GetRowValues(_row);
+                listingNumber = listingsRow[_listingIDColumn].ToString();
+
+                // listingNumber = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_18-table > tbody > tr:nth-child({_row}) > td:nth-child({_listingIDColumn}) > a"").innerText");
             }
             catch (ElementNotVisibleException ex)
             {
                 Console.WriteLine($"Could not read Listing ID for Listings table:Row {_row}");
                 throw ex;
             }
-            catch (Exception)
-            {
-                listingNumber = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_17-table > tbody > tr:nth-child({_row}) > td:nth-child({_listingIDColumn}) > a"").innerText");
-            }
 
             try
             {
-                organizationName = (string)_ListingsPage.ListingsTable.JSExecuteJavaScript(@$"document.querySelector(""#pn_id_17-table > tbody > tr:nth-child({_row}) > td:nth-child({_organizationColumn})"").innerText");
+                organizationName = listingsRow[_organizationColumn];
             }
             catch
             {

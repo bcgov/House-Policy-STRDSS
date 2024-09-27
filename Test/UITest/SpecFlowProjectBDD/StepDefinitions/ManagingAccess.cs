@@ -107,8 +107,6 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("There should be a dedicated section for managing user access requests")]
         public void ThereShouldBeADedicatedSectionForManagingUserAccessRequests()
         {
-            string selector = "body > app-root > app-layout > div.content > app-user-management > div.table-card-container";
-
             bool result = (bool)_ManagingAccessPage.UserTable.IsEnabled();
 
             ClassicAssert.IsTrue(result);
@@ -134,18 +132,14 @@ namespace SpecFlowProjectBDD.StepDefinitions
             result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#table-header"").checkVisibility()");
             ClassicAssert.IsTrue(result);
 
-            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#givenNm_th"").textContent.toLowerCase().trim() === ""first name""");
+            var headerRow = _ManagingAccessPage.UserTable.GetHeaderRow();
 
-            ClassicAssert.IsTrue(result);
-
-            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#familyNm_th"").textContent.toLowerCase().trim() === 'last name'");
-            ClassicAssert.IsTrue(result);
-
-            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#orgName_th"").textContent.toLowerCase().trim() === ""organization""");
-            ClassicAssert.IsTrue(result);
-
-            result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#emailAddressDsc_th"").textContent.toLowerCase().trim() === ""email address""");
-            ClassicAssert.IsTrue(result);
+            //2
+            //result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#givenNm_th"").textContent.toLowerCase().trim() === ""first name""");
+            ClassicAssert.AreEqual(headerRow[2],"First Name");
+            ClassicAssert.AreEqual(headerRow[3], "Last Name");
+            ClassicAssert.AreEqual(headerRow[6], "Organization");
+            ClassicAssert.AreEqual(headerRow[5], "Email Address");
         }
 
 
@@ -158,7 +152,19 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then("I should be able to view detailed information provided by the user, including their role request and any justifications or additional comments")]
         public void ShouldBeAbleToViewDetailedInformationProvidedByTheUser()
         {
+            //Finicky element. Added loop to ensure that the control is ready
+            int trys = 0;
             bool result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#row-0"").checkVisibility()");
+
+            if (!result)
+            {
+                while ((!result) && (trys < 3))
+                {
+                    Thread.Sleep(2000);
+                    result = (bool)_ManagingAccessPage.UserTable.JSExecuteJavaScript(@"document.querySelector(""#row-0"").checkVisibility()");
+                }
+            }
+
             ClassicAssert.IsTrue(result);
         }
 

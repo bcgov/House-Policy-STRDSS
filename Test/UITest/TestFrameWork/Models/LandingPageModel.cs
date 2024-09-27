@@ -14,7 +14,8 @@
 
         public static string UploadPlatformDataButton { get => "uploadPlatformData_btn"; }
 
-        public static string ViewListingsButton { get => "listings_btn"; }
+        public static string ListingsButton { get => "listings_btn"; }
 
+        public static string AggregatedListingsButton { get => "aggregated_listings_btn"; }
     }
 }

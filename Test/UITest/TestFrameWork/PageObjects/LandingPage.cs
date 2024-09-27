@@ -15,6 +15,7 @@ namespace UITest.PageObjects
         private Button _UploadPlatformDataButton;
         private Button _ViewPolicyGuidelinesButton;
         private Button _ViewListingsButton;
+        private Button _AggregatedListingsButton;
 
         private IDriver _Driver;
 
@@ -28,6 +29,7 @@ namespace UITest.PageObjects
         public Button UploadPlatformDataButton { get => _UploadPlatformDataButton; }
         public Button ViewPolicyGuidelinesButton { get => _ViewPolicyGuidelinesButton;}
         public Button ViewListingsButton { get => _ViewListingsButton; }
+        public Button AggregatedListingsButton { get => _AggregatedListingsButton; }
 
         public LandingPage(IDriver Driver)
         {
@@ -39,8 +41,8 @@ namespace UITest.PageObjects
             _EscalateTakedownToCEUButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.EscalateTakedownToCEUButton);
             _UploadPlatformDataButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.UploadPlatformDataButton);
             _ViewPolicyGuidelinesButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ViewPolicyGuidenceButton);
-            _ViewListingsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ViewListingsButton);
-
+            _ViewListingsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ListingsButton);
+            _AggregatedListingsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.AggregatedListingsButton);
         }
 
         public bool Navigate()

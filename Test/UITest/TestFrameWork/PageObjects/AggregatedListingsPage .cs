@@ -5,11 +5,11 @@ using UITest.TestObjectFramework;
 
 namespace UITest.PageObjects
 {
-    public class ListingsPage
+    public class AggregatedListingsPage
     {
         private IDriver _Driver;
 
-        private string _URL = @"localhost:5002/listings";
+        private string _URL = @"localhost:5002/aggregated-listings";
 
         private DropDownList _ListingsTypeDropDown;
         private MessageBox _ErrorMessageBox;
@@ -21,7 +21,7 @@ namespace UITest.PageObjects
         private Button _SendNoticeOfNonComplianceButton;
         private Button _SendTakedownRequestButton;
         private CheckBox _SelectAllCheckbox;
-        private Table _ListingsTable;
+        private Table _AggregatedListingsTable;
 
         public string URL { get => _URL; set => _URL = value; }
 
@@ -44,23 +44,23 @@ namespace UITest.PageObjects
 
         public CheckBox SelectAllCheckbox { get => _SelectAllCheckbox; set => _SelectAllCheckbox = value; }
 
-        public Table ListingsTable { get => _ListingsTable; }
+        public Table AggregatedListingsTable { get => _AggregatedListingsTable; }
         public IDriver Driver { get => _Driver; }
 
-        public ListingsPage(IDriver Driver)
+        public AggregatedListingsPage(IDriver Driver)
         {
             _Driver = Driver;
-            _LastPageButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.LastPageButton);
-            _FirstPageButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.FirstPageButton);
-            _NextPageButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.NextPageButton);
-            _PrevPageButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.PrevPageButton);
-            _SendNoticeOfNonComplianceButton = new Button(Driver, Enums.FINDBY.ID, ListingsPageModel.SendNoticeOfNonComplianceButton);
-            _SendTakedownRequestButton = new Button(Driver, Enums.FINDBY.ID, ListingsPageModel.SendTakedownRequestButton);
-            _RowsPerPageTextBox = new TextBox(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.RowsPerPageTextBox);
-            _ErrorMessageBox = new MessageBox(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.ErrorMessageBox);
-            _ListingsTypeDropDown = new DropDownList(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.ListingsTypeDropDown);
-            _SelectAllCheckbox = new CheckBox(Driver, Enums.FINDBY.CSSSELECTOR, ListingsPageModel.SelectAllCheckbox);
-            _ListingsTable = new Table(Driver, Enums.FINDBY.ID, ListingsPageModel.ListingsTable);
+            _LastPageButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.LastPageButton);
+            _FirstPageButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.FirstPageButton);
+            _NextPageButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.NextPageButton);
+            _PrevPageButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.PrevPageButton);
+            _SendNoticeOfNonComplianceButton = new Button(Driver, Enums.FINDBY.ID, AggregatedListingsPageModel.SendNoticeOfNonComplianceButton);
+            _SendTakedownRequestButton = new Button(Driver, Enums.FINDBY.ID, AggregatedListingsPageModel.SendTakedownRequestButton);
+            _RowsPerPageTextBox = new TextBox(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.RowsPerPageTextBox);
+            _ErrorMessageBox = new MessageBox(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.ErrorMessageBox);
+            _ListingsTypeDropDown = new DropDownList(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.ListingsTypeDropDown);
+            _SelectAllCheckbox = new CheckBox(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.SelectAllCheckbox);
+            _AggregatedListingsTable = new Table(Driver, Enums.FINDBY.CSSSELECTOR, AggregatedListingsPageModel.AggregatedListingsTable);
         }
     }
 }

@@ -70,15 +70,17 @@ namespace SpecFlowProjectBDD.Helpers
 
             //Sleep for 5 seconds and try twice in case text boxes are rendered, but not yet ready. Selenium WaitFor would be a better option than 
             // Sleep, but it is not reliable for authentication
-            while ((result == false) && (i++ < 2))
+            while ((result == false) && (i++ < 3))
             {
+                string url = _Driver.GetCurrentURL();
                 switch (logonType)
                 {
                     case LogonTypeEnum.IDIR:
                         {
                             try
                             {
-                                _PathFinderPage.IDRButton.Click();
+                                if (url.Contains(@"openid-connect/auth"))
+                                    _PathFinderPage.IDRButton.Click();
                                 Thread.Sleep(5000);
                                 //_IDRLoginPage.UserNameTextBox.WaitFor(30);
                                 _IDRLoginPage.UserNameTextBox.EnterText(_TestUserName);
@@ -88,7 +90,7 @@ namespace SpecFlowProjectBDD.Helpers
                             }
                             catch (Exception ex) when (ex is NoSuchElementException || ex is WebDriverTimeoutException)
                             {
-                                if (_Driver.GetCurrentURL().Contains(@"openid-connect/auth"))
+                                if (url.Contains(@"openid-connect/auth")||url.Contains(@"/logon.cgi"))
                                     continue;
                             }
 
@@ -98,7 +100,8 @@ namespace SpecFlowProjectBDD.Helpers
                         {
                             try
                             {
-                                _PathFinderPage.BCIDButton.Click();
+                                if (url.Contains(@"openid-connect/auth"))
+                                    _PathFinderPage.BCIDButton.Click();
                                 Thread.Sleep(5000);
                                 _BCIDPage.UserNameTextBox.WaitFor(5);
                                 _BCIDPage.UserNameTextBox.EnterText(_TestUserName);
@@ -108,7 +111,7 @@ namespace SpecFlowProjectBDD.Helpers
                             }
                             catch (Exception ex) when (ex is NoSuchElementException || ex is WebDriverTimeoutException)
                             {
-                                if (_Driver.GetCurrentURL().Contains(@"openid-connect/auth"))
+                                if (url.Contains(@"openid-connect/auth") || url.Contains(@"/logon.cgi"))
                                     continue;
                             }
 

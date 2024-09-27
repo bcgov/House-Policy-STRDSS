@@ -21,6 +21,7 @@ namespace StrDss.Service
             RentalListingReportValidationRule.LoadReportValidationRules(_rules);
             RoleValidationRule.LoadReportValidationRules(_rules);
             BizLicenceValidationRule.LoadBizLicenceValidationRules(_rules);
+            PlatformValidationRule.LoadPlatformUpdateValidationRules(_rules);
         }
 
         public IEnumerable<FieldValidationRule> GetFieldValidationRules(string entityName)

@@ -32,6 +32,8 @@ namespace StrDss.Data.Mappings
             CreateMap<RoleUpdateDto, DssUserRole>();
             CreateMap<PlatformCreateDto, DssOrganization>();
             CreateMap<PlatformUpdateDto, DssOrganization>();
+            CreateMap<PlatformSubCreateDto, DssOrganization>();
+            CreateMap<PlatformSubUpdateDto, DssOrganization>();
         }
     }
 }

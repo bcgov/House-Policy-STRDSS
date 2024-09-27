@@ -1605,7 +1605,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/organizations/platforms/592",
+					"raw": "{{host}}/api/organizations/platforms/1402",
 					"host": [
 						"{{host}}"
 					],
@@ -1613,7 +1613,123 @@
 						"api",
 						"organizations",
 						"platforms",
-						"592"
+						"1402"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Platform",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"organizationId\": 0,\r\n    \"organizationCd\": \"TESTCD2\",\r\n    \"organizationNm\": \"TEST ORG 2\",\r\n    \"updDtm\": \"2024-09-27T16:31:12.047Z\",\r\n    \"primaryNoticeOfTakedownContactEmail\": \"email1@email.com\",\r\n    \"primaryTakedownRequestContactEmail\": \"email2@email.com\",\r\n    \"secondaryNoticeOfTakedownContactEmail\": \"email2@email.com\",\r\n    \"secondaryTakedownRequestContactEmail\": \"email2@email.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/organizations/platforms",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"organizations",
+						"platforms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Sub Platform",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"organizationCd\": \"TESTCDSUB11\",\r\n    \"organizationNm\": \"TEST ORG Sub 1\",\r\n    \"managingOrganizationId\": 1402\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/organizations/platforms/subsidiaries",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"organizations",
+						"platforms",
+						"subsidiaries"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Platform",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"organizationNm\": \"TEST ORG11\",\r\n    \"updDtm\": \"2024-09-27T18:21:49.159676Z\",\r\n    \"primaryNoticeOfTakedownContactEmail\": \"email1@email.com\",\r\n    \"primaryTakedownRequestContactEmail\": \"email2@email.com\",\r\n    \"secondaryNoticeOfTakedownContactEmail\": \"email2@email.com\",\r\n    \"secondaryTakedownRequestContactEmail\": \"email2@email.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/organizations/platforms/1402",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"organizations",
+						"platforms",
+						"1402"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Subsidiary",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"organizationNm\": \"TEST ORG11111\",\r\n    \"updDtm\": \"2024-09-27T19:16:10.035433Z\",\r\n    \"managingOrganizationId\": 1402\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/organizations/platforms/subsidiaries/1403",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"organizations",
+						"platforms",
+						"subsidiaries",
+						"1403"
 					]
 				}
 			},

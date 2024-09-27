@@ -29,6 +29,8 @@ namespace StrDss.Data.Repositories
         Task<DssOrganization> CreatePlatformAsync(PlatformCreateDto dto);
         Task<bool> DoesOrgCdExist(string orgCd);
         Task UpdatePlatformAsync(PlatformUpdateDto dto);
+        Task<DssOrganization> CreatePlatformSubAsync(PlatformSubCreateDto dto);
+        Task UpdatePlatformSubAsync(PlatformSubUpdateDto dto);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -188,10 +190,10 @@ namespace StrDss.Data.Repositories
 
             await _dbSet.AddAsync(entity);
 
-            CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.NoticeOfTakedownContactEmail1, true);
-            CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.NoticeOfTakedownContactEmail2, false);
-            CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.TakedownRequestContactEmail1, true);
-            CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.TakedownRequestContactEmail2, false);
+            CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.PrimaryNoticeOfTakedownContactEmail, true);
+            CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.SecondaryNoticeOfTakedownContactEmail, false);
+            CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
+            CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
 
             return entity;
         }
@@ -222,10 +224,10 @@ namespace StrDss.Data.Repositories
 
             _mapper.Map(dto, entity);
 
-            UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.NoticeOfTakedownContactEmail1, true);
-            UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.NoticeOfTakedownContactEmail2, false);
-            UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.TakedownRequestContactEmail1, true);
-            UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.TakedownRequestContactEmail2, false);
+            UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.PrimaryNoticeOfTakedownContactEmail, true);
+            UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.SecondaryNoticeOfTakedownContactEmail, false);
+            UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
+            UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
         }
 
         private void UpdateContact(DssOrganization entity, string messageType, string? emailAddress, bool isPrimary)
@@ -249,6 +251,27 @@ namespace StrDss.Data.Repositories
                     contact.EmailAddressDsc = emailAddress;
                 }                    
             }
+        }
+
+        public async Task<DssOrganization> CreatePlatformSubAsync(PlatformSubCreateDto dto)
+        {
+            var entity = _mapper.Map<DssOrganization>(dto);
+
+            entity.OrganizationCd = dto.OrganizationCd.ToUpperInvariant();
+            entity.OrganizationType = OrganizationTypes.Platform;
+
+            await _dbSet.AddAsync(entity);
+
+            return entity;
+        }
+
+        public async Task UpdatePlatformSubAsync(PlatformSubUpdateDto dto)
+        {
+            var entity = await _dbSet
+                .Include(x => x.DssOrganizationContactPeople)
+                .FirstAsync(x => x.OrganizationId == dto.OrganizationId);
+
+            _mapper.Map(dto, entity);
         }
     }
 }

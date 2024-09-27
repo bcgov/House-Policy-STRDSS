@@ -29,6 +29,8 @@ namespace StrDss.Data.Repositories
         Task<DssOrganization> CreatePlatformAsync(PlatformCreateDto dto);
         Task<bool> DoesOrgCdExist(string orgCd);
         Task UpdatePlatformAsync(PlatformUpdateDto dto);
+        Task<DssOrganization> CreatePlatformSubAsync(PlatformSubCreateDto dto);
+        Task UpdatePlatformSubAsync(PlatformSubUpdateDto dto);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -249,6 +251,27 @@ namespace StrDss.Data.Repositories
                     contact.EmailAddressDsc = emailAddress;
                 }                    
             }
+        }
+
+        public async Task<DssOrganization> CreatePlatformSubAsync(PlatformSubCreateDto dto)
+        {
+            var entity = _mapper.Map<DssOrganization>(dto);
+
+            entity.OrganizationCd = dto.OrganizationCd.ToUpperInvariant();
+            entity.OrganizationType = OrganizationTypes.Platform;
+
+            await _dbSet.AddAsync(entity);
+
+            return entity;
+        }
+
+        public async Task UpdatePlatformSubAsync(PlatformSubUpdateDto dto)
+        {
+            var entity = await _dbSet
+                .Include(x => x.DssOrganizationContactPeople)
+                .FirstAsync(x => x.OrganizationId == dto.OrganizationId);
+
+            _mapper.Map(dto, entity);
         }
     }
 }

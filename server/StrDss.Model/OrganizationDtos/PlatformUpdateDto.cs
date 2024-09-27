@@ -1,6 +1,6 @@
 ﻿namespace StrDss.Model.OrganizationDtos
 {
-    public class PlatformUpdateDto
+    public class PlatformUpdateDto : IPlatformUpdateDto
     {
         public long OrganizationId { get; set; }
         public string OrganizationNm { get; set; } = null!;

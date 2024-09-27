@@ -7,6 +7,8 @@ using StrDss.Data;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
+using StrDss.Model.UserDtos;
+using System.Threading.Tasks;
 
 namespace StrDss.Service
 {
@@ -20,6 +22,7 @@ namespace StrDss.Service
         Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude);
         Task<PagedDto<PlatformViewDto>> GetPlatforms(int pageSize, int pageNumber, string orderBy, string direction);
         Task<PlatformViewDto?> GetPlatform(long id);
+        Task<(Dictionary<string, List<string>>, long)> CreatePlatformAsync(PlatformUpdateDto dto);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -70,6 +73,41 @@ namespace StrDss.Service
         public async Task<PlatformViewDto?> GetPlatform(long id)
         {
             return await _orgRepo.GetPlatform(id);
+        }
+
+        public async Task<(Dictionary<string, List<string>>, long)> CreatePlatformAsync(PlatformUpdateDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            await ValidatePlatformUpdateDto(dto, errors);
+
+            if (errors.Any())
+            {
+                return (errors, 0);
+            }
+
+            var entity = await _orgRepo.CreatePlatformAsync(dto);
+
+            _unitOfWork.Commit();
+
+            return (errors, entity.OrganizationId);            
+        }
+
+        private async Task<Dictionary<string, List<string>>> ValidatePlatformUpdateDto(PlatformUpdateDto dto, Dictionary<string, List<string>> errors)
+        {
+            _validator.Validate(Entities.Platform, dto, errors);
+
+            if (errors.Any())
+            {
+                return errors;
+            }
+
+            if (await _orgRepo.DoesOrgCdExist(dto.OrganizationCd))
+            {
+                errors.AddItem("OrganizationCd", $"Organization Code {dto.OrganizationCd} already exists");
+            }
+
+            return errors;
         }
     }
 }

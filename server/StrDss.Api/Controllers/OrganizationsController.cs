@@ -79,7 +79,7 @@ namespace StrDss.Api.Controllers
         }
 
 
-        [ApiAuthorize()]
+        [ApiAuthorize]
         [HttpGet("platforms")]
         public async Task<ActionResult<List<PlatformViewDto>>> GetPlatforms(int pageSize = 10, int pageNumber = 1, string orderBy = "OrganizationNm", string direction = "asc")
         {
@@ -87,7 +87,7 @@ namespace StrDss.Api.Controllers
             return Ok(platforms);
         }
 
-        [ApiAuthorize()]
+        [ApiAuthorize]
         [HttpGet("platforms/{id}")]
         public async Task<ActionResult<PlatformViewDto>> GetPlatform(long id)
         {
@@ -99,6 +99,20 @@ namespace StrDss.Api.Controllers
             }
 
             return Ok(platform);
+        }
+
+        [ApiAuthorize(Permissions.UserWrite)] //todo: use platform_write permission when it's ready in the database
+        [HttpPost("platforms", Name = "CreatePlatform")]
+        public async Task<ActionResult> CreatePlatform(PlatformUpdateDto dto)
+        {
+            var (errors, id) = await _orgService.CreatePlatformAsync(dto);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok(id);
         }
     }
 }

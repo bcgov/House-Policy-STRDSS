@@ -1,8 +1,8 @@
 ﻿namespace StrDss.Model.OrganizationDtos
 {
-    public class PlatformUpdateDto
+    public class PlatformCreateDto
     {
-        public long OrganizationId { get; set; }
+        public string OrganizationCd { get; set; } = null!;
         public string OrganizationNm { get; set; } = null!;
         public DateTime UpdDtm { get; set; }
         public string? NoticeOfTakedownContactEmail1 { get; set; }

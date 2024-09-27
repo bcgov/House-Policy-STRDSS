@@ -82,7 +82,7 @@ namespace StrDss.Service
         {
             var errors = new Dictionary<string, List<string>>();
 
-            await ValidatePlatformCreateDto(dto, errors);
+            await ValidatePlatformCreateDto<PlatformCreateDto>(dto, errors);
 
             if (errors.Any())
             {
@@ -93,12 +93,13 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            return (errors, entity.OrganizationId);            
+            return (errors, entity.OrganizationId);
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidatePlatformCreateDto(IPlatformCreateDto dto, Dictionary<string, List<string>> errors)
+        private async Task<Dictionary<string, List<string>>> ValidatePlatformCreateDto<T>(IPlatformCreateDto dto, Dictionary<string, List<string>> errors)
+            where T : class, IPlatformCreateDto
         {
-            _validator.Validate(Entities.Platform, dto, errors);
+            _validator.Validate(Entities.Platform, (T)dto, errors);
 
             if (errors.Any())
             {
@@ -117,7 +118,7 @@ namespace StrDss.Service
         {
             var errors = new Dictionary<string, List<string>>();
 
-            await ValidatePlatformUpdateDto(dto, errors);
+            await ValidatePlatformUpdateDto<PlatformUpdateDto>(dto, errors);
 
             if (errors.Any())
             {
@@ -131,7 +132,8 @@ namespace StrDss.Service
             return errors;
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidatePlatformUpdateDto(IPlatformUpdateDto dto, Dictionary<string, List<string>> errors)
+        private async Task<Dictionary<string, List<string>>> ValidatePlatformUpdateDto<T>(IPlatformUpdateDto dto, Dictionary<string, List<string>> errors)
+            where T : class, IPlatformUpdateDto
         {
             var platformDto = await _orgRepo.GetPlatform(dto.OrganizationId);
 
@@ -141,7 +143,7 @@ namespace StrDss.Service
                 return errors;
             }
 
-            _validator.Validate(Entities.Platform, dto, errors);
+            _validator.Validate(Entities.Platform, (T)dto, errors);
 
             return errors;
         }
@@ -157,7 +159,7 @@ namespace StrDss.Service
                 return (errors, 0);
             }
 
-            await ValidatePlatformCreateDto(dto, errors);
+            await ValidatePlatformCreateDto<PlatformCreateDto>(dto, errors);
 
             if (errors.Any())
             {
@@ -205,7 +207,7 @@ namespace StrDss.Service
                 return errors;
             }
 
-            await ValidatePlatformUpdateDto(dto, errors);
+            await ValidatePlatformUpdateDto<PlatformSubUpdateDto>(dto, errors);
 
             if (errors.Any())
             {

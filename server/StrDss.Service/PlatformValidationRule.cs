@@ -29,7 +29,7 @@ namespace StrDss.Service
             rules.Add(new FieldValidationRule
             {
                 EntityName = Entities.Platform,
-                FieldName = PlatformFields.NoticeOfTakedownContactEmail1,
+                FieldName = PlatformFields.PrimaryNoticeOfTakedownContactEmail,
                 FieldType = FieldTypes.String,
                 Required = true,
                 MaxLength = 320,
@@ -39,7 +39,7 @@ namespace StrDss.Service
             rules.Add(new FieldValidationRule
             {
                 EntityName = Entities.Platform,
-                FieldName = PlatformFields.TakedownRequestContactEmail1,
+                FieldName = PlatformFields.PrimaryTakedownRequestContactEmail,
                 FieldType = FieldTypes.String,
                 Required = true,
                 MaxLength = 320,
@@ -49,7 +49,7 @@ namespace StrDss.Service
             rules.Add(new FieldValidationRule
             {
                 EntityName = Entities.Platform,
-                FieldName = PlatformFields.NoticeOfTakedownContactEmail2,
+                FieldName = PlatformFields.SecondaryNoticeOfTakedownContactEmail,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320,
@@ -59,7 +59,7 @@ namespace StrDss.Service
             rules.Add(new FieldValidationRule
             {
                 EntityName = Entities.Platform,
-                FieldName = PlatformFields.TakedownRequestContactEmail2,
+                FieldName = PlatformFields.SecondaryTakedownRequestContactEmail,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320,

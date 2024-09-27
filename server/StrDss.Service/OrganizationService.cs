@@ -22,7 +22,8 @@ namespace StrDss.Service
         Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude);
         Task<PagedDto<PlatformViewDto>> GetPlatforms(int pageSize, int pageNumber, string orderBy, string direction);
         Task<PlatformViewDto?> GetPlatform(long id);
-        Task<(Dictionary<string, List<string>>, long)> CreatePlatformAsync(PlatformUpdateDto dto);
+        Task<(Dictionary<string, List<string>>, long)> CreatePlatformAsync(PlatformCreateDto dto);
+        Task<Dictionary<string, List<string>>> UpdatePlatformAsync(PlatformUpdateDto dto);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -75,11 +76,11 @@ namespace StrDss.Service
             return await _orgRepo.GetPlatform(id);
         }
 
-        public async Task<(Dictionary<string, List<string>>, long)> CreatePlatformAsync(PlatformUpdateDto dto)
+        public async Task<(Dictionary<string, List<string>>, long)> CreatePlatformAsync(PlatformCreateDto dto)
         {
             var errors = new Dictionary<string, List<string>>();
 
-            await ValidatePlatformUpdateDto(dto, errors);
+            await ValidatePlatformCreateDto(dto, errors);
 
             if (errors.Any())
             {
@@ -93,7 +94,7 @@ namespace StrDss.Service
             return (errors, entity.OrganizationId);            
         }
 
-        private async Task<Dictionary<string, List<string>>> ValidatePlatformUpdateDto(PlatformUpdateDto dto, Dictionary<string, List<string>> errors)
+        private async Task<Dictionary<string, List<string>>> ValidatePlatformCreateDto(PlatformCreateDto dto, Dictionary<string, List<string>> errors)
         {
             _validator.Validate(Entities.Platform, dto, errors);
 
@@ -106,6 +107,41 @@ namespace StrDss.Service
             {
                 errors.AddItem("OrganizationCd", $"Organization Code {dto.OrganizationCd} already exists");
             }
+
+            return errors;
+        }
+
+        public async Task<Dictionary<string, List<string>>> UpdatePlatformAsync(PlatformUpdateDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            var platformDto = await _orgRepo.GetPlatform(dto.OrganizationId);
+
+            if (platformDto == null)
+            {
+                errors.AddItem("OrganizationId", $"Platform with ID {dto.OrganizationId} does not exist");
+                return errors;
+            }
+
+            await ValidatePlatformUpdateDto(dto, errors);
+
+            if (errors.Any())
+            {
+                return errors;
+            }
+
+            await _orgRepo.UpdatePlatformAsync(dto);
+
+            _unitOfWork.Commit();
+
+            return errors;
+        }
+
+        private async Task<Dictionary<string, List<string>>> ValidatePlatformUpdateDto(PlatformUpdateDto dto, Dictionary<string, List<string>> errors)
+        {
+            await Task.CompletedTask;
+
+            _validator.Validate(Entities.Platform, dto, errors);
 
             return errors;
         }

@@ -103,7 +103,7 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.UserWrite)] //todo: use platform_write permission when it's ready in the database
         [HttpPost("platforms", Name = "CreatePlatform")]
-        public async Task<ActionResult> CreatePlatform(PlatformUpdateDto dto)
+        public async Task<ActionResult> CreatePlatform(PlatformCreateDto dto)
         {
             var (errors, id) = await _orgService.CreatePlatformAsync(dto);
 
@@ -113,6 +113,22 @@ namespace StrDss.Api.Controllers
             }
 
             return Ok(id);
+        }
+
+        [ApiAuthorize(Permissions.UserWrite)] //todo: use platform_write permission when it's ready in the database
+        [HttpPut("platforms/{id}", Name = "UpdatePlatform")]
+        public async Task<ActionResult> UpdatePlatform(PlatformUpdateDto dto, long id)
+        {
+            dto.OrganizationId = id;
+
+            var errors = await _orgService.UpdatePlatformAsync(dto);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
         }
     }
 }

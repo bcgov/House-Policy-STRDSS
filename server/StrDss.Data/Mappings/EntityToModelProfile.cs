@@ -51,7 +51,7 @@ namespace StrDss.Data.Mappings
                 .ForMember(o => o.UpdDtm, opt => opt.MapFrom(i => DateUtils.ConvertUtcToPacificTime(i.UpdDtm)));
 
             CreateMap<DssBusinessLicence, BizLicenceSearchDto>();
-            CreateMap<DssOrganization, PlatformCreateDto>();
+            CreateMap<DssOrganization, PlatformUpdateDto>();
             CreateMap<DssPlatformVw, PlatformViewDto>();
         }
     }

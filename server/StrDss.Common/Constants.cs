@@ -12,26 +12,16 @@
         public const string RentalListingRowUntyped = "RentalListingRowUntyped";
         public const string Role = "Role";
         public const string BizLicenceRowUntyped = "BizLicenceRowUntyped";
+        public const string Platform = "Platform";
 
     }
     public static class Fields
     {
-        public const string StreetAddress = "StreetAddress";
-        public const string City = "City";
-        public const string Province = "Province";
-        public const string PostalCode = "PostalCode";
-        public const string ZoningTypeId = "ZoningTypeId";
-        public const string SquareFootage = "SquareFootage";
-        public const string StrAffiliateId = "StrAffiliateId";
-        public const string IsOwnerPrimaryResidence = "IsOwnerPrimaryResidence";
-        public const string ComplianceStatusId = "ComplianceStatusId";
-
         public const string Username = "Username";
         public const string Passwrod = "Passwrod";
         public const string LastName = "LastName";
         public const string PhoneNumber = "PhoneNumber";
         public const string RoleId = "RoleId";
-
     }
 
     public static class RentalListingReportFields
@@ -117,6 +107,16 @@
         public const string PropertyLegalDescriptionTxt = "PropertyLegalDescriptionTxt";
     }
 
+    public static class PlatformFields
+    {
+        public const string OrganizationId = "OrganizationId";
+        public const string OrganizationCd = "OrganizationCd";
+        public const string OrganizationNm = "OrganizationNm";
+        public const string NoticeOfTakedownContactEmail1 = "NoticeOfTakedownContactEmail1";
+        public const string TakedownRequestContactEmail1 = "TakedownRequestContactEmail1";
+        public const string NoticeOfTakedownContactEmail2 = "NoticeOfTakedownContactEmail2";
+        public const string TakedownRequestContactEmail2 = "TakedownRequestContactEmail2";
+    }
 
     public static class RentalListingExport
     {

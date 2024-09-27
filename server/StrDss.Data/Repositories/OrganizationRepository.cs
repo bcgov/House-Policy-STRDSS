@@ -10,6 +10,7 @@ using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
+using System.Data;
 
 namespace StrDss.Data.Repositories
 {
@@ -25,6 +26,8 @@ namespace StrDss.Data.Repositories
         Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude);
         Task<PagedDto<PlatformViewDto>> GetPlatforms(int pageSize, int pageNumber, string orderBy, string direction);
         Task<PlatformViewDto?> GetPlatform(long id);
+        Task<DssOrganization> CreatePlatformAsync(PlatformUpdateDto dto);
+        Task<bool> DoesOrgCdExist(string orgCd);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -175,5 +178,38 @@ namespace StrDss.Data.Repositories
             return platform;
         }
 
+        public async Task<DssOrganization> CreatePlatformAsync(PlatformUpdateDto dto)
+        {
+            var entity = _mapper.Map<DssOrganization>(dto);
+
+            entity.OrganizationType = OrganizationTypes.Platform;
+
+            await _dbSet.AddAsync(entity);
+
+            CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.NoticeOfTakedownContactEmail1, true);
+            CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.NoticeOfTakedownContactEmail2, false);
+            CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.TakedownRequestContactEmail1, true);
+            CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.TakedownRequestContactEmail2, false);
+
+            return entity;
+        }
+
+        private void CreateContact(DssOrganization entity, string messageType, string? emailAddress, bool isPrimary)
+        {
+            if (!string.IsNullOrEmpty(emailAddress))
+            {
+                entity.DssOrganizationContactPeople.Add(new DssOrganizationContactPerson
+                {
+                    EmailAddressDsc = emailAddress,
+                    IsPrimary = isPrimary,
+                    EmailMessageType = messageType
+                });
+            }
+        }
+
+        public async Task<bool> DoesOrgCdExist(string orgCd)
+        {
+            return await _dbSet.AnyAsync(x => x.OrganizationCd == orgCd);
+        }
     }
 }

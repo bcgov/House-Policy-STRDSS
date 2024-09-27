@@ -30,7 +30,7 @@ namespace StrDss.Data.Mappings
                 .ForMember(dest => dest.SeparateReservationsQty, opt => opt.MapFrom(src => CommonUtils.StringToShort(src.ReservationsQty)));
 
             CreateMap<RoleUpdateDto, DssUserRole>();
-            CreateMap<PlatformCreateDto, DssOrganization>();
+            CreateMap<PlatformUpdateDto, DssOrganization>();
         }
     }
 }

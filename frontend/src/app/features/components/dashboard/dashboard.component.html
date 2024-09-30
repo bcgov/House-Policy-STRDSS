@@ -1,15 +1,55 @@
 <h2>Home</h2>
 <div class="cards">
-    <div class="dashboard-card" *ngFor="let card of cardsToDisplay" [id]="card.boxId">
+    <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.main" [id]="card.boxId">
         <div class="card-header">{{card.title}}</div>
-        <div class="card-content">{{card.description}}</div>
+        <div class="card-content">{{card.description}}
+            <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
+        </div>
         <div class="card-actions">
             <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
                 (click)="navigateTo(card.route)">{{card.buttonText}}</button>
         </div>
     </div>
 </div>
-<br>
+<h2 *ngIf="cardSectionsToDisplay.admin.length">Administration Tools</h2>
+<div *ngIf="cardSectionsToDisplay.admin.length" class="cards">
+    <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.admin" [id]="card.boxId">
+        <div class="card-header">{{card.title}}</div>
+        <div class="card-content">{{card.description}}
+            <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
+        </div>
+        <div class="card-actions">
+            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
+                (click)="navigateTo(card.route)">{{card.buttonText}}</button>
+        </div>
+    </div>
+</div>
+<h2 *ngIf="cardSectionsToDisplay.forms.length">Forms</h2>
+<div *ngIf="cardSectionsToDisplay.forms.length" class="cards">
+    <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.forms" [id]="card.boxId">
+        <div class="card-header">{{card.title}}</div>
+        <div class="card-content">{{card.description}}
+            <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
+        </div>
+        <div class="card-actions">
+            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
+                (click)="navigateTo(card.route)">{{card.buttonText}}</button>
+        </div>
+    </div>
+</div>
+<h2 *ngIf="cardSectionsToDisplay.info.length">Information and Support</h2>
+<div *ngIf="cardSectionsToDisplay.info.length" class="cards">
+    <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.info" [id]="card.boxId">
+        <div class="card-header">{{card.title}}</div>
+        <div class="card-content">{{card.description}}
+            <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
+        </div>
+        <div class="card-actions">
+            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
+                (click)="navigateTo(card.route)">{{card.buttonText}}</button>
+        </div>
+    </div>
+</div>
 
 <div class="listings-upload-history" *ngIf="showListingHistory">
     <app-listing-upload-history-table [isSmall]="true"></app-listing-upload-history-table>

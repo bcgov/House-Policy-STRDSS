@@ -6,7 +6,7 @@ import { UserDataService } from '../../../common/services/user-data.service';
 import { CommonModule } from '@angular/common';
 import { User } from '../../../common/models/user';
 import { DashboardService } from '../../../common/services/dashboard.service';
-import { DashboardCard } from '../../../common/models/dashboard-card';
+import { DashboardCard, DashboardCardSections } from '../../../common/models/dashboard-card';
 import { ListingUploadHistoryTableComponent } from '../../../common/listing-upload-history-table/listing-upload-history-table.component';
 import { upload_history_read } from '../../../common/consts/permissions.const';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
@@ -31,6 +31,12 @@ export class DashboardComponent implements OnInit {
   showListingHistory = false;
 
   cardsToDisplay = new Array<DashboardCard>();
+  cardSectionsToDisplay: DashboardCardSections = {
+    main: [],
+    admin: [],
+    forms: [],
+    info: [],
+  }
 
   constructor(
     private router: Router,
@@ -45,7 +51,7 @@ export class DashboardComponent implements OnInit {
     this.userDataService.getCurrentUser().subscribe({
       next: (value: User) => {
         this.currentUser = value;
-        this.cardsToDisplay = this.dashboardService.getCardsPerUserType(this.currentUser);
+        this.cardSectionsToDisplay = this.dashboardService.getCardsPerUserType(this.currentUser);
         this.showListingHistory = this.currentUser.permissions.includes(upload_history_read) && this.currentUser.organizationType !== 'LG';
       },
       complete: () => {

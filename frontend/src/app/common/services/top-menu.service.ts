@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TopMenuItem } from '../models/top-menu-item';
-import { ceu_action, licence_file_upload, listing_file_upload, listing_read, role_read, takedown_action, upload_history_read, user_write } from '../consts/permissions.const';
+import { ceu_action, licence_file_upload, listing_file_upload, listing_read, platform_write, role_read, takedown_action, upload_history_read, user_write } from '../consts/permissions.const';
 import { User } from '../models/user';
 
 @Injectable({
@@ -50,7 +50,7 @@ export class TopMenuService {
         accessPermission: listing_read,
         buttonId: 'listings_mi_btn',
         route: '/listings',
-        title: 'View Listings',
+        title: 'Listing Data',
         folderName: 'Listings',
       },
       {
@@ -64,7 +64,7 @@ export class TopMenuService {
         accessPermission: takedown_action,
         buttonId: 'sendNotice_mi_btn',
         route: '/compliance-notice',
-        title: 'Notice of Non-Compliance',
+        title: 'Send Notice of Non-Compliance',
         description: 'Send a request to an STR platform to remove a non-compliant listing. A Takedown Request can be sent within a period of 5 to 90 days after a Notice of Non-Compliance is delivered.',
         folderName: 'Forms',
       },
@@ -73,7 +73,7 @@ export class TopMenuService {
         buttonId: 'sendTakedownLetter_mi_btn',
         route: '/delisting-request',
         description: 'Send a request to an STR platform to remove a non-compliant listing. A Takedown Request can be sent within a period of 5 to 90 days after a Notice of Non-Compliance is delivered.',
-        title: 'Takedown Request',
+        title: 'Send Takedown Request',
         folderName: 'Forms',
       },
       {
@@ -110,7 +110,7 @@ export class TopMenuService {
         buttonId: 'platformUploadHistory_mi_btn',
         route: '/upload-listing-history',
         description: 'View all platform upload history here',
-        title: 'Upload History',
+        title: 'Platform Upload History',
         folderName: 'Upload',
       },
       {
@@ -135,19 +135,16 @@ export class TopMenuService {
         buttonId: 'roleManagement_mi_btn',
         route: '/roles',
         description: 'Add or edit roles and permissions',
-        title: 'Manage Roles & Permissions',
+        title: 'Manage Roles and Permissions',
         folderName: 'Admin Tools',
       },
-
       {
-        accessPermission: '',
-        buttonId: 'viewPolicyGuidance_mi_btn',
-        route: 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/data-guidelines-localgovernment',
-        orgType: 'LG',
-        isItOrgTypeBased: true,
-        description: 'View the policy guidance for sending Notices, Takedown Requests and Escalations',
-        title: 'Guidance for local governments',
-        folderName: 'Support',
+        accessPermission: platform_write,
+        buttonId: 'platformManagement_mi_btn',
+        route: '/platform-management',
+        disabled: true,
+        title: 'Manage Platforms',
+        folderName: 'Admin Tools',
       },
       {
         accessPermission: '',
@@ -167,6 +164,16 @@ export class TopMenuService {
         isItOrgTypeBased: true,
         description: 'View the guidelines for uploading data and actioning takedown requests',
         title: 'Guideline for Platforms',
+        folderName: 'Support',
+      },
+      {
+        accessPermission: '',
+        buttonId: 'viewPolicyGuidance_mi_btn',
+        route: 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/data-guidelines-localgovernment',
+        orgType: 'LG',
+        isItOrgTypeBased: true,
+        description: 'View the policy guidance for sending Notices, Takedown Requests and Escalations',
+        title: 'Guidance for Local Governments',
         folderName: 'Support',
       },
     ]

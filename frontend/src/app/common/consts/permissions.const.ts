@@ -10,3 +10,4 @@ export const role_read: string = 'role_read';
 export const role_write: string = 'role_write';
 export const address_write: string = 'address_write';
 export const upload_history_read: string = 'upload_history_read';
+export const platform_write: string = 'platform_write';

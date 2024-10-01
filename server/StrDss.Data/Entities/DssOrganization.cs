@@ -79,6 +79,8 @@ public partial class DssOrganization
     /// </summary>
     public bool? IsStrProhibited { get; set; }
 
+    public bool? IsPlatformEnabled { get; set; }
+
     public virtual ICollection<DssBusinessLicence> DssBusinessLicences { get; set; } = new List<DssBusinessLicence>();
 
     public virtual ICollection<DssEmailMessage> DssEmailMessageInvolvedInOrganizations { get; set; } = new List<DssEmailMessage>();

@@ -436,14 +436,16 @@ public partial class DssDbContext : DbContext
                 .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION requires a business licence for Short Term Rental operation")
                 .HasColumnName("is_business_licence_required");
             entity.Property(e => e.IsLgParticipating)
-                .HasComment("Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing")
                 .HasColumnName("is_lg_participating");
+            entity.Property(e => e.IsPlatformEnabled)
+                .HasColumnName("is_platform_enabled");
             entity.Property(e => e.IsPrincipalResidenceRequired)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions")
                 .HasColumnName("is_principal_residence_required");
             entity.Property(e => e.IsStrProhibited)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT ORGANIZATION entirely prohibits short term housing rentals")
                 .HasColumnName("is_str_prohibited");
+
             entity.Property(e => e.LocalGovernmentType)
                 .HasMaxLength(50)
                 .HasComment("A sub-type of local government organization used for sorting and grouping or members")

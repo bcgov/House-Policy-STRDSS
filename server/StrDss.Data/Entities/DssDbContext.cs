@@ -436,6 +436,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION requires a business licence for Short Term Rental operation")
                 .HasColumnName("is_business_licence_required");
             entity.Property(e => e.IsLgParticipating)
+                .HasComment("Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing")
                 .HasColumnName("is_lg_participating");
             entity.Property(e => e.IsPlatformEnabled)
                 .HasColumnName("is_platform_enabled");

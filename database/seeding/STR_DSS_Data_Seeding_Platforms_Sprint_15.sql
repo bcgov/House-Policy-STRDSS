@@ -31,9 +31,17 @@ USING ( SELECT * FROM (VALUES
 ('Minor',NULL      ,'PLAT-WHISRES'  ,'Whistler Reservations'))
 AS s (platform_type, parent_org_cd, organization_cd, organization_nm)
 ) AS src
-ON (tgt.organization_cd=src.organization_cd)
-WHEN matched and (tgt.organization_nm != src.organization_nm or tgt.platform_type is null)
-THEN UPDATE set organization_nm=src.organization_nm, platform_type=src.platform_type
+ON (tgt.organization_cd=src.organization_cd and tgt.organization_type='Platform')
+WHEN matched and (
+	tgt.organization_nm != src.organization_nm or
+	coalesce(tgt.platform_type,'?') != src.platform_type or
+	coalesce(tgt.is_active, false) != true or
+	coalesce(tgt.managing_organization_id, -1) != (select o.organization_id from dss_organization as o where o.organization_cd=src.parent_org_cd))
+THEN UPDATE set
+	organization_nm = src.organization_nm,
+	platform_type = src.platform_type,
+	is_active = true,
+	managing_organization_id = (select o.organization_id from dss_organization as o where o.organization_cd=src.parent_org_cd)
 WHEN NOT MATCHED
-THEN INSERT (organization_type, platform_type, organization_cd, organization_nm, managing_organization_id)
-VALUES ('Platform', src.platform_type, src.organization_cd, src.organization_nm, (select o.organization_id from dss_organization as o where o.organization_cd=src.parent_org_cd));
+THEN INSERT (organization_type, platform_type, organization_cd, organization_nm, is_active, managing_organization_id)
+VALUES ('Platform', src.platform_type, src.organization_cd, src.organization_nm, true, (select o.organization_id from dss_organization as o where o.organization_cd=src.parent_org_cd));

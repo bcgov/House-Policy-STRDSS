@@ -23,4 +23,3 @@ COMMENT ON TABLE dss_platform_type IS 'A sub-type of rental platform organizatio
 COMMENT ON COLUMN dss_platform_type.platform_type IS 'System-consistent code (e.g. Major/Minor)';
 
 COMMENT ON COLUMN dss_platform_type.platform_type_nm IS 'Business term for the platform type (e.g. Major/Minor)';
-

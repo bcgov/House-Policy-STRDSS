@@ -1,11 +1,12 @@
 :host {
     width: 100%;
     height: 100%;
-    padding: 24px;
+    padding: 4px;
 
     h2 {
         padding: 0;
-        padding-left: 12px;
+        padding-top: 20px;
+        padding-bottom: 12px;
         font-size: 24px;
         font-family: 'BcSans-bold';
         margin-top: 0;
@@ -15,10 +16,11 @@
     .cards {
         display: flex;
         flex-wrap: wrap;
+        gap: 24px;
         width: 100%;
+        margin-bottom: 10px;
 
         .dashboard-card {
-            margin: 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
             box-sizing: border-box;
@@ -36,7 +38,6 @@
             .card-header {
                 height: 24px;
                 margin-bottom: 4px;
-                font-family: 'BcSans-regular';
                 font-size: 16px;
                 font-family: 'BcSans-bold';
                 color: #004578;
@@ -47,6 +48,12 @@
                 padding: 0;
                 font-family: 'BcSans-regular';
                 font-size: 16px;
+
+                .card-warning {
+                    margin-top: 6px;
+                    font-family: 'BcSans-bold';
+                    color: #CE3E39;
+                }
             }
 
             .card-actions {
@@ -56,6 +63,6 @@
     }
 
     .listings-upload-history {
-        padding: 12px;
+        padding-top: 20px;
     }
 }

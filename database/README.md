@@ -31,6 +31,10 @@ There is always a base set of fixed data that are not managed by the application
 
 ## Database Release Management
 Each production release depends on the execution of a fixed set of scripts against the database schema. Generally, these are applied in the same order as they were applied to the UAT database during each sprint. The following is the order list of scripts applied to deliver each release.
+
+_Note: Master scripts are the preferred release method to use, starting with Release 5. To use one, connect to the target database from the command line, and execute the following command:_
+
+`\i '<folder>/<script>' (must use / rather than \)`
 ### Release 1 Scripts:
 - Sprint 1: N/A
 - Sprint 2:
@@ -74,6 +78,10 @@ Each production release depends on the execution of a fixed set of scripts again
   - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_9.sql` **(TIP: run each MERGE statement independently)**
   - `utility/DSS-601_Correct_Rental_Listings_Sprint_9.sql`
 ### Release 5 Scripts:
+- Master Scripts:
+  - `utility/STR_DSS_Migration_Sprint_11.sql`
+  - `utility/STR_DSS_Migration_Sprint_12.sql`
+  - `utility/STR_DSS_Migration_Sprint_13.sql`
 - Sprint 10:
   - `seeding/STR_DSS_Data_Seeding_Platforms_Sprint_10.sql`
   - `STR_DSS_Data_Seeding_PRODONLY_PRIVATE_Sprint_10.sql` **(PRD ONLY - not in repo) OR** `seeding/STR_DSS_Data_Seeding_NONPROD_Sprint_6.sql` **(not a typo)**
@@ -95,8 +103,17 @@ Each production release depends on the execution of a fixed set of scripts again
   - `ddl/STR_DSS_Views_Sprint_13.sql`
   - `ddl/STR_DSS_Routines_Sprint_13.sql`
   - `utility/Correct_Rental_Listings_Sprint_13.sql`
+### Release 6 Scripts:
+- Master Scripts:
+  - `utility/STR_DSS_Migration_Sprint_14.sql`
+  - `utility/STR_DSS_Migration_Sprint_15.sql`
 - Sprint 14:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_14.sql`
   - `ddl/STR_DSS_Views_Sprint_14.sql`
   - `seeding/STR_DSS_Data_Seeding_Sprint_14.sql`
   - `utility/Correct_Rental_Listings_Sprint_14.sql`
+- Sprint 15:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_15.sql`
+  - `ddl/STR_DSS_Views_Sprint_15.sql`
+  - `seeding/STR_DSS_Data_Seeding_Sprint_15.sql`
+  - `seeding/STR_DSS_Data_Seeding_Platforms_Sprint_15.sql`

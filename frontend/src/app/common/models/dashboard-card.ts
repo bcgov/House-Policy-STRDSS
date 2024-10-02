@@ -11,4 +11,13 @@ export interface DashboardCard {
     hidden?: boolean;
     boxId?: string;
     buttonId?: string;
+    isComingSoon?: boolean;
+    section: 'main' | 'admin' | 'forms' | 'info';
+}
+
+export interface DashboardCardSections {
+    main: DashboardCard[];
+    admin: DashboardCard[];
+    forms: DashboardCard[];
+    info: DashboardCard[];
 }

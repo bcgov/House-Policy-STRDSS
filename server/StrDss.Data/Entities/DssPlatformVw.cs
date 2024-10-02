@@ -19,6 +19,8 @@ public partial class DssPlatformVw
 
     public Guid? UpdUserGuid { get; set; }
 
+    public bool? IsActive { get; set; }
+
     public long? PrimaryNoticeOfTakedownContactId { get; set; }
 
     public string? PrimaryNoticeOfTakedownContactEmail { get; set; }

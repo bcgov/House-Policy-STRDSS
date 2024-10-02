@@ -438,8 +438,8 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsLgParticipating)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing")
                 .HasColumnName("is_lg_participating");
-            entity.Property(e => e.IsPlatformEnabled)
-                .HasColumnName("is_platform_enabled");
+            entity.Property(e => e.IsActive)
+                .HasColumnName("is_active");
             entity.Property(e => e.IsPrincipalResidenceRequired)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions")
                 .HasColumnName("is_principal_residence_required");
@@ -698,6 +698,7 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.SecondaryTakedownRequestContactId).HasColumnName("secondary_takedown_request_contact_id");
             entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
             entity.Property(e => e.UpdUserGuid).HasColumnName("upd_user_guid");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
         });
 
         modelBuilder.Entity<DssRentalListing>(entity =>

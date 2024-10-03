@@ -1,4 +1,4 @@
-/* STR DSS Sprint 14 Mandatory Data Seeding */
+/* STR DSS Sprint 15 Mandatory Data Seeding */
 
 MERGE INTO dss_access_request_status AS tgt
 USING ( SELECT * FROM (VALUES
@@ -109,20 +109,23 @@ VALUES (src.platform_type, src.platform_type_nm);
 
 MERGE INTO dss_user_privilege AS tgt
 USING ( SELECT * FROM (VALUES
-('user_read','View users'),
-('user_write','Manage/edit users'),
-('role_read','View roles and permissions'),
-('role_write','Manage roles and permissions'),
-('listing_read','View/search/export listings and address log'),
 ('address_write','Edit addresses'),
+('audit_read','View audit logs'),
+('ceu_action','Send email to all hosts or platforms'),
 ('licence_file_upload','Upload business licence files'),
 ('listing_file_upload','Upload platform listing files'),
+('listing_read','View/search/export listings and address log'),
+('platform_read','View Manage Platforms'),
+('platform_write','Edit Platforms'),
+('province_action','Create Provincial Compliance Order'),
+('registry_view','View Registry Information'),
+('role_read','View roles and permissions'),
+('role_write','Manage roles and permissions'),
+('takedown_action','Create Takedown Action'),
 ('takedown_file_upload','Upload platform takedown files'),
 ('upload_history_read','View platform upload listing/takedown history'),
-('audit_read','View audit logs'),
-('takedown_action','Create Takedown Action'),
-('province_action','Create Provincial Compliance Order'),
-('ceu_action','Send email to all hosts or platforms'))
+('user_read','View users'),
+('user_write','Manage/edit users'))
 AS s (user_privilege_cd, user_privilege_nm)
 ) AS src
 ON (tgt.user_privilege_cd=src.user_privilege_cd)
@@ -152,39 +155,46 @@ VALUES (src.user_role_cd, src.user_role_nm);
 
 MERGE INTO dss_user_role_privilege AS tgt
 USING ( SELECT * FROM (VALUES
-('ceu_admin','user_read'),
-('ceu_admin','user_write'),
-('ceu_admin','role_read'),
-('ceu_admin','role_write'),
-('ceu_admin','listing_read'),
-('ceu_admin','address_write'),
-('ceu_admin','licence_file_upload'),
-('ceu_admin','listing_file_upload'),
-('ceu_admin','takedown_file_upload'),
-('ceu_admin','upload_history_read'),
-('ceu_admin','audit_read'),
-('ceu_admin','ceu_action'),
---
-('ceu_staff','listing_read'), -- to be confirmed
-('ceu_staff','address_write'), -- to be confirmed
-('ceu_staff','upload_history_read'),
-('ceu_staff','audit_read'),
-('ceu_staff','province_action'),
-('ceu_staff','ceu_action'),
---
-('bc_staff','listing_read'), -- to be confirmed
+('bc_staff','listing_read'),
+('bc_staff','registry_view'),
 ('bc_staff','upload_history_read'),
 --
-('lg_staff','listing_read'), -- to be confirmed
-('lg_staff','address_write'), -- to be confirmed
-('lg_staff','licence_file_upload'),
-('lg_staff','upload_history_read'),
-('lg_staff','audit_read'),
-('lg_staff','takedown_action'),
+('ceu_admin','address_write'),
+('ceu_admin','audit_read'),
+('ceu_admin','ceu_action'),
+('ceu_admin','licence_file_upload'),
+('ceu_admin','listing_file_upload'),
+('ceu_admin','listing_read'),
+('ceu_admin','platform_read'),
+('ceu_admin','platform_write'),
+('ceu_admin','registry_view'),
+('ceu_admin','role_read'),
+('ceu_admin','role_write'),
+('ceu_admin','takedown_file_upload'),
+('ceu_admin','upload_history_read'),
+('ceu_admin','user_read'),
+('ceu_admin','user_write'),
 --
-('platform_staff','upload_history_read'),
+('ceu_staff','address_write'),
+('ceu_staff','audit_read'),
+('ceu_staff','ceu_action'),
+('ceu_staff','listing_read'),
+('ceu_staff','platform_read'),
+('ceu_staff','province_action'),
+('ceu_staff','registry_view'),
+('ceu_staff','upload_history_read'),
+--
+('lg_staff','address_write'),
+('lg_staff','audit_read'),
+('lg_staff','licence_file_upload'),
+('lg_staff','listing_read'),
+('lg_staff','registry_view'),
+('lg_staff','takedown_action'),
+('lg_staff','upload_history_read'),
+--
+('platform_staff','listing_file_upload'),
 ('platform_staff','takedown_file_upload'),
-('platform_staff','listing_file_upload'))
+('platform_staff','upload_history_read'))
 AS s (user_role_cd, user_privilege_cd)
 ) AS src
 ON (tgt.user_role_cd=src.user_role_cd AND tgt.user_privilege_cd=src.user_privilege_cd)

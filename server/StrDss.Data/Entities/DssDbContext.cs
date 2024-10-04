@@ -31,6 +31,8 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssPhysicalAddress> DssPhysicalAddresses { get; set; }
 
+    public virtual DbSet<DssPlatformType> DssPlatformTypes { get; set; }
+
     public virtual DbSet<DssPlatformVw> DssPlatformVws { get; set; }
 
     public virtual DbSet<DssRentalListing> DssRentalListings { get; set; }
@@ -432,24 +434,24 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(100)
                 .HasComment("A free form description of the economic region to which a Local Government Subdivision belongs")
                 .HasColumnName("economic_region_dsc");
+            entity.Property(e => e.IsActive)
+                .HasComment("Indicates whether the ORGANIZATION is currently available for new associations")
+                .HasColumnName("is_active");
             entity.Property(e => e.IsBusinessLicenceRequired)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION requires a business licence for Short Term Rental operation")
                 .HasColumnName("is_business_licence_required");
             entity.Property(e => e.IsLgParticipating)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing")
                 .HasColumnName("is_lg_participating");
-            entity.Property(e => e.IsActive)
-                .HasColumnName("is_active");
             entity.Property(e => e.IsPrincipalResidenceRequired)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions")
                 .HasColumnName("is_principal_residence_required");
             entity.Property(e => e.IsStrProhibited)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT ORGANIZATION entirely prohibits short term housing rentals")
                 .HasColumnName("is_str_prohibited");
-
             entity.Property(e => e.LocalGovernmentType)
                 .HasMaxLength(50)
-                .HasComment("A sub-type of local government organization used for sorting and grouping or members")
+                .HasComment("A sub-type of local government organization used for sorting and grouping of members")
                 .HasColumnName("local_government_type");
             entity.Property(e => e.ManagingOrganizationId)
                 .HasComment("Self-referential hierarchical foreign key")
@@ -466,6 +468,10 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(25)
                 .HasComment("Foreign key")
                 .HasColumnName("organization_type");
+            entity.Property(e => e.PlatformType)
+                .HasMaxLength(25)
+                .HasComment("Foreign key")
+                .HasColumnName("platform_type");
             entity.Property(e => e.UpdDtm)
                 .HasComment("Trigger-updated timestamp of last change")
                 .HasColumnName("upd_dtm");
@@ -481,6 +487,10 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.OrganizationType)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_organization_fk_treated_as");
+
+            entity.HasOne(d => d.PlatformTypeNavigation).WithMany(p => p.DssOrganizations)
+                .HasForeignKey(d => d.PlatformType)
+                .HasConstraintName("dss_organization_fk_classified_as");
         });
 
         modelBuilder.Entity<DssOrganizationContactPerson>(entity =>
@@ -663,12 +673,29 @@ public partial class DssDbContext : DbContext
                 .HasConstraintName("dss_physical_address_fk_replaced_by");
         });
 
+        modelBuilder.Entity<DssPlatformType>(entity =>
+        {
+            entity.HasKey(e => e.PlatformType).HasName("dss_platform_type_pk");
+
+            entity.ToTable("dss_platform_type", tb => tb.HasComment("A sub-type of rental platform organization used for sorting and grouping of members"));
+
+            entity.Property(e => e.PlatformType)
+                .HasMaxLength(25)
+                .HasComment("System-consistent code (e.g. Major/Minor)")
+                .HasColumnName("platform_type");
+            entity.Property(e => e.PlatformTypeNm)
+                .HasMaxLength(250)
+                .HasComment("Business term for the platform type (e.g. Major/Minor)")
+                .HasColumnName("platform_type_nm");
+        });
+
         modelBuilder.Entity<DssPlatformVw>(entity =>
         {
             entity
                 .HasNoKey()
                 .ToView("dss_platform_vw");
 
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.ManagingOrganizationId).HasColumnName("managing_organization_id");
             entity.Property(e => e.OrganizationCd)
                 .HasMaxLength(25)
@@ -680,6 +707,12 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.OrganizationType)
                 .HasMaxLength(25)
                 .HasColumnName("organization_type");
+            entity.Property(e => e.PlatformType)
+                .HasMaxLength(25)
+                .HasColumnName("platform_type");
+            entity.Property(e => e.PlatformTypeNm)
+                .HasMaxLength(250)
+                .HasColumnName("platform_type_nm");
             entity.Property(e => e.PrimaryNoticeOfTakedownContactEmail)
                 .HasMaxLength(320)
                 .HasColumnName("primary_notice_of_takedown_contact_email");
@@ -698,7 +731,6 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.SecondaryTakedownRequestContactId).HasColumnName("secondary_takedown_request_contact_id");
             entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
             entity.Property(e => e.UpdUserGuid).HasColumnName("upd_user_guid");
-            entity.Property(e => e.IsActive).HasColumnName("is_active");
         });
 
         modelBuilder.Entity<DssRentalListing>(entity =>
@@ -1034,6 +1066,7 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsMatchVerified).HasColumnName("is_match_verified");
             entity.Property(e => e.IsNew).HasColumnName("is_new");
             entity.Property(e => e.IsPrincipalResidenceRequired).HasColumnName("is_principal_residence_required");
+            entity.Property(e => e.IsStrProhibited).HasColumnName("is_str_prohibited");
             entity.Property(e => e.IsTakenDown).HasColumnName("is_taken_down");
             entity.Property(e => e.LastActionDtm).HasColumnName("last_action_dtm");
             entity.Property(e => e.LastActionNm)

@@ -1059,7 +1059,9 @@
     dbl.licence_status_type,
     drl.effective_business_licence_no,
     drl.effective_host_nm,
-    drl.is_changed_business_licence
+    drl.is_changed_business_licence,
+    drl.lg_transfer_dtm,
+    lgs.is_str_prohibited
    FROM ((((((((dss.dss_rental_listing drl
      JOIN dss.dss_organization org ON ((org.organization_id = drl.offering_organization_id)))
      LEFT JOIN dss.dss_listing_status_type dlst ON (((drl.listing_status_type)::text = (dlst.listing_status_type)::text)))
@@ -1123,6 +1125,8 @@
 			<column name="effective_business_licence_no" type="varchar" />
 			<column name="effective_host_nm" type="varchar" />
 			<column name="is_changed_business_licence" type="boolean" />
+			<column name="lg_transfer_dtm" type="timestamptz" />
+			<column name="is_str_prohibited" type="boolean" />
 		</view>
 		<view name="dss_rental_upload_history_view" >
 			<view_script><![CDATA[CREATE OR REPLACE VIEW ${view} AS SELECT dud.upload_delivery_id,
@@ -1488,7 +1492,7 @@ END;$function$
 Short Term Rental Data Sharing
 Physical Data Diagram (Sprint 15)
 Leif Larsen, DXC Technology
-September 18, 2024]]></comment>
+October 2, 2024]]></comment>
 		</callout>
 	</layout>
 </project>

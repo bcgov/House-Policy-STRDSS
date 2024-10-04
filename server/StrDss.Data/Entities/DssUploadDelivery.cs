@@ -34,6 +34,11 @@ public partial class DssUploadDelivery
     public byte[]? SourceBin { get; set; }
 
     /// <summary>
+    /// Full text of the header line
+    /// </summary>
+    public string? SourceHeaderTxt { get; set; }
+
+    /// <summary>
     /// Foreign key
     /// </summary>
     public long ProvidingOrganizationId { get; set; }
@@ -47,11 +52,6 @@ public partial class DssUploadDelivery
     /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
-
-    /// <summary>
-    /// Full text of the header line
-    /// </summary>
-    public string? SourceHeaderTxt { get; set; }
 
     public virtual ICollection<DssUploadLine> DssUploadLines { get; set; } = new List<DssUploadLine>();
 

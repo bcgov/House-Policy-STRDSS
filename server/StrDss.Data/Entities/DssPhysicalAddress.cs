@@ -35,41 +35,6 @@ public partial class DssPhysicalAddress
     public short? MatchScoreAmt { get; set; }
 
     /// <summary>
-    /// The siteID returned by the address match
-    /// </summary>
-    public string? SiteNo { get; set; }
-
-    /// <summary>
-    /// The blockID returned by the address match
-    /// </summary>
-    public string? BlockNo { get; set; }
-
-    /// <summary>
-    /// The computed location point of the matched address
-    /// </summary>
-    public Geometry? LocationGeometry { get; set; }
-
-    /// <summary>
-    /// Indicates whether the address has been identified as exempt from Short Term Rental regulations
-    /// </summary>
-    public bool? IsExempt { get; set; }
-
-    /// <summary>
-    /// Foreign key
-    /// </summary>
-    public long? ContainingOrganizationId { get; set; }
-
-    /// <summary>
-    /// Trigger-updated timestamp of last change
-    /// </summary>
-    public DateTime UpdDtm { get; set; }
-
-    /// <summary>
-    /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
-    /// </summary>
-    public Guid? UpdUserGuid { get; set; }
-
-    /// <summary>
     /// The unitNumber (suite) returned by the address match (e.g. 100)
     /// </summary>
     public string? UnitNo { get; set; }
@@ -110,14 +75,34 @@ public partial class DssPhysicalAddress
     public string? ProvinceCd { get; set; }
 
     /// <summary>
-    /// Foreign key
+    /// The siteID returned by the address match
     /// </summary>
-    public long? ReplacingPhysicalAddressId { get; set; }
+    public string? SiteNo { get; set; }
+
+    /// <summary>
+    /// The blockID returned by the address match
+    /// </summary>
+    public string? BlockNo { get; set; }
+
+    /// <summary>
+    /// The computed location point of the matched address
+    /// </summary>
+    public Geometry? LocationGeometry { get; set; }
+
+    /// <summary>
+    /// Indicates whether the address has been identified as exempt from Short Term Rental regulations
+    /// </summary>
+    public bool? IsExempt { get; set; }
 
     /// <summary>
     /// Indicates whether the matched address has been verified as correct for the listing by the responsible authorities
     /// </summary>
     public bool? IsMatchVerified { get; set; }
+
+    /// <summary>
+    /// Indicates whether the original address has received a different property address from the platform in the last reporting period
+    /// </summary>
+    public bool? IsChangedOriginalAddress { get; set; }
 
     /// <summary>
     /// Indicates whether the matched address has been manually changed to one that is verified as correct for the listing
@@ -130,9 +115,24 @@ public partial class DssPhysicalAddress
     public bool? IsSystemProcessing { get; set; }
 
     /// <summary>
-    /// Indicates whether the original address has received a different property address from the platform in the last reporting period
+    /// Foreign key
     /// </summary>
-    public bool? IsChangedOriginalAddress { get; set; }
+    public long? ContainingOrganizationId { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? ReplacingPhysicalAddressId { get; set; }
+
+    /// <summary>
+    /// Trigger-updated timestamp of last change
+    /// </summary>
+    public DateTime UpdDtm { get; set; }
+
+    /// <summary>
+    /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
+    /// </summary>
+    public Guid? UpdUserGuid { get; set; }
 
     public virtual DssOrganization? ContainingOrganization { get; set; }
 

@@ -21,6 +21,8 @@
         public string? SecondaryNoticeOfTakedownContactEmail { get; set; }
         public long? SecondaryTakedownRequestContactId { get; set; }
         public string? SecondaryTakedownRequestContactEmail { get; set; }
+        public bool? IsActive { get; set; }
+        public string? PlatformType { get; set; }
         public virtual ICollection<PlatformViewDto> Subsidiaries { get; set; }
     }
 }

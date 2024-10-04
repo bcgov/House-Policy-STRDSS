@@ -14,6 +14,11 @@ public partial class DssOrganizationContactPerson
     public long OrganizationContactPersonId { get; set; }
 
     /// <summary>
+    /// E-mail address given for the contact by the organization
+    /// </summary>
+    public string EmailAddressDsc { get; set; } = null!;
+
+    /// <summary>
     /// Indicates whether the contact should receive all communications directed at the organization
     /// </summary>
     public bool? IsPrimary { get; set; }
@@ -34,14 +39,14 @@ public partial class DssOrganizationContactPerson
     public string? PhoneNo { get; set; }
 
     /// <summary>
-    /// E-mail address given for the contact by the organization
+    /// Foreign key
     /// </summary>
-    public string EmailAddressDsc { get; set; } = null!;
+    public long ContactedThroughOrganizationId { get; set; }
 
     /// <summary>
     /// Foreign key
     /// </summary>
-    public long ContactedThroughOrganizationId { get; set; }
+    public string? EmailMessageType { get; set; }
 
     /// <summary>
     /// Trigger-updated timestamp of last change
@@ -52,11 +57,6 @@ public partial class DssOrganizationContactPerson
     /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
-
-    /// <summary>
-    /// Foreign key
-    /// </summary>
-    public string? EmailMessageType { get; set; }
 
     public virtual DssOrganization ContactedThroughOrganization { get; set; } = null!;
 

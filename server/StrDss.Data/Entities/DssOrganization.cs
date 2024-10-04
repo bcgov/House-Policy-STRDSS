@@ -30,29 +30,29 @@ public partial class DssOrganization
     public string OrganizationNm { get; set; } = null!;
 
     /// <summary>
-    /// the multipolygon shape identifying the boundaries of a local government subdivision
+    /// A sub-type of local government organization used for sorting and grouping of members
     /// </summary>
-    public Geometry? AreaGeometry { get; set; }
+    public string? LocalGovernmentType { get; set; }
 
     /// <summary>
-    /// Self-referential hierarchical foreign key
+    /// A free form description of the economic region to which a Local Government Subdivision belongs
     /// </summary>
-    public long? ManagingOrganizationId { get; set; }
+    public string? EconomicRegionDsc { get; set; }
 
     /// <summary>
-    /// Trigger-updated timestamp of last change
+    /// Indicates whether the ORGANIZATION is currently available for new associations
     /// </summary>
-    public DateTime UpdDtm { get; set; }
-
-    /// <summary>
-    /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
-    /// </summary>
-    public Guid? UpdUserGuid { get; set; }
+    public bool? IsActive { get; set; }
 
     /// <summary>
     /// Indicates whether a LOCAL GOVERNMENT ORGANIZATION participates in Short Term Rental Data Sharing
     /// </summary>
     public bool? IsLgParticipating { get; set; }
+
+    /// <summary>
+    /// Indicates whether a LOCAL GOVERNMENT ORGANIZATION entirely prohibits short term housing rentals
+    /// </summary>
+    public bool? IsStrProhibited { get; set; }
 
     /// <summary>
     /// Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions
@@ -65,19 +65,29 @@ public partial class DssOrganization
     public bool? IsBusinessLicenceRequired { get; set; }
 
     /// <summary>
-    /// A free form description of the economic region to which a Local Government Subdivision belongs
+    /// the multipolygon shape identifying the boundaries of a local government subdivision
     /// </summary>
-    public string? EconomicRegionDsc { get; set; }
+    public Geometry? AreaGeometry { get; set; }
 
     /// <summary>
-    /// A sub-type of local government organization used for sorting and grouping or members
+    /// Self-referential hierarchical foreign key
     /// </summary>
-    public string? LocalGovernmentType { get; set; }
+    public long? ManagingOrganizationId { get; set; }
 
     /// <summary>
-    /// Indicates whether a LOCAL GOVERNMENT ORGANIZATION entirely prohibits short term housing rentals
+    /// Foreign key
     /// </summary>
-    public bool? IsStrProhibited { get; set; }
+    public string? PlatformType { get; set; }
+
+    /// <summary>
+    /// Trigger-updated timestamp of last change
+    /// </summary>
+    public DateTime UpdDtm { get; set; }
+
+    /// <summary>
+    /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
+    /// </summary>
+    public Guid? UpdUserGuid { get; set; }
 
     public virtual ICollection<DssBusinessLicence> DssBusinessLicences { get; set; } = new List<DssBusinessLicence>();
 
@@ -104,4 +114,6 @@ public partial class DssOrganization
     public virtual DssOrganization? ManagingOrganization { get; set; }
 
     public virtual DssOrganizationType OrganizationTypeNavigation { get; set; } = null!;
+
+    public virtual DssPlatformType? PlatformTypeNavigation { get; set; }
 }

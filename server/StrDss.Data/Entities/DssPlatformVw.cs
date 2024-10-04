@@ -15,6 +15,12 @@ public partial class DssPlatformVw
 
     public long? ManagingOrganizationId { get; set; }
 
+    public bool? IsActive { get; set; }
+
+    public string? PlatformType { get; set; }
+
+    public string? PlatformTypeNm { get; set; }
+
     public DateTime? UpdDtm { get; set; }
 
     public Guid? UpdUserGuid { get; set; }

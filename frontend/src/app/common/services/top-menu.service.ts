@@ -142,7 +142,6 @@ export class TopMenuService {
         accessPermission: platform_write,
         buttonId: 'platformManagement_mi_btn',
         route: '/platform-management',
-        disabled: true,
         title: 'Manage Platforms',
         folderName: 'Admin Tools',
       },

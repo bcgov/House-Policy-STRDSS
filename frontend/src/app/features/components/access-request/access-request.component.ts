@@ -13,6 +13,7 @@ import { AccessRequest } from '../../../common/models/access-request';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { forkJoin } from 'rxjs';
+import { OrganizationService } from '../../../common/services/organization.service';
 
 @Component({
   selector: 'app-access-request',
@@ -51,6 +52,7 @@ export class AccessRequestComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private requestAccessService: RequestAccessService,
+    private organizationsService: OrganizationService,
     private userDataService: UserDataService,
     private loaderService: GlobalLoaderService,
     private cd: ChangeDetectorRef,
@@ -111,7 +113,7 @@ export class AccessRequestComponent implements OnInit {
   private initData(): void {
     this.loaderService.loadingStart();
     const getCurrentUser = this.userDataService.getCurrentUser();
-    const getOrgs = this.requestAccessService.getOrganizationTypes();
+    const getOrgs = this.organizationsService.getOrganizationTypes();
 
     forkJoin([getCurrentUser, getOrgs]).subscribe({
       next: ([user, types]) => {

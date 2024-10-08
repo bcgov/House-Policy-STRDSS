@@ -1,0 +1,182 @@
+<div class="header">
+    <h2>Manage Platforms</h2>
+    <button pButton icon="pi pi-plus" class="add-new-platform-btn" id="add-new-platform-btn"
+        (click)="onAddNewPlatform()">
+        &nbsp;Add Parent Platform
+    </button>
+</div>
+<div class="content">
+    <p-table [value]="platforms" dataKey="id" [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 4rem"></th>
+                <th class="sortable-header" id="organizationNm_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'organizationNm'"
+                    (click)="onSort('organizationNm')">Platform Name
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="organizationCd_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'organizationCd'"
+                    (click)="onSort('organizationCd')">Platform ID
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'organizationCd' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'organizationCd' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th>Platform Type</th>
+                <th class="sortable-header" id="primaryNoticeOfTakedownContactEmail_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'primaryNoticeOfTakedownContactEmail'"
+                    (click)="onSort('primaryNoticeOfTakedownContactEmail')">Notice of Non-compliance Email
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'primaryNoticeOfTakedownContactEmail' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'primaryNoticeOfTakedownContactEmail' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="primaryTakedownRequestContactEmail_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'primaryTakedownRequestContactEmail'"
+                    (click)="onSort('primaryTakedownRequestContactEmail')">Takedown Request Email
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'primaryTakedownRequestContactEmail' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'primaryTakedownRequestContactEmail' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="isActive_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'isActive'" (click)="onSort('isActive')">Status
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'isActive' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'isActive' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="updDtm_header" [class.sorted]="this.sort && this.sort.prop === 'updDtm'"
+                    (click)="onSort('updDtm')">Last Update Date
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th style="width: 4rem">Edit</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-platform let-index="rowIndex" let-expanded="expanded">
+            <tr>
+                <td style="width: 4rem">
+                    <button [disabled]="!platform.subsidiaries || !platform.subsidiaries.length"
+                        [pRowTogglerDisabled]="!platform.subsidiaries || !platform.subsidiaries.length" pButton
+                        [pTooltip]="(!platform.subsidiaries || !platform.subsidiaries.length)?'Does Not Contain Subsidiary Platforms':'Expand / Collapse'"
+                        id="expand-platform-row-{{index}}" type="button" class="p-button-transparent toggle-row-btn"
+                        pRipple [pRowToggler]="platform"
+                        icon="{{expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'}}"></button>
+
+                </td>
+                <td>{{platform.organizationNm || '-'}}</td>
+                <td>{{platform.organizationCd || '-'}}</td>
+                <td>{{platform.platformType || '-'}}</td>
+                <td>{{platform.primaryNoticeOfTakedownContactEmail || '-'}}
+                </td>
+                <td>{{platform.primaryTakedownRequestContactEmail || '-'}}
+                </td>
+                <td class="status" [class.disabled]="!platform.isActive">
+                    {{platform.isActive?'Active':'Disabled'}}</td>
+                <td>{{platform.updDtm |date:'yyyy-MM-dd'}}</td>
+                <td style="width: 4rem">
+                    <span id="platform-edit-{{index}}-icon" class="edit-icon"></span>
+                    <!-- <span id="platform-edit-{{index}}-icon" class="edit-icon"
+                        [routerLink]="'/platform/'+platform.organizationId"> </span> -->
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="rowexpansion" let-platform>
+            <tr>
+                <td colspan="9">
+                    <p-table [value]="platform.subsidiaries">
+                        <ng-template pTemplate="header">
+            <tr>
+                <th class="sortable-header" id="organizationNm_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'organizationNm'"
+                    (click)="onSortSub('organizationNm')">Platform Name
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'organizationNm' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'organizationNm' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="organizationCd_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'organizationCd'"
+                    (click)="onSortSub('organizationCd')">Platform ID
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'organizationCd' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'organizationCd' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th>Platform Type</th>
+                <th class="sortable-header" id="primaryNoticeOfTakedownContactEmail_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'primaryNoticeOfTakedownContactEmail'"
+                    (click)="onSortSub('primaryNoticeOfTakedownContactEmail')">Notice of Non-compliance Email
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'primaryNoticeOfTakedownContactEmail' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'primaryNoticeOfTakedownContactEmail' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="primaryTakedownRequestContactEmail_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'primaryTakedownRequestContactEmail'"
+                    (click)="onSortSub('primaryTakedownRequestContactEmail')">Takedown Request Email
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'primaryTakedownRequestContactEmail' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'primaryTakedownRequestContactEmail' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="isActive_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'isActive'" (click)="onSortSub('isActive')">
+                    Status
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isActive' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isActive' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="updDtm_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'updDtm'" (click)="onSortSub('updDtm')">
+                    Last
+                    Update
+                    Date
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'updDtm' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'updDtm' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th style="width: 4rem">Edit</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-subPlatform let-index>
+            <tr>
+                <td>{{subPlatform.organizationNm || '-'}}</td>
+                <td>{{subPlatform.organizationCd || '-'}}</td>
+                <td>{{subPlatform.platformType || '-'}}</td>
+                <td>{{subPlatform.primaryNoticeOfTakedownContactEmail || '-'}}
+                </td>
+                <td>{{subPlatform.primaryTakedownRequestContactEmail || '-'}}
+                </td>
+                <td class="status" [class.disabled]="!subPlatform.isActive">
+                    {{subPlatform.isActive?'Active':'Disabled'}}</td>
+                <td>{{subPlatform.updDtm |date:'yyyy-MM-dd'}}</td>
+                <td style="width: 4rem">
+                    <span id="subPlatform-edit-{{index}}-icon" class="edit-icon"> </span>
+                    <!-- <span id="subPlatform-edit-{{index}}-icon" class="edit-icon"
+                        [routerLink]="'/platform/'+platform.organizationId"> </span> -->
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    </td>
+    </tr>
+    </ng-template>
+
+
+    </p-table>
+    <p-paginator #paginator class="platform-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
+        [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
+        [showCurrentPageReport]="true" [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
+        [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
+</div>

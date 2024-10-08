@@ -9,7 +9,7 @@ import { PageNotFoundComponent } from './common/components/page-not-found/page-n
 import { approvedUserGuard } from './common/guards/approved-user.guard';
 import { activeUserGuard } from './common/guards/active-user.guard';
 import { accessRequestTokenGuard } from './common/guards/access-request-token.guard';
-import { licence_file_upload, listing_file_upload, listing_read, role_read, role_write, takedown_action, upload_history_read, user_read, user_write } from './common/consts/permissions.const';
+import { licence_file_upload, listing_file_upload, listing_read, platform_write, role_read, role_write, takedown_action, upload_history_read, user_read, user_write } from './common/consts/permissions.const';
 import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 import { TermsAndConditionsComponent } from './common/components/terms-and-conditions/terms-and-conditions.component';
 import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
@@ -26,6 +26,11 @@ import { ExportListingsComponent } from './features/components/export-listings/e
 import { UploadBusinessLicenseComponent } from './features/components/upload-business-license/upload-business-license.component';
 import { AggregatedListingsTableComponent } from './features/components/listings-table/aggregated-listings-table/aggregated-listings-table.component';
 import { AddApsUserComponent } from './features/components/user-management/add-aps-user/add-aps-user.component';
+import { PlatformManagementComponent } from './features/components/platform-management/platform-management.component';
+import { AddNewPlatformComponent } from './features/components/platform-management/add-new-platform/add-new-platform.component';
+import { AddSubPlatformComponent } from './features/components/platform-management/add-sub-platform/add-sub-platform.component';
+import { EditPlatformComponent } from './features/components/platform-management/edit-platform/edit-platform.component';
+import { ViewPlatformComponent } from './features/components/platform-management/view-platform/view-platform.component';
 
 export const routes: Routes = [
     {
@@ -107,6 +112,42 @@ export const routes: Routes = [
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: UserManagementComponent,
         data: { permissions: [user_write] }
+    },
+    {
+        path: 'user-management',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: UserManagementComponent,
+        data: { permissions: [user_write] }
+    },
+    {
+        path: 'platform-management',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: PlatformManagementComponent,
+        data: { permissions: [platform_write] }
+    },
+    {
+        path: 'add-new-platform',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: AddNewPlatformComponent,
+        data: { permissions: [platform_write] }
+    },
+    {
+        path: 'add-sub-platform',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: AddSubPlatformComponent,
+        data: { permissions: [platform_write] }
+    },
+    {
+        path: 'edit-platform',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: EditPlatformComponent,
+        data: { permissions: [platform_write] }
+    },
+    {
+        path: 'platform/:id',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: ViewPlatformComponent,
+        data: { permissions: [platform_write] }
     },
     {
         path: 'user/:id',

@@ -19,6 +19,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { Router, RouterModule } from '@angular/router';
+import { OrganizationService } from '../../../common/services/organization.service';
 
 @Component({
   selector: 'app-user-management',
@@ -74,6 +75,7 @@ export class UserManagementComponent implements OnInit {
   constructor(
     private requestAccessService: RequestAccessService,
     private userDataService: UserDataService,
+    private organizationsService: OrganizationService,
     private fb: FormBuilder,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
@@ -282,7 +284,7 @@ export class UserManagementComponent implements OnInit {
     });
 
     this.loaderService.loadingStart();
-    this.requestAccessService.getOrganizations().subscribe({
+    this.organizationsService.getOrganizations().subscribe({
       next: (data) => {
         this.organizations = data.sort((a, b) => this.sortHandler(a.label, b.label));
         this.filteredOrganizations = data.sort((a, b) => this.sortHandler(a.label, b.label));
@@ -298,7 +300,7 @@ export class UserManagementComponent implements OnInit {
     });
 
     this.loaderService.loadingStart();
-    this.requestAccessService.getOrganizationTypes().subscribe({
+    this.organizationsService.getOrganizationTypes().subscribe({
       next: (data) => {
         this.organizationTypes = data.sort((a, b) => this.sortHandler(a.label, b.label));
       },

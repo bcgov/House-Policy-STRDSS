@@ -12,11 +12,11 @@ import { UserDataService } from '../../../common/services/user-data.service';
 import { User } from '../../../common/models/user';
 import { DropdownModule } from 'primeng/dropdown';
 import { DropdownOptionOrganization } from '../../../common/models/dropdown-option';
-import { RequestAccessService } from '../../../common/services/request-access.service';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { PaginatorModule } from 'primeng/paginator';
+import { OrganizationService } from '../../../common/services/organization.service';
 
 @Component({
   selector: 'app-upload-business-license',
@@ -58,7 +58,7 @@ export class UploadBusinessLicenseComponent implements OnInit {
     private loaderService: GlobalLoaderService,
     private userDataService: UserDataService,
     private messageService: MessageService,
-    private requestAccessService: RequestAccessService,
+    private organizationsService: OrganizationService,
     private cd: ChangeDetectorRef,
   ) { }
 
@@ -187,7 +187,7 @@ export class UploadBusinessLicenseComponent implements OnInit {
   }
 
   private getOrganizations(): void {
-    this.requestAccessService.getOrganizations('LG').subscribe({
+    this.organizationsService.getOrganizations('LG').subscribe({
       next: (orgs) => {
         const communities = orgs.map((org: DropdownOptionOrganization) =>
           ({ label: org.label, value: org.value, localGovernmentType: org.localGovernmentType || 'Other' }));

@@ -1,0 +1,67 @@
+:host {
+    width: 100%;
+    background-color: white;
+
+    .header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 24px;
+    }
+
+    .content {
+        p-paginator {
+            display: flex;
+            justify-content: end;
+        }
+
+        th {
+            font-size: 14px;
+            font-family: 'BcSans-bold';
+
+            &.sortable-header {
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+
+                &:hover {
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+
+                i {
+                    vertical-align: middle;
+                }
+            }
+        }
+
+        td {
+            .toggle-row-btn:disabled {
+                opacity: .2;
+            }
+
+            .edit-icon {
+                display: inline-block;
+                width: 26px;
+                height: 26px;
+                background-image: url(../../../../assets/images/edit-user.svg);
+                background-position: center center;
+                background-repeat: no-repeat;
+                padding: 4px;
+                padding-right: 12px;
+
+                &:hover {
+                    &:not(.disabled) {
+                        cursor: pointer;
+                        filter: drop-shadow(0px 0px 1px #555);
+                    }
+                }
+
+                &.disabled {
+                    opacity: .5;
+                }
+            }
+        }
+    }
+}

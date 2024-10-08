@@ -13,18 +13,6 @@ export class RequestAccessService {
 
   constructor(private httpClient: HttpClient) { }
 
-  getOrganizationTypes(): Observable<Array<DropdownOption>> {
-    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/types`);
-  }
-
-  getOrganizations(type?: string): Observable<Array<DropdownOption>> {
-    if (type) {
-      return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations?type=${type}`);
-    } else {
-      return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations`);
-    }
-  }
-
   createAccessRequest(body: AccessRequest): Observable<unknown> {
     return this.httpClient.post<unknown>(`${environment.API_HOST}/users/accessrequests`, body);
   }

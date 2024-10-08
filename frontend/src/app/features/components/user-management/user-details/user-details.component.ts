@@ -9,12 +9,12 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { RolesService } from '../../../../common/services/roles.service';
 import { forkJoin } from 'rxjs';
-import { RequestAccessService } from '../../../../common/services/request-access.service';
 import { DropdownOption, DropdownOptionSelectable } from '../../../../common/models/dropdown-option';
 import { FormsModule } from '@angular/forms';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ErrorHandlingService } from '../../../../common/services/error-handling.service';
+import { OrganizationService } from '../../../../common/services/organization.service';
 
 @Component({
   selector: 'app-user-details',
@@ -50,7 +50,7 @@ export class UserDetailsComponent implements OnInit {
     private userService: UserDataService,
     private rolesService: RolesService,
     private errorService: ErrorHandlingService,
-    private requestAccessService: RequestAccessService,
+    private organizationsService: OrganizationService,
     private route: ActivatedRoute,
     private router: Router,
     private loaderService: GlobalLoaderService,
@@ -118,8 +118,8 @@ export class UserDetailsComponent implements OnInit {
     forkJoin([
       this.userService.getUserById(this.id),
       this.rolesService.getRoles(),
-      this.requestAccessService.getOrganizationTypes(),
-      this.requestAccessService.getOrganizations(),
+      this.organizationsService.getOrganizationTypes(),
+      this.organizationsService.getOrganizations(),
     ]).subscribe({
       next: ([user, roles, orgTypes, organizations]) => {
         this.user = user;

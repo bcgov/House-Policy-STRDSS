@@ -26,8 +26,8 @@ import { SidebarModule } from 'primeng/sidebar';
 import { ListingFilter } from '../../../common/models/listing-filter';
 import { AccordionModule } from 'primeng/accordion';
 import { RadioButtonModule } from 'primeng/radiobutton';
-import { RequestAccessService } from '../../../common/services/request-access.service';
 import { FilterPersistenceService } from '../../../common/services/filter-persistence.service';
+import { OrganizationService } from '../../../common/services/organization.service';
 
 @Component({
   selector: 'app-listings-table',
@@ -78,7 +78,7 @@ export class ListingsTableComponent implements OnInit {
     private listingService: ListingDataService,
     private userService: UserDataService,
     private router: Router,
-    private requestAccessService: RequestAccessService,
+    private organizationsService: OrganizationService,
     private searchStateService: SelectedListingsStateService,
     private route: ActivatedRoute,
     private loaderService: GlobalLoaderService,
@@ -327,7 +327,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   private getOrganizations(): void {
-    this.requestAccessService.getOrganizations('LG').subscribe({
+    this.organizationsService.getOrganizations('LG').subscribe({
       next: (orgs) => {
         this.communities = orgs.map((org: DropdownOptionOrganization) =>
           ({ label: org.label, value: org.value, localGovernmentType: org.localGovernmentType || 'Other' }));

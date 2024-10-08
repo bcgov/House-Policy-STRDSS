@@ -17,7 +17,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ListingDetailsComponent } from '../listing-details/listing-details.component';
 import { ListingFilter } from '../../../../common/models/listing-filter';
 import { environment } from '../../../../../environments/environment';
-import { PagingResponse, PagingResponsePageInfo } from '../../../../common/models/paging-response';
+import { PagingResponsePageInfo } from '../../../../common/models/paging-response';
 import {
     DropdownOption,
     DropdownOptionOrganization,
@@ -29,12 +29,12 @@ import {
 import { ListingDataService } from '../../../../common/services/listing-data.service';
 import { FilterPersistenceService } from '../../../../common/services/filter-persistence.service';
 import { GlobalLoaderService } from '../../../../common/services/global-loader.service';
-import { RequestAccessService } from '../../../../common/services/request-access.service';
 import { SelectedListingsStateService } from '../../../../common/services/selected-listings-state.service';
 import { UserDataService } from '../../../../common/services/user-data.service';
 import { User } from '../../../../common/models/user';
 import { ListingSearchRequest } from '../../../../common/models/listing-search-request';
 import { ListingDetails } from '../../../../common/models/listing-details';
+import { OrganizationService } from '../../../../common/services/organization.service';
 
 @Component({
     selector: 'app-aggregated-listings-table',
@@ -88,13 +88,13 @@ export class AggregatedListingsTableComponent implements OnInit {
         private listingService: ListingDataService,
         private userService: UserDataService,
         private router: Router,
-        private requestAccessService: RequestAccessService,
+        private organizationsService: OrganizationService,
         private searchStateService: SelectedListingsStateService,
         private route: ActivatedRoute,
         private loaderService: GlobalLoaderService,
         private cd: ChangeDetectorRef,
         private filterPersistenceService: FilterPersistenceService,
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         this.getOrganizations();
@@ -474,7 +474,7 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     private getOrganizations(): void {
-        this.requestAccessService.getOrganizations('LG').subscribe({
+        this.organizationsService.getOrganizations('LG').subscribe({
             next: (orgs) => {
                 this.communities = orgs.map((org: DropdownOptionOrganization) => ({
                     label: org.label,

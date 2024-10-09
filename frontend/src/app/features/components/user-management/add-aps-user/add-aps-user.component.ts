@@ -10,12 +10,12 @@ import { TagModule } from 'primeng/tag';
 import { DropdownOptionSelectable, DropdownOption } from '../../../../common/models/dropdown-option';
 import { ErrorHandlingService } from '../../../../common/services/error-handling.service';
 import { GlobalLoaderService } from '../../../../common/services/global-loader.service';
-import { RequestAccessService } from '../../../../common/services/request-access.service';
 import { RolesService } from '../../../../common/services/roles.service';
 import { UserDataService } from '../../../../common/services/user-data.service';
 import { forkJoin } from 'rxjs';
 import { ApsUser } from '../../../../common/models/aps-user';
 import { InputTextModule } from 'primeng/inputtext';
+import { OrganizationService } from '../../../../common/services/organization.service';
 
 @Component({
   selector: 'app-add-aps-user',
@@ -51,7 +51,7 @@ export class AddApsUserComponent implements OnInit {
     private userService: UserDataService,
     private rolesService: RolesService,
     private errorService: ErrorHandlingService,
-    private requestAccessService: RequestAccessService,
+    private organizationsService: OrganizationService,
     private router: Router,
     private loaderService: GlobalLoaderService,
     private cd: ChangeDetectorRef,
@@ -98,8 +98,8 @@ export class AddApsUserComponent implements OnInit {
 
     forkJoin([
       this.rolesService.getRoles(),
-      this.requestAccessService.getOrganizationTypes(),
-      this.requestAccessService.getOrganizations(),
+      this.organizationsService.getOrganizationTypes(),
+      this.organizationsService.getOrganizations(),
     ]).subscribe({
       next: ([roles, orgTypes, organizations]) => {
         this.orgTypes = orgTypes.sort((a, b) => this.sortHandler(a.label, b.label));

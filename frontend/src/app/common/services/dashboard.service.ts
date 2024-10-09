@@ -140,12 +140,10 @@ export class DashboardService {
         buttonIcon: '',
         buttonText: 'Manage Platforms',
         description: 'Manage platform information',
-        route: '/',
+        route: '/platform-management',
         boxId: 'platformManagement_box',
         buttonId: 'platformManagement_btn',
         section: 'admin',
-        isButtonDisabled: true,
-        isComingSoon: true,
       },
       {
         title: 'Guidance for Local Government',

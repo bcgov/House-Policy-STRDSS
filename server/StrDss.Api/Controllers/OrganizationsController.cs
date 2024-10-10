@@ -79,7 +79,7 @@ namespace StrDss.Api.Controllers
         }
 
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.PlatformRead)] //TODO: use platform_read permission when it's ready in the database
         [HttpGet("platforms")]
         public async Task<ActionResult<List<PlatformViewDto>>> GetPlatforms(int pageSize = 10, int pageNumber = 1, string orderBy = "OrganizationNm", string direction = "asc")
         {
@@ -87,7 +87,7 @@ namespace StrDss.Api.Controllers
             return Ok(platforms);
         }
 
-        [ApiAuthorize]
+        [ApiAuthorize(Permissions.PlatformRead)] //TODO: use platform_read permission when it's ready in the database
         [HttpGet("platforms/{id}")]
         public async Task<ActionResult<PlatformViewDto>> GetPlatform(long id)
         {

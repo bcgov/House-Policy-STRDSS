@@ -86,7 +86,7 @@ namespace StrDss.Data.Repositories
 
             if (org == null) return new List<string>();
 
-            if (org.OrganizationType != OrganizationTypes.Platform) 
+            if (org.OrganizationType != OrganizationTypes.Platform)
                 return new List<string> { org.OrganizationCd };
 
             var orgCds = await _dbSet.AsNoTracking()
@@ -165,7 +165,7 @@ namespace StrDss.Data.Repositories
 
             foreach (var platform in platforms.SourceList)
             {
-                platform.Subsidiaries = _mapper.Map <List<PlatformViewDto>>
+                platform.Subsidiaries = _mapper.Map<List<PlatformViewDto>>
                     (await _dbContext.DssPlatformVws.AsNoTracking().Where(x => x.ManagingOrganizationId == platform.OrganizationId).ToListAsync());
             }
 
@@ -249,7 +249,7 @@ namespace StrDss.Data.Repositories
                 else
                 {
                     contact.EmailAddressDsc = emailAddress;
-                }                    
+                }
             }
         }
 
@@ -259,6 +259,10 @@ namespace StrDss.Data.Repositories
 
             entity.OrganizationCd = dto.OrganizationCd.ToUpperInvariant();
             entity.OrganizationType = OrganizationTypes.Platform;
+
+            //Per acceptance criteria fo DSS-223. set subsidary platform type to parent platform type on create
+            var parentOrg = await GetPlatform(dto.ManagingOrganizationId);
+            entity.PlatformType = parentOrg.PlatformType;
 
             await _dbSet.AddAsync(entity);
 

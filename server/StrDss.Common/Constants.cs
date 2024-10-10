@@ -342,6 +342,8 @@
         public const string TakedownAction = "takedown_action";
         public const string ProvinceAction = "province_action";
         public const string CeuAction = "ceu_action";
+        public const string PlatformRead = "platform_read";
+        public const string PlatformWrite = "platform_write";
     }
 
     public static class UploadDeliveryTypes

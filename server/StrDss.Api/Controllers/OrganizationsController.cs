@@ -101,7 +101,7 @@ namespace StrDss.Api.Controllers
             return Ok(platform);
         }
 
-        [ApiAuthorize(Permissions.UserWrite)] //todo: use platform_write permission when it's ready in the database
+        [ApiAuthorize(Permissions.PlatformWrite)] //todo: use platform_write permission when it's ready in the database
         [HttpPost("platforms", Name = "CreatePlatform")]
         public async Task<ActionResult> CreatePlatform(PlatformCreateDto dto)
         {
@@ -115,7 +115,7 @@ namespace StrDss.Api.Controllers
             return Ok(id);
         }
 
-        [ApiAuthorize(Permissions.UserWrite)] //todo: use platform_write permission when it's ready in the database
+        [ApiAuthorize(Permissions.PlatformWrite)] //todo: use platform_write permission when it's ready in the database
         [HttpPut("platforms/{id}", Name = "UpdatePlatform")]
         public async Task<ActionResult> UpdatePlatform(PlatformUpdateDto dto, long id)
         {
@@ -131,7 +131,7 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        [ApiAuthorize(Permissions.UserWrite)] //todo: use platform_write permission when it's ready in the database
+        [ApiAuthorize(Permissions.PlatformWrite)] //todo: use platform_write permission when it's ready in the database
         [HttpPost("platforms/subsidiaries", Name = "CreatePlatformSub")]
         public async Task<ActionResult> CreatePlatformSub(PlatformSubCreateDto dto)
         {
@@ -145,7 +145,7 @@ namespace StrDss.Api.Controllers
             return Ok(id);
         }
 
-        [ApiAuthorize(Permissions.UserWrite)] //todo: use platform_write permission when it's ready in the database
+        [ApiAuthorize(Permissions.PlatformWrite)] //todo: use platform_write permission when it's ready in the database
         [HttpPut("platforms/subsidiaries/{id}", Name = "UpdatePlatformSub")]
         public async Task<ActionResult> UpdatePlatformSub(PlatformSubUpdateDto dto, long id)
         {

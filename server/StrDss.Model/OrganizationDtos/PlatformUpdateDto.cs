@@ -9,5 +9,7 @@
         public string? PrimaryTakedownRequestContactEmail { get; set; }
         public string? SecondaryNoticeOfTakedownContactEmail { get; set; }
         public string? SecondaryTakedownRequestContactEmail { get; set; }
+        public bool? IsActive { get; set; }
+        public string? PlatformType { get; set; }
     }
 }

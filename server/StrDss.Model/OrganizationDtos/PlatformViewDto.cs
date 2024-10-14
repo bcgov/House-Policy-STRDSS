@@ -13,6 +13,8 @@
         public string OrganizationNm { get; set; } = null!;
         public DateTime UpdDtm { get; set; }
         public Guid? UpdUserGuid { get; set; }
+        //TODO: remove default values after Leif Updates the view to include "Full Name"
+        public string UpdUserNm { get; } = "Richard Anderson";
         public long? PrimaryNoticeOfTakedownContactId { get; set; }
         public string? PrimaryNoticeOfTakedownContactEmail { get; set; }
         public long? PrimaryTakedownRequestContactId { get; set; }

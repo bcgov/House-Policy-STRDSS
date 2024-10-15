@@ -159,7 +159,7 @@ namespace StrDss.Service
                 return (errors, 0);
             }
 
-            await ValidatePlatformCreateDto<PlatformCreateDto>(dto, errors);
+            await ValidatePlatformCreateDto<PlatformSubCreateDto>(dto, errors);
 
             if (errors.Any())
             {

@@ -2,6 +2,7 @@
 {
     public class PlatformUpdateDto : IPlatformUpdateDto
     {
+        public string OrganizationCd { get; set; }
         public long OrganizationId { get; set; }
         public string OrganizationNm { get; set; } = null!;
         public DateTime UpdDtm { get; set; }

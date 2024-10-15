@@ -104,6 +104,4 @@ public partial class DssRentalListingVw
     public bool? IsChangedBusinessLicence { get; set; }
 
     public DateTime? LgTransferDtm { get; set; }
-
-    public bool? IsStrProhibited { get; set; }
 }

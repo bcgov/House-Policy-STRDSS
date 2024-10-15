@@ -30,12 +30,14 @@ namespace StrDss.Service
     public class OrganizationService : ServiceBase, IOrganizationService
     {
         private IOrganizationRepository _orgRepo;
+        private ICodeSetRepository _codeSetRepo;
 
         public OrganizationService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IOrganizationRepository orgRepo) 
+            IOrganizationRepository orgRepo, ICodeSetRepository codeSetRep) 
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _orgRepo = orgRepo;
+            _codeSetRepo = codeSetRep;
         }
 
         public async Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc()
@@ -99,6 +101,11 @@ namespace StrDss.Service
         private async Task<Dictionary<string, List<string>>> ValidatePlatformCreateDto<T>(IPlatformCreateDto dto, Dictionary<string, List<string>> errors)
             where T : class, IPlatformCreateDto
         {
+            if (!_validator.CommonCodes.Any())
+            {
+                _validator.CommonCodes = await _codeSetRepo.LoadCodeSetAsync();
+            }
+
             _validator.Validate(Entities.Platform, (T)dto, errors);
 
             if (errors.Any())
@@ -141,6 +148,11 @@ namespace StrDss.Service
             {
                 errors.AddItem("OrganizationId", $"Platform with ID {dto.OrganizationId} does not exist");
                 return errors;
+            }
+
+            if (!_validator.CommonCodes.Any())
+            {
+                _validator.CommonCodes = await _codeSetRepo.LoadCodeSetAsync();
             }
 
             _validator.Validate(Entities.Platform, (T)dto, errors);

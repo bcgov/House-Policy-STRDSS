@@ -116,6 +116,7 @@
         public const string PrimaryTakedownRequestContactEmail = "PrimaryTakedownRequestContactEmail";
         public const string SecondaryNoticeOfTakedownContactEmail = "SecondaryNoticeOfTakedownContactEmail";
         public const string SecondaryTakedownRequestContactEmail = "SecondaryTakedownRequestContactEmail";
+        public const string PlatformType = "PlatformType";
     }
 
     public static class RentalListingExport
@@ -235,6 +236,7 @@
     public static class CodeSet
     {
         public const string LicenceStatus = "Licence Status";
+        public const string PlatformTypes = "Platform Types";
     }
 
     public static class StrDssIdProviders

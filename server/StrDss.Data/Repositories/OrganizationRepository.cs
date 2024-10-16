@@ -26,11 +26,13 @@ namespace StrDss.Data.Repositories
         Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude);
         Task<PagedDto<PlatformViewDto>> GetPlatforms(int pageSize, int pageNumber, string orderBy, string direction);
         Task<PlatformViewDto?> GetPlatform(long id);
+        Task<List<PlatformTypeDto>> GetPlatformTypesAsync();
         Task<DssOrganization> CreatePlatformAsync(PlatformCreateDto dto);
         Task<bool> DoesOrgCdExist(string orgCd);
         Task UpdatePlatformAsync(PlatformUpdateDto dto);
         Task<DssOrganization> CreatePlatformSubAsync(PlatformSubCreateDto dto);
         Task UpdatePlatformSubAsync(PlatformSubUpdateDto dto);
+ 
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -51,6 +53,17 @@ namespace StrDss.Data.Repositories
                 .ToListAsync());
 
             return types;
+        }
+
+        public async Task<List<PlatformTypeDto>> GetPlatformTypesAsync()
+        {
+            var platformTypes = _mapper.Map<List<PlatformTypeDto>>(
+                await _dbContext.DssPlatformTypes.AsNoTracking().ToListAsync());
+
+
+            //await _dbContext.DssPlatformTypes.ToListAsync();
+
+            return platformTypes;
         }
 
         public async Task<List<OrganizationDto>> GetOrganizationsAsync(string? type)

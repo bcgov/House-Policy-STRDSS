@@ -22,6 +22,7 @@ namespace StrDss.Service
         Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude);
         Task<PagedDto<PlatformViewDto>> GetPlatforms(int pageSize, int pageNumber, string orderBy, string direction);
         Task<PlatformViewDto?> GetPlatform(long id);
+        Task<List<PlatformTypeDto>> GetPlatformTypesAsync();
         Task<(Dictionary<string, List<string>>, long)> CreatePlatformAsync(PlatformCreateDto dto);
         Task<Dictionary<string, List<string>>> UpdatePlatformAsync(PlatformUpdateDto dto);
         Task<(Dictionary<string, List<string>>, long)> CreatePlatformSubAsync(PlatformSubCreateDto dto);
@@ -76,6 +77,11 @@ namespace StrDss.Service
         public async Task<PlatformViewDto?> GetPlatform(long id)
         {
             return await _orgRepo.GetPlatform(id);
+        }
+
+        public async Task<List<PlatformTypeDto>> GetPlatformTypesAsync()
+        {
+            return await _orgRepo.GetPlatformTypesAsync();
         }
 
         public async Task<(Dictionary<string, List<string>>, long)> CreatePlatformAsync(PlatformCreateDto dto)

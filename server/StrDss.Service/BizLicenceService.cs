@@ -110,6 +110,8 @@ namespace StrDss.Service
 
         private async Task<(string orgCd, string sourceRecordNo)> ProcessLine(DssUploadDelivery upload, string header, DssUploadLine line, CsvReader csvReader)
         {
+            var systemError = "";
+
             csvReader.Read();
 
             csvReader.ReadHeader();
@@ -132,9 +134,16 @@ namespace StrDss.Service
 
             row.LicenceStatusType = row.LicenceStatusType.IsEmpty() ? "ISSUED" : row.LicenceStatusType;
 
-            await _bizLicenceRepo.InsertRowToBizLicTempTable(row, org.OrganizationId);
+            try
+            {
+                await _bizLicenceRepo.InsertRowToBizLicTempTable(row, org.OrganizationId);
+            }
+            catch (Exception ex)
+            {
+                systemError = ex.Message;
+            }
 
-            SaveUploadLine(line, errors, false, "");
+            SaveUploadLine(line, errors, false, systemError);
 
             return (row.OrgCd, row.BusinessLicenceNo);
         }

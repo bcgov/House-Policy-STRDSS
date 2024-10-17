@@ -1066,7 +1066,6 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsMatchVerified).HasColumnName("is_match_verified");
             entity.Property(e => e.IsNew).HasColumnName("is_new");
             entity.Property(e => e.IsPrincipalResidenceRequired).HasColumnName("is_principal_residence_required");
-            entity.Property(e => e.IsStrProhibited).HasColumnName("is_str_prohibited");
             entity.Property(e => e.IsTakenDown).HasColumnName("is_taken_down");
             entity.Property(e => e.LastActionDtm).HasColumnName("last_action_dtm");
             entity.Property(e => e.LastActionNm)

@@ -14,14 +14,14 @@ public partial class DssRentalListingReport
     public long RentalListingReportId { get; set; }
 
     /// <summary>
-    /// The month to which the listing information is relevant (always set to the first day of the month)
-    /// </summary>
-    public DateOnly ReportPeriodYm { get; set; }
-
-    /// <summary>
     /// Indicates whether the rental listing version is the most recent one reported by the platform
     /// </summary>
     public bool IsCurrent { get; set; }
+
+    /// <summary>
+    /// The month to which the listing information is relevant (always set to the first day of the month)
+    /// </summary>
+    public DateOnly ReportPeriodYm { get; set; }
 
     /// <summary>
     /// Foreign key

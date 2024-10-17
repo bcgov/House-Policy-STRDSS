@@ -65,6 +65,15 @@ namespace StrDss.Service
                 MaxLength = 320,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Email)
             });
+
+            rules.Add(new FieldValidationRule
+            {
+                EntityName = Entities.Platform,
+                FieldName = PlatformFields.PlatformType,
+                FieldType = FieldTypes.String,
+                Required = true,
+                CodeSet = CodeSet.PlatformTypes,
+            });
         }
     }
 

@@ -25,6 +25,12 @@ public partial class DssPlatformVw
 
     public Guid? UpdUserGuid { get; set; }
 
+    public string? UpdUserDisplayNm { get; set; }
+
+    public string? UpdUserGivenNm { get; set; }
+
+    public string? UpdUserFamilyNm { get; set; }
+
     public long? PrimaryNoticeOfTakedownContactId { get; set; }
 
     public string? PrimaryNoticeOfTakedownContactEmail { get; set; }

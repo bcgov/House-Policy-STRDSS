@@ -730,6 +730,15 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("secondary_takedown_request_contact_email");
             entity.Property(e => e.SecondaryTakedownRequestContactId).HasColumnName("secondary_takedown_request_contact_id");
             entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
+            entity.Property(e => e.UpdUserDisplayNm)
+                .HasMaxLength(250)
+                .HasColumnName("upd_user_display_nm");
+            entity.Property(e => e.UpdUserFamilyNm)
+                .HasMaxLength(250)
+                .HasColumnName("upd_user_family_nm");
+            entity.Property(e => e.UpdUserGivenNm)
+                .HasMaxLength(250)
+                .HasColumnName("upd_user_given_nm");
             entity.Property(e => e.UpdUserGuid).HasColumnName("upd_user_guid");
         });
 
@@ -1268,6 +1277,10 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(320)
                 .HasComment("E-mail address associated with the user by the identity provider")
                 .HasColumnName("email_address_dsc");
+            entity.Property(e => e.ExternalIdentityCd)
+                .HasMaxLength(100)
+                .HasComment("A non-guid unique identifier assigned by the identity provider")
+                .HasColumnName("external_identity_cd");
             entity.Property(e => e.FamilyNm)
                 .HasMaxLength(25)
                 .HasComment("A name that is often shared amongst members of the same family (commonly known as a surname within some cultures)")

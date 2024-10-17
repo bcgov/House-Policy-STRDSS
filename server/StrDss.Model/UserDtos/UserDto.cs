@@ -9,6 +9,7 @@ namespace StrDss.Model.UserDtos
 
         [JsonIgnore]
         public Guid UserGuid { get; set; }
+        public string? ExternalIdentityCd { get; set; }
 
         public string DisplayNm { get; set; } = null!;
 

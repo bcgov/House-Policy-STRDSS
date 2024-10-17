@@ -3,7 +3,7 @@
     public class UserCreateDto
     {
         public Guid UserGuid { get; set; }
-
+        public string? ExternalIdentityCd { get; set; }
         public string DisplayNm { get; set; } = null!;
 
         public string IdentityProviderNm { get; set; } = null!;

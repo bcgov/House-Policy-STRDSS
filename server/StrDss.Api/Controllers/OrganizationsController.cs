@@ -101,7 +101,16 @@ namespace StrDss.Api.Controllers
             return Ok(platform);
         }
 
-        [ApiAuthorize(Permissions.PlatformWrite)]
+        [ApiAuthorize] 
+        [HttpGet("platformTypeDropdown", Name = "GetPlatformTypesDropdown")]
+        public async Task<ActionResult<List<PlatformTypeDto>>> GetPlatformTypesDropDown()
+        {
+            var platformTypes = await _orgService.GetPlatformTypesAsync();
+
+            return Ok(platformTypes);
+        }
+
+        [ApiAuthorize(Permissions.PlatformWrite)] 
         [HttpPost("platforms", Name = "CreatePlatform")]
         public async Task<ActionResult> CreatePlatform(PlatformCreateDto dto)
         {

@@ -13,8 +13,11 @@
         public string OrganizationNm { get; set; } = null!;
         public DateTime UpdDtm { get; set; }
         public Guid? UpdUserGuid { get; set; }
-        //TODO: remove default values after Leif Updates the view to include "Full Name"
+        //TODO: Add FullName to Platformvw. Remove default value below after Leif Updates the view to include "Full Name".
         public string UpdUserNm { get; } = "Richard Anderson";
+
+        //TODO: Add ManagingOrganizationID to PlatFormvw. Comment in line below when completed
+        //public long ManagingOrganizationId { get; set; }
         public long? PrimaryNoticeOfTakedownContactId { get; set; }
         public string? PrimaryNoticeOfTakedownContactEmail { get; set; }
         public long? PrimaryTakedownRequestContactId { get; set; }

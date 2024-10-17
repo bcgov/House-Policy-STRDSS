@@ -40,8 +40,8 @@ namespace StrDss.Data.Repositories
                 .Select(x => new CommonCodeDto
                 {
                     CodeSet = CodeSet.PlatformTypes,
-                    CodeName = x.PlatformTypeNm,
-                    CodeValue = x.PlatformType
+                    CodeName = x.PlatformType,
+                    CodeValue = x.PlatformTypeNm
                 }).ToListAsync()
             );
 

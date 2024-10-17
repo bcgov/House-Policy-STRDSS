@@ -110,11 +110,7 @@ namespace StrDss.Api.Controllers
             return Ok(platformTypes);
         }
 
-<<<<<<< HEAD
-        [ApiAuthorize(Permissions.PlatformWrite)] //todo: use platform_write permission when it's ready in the database
-=======
         [ApiAuthorize(Permissions.PlatformWrite)] 
->>>>>>> 890efbdf2d84b20041a749cb999aaeda1c091937
         [HttpPost("platforms", Name = "CreatePlatform")]
         public async Task<ActionResult> CreatePlatform(PlatformCreateDto dto)
         {

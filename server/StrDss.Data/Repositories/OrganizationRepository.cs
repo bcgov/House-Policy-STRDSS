@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -9,7 +8,6 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
-using StrDss.Model.RentalReportDtos;
 using System.Data;
 
 namespace StrDss.Data.Repositories

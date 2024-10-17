@@ -29,19 +29,14 @@ public partial class DssEmailMessage
     public string MessageTemplateDsc { get; set; } = null!;
 
     /// <summary>
-    /// Indicates whether the user initiating the message should receive a copy of the email
-    /// </summary>
-    public bool IsSubmitterCcRequired { get; set; }
-
-    /// <summary>
     /// Indicates whether the the property host has already been contacted by external means
     /// </summary>
     public bool? IsHostContactedExternally { get; set; }
 
     /// <summary>
-    /// Indicates whether message body should include text a block of detail text that is standard for the message type
+    /// Indicates whether the user initiating the message should receive a copy of the email
     /// </summary>
-    public bool? IsWithStandardDetail { get; set; }
+    public bool IsSubmitterCcRequired { get; set; }
 
     /// <summary>
     /// A phone number associated with a Local Government contact
@@ -77,16 +72,6 @@ public partial class DssEmailMessage
     /// User-provided URL for a local government bylaw that is the subject of the message
     /// </summary>
     public string? LgStrBylawUrl { get; set; }
-
-    /// <summary>
-    /// Free form text that should be included in the message body
-    /// </summary>
-    public string? CustomDetailTxt { get; set; }
-
-    /// <summary>
-    /// Foreign key
-    /// </summary>
-    public long? ConcernedWithRentalListingId { get; set; }
 
     /// <summary>
     /// Foreign key
@@ -127,6 +112,21 @@ public partial class DssEmailMessage
     /// The globally unique identifier (assigned by the identity provider) for the most recent user to record a change
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
+
+    /// <summary>
+    /// Foreign key
+    /// </summary>
+    public long? ConcernedWithRentalListingId { get; set; }
+
+    /// <summary>
+    /// Indicates whether message body should include text a block of detail text that is standard for the message type
+    /// </summary>
+    public bool? IsWithStandardDetail { get; set; }
+
+    /// <summary>
+    /// Free form text that should be included in the message body
+    /// </summary>
+    public string? CustomDetailTxt { get; set; }
 
     public virtual DssUserIdentity? AffectedByUserIdentity { get; set; }
 

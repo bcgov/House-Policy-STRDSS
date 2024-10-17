@@ -103,7 +103,7 @@ namespace StrDss.Data.Repositories
                     @LicenceStatusType, @ProvidingOrganizationId
                 );";
 
-            bool ConvertToBool(string value) => value?.ToUpper() == "Y";
+            bool? ConvertToBool(string value) => string.IsNullOrEmpty(value) ? null : value?.ToUpper() == "Y";
 
             DateTime? ConvertToDate(string value) => DateTime.TryParseExact(value, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var date) ? date : (DateTime?) null;
 
@@ -142,9 +142,9 @@ namespace StrDss.Data.Repositories
                 new NpgsqlParameter("@propertyZoneTxt", row.PropertyZoneTxt ?? (object)DBNull.Value),
                 new NpgsqlParameter("@availableBedroomsQty", ConvertToInt2(row.AvailableBedroomsQty) ?? (object)DBNull.Value),
                 new NpgsqlParameter("@maxGuestsAllowedQty", ConvertToInt2(row.MaxGuestsAllowedQty) ?? (object)DBNull.Value),
-                new NpgsqlParameter("@isPrincipalResidence", ConvertToBool(row.IsPrincipalResidence)),
-                new NpgsqlParameter("@isOwnerLivingOnsite", ConvertToBool(row.IsOwnerLivingOnsite)),
-                new NpgsqlParameter("@isOwnerPropertyTenant", ConvertToBool(row.IsOwnerPropertyTenant)),
+                new NpgsqlParameter("@isPrincipalResidence", ConvertToBool(row.IsPrincipalResidence) ?? (object)DBNull.Value),
+                new NpgsqlParameter("@isOwnerLivingOnsite", ConvertToBool(row.IsOwnerLivingOnsite) ?? (object)DBNull.Value),
+                new NpgsqlParameter("@isOwnerPropertyTenant", ConvertToBool(row.IsOwnerPropertyTenant) ??(object) DBNull.Value),
                 new NpgsqlParameter("@propertyFolioNo", row.PropertyFolioNo ?? (object)DBNull.Value),
                 new NpgsqlParameter("@propertyParcelIdentifierNo", row.PropertyParcelIdentifierNo ?? (object)DBNull.Value),
                 new NpgsqlParameter("@propertyLegalDescriptionTxt", row.PropertyLegalDescriptionTxt ?? (object)DBNull.Value),

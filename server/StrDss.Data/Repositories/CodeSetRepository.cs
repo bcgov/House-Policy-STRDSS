@@ -34,6 +34,17 @@ namespace StrDss.Data.Repositories
                 }).ToListAsync()
             );
 
+            commonCodes.AddRange(await
+                _dbContext.DssPlatformTypes
+                .AsNoTracking()
+                .Select(x => new CommonCodeDto
+                {
+                    CodeSet = CodeSet.PlatformTypes,
+                    CodeName = x.PlatformType,
+                    CodeValue = x.PlatformTypeNm
+                }).ToListAsync()
+            );
+
             return commonCodes;
         }
     }

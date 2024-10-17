@@ -3,6 +3,7 @@
     public interface IPlatformUpdateDto
     {
         public long OrganizationId { get; set; }
+        public string OrganizationCd { get; set; }
         public string OrganizationNm { get; set; }
     }
 }

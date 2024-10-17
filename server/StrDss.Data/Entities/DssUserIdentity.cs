@@ -88,6 +88,11 @@ public partial class DssUserIdentity
     /// </summary>
     public Guid? UpdUserGuid { get; set; }
 
+    /// <summary>
+    /// A non-guid unique identifier assigned by the identity provider
+    /// </summary>
+    public string? ExternalIdentityCd { get; set; }
+
     public virtual DssAccessRequestStatus AccessRequestStatusCdNavigation { get; set; } = null!;
 
     public virtual ICollection<DssEmailMessage> DssEmailMessageAffectedByUserIdentities { get; set; } = new List<DssEmailMessage>();

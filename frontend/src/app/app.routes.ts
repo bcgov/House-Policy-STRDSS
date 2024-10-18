@@ -69,7 +69,7 @@ export const routes: Routes = [
         data: { permissions: [takedown_action] }
     },
     {
-        path: 'delisting-request',
+        path: 'takedown-request',
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: DelistingRequestComponent,
         data: { permissions: [takedown_action] }

@@ -200,7 +200,7 @@ export class DashboardService {
         buttonIcon: '',
         buttonText: 'Send Takedown Letter',
         description: 'Send a request to an STR platform to remove a non-compliant listing. A Takedown Request can be sent within a period of 5 to 90 days after a Notice of Non-Compliance is delivered.',
-        route: '/delisting-request',
+        route: '/takedown-request',
         title: 'Send Takedown Request',
         boxId: 'sendTakedownLetter_box',
         buttonId: 'sendTakedownLetter_btn',

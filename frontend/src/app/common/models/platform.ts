@@ -15,8 +15,38 @@ export interface Platform {
     secondaryNoticeOfTakedownContactEmail: string;
     secondaryTakedownRequestContactId: number;
     secondaryTakedownRequestContactEmail: string;
-    subsidiaries: Array<Platform>;
+    subsidiaries: Array<SubPlatform>;
     platformType: string;
+}
+
+export interface UpdatePlatform {
+    organizationNm: string;
+    updDtm: string;
+    isActive: boolean;
+    primaryNoticeOfTakedownContactEmail: string;
+    primaryTakedownRequestContactEmail: string;
+    secondaryNoticeOfTakedownContactEmail: string;
+    secondaryTakedownRequestContactEmail: string;
+    platformType: string;
+}
+
+export interface UpdateSubPlatform {
+    organizationNm: string;
+    updDtm: string;
+    isActive: boolean;
+    managingOrganizationId: number;
+}
+
+export interface SubPlatform {
+    id?: string;
+    organizationId: number;
+    organizationType: string;
+    organizationCd: string;
+    organizationNm: string;
+    updDtm: string;
+    isActive: boolean;
+    updUserGuid: string;
+    managingOrganizationId: number;
 }
 
 export interface PlatformCreate {
@@ -28,4 +58,12 @@ export interface PlatformCreate {
     primaryTakedownRequestContactEmail: string;
     secondaryNoticeOfTakedownContactEmail: string;
     secondaryTakedownRequestContactEmail: string;
+}
+
+export interface SubPlatformCreate {
+    organizationCd: string;
+    organizationNm: string;
+    managingOrganizationId: number;
+    isActive: boolean;
+    updDtm: string;
 }

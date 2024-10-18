@@ -1,0 +1,77 @@
+:host {
+    width: 100%;
+    height: auto;
+    background-color: white;
+    padding: 0 20px;
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .edit-icon {
+            background-image: url(../../../../../assets/images/edit-info_white.svg);
+        }
+    }
+
+    .content {
+        width: 100%;
+        height: auto;
+        display: flex;
+        gap: 18px;
+
+        .col {
+            width: calc(50% - 9px);
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+
+            p-panel {
+                .panel-header {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    height: 25px;
+                }
+
+                .row {
+                    padding: 6px;
+
+                    .name {
+                        color: #255A90;
+                    }
+
+                    .status {
+                        padding-left: 2px;
+                        color: #CE3E39;
+
+                        &.active {
+                            color: #42814A;
+                        }
+                    }
+                }
+
+                .panel-button {
+                    .edit-icon {
+                        background-image: url(../../../../../assets/images/edit-info.svg);
+                    }
+                }
+            }
+
+            padding-bottom: 18px;
+        }
+    }
+
+    span {
+        &.edit-icon {
+            width: 18px;
+            height: 18px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            margin-right: 4px;
+        }
+    }
+}

@@ -31,6 +31,7 @@ import { AddNewPlatformComponent } from './features/components/platform-manageme
 import { AddSubPlatformComponent } from './features/components/platform-management/add-sub-platform/add-sub-platform.component';
 import { EditPlatformComponent } from './features/components/platform-management/edit-platform/edit-platform.component';
 import { ViewPlatformComponent } from './features/components/platform-management/view-platform/view-platform.component';
+import { EditSubPlatformComponent } from './features/components/platform-management/edit-sub-platform/edit-sub-platform.component';
 
 export const routes: Routes = [
     {
@@ -132,15 +133,21 @@ export const routes: Routes = [
         data: { permissions: [platform_write] }
     },
     {
-        path: 'add-sub-platform',
+        path: 'add-sub-platform/:id',
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: AddSubPlatformComponent,
         data: { permissions: [platform_write] }
     },
     {
-        path: 'edit-platform',
+        path: 'edit-platform/:id',
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: EditPlatformComponent,
+        data: { permissions: [platform_write] }
+    },
+    {
+        path: 'edit-sub-platform/:id',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: EditSubPlatformComponent,
         data: { permissions: [platform_write] }
     },
     {

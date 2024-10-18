@@ -78,13 +78,14 @@
                 </td>
                 <td>{{platform.primaryTakedownRequestContactEmail || '-'}}
                 </td>
-                <td class="status" [class.disabled]="!platform.isActive">
+                <td class="status" [class.active]="platform.isActive">
                     {{platform.isActive?'Active':'Disabled'}}</td>
                 <td>{{platform.updDtm |date:'yyyy-MM-dd'}}</td>
                 <td style="width: 4rem">
-                    <span id="platform-edit-{{index}}-icon" class="edit-icon"></span>
-                    <!-- <span id="platform-edit-{{index}}-icon" class="edit-icon"
-                        [routerLink]="'/platform/'+platform.organizationId"> </span> -->
+                    <a id="platform-edit-{{index}}-icon" class="edit-icon"
+                        [routerLink]="'/platform/'+platform.organizationId">
+                        <i class="pi pi-list"></i>
+                    </a>
                 </td>
             </tr>
         </ng-template>
@@ -146,26 +147,20 @@
                     <i class="pi pi-angle-up"
                         *ngIf="this.sortSub && this.sortSub.prop === 'updDtm' && this.sortSub.dir === 'asc'"></i>
                 </th>
-                <th style="width: 4rem">Edit</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-subPlatform let-index>
             <tr>
                 <td>{{subPlatform.organizationNm || '-'}}</td>
                 <td>{{subPlatform.organizationCd || '-'}}</td>
-                <td>{{subPlatform.platformType || '-'}}</td>
-                <td>{{subPlatform.primaryNoticeOfTakedownContactEmail || '-'}}
+                <td>{{platform.platformType || '-'}}</td>
+                <td>{{platform.primaryNoticeOfTakedownContactEmail || '-'}}
                 </td>
-                <td>{{subPlatform.primaryTakedownRequestContactEmail || '-'}}
+                <td>{{platform.primaryTakedownRequestContactEmail || '-'}}
                 </td>
-                <td class="status" [class.disabled]="!subPlatform.isActive">
+                <td class="status" [class.active]="!!subPlatform.isActive">
                     {{subPlatform.isActive?'Active':'Disabled'}}</td>
                 <td>{{subPlatform.updDtm |date:'yyyy-MM-dd'}}</td>
-                <td style="width: 4rem">
-                    <span id="subPlatform-edit-{{index}}-icon" class="edit-icon"> </span>
-                    <!-- <span id="subPlatform-edit-{{index}}-icon" class="edit-icon"
-                        [routerLink]="'/platform/'+platform.organizationId"> </span> -->
-                </td>
             </tr>
         </ng-template>
     </p-table>

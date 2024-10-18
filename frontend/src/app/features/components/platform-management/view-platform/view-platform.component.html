@@ -1,1 +1,141 @@
-<p>view-platform works!</p>
+<div class="header">
+    <h2>Detailed Platform Contact Information</h2>
+    <button pButton class="header-button" (click)="onAddSubPlatform()">
+        <span class="edit-icon"></span> Add Subsidiary
+        Platform
+    </button>
+</div>
+<div class="content" *ngIf="platform">
+    <div class="col">
+        <p-panel>
+            <ng-template pTemplate="header">
+                <div class="panel-header">
+                    <strong class="title">
+                        Parent Platform Information
+                    </strong>
+                    <p-tag class="tag-blue">
+                        <strong class="tag-text">Last Update Date: </strong>{{platform.updDtm|date:'YYYY-MM-dd' || '-'}}
+                    </p-tag>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="content">
+                <div class="row">
+                    <strong>Platform Name:</strong>
+                    <span>
+                        {{platform.organizationNm || '-'}}
+                    </span>
+                </div>
+                <div class="row">
+                    <strong>Platform Code:</strong>
+                    <span>
+                        {{platform.organizationCd || '-'}}
+                    </span>
+                </div>
+                <div class="row">
+                    <strong>Email for Non-Compliance Notices:</strong>
+                    <span>
+                        {{platform.primaryNoticeOfTakedownContactEmail || '-'}}
+                    </span>
+                </div>
+                <div class="row">
+                    <strong>Email for Takedown Request Letters:</strong>
+                    <span>
+                        {{platform.primaryTakedownRequestContactEmail || '-'}}
+                    </span>
+                </div>
+                <div class="row">
+                    <strong>Platform Type:</strong>
+                    <span>
+                        {{platform.platformType || '-'}}
+                    </span>
+                </div>
+                <div class="row">
+                    <strong>Platform Status:</strong>
+                    <span class="status"
+                        [class.active]="platform.isActive">{{platform.isActive?'Active':'Disabled'}}</span>
+                </div>
+                <div class="row">
+                    <strong>Last Updated By:</strong>
+                    <span>
+                        {{platform.updUserGuid || '-'}}
+                    </span>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton class="panel-button p-button-link" (click)="onEditPlatform(platform.organizationId)">
+                    <span class="edit-icon"></span> Update Parent Platform Information
+                </button>
+            </ng-template>
+
+        </p-panel>
+    </div>
+
+    <div class="col" *ngIf="platform.subsidiaries.length">
+        <p-panel *ngFor="let sub of platform.subsidiaries" class="greyish-header">
+            <ng-template pTemplate="header">
+                <div class="panel-header">
+                    <strong class="title">
+                        Subsidiary Platform Information
+                    </strong>
+                    <p-tag class="tag-dark-gray">
+                        <strong class="tag-text">Last Update Date:</strong>{{sub.updDtm|date:'YYYY-MM-dd' || '-'}}
+                    </p-tag>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="content">
+                <div class="row">
+                    <strong>Platform Name:</strong>
+                    <span class="name">
+                        {{sub.organizationNm || '-'}}
+                    </span>
+                </div>
+                <div class="row">
+                    <strong>Platform Code:</strong>
+                    <span>
+                        {{sub.organizationCd || '-'}}
+                    </span>
+                </div>
+                <div class="row">
+                    <strong>Platform Status:</strong>
+                    <span class="status" [class.active]="sub.isActive">
+                        {{sub.isActive?'Active':'Disabled'}}
+                    </span>
+                </div>
+                <div class="row">
+                    <strong>Last Updated By:</strong>
+                    <span>
+                        {{sub.updUserGuid || '-'}}
+                    </span>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton class="panel-button p-button-link" (click)="onEditSubPlatform(sub.organizationId)">
+                    <span class="edit-icon"></span> Update Subsidiary Platform Information
+                </button>
+            </ng-template>
+
+        </p-panel>
+
+    </div>
+    <div class="col" *ngIf="!platform.subsidiaries.length">
+        <p-panel class="greyish-header">
+            <ng-template pTemplate="header">
+                <div class="panel-header">
+                    <strong class="title">
+                        Subsidiary Platform Information
+                    </strong>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="content">
+                <div class="row">
+                    <strong>There is no subsidiary added under this platform.</strong>
+                </div>
+            </ng-template>
+        </p-panel>
+    </div>
+</div>

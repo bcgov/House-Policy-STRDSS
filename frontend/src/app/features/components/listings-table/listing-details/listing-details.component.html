@@ -36,7 +36,7 @@
             <ng-template pTemplate="header">
                 <div class="property-info-container">
                     <strong class="panel-header-text">Platform Information</strong>
-                    <p-tag class="platform-report-month">
+                    <p-tag class="tag-blue">
                         <strong class="tag-text">Platform Report Month:</strong>{{listing.latestReportPeriodYm
                         |date:'YYYY-MM' || '-'}}
                     </p-tag>
@@ -263,7 +263,7 @@
             <ng-template pTemplate="header">
                 <div class="property-info-container">
                     <strong class="panel-header-text">Business Licence Information</strong>
-                    <p-tag class="last-bl-update-date" *ngIf="blInfo?.updDtm">
+                    <p-tag class="tag-dark-gray" *ngIf="blInfo?.updDtm">
                         <strong class="tag-text">BL Records Last Uploaded:</strong>{{blInfo.updDtm |date:'yyyy-MM-dd' }}
                     </p-tag>
                 </div>

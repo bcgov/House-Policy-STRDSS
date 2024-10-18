@@ -3,7 +3,7 @@ import { DropdownOption } from '../models/dropdown-option';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Platform } from '../models/platform';
+import { Platform, SubPlatform, SubPlatformCreate, UpdatePlatform, UpdateSubPlatform } from '../models/platform';
 import { PagingResponse } from '../models/paging-response';
 
 @Injectable({
@@ -36,19 +36,27 @@ export class OrganizationService {
     return this.httpClient.get<PagingResponse<Platform>>(url);
   }
 
-  getPlatform(id: number): Observable<Platform> {
-    return this.httpClient.get<Platform>(`${environment.API_HOST}/organizations/platform/${id}`);
+  getPlatform(id: number): Observable<Platform | SubPlatform> {
+    return this.httpClient.get<Platform | SubPlatform>(`${environment.API_HOST}/organizations/platforms/${id}`);
   }
 
-  addPlatform(platform: Platform): Observable<Platform> {
-    return this.httpClient.post<Platform>(`${environment.API_HOST}/organizations/platforms`, platform);
+  addPlatform(platform: Platform): Observable<any> {
+    return this.httpClient.post<any>(`${environment.API_HOST}/organizations/platforms`, platform);
   }
 
-  addSubPlatform(platform: Platform, parentId: number): Observable<Platform> {
-    return this.httpClient.post<Platform>(`${environment.API_HOST}/organizations/platform/${parentId}`, platform);
+  addSubPlatform(platform: SubPlatformCreate): Observable<any> {
+    return this.httpClient.post<any>(`${environment.API_HOST}/organizations/platforms/subsidiaries`, platform);
   }
 
-  editPlatform(platform: Platform): Observable<Platform> {
-    return this.httpClient.put<Platform>(`${environment.API_HOST}/organizations/platform`, platform);
+  editPlatform(id: number, platform: UpdatePlatform): Observable<any> {
+    return this.httpClient.put<any>(`${environment.API_HOST}/organizations/platforms/${id}`, platform);
+  }
+
+  editSubPlatform(id: number, platform: UpdateSubPlatform): Observable<any> {
+    return this.httpClient.put<any>(`${environment.API_HOST}/organizations/platforms/subsidiaries/${id}`, platform);
+  }
+
+  getPlatformTypes(): Observable<Array<DropdownOption>> {
+    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/platformTypeDropdown`);
   }
 }

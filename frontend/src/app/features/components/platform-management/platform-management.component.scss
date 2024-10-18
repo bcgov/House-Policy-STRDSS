@@ -41,25 +41,32 @@
                 opacity: .2;
             }
 
-            .edit-icon {
-                display: inline-block;
-                width: 26px;
-                height: 26px;
-                background-image: url(../../../../assets/images/edit-user.svg);
-                background-position: center center;
-                background-repeat: no-repeat;
-                padding: 4px;
-                padding-right: 12px;
+            &.status {
+                padding-left: 2px;
+                color: #CE3E39;
 
-                &:hover {
-                    &:not(.disabled) {
-                        cursor: pointer;
-                        filter: drop-shadow(0px 0px 1px #555);
-                    }
+                &.active {
+                    color: #42814A;
+                }
+            }
+
+            .edit-icon {
+
+                i {
+                    padding: 5px;
+                    text-decoration: none;
+                    background-color: #053662;
+                    border-color: #053662;
+                    color: #FFFFFF;
+                    border-radius: 4px;
                 }
 
-                &.disabled {
-                    opacity: .5;
+                &:visited {
+                    i {
+                        background-color: #3470B1;
+                        border-color: #3470B1;
+                        color: #FFFFFF;
+                    }
                 }
             }
         }

@@ -1,1 +1,168 @@
-<p>edit-platform works!</p>
+<div class="header">
+    <h2>Edit Platform</h2>
+    <span class="sub-header">All fields are required except where stated</span>
+</div>
+<div class="content" *ngIf="platform">
+    <form [formGroup]="myForm">
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="organizationNm">Platform Name</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <input placeholder="Enter Value" [ngClass]="'full-width-text-field'" type="text" pInputText
+                            formControlName="organizationNm" id="organizationNm" name="organizationNm" />
+                    </div>
+                    <div class="validation-errors" *ngIf="!organizationNmControl.pristine">
+
+                        <small id="requiredOrganizationName" *ngIf="organizationNmControl.errors?.['required']">
+                            Platform Name is Required
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="organizationCd">Platform Code</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <input placeholder="Enter Value" [ngClass]="'full-width-text-field'" type="text" pInputText
+                            formControlName="organizationCd" id="organizationCd" name="organizationCd" />
+                    </div>
+                    <div class="validation-errors" *ngIf="!organizationCdControl.pristine">
+
+                        <small id="requiredOrganizationCd" *ngIf="organizationCdControl.errors?.['required']">
+                            Platform Code is Required
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="organizationCd">Email for Non-Compliance Notices</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <input placeholder="Enter Platform’s Email Contact" [ngClass]="'full-width-text-field'"
+                            type="text" pInputText formControlName="primaryNoticeOfTakedownContactEmail"
+                            id="primaryNoticeOfTakedownContactEmail" name="primaryNoticeOfTakedownContactEmail" />
+                    </div>
+                    <div class="validation-errors" *ngIf="!primaryNoticeOfTakedownContactEmailControl.pristine">
+
+                        <small id="requiredPrimaryNoticeOfTakedownContactEmail"
+                            *ngIf="primaryNoticeOfTakedownContactEmailControl.errors?.['required']">
+                            Email is Required
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="secondaryNoticeOfTakedownContactEmail">Secondary Email for Non-Compliance
+                            Notices (optional)</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <input placeholder="Enter Platform’s Email Contact" [ngClass]="'full-width-text-field'"
+                            type="text" pInputText formControlName="secondaryNoticeOfTakedownContactEmail"
+                            id="secondaryNoticeOfTakedownContactEmail" name="secondaryNoticeOfTakedownContactEmail" />
+                    </div>
+                    <div class="validation-errors" *ngIf="!secondaryNoticeOfTakedownContactEmailControl.pristine">
+
+                        <small id="requiredSecondaryNoticeOfTakedownContactEmail"
+                            *ngIf="secondaryNoticeOfTakedownContactEmailControl.errors?.['required']">
+                            Email is Required
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="primaryTakedownRequestContactEmail">Email for Takedown Request Letters</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <input placeholder="Enter Platform’s Email Contact" [ngClass]="'full-width-text-field'"
+                            type="text" pInputText formControlName="primaryTakedownRequestContactEmail"
+                            id="primaryTakedownRequestContactEmail" name="primaryTakedownRequestContactEmail" />
+                    </div>
+                    <div class="validation-errors" *ngIf="!primaryTakedownRequestContactEmailControl.pristine">
+
+                        <small id="requiredPrimaryTakedownRequestContactEmail"
+                            *ngIf="primaryTakedownRequestContactEmailControl.errors?.['required']">
+                            Email is Required
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="secondaryTakedownRequestContactEmail">Secondary Email for Takedown Request
+                            Letters (optional)</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <input placeholder="Enter Platform’s Email Contact" [ngClass]="'full-width-text-field'"
+                            type="text" pInputText formControlName="secondaryTakedownRequestContactEmail"
+                            id="secondaryTakedownRequestContactEmail" name="secondaryTakedownRequestContactEmail" />
+                    </div>
+                    <div class="validation-errors" *ngIf="!secondaryTakedownRequestContactEmailControl.pristine">
+
+                        <small id="requiredSecondaryTakedownRequestContactEmail"
+                            *ngIf="secondaryTakedownRequestContactEmailControl.errors?.['required']">
+                            Email is Required
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="platformType">Platform Type</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <p-dropdown [options]="platformTypes" formControlName="platformType" placeholder="Please Select"
+                            id="platformType" name="platformType" [required]="true"
+                            [ngClass]="'full-width-text-field'"></p-dropdown>
+                    </div>
+                    <div class="validation-errors" *ngIf="!platformTypeControl.pristine">
+
+                        <small id="requiredPlatformType" *ngIf="platformTypeControl.errors?.['required']">
+                            Platform Type is Required
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="platformType">Platform Type</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <p-radioButton name="isActive" id="isActive-true" [value]="true" label="Active"
+                            formControlName="isActive"></p-radioButton> &nbsp;
+                        <p-radioButton name="isActive" id="isActive-false" [value]="false" label="Disabled"
+                            formControlName="isActive"></p-radioButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="actions" *ngIf="myForm">
+    <button pButton (click)="onSave()" [disabled]="!myForm.valid">Save</button>
+    <button pButton class="p-button-transparent" (click)="onCancel()">Cancel</button>
+</div>

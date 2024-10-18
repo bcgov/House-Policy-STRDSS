@@ -71,7 +71,7 @@ export class TopMenuService {
       {
         accessPermission: takedown_action,
         buttonId: 'sendTakedownLetter_mi_btn',
-        route: '/delisting-request',
+        route: '/takedown-request',
         description: 'Send a request to an STR platform to remove a non-compliant listing. A Takedown Request can be sent within a period of 5 to 90 days after a Notice of Non-Compliance is delivered.',
         title: 'Send Takedown Request',
         folderName: 'Forms',

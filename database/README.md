@@ -32,7 +32,7 @@ There is always a base set of fixed data that are not managed by the application
 ## Database Release Management
 Each production release depends on the execution of a fixed set of scripts against the database schema. Generally, these are applied in the same order as they were applied to the UAT database during each sprint. The following is the order list of scripts applied to deliver each release.
 
-_Note: Master scripts are the preferred release method to use, starting with Release 5. To use one, connect to the target database from the command line, and execute the following command:_
+_Note: Master scripts are the preferred release method to use, starting with Release 5. To use one, connect to the target database from the `psql` command line, and execute the following command:_
 
 `\i '<folder>/<script>' (must use / rather than \)`
 ### Release 1 Scripts:
@@ -117,3 +117,8 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
   - `ddl/STR_DSS_Views_Sprint_15.sql`
   - `seeding/STR_DSS_Data_Seeding_Sprint_15.sql`
   - `seeding/STR_DSS_Data_Seeding_Platforms_Sprint_15.sql`
+- Sprint 16:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_16.sql`
+  - `ddl/STR_DSS_Views_Sprint_16.sql`
+  - `seeding/STR_DSS_Data_Seeding_Sprint_16.sql`
+  - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_16.sql`

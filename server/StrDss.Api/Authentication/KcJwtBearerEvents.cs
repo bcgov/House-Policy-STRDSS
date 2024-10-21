@@ -29,7 +29,7 @@ namespace StrDss.Api.Authentication
 
             _currentUser.LoadUserSession(context!.Principal!);
 
-            var (user, permissions) = await _userService.GetUserByGuidAsync(_currentUser.UserGuid);
+            var (user, permissions) = await _userService.GetUserByCurrentUserAsync();
 
             if (user == null)
             {
@@ -39,6 +39,7 @@ namespace StrDss.Api.Authentication
             }
             else
             {
+                _currentUser.UserGuid = user.UserGuid;
                 _currentUser.Id = user.UserIdentityId;
                 _currentUser.IsActive = user.IsEnabled;
                 _currentUser.AccessRequestStatus = user.AccessRequestStatusCd;

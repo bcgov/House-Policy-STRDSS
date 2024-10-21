@@ -147,7 +147,7 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
-            var user = await _userRepo.GetUserByGuid(_currentUser.UserGuid);
+            var user = await _userRepo.GetUserByCurrentUser();
 
             var adminUsers = await _userRepo.GetAdminUsers();
 
@@ -197,7 +197,7 @@ namespace StrDss.Service
         {
             var errors = new Dictionary<string, List<string>>();
 
-            var userDto = await _userRepo.GetUserByGuid(_currentUser.UserGuid);
+            var userDto = await _userRepo.GetUserByCurrentUser();
             if (userDto != null)
             {
                 if (userDto.AccessRequestStatusCd == AccessRequestStatuses.Requested)

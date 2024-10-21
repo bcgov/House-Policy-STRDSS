@@ -69,8 +69,8 @@ namespace StrDss.Model
             FirstName = textInfo.ToTitleCase(user.GetCustomClaim(ClaimTypes.GivenName));
             LastName = textInfo.ToTitleCase(user.GetCustomClaim(ClaimTypes.Surname));
             DisplayName = user.GetCustomClaim(StrDssClaimTypes.DisplayName);
-            ExternalIdentityCd = user.GetCustomClaim(StrDssClaimTypes.Sub);
-            IsBcServicesCard = ExternalIdentityCd == Environment.GetEnvironmentVariable("SSO_CLIENT");
+            ExternalIdentityCd = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            IsBcServicesCard = IdentityProviderNm == Environment.GetEnvironmentVariable("SSO_CLIENT");
 
             switch (IdentityProviderNm)
             {

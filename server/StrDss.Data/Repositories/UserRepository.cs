@@ -18,6 +18,7 @@ namespace StrDss.Data.Repositories
         Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByDisplayNameAsync(string displayName);
         Task<UserDto?> GetUserById(long id);
         Task<UserDto?> GetUserByGuid(Guid guid);
+        Task<UserDto?> GetUserByCurrentUser();
         Task UpdateUserAsync(UserDto dto);
         Task UpdateUserAsync(UserUpdateDto dto);
         Task DenyAccessRequest(AccessRequestDenyDto dto);
@@ -183,6 +184,22 @@ namespace StrDss.Data.Repositories
         public async Task<UserDto?> GetUserByGuid(Guid guid)
         {
             var entity = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.UserGuid == guid);
+            return _mapper.Map<UserDto>(entity);
+        }
+
+        public async Task<UserDto?> GetUserByCurrentUser()
+        {
+            DssUserIdentity? entity;
+
+            if (_currentUser.IsBcServicesCard)
+            {
+                entity = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.ExternalIdentityCd == _currentUser.ExternalIdentityCd);
+            }
+            else
+            {
+                entity = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.UserGuid == _currentUser.UserGuid);
+            }
+
             return _mapper.Map<UserDto>(entity);
         }
 

@@ -17,6 +17,7 @@ namespace StrDss.Service
     {
         Task<PagedDto<UserListtDto>> GetUserListAsync(string status, string search, long? orgranizationId, int pageSize, int pageNumber, string orderBy, string direction);
         Task<(UserDto? user, List<string> permissions)> GetUserByGuidAsync(Guid guid);
+        Task<(UserDto? user, List<string> permissions)> GetUserByCurrentUserAsync();
         Task<Dictionary<string, List<string>>> CreateAccessRequestAsync(AccessRequestCreateDto dto);
         Task<Dictionary<string, List<string>>> DenyAccessRequest(AccessRequestDenyDto dto);
         Task<Dictionary<string, List<string>>> ApproveAccessRequest(AccessRequestApproveDto dto);
@@ -61,6 +62,11 @@ namespace StrDss.Service
             return await _userRepo.GetUserAndPermissionsByGuidAsync(guid);
         }
 
+        public async Task<(UserDto? user, List<string> permissions)> GetUserByCurrentUserAsync()
+        {
+            return await _userRepo.GetUserAndPermissionsByCurrentUserAsync();
+        }
+
         public async Task<(UserDto? user, List<string> permissions)> GetUserByDisplayNameAsync(string displayName)
         {
             return await _userRepo.GetUserAndPermissionsByDisplayNameAsync(displayName);
@@ -103,7 +109,8 @@ namespace StrDss.Service
             {
                 var userCreateDto = new UserCreateDto
                 {
-                    UserGuid = _currentUser.UserGuid,
+                    UserGuid = _currentUser.IsBcServicesCard ? Guid.NewGuid() : _currentUser.UserGuid,
+                    ExternalIdentityCd = _currentUser.ExternalIdentityCd,
                     DisplayNm = _currentUser.DisplayName,
                     IdentityProviderNm = _currentUser.IdentityProviderNm,
                     IsEnabled = false,

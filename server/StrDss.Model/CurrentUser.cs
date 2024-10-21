@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using NetTopologySuite.Noding;
 using StrDss.Common;
 
 namespace StrDss.Model
@@ -28,6 +29,8 @@ namespace StrDss.Model
         void LoadUserSession(ClaimsPrincipal user);
         void LoadApsSession(ClaimsPrincipal user);
         void AddClaim(ClaimsPrincipal user, string claimType, string value);
+        string? ExternalIdentityCd { get; set; }
+        bool IsBcServicesCard { get; set; }
     }
 
     public class CurrentUser : ICurrentUser
@@ -51,6 +54,8 @@ namespace StrDss.Model
         public long OrganizationId { get; set; }
         public string OrganizationName { get; set; } = "";
         public DateTime? TermsAcceptanceDtm { get; set; }
+        public string? ExternalIdentityCd { get; set; }
+        public bool IsBcServicesCard { get; set; } = false;
 
         public void LoadUserSession(ClaimsPrincipal user)
         {
@@ -64,6 +69,8 @@ namespace StrDss.Model
             FirstName = textInfo.ToTitleCase(user.GetCustomClaim(ClaimTypes.GivenName));
             LastName = textInfo.ToTitleCase(user.GetCustomClaim(ClaimTypes.Surname));
             DisplayName = user.GetCustomClaim(StrDssClaimTypes.DisplayName);
+            ExternalIdentityCd = user.GetCustomClaim(StrDssClaimTypes.Sub);
+            IsBcServicesCard = ExternalIdentityCd == Environment.GetEnvironmentVariable("SSO_CLIENT");
 
             switch (IdentityProviderNm)
             {

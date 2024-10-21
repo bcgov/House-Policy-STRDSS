@@ -16,7 +16,7 @@
     .cards {
         display: flex;
         flex-wrap: wrap;
-        gap: 24px;
+        gap: 18px;
         width: 100%;
         margin-bottom: 10px;
 
@@ -24,11 +24,11 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             box-sizing: border-box;
-            padding: 18px;
+            padding: 16px;
             background-color: #FFFFFF;
 
-            width: 470px;
-            height: 225px;
+            width: 368px;
+            height: 230px;
 
             display: flex;
             justify-content: space-between;

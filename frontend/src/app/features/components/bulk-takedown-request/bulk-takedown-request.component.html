@@ -6,13 +6,9 @@
 <form *ngIf="myForm" [formGroup]="myForm">
 
     <p-panel class="table-panel">
-        <ng-template pTemplate="header" *ngIf="containsDisabledItems">
+        <ng-template pTemplate="header">
             <div class="header-panel">
                 <strong>Included Listings</strong>
-                <div *ngIf="containsDisabledItems" class="some-items-are-inactive-msg"> <i
-                        class="pi pi-info-circle"></i>Notices of Non-Compliance and
-                    Takedown Requests cannot be sent
-                    for inactive listings as they are no longer available on the platform.</div>
             </div>
         </ng-template>
 
@@ -21,8 +17,7 @@
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width: 4rem">
-                        <p-checkbox [binary]="true" [disabled]="containsDisabledItems"
-                            (onChange)="onListingSelected($event)"></p-checkbox>
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                     </th>
                     <th class="sortable-header" id="status_header"
                         [class.sorted]="this.sort && this.sort.prop === 'offeringOrganizationNm'"
@@ -65,8 +60,7 @@
             <ng-template pTemplate="body" let-listing>
                 <tr class="small-text">
                     <td>
-                        <p-tableCheckbox [disabled]="listing.listingStatusType === 'I'"
-                            [value]="listing"></p-tableCheckbox>
+                        <p-tableCheckbox [value]="listing"></p-tableCheckbox>
                     </td>
                     <td>{{ listing.offeringOrganizationNm }}</td>
                     <td>

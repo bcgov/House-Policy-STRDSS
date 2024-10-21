@@ -41,7 +41,6 @@ export class BulkTakedownRequestComponent implements OnInit {
   listings!: Array<ListingDetails | ListingTableRow>;
   returnUrl!: string;
   myForm!: FormGroup;
-  containsDisabledItems = false;
 
   previewText = '';
   showPreviewDialog = false;
@@ -87,20 +86,11 @@ export class BulkTakedownRequestComponent implements OnInit {
           this.returnUrl = param['returnUrl'];
           this.listings = [...this.searchStateService.selectedListings];
           this.searchStateService.selectedListings = new Array<ListingDetails>();
-          this.selectedListings = this.listings.filter(l => l.listingStatusType !== 'I');
-          this.containsDisabledItems = this.listings.some(l => l.listingStatusType !== 'I')
+          this.selectedListings = this.listings;
           this.initForm();
           this.cloakParams();
         }
       });
-  }
-
-  onListingSelected(e: any): void {
-    if (e.checked) {
-      this.selectedListings = this.listings.filter(l => l.listingStatusType !== 'I');
-    } else {
-      this.selectedListings = [];
-    }
   }
 
   onSort(property: keyof ListingDetails): void {

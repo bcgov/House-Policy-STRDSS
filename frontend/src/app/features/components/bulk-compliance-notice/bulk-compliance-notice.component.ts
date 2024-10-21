@@ -45,7 +45,6 @@ export class BulkComplianceNoticeComponent implements OnInit {
   listings!: Array<ListingDetails | ListingTableRow>;
   returnUrl!: string;
   myForm!: FormGroup;
-  containsDisabledItems = false;
 
   extendedListings = new Array<ListingDetailsWithHostCheckboxExtension | any>();
 
@@ -53,7 +52,6 @@ export class BulkComplianceNoticeComponent implements OnInit {
   showPreviewDialog = false;
 
   submissionArray!: Array<ComplianceNoticeBulk>;
-
   selectedListings!: Array<ListingDetails | ListingTableRow>;
   addressWarningScoreLimit = Number.parseInt(environment.ADDRESS_SCORE);
   sort!: { prop: string, dir: 'asc' | 'desc' }
@@ -84,12 +82,10 @@ export class BulkComplianceNoticeComponent implements OnInit {
         else {
           this.returnUrl = param['returnUrl'];
           this.listings = [...this.searchStateService.selectedListings];
-          this.containsDisabledItems = this.listings.some(l => l.listingStatusType !== 'I')
 
           this.extendedListings = this.listings.map((listing) => ({ ...listing, sendNoticeToHosts: (listing as any).hasAtLeastOneValidHostEmail }));
           this.searchStateService.selectedListings = new Array<ListingDetailsWithHostCheckboxExtension>();
-          this.selectedListings = this.extendedListings.filter(l => l.listingStatusType !== 'I')
-            ;
+          this.selectedListings = this.extendedListings;
 
           this.initForm();
           this.cloakParams();
@@ -149,14 +145,6 @@ export class BulkComplianceNoticeComponent implements OnInit {
 
   cancelPreview(): void {
     this.showPreviewDialog = false;
-  }
-
-  onListingSelected(e: any): void {
-    if (e.checked) {
-      this.selectedListings = this.listings.filter(l => l.listingStatusType !== 'I');
-    } else {
-      this.selectedListings = [];
-    }
   }
 
   private sendPreview(): void {

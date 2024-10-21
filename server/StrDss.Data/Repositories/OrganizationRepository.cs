@@ -271,10 +271,6 @@ namespace StrDss.Data.Repositories
             entity.OrganizationCd = dto.OrganizationCd.ToUpperInvariant();
             entity.OrganizationType = OrganizationTypes.Platform;
 
-            //Per acceptance criteria fo DSS-223. set subsidary platform type to parent platform type on create
-            var parentOrg = await GetPlatform(dto.ManagingOrganizationId);
-            entity.PlatformType = parentOrg.PlatformType;
-
             await _dbSet.AddAsync(entity);
 
             return entity;

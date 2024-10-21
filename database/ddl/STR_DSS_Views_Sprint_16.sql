@@ -29,6 +29,6 @@ left join dss_platform_type dpt on dpt.platform_type = do2.platform_type
 left join dss_user_identity dui on dui.user_guid = do2.upd_user_guid
 left join dss_organization_contact_person docp on docp.contacted_through_organization_id = do2.organization_id and docp.email_message_type = 'Notice of Takedown' and docp.is_primary = true
 left join dss_organization_contact_person docp2 on docp2.contacted_through_organization_id = do2.organization_id and docp2.email_message_type = 'Takedown Request' and docp2.is_primary = true
-left join dss_organization_contact_person docp3 on docp3.contacted_through_organization_id = do2.organization_id and docp3.email_message_type = 'Notice of Takedown' and docp.is_primary != true
+left join dss_organization_contact_person docp3 on docp3.contacted_through_organization_id = do2.organization_id and docp3.email_message_type = 'Notice of Takedown' and docp3.is_primary != true
 left join dss_organization_contact_person docp4 on docp4.contacted_through_organization_id = do2.organization_id and docp4.email_message_type = 'Takedown Request' and docp4.is_primary != true
 where do2.organization_type = 'Platform';

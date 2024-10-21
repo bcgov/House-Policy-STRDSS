@@ -53,7 +53,7 @@ namespace StrDss.Test
         {
             // Arrange
             userDto.AccessRequestStatusCd = AccessRequestStatuses.Requested;
-            userRepoMock.Setup(x => x.GetUserByGuid(It.IsAny<Guid>())).ReturnsAsync(userDto);
+            userRepoMock.Setup(x => x.GetUserByCurrentUser()).ReturnsAsync(userDto);
 
             // Act
             var errors = await sut.CreateAccessRequestAsync(dto);
@@ -75,7 +75,7 @@ namespace StrDss.Test
             // Arrange
             userDto.AccessRequestStatusCd = AccessRequestStatuses.Approved;
             userDto.IsEnabled = false;
-            userRepoMock.Setup(x => x.GetUserByGuid(It.IsAny<Guid>())).ReturnsAsync(userDto);
+            userRepoMock.Setup(x => x.GetUserByCurrentUser()).ReturnsAsync(userDto);
 
             // Act
             var errors = await sut.CreateAccessRequestAsync(dto);
@@ -96,7 +96,7 @@ namespace StrDss.Test
         {
             // Arrange
             userDto.AccessRequestStatusCd = AccessRequestStatuses.Approved;
-            userRepoMock.Setup(x => x.GetUserByGuid(It.IsAny<Guid>())).ReturnsAsync(userDto);
+            userRepoMock.Setup(x => x.GetUserByCurrentUser()).ReturnsAsync(userDto);
 
             // Act
             var errors = await sut.CreateAccessRequestAsync(dto);
@@ -312,7 +312,7 @@ namespace StrDss.Test
         {
             int callCount = 0;
 
-            userRepoMock.Setup(x => x.GetUserByGuid(It.IsAny<Guid>()))
+            userRepoMock.Setup(x => x.GetUserByCurrentUser())
               .ReturnsAsync(() =>
               {
                   callCount++;

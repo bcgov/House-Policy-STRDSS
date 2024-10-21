@@ -287,6 +287,7 @@
         public const string Expired = "expired";
         public const string StrDssCred = "str_dss_cred";
         public const string ClientId = "client_id";
+        public const string Sub = "sub";
 
         public static string GetSimpleName(string fullName)
         {

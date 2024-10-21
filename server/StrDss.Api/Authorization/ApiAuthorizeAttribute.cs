@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.IdentityModel.Protocols.WsTrust;
 using StrDss.Common;
+using System.Security.Claims;
 
 namespace StrDss.Api.Authorization
 {
@@ -21,7 +23,8 @@ namespace StrDss.Api.Authorization
             _logger = loggerFactory.CreateLogger<StrDssLogger>();
 
             var user = context.HttpContext.User;
-            var username = user?.Identity?.Name ?? "Unknown";
+            var username = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
+
             var ipAddress = context.HttpContext.Connection.RemoteIpAddress;
             var ip = ipAddress == null ? "Unknown" : ipAddress.ToString();
 
@@ -39,33 +42,14 @@ namespace StrDss.Api.Authorization
             if (identityProviderNm == "" && clientId != "")
             {
                 identityProviderNm = StrDssIdProviders.Aps;
+                username = clientId;
             }
 
             var displayName = user.GetCustomClaim(StrDssClaimTypes.DisplayName);
             
-            string userId;
-            switch (identityProviderNm)
-            {
-                case StrDssIdProviders.Idir:
-                    userId = user.GetCustomClaim(StrDssClaimTypes.IdirUserGuid);
-                    break;
-                case StrDssIdProviders.BceidBusiness:
-                    userId = user.GetCustomClaim(StrDssClaimTypes.BceidUserGuid);
-                    break;
-                case StrDssIdProviders.StrDss:
-                    userId = user.GetCustomClaim(StrDssClaimTypes.StrDssUserGuid);
-                    break;
-                case StrDssIdProviders.Aps:
-                    userId = clientId;
-                    break;
-                default:
-                    userId = "Unknown";
-                    break;
-            }
-
             if (_permissions.Length == 0)
             {
-                _logger.LogInformation($"[AUTH] User '{userId}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
+                _logger.LogInformation($"[AUTH] User '{username}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
                 return;
             }
 
@@ -82,12 +66,12 @@ namespace StrDss.Api.Authorization
 
             if (!hasPermission)
             {
-                _logger.LogInformation($"[AUTH] User '{userId}' does not have permission to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
+                _logger.LogInformation($"[AUTH] User '{username}' does not have permission to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
                 context.Result = new UnauthorizedResult(); //401
                 return;
             }
 
-            _logger.LogInformation($"[AUTH] User '{userId}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
+            _logger.LogInformation($"[AUTH] User '{username}' is authorized to access {context.ActionDescriptor.DisplayName} from IP address {ip}.");
         }
     }
 }

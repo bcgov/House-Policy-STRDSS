@@ -112,7 +112,6 @@
                     <i class="pi pi-angle-up"
                         *ngIf="this.sortSub && this.sortSub.prop === 'organizationCd' && this.sortSub.dir === 'asc'"></i>
                 </th>
-                <th>Platform Type</th>
                 <th class="sortable-header" id="primaryNoticeOfTakedownContactEmail_header"
                     [class.sorted]="this.sortSub && this.sortSub.prop === 'primaryNoticeOfTakedownContactEmail'"
                     (click)="onSortSub('primaryNoticeOfTakedownContactEmail')">Notice of Non-compliance Email
@@ -153,10 +152,9 @@
             <tr>
                 <td>{{subPlatform.organizationNm || '-'}}</td>
                 <td>{{subPlatform.organizationCd || '-'}}</td>
-                <td>{{platform.platformType || '-'}}</td>
-                <td>{{platform.primaryNoticeOfTakedownContactEmail || '-'}}
+                <td>{{subPlatform.primaryNoticeOfTakedownContactEmail || '-'}}
                 </td>
-                <td>{{platform.primaryTakedownRequestContactEmail || '-'}}
+                <td>{{subPlatform.primaryTakedownRequestContactEmail || '-'}}
                 </td>
                 <td class="status" [class.active]="!!subPlatform.isActive">
                     {{subPlatform.isActive?'Active':'Disabled'}}</td>

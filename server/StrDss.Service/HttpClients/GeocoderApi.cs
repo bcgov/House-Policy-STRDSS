@@ -116,7 +116,7 @@ namespace StrDss.Service.HttpClients
         {
             var toRemove = ", Canada";
 
-            address = address.Replace("#", " ");
+            address = address.Replace("#", " UNIT ");
 
             if (address.EndsWith(toRemove))
             {

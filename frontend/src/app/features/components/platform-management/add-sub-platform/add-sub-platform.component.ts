@@ -74,11 +74,27 @@ export class AddSubPlatformComponent implements OnInit {
   public get platformStatusControl(): AbstractControl {
     return this.myForm.controls['status'];
   }
+  public get primaryNoticeOfTakedownContactEmailControl(): AbstractControl {
+    return this.myForm.controls['primaryNoticeOfTakedownContactEmail'];
+  }
+  public get primaryTakedownRequestContactEmailControl(): AbstractControl {
+    return this.myForm.controls['primaryTakedownRequestContactEmail'];
+  }
+  public get secondaryNoticeOfTakedownContactEmailControl(): AbstractControl {
+    return this.myForm.controls['secondaryNoticeOfTakedownContactEmail'];
+  }
+  public get secondaryTakedownRequestContactEmailControl(): AbstractControl {
+    return this.myForm.controls['secondaryTakedownRequestContactEmail'];
+  }
 
   private initForm(): void {
     this.myForm = this.fb.group({
       organizationNm: ['', [Validators.required]],
       organizationCd: ['', [Validators.required]],
+      primaryNoticeOfTakedownContactEmail: ['', [Validators.required, Validators.email]],
+      primaryTakedownRequestContactEmail: ['', [Validators.required, Validators.email]],
+      secondaryNoticeOfTakedownContactEmail: ['', [Validators.email]],
+      secondaryTakedownRequestContactEmail: ['', [Validators.email]],
       status: [{ value: true, disabled: true }, []],
     });
   }

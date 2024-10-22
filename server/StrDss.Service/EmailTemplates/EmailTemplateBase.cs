@@ -48,9 +48,9 @@ namespace StrDss.Service.EmailTemplates
                 Body = GetContent(),
                 From = From,
                 Subject = Subject,
-                To = To,
-                Cc = Cc,
-                Bcc = Bcc,
+                To = To.Where(email => !string.IsNullOrWhiteSpace(email)).ToList(),
+                Cc = Cc.Where(email => !string.IsNullOrWhiteSpace(email)).ToList(),
+                Bcc = Bcc.Where(email => !string.IsNullOrWhiteSpace(email)).ToList(),
                 Info = Info,
                 Attachments = Attachments,
             };

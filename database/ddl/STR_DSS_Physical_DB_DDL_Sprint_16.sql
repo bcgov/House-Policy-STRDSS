@@ -457,7 +457,7 @@ CREATE OR REPLACE VIEW dss_platform_vw AS SELECT do2.organization_id,
      LEFT JOIN dss_user_identity dui ON ((dui.user_guid = do2.upd_user_guid)))
      LEFT JOIN dss_organization_contact_person docp ON (((docp.contacted_through_organization_id = do2.organization_id) AND ((docp.email_message_type)::text = 'Notice of Takedown'::text) AND (docp.is_primary = true))))
      LEFT JOIN dss_organization_contact_person docp2 ON (((docp2.contacted_through_organization_id = do2.organization_id) AND ((docp2.email_message_type)::text = 'Takedown Request'::text) AND (docp2.is_primary = true))))
-     LEFT JOIN dss_organization_contact_person docp3 ON (((docp3.contacted_through_organization_id = do2.organization_id) AND ((docp3.email_message_type)::text = 'Notice of Takedown'::text) AND (docp.is_primary <> true))))
+     LEFT JOIN dss_organization_contact_person docp3 ON (((docp3.contacted_through_organization_id = do2.organization_id) AND ((docp3.email_message_type)::text = 'Notice of Takedown'::text) AND (docp3.is_primary <> true))))
      LEFT JOIN dss_organization_contact_person docp4 ON (((docp4.contacted_through_organization_id = do2.organization_id) AND ((docp4.email_message_type)::text = 'Takedown Request'::text) AND (docp4.is_primary <> true))))
   WHERE ((do2.organization_type)::text = 'Platform'::text);
 

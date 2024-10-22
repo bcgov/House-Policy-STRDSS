@@ -58,7 +58,7 @@
                 <div class="row">
                     <strong>Last Updated By:</strong>
                     <span>
-                        {{platform.updUserGuid || '-'}}
+                        {{platform.updUserDisplayNm || '-'}}
                     </span>
                 </div>
             </ng-template>
@@ -99,6 +99,18 @@
                     </span>
                 </div>
                 <div class="row">
+                    <strong>Email for Non-Compliance Notices:</strong>
+                    <span>
+                        {{sub.primaryNoticeOfTakedownContactEmail || '-'}}
+                    </span>
+                </div>
+                <div class="row">
+                    <strong>Email for Takedown Request Letters:</strong>
+                    <span>
+                        {{sub.primaryTakedownRequestContactEmail || '-'}}
+                    </span>
+                </div>
+                <div class="row">
                     <strong>Platform Status:</strong>
                     <span class="status" [class.active]="sub.isActive">
                         {{sub.isActive?'Active':'Disabled'}}
@@ -107,7 +119,7 @@
                 <div class="row">
                     <strong>Last Updated By:</strong>
                     <span>
-                        {{sub.updUserGuid || '-'}}
+                        {{sub.updUserDisplayNm || '-'}}
                     </span>
                 </div>
             </ng-template>

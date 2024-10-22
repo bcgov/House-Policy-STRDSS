@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownOption } from '../../../../common/models/dropdown-option';
 import { ErrorHandlingService } from '../../../../common/services/error-handling.service';
@@ -40,6 +40,7 @@ export class EditPlatformComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private orgService: OrganizationService,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -130,7 +131,9 @@ export class EditPlatformComponent implements OnInit {
       secondaryNoticeOfTakedownContactEmail: [this.platform.secondaryNoticeOfTakedownContactEmail, [Validators.email]],
       secondaryTakedownRequestContactEmail: [this.platform.secondaryTakedownRequestContactEmail, [Validators.email]],
       platformType: [this.platform.platformType, [Validators.required]],
-      isActive: [!!this.platform.isActive, [Validators.required]],
+      isActive: [{ value: !!this.platform.isActive, disabled: true }, [Validators.required]],
     });
+
+    this.cd.detectChanges();
   }
 }

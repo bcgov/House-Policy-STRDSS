@@ -52,6 +52,10 @@ export class EditSubPlatformComponent implements OnInit {
       isActive: platformRaw.isActive,
       organizationNm: platformRaw.organizationNm,
       managingOrganizationId: this.platform.managingOrganizationId,
+      primaryNoticeOfTakedownContactEmail: platformRaw.primaryNoticeOfTakedownContactEmail,
+      primaryTakedownRequestContactEmail: platformRaw.primaryTakedownRequestContactEmail,
+      secondaryNoticeOfTakedownContactEmail: platformRaw.secondaryNoticeOfTakedownContactEmail,
+      secondaryTakedownRequestContactEmail: platformRaw.secondaryTakedownRequestContactEmail,
       updDtm: this.platform.updDtm,
     };
 
@@ -78,6 +82,18 @@ export class EditSubPlatformComponent implements OnInit {
   public get organizationCdControl(): AbstractControl {
     return this.myForm.controls['organizationCd'];
   }
+  public get primaryNoticeOfTakedownContactEmailControl(): AbstractControl {
+    return this.myForm.controls['primaryNoticeOfTakedownContactEmail'];
+  }
+  public get primaryTakedownRequestContactEmailControl(): AbstractControl {
+    return this.myForm.controls['primaryTakedownRequestContactEmail'];
+  }
+  public get secondaryNoticeOfTakedownContactEmailControl(): AbstractControl {
+    return this.myForm.controls['secondaryNoticeOfTakedownContactEmail'];
+  }
+  public get secondaryTakedownRequestContactEmailControl(): AbstractControl {
+    return this.myForm.controls['secondaryTakedownRequestContactEmail'];
+  }
   public get platformStatusControl(): AbstractControl {
     return this.myForm.controls['isActive'];
   }
@@ -100,7 +116,11 @@ export class EditSubPlatformComponent implements OnInit {
     this.myForm = this.fb.group({
       organizationNm: [this.platform.organizationNm, [Validators.required]],
       organizationCd: [{ value: this.platform.organizationCd, disabled: true }, [Validators.required]],
-      isActive: [!!this.platform.isActive, [Validators.required]],
+      primaryNoticeOfTakedownContactEmail: [this.platform.primaryNoticeOfTakedownContactEmail, [Validators.required, Validators.email]],
+      primaryTakedownRequestContactEmail: [this.platform.primaryTakedownRequestContactEmail, [Validators.required, Validators.email]],
+      secondaryNoticeOfTakedownContactEmail: [this.platform.secondaryNoticeOfTakedownContactEmail, [Validators.email]],
+      secondaryTakedownRequestContactEmail: [this.platform.secondaryTakedownRequestContactEmail, [Validators.email]],
+      isActive: [{ value: !!this.platform.isActive, disabled: true }, [Validators.required]],
     });
 
     this.cd.detectChanges();

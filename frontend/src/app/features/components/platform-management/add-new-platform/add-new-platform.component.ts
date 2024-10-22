@@ -9,6 +9,7 @@ import { GlobalLoaderService } from '../../../../common/services/global-loader.s
 import { OrganizationService } from '../../../../common/services/organization.service';
 import { DropdownOption } from '../../../../common/models/dropdown-option';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-new-platform',
@@ -33,6 +34,7 @@ export class AddNewPlatformComponent implements OnInit {
     private fb: FormBuilder,
     private messageHandlerService: ErrorHandlingService,
     private loaderService: GlobalLoaderService,
+    private router: Router,
     private orgService: OrganizationService,
   ) { }
 
@@ -68,6 +70,7 @@ export class AddNewPlatformComponent implements OnInit {
   onCancel(): void {
     this.myForm.reset();
     this.platformStatusControl.setValue(true);
+    this.router.navigateByUrl(`/platform-management`);
   }
 
   public get organizationNmControl(): AbstractControl {

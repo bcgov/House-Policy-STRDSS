@@ -63,8 +63,6 @@ namespace StrDss.Service
 
                 var jsonContent = emailContent.ToString();
 
-                _logger.LogDebug($"CHES: {jsonContent}");
-
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                 var response = await _httpClient.PostAsync($"{chesUrl}/api/v1/email", httpContent);

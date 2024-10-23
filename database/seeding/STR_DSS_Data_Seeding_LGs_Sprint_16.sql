@@ -392,14 +392,16 @@ AS s (local_government_type, organization_cd, organization_nm)
 ) AS src
 ON (tgt.organization_cd=UPPER(src.organization_cd))
 WHEN matched and (
+coalesce(tgt.is_active, false) != true or
 tgt.organization_nm!=src.organization_nm or
 tgt.organization_type!='LG' or
 tgt.local_government_type!=src.local_government_type or
 tgt.local_government_type is null)
 THEN UPDATE SET
+is_active = true,
 organization_nm=src.organization_nm,
 organization_type='LG',
 local_government_type=src.local_government_type
 WHEN NOT MATCHED
-THEN INSERT (organization_type, organization_cd, organization_nm, local_government_type)
-VALUES ('LG', src.organization_cd, src.organization_nm, src.local_government_type);
+THEN INSERT (is_active, organization_type, organization_cd, organization_nm, local_government_type)
+VALUES (true, 'LG', src.organization_cd, src.organization_nm, src.local_government_type);

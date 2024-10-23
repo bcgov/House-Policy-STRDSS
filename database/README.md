@@ -122,3 +122,14 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
   - `ddl/STR_DSS_Views_Sprint_16.sql`
   - `seeding/STR_DSS_Data_Seeding_Sprint_16.sql`
   - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_16.sql`
+  - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_16.sql` **(TIP: run each MERGE statement independently)**
+- Sprint 17 (planned changes):
+  - Create lookup table `dss_local_government_type`:
+    - Columns `local_government_type`, `local_government_type_nm`
+  - Alter table `dss_organization`:
+    - Add foreign key to table `dss_local_government_type`
+    - Add columns: `business_licence_format_txt`, `regional_district_dsc`
+  - Seed new rows in table `dss_user_privilege`:
+    - `jurisdiction_read`
+    - `jurisdiction_write`
+    - `bl_link_write` ??

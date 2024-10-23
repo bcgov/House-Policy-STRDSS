@@ -1741,14 +1741,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/organizations/platforms?pageSize=100&pageNumber=1",
+					"raw": "{{host}}/api/organizations/jurisdictions?pageSize=100&pageNumber=1",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
 						"organizations",
-						"platforms"
+						"jurisdictions"
 					],
 					"query": [
 						{

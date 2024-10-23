@@ -1,0 +1,25 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: enable-strdssdev-backup-to-strdsstest-db
+  labels:
+    app.kubernetes.io/instance: strdssdev-backup
+    env: development
+    DataClass: Medium
+    environment: dev
+    app.kubernetes.io/name: strdssdev-backup
+    project: b0471a-project
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: strdssdev-backup
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: strdsstest
+    - to:
+        - ipBlock:
+            cidr: 142.34.229.4/32
+  policyTypes:
+    - Egress

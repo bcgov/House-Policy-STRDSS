@@ -347,6 +347,8 @@
         public const string CeuAction = "ceu_action";
         public const string PlatformRead = "platform_read";
         public const string PlatformWrite = "platform_write";
+        public const string JurisdictionRead = "jurisdiction_read"; 
+        public const string JurisdictionWrite = "jurisdiction_write";
     }
 
     public static class UploadDeliveryTypes

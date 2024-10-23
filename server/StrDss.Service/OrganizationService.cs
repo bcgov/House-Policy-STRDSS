@@ -27,6 +27,7 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> UpdatePlatformAsync(PlatformUpdateDto dto);
         Task<(Dictionary<string, List<string>>, long)> CreatePlatformSubAsync(PlatformSubCreateDto dto);
         Task<Dictionary<string, List<string>>> UpdatePlatformSubAsync(PlatformSubUpdateDto dto);
+        Task<PagedDto<LocalGovViewDto>> GetJurisdictions(int pageSize, int pageNumber, string orderBy, string direction);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -237,6 +238,11 @@ namespace StrDss.Service
             _unitOfWork.Commit();
 
             return errors;
+        }
+
+        public async Task<PagedDto<LocalGovViewDto>> GetJurisdictions(int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            return await _orgRepo.GetJurisdictions(pageSize, pageNumber, orderBy, direction);
         }
     }
 }

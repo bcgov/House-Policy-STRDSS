@@ -1734,6 +1734,35 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Get Jurisdictions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/organizations/platforms?pageSize=100&pageNumber=1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"organizations",
+						"platforms"
+					],
+					"query": [
+						{
+							"key": "pageSize",
+							"value": "100"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {

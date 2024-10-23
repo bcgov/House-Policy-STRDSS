@@ -212,11 +212,13 @@ AS s (organization_type, organization_cd, organization_nm)
 ) AS src
 ON (tgt.organization_cd=src.organization_cd)
 WHEN matched and (
+coalesce(tgt.is_active, false) != true or
 tgt.organization_nm!=src.organization_nm or
 tgt.organization_type!=src.organization_type)
 THEN UPDATE SET
+is_active = true,
 organization_nm=src.organization_nm,
 organization_type=src.organization_type
 WHEN NOT MATCHED
-THEN INSERT (organization_type, organization_cd, organization_nm)
-VALUES (src.organization_type, src.organization_cd, src.organization_nm);
+THEN INSERT (is_active, organization_type, organization_cd, organization_nm)
+VALUES (true, src.organization_type, src.organization_cd, src.organization_nm);

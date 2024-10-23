@@ -30,7 +30,7 @@ namespace StrDss.Data.Repositories
         Task UpdatePlatformAsync(PlatformUpdateDto dto);
         Task<DssOrganization> CreatePlatformSubAsync(PlatformSubCreateDto dto);
         Task UpdatePlatformSubAsync(PlatformSubUpdateDto dto);
- 
+        Task<PagedDto<LocalGovViewDto>> GetJurisdictions(int pageSize, int pageNumber, string orderBy, string direction);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -151,7 +151,7 @@ namespace StrDss.Data.Repositories
 
             var strRequirement = await _dbContext.DssOrganizations
                 .FromSqlRaw(@"
-                    SELECT p.organization_nm, c.is_principal_residence_required, c.is_business_licence_required, p.is_str_prohibited
+                    SELECT p.organization_nm, c.is_principal_residence_required, c.is_business_licence_required, c.is_str_prohibited
                     FROM dss_organization c, dss_organization p
                     WHERE p.organization_id = c.managing_organization_id and c.organization_id = dss_containing_organization_id({0})", point)
 
@@ -293,6 +293,22 @@ namespace StrDss.Data.Repositories
             UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.SecondaryNoticeOfTakedownContactEmail, false);
             UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
             UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
+        }
+
+        public async Task<PagedDto<LocalGovViewDto>> GetJurisdictions(int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            var query = _dbSet.AsNoTracking()
+                .Where(x => x.OrganizationType == OrganizationTypes.LG && x.ManagingOrganizationId == null);
+
+            var lgs = await Page<DssOrganization, LocalGovViewDto>(query, pageSize, pageNumber, orderBy, direction);
+
+            foreach (var lg in lgs.SourceList)
+            {
+                lg.Jurisdictions = _mapper.Map<List<JurisdictionsViewDto>>
+                    (await _dbSet.AsNoTracking().Where(x => x.ManagingOrganizationId == lg.OrganizationId).ToListAsync());
+            }
+
+            return lgs;
         }
     }
 }

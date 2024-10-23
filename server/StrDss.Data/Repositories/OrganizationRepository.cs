@@ -151,9 +151,9 @@ namespace StrDss.Data.Repositories
 
             var strRequirement = await _dbContext.DssOrganizations
                 .FromSqlRaw(@"
-                    SELECT organization_nm, is_principal_residence_required, is_business_licence_required, is_str_prohibited
-                    FROM dss_organization
-                    WHERE organization_id = dss_containing_organization_id({0})", point)
+                    SELECT p.organization_nm, c.is_principal_residence_required, c.is_business_licence_required, p.is_str_prohibited
+                    FROM dss_organization c, dss_organization p
+                    WHERE p.organization_id = c.managing_organization_id and c.organization_id = dss_containing_organization_id({0})", point)
 
                 .Select(o => new StrRequirementsDto
                 {

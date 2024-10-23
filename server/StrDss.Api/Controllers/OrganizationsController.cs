@@ -172,7 +172,7 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.JurisdictionRead)]
         [HttpGet("jurisdictions")]
-        public async Task<ActionResult<List<PlatformViewDto>>> GetJurisdictions(int pageSize = 10, int pageNumber = 1, string orderBy = "OrganizationNm", string direction = "asc")
+        public async Task<ActionResult<List<LocalGovViewDto>>> GetJurisdictions(int pageSize = 10, int pageNumber = 1, string orderBy = "OrganizationNm", string direction = "asc")
         {
             var jurisdictions = await _orgService.GetJurisdictions(pageSize, pageNumber, orderBy, direction);
             return Ok(jurisdictions);

@@ -33,6 +33,8 @@ as db_has_s15_col
 	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_16.sql'
 	\echo 'Calling STR_DSS_Data_Seeding_LGs_Sprint_16.sql'
 	\ir '../seeding/STR_DSS_Data_Seeding_LGs_Sprint_16.sql'
+	\echo 'Calling STR_DSS_Data_Seeding_Geometry_Sprint_16.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_Geometry_Sprint_16.sql'
 \elif :db_has_dss_tab
 	\echo 'Database migration state is unknown - Exiting without changes'
 \else

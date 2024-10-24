@@ -25,6 +25,7 @@ namespace StrDss.Service
         Task CreateRentalListingExportFiles();
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
         Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
+        Task<RentalListingExtractDto?> GetRetalListingExportByNameAsync(string extractName);
         Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults);
         Task<Dictionary<string, List<string>>> ConfirmAddressAsync(long rentalListingId);
         Task<Dictionary<string, List<string>>> UpdateAddressAsync(UpdateListingAddressDto dto);
@@ -148,9 +149,11 @@ namespace StrDss.Service
 
             var listingIds = await _listingRepo.GetRentalListingIdsToExport();
             var headers = RentalListingExport.GetHeadersAsCsv();
+            var finHeaders = RentalListingExport.GetFinHeadersAsCsv();
 
             var lgExport = InitializeExport(headers);
             var allExport = InitializeExport(headers);
+            var finExport = InitializeExport(finHeaders);
             var prExport = InitializeExport(headers);
             var count = 0;
             var totalCount = listingIds.Count;
@@ -179,16 +182,19 @@ namespace StrDss.Service
                 }
 
                 var line = ToCsvString(listing);
+                var finLine = ToCsvString(listing, true);
 
                 lgExport.Add(line);
                 allExport.Add(line);
+                finExport.Add(finLine);
+
                 if (listing.IsPrincipalResidenceRequired == true)
                 {
                     prExport.Add(line);
                 }
             }
 
-            await CreateFinalExports(allExport, prExport, lgExport, lg, lgId);
+            await CreateFinalExports(allExport, finExport, prExport, lgExport, lg, lgId);
             stopWatchForAll.Stop();
             _logger.LogInformation($"Rental Listing Export - Finished - {stopWatchForAll.Elapsed.TotalSeconds} seconds");
         }
@@ -214,7 +220,7 @@ namespace StrDss.Service
             }
         }
 
-        private async Task CreateFinalExports(List<string> allExport, List<string> prExport, List<string> lgExport, string lg, long lgId)
+        private async Task CreateFinalExports(List<string> allExport, List<string> finExport, List<string> prExport, List<string> lgExport, string lg, long lgId)
         {
             var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyyMMdd");
 
@@ -223,6 +229,15 @@ namespace StrDss.Service
                 _logger.LogInformation("Rental Listing Export - Creating a zip file for all rental listings");
                 var extract = await _listingRepo.GetOrCreateRentalListingExtractByExtractNm(ListingExportFileNames.All);
                 extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", allExport), $"STRlisting_{ListingExportFileNames.All}_{date}");
+                extract.IsPrRequirementFiltered = false;
+                _unitOfWork.Commit();                
+            }
+
+            if (finExport.Count > 1)
+            {
+                _logger.LogInformation("Rental Listing Export - Creating a zip file for all rental listings for FIN");
+                var extract = await _listingRepo.GetOrCreateRentalListingExtractByExtractNm(ListingExportFileNames.Fin);
+                extract.SourceBin = CommonUtils.CreateZip(string.Join("\r\n", finExport), $"STRlisting_{ListingExportFileNames.Fin}_{date}");
                 extract.IsPrRequirementFiltered = false;
                 _unitOfWork.Commit();
             }
@@ -239,10 +254,8 @@ namespace StrDss.Service
             await ProcessExportForLocalGovernment(lgExport, lgId, lg);
         }
 
-        private static string ToCsvString(RentalListingExportDto listing)
+        private static string ToCsvString(RentalListingExportDto listing, bool isFin = false)
         {
-            
-
             var builder = new StringBuilder();
 
             builder.Append(FormatCsvField(listing.LatestReportPeriodYm)).Append(','); // Most Recent Platform Report Month
@@ -320,12 +333,16 @@ namespace StrDss.Service
             builder.Append(FormatCsvField(listing.SupplierHost5FaxNumber)).Append(','); // Supplier Host 5 fax number
             builder.Append(FormatCsvField(listing.SupplierHost5MailingAddress)).Append(','); // Supplier Host 5 Mailing Address
             builder.Append(FormatCsvField(listing.SupplierHost5Id)).Append(','); // Host ID of Supplier Host 5
-            builder.Append(FormatCsvField(listing.LastActionNm)).Append(','); // Last Action Taken
-            builder.Append(FormatCsvField(listing.LastActionDtm)).Append(','); // Date of Last Action Taken
-            builder.Append(FormatCsvField(listing.LastActionNm1)).Append(','); // Last Action Taken 1
-            builder.Append(FormatCsvField(listing.LastActionDtm1)).Append(','); // Date of Last Action Taken 1
-            builder.Append(FormatCsvField(listing.LastActionNm2)).Append(','); // Previous Action Taken 2
-            builder.Append(FormatCsvField(listing.LastActionDtm2)); // Date of Previous Action Taken 2
+
+            if (!isFin)
+            {
+                builder.Append(FormatCsvField(listing.LastActionNm)).Append(','); // Last Action Taken
+                builder.Append(FormatCsvField(listing.LastActionDtm)).Append(','); // Date of Last Action Taken
+                builder.Append(FormatCsvField(listing.LastActionNm1)).Append(','); // Last Action Taken 1
+                builder.Append(FormatCsvField(listing.LastActionDtm1)).Append(','); // Date of Last Action Taken 1
+                builder.Append(FormatCsvField(listing.LastActionNm2)).Append(','); // Previous Action Taken 2
+                builder.Append(FormatCsvField(listing.LastActionDtm2)); // Date of Previous Action Taken 2
+            }
 
             return builder.ToString();
         }
@@ -371,6 +388,11 @@ namespace StrDss.Service
         public async Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId)
         {
             return await _listingRepo.GetRetalListingExportAsync(extractId);
+        }
+
+        public async Task<RentalListingExtractDto?> GetRetalListingExportByNameAsync(string extractName)
+        {
+            return await _listingRepo.GetRetalListingExportByNameAsync(extractName);
         }
 
         public async Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync()

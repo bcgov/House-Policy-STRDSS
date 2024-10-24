@@ -29,12 +29,27 @@ Often, database object definitions are changed after the sprint modeling activit
 ## Data Seeding
 There is always a base set of fixed data that are not managed by the application, and must be populated by script. Some of these are merely temporary situations that will be resolved as stories evolve to replace them.
 
+## Database Change Summaries
+Each sprint delivers a planned set of incremental changes to the database. The following summarizes these changes.
+
+### Sprint 17:
+- Create lookup table `dss_local_government_type`:
+  - Columns `local_government_type`, `local_government_type_nm`
+- Alter table `dss_organization`:
+  - Add foreign key to table `dss_local_government_type`
+  - Add columns: `business_licence_format_txt`, `regional_district_dsc`
+- Seed new rows in table `dss_user_privilege` and `dss_user_role_privilege`:
+  - `jurisdiction_read` (for `ceu_admin`, `ceu_staff`)
+  - `jurisdiction_write` (for `ceu_admin`)
+  - `bl_link_write` (for `lg_staff`)
+
 ## Database Release Management
 Each production release depends on the execution of a fixed set of scripts against the database schema. Generally, these are applied in the same order as they were applied to the UAT database during each sprint. The following is the order list of scripts applied to deliver each release.
 
 _Note: Master scripts are the preferred release method to use, starting with Release 5. To use one, connect to the target database from the `psql` command line, and execute the following command:_
 
 `\i '<folder>/<script>' (must use / rather than \)`
+
 ### Release 1 Scripts:
 - Sprint 1: N/A
 - Sprint 2:
@@ -123,13 +138,7 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
   - `seeding/STR_DSS_Data_Seeding_Sprint_16.sql`
   - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_16.sql`
   - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_16.sql` **(TIP: run each MERGE statement independently)**
-- Sprint 17 (planned changes):
-  - Create lookup table `dss_local_government_type`:
-    - Columns `local_government_type`, `local_government_type_nm`
-  - Alter table `dss_organization`:
-    - Add foreign key to table `dss_local_government_type`
-    - Add columns: `business_licence_format_txt`, `regional_district_dsc`
-  - Seed new rows in table `dss_user_privilege`:
-    - `jurisdiction_read`
-    - `jurisdiction_write`
-    - `bl_link_write` ??
+- Sprint 17:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_17_pre_DML.sql`
+  - `seeding/STR_DSS_Data_Seeding_Sprint_17.sql`
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_17_post_DML.sql`

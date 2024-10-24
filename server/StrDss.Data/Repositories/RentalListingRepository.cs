@@ -27,6 +27,7 @@ namespace StrDss.Data.Repositories
         Task<DssRentalListingExtract> GetOrCreateRentalListingExtractByExtractNm(string name);
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
         Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
+        Task<RentalListingExtractDto?> GetRetalListingExportByNameAsync(string extractName);
         Task ConfirmAddressAsync(long rentalListingId);
         Task<DssRentalListing> UpdateAddressAsync(UpdateListingAddressDto dto);
         DateTime GetLatestRentalListingExportTime();
@@ -642,6 +643,18 @@ namespace StrDss.Data.Repositories
                 .DssRentalListingExtracts
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.RentalListingExtractId == extractId);
+
+            if (extract == null) return null;
+
+            return _mapper.Map<RentalListingExtractDto>(extract);
+        }
+
+        public async Task<RentalListingExtractDto?> GetRetalListingExportByNameAsync(string extractName)
+        {
+            var extract = await _dbContext
+                .DssRentalListingExtracts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.RentalListingExtractNm == extractName);
 
             if (extract == null) return null;
 

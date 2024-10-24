@@ -25,6 +25,7 @@ namespace StrDss.Service
         Task CreateRentalListingExportFiles();
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
         Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId);
+        Task<RentalListingExtractDto?> GetRetalListingExportByNameAsync(string extractName);
         Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults);
         Task<Dictionary<string, List<string>>> ConfirmAddressAsync(long rentalListingId);
         Task<Dictionary<string, List<string>>> UpdateAddressAsync(UpdateListingAddressDto dto);
@@ -387,6 +388,11 @@ namespace StrDss.Service
         public async Task<RentalListingExtractDto?> GetRetalListingExportAsync(long extractId)
         {
             return await _listingRepo.GetRetalListingExportAsync(extractId);
+        }
+
+        public async Task<RentalListingExtractDto?> GetRetalListingExportByNameAsync(string extractName)
+        {
+            return await _listingRepo.GetRetalListingExportByNameAsync(extractName);
         }
 
         public async Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync()

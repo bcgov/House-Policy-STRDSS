@@ -7,6 +7,7 @@ using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace StrDss.Api.Controllers
 {
@@ -96,6 +97,30 @@ namespace StrDss.Api.Controllers
         public async Task<ActionResult> GetRetalListingExportAsync(long extractId)
         {
             var extract = await _listingService.GetRetalListingExportAsync(extractId);
+
+            if (extract == null)
+            {
+                return NotFound();
+            }
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG && extract.FilteringOrganizationId != _currentUser.OrganizationId)
+            {
+                return Unauthorized();
+            }
+
+            return File(extract.SourceBin!, "application/zip", $"STRlisting_{extract.RentalListingExtractNm}_{extract.UpdDtm.ToString("yyyyMMdd")}.zip");
+        }
+
+        /// <summary>
+        /// Downloads a zipped CSV file containing all listings reported by platforms
+        /// </summary>
+        /// <returns>A zipped CSV file</returns>
+        [ApiAuthorize(Permissions.ListingRead)]
+        [SwaggerOperation(Tags = new string[] { Common.ApiTags.Aps })]
+        [HttpGet("exports/fin")]
+        public async Task<ActionResult<FileContentResult>> GetRetalListingExportFin()
+        {
+            var extract = await _listingService.GetRetalListingExportByNameAsync(ListingExportFileNames.Fin);
 
             if (extract == null)
             {

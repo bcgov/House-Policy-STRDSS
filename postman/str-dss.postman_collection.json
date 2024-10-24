@@ -1207,6 +1207,26 @@
 			"response": []
 		},
 		{
+			"name": "export file for finance",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/rentallistings/exports/fin",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"rentallistings",
+						"exports",
+						"fin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Confirm Address",
 			"request": {
 				"method": "PUT",

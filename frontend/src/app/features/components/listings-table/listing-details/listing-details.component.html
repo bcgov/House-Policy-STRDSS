@@ -22,12 +22,9 @@
     </div>
     <div class="column">
         <button *ngIf="!isCEU" pButton (click)="sendNoticeOfNonCompliance()" class="p-button-outlined do-not-print-it">
-            <span class="nonc-icon"></span> Send Notice Of
-            Non-Compliance </button>
+            <span class="nonc-icon"></span> Send Notice Of Non-Compliance </button>
         <button *ngIf="!isCEU" pButton (click)="sendTakedownRequest()" class="p-button-outlined do-not-print-it"><span
-                class="tdr-icon"></span> Send
-            Takedown
-            Request</button>
+                class="tdr-icon"></span> Send Takedown Request</button>
     </div>
 </div>
 <div class="content" *ngIf="listing">
@@ -79,7 +76,7 @@
                     </span>
                     <span class="status-item" *ngIf="listing.isTakenDown">
                         <span>
-                            Takedown Complete
+                            Takedown Reported
                         </span>
                         <span class="status-flag status-takedown-complete">
                         </span>
@@ -497,7 +494,7 @@
                 current monthly data</li>
             <li><span class="status-circle status-inactive">I</span>&nbsp;Inactive: Listing appeared in previous
                 but not current monthly data </li>
-            <li><span class="status-flag status-takedown-complete"></span>&nbsp;Takedown Complete: Platform confirmed
+            <li><span class="status-flag status-takedown-complete"></span>&nbsp;Takedown Reported: Platform reported
                 takedown of the listing</li>
             <li><span class="status-flag status-reassigned"></span>&nbsp;Reassigned: Address (best
                 match) was updated to a new jurisdiction</li>

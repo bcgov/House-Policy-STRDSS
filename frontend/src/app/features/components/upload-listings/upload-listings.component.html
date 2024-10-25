@@ -51,10 +51,12 @@
         <div class="form-group-row-col">
             <label for="platformId">Upload Your Platform Data (.CSV File Only)</label>
         </div>
-        <div class="form-group-row-col upload-container">
+        <div class="form-group-row-col upload-container" [class.has-file]="uploadedFile?.name">
             <app-upload-file #componentRef [extension]="'.csv'" [sizeLimit]="maxFileSize"
                 (filesSelected)="onFileSelected($event, componentRef)"></app-upload-file>
             <div class="file-name">{{uploadedFile?.name ||'No file selected'}}</div>
+            <button pButton class="p-button-transparent clean-btn" (click)="onClear()" *ngIf="uploadedFile?.name"
+                icon="pi pi-times" size="small"></button>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!fileControl.pristine && fileControl.errors">
             <small id="file-error-text" *ngIf="fileControl.errors?.['required']">File is required</small>

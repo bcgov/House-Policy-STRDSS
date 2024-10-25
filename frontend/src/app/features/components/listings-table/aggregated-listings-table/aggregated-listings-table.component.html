@@ -88,6 +88,8 @@
                     <th> Last Action </th>
 
                     <th> Last Action Date</th>
+
+                    <th> Listings </th>
                 </tr>
             </ng-template>
 
@@ -117,6 +119,7 @@
                     </td>
                     <td>{{ row.lastActionNm }}</td>
                     <td>{{ row.lastActionDtm |date }}</td>
+                    <td>{{ row.listings.length }}</td>
                 </tr>
             </ng-template>
 
@@ -171,7 +174,7 @@
                     </td>
                     <td>{{ listing.offeringOrganizationNm }}</td>
                     <td> <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
-                            [href]="listing.platformListingUrl">{{
+                            [href]="listing.platformListingUrl | urlProtocol">{{
                             listing.platformListingNo }}</a>
                     </td>
                     <td class="align-center"><a [ariaLabel]="'open-listing-details'" pButton

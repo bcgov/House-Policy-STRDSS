@@ -34,8 +34,17 @@
                 align-items: center;
                 margin-top: 6px;
 
+                &.has-file {
+                    justify-content: space-between;
+                }
+
                 .file-name {
                     padding-right: 8px;
+                }
+
+                .clean-btn {
+                    width: 2rem;
+                    padding: 0.3rem 0;
                 }
             }
         }

@@ -22,6 +22,7 @@ import { TagModule } from 'primeng/tag';
 import { BusinessLicence } from '../../../../common/models/business-licence';
 import { BusinessLicenceService } from '../../../../common/services/business-licence.service';
 import { BLSearchResultRow } from '../../../../common/models/bl-search-result-row';
+import { UrlProtocolPipe } from '../../../../common/pipes/url-protocol.pipe';
 
 @Component({
   selector: 'app-listing-details',
@@ -38,6 +39,7 @@ import { BLSearchResultRow } from '../../../../common/models/bl-search-result-ro
     DialogModule,
     TooltipModule,
     TagModule,
+    UrlProtocolPipe,
   ],
   templateUrl: './listing-details.component.html',
   styleUrl: './listing-details.component.scss'

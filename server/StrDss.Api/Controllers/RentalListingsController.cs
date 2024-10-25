@@ -118,7 +118,7 @@ namespace StrDss.Api.Controllers
         [ApiAuthorize(Permissions.ListingRead)]
         [SwaggerOperation(Tags = new string[] { Common.ApiTags.Aps })]
         [HttpGet("exports/fin")]
-        public async Task<ActionResult<FileContentResult>> GetRetalListingExportFin()
+        public async Task<ActionResult> GetRetalListingExportFin()
         {
             var extract = await _listingService.GetRetalListingExportByNameAsync(ListingExportFileNames.Fin);
 

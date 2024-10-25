@@ -26,7 +26,7 @@ import { GlobalLoaderService } from '../../../common/services/global-loader.serv
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
-  userType = '' || 'BCGov' || 'Platform' || 'LG' || 'Admin';
+  userType!: '' | 'BCGov' | 'Platform' | 'LG' | 'Admin';
   currentUser!: User;
   showListingHistory = false;
 

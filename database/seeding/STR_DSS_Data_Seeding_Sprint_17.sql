@@ -38,12 +38,14 @@ VALUES (src.licence_status_type, src.licence_status_type_nm, src.licence_status_
 
 MERGE INTO dss_economic_region AS tgt
 USING ( SELECT * FROM (VALUES
-(1,'PENDING','Pending'),
-(2,'ISSUED','Issued'),
-(2,'SUSPENDED','Suspended'),
-(2,'REVOKED','Revoked'),
-(2,'CANCELLED','Cancelled'),
-(3,'EXPIRED','Expired'))
+(1,'Cariboo','Cariboo'),
+(2,'Kootenay','Kootenay'),
+(3,'Lower Mainland Southwest','Lower Mainland Southwest'),
+(4,'Nechako','Nechako'),
+(5,'North Coast','North Coast'),
+(6,'Northeast','Northeast'),
+(7,'Thompson Okanagan','Thompson Okanagan'),
+(8,'Vancouver Island and Coast','Vancouver Island and Coast'))
 AS s (economic_region_sort_no,economic_region_dsc, economic_region_nm)
 ) AS src
 ON (tgt.economic_region_dsc=src.economic_region_dsc)
@@ -99,19 +101,23 @@ VALUES (src.listing_status_type, src.listing_status_type_nm, src.listing_status_
 
 MERGE INTO dss_local_government_type AS tgt
 USING ( SELECT * FROM (VALUES
-('First Nations Community','First Nations Community'),
-('Municipality','Municipality'),
-('Other','Other'),
-('Regional District Electoral Area','Regional District Electoral Area'))
-AS s (local_government_type, local_government_type_nm)
+(5,'First Nations Community','First Nations Community'),
+(3,'Mountain Resort Area','Mountain Resort Area'),
+(1,'Municipality','Municipality'),
+(4,'Other','Other'),
+(2,'Regional District','Regional District'))
+AS s (local_government_type_sort_no, local_government_type, local_government_type_nm)
 ) AS src
 ON (tgt.local_government_type=src.local_government_type)
-WHEN matched and tgt.local_government_type_nm!=src.local_government_type_nm
+WHEN matched and (
+tgt.local_government_type_nm!=src.local_government_type_nm or
+coalesce(tgt.local_government_type_sort_no,-1)!=coalesce(src.local_government_type_sort_no,-1))
 THEN UPDATE SET
-local_government_type_nm=src.local_government_type_nm
+local_government_type_nm=src.local_government_type_nm,
+local_government_type_sort_no=src.local_government_type_sort_no
 WHEN NOT MATCHED
-THEN INSERT (local_government_type, local_government_type_nm)
-VALUES (src.local_government_type, src.local_government_type_nm);
+THEN INSERT (local_government_type, local_government_type_nm, local_government_type_sort_no)
+VALUES (src.local_government_type, src.local_government_type_nm, src.local_government_type_sort_no);
 
 MERGE INTO dss_organization_type AS tgt
 USING ( SELECT * FROM (VALUES

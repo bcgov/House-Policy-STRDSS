@@ -9,22 +9,19 @@ The public API is accessible at
 API access is controlled via Kong, administered via the BC Gov API Programme Services API Gateway.
 **Kong configuration is not updated via Github Actions, and must be updated manually when there are changes.**
 
-For an overview of the API Gateway update process, see:
-https://bcgov.github.io/aps-infra-platform/guides/owner-journey-v1/
-
+For an overview of the API Gateway update process, see: [APS guides](https://bcgov.github.io/aps-infra-platform/guides/owner-journey-v1/)
 
 ## Publication
 
 ### Prerequisites
-1. In the API Services Portal (https://api.gov.bc.ca/), the namespace strdata has already been created.
+
+1. In the [API Services Portal](https://api.gov.bc.ca/), the namespace strdata has already been created.
 1. In the namespace, authorization profile has been created as follows:
     * Flow: Client Credential Flow, using Client ID and Secret
     * Mode: Automatic
     * Client Mappers (Audience): gateway-strdata
 
-
-### Publication
-
+### Publication Steps
 
 1. Log into https://api.gov.bc.ca/
 1. Select the strdata namespace
@@ -41,8 +38,9 @@ https://bcgov.github.io/aps-infra-platform/guides/owner-journey-v1/
     export SURL="https://authz.apps.gov.bc.ca/auth/realms/aps/protocol/openid-connect/token"
 
     gwa login --client-id $SCID --client-secret $SCSC
-    gwa pg strdata-{env}.yaml
+    gwa pg strdata.yaml
    ```
+
 1. (optional for Windows GWA) In command prompt of Windows run the following commands (the first command create a .env file locally, which will need to be deleted if you need to create one for the other environment):
 
    ```sh
@@ -51,12 +49,13 @@ https://bcgov.github.io/aps-infra-platform/guides/owner-journey-v1/
     gwa login --client-id "<<client id>>" --client-secret "<<client secret>>"
     gwa pg strdata-{env}.yaml
    ```
+
 1. Check the Gateway in the API Service Portal to make sure that the routes have been published
 1. Create a dataset if it doesn't exist.
 
-   https://bcgov.github.io/aps-infra-platform/guides/owner-journey-v1/#91-setup-your-draft-dataset
+   [Setup your draft dataset](https://bcgov.github.io/aps-infra-platform/guides/wner-journey-v1/#91-setup-your-draft-dataset)
 
-   ```
+   ```json
    {
       "name": "strdata-dataset",
       "license_title": "Open Government Licence - British Columbia",
@@ -85,7 +84,7 @@ Refer to [Public Short-Term Rental Data API.pdf](./Public%20Short-Term%20Rental%
 
 ### Calling API
 
-1. Get a token with client ID and secret.
+Obtain an access token using your client ID and secret, then use it to call the API. In this example, we’re calling https://strdata.dev.api.gov.bc.ca/api/organizations/strrequirements
 
    ```sh
    export CLIENT_ID="your_client_id"

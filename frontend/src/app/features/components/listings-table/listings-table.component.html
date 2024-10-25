@@ -175,7 +175,7 @@
                     <td>{{ row.offeringOrganizationNm }}</td>
                     <td>
                         <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
-                            [href]="row.platformListingUrl">{{
+                            [href]="row.platformListingUrl | urlProtocol">{{
                             row.platformListingNo }}</a>
                     </td>
                     <td class="align-center">

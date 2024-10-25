@@ -35,6 +35,7 @@ import { User } from '../../../../common/models/user';
 import { ListingSearchRequest } from '../../../../common/models/listing-search-request';
 import { ListingDetails } from '../../../../common/models/listing-details';
 import { OrganizationService } from '../../../../common/services/organization.service';
+import { UrlProtocolPipe } from '../../../../common/pipes/url-protocol.pipe';
 
 @Component({
     selector: 'app-aggregated-listings-table',
@@ -56,6 +57,7 @@ import { OrganizationService } from '../../../../common/services/organization.se
         SidebarModule,
         AccordionModule,
         RadioButtonModule,
+        UrlProtocolPipe,
     ],
     templateUrl: './aggregated-listings-table.component.html',
     styleUrl: './aggregated-listings-table.component.scss',

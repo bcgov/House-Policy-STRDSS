@@ -28,6 +28,7 @@ import { AccordionModule } from 'primeng/accordion';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FilterPersistenceService } from '../../../common/services/filter-persistence.service';
 import { OrganizationService } from '../../../common/services/organization.service';
+import { UrlProtocolPipe } from '../../../common/pipes/url-protocol.pipe';
 
 @Component({
   selector: 'app-listings-table',
@@ -49,6 +50,7 @@ import { OrganizationService } from '../../../common/services/organization.servi
     SidebarModule,
     AccordionModule,
     RadioButtonModule,
+    UrlProtocolPipe,
   ],
   templateUrl: './listings-table.component.html',
   styleUrl: './listings-table.component.scss'

@@ -84,7 +84,7 @@ Refer to [Public Short-Term Rental Data API.pdf](./Public%20Short-Term%20Rental%
 
 ### Calling API
 
-1. Get a token with client ID and secret.
+Obtain an access token using your client ID and secret, then use it to call the API. In this example, we’re calling https://strdata.dev.api.gov.bc.ca/api/organizations/strrequirements
 
    ```sh
    export CLIENT_ID="your_client_id"

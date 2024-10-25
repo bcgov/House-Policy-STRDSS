@@ -4,7 +4,7 @@ COPY . .
 RUN dotnet restore
 RUN dotnet publish "StrDss.Api/StrDss.Api.csproj" -c Release -o /app/published-app
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0.18 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:7.0.19 AS runtime
 WORKDIR /app
 COPY --from=build /app/published-app .
 EXPOSE 8080

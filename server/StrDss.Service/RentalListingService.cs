@@ -181,8 +181,8 @@ namespace StrDss.Service
                     lgExport = InitializeExport(headers);
                 }
 
-                var line = ToCsvString(listing);
-                var finLine = ToCsvString(listing, true);
+                var line = ToCsvString(listing, RentalListingExport.Headers);
+                var finLine = ToCsvString(listing, RentalListingExport.FinHeaders);
 
                 lgExport.Add(line);
                 allExport.Add(line);
@@ -254,95 +254,175 @@ namespace StrDss.Service
             await ProcessExportForLocalGovernment(lgExport, lgId, lg);
         }
 
-        private static string ToCsvString(RentalListingExportDto listing, bool isFin = false)
+        private static string ToCsvString(RentalListingExportDto listing, string[] headers)
         {
             var builder = new StringBuilder();
 
-            builder.Append(FormatCsvField(listing.LatestReportPeriodYm)).Append(','); // Most Recent Platform Report Month
-            builder.Append(FormatCsvField(listing.ListingStatusTypeNm)).Append(','); // Status
-            builder.Append(FormatCsvField(listing.ManagingOrganizationNm)).Append(','); // Jurisdiction assigned to
-            builder.Append(FormatCsvField(listing.EconomicRegionDsc)).Append(','); // economic_region_name
-            builder.Append(FormatCsvField(listing.IsPrincipalResidenceRequired)).Append(','); // pr_requirement
-            builder.Append(FormatCsvField(listing.IsBusinessLicenceRequired)).Append(','); // BL_requirement
-            builder.Append(FormatCsvField(listing.OfferingOrganizationCd)).Append(','); // Platform Code
-            builder.Append(FormatCsvField(listing.PlatformListingNo)).Append(','); // Listing ID
-            builder.Append(FormatCsvField(listing.PlatformListingUrl)).Append(','); // URL Address
-            builder.Append(FormatCsvField(listing.OriginalAddressTxt)).Append(','); // Platform listing address
-            builder.Append(FormatCsvField(listing.MatchAddressTxt)).Append(','); // Geocoder Best match address (current month) - complete address
-            builder.Append(FormatCsvField(listing.AddressSort2LocalityNm)).Append(','); // Geocoder Best match address (current month) -city only
-            builder.Append(FormatCsvField(listing.BusinessLicenceNo)).Append(','); // Local Government Business Licence Number
-            builder.Append(FormatCsvField(listing.IsEntireUnit)).Append(','); // Accommodation Type
-            builder.Append(FormatCsvField(listing.AvailableBedroomsQty)).Append(','); // Number of Bedrooms available for STR
-            builder.Append(FormatCsvField(listing.CurrentMonth)).Append(','); // Current Month
-            builder.Append(FormatCsvField(listing.NightsBookedQty00)).Append(','); // Number of nights booked (Current month)
-            builder.Append(FormatCsvField(listing.NightsBookedQty01)).Append(','); // Number of nights booked (Current month - 1)
-            builder.Append(FormatCsvField(listing.NightsBookedQty02)).Append(','); // Number of nights booked (Current month - 2)
-            builder.Append(FormatCsvField(listing.NightsBookedQty03)).Append(','); // Number of nights booked (Current month - 3)
-            builder.Append(FormatCsvField(listing.NightsBookedQty04)).Append(','); // Number of nights booked (Current month - 4)
-            builder.Append(FormatCsvField(listing.NightsBookedQty05)).Append(','); // Number of nights booked (Current month - 5)
-            builder.Append(FormatCsvField(listing.NightsBookedQty06)).Append(','); // Number of nights booked (Current month - 6)
-            builder.Append(FormatCsvField(listing.NightsBookedQty07)).Append(','); // Number of nights booked (Current month - 7)
-            builder.Append(FormatCsvField(listing.NightsBookedQty08)).Append(','); // Number of nights booked (Current month - 8)
-            builder.Append(FormatCsvField(listing.NightsBookedQty09)).Append(','); // Number of nights booked (Current month - 9)
-            builder.Append(FormatCsvField(listing.NightsBookedQty10)).Append(','); // Number of nights booked (Current month - 10)
-            builder.Append(FormatCsvField(listing.NightsBookedQty11)).Append(','); // Number of nights booked (Current month - 11)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty00)).Append(','); // Number of separate reservations (Current month)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty01)).Append(','); // Number of separate reservations (Current month - 1)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty02)).Append(','); // Number of separate reservations (Current month - 2)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty03)).Append(','); // Number of separate reservations (Current month - 3)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty04)).Append(','); // Number of separate reservations (Current month - 4)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty05)).Append(','); // Number of separate reservations (Current month - 5)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty06)).Append(','); // Number of separate reservations (Current month - 6)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty07)).Append(','); // Number of separate reservations (Current month - 7)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty08)).Append(','); // Number of separate reservations (Current month - 8)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty09)).Append(','); // Number of separate reservations (Current month - 9)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty10)).Append(','); // Number of separate reservations (Current month - 10)
-            builder.Append(FormatCsvField(listing.SeparateReservationsQty11)).Append(','); // Number of separate reservations (Current month - 11)
-            builder.Append(FormatCsvField(listing.PropertyHostName)).Append(','); // Property Host name
-            builder.Append(FormatCsvField(listing.PropertyHostEmail)).Append(','); // Property Host email address
-            builder.Append(FormatCsvField(listing.PropertyHostPhoneNumber)).Append(','); // Property Host phone number
-            builder.Append(FormatCsvField(listing.PropertyHostFaxNumber)).Append(','); // Property Host fax number
-            builder.Append(FormatCsvField(listing.PropertyHostMailingAddress)).Append(','); // Property Host Mailing Address
-            builder.Append(FormatCsvField(listing.SupplierHost1Name)).Append(','); // Supplier Host 1 name
-            builder.Append(FormatCsvField(listing.SupplierHost1Email)).Append(','); // Supplier Host 1 email address
-            builder.Append(FormatCsvField(listing.SupplierHost1PhoneNumber)).Append(','); // Supplier Host 1 phone number
-            builder.Append(FormatCsvField(listing.SupplierHost1FaxNumber)).Append(','); // Supplier Host 1 fax number
-            builder.Append(FormatCsvField(listing.SupplierHost1MailingAddress)).Append(','); // Supplier Host 1 Mailing Address
-            builder.Append(FormatCsvField(listing.SupplierHost1Id)).Append(','); // Host ID of Supplier Host 1
-            builder.Append(FormatCsvField(listing.SupplierHost2Name)).Append(','); // Supplier Host 2 name
-            builder.Append(FormatCsvField(listing.SupplierHost2Email)).Append(','); // Supplier Host 2 email address
-            builder.Append(FormatCsvField(listing.SupplierHost2PhoneNumber)).Append(','); // Supplier Host 2 phone number
-            builder.Append(FormatCsvField(listing.SupplierHost2FaxNumber)).Append(','); // Supplier Host 2 fax number
-            builder.Append(FormatCsvField(listing.SupplierHost2MailingAddress)).Append(','); // Supplier Host 2 Mailing Address
-            builder.Append(FormatCsvField(listing.SupplierHost2Id)).Append(','); // Host ID of Supplier Host 2
-            builder.Append(FormatCsvField(listing.SupplierHost3Name)).Append(','); // Supplier Host 3 name
-            builder.Append(FormatCsvField(listing.SupplierHost3Email)).Append(','); // Supplier Host 3 email address
-            builder.Append(FormatCsvField(listing.SupplierHost3PhoneNumber)).Append(','); // Supplier Host 3 phone number
-            builder.Append(FormatCsvField(listing.SupplierHost3FaxNumber)).Append(','); // Supplier Host 3 fax number
-            builder.Append(FormatCsvField(listing.SupplierHost3MailingAddress)).Append(','); // Supplier Host 3 Mailing Address
-            builder.Append(FormatCsvField(listing.SupplierHost3Id)).Append(','); // Host ID of Supplier Host 3
-            builder.Append(FormatCsvField(listing.SupplierHost4Name)).Append(','); // Supplier Host 4 name
-            builder.Append(FormatCsvField(listing.SupplierHost4Email)).Append(','); // Supplier Host 4 email address
-            builder.Append(FormatCsvField(listing.SupplierHost4PhoneNumber)).Append(','); // Supplier Host 4 phone number
-            builder.Append(FormatCsvField(listing.SupplierHost4FaxNumber)).Append(','); // Supplier Host 4 fax number
-            builder.Append(FormatCsvField(listing.SupplierHost4MailingAddress)).Append(','); // Supplier Host 4 Mailing Address
-            builder.Append(FormatCsvField(listing.SupplierHost4Id)).Append(','); // Host ID of Supplier Host 4
-            builder.Append(FormatCsvField(listing.SupplierHost5Name)).Append(','); // Supplier Host 5 name
-            builder.Append(FormatCsvField(listing.SupplierHost5Email)).Append(','); // Supplier Host 5 email address
-            builder.Append(FormatCsvField(listing.SupplierHost5PhoneNumber)).Append(','); // Supplier Host 5 phone number
-            builder.Append(FormatCsvField(listing.SupplierHost5FaxNumber)).Append(','); // Supplier Host 5 fax number
-            builder.Append(FormatCsvField(listing.SupplierHost5MailingAddress)).Append(','); // Supplier Host 5 Mailing Address
-            builder.Append(FormatCsvField(listing.SupplierHost5Id)).Append(','); // Host ID of Supplier Host 5
+            if (headers.Contains(CsvCols.MostRecentPlatformReportMonth))
+                builder.Append(FormatCsvField(listing.LatestReportPeriodYm)).Append(',');
+            if (headers.Contains(CsvCols.Status))
+                builder.Append(FormatCsvField(listing.ListingStatusTypeNm)).Append(',');
+            if (headers.Contains(CsvCols.JurisdictionAssignedTo))
+                builder.Append(FormatCsvField(listing.ManagingOrganizationNm)).Append(',');
+            if (headers.Contains(CsvCols.EconomicRegionName))
+                builder.Append(FormatCsvField(listing.EconomicRegionDsc)).Append(',');
+            if (headers.Contains(CsvCols.PrRequirement))
+                builder.Append(FormatCsvField(listing.IsPrincipalResidenceRequired)).Append(',');
+            if (headers.Contains(CsvCols.BlRequirement))
+                builder.Append(FormatCsvField(listing.IsBusinessLicenceRequired)).Append(',');
+            if (headers.Contains(CsvCols.PlatformCode))
+                builder.Append(FormatCsvField(listing.OfferingOrganizationCd)).Append(',');
+            if (headers.Contains(CsvCols.ListingId))
+                builder.Append(FormatCsvField(listing.PlatformListingNo)).Append(',');
+            if (headers.Contains(CsvCols.UrlAddress))
+                builder.Append(FormatCsvField(listing.PlatformListingUrl)).Append(',');
+            if (headers.Contains(CsvCols.PlatformListingAddress))
+                builder.Append(FormatCsvField(listing.OriginalAddressTxt)).Append(',');
+            if (headers.Contains(CsvCols.GeocoderBestMatchAddressComplete))
+                builder.Append(FormatCsvField(listing.MatchAddressTxt)).Append(',');
+            if (headers.Contains(CsvCols.GeocoderBestMatchAddressCity))
+                builder.Append(FormatCsvField(listing.AddressSort2LocalityNm)).Append(',');
+            if (headers.Contains(CsvCols.LocalGovernmentBusinessLicenceNumber))
+                builder.Append(FormatCsvField(listing.BusinessLicenceNo)).Append(',');
+            if (headers.Contains(CsvCols.EntireUnit))
+                builder.Append(FormatCsvField(listing.IsEntireUnit)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfBedroomsAvailableForStr))
+                builder.Append(FormatCsvField(listing.AvailableBedroomsQty)).Append(',');
+            if (headers.Contains(CsvCols.CurrentMonth))
+                builder.Append(FormatCsvField(listing.CurrentMonth)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedCurrentMonth))
+                builder.Append(FormatCsvField(listing.NightsBookedQty00)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth1))
+                builder.Append(FormatCsvField(listing.NightsBookedQty01)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth2))
+                builder.Append(FormatCsvField(listing.NightsBookedQty02)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth3))
+                builder.Append(FormatCsvField(listing.NightsBookedQty03)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth4))
+                builder.Append(FormatCsvField(listing.NightsBookedQty04)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth5))
+                builder.Append(FormatCsvField(listing.NightsBookedQty05)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth6))
+                builder.Append(FormatCsvField(listing.NightsBookedQty06)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth7))
+                builder.Append(FormatCsvField(listing.NightsBookedQty07)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth8))
+                builder.Append(FormatCsvField(listing.NightsBookedQty08)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth9))
+                builder.Append(FormatCsvField(listing.NightsBookedQty09)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth10))
+                builder.Append(FormatCsvField(listing.NightsBookedQty10)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfNightsBookedPreviousMonth11))
+                builder.Append(FormatCsvField(listing.NightsBookedQty11)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsCurrentMonth))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty00)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth1))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty01)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth2))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty02)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth3))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty03)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth4))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty04)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth5))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty05)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth6))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty06)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth7))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty07)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth8))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty08)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth9))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty09)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth10))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty10)).Append(',');
+            if (headers.Contains(CsvCols.NumberOfSeparateReservationsPreviousMonth11))
+                builder.Append(FormatCsvField(listing.SeparateReservationsQty11)).Append(',');
+            if (headers.Contains(CsvCols.PropertyHostName))
+                builder.Append(FormatCsvField(listing.PropertyHostName)).Append(',');
+            if (headers.Contains(CsvCols.PropertyHostEmailAddress))
+                builder.Append(FormatCsvField(listing.PropertyHostEmail)).Append(',');
+            if (headers.Contains(CsvCols.PropertyHostPhoneNumber))
+                builder.Append(FormatCsvField(listing.PropertyHostPhoneNumber)).Append(',');
+            if (headers.Contains(CsvCols.PropertyHostFaxNumber))
+                builder.Append(FormatCsvField(listing.PropertyHostFaxNumber)).Append(',');
+            if (headers.Contains(CsvCols.PropertyHostMailingAddress))
+                builder.Append(FormatCsvField(listing.PropertyHostMailingAddress)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost1Name))
+                builder.Append(FormatCsvField(listing.SupplierHost1Name)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost1EmailAddress))
+                builder.Append(FormatCsvField(listing.SupplierHost1Email)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost1PhoneNumber))
+                builder.Append(FormatCsvField(listing.SupplierHost1PhoneNumber)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost1FaxNumber))
+                builder.Append(FormatCsvField(listing.SupplierHost1FaxNumber)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost1MailingAddress))
+                builder.Append(FormatCsvField(listing.SupplierHost1MailingAddress)).Append(',');
+            if (headers.Contains(CsvCols.HostIdOfSupplierHost1))
+                builder.Append(FormatCsvField(listing.SupplierHost1Id)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost2Name))
+                builder.Append(FormatCsvField(listing.SupplierHost2Name)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost2EmailAddress))
+                builder.Append(FormatCsvField(listing.SupplierHost2Email)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost2PhoneNumber))
+                builder.Append(FormatCsvField(listing.SupplierHost2PhoneNumber)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost2FaxNumber))
+                builder.Append(FormatCsvField(listing.SupplierHost2FaxNumber)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost2MailingAddress))
+                builder.Append(FormatCsvField(listing.SupplierHost2MailingAddress)).Append(',');
+            if (headers.Contains(CsvCols.HostIdOfSupplierHost2))
+                builder.Append(FormatCsvField(listing.SupplierHost2Id)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost3Name))
+                builder.Append(FormatCsvField(listing.SupplierHost3Name)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost3EmailAddress))
+                builder.Append(FormatCsvField(listing.SupplierHost3Email)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost3PhoneNumber))
+                builder.Append(FormatCsvField(listing.SupplierHost3PhoneNumber)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost3FaxNumber))
+                builder.Append(FormatCsvField(listing.SupplierHost3FaxNumber)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost3MailingAddress))
+                builder.Append(FormatCsvField(listing.SupplierHost3MailingAddress)).Append(',');
+            if (headers.Contains(CsvCols.HostIdOfSupplierHost3))
+                builder.Append(FormatCsvField(listing.SupplierHost3Id)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost4Name))
+                builder.Append(FormatCsvField(listing.SupplierHost4Name)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost4EmailAddress))
+                builder.Append(FormatCsvField(listing.SupplierHost4Email)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost4PhoneNumber))
+                builder.Append(FormatCsvField(listing.SupplierHost4PhoneNumber)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost4FaxNumber))
+                builder.Append(FormatCsvField(listing.SupplierHost4FaxNumber)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost4MailingAddress))
+                builder.Append(FormatCsvField(listing.SupplierHost4MailingAddress)).Append(',');
+            if (headers.Contains(CsvCols.HostIdOfSupplierHost4))
+                builder.Append(FormatCsvField(listing.SupplierHost4Id)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost5Name))
+                builder.Append(FormatCsvField(listing.SupplierHost5Name)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost5EmailAddress))
+                builder.Append(FormatCsvField(listing.SupplierHost5Email)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost5PhoneNumber))
+                builder.Append(FormatCsvField(listing.SupplierHost5PhoneNumber)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost5FaxNumber))
+                builder.Append(FormatCsvField(listing.SupplierHost5FaxNumber)).Append(',');
+            if (headers.Contains(CsvCols.SupplierHost5MailingAddress))
+                builder.Append(FormatCsvField(listing.SupplierHost5MailingAddress)).Append(',');
+            if (headers.Contains(CsvCols.HostIdOfSupplierHost5))
+                builder.Append(FormatCsvField(listing.SupplierHost5Id)).Append(',');
+            if (headers.Contains(CsvCols.LastActionTaken))
+                builder.Append(FormatCsvField(listing.LastActionNm)).Append(',');
+            if (headers.Contains(CsvCols.DateOfLastActionTaken))
+                builder.Append(FormatCsvField(listing.LastActionDtm)).Append(',');
+            if (headers.Contains(CsvCols.PreviousActionTaken1))
+                builder.Append(FormatCsvField(listing.LastActionNm1)).Append(',');
+            if (headers.Contains(CsvCols.DateOfPreviousActionTaken1))
+                builder.Append(FormatCsvField(listing.LastActionDtm1)).Append(',');
+            if (headers.Contains(CsvCols.PreviousActionTaken2))
+                builder.Append(FormatCsvField(listing.LastActionNm2)).Append(',');
+            if (headers.Contains(CsvCols.DateOfPreviousActionTaken2))
+                builder.Append(FormatCsvField(listing.LastActionDtm2)).Append(',');
 
-            if (!isFin)
-            {
-                builder.Append(FormatCsvField(listing.LastActionNm)).Append(','); // Last Action Taken
-                builder.Append(FormatCsvField(listing.LastActionDtm)).Append(','); // Date of Last Action Taken
-                builder.Append(FormatCsvField(listing.LastActionNm1)).Append(','); // Last Action Taken 1
-                builder.Append(FormatCsvField(listing.LastActionDtm1)).Append(','); // Date of Last Action Taken 1
-                builder.Append(FormatCsvField(listing.LastActionNm2)).Append(','); // Previous Action Taken 2
-                builder.Append(FormatCsvField(listing.LastActionDtm2)); // Date of Previous Action Taken 2
-            }
+            if (builder.Length > 0)
+                builder.Length--;
 
             return builder.ToString();
         }

@@ -1559,7 +1559,7 @@ END;$function$
 	</schema>
 	<layout name="Physical Data Diagram (Sprint 17)" id="Layout-662" show_column_type="y" show_relation="name" >
 		<comment><![CDATA[Physical Data Diagram (Sprint 17)]]></comment>
-		<entity schema="dss" name="dss_access_request_status" color="C0C139" x="912" y="592" />
+		<entity schema="dss" name="dss_access_request_status" color="C0C139" x="928" y="592" />
 		<entity schema="dss" name="dss_business_licence" color="C0C139" x="64" y="1168" />
 		<entity schema="dss" name="dss_business_licence_status_type" color="C0C139" x="112" y="832" />
 		<entity schema="dss" name="dss_economic_region" color="39C13E" x="48" y="352" />

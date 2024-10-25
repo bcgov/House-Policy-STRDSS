@@ -119,170 +119,255 @@
         public const string PlatformType = "PlatformType";
     }
 
+    public static class CsvCols
+    {
+        public const string MostRecentPlatformReportMonth = "Most Recent Platform Report Month";
+        public const string Status = "Status";
+        public const string JurisdictionAssignedTo = "Jurisdiction assigned to";
+        public const string EconomicRegionName = "economic_region_name";
+        public const string PrRequirement = "pr_requirement";
+        public const string BlRequirement = "BL_requirement";
+        public const string PlatformCode = "Platform Code";
+        public const string ListingId = "Listing ID";
+        public const string UrlAddress = "URL Address";
+        public const string PlatformListingAddress = "Platform listing address";
+        public const string GeocoderBestMatchAddressComplete = "Geocoder Best match address (current month) - complete address";
+        public const string GeocoderBestMatchAddressCity = "Geocoder Best match address (current month) -city only";
+        public const string LocalGovernmentBusinessLicenceNumber = "Local Government Business Licence Number";
+        public const string EntireUnit = "Entire Unit";
+        public const string NumberOfBedroomsAvailableForStr = "Number of Bedrooms available for STR";
+        public const string CurrentMonth = "Current Month";
+        public const string NumberOfNightsBookedCurrentMonth = "Number of nights booked (Current month)";
+        public const string NumberOfNightsBookedPreviousMonth1 = "Number of nights booked (Current month - 1)";
+        public const string NumberOfNightsBookedPreviousMonth2 = "Number of nights booked (Current month - 2)";
+        public const string NumberOfNightsBookedPreviousMonth3 = "Number of nights booked (Current month - 3)";
+        public const string NumberOfNightsBookedPreviousMonth4 = "Number of nights booked (Current month - 4)";
+        public const string NumberOfNightsBookedPreviousMonth5 = "Number of nights booked (Current month - 5)";
+        public const string NumberOfNightsBookedPreviousMonth6 = "Number of nights booked (Current month - 6)";
+        public const string NumberOfNightsBookedPreviousMonth7 = "Number of nights booked (Current month - 7)";
+        public const string NumberOfNightsBookedPreviousMonth8 = "Number of nights booked (Current month - 8)";
+        public const string NumberOfNightsBookedPreviousMonth9 = "Number of nights booked (Current month - 9)";
+        public const string NumberOfNightsBookedPreviousMonth10 = "Number of nights booked (Current month - 10)";
+        public const string NumberOfNightsBookedPreviousMonth11 = "Number of nights booked (Current month - 11)";
+        public const string NumberOfSeparateReservationsCurrentMonth = "Number of separate reservations (Current month)";
+        public const string NumberOfSeparateReservationsPreviousMonth1 = "Number of separate reservations (Current month - 1)";
+        public const string NumberOfSeparateReservationsPreviousMonth2 = "Number of separate reservations (Current month - 2)";
+        public const string NumberOfSeparateReservationsPreviousMonth3 = "Number of separate reservations (Current month - 3)";
+        public const string NumberOfSeparateReservationsPreviousMonth4 = "Number of separate reservations (Current month - 4)";
+        public const string NumberOfSeparateReservationsPreviousMonth5 = "Number of separate reservations (Current month - 5)";
+        public const string NumberOfSeparateReservationsPreviousMonth6 = "Number of separate reservations (Current month - 6)";
+        public const string NumberOfSeparateReservationsPreviousMonth7 = "Number of separate reservations (Current month - 7)";
+        public const string NumberOfSeparateReservationsPreviousMonth8 = "Number of separate reservations (Current month - 8)";
+        public const string NumberOfSeparateReservationsPreviousMonth9 = "Number of separate reservations (Current month - 9)";
+        public const string NumberOfSeparateReservationsPreviousMonth10 = "Number of separate reservations (Current month - 10)";
+        public const string NumberOfSeparateReservationsPreviousMonth11 = "Number of separate reservations (Current month - 11)";
+        public const string PropertyHostName = "Property Host name";
+        public const string PropertyHostEmailAddress = "Property Host email address";
+        public const string PropertyHostPhoneNumber = "Property Host phone number";
+        public const string PropertyHostFaxNumber = "Property Host fax number";
+        public const string PropertyHostMailingAddress = "Property Host Mailing Address";
+        public const string SupplierHost1Name = "Supplier Host 1 name";
+        public const string SupplierHost1EmailAddress = "Supplier Host 1 email address";
+        public const string SupplierHost1PhoneNumber = "Supplier Host 1 phone number";
+        public const string SupplierHost1FaxNumber = "Supplier Host 1 fax number";
+        public const string SupplierHost1MailingAddress = "Supplier Host 1 Mailing Address";
+        public const string HostIdOfSupplierHost1 = "Host ID of Supplier Host 1";
+        public const string SupplierHost2Name = "Supplier Host 2 name";
+        public const string SupplierHost2EmailAddress = "Supplier Host 2 email address";
+        public const string SupplierHost2PhoneNumber = "Supplier Host 2 phone number";
+        public const string SupplierHost2FaxNumber = "Supplier Host 2 fax number";
+        public const string SupplierHost2MailingAddress = "Supplier Host 2 Mailing Address";
+        public const string HostIdOfSupplierHost2 = "Host ID of Supplier Host 2";
+        public const string SupplierHost3Name = "Supplier Host 3 name";
+        public const string SupplierHost3EmailAddress = "Supplier Host 3 email address";
+        public const string SupplierHost3PhoneNumber = "Supplier Host 3 phone number";
+        public const string SupplierHost3FaxNumber = "Supplier Host 3 fax number";
+        public const string SupplierHost3MailingAddress = "Supplier Host 3 Mailing Address";
+        public const string HostIdOfSupplierHost3 = "Host ID of Supplier Host 3";
+        public const string SupplierHost4Name = "Supplier Host 4 name";
+        public const string SupplierHost4EmailAddress = "Supplier Host 4 email address";
+        public const string SupplierHost4PhoneNumber = "Supplier Host 4 phone number";
+        public const string SupplierHost4FaxNumber = "Supplier Host 4 fax number";
+        public const string SupplierHost4MailingAddress = "Supplier Host 4 Mailing Address";
+        public const string HostIdOfSupplierHost4 = "Host ID of Supplier Host 4";
+        public const string SupplierHost5Name = "Supplier Host 5 name";
+        public const string SupplierHost5EmailAddress = "Supplier Host 5 email address";
+        public const string SupplierHost5PhoneNumber = "Supplier Host 5 phone number";
+        public const string SupplierHost5FaxNumber = "Supplier Host 5 fax number";
+        public const string SupplierHost5MailingAddress = "Supplier Host 5 Mailing Address";
+        public const string HostIdOfSupplierHost5 = "Host ID of Supplier Host 5";
+        public const string LastActionTaken = "Last Action Taken";
+        public const string DateOfLastActionTaken = "Date of Last Action Taken";
+        public const string PreviousActionTaken1 = "Previous Action Taken 1";
+        public const string DateOfPreviousActionTaken1 = "Date of Previous Action Taken 1";
+        public const string PreviousActionTaken2 = "Previous Action Taken 2";
+        public const string DateOfPreviousActionTaken2 = "Date of Previous Action Taken 2";
+    }
+
     public static class RentalListingExport
     {
         public static readonly string[] Headers = new string[]
         {
-            "Most Recent Platform Report Month",
-            "Status",
-            "Jurisdiction assigned to",
-            "economic_region_name",
-            "pr_requirement",
-            "BL_requirement",
-            "Platform Code",
-            "Listing ID",
-            "URL Address",
-            "Platform listing address",
-            "Geocoder Best match address (current month) - complete address",
-            "Geocoder Best match address (current month) -city only",
-            "Local Government Business Licence Number",
-            "Entire Unit",
-            "Number of Bedrooms available for STR",
-            "Current Month",
-            "Number of nights booked (Current month)",
-            "Number of nights booked (Current month - 1)",
-            "Number of nights booked (Current month - 2)",
-            "Number of nights booked (Current month - 3)",
-            "Number of nights booked (Current month - 4)",
-            "Number of nights booked (Current month - 5)",
-            "Number of nights booked (Current month - 6)",
-            "Number of nights booked (Current month - 7)",
-            "Number of nights booked (Current month - 8)",
-            "Number of nights booked (Current month - 9)",
-            "Number of nights booked (Current month - 10)",
-            "Number of nights booked (Current month - 11)",
-            "Number of separate reservations (Current month)",
-            "Number of separate reservations (Current month - 1)",
-            "Number of separate reservations (Current month - 2)",
-            "Number of separate reservations (Current month - 3)",
-            "Number of separate reservations (Current month - 4)",
-            "Number of separate reservations (Current month - 5)",
-            "Number of separate reservations (Current month - 6)",
-            "Number of separate reservations (Current month - 7)",
-            "Number of separate reservations (Current month - 8)",
-            "Number of separate reservations (Current month - 9)",
-            "Number of separate reservations (Current month - 10)",
-            "Number of separate reservations (Current month - 11)",
-            "Property Host name",
-            "Property Host email address",
-            "Property Host phone number",
-            "Property Host fax number",
-            "Property Host Mailing Address",
-            "Supplier Host 1 name",
-            "Supplier Host 1 email address",
-            "Supplier Host 1 phone number",
-            "Supplier Host 1 fax number",
-            "Supplier Host 1 Mailing Address",
-            "Host ID of Supplier Host 1",
-            "Supplier Host 2 name",
-            "Supplier Host 2 email address",
-            "Supplier Host 2 phone number",
-            "Supplier Host 2 fax number",
-            "Supplier Host 2 Mailing Address",
-            "Host ID of Supplier Host 2",
-            "Supplier Host 3 name",
-            "Supplier Host 3 email address",
-            "Supplier Host 3 phone number",
-            "Supplier Host 3 fax number",
-            "Supplier Host 3 Mailing Address",
-            "Host ID of Supplier Host 3",
-            "Supplier Host 4 name",
-            "Supplier Host 4 email address",
-            "Supplier Host 4 phone number",
-            "Supplier Host 4 fax number",
-            "Supplier Host 4 Mailing Address",
-            "Host ID of Supplier Host 4",
-            "Supplier Host 5 name",
-            "Supplier Host 5 email address",
-            "Supplier Host 5 phone number",
-            "Supplier Host 5 fax number",
-            "Supplier Host 5 Mailing Address",
-            "Host ID of Supplier Host 5",
-            "Last Action Taken",
-            "Date of Last Action Taken",
-            "Previous Action Taken 1",
-            "Date of Previous Action Taken 1",
-            "Previous Action Taken 2",
-            "Date of Previous Action Taken 2"
+            CsvCols.MostRecentPlatformReportMonth,
+            CsvCols.Status,
+            CsvCols.JurisdictionAssignedTo,
+            CsvCols.EconomicRegionName,
+            CsvCols.PrRequirement,
+            CsvCols.BlRequirement,
+            CsvCols.PlatformCode,
+            CsvCols.ListingId,
+            CsvCols.UrlAddress,
+            CsvCols.PlatformListingAddress,
+            CsvCols.GeocoderBestMatchAddressComplete,
+            CsvCols.GeocoderBestMatchAddressCity,
+            CsvCols.LocalGovernmentBusinessLicenceNumber,
+            CsvCols.EntireUnit,
+            CsvCols.NumberOfBedroomsAvailableForStr,
+            CsvCols.CurrentMonth,
+            CsvCols.NumberOfNightsBookedCurrentMonth,
+            CsvCols.NumberOfNightsBookedPreviousMonth1,
+            CsvCols.NumberOfNightsBookedPreviousMonth2,
+            CsvCols.NumberOfNightsBookedPreviousMonth3,
+            CsvCols.NumberOfNightsBookedPreviousMonth4,
+            CsvCols.NumberOfNightsBookedPreviousMonth5,
+            CsvCols.NumberOfNightsBookedPreviousMonth6,
+            CsvCols.NumberOfNightsBookedPreviousMonth7,
+            CsvCols.NumberOfNightsBookedPreviousMonth8,
+            CsvCols.NumberOfNightsBookedPreviousMonth9,
+            CsvCols.NumberOfNightsBookedPreviousMonth10,
+            CsvCols.NumberOfNightsBookedPreviousMonth11,
+            CsvCols.NumberOfSeparateReservationsCurrentMonth,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth1,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth2,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth3,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth4,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth5,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth6,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth7,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth8,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth9,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth10,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth11,
+            CsvCols.PropertyHostName,
+            CsvCols.PropertyHostEmailAddress,
+            CsvCols.PropertyHostPhoneNumber,
+            CsvCols.PropertyHostFaxNumber,
+            CsvCols.PropertyHostMailingAddress,
+            CsvCols.SupplierHost1Name,
+            CsvCols.SupplierHost1EmailAddress,
+            CsvCols.SupplierHost1PhoneNumber,
+            CsvCols.SupplierHost1FaxNumber,
+            CsvCols.SupplierHost1MailingAddress,
+            CsvCols.HostIdOfSupplierHost1,
+            CsvCols.SupplierHost2Name,
+            CsvCols.SupplierHost2EmailAddress,
+            CsvCols.SupplierHost2PhoneNumber,
+            CsvCols.SupplierHost2FaxNumber,
+            CsvCols.SupplierHost2MailingAddress,
+            CsvCols.HostIdOfSupplierHost2,
+            CsvCols.SupplierHost3Name,
+            CsvCols.SupplierHost3EmailAddress,
+            CsvCols.SupplierHost3PhoneNumber,
+            CsvCols.SupplierHost3FaxNumber,
+            CsvCols.SupplierHost3MailingAddress,
+            CsvCols.HostIdOfSupplierHost3,
+            CsvCols.SupplierHost4Name,
+            CsvCols.SupplierHost4EmailAddress,
+            CsvCols.SupplierHost4PhoneNumber,
+            CsvCols.SupplierHost4FaxNumber,
+            CsvCols.SupplierHost4MailingAddress,
+            CsvCols.HostIdOfSupplierHost4,
+            CsvCols.SupplierHost5Name,
+            CsvCols.SupplierHost5EmailAddress,
+            CsvCols.SupplierHost5PhoneNumber,
+            CsvCols.SupplierHost5FaxNumber,
+            CsvCols.SupplierHost5MailingAddress,
+            CsvCols.HostIdOfSupplierHost5,
+            CsvCols.LastActionTaken,
+            CsvCols.DateOfLastActionTaken,
+            CsvCols.PreviousActionTaken1,
+            CsvCols.DateOfPreviousActionTaken1,
+            CsvCols.PreviousActionTaken2,
+            CsvCols.DateOfPreviousActionTaken2,
         };
 
         public static readonly string[] FinHeaders = new string[]
         {
-            "Most Recent Platform Report Month",
-            "Status",
-            "Jurisdiction assigned to",
-            "economic_region_name",
-            "pr_requirement",
-            "BL_requirement",
-            "Platform Code",
-            "Listing ID",
-            "URL Address",
-            "Platform listing address",
-            "Geocoder Best match address (current month) - complete address",
-            "Geocoder Best match address (current month) -city only",
-            "Local Government Business Licence Number",
-            "Entire Unit",
-            "Number of Bedrooms available for STR",
-            "Current Month",
-            "Number of nights booked (Current month)",
-            "Number of nights booked (Current month - 1)",
-            "Number of nights booked (Current month - 2)",
-            "Number of nights booked (Current month - 3)",
-            "Number of nights booked (Current month - 4)",
-            "Number of nights booked (Current month - 5)",
-            "Number of nights booked (Current month - 6)",
-            "Number of nights booked (Current month - 7)",
-            "Number of nights booked (Current month - 8)",
-            "Number of nights booked (Current month - 9)",
-            "Number of nights booked (Current month - 10)",
-            "Number of nights booked (Current month - 11)",
-            "Number of separate reservations (Current month)",
-            "Number of separate reservations (Current month - 1)",
-            "Number of separate reservations (Current month - 2)",
-            "Number of separate reservations (Current month - 3)",
-            "Number of separate reservations (Current month - 4)",
-            "Number of separate reservations (Current month - 5)",
-            "Number of separate reservations (Current month - 6)",
-            "Number of separate reservations (Current month - 7)",
-            "Number of separate reservations (Current month - 8)",
-            "Number of separate reservations (Current month - 9)",
-            "Number of separate reservations (Current month - 10)",
-            "Number of separate reservations (Current month - 11)",
-            "Property Host name",
-            "Property Host email address",
-            "Property Host phone number",
-            "Property Host fax number",
-            "Property Host Mailing Address",
-            "Supplier Host 1 name",
-            "Supplier Host 1 email address",
-            "Supplier Host 1 phone number",
-            "Supplier Host 1 fax number",
-            "Supplier Host 1 Mailing Address",
-            "Host ID of Supplier Host 1",
-            "Supplier Host 2 name",
-            "Supplier Host 2 email address",
-            "Supplier Host 2 phone number",
-            "Supplier Host 2 fax number",
-            "Supplier Host 2 Mailing Address",
-            "Host ID of Supplier Host 2",
-            "Supplier Host 3 name",
-            "Supplier Host 3 email address",
-            "Supplier Host 3 phone number",
-            "Supplier Host 3 fax number",
-            "Supplier Host 3 Mailing Address",
-            "Host ID of Supplier Host 3",
-            "Supplier Host 4 name",
-            "Supplier Host 4 email address",
-            "Supplier Host 4 phone number",
-            "Supplier Host 4 fax number",
-            "Supplier Host 4 Mailing Address",
-            "Host ID of Supplier Host 4",
-            "Supplier Host 5 name",
-            "Supplier Host 5 email address",
-            "Supplier Host 5 phone number",
-            "Supplier Host 5 fax number",
-            "Supplier Host 5 Mailing Address",
-            "Host ID of Supplier Host 5"
+            CsvCols.MostRecentPlatformReportMonth,
+            CsvCols.Status,
+            CsvCols.JurisdictionAssignedTo,
+            CsvCols.EconomicRegionName,
+            CsvCols.PrRequirement,
+            CsvCols.BlRequirement,
+            CsvCols.PlatformCode,
+            CsvCols.ListingId,
+            CsvCols.UrlAddress,
+            CsvCols.PlatformListingAddress,
+            CsvCols.GeocoderBestMatchAddressComplete,
+            CsvCols.GeocoderBestMatchAddressCity,
+            CsvCols.LocalGovernmentBusinessLicenceNumber,
+            CsvCols.EntireUnit,
+            CsvCols.NumberOfBedroomsAvailableForStr,
+            CsvCols.CurrentMonth,
+            CsvCols.NumberOfNightsBookedCurrentMonth,
+            CsvCols.NumberOfNightsBookedPreviousMonth1,
+            CsvCols.NumberOfNightsBookedPreviousMonth2,
+            CsvCols.NumberOfNightsBookedPreviousMonth3,
+            CsvCols.NumberOfNightsBookedPreviousMonth4,
+            CsvCols.NumberOfNightsBookedPreviousMonth5,
+            CsvCols.NumberOfNightsBookedPreviousMonth6,
+            CsvCols.NumberOfNightsBookedPreviousMonth7,
+            CsvCols.NumberOfNightsBookedPreviousMonth8,
+            CsvCols.NumberOfNightsBookedPreviousMonth9,
+            CsvCols.NumberOfNightsBookedPreviousMonth10,
+            CsvCols.NumberOfNightsBookedPreviousMonth11,
+            CsvCols.NumberOfSeparateReservationsCurrentMonth,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth1,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth2,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth3,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth4,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth5,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth6,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth7,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth8,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth9,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth10,
+            CsvCols.NumberOfSeparateReservationsPreviousMonth11,
+            CsvCols.PropertyHostName,
+            CsvCols.PropertyHostEmailAddress,
+            CsvCols.PropertyHostPhoneNumber,
+            CsvCols.PropertyHostFaxNumber,
+            CsvCols.PropertyHostMailingAddress,
+            CsvCols.SupplierHost1Name,
+            CsvCols.SupplierHost1EmailAddress,
+            CsvCols.SupplierHost1PhoneNumber,
+            CsvCols.SupplierHost1FaxNumber,
+            CsvCols.SupplierHost1MailingAddress,
+            CsvCols.HostIdOfSupplierHost1,
+            CsvCols.SupplierHost2Name,
+            CsvCols.SupplierHost2EmailAddress,
+            CsvCols.SupplierHost2PhoneNumber,
+            CsvCols.SupplierHost2FaxNumber,
+            CsvCols.SupplierHost2MailingAddress,
+            CsvCols.HostIdOfSupplierHost2,
+            CsvCols.SupplierHost3Name,
+            CsvCols.SupplierHost3EmailAddress,
+            CsvCols.SupplierHost3PhoneNumber,
+            CsvCols.SupplierHost3FaxNumber,
+            CsvCols.SupplierHost3MailingAddress,
+            CsvCols.HostIdOfSupplierHost3,
+            CsvCols.SupplierHost4Name,
+            CsvCols.SupplierHost4EmailAddress,
+            CsvCols.SupplierHost4PhoneNumber,
+            CsvCols.SupplierHost4FaxNumber,
+            CsvCols.SupplierHost4MailingAddress,
+            CsvCols.HostIdOfSupplierHost4,
+            CsvCols.SupplierHost5Name,
+            CsvCols.SupplierHost5EmailAddress,
+            CsvCols.SupplierHost5PhoneNumber,
+            CsvCols.SupplierHost5FaxNumber,
+            CsvCols.SupplierHost5MailingAddress,
+            CsvCols.HostIdOfSupplierHost5,
         };
 
         public static string GetHeadersAsCsv()

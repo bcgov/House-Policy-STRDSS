@@ -30,11 +30,28 @@
         }
 
         &.file-select {
-            margin-top: 12px;
-            border-radius: 4px;
+            min-width: 366px;
+            width: fit-content;
+            display: flex;
+            gap: 12px;
+            padding: 4px !important;
             border: 1px solid #353433;
-            padding: 4px;
+            border-radius: 4px;
             align-items: center;
+            margin-top: 6px;
+
+            &.has-file {
+                justify-content: space-between;
+            }
+
+            .file-name {
+                padding-right: 8px;
+            }
+
+            .clean-btn {
+                width: 2rem;
+                padding: 0.3rem 0;
+            }
         }
 
         &.table-row {

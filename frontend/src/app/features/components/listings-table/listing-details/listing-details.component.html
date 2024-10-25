@@ -3,7 +3,7 @@
         <h2>Detailed Listing Information for</h2>
 
         <a target="_blank" class="listing-url-lnk"
-            [href]="listing.platformListingUrl">{{listing.platformListingNo}}</a>&nbsp; <i
+            [href]="listing.platformListingUrl | urlProtocol">{{listing.platformListingNo}}</a>&nbsp; <i
             class="pi pi-external-link do-not-print-it"></i>
     </div>
     <div class="legend-container">

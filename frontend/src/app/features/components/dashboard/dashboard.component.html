@@ -6,8 +6,10 @@
             <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
         </div>
         <div class="card-actions">
-            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
-                (click)="navigateTo(card.route)">{{card.buttonText}}</button>
+            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
+                <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
+                {{card.buttonText}}
+            </button>
         </div>
     </div>
 </div>
@@ -19,8 +21,9 @@
             <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
         </div>
         <div class="card-actions">
-            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
-                (click)="navigateTo(card.route)">{{card.buttonText}}</button>
+            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
+                <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
+                {{card.buttonText}}</button>
         </div>
     </div>
 </div>
@@ -32,8 +35,10 @@
             <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
         </div>
         <div class="card-actions">
-            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
-                (click)="navigateTo(card.route)">{{card.buttonText}}</button>
+            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
+                <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
+                {{card.buttonText}}
+            </button>
         </div>
     </div>
 </div>
@@ -45,8 +50,10 @@
             <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
         </div>
         <div class="card-actions">
-            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId"
-                (click)="navigateTo(card.route)">{{card.buttonText}}</button>
+            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
+                <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
+                {{card.buttonText}}
+            </button>
         </div>
     </div>
 </div>

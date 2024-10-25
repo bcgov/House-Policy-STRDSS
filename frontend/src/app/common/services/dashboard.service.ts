@@ -49,7 +49,7 @@ export class DashboardService {
       {
         title: 'Aggregated Listing Data',
         accessPermission: listing_read,
-        buttonIcon: '',
+        buttonIcon: 'eye',
         buttonText: 'View Aggregated Listing Data',
         description: 'View aggregated platform listing data for your community',
         route: 'aggregated-listings',
@@ -60,7 +60,7 @@ export class DashboardService {
       {
         title: 'Listing Data',
         accessPermission: listing_read,
-        buttonIcon: '',
+        buttonIcon: 'eye',
         buttonText: 'View Listing Data',
         description: 'View platform listing data for your community',
         route: 'listings',
@@ -71,7 +71,7 @@ export class DashboardService {
       {
         title: 'Download Listing Data',
         accessPermission: listing_read,
-        buttonIcon: '',
+        buttonIcon: 'export',
         buttonText: 'Download Listing Data',
         description: 'Download listing data for your community',
         route: 'export-listings',
@@ -82,7 +82,7 @@ export class DashboardService {
       {
         title: 'Upload Platform Data',
         accessPermission: listing_file_upload,
-        buttonIcon: '',
+        buttonIcon: 'upload',
         buttonText: 'Upload data',
         description: 'Upload platform data to the system ',
         route: 'upload-listing-data',
@@ -94,7 +94,7 @@ export class DashboardService {
         title: 'Platform Upload History',
         accessPermission: upload_history_read,
         description: 'View all platform upload history here',
-        buttonIcon: '',
+        buttonIcon: 'history',
         buttonText: 'Platform Upload History',
         route: '/upload-listing-history',
         boxId: 'platformUploadHistory_box',
@@ -104,7 +104,7 @@ export class DashboardService {
       {
         title: 'Upload Business Licence Data',
         accessPermission: licence_file_upload,
-        buttonIcon: '',
+        buttonIcon: 'history',
         buttonText: 'Upload Business Licence Data',
         description: 'Upload your local government’s business licence data',
         route: '/upload-business-licence-data',
@@ -115,7 +115,7 @@ export class DashboardService {
       {
         title: 'User Management',
         accessPermission: user_write,
-        buttonIcon: '',
+        buttonIcon: 'user-cog',
         buttonText: 'User Management',
         description: 'Process new requests for system access',
         route: '/user-management',
@@ -126,7 +126,7 @@ export class DashboardService {
       {
         title: 'Manage Roles and Permissions',
         accessPermission: role_read,
-        buttonIcon: '',
+        buttonIcon: 'user-cog',
         buttonText: 'Manage Roles And Permissions',
         description: 'Add or edit roles and permissions',
         route: '/roles',
@@ -137,7 +137,7 @@ export class DashboardService {
       {
         title: 'Manage Platforms',
         accessPermission: platform_write,
-        buttonIcon: '',
+        buttonIcon: 'cog',
         buttonText: 'Manage Platforms',
         description: 'Manage platform information',
         route: '/platform-management',
@@ -148,7 +148,7 @@ export class DashboardService {
       {
         title: 'Guidance for Local Government',
         accessPermission: '',
-        buttonIcon: '',
+        buttonIcon: 'eye',
         buttonText: 'View Local Government Guide',
         description: 'View the policy guidance for sending Notices, Takedown Requests and Escalations',
         route: 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/data-guidelines-localgovernment',
@@ -161,7 +161,7 @@ export class DashboardService {
       {
         title: 'Guideline for Platforms',
         accessPermission: '',
-        buttonIcon: '',
+        buttonIcon: 'eye',
         buttonText: 'View Platform Guide',
         description: 'Understand requirements for STR platforms under the STRAA',
         route: 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/data-guidelines-platforms',
@@ -174,7 +174,7 @@ export class DashboardService {
       {
         title: 'User Guide',
         accessPermission: '',
-        buttonIcon: '',
+        buttonIcon: 'eye',
         buttonText: 'View User Guide',
         description: 'See detailed information about how the STR Data Portal works',
         route: 'https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/strdataportal-support',
@@ -186,7 +186,7 @@ export class DashboardService {
       },
       {
         accessPermission: takedown_action,
-        buttonIcon: '',
+        buttonIcon: 'exclamation-circle',
         buttonText: 'Send Notice',
         description: 'Notify an STR host and platform that a listing is not compliant with a business licence requirement. A notice must be sent prior to sending a Takedown Request',
         route: '/compliance-notice',
@@ -197,7 +197,7 @@ export class DashboardService {
       },
       {
         accessPermission: takedown_action,
-        buttonIcon: '',
+        buttonIcon: 'file-x',
         buttonText: 'Send Takedown Letter',
         description: 'Send a request to an STR platform to remove a non-compliant listing. A Takedown Request can be sent within a period of 5 to 90 days after a Notice of Non-Compliance is delivered.',
         route: '/takedown-request',

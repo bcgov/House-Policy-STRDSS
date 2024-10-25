@@ -1,0 +1,24 @@
+kind: Service
+apiVersion: v1
+metadata:
+  annotations:
+    aviinfrasetting.ako.vmware.com/name: dataclass-medium
+  name: strdsstest-lb
+  labels:
+    DataClass: Medium
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: strdsstest-lb
+    app.kubernetes.io/name: strdsstest-lb
+    app.kubernetes.io/version: 16.3.0
+    helm.sh/chart: postgresql-15.5.20
+spec:
+  type: LoadBalancer
+  ports:
+    - name: tcp-postgresql
+      protocol: TCP
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: strdsstest
+    app.kubernetes.io/name: strdsstest

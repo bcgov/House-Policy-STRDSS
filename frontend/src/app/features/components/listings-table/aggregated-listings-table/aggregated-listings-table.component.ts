@@ -245,6 +245,7 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     onSearch(): void {
+        this.getListings(0);
         this.paginator.changePage(0);
     }
 

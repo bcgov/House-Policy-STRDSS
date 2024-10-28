@@ -191,6 +191,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   onSearch(): void {
+    this.getListings(0);
     this.paginator.changePage(0);
   }
 

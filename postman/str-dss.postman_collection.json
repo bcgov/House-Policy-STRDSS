@@ -1749,6 +1749,35 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Update Local Gov",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"organizationId\": 6,\r\n  \"organizationNm\": \"Test Victoria #1\",\r\n  \"localGovernmentType\": \"Municipality\",\r\n  \"businessLicenceFormatTxt\": \"XXX\",\r\n  \"updDtm\": \"2024-08-20T17:46:27.820716Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/organizations/localgovs/6",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"organizations",
+						"localgovs",
+						"6"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {

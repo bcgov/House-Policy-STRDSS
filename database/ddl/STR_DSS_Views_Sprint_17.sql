@@ -10,6 +10,7 @@ SELECT do2.organization_id
 , do2.local_government_type
 , lgt.local_government_type_nm
 , do2.business_licence_format_txt
+, do2.upd_dtm
 FROM dss_organization do2
 left join dss_local_government_type lgt on lgt.local_government_type = do2.local_government_type
 where do2.organization_type = 'LG';

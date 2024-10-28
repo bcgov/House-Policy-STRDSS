@@ -184,11 +184,11 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.JurisdictionRead)]
-        [HttpGet("jurisdictions")]
-        public async Task<ActionResult<List<LocalGovViewDto>>> GetJurisdictions(int pageSize = 10, int pageNumber = 1, string orderBy = "OrganizationNm", string direction = "asc")
+        [HttpGet("localgovs")]
+        public async Task<ActionResult<List<LocalGovViewDto>>> GetLocalGovs(int pageSize = 10, int pageNumber = 1, string orderBy = "OrganizationNm", string direction = "asc")
         {
-            var jurisdictions = await _orgService.GetJurisdictions(pageSize, pageNumber, orderBy, direction);
-            return Ok(jurisdictions);
+            var lgs = await _orgService.GetLocalGovs(pageSize, pageNumber, orderBy, direction);
+            return Ok(lgs);
         }
 
         [ApiAuthorize(Permissions.JurisdictionRead)]

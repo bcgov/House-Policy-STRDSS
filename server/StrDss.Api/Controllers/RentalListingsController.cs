@@ -212,7 +212,7 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        [ApiAuthorize(Permissions.ListingRead)]
+        [ApiAuthorize(Permissions.BlLinkWrite)]
         [HttpPut("{rentalListingId}/linkbl/{licenceId}")]
         public async Task<ActionResult> LinkBizLicence(long rentalListingId, long licenceId)
         {
@@ -226,7 +226,7 @@ namespace StrDss.Api.Controllers
             return Ok(listing);
         }
 
-        [ApiAuthorize(Permissions.ListingRead)]
+        [ApiAuthorize(Permissions.BlLinkWrite)]
         [HttpPut("{rentalListingId}/unlinkbl")]
         public async Task<ActionResult> UnLinkBizLicence(long rentalListingId)
         {

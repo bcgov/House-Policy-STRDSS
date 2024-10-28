@@ -18,4 +18,6 @@ public partial class DssLocalGovVw
     public string? LocalGovernmentTypeNm { get; set; }
 
     public string? BusinessLicenceFormatTxt { get; set; }
+
+    public DateTime? UpdDtm { get; set; }
 }

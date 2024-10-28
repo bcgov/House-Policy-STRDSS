@@ -65,7 +65,7 @@ namespace StrDss.Api.Controllers
         /// <param name="longitude">The longitude of the location, must be between -180 and 180 degrees.</param>
         /// <param name="latitude">The latitude of the location, must be between -90 and 90 degrees.</param>
         /// <returns>An object containing STR requirements for the given location, or a validation error if the input is invalid.</returns>
-        [ApiAuthorize] //todo: specify permission
+        [ApiAuthorize(Permissions.RegistryView)]
         [SwaggerOperation(Tags = new string[] { Common.ApiTags.Aps })]
         [HttpGet("strrequirements", Name = "GetStrRequirements")]
         public async Task<ActionResult<StrRequirementsDto>> GetStrRequirements(double longitude, double latitude)
@@ -189,6 +189,36 @@ namespace StrDss.Api.Controllers
         {
             var jurisdictions = await _orgService.GetJurisdictions(pageSize, pageNumber, orderBy, direction);
             return Ok(jurisdictions);
+        }
+
+        [ApiAuthorize(Permissions.JurisdictionRead)]
+        [HttpGet("localgovs/{id}")]
+        public async Task<ActionResult<LocalGovViewDto>> GetLocalGov(long id)
+        {
+            var lg = await _orgService.GetLocalGov(id);
+
+            if (lg == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(lg);
+        }
+
+        [ApiAuthorize(Permissions.JurisdictionWrite)]
+        [HttpPut("localgovs/{id}", Name = "UpdateLocalGov")]
+        public async Task<ActionResult> UpdateLocalGov(LocalGovUpdateDto dto, long id)
+        {
+            dto.OrganizationId = id;
+
+            var errors = await _orgService.UpdateLocalGovAsync(dto);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
         }
     }
 }

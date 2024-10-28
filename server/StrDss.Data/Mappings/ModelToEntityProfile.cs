@@ -34,6 +34,7 @@ namespace StrDss.Data.Mappings
             CreateMap<PlatformUpdateDto, DssOrganization>();
             CreateMap<PlatformSubCreateDto, DssOrganization>();
             CreateMap<PlatformSubUpdateDto, DssOrganization>();
+            CreateMap<LocalGovUpdateDto, DssOrganization>();
         }
     }
 }

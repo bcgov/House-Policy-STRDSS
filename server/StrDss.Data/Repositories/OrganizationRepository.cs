@@ -33,6 +33,8 @@ namespace StrDss.Data.Repositories
         Task<DssOrganization> CreatePlatformSubAsync(PlatformSubCreateDto dto);
         Task UpdatePlatformSubAsync(PlatformSubUpdateDto dto);
         Task<PagedDto<LocalGovViewDto>> GetJurisdictions(int pageSize, int pageNumber, string orderBy, string direction);
+        Task UpdateLocalGovAsync(LocalGovUpdateDto dto);
+        Task<LocalGovViewDto?> GetLocalGov(long id);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -329,6 +331,21 @@ namespace StrDss.Data.Repositories
             }
 
             return lgs;
+        }
+
+        public async Task UpdateLocalGovAsync(LocalGovUpdateDto dto)
+        {
+            var entity = await _dbSet
+                .FirstAsync(x => x.OrganizationId == dto.OrganizationId);
+
+            _mapper.Map(dto, entity);
+        }
+
+        public async Task<LocalGovViewDto?> GetLocalGov(long id)
+        {
+            var localGov = _mapper.Map<LocalGovViewDto>(await _dbContext.DssLocalGovVws.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == id));
+
+            return localGov;
         }
     }
 }

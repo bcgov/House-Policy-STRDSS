@@ -461,6 +461,7 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.OrganizationType)
                 .HasMaxLength(25)
                 .HasColumnName("organization_type");
+            entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
         });
 
         modelBuilder.Entity<DssLocalGovernmentType>(entity =>

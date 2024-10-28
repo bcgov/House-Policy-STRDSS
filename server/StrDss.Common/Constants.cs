@@ -13,7 +13,7 @@
         public const string Role = "Role";
         public const string BizLicenceRowUntyped = "BizLicenceRowUntyped";
         public const string Platform = "Platform";
-
+        public const string LocalGov = "LocalGov";
     }
     public static class Fields
     {
@@ -117,6 +117,15 @@
         public const string SecondaryNoticeOfTakedownContactEmail = "SecondaryNoticeOfTakedownContactEmail";
         public const string SecondaryTakedownRequestContactEmail = "SecondaryTakedownRequestContactEmail";
         public const string PlatformType = "PlatformType";
+    }
+
+    public static class LocalGovFields
+    {
+        public const string OrganizationId = "OrganizationId";
+        public const string OrganizationCd = "OrganizationCd";
+        public const string OrganizationNm = "OrganizationNm";
+        public const string LocalGovernmentType = "LocalGovernmentType";
+        public const string BusinessLicenceFormatTxt = "BusinessLicenceFormatTxt";
     }
 
     public static class CsvCols
@@ -406,6 +415,7 @@
     {
         public const string LicenceStatus = "Licence Status";
         public const string PlatformTypes = "Platform Types";
+        public const string LocalGovTypes = "Local Gov Types";
     }
 
     public static class StrDssIdProviders
@@ -516,7 +526,9 @@
         public const string CeuAction = "ceu_action";
         public const string PlatformRead = "platform_read";
         public const string PlatformWrite = "platform_write";
-        public const string JurisdictionRead = "jurisdiction_read"; 
+        public const string RegistryView = "registry_view";
+        public const string BlLinkWrite = "bl_link_write";
+        public const string JurisdictionRead = "jurisdiction_read";
         public const string JurisdictionWrite = "jurisdiction_write";
     }
 

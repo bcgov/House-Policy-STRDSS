@@ -14,6 +14,8 @@ namespace StrDss.Service
 {
     public interface IOrganizationService
     {
+        Task<List<LocalGovTypeDto>> GetLocalGovTypesAsync();
+        Task<List<EconomicRegionDto>> GetEconomicRegionsAsync();
         Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc();
         Task<List<OrganizationDto>> GetOrganizationsAsync(string? type);
         Task<List<DropdownNumDto>> GetOrganizationsDropdownAsync(string? type);
@@ -41,7 +43,14 @@ namespace StrDss.Service
             _orgRepo = orgRepo;
             _codeSetRepo = codeSetRep;
         }
-
+        public async Task<List<LocalGovTypeDto>> GetLocalGovTypesAsync()
+        {
+            return await _orgRepo.GetLocalGovTypesAsync();
+        }
+        public async Task<List<EconomicRegionDto>> GetEconomicRegionsAsync()
+        {
+            return await _orgRepo.GetEconomicRegionsAsync();
+        }
         public async Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc()
         {
             return await _orgRepo.GetOrganizationTypesAsnc();

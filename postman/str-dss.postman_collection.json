@@ -1729,6 +1729,26 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Get Local Gov",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/organizations/localgovs/6",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"organizations",
+						"localgovs",
+						"6"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {

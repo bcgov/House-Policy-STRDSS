@@ -45,6 +45,18 @@ namespace StrDss.Data.Repositories
                 }).ToListAsync()
             );
 
+
+            commonCodes.AddRange(await
+                _dbContext.DssLocalGovernmentTypes
+                .AsNoTracking()
+                .Select(x => new CommonCodeDto
+                {
+                    CodeSet = CodeSet.LocalGovTypes,
+                    CodeName = x.LocalGovernmentType,
+                    CodeValue = x.LocalGovernmentTypeNm
+                }).ToListAsync()
+            );
+
             return commonCodes;
         }
     }

@@ -7,8 +7,6 @@ using StrDss.Data;
 using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
-using StrDss.Model.UserDtos;
-using System.Threading.Tasks;
 
 namespace StrDss.Service
 {
@@ -30,6 +28,8 @@ namespace StrDss.Service
         Task<(Dictionary<string, List<string>>, long)> CreatePlatformSubAsync(PlatformSubCreateDto dto);
         Task<Dictionary<string, List<string>>> UpdatePlatformSubAsync(PlatformSubUpdateDto dto);
         Task<PagedDto<LocalGovViewDto>> GetJurisdictions(int pageSize, int pageNumber, string orderBy, string direction);
+        Task<LocalGovViewDto?> GetLocalGov(long id);
+        Task<Dictionary<string, List<string>>> UpdateLocalGovAsync(LocalGovUpdateDto dto);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -252,6 +252,48 @@ namespace StrDss.Service
         public async Task<PagedDto<LocalGovViewDto>> GetJurisdictions(int pageSize, int pageNumber, string orderBy, string direction)
         {
             return await _orgRepo.GetJurisdictions(pageSize, pageNumber, orderBy, direction);
+        }
+        public async Task<LocalGovViewDto?> GetLocalGov(long id)
+        {
+            return await _orgRepo.GetLocalGov(id);
+        }
+
+        public async Task<Dictionary<string, List<string>>> UpdateLocalGovAsync(LocalGovUpdateDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            await ValidateLocalGovUpdateDto(dto, errors);
+
+            if (errors.Any())
+            {
+                return errors;
+            }
+
+            await _orgRepo.UpdateLocalGovAsync(dto);
+
+            _unitOfWork.Commit();
+
+            return errors;
+        }
+
+        private async Task<Dictionary<string, List<string>>> ValidateLocalGovUpdateDto(LocalGovUpdateDto dto, Dictionary<string, List<string>> errors)
+        {
+            var localGov = await _orgRepo.GetLocalGov(dto.OrganizationId);
+
+            if (localGov == null)
+            {
+                errors.AddItem("OrganizationId", $"Local government with ID {dto.OrganizationId} does not exist");
+                return errors;
+            }
+
+            if (!_validator.CommonCodes.Any())
+            {
+                _validator.CommonCodes = await _codeSetRepo.LoadCodeSetAsync();
+            }
+
+            _validator.Validate(Entities.LocalGov, dto, errors);
+
+            return errors;
         }
     }
 }

@@ -318,10 +318,9 @@ namespace StrDss.Data.Repositories
 
         public async Task<PagedDto<LocalGovViewDto>> GetJurisdictions(int pageSize, int pageNumber, string orderBy, string direction)
         {
-            var query = _dbSet.AsNoTracking()
-                .Where(x => x.OrganizationType == OrganizationTypes.LG && x.ManagingOrganizationId == null);
+            var query = _dbContext.DssLocalGovVws.AsNoTracking().AsQueryable();
 
-            var lgs = await Page<DssOrganization, LocalGovViewDto>(query, pageSize, pageNumber, orderBy, direction);
+            var lgs = await Page<DssLocalGovVw, LocalGovViewDto>(query, pageSize, pageNumber, orderBy, direction);
 
             foreach (var lg in lgs.SourceList)
             {

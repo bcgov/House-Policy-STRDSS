@@ -55,7 +55,7 @@ namespace StrDss.Data.Mappings
             CreateMap<DssPlatformVw, PlatformViewDto>();
             CreateMap<DssPlatformType, PlatformTypeDto>();
 
-            CreateMap<DssOrganization, LocalGovViewDto>();
+            CreateMap<DssLocalGovVw, LocalGovViewDto>();
             CreateMap<DssOrganization, JurisdictionsViewDto>();
             CreateMap<DssEconomicRegion, EconomicRegionDto>();
             CreateMap<DssLocalGovernmentType, LocalGovTypeDto>();

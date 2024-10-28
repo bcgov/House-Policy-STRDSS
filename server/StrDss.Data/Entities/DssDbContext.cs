@@ -25,6 +25,8 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssListingStatusType> DssListingStatusTypes { get; set; }
 
+    public virtual DbSet<DssLocalGovVw> DssLocalGovVws { get; set; }
+
     public virtual DbSet<DssLocalGovernmentType> DssLocalGovernmentTypes { get; set; }
 
     public virtual DbSet<DssOrganization> DssOrganizations { get; set; }
@@ -69,9 +71,7 @@ public partial class DssDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .HasPostgresExtension("pgcrypto")
-            .HasPostgresExtension("postgis");
+        modelBuilder.HasPostgresExtension("postgis");
 
         modelBuilder.Entity<DssAccessRequestStatus>(entity =>
         {
@@ -434,6 +434,33 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(50)
                 .HasComment("Business term for the listing status (e.g. New, Active, Inactive, Reassigned, Taken Down)")
                 .HasColumnName("listing_status_type_nm");
+        });
+
+        modelBuilder.Entity<DssLocalGovVw>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("dss_local_gov_vw");
+
+            entity.Property(e => e.BusinessLicenceFormatTxt)
+                .HasMaxLength(50)
+                .HasColumnName("business_licence_format_txt");
+            entity.Property(e => e.LocalGovernmentType)
+                .HasMaxLength(50)
+                .HasColumnName("local_government_type");
+            entity.Property(e => e.LocalGovernmentTypeNm)
+                .HasMaxLength(250)
+                .HasColumnName("local_government_type_nm");
+            entity.Property(e => e.OrganizationCd)
+                .HasMaxLength(25)
+                .HasColumnName("organization_cd");
+            entity.Property(e => e.OrganizationId).HasColumnName("organization_id");
+            entity.Property(e => e.OrganizationNm)
+                .HasMaxLength(250)
+                .HasColumnName("organization_nm");
+            entity.Property(e => e.OrganizationType)
+                .HasMaxLength(25)
+                .HasColumnName("organization_type");
         });
 
         modelBuilder.Entity<DssLocalGovernmentType>(entity =>

@@ -17,11 +17,17 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssBusinessLicenceStatusType> DssBusinessLicenceStatusTypes { get; set; }
 
+    public virtual DbSet<DssEconomicRegion> DssEconomicRegions { get; set; }
+
     public virtual DbSet<DssEmailMessage> DssEmailMessages { get; set; }
 
     public virtual DbSet<DssEmailMessageType> DssEmailMessageTypes { get; set; }
 
     public virtual DbSet<DssListingStatusType> DssListingStatusTypes { get; set; }
+
+    public virtual DbSet<DssLocalGovVw> DssLocalGovVws { get; set; }
+
+    public virtual DbSet<DssLocalGovernmentType> DssLocalGovernmentTypes { get; set; }
 
     public virtual DbSet<DssOrganization> DssOrganizations { get; set; }
 
@@ -253,6 +259,25 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("licence_status_type_nm");
         });
 
+        modelBuilder.Entity<DssEconomicRegion>(entity =>
+        {
+            entity.HasKey(e => e.EconomicRegionDsc).HasName("dss_economic_region_pk");
+
+            entity.ToTable("dss_economic_region", tb => tb.HasComment("A geographic classification of LOCAL GOVERNMENT SUBDIVISION used for sorting and grouping of members"));
+
+            entity.Property(e => e.EconomicRegionDsc)
+                .HasMaxLength(100)
+                .HasComment("System-consistent code (e.g. Northeast, Cariboo)")
+                .HasColumnName("economic_region_dsc");
+            entity.Property(e => e.EconomicRegionNm)
+                .HasMaxLength(250)
+                .HasComment("Business term for the ECONOMIC REGION (e.g. Northeast, Cariboo)")
+                .HasColumnName("economic_region_nm");
+            entity.Property(e => e.EconomicRegionSortNo)
+                .HasComment("Relative order in which the business prefers to see the ECONOMIC REGION listed")
+                .HasColumnName("economic_region_sort_no");
+        });
+
         modelBuilder.Entity<DssEmailMessage>(entity =>
         {
             entity.HasKey(e => e.EmailMessageId).HasName("dss_email_message_pk");
@@ -411,6 +436,52 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("listing_status_type_nm");
         });
 
+        modelBuilder.Entity<DssLocalGovVw>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("dss_local_gov_vw");
+
+            entity.Property(e => e.BusinessLicenceFormatTxt)
+                .HasMaxLength(50)
+                .HasColumnName("business_licence_format_txt");
+            entity.Property(e => e.LocalGovernmentType)
+                .HasMaxLength(50)
+                .HasColumnName("local_government_type");
+            entity.Property(e => e.LocalGovernmentTypeNm)
+                .HasMaxLength(250)
+                .HasColumnName("local_government_type_nm");
+            entity.Property(e => e.OrganizationCd)
+                .HasMaxLength(25)
+                .HasColumnName("organization_cd");
+            entity.Property(e => e.OrganizationId).HasColumnName("organization_id");
+            entity.Property(e => e.OrganizationNm)
+                .HasMaxLength(250)
+                .HasColumnName("organization_nm");
+            entity.Property(e => e.OrganizationType)
+                .HasMaxLength(25)
+                .HasColumnName("organization_type");
+        });
+
+        modelBuilder.Entity<DssLocalGovernmentType>(entity =>
+        {
+            entity.HasKey(e => e.LocalGovernmentType).HasName("dss_local_government_type_pk");
+
+            entity.ToTable("dss_local_government_type", tb => tb.HasComment("A sub-type of local government organization used for sorting and grouping of members"));
+
+            entity.Property(e => e.LocalGovernmentType)
+                .HasMaxLength(50)
+                .HasComment("System-consistent code (e.g. Municipality, First Nations Community)")
+                .HasColumnName("local_government_type");
+            entity.Property(e => e.LocalGovernmentTypeNm)
+                .HasMaxLength(250)
+                .HasComment("Business term for for the local government type (e.g. Municipality, First Nations Community)")
+                .HasColumnName("local_government_type_nm");
+            entity.Property(e => e.LocalGovernmentTypeSortNo)
+                .HasComment("Relative order in which the business prefers to see the LOCAL GOVERNMENT TYPE listed")
+                .HasColumnName("local_government_type_sort_no");
+        });
+
         modelBuilder.Entity<DssOrganization>(entity =>
         {
             entity.HasKey(e => e.OrganizationId).HasName("dss_organization_pk");
@@ -430,9 +501,13 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.AreaGeometry)
                 .HasComment("the multipolygon shape identifying the boundaries of a local government subdivision")
                 .HasColumnName("area_geometry");
+            entity.Property(e => e.BusinessLicenceFormatTxt)
+                .HasMaxLength(50)
+                .HasComment("A free form indication of how BUSINESS NUMBER is laid out for a LOCAL GOVERNMENT ORGANIZATION")
+                .HasColumnName("business_licence_format_txt");
             entity.Property(e => e.EconomicRegionDsc)
                 .HasMaxLength(100)
-                .HasComment("A free form description of the economic region to which a Local Government Subdivision belongs")
+                .HasComment("Foreign key for a Local Government Subdivision")
                 .HasColumnName("economic_region_dsc");
             entity.Property(e => e.IsActive)
                 .HasComment("Indicates whether the ORGANIZATION is currently available for new associations")
@@ -447,11 +522,11 @@ public partial class DssDbContext : DbContext
                 .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION is subject to Provincial Principal Residence Short Term Rental restrictions")
                 .HasColumnName("is_principal_residence_required");
             entity.Property(e => e.IsStrProhibited)
-                .HasComment("Indicates whether a LOCAL GOVERNMENT ORGANIZATION entirely prohibits short term housing rentals")
+                .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION entirely prohibits short term housing rentals")
                 .HasColumnName("is_str_prohibited");
             entity.Property(e => e.LocalGovernmentType)
                 .HasMaxLength(50)
-                .HasComment("A sub-type of local government organization used for sorting and grouping of members")
+                .HasComment("Foreign key for a LOCAL GOVERNMENT")
                 .HasColumnName("local_government_type");
             entity.Property(e => e.ManagingOrganizationId)
                 .HasComment("Self-referential hierarchical foreign key")
@@ -470,7 +545,7 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("organization_type");
             entity.Property(e => e.PlatformType)
                 .HasMaxLength(25)
-                .HasComment("Foreign key")
+                .HasComment("Foreign key for a RENTAL PLATFORM")
                 .HasColumnName("platform_type");
             entity.Property(e => e.UpdDtm)
                 .HasComment("Trigger-updated timestamp of last change")
@@ -478,6 +553,14 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.UpdUserGuid)
                 .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
                 .HasColumnName("upd_user_guid");
+
+            entity.HasOne(d => d.EconomicRegionDscNavigation).WithMany(p => p.DssOrganizations)
+                .HasForeignKey(d => d.EconomicRegionDsc)
+                .HasConstraintName("dss_organization_fk_within");
+
+            entity.HasOne(d => d.LocalGovernmentTypeNavigation).WithMany(p => p.DssOrganizations)
+                .HasForeignKey(d => d.LocalGovernmentType)
+                .HasConstraintName("dss_organization_fk_administered_as");
 
             entity.HasOne(d => d.ManagingOrganization).WithMany(p => p.InverseManagingOrganization)
                 .HasForeignKey(d => d.ManagingOrganizationId)

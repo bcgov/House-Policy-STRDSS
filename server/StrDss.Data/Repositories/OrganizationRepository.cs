@@ -32,7 +32,7 @@ namespace StrDss.Data.Repositories
         Task UpdatePlatformAsync(PlatformUpdateDto dto);
         Task<DssOrganization> CreatePlatformSubAsync(PlatformSubCreateDto dto);
         Task UpdatePlatformSubAsync(PlatformSubUpdateDto dto);
-        Task<PagedDto<LocalGovViewDto>> GetJurisdictions(int pageSize, int pageNumber, string orderBy, string direction);
+        Task<PagedDto<LocalGovViewDto>> GetLocalGovs(int pageSize, int pageNumber, string orderBy, string direction);
         Task UpdateLocalGovAsync(LocalGovUpdateDto dto);
         Task<LocalGovViewDto?> GetLocalGov(long id);
     }
@@ -318,7 +318,7 @@ namespace StrDss.Data.Repositories
             UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
         }
 
-        public async Task<PagedDto<LocalGovViewDto>> GetJurisdictions(int pageSize, int pageNumber, string orderBy, string direction)
+        public async Task<PagedDto<LocalGovViewDto>> GetLocalGovs(int pageSize, int pageNumber, string orderBy, string direction)
         {
             var query = _dbContext.DssLocalGovVws.AsNoTracking().AsQueryable();
 

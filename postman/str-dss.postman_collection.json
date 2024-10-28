@@ -1664,19 +1664,19 @@
 			"response": []
 		},
 		{
-			"name": "Get Jurisdictions",
+			"name": "Get Local Govs",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/organizations/jurisdictions?pageSize=100&pageNumber=1",
+					"raw": "{{host}}/api/organizations/localgovs?pageSize=100&pageNumber=1",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
 						"organizations",
-						"jurisdictions"
+						"localgovs"
 					],
 					"query": [
 						{
@@ -1757,7 +1757,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"organizationId\": 6,\r\n  \"organizationNm\": \"Test Victoria #1\",\r\n  \"localGovernmentType\": \"Municipality\",\r\n  \"businessLicenceFormatTxt\": \"XXX\",\r\n  \"updDtm\": \"2024-08-20T17:46:27.820716Z\"\r\n}",
+					"raw": "{\r\n  \"organizationId\": 6,\r\n  \"organizationNm\": \"Test Victoria #1\",\r\n  \"localGovernmentType\": \"Municipality\",\r\n  \"businessLicenceFormatTxt\": \"XXX\",\r\n  \"updDtm\": \"2024-10-23T18:30:39.833787Z\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

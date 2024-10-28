@@ -14,6 +14,8 @@ namespace StrDss.Data.Repositories
 {
     public interface IOrganizationRepository
     {
+        Task<List<LocalGovTypeDto>> GetLocalGovTypesAsync();
+        Task<List<EconomicRegionDto>> GetEconomicRegionsAsync();
         Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc();
         Task<List<OrganizationDto>> GetOrganizationsAsync(string? type);
         Task<OrganizationDto?> GetOrganizationByIdAsync(long orgId);
@@ -41,6 +43,25 @@ namespace StrDss.Data.Repositories
             : base(dbContext, mapper, currentUser, logger)
         {
             _config = config;
+        }
+        public async Task<List<LocalGovTypeDto>> GetLocalGovTypesAsync()
+        {
+            var types = _mapper.Map<List<LocalGovTypeDto>>(
+                await _dbContext.DssLocalGovernmentTypes.AsNoTracking()
+                .OrderBy(x => x.LocalGovernmentTypeSortNo)
+                .ToListAsync());
+
+            return types;
+        }
+
+        public async Task<List<EconomicRegionDto>> GetEconomicRegionsAsync()
+        {
+            var regions = _mapper.Map<List<EconomicRegionDto>>(
+                await _dbContext.DssEconomicRegions.AsNoTracking()
+                .OrderBy(x => x.EconomicRegionSortNo)
+                .ToListAsync());
+
+            return regions;
         }
 
         public async Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc()

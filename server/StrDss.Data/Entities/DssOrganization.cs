@@ -65,17 +65,17 @@ public partial class DssOrganization
     public bool? IsBusinessLicenceRequired { get; set; }
 
     /// <summary>
-    /// A free form description of the economic region to which a Local Government Subdivision belongs
+    /// Foreign key for a Local Government Subdivision
     /// </summary>
     public string? EconomicRegionDsc { get; set; }
 
     /// <summary>
-    /// A sub-type of local government organization used for sorting and grouping of members
+    /// Foreign key for a LOCAL GOVERNMENT
     /// </summary>
     public string? LocalGovernmentType { get; set; }
 
     /// <summary>
-    /// Indicates whether a LOCAL GOVERNMENT ORGANIZATION entirely prohibits short term housing rentals
+    /// Indicates whether a LOCAL GOVERNMENT SUBDIVISION entirely prohibits short term housing rentals
     /// </summary>
     public bool? IsStrProhibited { get; set; }
 
@@ -85,9 +85,14 @@ public partial class DssOrganization
     public bool? IsActive { get; set; }
 
     /// <summary>
-    /// Foreign key
+    /// Foreign key for a RENTAL PLATFORM
     /// </summary>
     public string? PlatformType { get; set; }
+
+    /// <summary>
+    /// A free form indication of how BUSINESS NUMBER is laid out for a LOCAL GOVERNMENT ORGANIZATION
+    /// </summary>
+    public string? BusinessLicenceFormatTxt { get; set; }
 
     public virtual ICollection<DssBusinessLicence> DssBusinessLicences { get; set; } = new List<DssBusinessLicence>();
 
@@ -109,7 +114,11 @@ public partial class DssOrganization
 
     public virtual ICollection<DssUserIdentity> DssUserIdentities { get; set; } = new List<DssUserIdentity>();
 
+    public virtual DssEconomicRegion? EconomicRegionDscNavigation { get; set; }
+
     public virtual ICollection<DssOrganization> InverseManagingOrganization { get; set; } = new List<DssOrganization>();
+
+    public virtual DssLocalGovernmentType? LocalGovernmentTypeNavigation { get; set; }
 
     public virtual DssOrganization? ManagingOrganization { get; set; }
 

@@ -57,7 +57,8 @@ namespace StrDss.Data.Mappings
 
             CreateMap<DssOrganization, LocalGovViewDto>();
             CreateMap<DssOrganization, JurisdictionsViewDto>();
-
+            CreateMap<DssEconomicRegion, EconomicRegionDto>();
+            CreateMap<DssLocalGovernmentType, LocalGovTypeDto>();
         }
     }
 }

@@ -23,6 +23,19 @@ namespace StrDss.Api.Controllers
         {
             _orgService = orgService;
         }
+        [ApiAuthorize]
+        [HttpGet("localgovtypes", Name = "GetLocalGovTypes")]
+        public async Task<ActionResult<List<LocalGovTypeDto>>> GetLocalGovTypes()
+        {
+            return Ok(await _orgService.GetLocalGovTypesAsync());
+        }
+
+        [ApiAuthorize]
+        [HttpGet("economicregions", Name = "GetEconomicRegions")]
+        public async Task<ActionResult<List<EconomicRegionDto>>> GetEconomicRegions()
+        {
+            return Ok(await _orgService.GetEconomicRegionsAsync());
+        }
 
         [ApiAuthorize]
         [HttpGet("types", Name = "GetOrganizationTypes")]

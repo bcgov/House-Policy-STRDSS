@@ -35,6 +35,8 @@ namespace StrDss.Data.Repositories
         Task<PagedDto<LocalGovViewDto>> GetLocalGovs(int pageSize, int pageNumber, string orderBy, string direction);
         Task UpdateLocalGovAsync(LocalGovUpdateDto dto);
         Task<LocalGovViewDto?> GetLocalGov(long id);
+        Task<JurisdictionsViewDto?> GetJurisdiction(long id);
+        Task UpdateJurisdictionAsync(JurisdictionUpdateDto dto);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
@@ -343,9 +345,26 @@ namespace StrDss.Data.Repositories
 
         public async Task<LocalGovViewDto?> GetLocalGov(long id)
         {
-            var localGov = _mapper.Map<LocalGovViewDto>(await _dbContext.DssLocalGovVws.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == id));
+            var localGov = _mapper.Map<LocalGovViewDto>
+                (await _dbContext.DssLocalGovVws.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == id));
 
             return localGov;
+        }
+
+        public async Task<JurisdictionsViewDto?> GetJurisdiction(long id)
+        {
+            var jurisdiction = _mapper.Map<JurisdictionsViewDto>
+                (await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationType == OrganizationTypes.LGSub && x.OrganizationId == id));
+
+            return jurisdiction;
+        }
+
+        public async Task UpdateJurisdictionAsync(JurisdictionUpdateDto dto)
+        {
+            var entity = await _dbSet
+                .FirstAsync(x => x.OrganizationId == dto.OrganizationId);
+
+            _mapper.Map(dto, entity);
         }
     }
 }

@@ -57,6 +57,17 @@ namespace StrDss.Data.Repositories
                 }).ToListAsync()
             );
 
+            commonCodes.AddRange(await
+                _dbContext.DssEconomicRegions
+                .AsNoTracking()
+                .Select(x => new CommonCodeDto
+                {
+                    CodeSet = CodeSet.EconomicRegions,
+                    CodeName = x.EconomicRegionDsc,
+                    CodeValue = x.EconomicRegionNm
+                }).ToListAsync()
+            );
+
             return commonCodes;
         }
     }

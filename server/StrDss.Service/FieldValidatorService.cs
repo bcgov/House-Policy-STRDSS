@@ -65,6 +65,9 @@ namespace StrDss.Service
                 case FieldTypes.Decimal:
                     messages.AddRange(ValidateNumberField(rule, val));
                     break;
+                case FieldTypes.Bool:
+                    messages.AddRange(ValidateBoolField(rule, val));
+                    break;
                 default:
                     throw new NotImplementedException($"Validation for {rule.FieldType} is not implemented.");
             }
@@ -236,5 +239,34 @@ namespace StrDss.Service
 
             return messages;
         }
+        private List<string> ValidateBoolField<T>(FieldValidationRule rule, T val, int rowNum = 0)
+        {
+            var messages = new List<string>();
+            var rowNumPrefix = rowNum == 0 ? "" : $"Row # {rowNum}: ";
+            var field = rule.FieldName.WordToWords();
+
+            if (rule.Required && val is null)
+            {
+                messages.Add($"{rowNumPrefix}{field} field is required.");
+                return messages;
+            }
+
+            if (!rule.Required && (val is null || val!.ToString()!.IsEmpty()))
+                return messages;
+
+            bool boolVal;
+            if (val is bool boolValue)
+            {
+                boolVal = boolValue;
+            }
+            else
+            {
+                messages.Add($"{rowNumPrefix}{field} field must be a boolean value (true or false).");
+                return messages;
+            }
+
+            return messages;
+        }
+
     }
 }

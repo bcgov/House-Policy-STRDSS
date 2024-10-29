@@ -14,6 +14,7 @@
         public const string BizLicenceRowUntyped = "BizLicenceRowUntyped";
         public const string Platform = "Platform";
         public const string LocalGov = "LocalGov";
+        public const string Jurisdiction = "Jurisdiction";
     }
     public static class Fields
     {
@@ -109,7 +110,6 @@
 
     public static class PlatformFields
     {
-        public const string OrganizationId = "OrganizationId";
         public const string OrganizationCd = "OrganizationCd";
         public const string OrganizationNm = "OrganizationNm";
         public const string PrimaryNoticeOfTakedownContactEmail = "PrimaryNoticeOfTakedownContactEmail";
@@ -121,11 +121,19 @@
 
     public static class LocalGovFields
     {
-        public const string OrganizationId = "OrganizationId";
         public const string OrganizationCd = "OrganizationCd";
         public const string OrganizationNm = "OrganizationNm";
         public const string LocalGovernmentType = "LocalGovernmentType";
         public const string BusinessLicenceFormatTxt = "BusinessLicenceFormatTxt";
+    }
+
+    public static class JurisdictionFields
+    {
+        public const string ManagingOrganizationId = "ManagingOrganizationId";
+        public const string IsPrincipalResidenceRequired = "IsPrincipalResidenceRequired";
+        public const string IsStrProhibited = "IsStrProhibited";
+        public const string IsBusinessLicenceRequired = "IsBusinessLicenceRequired";
+        public const string EconomicRegionDsc = "EconomicRegionDsc";
     }
 
     public static class CsvCols
@@ -409,13 +417,15 @@
         public const string String = "S";
         public const string Decimal = "N";
         public const string Date = "D";
+        public const string Bool = "B";
     }
 
     public static class CodeSet
     {
         public const string LicenceStatus = "Licence Status";
         public const string PlatformTypes = "Platform Types";
-        public const string LocalGovTypes = "Local Gov Types";
+        public const string LocalGovTypes = "Local Government Types";
+        public const string EconomicRegions = "Economic Regions";
     }
 
     public static class StrDssIdProviders

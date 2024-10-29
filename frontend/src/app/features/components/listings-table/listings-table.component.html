@@ -168,7 +168,7 @@
                                 pTooltip="Reassigned">
                             </div>
                             <div *ngIf="row.isTakenDown" class="status-flag status-takedown-complete"
-                                pTooltip="Takedown Complete">
+                                pTooltip="Takedown Reported">
                             </div>
                         </div>
                     </td>
@@ -357,7 +357,7 @@
                     </p-checkbox>
                 </div>
                 <div class="row">
-                    <p-checkbox label="Takedown Complete" [binary]="true"
+                    <p-checkbox label="Takedown Reported" [binary]="true"
                         [(ngModel)]="cancelableFilter.byStatus.takedownComplete" inputId="t-filter-cb">
                     </p-checkbox>
                 </div>

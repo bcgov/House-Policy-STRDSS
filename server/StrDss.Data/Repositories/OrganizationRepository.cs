@@ -36,6 +36,7 @@ namespace StrDss.Data.Repositories
         Task UpdateLocalGovAsync(LocalGovUpdateDto dto);
         Task<LocalGovViewDto?> GetLocalGov(long id);
         Task<JurisdictionsViewDto?> GetJurisdiction(long id);
+        Task UpdateJurisdictionAsync(JurisdictionUpdateDto dto);
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {

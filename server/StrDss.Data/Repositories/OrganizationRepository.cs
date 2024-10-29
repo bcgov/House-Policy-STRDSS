@@ -357,5 +357,13 @@ namespace StrDss.Data.Repositories
 
             return jurisdiction;
         }
+
+        public async Task UpdateJurisdictionAsync(JurisdictionUpdateDto dto)
+        {
+            var entity = await _dbSet
+                .FirstAsync(x => x.OrganizationId == dto.OrganizationId);
+
+            _mapper.Map(dto, entity);
+        }
     }
 }

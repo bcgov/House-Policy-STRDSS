@@ -42,6 +42,7 @@ Each sprint delivers a planned set of incremental changes to the database. The f
   - Add foreign key to table `dss_economic_region`
   - Add foreign key to table `dss_local_government_type`
   - Add column: `business_licence_format_txt`
+- Create view `dss_local_gov_vw`
 - Seed new rows in table `dss_user_privilege` and `dss_user_role_privilege`:
   - `jurisdiction_read` (for `ceu_admin`, `ceu_staff`)
   - `jurisdiction_write` (for `ceu_admin`)
@@ -144,6 +145,7 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
   - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_16.sql` **(TIP: run each MERGE statement independently)**
 - Sprint 17:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_17_pre_DML.sql`
+  - `ddl/STR_DSS_Views_Sprint_17.sql`
   - `seeding/STR_DSS_Data_Seeding_Sprint_17.sql`
   - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_17.sql`
   - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_17.sql` **(TIP: run each MERGE statement independently)**

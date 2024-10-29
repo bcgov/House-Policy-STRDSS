@@ -1,4 +1,4 @@
-FROM node:18.16.0-slim as builder-app
+FROM node:18.16.0 as builder-app
 
 ARG generate_sourcemap=false
 WORKDIR /app
@@ -10,11 +10,9 @@ COPY . .
 
 RUN npm run build -- --configuration production --output-hashing=none
 
-FROM nginx:stable-alpine as builder-modules
+FROM nginx:1.27.2-alpine as builder-modules
 
-# Ensure that the version of nginx of the builder image is compatible with the nginx version of the main image.
-ENV NGINX_VERSION 1.24.0
-
+ENV NGINX_VERSION 1.27.2
 ENV MORE_HEADERS_VERSION=0.34
 ENV MORE_HEADERS_GITREPO=openresty/headers-more-nginx-module
 
@@ -44,7 +42,7 @@ RUN mkdir -p ${DOWNLOADS} && \
   ./configure --with-compat $CONFARGS --add-dynamic-module=${HEADERS_MORE_MODULE} && \
   make && make install
 
-FROM nginx:stable-alpine3.17-slim
+FROM nginx:1.27.2-alpine
 
 ENV NGINX_DIR /usr/share/nginx
 

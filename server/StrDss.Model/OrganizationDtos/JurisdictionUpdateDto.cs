@@ -1,13 +1,8 @@
-﻿using System.Text.Json.Serialization;
-
-namespace StrDss.Model.OrganizationDtos
+﻿namespace StrDss.Model.OrganizationDtos
 {
-    public class JurisdictionsViewDto
+    public class JurisdictionUpdateDto
     {
         public long OrganizationId { get; set; }
-        public string OrganizationNm { get; set; } = null!;
-        [JsonPropertyName("shapeFileId")]
-        public string OrganizationCd { get; set; } = null!;
         public long? ManagingOrganizationId { get; set; }
         public bool? IsPrincipalResidenceRequired { get; set; }
         public bool? IsStrProhibited { get; set; }

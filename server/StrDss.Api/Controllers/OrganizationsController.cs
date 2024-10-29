@@ -220,5 +220,19 @@ namespace StrDss.Api.Controllers
 
             return Ok();
         }
+
+        [ApiAuthorize(Permissions.JurisdictionRead)]
+        [HttpGet("localgovs/jurisdictions/{id}")]
+        public async Task<ActionResult<LocalGovViewDto>> GetJurisdiction(long id)
+        {
+            var jurisdiction = await _orgService.GetJurisdiction(id);
+
+            if (jurisdiction == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(jurisdiction);
+        }
     }
 }

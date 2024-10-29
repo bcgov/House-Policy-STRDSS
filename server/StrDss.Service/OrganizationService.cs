@@ -30,6 +30,7 @@ namespace StrDss.Service
         Task<PagedDto<LocalGovViewDto>> GetLocalGovs(int pageSize, int pageNumber, string orderBy, string direction);
         Task<LocalGovViewDto?> GetLocalGov(long id);
         Task<Dictionary<string, List<string>>> UpdateLocalGovAsync(LocalGovUpdateDto dto);
+        Task<JurisdictionsViewDto?> GetJurisdiction(long id);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -294,6 +295,11 @@ namespace StrDss.Service
             _validator.Validate(Entities.LocalGov, dto, errors);
 
             return errors;
+        }
+
+        public async Task<JurisdictionsViewDto?> GetJurisdiction(long id)
+        {
+            return await _orgRepo.GetJurisdiction(id);
         }
     }
 }

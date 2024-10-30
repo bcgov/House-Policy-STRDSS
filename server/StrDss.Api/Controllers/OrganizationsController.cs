@@ -234,5 +234,21 @@ namespace StrDss.Api.Controllers
 
             return Ok(jurisdiction);
         }
+
+        [ApiAuthorize(Permissions.JurisdictionWrite)]
+        [HttpPut("localgovs/jurisdictions/{id}", Name = "UpdateJurisdiction")]
+        public async Task<ActionResult> UpdateJurisdiction(JurisdictionUpdateDto dto, long id)
+        {
+            dto.OrganizationId = id;
+
+            var errors = await _orgService.UpdateJurisdictionAsync(dto);
+
+            if (errors.Any())
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
+
+            return Ok();
+        }
     }
 }

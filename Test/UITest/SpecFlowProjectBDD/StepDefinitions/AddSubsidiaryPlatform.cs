@@ -101,8 +101,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"I should be presented with a list of platforms and sub-platforms")]
         public void ThenIShouldBePresentedWithAListOfPlatformsAndSub_Platforms()
         {
-
-
+            ClassicAssert.IsTrue(_Driver.GetCurrentURL().Contains("platform-management"));
         }
 
         [When(@"I click the edit button for a platform")]
@@ -111,11 +110,10 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _ManagePlatformsPage.EditPlatformButton.Click();
         }
 
-        [Then(@"I amd directed to the Platform view page")]
-        public void ThenIAmdDirectedToThePlatformViewPage()
+        [Then(@"I am directed to the Platform view page")]
+        public void ThenIAmDirectedToThePlatformViewPage()
         {
-         
-
+            ClassicAssert.IsTrue(_Driver.GetCurrentURL().Contains("/platform/"));
         }
 
         [When(@"I click on the add subsidiary platform button")]
@@ -162,7 +160,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"the sub platform should be created")]
         public void ThenTheSubPlatformShouldBeCreated()
         {
-
+            ClassicAssert.IsTrue(_Driver.GetCurrentURL().Contains("/platform/"));
         }
 
         [Then(@"the sub platform should be a child of the parent platform")]

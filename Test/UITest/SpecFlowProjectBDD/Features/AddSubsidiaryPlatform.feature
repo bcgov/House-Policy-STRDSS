@@ -14,7 +14,7 @@ Scenario: AddSubsidiaryPlatform
 
 #Select Platform
 	When I click the edit button for a platform
-	Then I amd directed to the Platform view page
+	Then I am directed to the Platform view page
 
 #Add sub-platform
 	When I click on the add subsidiary platform button

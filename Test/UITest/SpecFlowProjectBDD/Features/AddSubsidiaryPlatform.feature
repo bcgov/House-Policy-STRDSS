@@ -1,7 +1,7 @@
 ﻿Feature: ManagePlatforms
 Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-226
 
-@LandingPage
+@AddSubsidiaryPlatform
 Scenario: AddSubsidiaryPlatform
 #User Authentication
 	Given that I am an authenticated User "<UserName>" and the expected result is "<ExpectedResult>" and I am a "<UserType>" user

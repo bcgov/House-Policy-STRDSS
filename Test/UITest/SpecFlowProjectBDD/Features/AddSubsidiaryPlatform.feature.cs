@@ -75,12 +75,12 @@ namespace SpecFlowProjectBDD.Features
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("AddSubsidiaryPlatform")]
-        [NUnit.Framework.CategoryAttribute("LandingPage")]
+        [NUnit.Framework.CategoryAttribute("AddSubsidiaryPlatform")]
         [NUnit.Framework.TestCaseAttribute("CEUATST", "ceu_admin", "all", "pass", null)]
         public void AddSubsidiaryPlatform(string userName, string userType, string environment, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {
-                    "LandingPage"};
+                    "AddSubsidiaryPlatform"};
             if ((exampleTags != null))
             {
                 @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));

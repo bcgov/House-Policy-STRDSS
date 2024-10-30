@@ -5,12 +5,14 @@ using UITest.TestDriver;
 
 namespace SpecFlowProjectBDD.Hooks
 {
+    /// <summary>
+    /// Hooks for scenario and test setup/teardown. Currently only uses Chrome and will need to be modified for other browser types
+    /// </summary>
     [Binding]
     public class SeleniumSpecFlowHooks
     {
         private int driverProcessPID;
-        private Process[] driverProcessess1;
-        private Process[] driverProcessess2;
+        private Process[] driverProcessess;
         protected IObjectContainer _Container;
 
         public SeleniumSpecFlowHooks(IObjectContainer container)
@@ -21,18 +23,7 @@ namespace SpecFlowProjectBDD.Hooks
         [BeforeScenario(Order = 3)]
         public void SetupDrivers()
         {
-            //check for any Chromedrivers running as a disconnected process rather than under VS. Having running drivers will cause the current test to fail
-            driverProcessess1 = Process.GetProcessesByName("chromedriver.exe");
-
-            if (driverProcessess1.Length != 0)
-            {
-                //cleanup old drivers
-                foreach (var driverProcess in driverProcessess1)
-                {
-                    driverProcess.Kill();
-                }
-            }
-
+            CleanupDrivers();
             SeleniumDriver webDriver = new SeleniumDriver(SeleniumDriver.DRIVERTYPE.CHROME);
             webDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
 
@@ -42,7 +33,15 @@ namespace SpecFlowProjectBDD.Hooks
         [AfterScenario(Order = 3)]
         public void DestroyDrivers()
         {
-            var webDriver = _Container.Resolve<SeleniumDriver>();
+            SeleniumDriver? webDriver = null;
+            try
+            {
+               webDriver = _Container.Resolve<SeleniumDriver>();
+            }
+            catch (BoDi.ObjectContainerException ex)
+            {
+                CleanupDrivers();
+            }
 
             if (webDriver == null) 
                 return;
@@ -50,6 +49,22 @@ namespace SpecFlowProjectBDD.Hooks
             webDriver.Quit();
             webDriver.Dispose();
         }
+
+        private void CleanupDrivers()
+        {
+            //check for any Chromedrivers running as a disconnected process rather than under VS. Having running drivers will cause the current test to fail
+            driverProcessess = Process.GetProcessesByName("chromedriver");
+
+            if (driverProcessess.Length != 0)
+            {
+                //cleanup old drivers
+                foreach (var driverProcess in driverProcessess)
+                {
+                    driverProcess.Kill();
+                }
+            }
+        }
+
 
     }
 }

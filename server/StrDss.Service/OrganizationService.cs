@@ -31,6 +31,7 @@ namespace StrDss.Service
         Task<LocalGovViewDto?> GetLocalGov(long id);
         Task<Dictionary<string, List<string>>> UpdateLocalGovAsync(LocalGovUpdateDto dto);
         Task<JurisdictionsViewDto?> GetJurisdiction(long id);
+        Task<Dictionary<string, List<string>>> UpdateJurisdictionAsync(JurisdictionUpdateDto dto);
     }
     public class OrganizationService : ServiceBase, IOrganizationService
     {
@@ -300,6 +301,58 @@ namespace StrDss.Service
         public async Task<JurisdictionsViewDto?> GetJurisdiction(long id)
         {
             return await _orgRepo.GetJurisdiction(id);
+        }
+
+        public async Task<Dictionary<string, List<string>>> UpdateJurisdictionAsync(JurisdictionUpdateDto dto)
+        {
+            var errors = new Dictionary<string, List<string>>();
+
+            await ValidateJurisdictionUpdateDto(dto, errors);
+
+            if (errors.Any())
+            {
+                return errors;
+            }
+
+            await _orgRepo.UpdateJurisdictionAsync(dto);
+
+            _unitOfWork.Commit();
+
+            return errors;
+        }
+
+        private async Task<Dictionary<string, List<string>>> ValidateJurisdictionUpdateDto(JurisdictionUpdateDto dto, Dictionary<string, List<string>> errors)
+        {
+            var jurisdiction = await _orgRepo.GetJurisdiction(dto.OrganizationId);
+
+            if (jurisdiction == null)
+            {
+                errors.AddItem("OrganizationId", $"Jurisdiction with ID {dto.OrganizationId} does not exist");
+                return errors;
+            }
+
+            if (dto.ManagingOrganizationId == null)
+            {
+                errors.AddItem("ManagingOrganizationId", $"The local government name field is required.");
+                return errors;
+            }
+
+            var localGov = await _orgRepo.GetLocalGov(dto.ManagingOrganizationId.Value);
+
+            if (localGov == null)
+            {
+                errors.AddItem("ManagingOrganizationId", $"Local government with ID {dto.ManagingOrganizationId} does not exist");
+                return errors;
+            }
+
+            if (!_validator.CommonCodes.Any())
+            {
+                _validator.CommonCodes = await _codeSetRepo.LoadCodeSetAsync();
+            }
+
+            _validator.Validate(Entities.Jurisdiction, dto, errors);
+
+            return errors;
         }
     }
 }

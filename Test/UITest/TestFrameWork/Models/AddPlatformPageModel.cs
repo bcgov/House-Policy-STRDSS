@@ -2,7 +2,7 @@
 
 namespace UITest.Models
 {
-    public class AddNewPlatformPageModel
+    public class AddPlatformPageModel
     {
         
 
@@ -14,6 +14,6 @@ namespace UITest.Models
         public static string SecondaryEmailForTakedownRequest { get => "secondaryTakedownRequestContactEmail"; }
         public static string SaveButton { get => "body > app-root > app-layout > div.content > app-add-sub-platform > div.actions.ng-star-inserted > button:nth-child(1)"; }
         public static string CancelButton { get => "body > app-root > app-layout > div.content > app-add-sub-platform > div.actions.ng-star-inserted > button.p-element.p-button-transparent.p-button.p-component"; }
-
+        public static string PlatformTypeDropDown { get => "platformType"; }
     }
 }

@@ -223,7 +223,7 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.JurisdictionRead)]
         [HttpGet("localgovs/jurisdictions/{id}")]
-        public async Task<ActionResult<LocalGovViewDto>> GetJurisdiction(long id)
+        public async Task<ActionResult<JurisdictionsViewDto>> GetJurisdiction(long id)
         {
             var jurisdiction = await _orgService.GetJurisdiction(id);
 

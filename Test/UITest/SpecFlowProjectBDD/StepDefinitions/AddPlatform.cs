@@ -13,41 +13,41 @@ using SpecFlowProjectBDD.Utilities;
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
-    [Scope(Scenario = "AddSubsidiaryPlatform")]
-    public class AddSubsidiaryPlatform
+    [Scope(Scenario = "AddPlatform")]
+    public class AddPlatform
     {
         private IDriver _Driver;
         private LandingPage _LandingPage;
         private ManagePlatformsPage _ManagePlatformsPage;
         private DetailedPlatformContactInformationPage _DetailedPlatformContactInformationPage;
-        private AddSubPlatformPage _AddSubPlatformPage;
+        private AddPlatformPage _AddPlatformPage;
         private PathFinderPage _PathFinderPage;
         private IDirLoginPage _IDRLoginPage;
 
         private string _TestUserName;
         private string _TestPassword;
-        private bool   _ExpectedResult = false;
-        private string _PlatformName = string.Empty ;
+        private bool _ExpectedResult = false;
+        private string _PlatformName = string.Empty;
         private string _PlatformCode = string.Empty;
         private string _EmailForNonComplianceNotices = string.Empty;
         private string _EmailForTakedownRequestLetters = string.Empty;
         private string _SecondaryEmailForNonComplianceNotices = string.Empty;
         private string _SecondaryEmailForTakedownRequest = string.Empty;
 
-        private StrUtilities _strUtilities; 
+        private StrUtilities _strUtilities;
 
         private AppSettings _AppSettings;
         private SFEnums.UserTypeEnum _UserType;
         private BCIDPage _BCIDPage;
         private SFEnums.LogonTypeEnum? _LogonType;
 
-        public AddSubsidiaryPlatform(SeleniumDriver Driver)
+        public AddPlatform(SeleniumDriver Driver)
         {
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
             _ManagePlatformsPage = new ManagePlatformsPage(_Driver);
             _DetailedPlatformContactInformationPage = new DetailedPlatformContactInformationPage(_Driver);
-            _AddSubPlatformPage = new AddSubPlatformPage(_Driver);
+            _AddPlatformPage = new AddPlatformPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDRLoginPage = new IDirLoginPage(_Driver);
             _BCIDPage = new BCIDPage(_Driver);
@@ -60,7 +60,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             _SecondaryEmailForNonComplianceNotices = "Foo@foo.com";
             _SecondaryEmailForTakedownRequest = "Foo@foo.com";
         }
-        //User Authentication
+
         [Given(@"that I am an authenticated User ""([^""]*)"" and the expected result is ""([^""]*)"" and I am a ""([^""]*)"" user")]
         public void GivenThatIAmAnAuthenticatedUserAndTheExpectedResultIsAndIAmAUser(string UserName, string ExpectedResult, string UserType)
         {
@@ -92,8 +92,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             }
         }
 
-        [When(@"I click on the Manage Platforms button")]
-        public void WhenIClickOnTheManagePlatformsButton()
+        [When(@"I login and navigate to the Manage Platforms feature")]
+        public void WhenILoginAndNavigateToTheManagePlatformsFeature()
         {
             Thread.Sleep(3000);
             _LandingPage.ManagePlatformsButton.Click();
@@ -105,22 +105,10 @@ namespace SpecFlowProjectBDD.StepDefinitions
             ClassicAssert.IsTrue(_Driver.GetCurrentURL().Contains("platform-management"));
         }
 
-        [When(@"I click the edit button for a platform")]
-        public void WhenIClickTheEditButtonForAPlatform()
+        [When(@"I click the add new platform button for a platform")]
+        public void WhenIClickTheAddNewPlatformButtonForAPlatform()
         {
-            _ManagePlatformsPage.EditPlatformButton.Click();
-        }
-
-        [Then(@"I am directed to the Platform view page")]
-        public void ThenIAmDirectedToThePlatformViewPage()
-        {
-            ClassicAssert.IsTrue(_Driver.GetCurrentURL().Contains("/platform/"));
-        }
-
-        [When(@"I click on the add subsidiary platform button")]
-        public void WhenIClickOnTheAddSubsidiaryPlatformButton()
-        {
-            _DetailedPlatformContactInformationPage.AddSubsidiaryPlatformButton.Click();
+            _ManagePlatformsPage.AddNewParentPlatformButton.Click();
         }
 
         [Then(@"I should be presented with the Add Platform page")]
@@ -138,36 +126,37 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [When(@"I fill in valid values for the input fields")]
         public void WhenIFillInValidValuesForTheInputFields()
         {
-            _AddSubPlatformPage.PlatformNameTextBox.EnterText(_PlatformName);
-            _AddSubPlatformPage.PlatformCodeTextBox.EnterText(_PlatformCode);
-            _AddSubPlatformPage.EmailForNonComplianceNoticesTextBox.EnterText(_EmailForNonComplianceNotices);
-            _AddSubPlatformPage.EmailForTakedownRequestLettersTextBox.EnterText(_EmailForTakedownRequestLetters);
-            _AddSubPlatformPage.SecondaryEmailForNonComplianceNoticesTextBox.EnterText(_SecondaryEmailForNonComplianceNotices);
-            _AddSubPlatformPage.SecondaryEmailForTakedownRequest.EnterText(_SecondaryEmailForTakedownRequest);
+            _AddPlatformPage.PlatformNameTextBox.EnterText(_PlatformName);
+            _AddPlatformPage.PlatformCodeTextBox.EnterText(_PlatformCode);
+            _AddPlatformPage.EmailForNonComplianceNoticesTextBox.EnterText(_EmailForNonComplianceNotices);
+            _AddPlatformPage.EmailForTakedownRequestLettersTextBox.EnterText(_EmailForTakedownRequestLetters);
+            _AddPlatformPage.SecondaryEmailForNonComplianceNoticesTextBox.EnterText(_SecondaryEmailForNonComplianceNotices);
+            _AddPlatformPage.SecondaryEmailForTakedownRequest.EnterText(_SecondaryEmailForTakedownRequest);
+           //AddPlatformPage.PlatformTypeDropdown
         }
 
         [Then(@"the Save button should be enabled")]
         public void ThenTheSaveButtonShouldBeEnabled()
         {
-            ClassicAssert.IsTrue(_AddSubPlatformPage.SaveButton.IsEnabled());
+            ClassicAssert.IsTrue(_AddPlatformPage.SaveButton.IsEnabled());
         }
 
         [When(@"I click the Save button")]
         public void WhenIClickTheSaveButton()
         {
-            _AddSubPlatformPage.SaveButton.Click();
+            _AddPlatformPage.SaveButton.Click();
         }
 
         [Then(@"the sub platform should be created")]
-        public void ThenTheSubPlatformShouldBeCreated()
+        public void ThenThePlatformShouldBeCreated()
         {
             ClassicAssert.IsTrue(_Driver.GetCurrentURL().Contains("/platform/"));
         }
 
         [Then(@"the sub platform should be a child of the parent platform")]
-        public void ThenTheSubPlatformShouldBeAChildOfTheParentPlatform()
+        public void ThenThePlatformShouldBeAChildOfTheParentPlatform()
         {
-
+            throw new PendingStepException();
         }
     }
 }

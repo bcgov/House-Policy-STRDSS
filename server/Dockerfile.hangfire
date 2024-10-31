@@ -1,10 +1,10 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0.408 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY . .
 RUN dotnet restore
 RUN dotnet publish "StrDss.Hangfire/StrDss.Hangfire.csproj" -c Release -o /app/published-app
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0.20 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/published-app .
 EXPOSE 8080

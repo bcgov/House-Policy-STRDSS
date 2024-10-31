@@ -1,13 +1,11 @@
 ﻿using AutoFixture.Xunit2;
 using Castle.Core.Configuration;
-using Microsoft.Extensions.Logging;
 using Moq;
 using StrDss.Common;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Service;
-using StrDss.Service.HttpClients;
 using Xunit;
 
 namespace StrDss.Test

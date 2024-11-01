@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Platform, SubPlatform, SubPlatformCreate, UpdatePlatform, UpdateSubPlatform } from '../models/platform';
 import { PagingResponse } from '../models/paging-response';
+import { LocalGovernment, Jurisdiction, LocalGovernmentUpdate, JurisdictionUpdate } from '../models/jurisdiction';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,41 @@ export class OrganizationService {
     } else {
       return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations`);
     }
+  }
+
+  getJurisdictions(pageSize = 1000, pageNumber = 1, orderBy?: string, direction?: 'asc'): Observable<PagingResponse<LocalGovernment>> {
+
+    let url = `${environment.API_HOST}/organizations/localgovs?pageSize=${pageSize}&pageNumber=${pageNumber}`;
+
+    if (orderBy) {
+      url += `&orderBy=${orderBy}&direction=${direction || 'asc'}`;
+    }
+
+    return this.httpClient.get<PagingResponse<LocalGovernment>>(url);
+  }
+
+  getLg(id: number): Observable<LocalGovernment> {
+    return this.httpClient.get<LocalGovernment>(`${environment.API_HOST}/organizations/localgovs/${id}`);
+  }
+
+  getJurisdiction(id: number): Observable<Jurisdiction> {
+    return this.httpClient.get<Jurisdiction>(`${environment.API_HOST}/organizations/localgovs/jurisdictions/${id}`);
+  }
+
+  getEconomicRegions(): Observable<Array<DropdownOption>> {
+    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/economicregions`);
+  }
+
+  getLocalGovTypes(): Observable<Array<DropdownOption>> {
+    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/localgovtypes`);
+  }
+
+  updateLg(lg: LocalGovernmentUpdate): Observable<any> {
+    return this.httpClient.put<any>(`${environment.API_HOST}/organizations/localgovs/${lg.organizationId}`, lg);
+  }
+
+  updateJurisdiction(jurisdiction: JurisdictionUpdate): Observable<any> {
+    return this.httpClient.put<any>(`${environment.API_HOST}/organizations/localgovs/jurisdictions/${jurisdiction.organizationId}`, jurisdiction);
   }
 
   getPlatforms(pageSize = 1000, pageNumber = 1, orderBy?: string, direction?: 'asc'): Observable<PagingResponse<Platform>> {

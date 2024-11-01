@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DropdownOption } from '../models/dropdown-option';
 import { environment } from '../../../environments/environment';
 import { AccessRequest, ApproveRequestModel, DenyRequestModel } from '../models/access-request';
 import { PagingRequest } from '../models/paging-request';

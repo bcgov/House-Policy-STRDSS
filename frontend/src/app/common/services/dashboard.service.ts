@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DashboardCard, DashboardCardSections } from '../models/dashboard-card';
-import { ceu_action, licence_file_upload, listing_file_upload, listing_read, platform_write, role_read, takedown_action, upload_history_read, user_write } from '../consts/permissions.const';
+import { jurisdiction_read, licence_file_upload, listing_file_upload, listing_read, platform_read, role_read, takedown_action, upload_history_read, user_write } from '../consts/permissions.const';
 import { User } from '../models/user';
 
 @Injectable({
@@ -136,13 +136,24 @@ export class DashboardService {
       },
       {
         title: 'Manage Platforms',
-        accessPermission: platform_write,
+        accessPermission: platform_read,
         buttonIcon: 'cog',
         buttonText: 'Manage Platforms',
         description: 'Manage platform information',
         route: '/platform-management',
         boxId: 'platformManagement_box',
         buttonId: 'platformManagement_btn',
+        section: 'admin',
+      },
+      {
+        title: 'Manage Jurisdictions',
+        accessPermission: jurisdiction_read,
+        buttonIcon: 'cog',
+        buttonText: 'Manage Jurisdictions',
+        description: 'Manage jurisdictions information',
+        route: '/manage-jurisdictions',
+        boxId: 'manageJurisdictionst_box',
+        buttonId: 'manageJurisdictionst_btn',
         section: 'admin',
       },
       {

@@ -1,0 +1,79 @@
+:host {
+    width: 100%;
+    background-color: white;
+
+    .header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 24px;
+    }
+
+    .content {
+        p-paginator {
+            display: flex;
+            justify-content: end;
+        }
+
+        tr {
+            &.header-panel {
+                th {
+                    background-color: #C1DDFC;
+                }
+            }
+        }
+
+        th {
+            font-size: 14px;
+            font-family: 'BcSans-bold';
+
+            &.sortable-header {
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+
+                &:hover {
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+
+                i {
+                    vertical-align: middle;
+                }
+            }
+        }
+
+        td {
+            .toggle-row-btn:disabled {
+                opacity: .2;
+            }
+
+            &.status {
+                padding-left: 2px;
+                color: #CE3E39;
+
+                &.active {
+                    color: #42814A;
+                }
+            }
+
+            a {
+                display: flex;
+                height: 26px;
+                width: 100%;
+                justify-content: center;
+
+                .edit-icon {
+                    display: block;
+                    background-image: url(../../../../assets/images/edit-info.svg);
+                    background-position: center center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                    height: 20px;
+                    width: 20px;
+                }
+            }
+        }
+    }
+}

@@ -11,3 +11,6 @@ export const role_write: string = 'role_write';
 export const address_write: string = 'address_write';
 export const upload_history_read: string = 'upload_history_read';
 export const platform_write: string = 'platform_write';
+export const platform_read: string = 'platform_read';
+export const jurisdiction_write: string = 'jurisdiction_write';
+export const jurisdiction_read: string = 'jurisdiction_read';

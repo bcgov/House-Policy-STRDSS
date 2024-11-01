@@ -1,17 +1,17 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { Platform } from '../../../common/models/platform';
 import { OrganizationService } from '../../../common/services/organization.service';
-import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
-import { Paginator, PaginatorModule } from 'primeng/paginator';
-import { TooltipModule } from 'primeng/tooltip';
 import { Router, RouterModule } from '@angular/router';
+import { TooltipModule } from 'primeng/tooltip';
+import { Paginator, PaginatorModule } from 'primeng/paginator';
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { CommonModule } from '@angular/common';
+import { LocalGovernment } from '../../../common/models/jurisdiction';
+import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 @Component({
-  selector: 'app-platform-management',
+  selector: 'app-manage-jurisdictions',
   standalone: true,
   imports: [
     TableModule,
@@ -21,34 +21,27 @@ import { GlobalLoaderService } from '../../../common/services/global-loader.serv
     TooltipModule,
     RouterModule,
   ],
-  templateUrl: './platform-management.component.html',
-  styleUrl: './platform-management.component.scss'
+  templateUrl: './manage-jurisdictions.component.html',
+  styleUrl: './manage-jurisdictions.component.scss'
 })
-export class PlatformManagementComponent implements OnInit {
+export class ManageJurisdictionsComponent implements OnInit {
   @ViewChild('paginator') paginator!: Paginator;
-  platforms = new Array<Platform>();
-
+  jurisdictions = new Array<LocalGovernment>();
   sort!: { prop: string; dir: 'asc' | 'desc' };
   sortSub!: { prop: string; dir: 'asc' | 'desc' };
   currentPage!: PagingResponsePageInfo;
 
   constructor(
-    private orgService: OrganizationService,
+    private organizationsService: OrganizationService,
     private cd: ChangeDetectorRef,
     private router: Router,
     private loaderService: GlobalLoaderService,
-  ) { }
+  ) {
+
+  }
 
   ngOnInit(): void {
     this.init();
-  }
-
-  onAddNewPlatform(): void {
-    this.router.navigateByUrl('/add-new-platform');
-  }
-
-  editPlatform(id: number): void {
-    this.router.navigateByUrl(`/platform/${id}`);
   }
 
   onSort(property: string): void {
@@ -78,11 +71,11 @@ export class PlatformManagementComponent implements OnInit {
       this.sortSub = { prop: property, dir: 'asc' };
     }
 
-    this.platforms.forEach(p => {
+    this.jurisdictions.forEach(p => {
       if (this.sortSub.dir === 'asc')
-        p.subsidiaries = p.subsidiaries.sort((a: any, b: any) => this.sortHandler(a[property], b[property]));
+        p.jurisdictions = p.jurisdictions.sort((a: any, b: any) => this.sortHandler(a[property], b[property]));
       else
-        p.subsidiaries = p.subsidiaries.sort((a: any, b: any) => this.sortHandler(b[property], a[property]));
+        p.jurisdictions = p.jurisdictions.sort((a: any, b: any) => this.sortHandler(b[property], a[property]));
     });
   }
 
@@ -95,18 +88,18 @@ export class PlatformManagementComponent implements OnInit {
 
   private getPlatforms(selectedPageNumber: number = 1): void {
     this.loaderService.loadingStart();
-    this.orgService.getPlatforms(
+    this.organizationsService.getJurisdictions(
       this.currentPage?.pageSize || 10,
       selectedPageNumber ?? (this.currentPage?.pageNumber || 0),
       this.sort?.prop || '',
       this.sort?.dir as any || 'asc',
     ).subscribe({
-      next: (result: PagingResponse<Platform>) => {
+      next: (result: PagingResponse<LocalGovernment>) => {
         this.currentPage = result.pageInfo;
+        this.jurisdictions = result.sourceList;
 
-        this.platforms = result.sourceList.map((x, index) =>
-          ({ ...x, id: `${x.organizationId}-${index + 1}` })
-        );
+        console.info('First jurisdiction', this.jurisdictions[0]);
+
         this.cd.detectChanges();
       },
       complete: () => {

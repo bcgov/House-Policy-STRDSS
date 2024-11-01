@@ -1,0 +1,135 @@
+<div class="header">
+    <h2>Update Jurisdiction Information</h2>
+    <span class="sub-header">All fields are required except where stated</span>
+</div>
+
+<div class="content" *ngIf="jurisdiction">
+    <form [formGroup]="myForm">
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="organizationNm">Jurisdiction Name</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <input placeholder="Enter Value" [ngClass]="'full-width-text-field'" type="text" pInputText
+                            formControlName="organizationNm" id="organizationNm" name="organizationNm" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="shapeFileId">Jurisdiction Name</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <input placeholder="Enter Value" [ngClass]="'full-width-text-field'" type="text" pInputText
+                            formControlName="shapeFileId" id="shapeFileId" name="shapeFileId" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="localGovernmentType">Local Government Name</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <p-dropdown placeholder="Please Select" appendTo="body" panelStyleClass="select-community"
+                            [inputId]="'community-filter-dropdown'" [filter]="true" [filterBy]="'label'"
+                            class="auto-width" [options]="groupedCommunities" [group]="true"
+                            formControlName="managingOrganizationId">
+                            <ng-template let-group pTemplate="group">
+                                <strong>{{group.label}}</strong>
+                            </ng-template>
+                        </p-dropdown>
+                    </div>
+                    <div class="validation-errors" *ngIf="!managingOrganizationIdControl.pristine">
+                        <small id="requiredmanagingOrganizationId"
+                            *ngIf="managingOrganizationIdControl.errors?.['required']">
+                            Local Government Name is Required
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="isPrincipalResidenceRequired">Principle Residence Requirement Applies?</label>
+                    </div>
+                    <div class="form-group-row-col radios">
+                        <p-radioButton name="isPrincipalResidenceRequired" id="isPrincipalResidenceRequired-true"
+                            [value]="true" label="Yes" formControlName="isPrincipalResidenceRequired"></p-radioButton>
+                        &nbsp;
+                        <p-radioButton name="isPrincipalResidenceRequired" id="isPrincipalResidenceRequired-false"
+                            [value]="false" label="No" formControlName="isPrincipalResidenceRequired"></p-radioButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="isStrProhibited">Short-Term Rental Prohibited?</label>
+                    </div>
+                    <div class="form-group-row-col radios">
+                        <p-radioButton name="isStrProhibited" id="isStrProhibited-true" [value]="true" label="Yes"
+                            formControlName="isStrProhibited"></p-radioButton> &nbsp;
+                        <p-radioButton name="isStrProhibited" id="isStrProhibited-false" [value]="false" label="No"
+                            formControlName="isStrProhibited"></p-radioButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="isBusinessLicenceRequired">Business Licence Requirement?</label>
+                    </div>
+                    <div class="form-group-row-col radios">
+                        <p-radioButton name="isBusinessLicenceRequired" id="isBusinessLicenceRequired-true"
+                            [value]="true" label="Yes" formControlName="isBusinessLicenceRequired"></p-radioButton>
+                        &nbsp;
+                        <p-radioButton name="isBusinessLicenceRequired" id="isBusinessLicenceRequired-false"
+                            [value]="false" label="No" formControlName="isBusinessLicenceRequired"></p-radioButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="economicRegionDsc">Economic Region</label>
+                    </div>
+                    <div class="form-group-row-col">
+                        <p-dropdown [options]="economicRegions" formControlName="economicRegionDsc"
+                            placeholder="Please Select" id="economicRegionDsc" name="economicRegionDsc"
+                            [required]="true" [ngClass]="'full-width-text-field'"></p-dropdown>
+                    </div>
+                    <div class="validation-errors" *ngIf="!economicRegionDscControl.pristine">
+
+                        <small id="requiredLocalGovernmentType" *ngIf="economicRegionDscControl.errors?.['required']">
+                            Economic Region is Required
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="actions" *ngIf="myForm">
+    <button pButton (click)="onSave()" [disabled]="!myForm.valid">Save</button>
+    <button pButton class="p-button-transparent" (click)="onCancel()">Cancel</button>
+</div>

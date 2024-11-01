@@ -1,0 +1,146 @@
+<div class="header">
+    <h2>Manage Jurisdictions</h2>
+</div>
+
+<div class="content">
+    <p-table [value]="jurisdictions" dataKey="organizationId" [tableStyle]="{ 'min-width': '60rem' }"
+        styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+            <tr class="header-panel">
+                <th style="width: 4rem"></th>
+                <th style="width: 24rem" class="sortable-header" id="organizationNm_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'organizationNm'"
+                    (click)="onSort('organizationNm')">Local Government Name
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="localGovernmentTypeNm_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'localGovernmentTypeNm'"
+                    (click)="onSort('localGovernmentTypeNm')">Local Government Type
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'localGovernmentTypeNm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'localGovernmentTypeNm' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="organizationCd_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'organizationCd'"
+                    (click)="onSort('organizationCd')">Local Government Code
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'organizationCd' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'organizationCd' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="businessLicenceFormatTxt_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'businessLicenceFormatTxt'"
+                    (click)="onSort('businessLicenceFormatTxt')">BL Format
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'businessLicenceFormatTxt' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'businessLicenceFormatTxt' && this.sort.dir === 'asc'"></i>
+                </th>
+                <th style="width: 19rem">Update Local Government Information</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-jurisdiction let-index="rowIndex" let-expanded="expanded">
+            <tr>
+                <td style="width: 4rem">
+                    <button [disabled]="!jurisdiction.jurisdictions || !jurisdiction.jurisdictions.length"
+                        [pRowTogglerDisabled]="!jurisdiction.jurisdictions || !jurisdiction.jurisdictions.length"
+                        pButton [pTooltip]="(!jurisdiction.jurisdictions || !jurisdiction.jurisdictions.length)?
+                        'Does Not Contain Jurisdictions':'Expand / Collapse'" id="expand-jurisdiction-row-{{index}}"
+                        type="button" class="p-button-transparent toggle-row-btn" pRipple [pRowToggler]="jurisdiction"
+                        icon="{{expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'}}"></button>
+                </td>
+                <td>{{jurisdiction.organizationNm || '-'}}</td>
+                <td>{{jurisdiction.localGovernmentTypeNm || '-'}}</td>
+                <td>{{jurisdiction.organizationCd || '-'}}</td>
+                <td>{{jurisdiction.businessLicenceFormatTxt || '-'}} </td>
+                <td style="text-align: center">
+                    <a id="lg-edit-{{index}}-icon"
+                        [routerLink]="'/update-local-government-information/'+jurisdiction.organizationId">
+                        <span class="edit-icon"></span>
+                    </a>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="rowexpansion" let-lg>
+            <tr>
+                <td colspan="9">
+                    <p-table [value]="lg.jurisdictions">
+                        <ng-template pTemplate="header">
+            <tr>
+                <th class="sortable-header" id="organizationNm_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'organizationNm'"
+                    (click)="onSortSub('organizationNm')">Jurisdiction Name
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'organizationNm' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'organizationNm' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="shapeFileId_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'shapeFileId'"
+                    (click)="onSortSub('shapeFileId')">Shape File ID
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'shapeFileId' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'shapeFileId' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="isPrincipalResidenceRequired_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'isPrincipalResidenceRequired'"
+                    (click)="onSortSub('isPrincipalResidenceRequired')">Principle Residence Requirement?
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isPrincipalResidenceRequired' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isPrincipalResidenceRequired' && this.sortSub.dir === 'asc'"></i>
+                </th>
+
+                <th class="sortable-header" id="isStrProhibited_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'isStrProhibited'"
+                    (click)="onSortSub('isStrProhibited')">STR Prohibited?
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isStrProhibited' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isStrProhibited' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="isBusinessLicenceRequired_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'isBusinessLicenceRequired'"
+                    (click)="onSortSub('isBusinessLicenceRequired')"> BL Requirement?
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isBusinessLicenceRequired' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isBusinessLicenceRequired' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th> Update Jurisdiction Info </th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-jurisdiction let-index>
+            <tr>
+                <td>{{jurisdiction.organizationNm || '-'}}</td>
+                <td>{{jurisdiction.shapeFileId || '-'}}</td>
+                <td>{{jurisdiction.isPrincipalResidenceRequired?'Yes':'No'}} </td>
+                <td>{{jurisdiction.isStrProhibited?'Yes':'No'}} </td>
+                <td>{{jurisdiction.isBusinessLicenceRequired?'Yes':'No'}} </td>
+                <td style="text-align: center">
+                    <a id="jurisdiction-edit-{{index}}-icon"
+                        [routerLink]="'/update-jurisdiction-information/'+jurisdiction.organizationId">
+                        <span class="edit-icon"></span>
+
+                    </a>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    </td>
+    </tr>
+    </ng-template>
+    </p-table>
+    <p-paginator #paginator class="jurisdiction-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
+        [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
+        [showCurrentPageReport]="true" [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
+        [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
+</div>

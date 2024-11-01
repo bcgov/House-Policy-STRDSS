@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { ListingSearchState } from '../models/listing-search-state';
 import { ListingDetails } from '../models/listing-details';
 
 @Injectable({

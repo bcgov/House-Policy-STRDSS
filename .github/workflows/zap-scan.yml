@@ -7,9 +7,9 @@ on:
         type: choice
         description: The Target URL
         options:
-        - https://dev-strdata.apps.silver.devops.gov.bc.ca/
-        - https://test-strdata.apps.silver.devops.gov.bc.ca/
-        - https://uat-strdata.apps.silver.devops.gov.bc.ca/
+        - https://dev.strdata.gov.bc.ca/
+        - https://test.strdata.gov.bc.ca/
+        - https://uat.strdata.gov.bc.ca/
 
 jobs:
   zap-scan:

@@ -67,7 +67,7 @@ services:
     - strdata.test.api.gov.bc.ca
     methods:
     - GET
-    paths: [/api/organizations/strrequirements]
+    paths: [/api/organizations/strrequirements, /api/rentallistings/exports/fin]
     strip_path: false
     https_redirect_status_code: 426
     path_handling: v0
@@ -122,7 +122,7 @@ services:
     - strdata-uat.api.gov.bc.ca
     methods:
     - GET
-    paths: [/api/organizations/strrequirements]
+    paths: [/api/organizations/strrequirements, /api/rentallistings/exports/fin]
     strip_path: false
     https_redirect_status_code: 426
     path_handling: v0
@@ -177,7 +177,7 @@ services:
     - strdata.api.gov.bc.ca
     methods:
     - GET
-    paths: [/api/organizations/strrequirements]
+    paths: [/api/organizations/strrequirements, /api/rentallistings/exports/fin]
     strip_path: false
     https_redirect_status_code: 426
     path_handling: v0

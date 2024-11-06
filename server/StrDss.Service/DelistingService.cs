@@ -1102,6 +1102,7 @@ namespace StrDss.Service
             List<ComplianceOrderFromListing> templates)
         {
             var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+            var commentError = false;
 
             foreach (var listing in listings)
             {
@@ -1115,12 +1116,20 @@ namespace StrDss.Service
 
                 listing.HostEmails = GetValidHostEmails(rentalListing.Hosts.ToArray(), emailRegex);
 
+                if (listing.Comment.Length > 3900)
+                    commentError = true;
+
                 template.OrgCd = rentalListing.OfferingOrganizationCd!;
                 template.RentalListingId = rentalListing.RentalListingId ?? 0;
                 template.To = listing.HostEmails;
                 template.Bcc = listing.BccList;
                 template.Comment = listing.Comment;
                 templates.Add(template);
+            }
+
+            if (commentError)
+            {
+                errors.AddItem("comment", "Your message to hosts exceeds the maximum allowed length of 3,900 characters. Please shorten your message and try again.");
             }
         }
         public async Task<Dictionary<string, List<string>>> CreateComplianceOrdersFromListingAsync(ComplianceOrderDto[] listings)

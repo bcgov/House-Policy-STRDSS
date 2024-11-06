@@ -4,7 +4,6 @@ using StrDss.Model;
 using StrDss.Model.UserDtos;
 using StrDss.Service;
 using StrDss.Service.Bceid;
-using System.Net;
 
 namespace StrDss.Api.Authentication
 {
@@ -48,6 +47,7 @@ namespace StrDss.Api.Authentication
                 _currentUser.OrganizationId = user.RepresentedByOrganizationId ?? 0;
                 _currentUser.OrganizationName = user.RepresentedByOrganization?.OrganizationNm ?? "";
                 _currentUser.TermsAcceptanceDtm = user.TermsAcceptanceDtm;
+                _currentUser.EmailAddress = user.EmailAddressDsc ?? "";
 
                 if (user.IsEnabled)
                 {

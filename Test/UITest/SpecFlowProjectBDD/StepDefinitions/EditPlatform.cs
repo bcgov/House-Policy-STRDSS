@@ -1,28 +1,28 @@
 using Configuration;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using NUnit.Framework.Legacy;
 using SpecFlowProjectBDD.Helpers;
+using SpecFlowProjectBDD.Utilities;
 using System;
 using TechTalk.SpecFlow;
 using TestFrameWork.Models;
 using UITest.PageObjects;
 using UITest.TestDriver;
 using static SpecFlowProjectBDD.SFEnums;
-using SpecFlowProjectBDD.Utilities;
 
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
-    [Scope(Scenario = "AddPlatform")]
-    public class AddPlatform
+    [Scope(Scenario = "EditPlatform")]
+    public class EditPlatform
     {
         private IDriver _Driver;
         private LandingPage _LandingPage;
         private ManagePlatformsPage _ManagePlatformsPage;
         private DetailedPlatformContactInformationPage _DetailedPlatformContactInformationPage;
-        private AddPlatformPage _AddPlatformPage;
+        private AddSubPlatformPage _AddSubPlatformPage;
         private PathFinderPage _PathFinderPage;
         private IDirLoginPage _IDRLoginPage;
+        private EditPlatformPage _EditPlatformPage;
 
         private string _TestUserName;
         private string _TestPassword;
@@ -41,16 +41,18 @@ namespace SpecFlowProjectBDD.StepDefinitions
         private BCIDPage _BCIDPage;
         private SFEnums.LogonTypeEnum? _LogonType;
 
-        public AddPlatform(SeleniumDriver Driver)
+        public EditPlatform(SeleniumDriver Driver)
         {
             _Driver = Driver;
             _LandingPage = new LandingPage(_Driver);
             _ManagePlatformsPage = new ManagePlatformsPage(_Driver);
             _DetailedPlatformContactInformationPage = new DetailedPlatformContactInformationPage(_Driver);
-            _AddPlatformPage = new AddPlatformPage(_Driver);
+            _AddSubPlatformPage = new AddSubPlatformPage(_Driver);
             _PathFinderPage = new PathFinderPage(_Driver);
             _IDRLoginPage = new IDirLoginPage(_Driver);
             _BCIDPage = new BCIDPage(_Driver);
+            _EditPlatformPage = new EditPlatformPage(Driver);
+
             _AppSettings = new AppSettings();
             _strUtilities = new StrUtilities();
             _PlatformName = "Sub-PlatForm" + _strUtilities.GenerateRandomString(50);
@@ -92,8 +94,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             }
         }
 
-        [When(@"I login and navigate to the Manage Platforms feature")]
-        public void WhenILoginAndNavigateToTheManagePlatformsFeature()
+        [When(@"I click on the Manage Platforms button")]
+        public void WhenIClickOnTheManagePlatformsButton()
         {
             Thread.Sleep(3000);
             _LandingPage.ManagePlatformsButton.Click();
@@ -105,61 +107,108 @@ namespace SpecFlowProjectBDD.StepDefinitions
             ClassicAssert.IsTrue(_Driver.GetCurrentURL().Contains("platform-management"));
         }
 
-        [When(@"I click the add new platform button for a platform")]
-        public void WhenIClickTheAddNewPlatformButtonForAPlatform()
+        [When(@"I select an existing platform")]
+        public void WhenISelectAnExistingPlatform()
         {
-            _ManagePlatformsPage.AddNewParentPlatformButton.Click();
+            _ManagePlatformsPage.EditPlatformButton.Click();
         }
 
-        [Then(@"I should be presented with the Add Platform page")]
-        public void ThenIShouldBePresentedWithTheAddPlatformPage()
+        [Then(@"I should be be able to edit platform information,")]
+        public void ThenIShouldBeBeAbleToEditPlatformInformation()
+        {
+            _DetailedPlatformContactInformationPage.UpdateParentPlatformInformationButton.Click();
+        }
+
+        [Then(@"I should see a call to action to disable the platform")]
+        public void ThenIShouldSeeACallToActionToDisableThePlatform()
+        {
+
+            //ClassicAssert.IsTrue(_EditPlatformPage.DisablePlatformButton.IsEnabled());
+        }
+
+        [When(@"I edit platform name information")]
+        public void WhenIEditPlatformNameInformation()
+        {
+            _EditPlatformPage.PlatformNameTextBox.EnterText(_PlatformName);
+        }
+
+        [Then(@"platform information should update across the platform \(e\.g\., listing view, detailed view, and drop down platform select menus, etc\.\)")]
+        public void ThenPlatformInformationShouldUpdateAcrossThePlatformE_G_ListingViewDetailedViewAndDropDownPlatformSelectMenusEtc_()
         {
 
         }
 
-        [Then(@"I should see a form with the required input fields for creating a sub-platform")]
-        public void ThenIShouldSeeAFormWithTheRequiredInputFieldsForCreatingASub_Platform()
+        [When(@"I edit platform email addresses")]
+        public void WhenIEditPlatformEmailAddresses()
+        {
+            _EditPlatformPage.EmailForNonComplianceNoticesTextBox.ClearText();
+            _EditPlatformPage.EmailForNonComplianceNoticesTextBox.EnterText("Foo@foo.com");
+
+            _EditPlatformPage.EmailForTakedownRequestLettersTextBox.ClearText();
+            _EditPlatformPage.EmailForTakedownRequestLettersTextBox.EnterText("Foo@foo.com");
+
+            _EditPlatformPage.SecondaryEmailForNonComplianceNoticesTextBox.ClearText();
+            _EditPlatformPage.SecondaryEmailForNonComplianceNoticesTextBox.EnterText("Foo@foo.com");
+
+            _EditPlatformPage.SecondaryEmailForTakedownRequest.ClearText();
+            _EditPlatformPage.SecondaryEmailForTakedownRequest.EnterText("Foo@foo.com");
+            _EditPlatformPage.PlatformTypeDropDown.JSExecuteJavaScript(@"document.querySelector(""#platformType > div"").click()");
+            _EditPlatformPage.PlatformTypeDropDown.JSExecuteJavaScript(@"document.querySelector(""#platformType_0"").click()");
+        }
+
+        [Then(@"emails should go to the updated platform contacts for each type of email \(Notice, takedown,\)")]
+        public void ThenEmailsShouldGoToTheUpdatedPlatformContactsForEachTypeOfEmailNoticeTakedown()
         {
 
         }
 
-        [When(@"I fill in valid values for the input fields")]
-        public void WhenIFillInValidValuesForTheInputFields()
+        [When(@"I update parent or subsidiary information or platform code")]
+        public void WhenIUpdateParentOrSubsidiaryInformationOrPlatformCode()
         {
-            _AddPlatformPage.PlatformNameTextBox.EnterText(_PlatformName);
-            _AddPlatformPage.PlatformCodeTextBox.EnterText(_PlatformCode);
-            _AddPlatformPage.EmailForNonComplianceNoticesTextBox.EnterText(_EmailForNonComplianceNotices);
-            _AddPlatformPage.EmailForTakedownRequestLettersTextBox.EnterText(_EmailForTakedownRequestLetters);
-            _AddPlatformPage.SecondaryEmailForNonComplianceNoticesTextBox.EnterText(_SecondaryEmailForNonComplianceNotices);
-            _AddPlatformPage.SecondaryEmailForTakedownRequest.EnterText(_SecondaryEmailForTakedownRequest);
-            _AddPlatformPage.PlatformTypeDropDown.JSExecuteJavaScript(@"document.querySelector(""#platformType > div"").click()");
-            _AddPlatformPage.PlatformTypeDropDown.JSExecuteJavaScript(@"document.querySelector(""#platformType_0"").click()");
-            //_AddPlatformPage.PlatformTypeDropdown.SelectFirstListItem();
+            //Not Enabled for sub-platform
+            //_EditPlatformPage.PlatformCodeTextBox.EnterText(_PlatformCode);
         }
 
-        [Then(@"the Save button should be enabled")]
-        public void ThenTheSaveButtonShouldBeEnabled()
+        [Then(@"the platform should be able to upload monthly data reports or takedown reports for all platforms associated with it \(ie\. parent or subsidiary platforms\)")]
+        public void ThenThePlatformShouldBeAbleToUploadMonthlyDataReportsOrTakedownReportsForAllPlatformsAssociatedWithItIe_ParentOrSubsidiaryPlatforms()
         {
-            //ClassicAssert.IsTrue(_AddPlatformPage.SaveButton.IsEnabled());
+
+        }
+
+        [Then(@"the platform uploads should validate against the updated platform code")]
+        public void ThenThePlatformUploadsShouldValidateAgainstTheUpdatedPlatformCode()
+        {
+
+        }
+
+        [When(@"submitting platform details")]
+        public void WhenSubmittingPlatformDetails()
+        {
+
+        }
+
+        [Then(@"the system should perform validation checks and provide clear error messages for any input errors")]
+        public void ThenTheSystemShouldPerformValidationChecksAndProvideClearErrorMessagesForAnyInputErrors()
+        {
+
         }
 
         [When(@"I click the Save button")]
         public void WhenIClickTheSaveButton()
         {
-            _AddPlatformPage.PlatformTypeDropDown.JSExecuteJavaScript(@"document.querySelector(""body > app-root > app-layout > div.content > app-add-new-platform > div.actions.ng-star-inserted > button:nth-child(1)"").click()");
-            //_AddPlatformPage.SaveButton.Click();
+            _EditPlatformPage.SaveButton.Click();
         }
 
         [Then(@"the sub platform should be created")]
-        public void ThenThePlatformShouldBeCreated()
+        public void ThenTheSubPlatformShouldBeCreated()
         {
-            Thread.Sleep(2000);
-            ClassicAssert.IsTrue(_Driver.GetCurrentURL().Contains("/platform"));
+
         }
 
         [Then(@"the sub platform should be a child of the parent platform")]
-        public void ThenThePlatformShouldBeAChildOfTheParentPlatform()
+        public void ThenTheSubPlatformShouldBeAChildOfTheParentPlatform()
         {
+
         }
     }
 }

@@ -29,7 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\AddPlatform - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Calculator - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\EditSubsidiaryPlatform - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\SendingMultipleNoticesOfNonCompliance - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\SendingMultipleNoticesOfTakeDown_NonCompliance - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\SendNoticeOfTakedownWithoutADSSlisting - Copy.feature.cs" />
@@ -72,6 +74,10 @@
 
   <ItemGroup>
     <SpecFlowFeatureFiles Update="Features\AddPlatform.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\EditPlatform.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>

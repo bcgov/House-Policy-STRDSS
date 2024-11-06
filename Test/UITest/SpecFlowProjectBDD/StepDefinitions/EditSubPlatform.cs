@@ -12,6 +12,7 @@ using static SpecFlowProjectBDD.SFEnums;
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
+    [Scope(Scenario = "EditSubsidiaryPlatform")]
     public class EditSubPlatform
     {
         private IDriver _Driver;

@@ -201,7 +201,8 @@ namespace SpecFlowProjectBDD.StepDefinitions
             //Validate message and return to home page
             System.Threading.Thread.Sleep(3000);
             ClassicAssert.IsTrue(_DelistingWarningPage.Driver.PageSource.Contains("Your Notice of Non-Compliance was Successfully Submitted!"));
-            _DelistingWarningPage.ReturnHomeButton.Click();
+            //DSS-457 - request to remove "return to home" button to stay on takedown request page so that another request can submitted
+            //_DelistingWarningPage.ReturnHomeButton.Click();
         }
 
         [Then("I should be copied on the email")]

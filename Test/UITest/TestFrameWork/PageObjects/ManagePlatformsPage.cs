@@ -9,19 +9,19 @@ namespace UITest.PageObjects
     {
         private IDriver _Driver;
 
-        private string _URL = @"http://127.0.0.1:4200/platform-management";
+        private string  _URL = @"http://127.0.0.1:4200/platform-management";
 
-        private Button _EditPlatformButton;
+        private Button  _EditPlatformButton;
 
-        private Table _ListingsTable;
+        private Table   _ListingsTable;
+        private Button  _AddNewParentPlatformButton;
 
         public string URL { get => _URL; set => _URL = value; }
-
-
         public Button EditPlatformButton { get => _EditPlatformButton; set => _EditPlatformButton = value; }
-
         public Table ListingsTable { get => _ListingsTable; }
         public IDriver Driver { get => _Driver; }
+
+        public Button AddNewParentPlatformButton { get => _AddNewParentPlatformButton; set => _AddNewParentPlatformButton = value; }
 
         public ManagePlatformsPage(IDriver Driver)
         {
@@ -30,6 +30,8 @@ namespace UITest.PageObjects
             _EditPlatformButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, ManagePlatformsPageModel.EditPlatformButton);
 
             _ListingsTable = new Table(Driver, Enums.FINDBY.ID, ManagePlatformsPageModel.ListingsTable);
+
+            AddNewParentPlatformButton = new Button(Driver, Enums.FINDBY.ID, ManagePlatformsPageModel.AddNewParentPlatformButton);
         }
     }
 }

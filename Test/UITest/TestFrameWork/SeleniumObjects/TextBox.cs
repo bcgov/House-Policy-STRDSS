@@ -21,5 +21,11 @@ namespace UITest.SeleniumObjects
         {
             return (Text);
         }
+
+        public void ClearText()
+        {
+            FindElement(base.LocatorType, base.Locator);
+            base.Element.Clear();
+        }
     }
 }

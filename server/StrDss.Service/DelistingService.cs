@@ -1116,6 +1116,7 @@ namespace StrDss.Service
                 listing.HostEmails = GetValidHostEmails(rentalListing.Hosts.ToArray(), emailRegex);
 
                 template.OrgCd = rentalListing.OfferingOrganizationCd!;
+                template.RentalListingId = rentalListing.RentalListingId ?? 0;
                 template.To = listing.HostEmails;
                 template.Bcc = listing.BccList;
                 template.Comment = listing.Comment;

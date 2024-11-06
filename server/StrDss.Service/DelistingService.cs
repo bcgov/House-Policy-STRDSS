@@ -9,6 +9,7 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.OrganizationDtos;
+using StrDss.Model.RentalReportDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
 using System.Text.RegularExpressions;
@@ -28,6 +29,8 @@ namespace StrDss.Service
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticesFromListingPreviewAsync(TakedownNoticesFromListingDto[] listings);
         Task<Dictionary<string, List<string>>> CreateTakedownRequestsFromListingAsync(TakedownRequestsFromListingDto[] listings);
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestsFromListingPreviewAsync(TakedownRequestsFromListingDto[] listings);
+        Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetComplianceOrdersFromListingPreviewAsync(ComplianceOrderDto[] listings);
+        Task<Dictionary<string, List<string>>> CreateComplianceOrdersFromListingAsync(ComplianceOrderDto[] listings);
     }
     public class DelistingService : ServiceBase, IDelistingService
     {
@@ -268,7 +271,7 @@ namespace StrDss.Service
                 var template = CreateTakedownNoticeTemplate(listing, rentalListing);
                 templates.Add(template);
 
-                ValidateCcListEmails(listing.CcList, emailRegex, errors);
+                ValidateEmails(listing.CcList, emailRegex, "ccList", errors);
                 ValidateLocalGovernmentContactEmail(listing, emailRegex, errors);
                 ValidateAndSetHostEmails(listing, rentalListing, emailRegex, template, errors);
 
@@ -410,7 +413,7 @@ namespace StrDss.Service
                 var template = CreateTakedownNoticeTemplate(listing, rentalListing);
                 templates.Add(template);
 
-                ValidateCcListEmails(listing.CcList, emailRegex, errors);
+                ValidateEmails(listing.CcList, emailRegex, "ccList", errors);
                 ValidateLocalGovernmentContactEmail(listing, emailRegex, errors);
                 ValidateAndSetHostEmails(listing, rentalListing, emailRegex, template, errors);
 
@@ -478,7 +481,7 @@ namespace StrDss.Service
 
             foreach (var listing in listings)
             {
-                ValidateCcListEmails(listing.CcList, emailRegex, errors);
+                ValidateEmails(listing.CcList, emailRegex, "ccList", errors);
 
                 var rentalListing = await _listingRepo.GetRentalListingForTakedownAction(listing.RentalListingId, false);
 
@@ -495,13 +498,13 @@ namespace StrDss.Service
             }
         }
 
-        private void ValidateCcListEmails(List<string> ccList, RegexInfo emailRegex, Dictionary<string, List<string>> errors)
+        private void ValidateEmails(List<string> emails, RegexInfo emailRegex, string field, Dictionary<string, List<string>> errors)
         {
-            foreach (var email in ccList)
+            foreach (var email in emails)
             {
                 if (!Regex.IsMatch(email, emailRegex.Regex))
                 {
-                    errors.AddItem("ccList", $"Email ({email}) is invalid");
+                    errors.AddItem(field, $"Email ({email}) is invalid");
                 }
             }
         }
@@ -630,7 +633,7 @@ namespace StrDss.Service
                 return errors;
             }
 
-            await SendTakedownRequestAsync(dto, platform, lg);
+            await SendTakedownRequestAsync(dto, platform!, lg!);
 
             return errors;
         }
@@ -780,11 +783,11 @@ namespace StrDss.Service
 
                 try
                 {
-                    await ProcessTakedownRequestBatchEmailAsync(platform, allEmails);
+                    await ProcessTakedownRequestBatchEmailAsync(platform!, allEmails);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Error while processing '{EmailMessageTypes.BatchTakedownRequest}' email for {platform.OrganizationNm}");
+                    _logger.LogError($"Error while processing '{EmailMessageTypes.BatchTakedownRequest}' email for {platform!.OrganizationNm}");
                     _logger.LogError(ex.ToString());
                     //send email to admin?
                 } 
@@ -883,7 +886,7 @@ namespace StrDss.Service
             }
 
             //the existence of the contact email has been validated above
-            var contacts = platform.ContactPeople
+            var contacts = platform!.ContactPeople
                 .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest)
                 .Select(x => x.EmailAddressDsc)
                 .ToArray();
@@ -1066,6 +1069,137 @@ namespace StrDss.Service
             }
 
             return errors;
+        }
+        public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetComplianceOrdersFromListingPreviewAsync(ComplianceOrderDto[] listings)
+        {
+            var errors = new Dictionary<string, List<string>>();
+            var templates = new List<ComplianceOrderFromListing>();
+
+            await ProcessComplianceOrderListings(listings, errors, templates);
+
+            if (errors.Count > 0)
+            {
+                return (errors, new EmailPreview());
+            }
+
+            var template = templates.FirstOrDefault();
+
+            if (template == null)
+            {
+                errors.AddItem("template", "Wasn't able to create email templates from the selected listings");
+                return (errors, new EmailPreview());
+            }
+
+            template.Preview = true;
+
+            return (errors, new EmailPreview()
+            {
+                Content = template.GetHtmlPreview()
+            });
+        }
+
+        private async Task ProcessComplianceOrderListings(ComplianceOrderDto[] listings, Dictionary<string, List<string>> errors,
+            List<ComplianceOrderFromListing> templates)
+        {
+            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+
+            foreach (var listing in listings)
+            {
+                var rentalListing = await _listingRepo.GetRentalListing(listing.RentalListingId, false);
+
+                if (rentalListing == null) continue;
+
+                var template = CreateComplianceOrderTemplate(listing, rentalListing);
+
+                ValidateEmails(listing.BccList, emailRegex, "bccList", errors);
+
+                listing.HostEmails = GetValidHostEmails(rentalListing.Hosts.ToArray(), emailRegex);
+
+                template.OrgCd = rentalListing.OfferingOrganizationCd!;
+                template.To = listing.HostEmails;
+                template.Bcc = listing.BccList;
+                template.Comment = listing.Comment;
+                templates.Add(template);
+            }
+        }
+        public async Task<Dictionary<string, List<string>>> CreateComplianceOrdersFromListingAsync(ComplianceOrderDto[] listings)
+        {
+            var errors = new Dictionary<string, List<string>>();
+            var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
+            var templates = new List<ComplianceOrderFromListing>();
+
+            await ProcessComplianceOrderListings(listings, errors, templates);
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            await SendComplianceOrderEmailsFromListingAsync(listings, templates, errors);
+
+            return errors;
+        }
+
+        private ComplianceOrderFromListing CreateComplianceOrderTemplate(ComplianceOrderDto listing, RentalListingViewDto rentalListing)
+        {
+            return new ComplianceOrderFromListing(_emailService)
+            {
+                Url = rentalListing.PlatformListingUrl ?? "",
+                ListingId = rentalListing.PlatformListingNo,
+                Comment = listing.Comment,
+                Info = $"{rentalListing.OfferingOrganizationCd}-{rentalListing.PlatformListingNo}"
+            };
+        }
+
+        private List<string> GetValidHostEmails(RentalListingContactDto[] contacts, RegexInfo emailRegex)
+        {
+            return contacts
+                .Where(contact => !string.IsNullOrEmpty(contact.EmailAddressDsc) && Regex.IsMatch(contact.EmailAddressDsc, emailRegex.Regex))
+                .Select(contact => contact.EmailAddressDsc ?? "")
+                .ToList();
+        }
+
+        private async Task SendComplianceOrderEmailsFromListingAsync(ComplianceOrderDto[] listings, List<ComplianceOrderFromListing> templates, Dictionary<string, List<string>> errors)
+        {
+            foreach (var template in templates)
+            {
+                try
+                {
+                    await SendComplianceOrderEmailFromListingAsync(listings, template);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
+                    errors.AddItem($"{template.OrgCd}-{template.ListingId}", "Failed to send email for the listing.");
+                }
+            }
+        }
+
+        private async Task SendComplianceOrderEmailFromListingAsync(ComplianceOrderDto[] listings, ComplianceOrderFromListing template)
+        {
+            var listing = listings.First(x => x.RentalListingId == template.RentalListingId);
+
+            var emailEntity = new DssEmailMessage
+            {
+                EmailMessageType = template.EmailMessageType,
+                MessageDeliveryDtm = DateTime.UtcNow,
+                MessageTemplateDsc = template.GetContent(),
+                IsSubmitterCcRequired = true, //todo: 
+                UnreportedListingNo = template.ListingId,
+                HostEmailAddressDsc = listing.HostEmails.FirstOrDefault(),
+                LgEmailAddressDsc = null,
+                CcEmailAddressDsc = string.Join("; ", template.Bcc),
+                UnreportedListingUrl = template.Url,
+                InitiatingUserIdentityId = _currentUser.Id,
+                AffectedByUserIdentityId = null,
+                ConcernedWithRentalListingId = listing.RentalListingId,
+            };
+
+            await _emailRepo.AddEmailMessage(emailEntity);
+
+            emailEntity.ExternalMessageNo = await template.SendEmail();
+
+            _unitOfWork.Commit();
         }
     }
 }

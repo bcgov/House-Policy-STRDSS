@@ -19,7 +19,6 @@ namespace StrDss.Test
             OrganizationDto platform,
             [Frozen] Mock<IConfiguration> configMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
-            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             DelistingService sut)
         {
@@ -352,7 +351,6 @@ namespace StrDss.Test
         public async Task SendDelistingWarningAsync_WhenHostEmailIsNotEmpty_AddsHostEmailToToList(
             TakedownNoticeCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)
@@ -383,7 +381,6 @@ namespace StrDss.Test
         [AutoDomainData]
         public async Task SendDelistingWarningAsync_WhenHostEmailIsEmpty_DoesNotAddHostEmailToToList(
             TakedownNoticeCreateDto dto,
-            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             DelistingService sut)
         {
             // Arrange
@@ -401,7 +398,6 @@ namespace StrDss.Test
         public async Task SendDelistingWarningAsync_Always_AddsCurrentUserEmailToCcList(
             TakedownNoticeCreateDto dto,
             OrganizationDto platform,
-            [Frozen] Mock<IEmailMessageService> emailServiceMock,
             [Frozen] Mock<ICurrentUser> currentUserMock,
             [Frozen] Mock<IOrganizationService> orgServiceMock,
             DelistingService sut)

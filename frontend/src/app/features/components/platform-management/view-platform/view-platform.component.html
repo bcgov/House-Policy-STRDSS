@@ -33,15 +33,38 @@
                     </span>
                 </div>
                 <div class="row">
-                    <strong>Email for Non-Compliance Notices:</strong>
+                    <strong>Email(s) for Non-Compliance Notices:</strong>
                     <span>
-                        {{platform.primaryNoticeOfTakedownContactEmail || '-'}}
+                        @if(platform.primaryNoticeOfTakedownContactEmail &&
+                        platform.secondaryNoticeOfTakedownContactEmail){
+                        {{platform.primaryNoticeOfTakedownContactEmail}},
+                        {{platform.secondaryNoticeOfTakedownContactEmail}}
+                        } @else {
+                        {{platform.primaryNoticeOfTakedownContactEmail}}{{platform.secondaryNoticeOfTakedownContactEmail}}
+                        }
+
+                        @if(!platform.primaryNoticeOfTakedownContactEmail &&
+                        !platform.secondaryNoticeOfTakedownContactEmail){
+                        -
+                        }
+
                     </span>
                 </div>
                 <div class="row">
-                    <strong>Email for Takedown Request Letters:</strong>
+                    <strong>Email(s) for Takedown Request Letters:</strong>
                     <span>
-                        {{platform.primaryTakedownRequestContactEmail || '-'}}
+                        @if(platform.primaryTakedownRequestContactEmail &&
+                        platform.secondaryTakedownRequestContactEmail){
+                        {{platform.primaryTakedownRequestContactEmail}},
+                        {{platform.secondaryTakedownRequestContactEmail}}
+                        } @else {
+                        {{platform.primaryTakedownRequestContactEmail}}{{platform.secondaryTakedownRequestContactEmail}}
+                        }
+
+                        @if(!platform.primaryTakedownRequestContactEmail &&
+                        !platform.secondaryTakedownRequestContactEmail){
+                        -
+                        }
                     </span>
                 </div>
                 <div class="row">
@@ -99,15 +122,32 @@
                     </span>
                 </div>
                 <div class="row">
-                    <strong>Email for Non-Compliance Notices:</strong>
+                    <strong>Email(s) for Non-Compliance Notices:</strong>
                     <span>
-                        {{sub.primaryNoticeOfTakedownContactEmail || '-'}}
+
+                        @if(sub.primaryNoticeOfTakedownContactEmail && sub.secondaryNoticeOfTakedownContactEmail){
+                        {{sub.primaryNoticeOfTakedownContactEmail}}, {{sub.secondaryNoticeOfTakedownContactEmail}}
+                        } @else {
+                        {{sub.primaryNoticeOfTakedownContactEmail}}{{sub.secondaryNoticeOfTakedownContactEmail}}
+                        }
+
+                        @if(!sub.primaryNoticeOfTakedownContactEmail && !sub.secondaryNoticeOfTakedownContactEmail){
+                        -
+                        }
                     </span>
                 </div>
                 <div class="row">
-                    <strong>Email for Takedown Request Letters:</strong>
+                    <strong>Email(s) for Takedown Request Letters:</strong>
                     <span>
-                        {{sub.primaryTakedownRequestContactEmail || '-'}}
+                        @if(sub.primaryTakedownRequestContactEmail && sub.secondaryTakedownRequestContactEmail){
+                        {{sub.primaryTakedownRequestContactEmail}}, {{sub.secondaryTakedownRequestContactEmail}}
+                        } @else {
+                        {{sub.primaryTakedownRequestContactEmail}}{{sub.secondaryTakedownRequestContactEmail}}
+                        }
+
+                        @if(!sub.primaryTakedownRequestContactEmail && !sub.secondaryTakedownRequestContactEmail){
+                        -
+                        }
                     </span>
                 </div>
                 <div class="row">

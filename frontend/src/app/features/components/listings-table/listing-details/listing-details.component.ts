@@ -23,6 +23,7 @@ import { BusinessLicence } from '../../../../common/models/business-licence';
 import { BusinessLicenceService } from '../../../../common/services/business-licence.service';
 import { BLSearchResultRow } from '../../../../common/models/bl-search-result-row';
 import { UrlProtocolPipe } from '../../../../common/pipes/url-protocol.pipe';
+import { TextCleanupPipe } from '../../../../common/pipes/text-cleanup.pipe';
 
 @Component({
   selector: 'app-listing-details',
@@ -40,6 +41,7 @@ import { UrlProtocolPipe } from '../../../../common/pipes/url-protocol.pipe';
     TooltipModule,
     TagModule,
     UrlProtocolPipe,
+    TextCleanupPipe,
   ],
   templateUrl: './listing-details.component.html',
   styleUrl: './listing-details.component.scss'

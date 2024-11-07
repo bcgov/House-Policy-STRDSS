@@ -118,7 +118,7 @@
                         </span>
                     </td>
                     <td>{{ row.lastActionNm }}</td>
-                    <td>{{ row.lastActionDtm |date }}</td>
+                    <td>{{ row.lastActionDtm |date:'yyyy-MM-dd' }}</td>
                     <td>{{ row.listings.length }}</td>
                 </tr>
             </ng-template>
@@ -210,7 +210,7 @@
                         </div>
                     </td>
                     <td>{{ listing.lastActionNm }}</td>
-                    <td>{{ listing.lastActionDtm |date }}</td>
+                    <td>{{ listing.lastActionDtm |date:'yyyy-MM-dd' }}</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -222,7 +222,7 @@
 <ng-template pTemplate="emptymessage">
     <tr>
         <td></td>
-        <td colspan="6">No listings matched your search. Please try again. </td>
+        <td colspan="7">No listings matched your search. Please try again. </td>
     </tr>
 </ng-template>
 </p-table>

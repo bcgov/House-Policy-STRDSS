@@ -40,7 +40,7 @@
                     <i class="pi pi-angle-up"
                         *ngIf="this.sort && this.sort.prop === 'businessLicenceFormatTxt' && this.sort.dir === 'asc'"></i>
                 </th>
-                <th style="width: 19rem">Update Local Government Information</th>
+                <th *ngIf="canEdit" style="width: 19rem">Update Local Government Information</th>
             </tr>
         </ng-template>
 
@@ -58,7 +58,7 @@
                 <td>{{jurisdiction.localGovernmentTypeNm || '-'}}</td>
                 <td>{{jurisdiction.organizationCd || '-'}}</td>
                 <td>{{jurisdiction.businessLicenceFormatTxt || '-'}} </td>
-                <td style="text-align: center">
+                <td *ngIf="canEdit" style="text-align: center">
                     <a id="lg-edit-{{index}}-icon"
                         [routerLink]="'/update-local-government-information/'+jurisdiction.organizationId">
                         <span class="edit-icon"></span>
@@ -114,7 +114,7 @@
                     <i class="pi pi-angle-up"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isBusinessLicenceRequired' && this.sortSub.dir === 'asc'"></i>
                 </th>
-                <th> Update Jurisdiction Info </th>
+                <th *ngIf="canEdit"> Update Jurisdiction Info </th>
             </tr>
         </ng-template>
 
@@ -125,7 +125,7 @@
                 <td>{{jurisdiction.isPrincipalResidenceRequired?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isStrProhibited?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isBusinessLicenceRequired?'Yes':'No'}} </td>
-                <td style="text-align: center">
+                <td *ngIf="canEdit" style="text-align: center">
                     <a id="jurisdiction-edit-{{index}}-icon"
                         [routerLink]="'/update-jurisdiction-information/'+jurisdiction.organizationId">
                         <span class="edit-icon"></span>

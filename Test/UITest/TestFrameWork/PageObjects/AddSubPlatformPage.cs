@@ -5,7 +5,7 @@ using UITest.TestObjectFramework;
 
 namespace UITest.PageObjects
 {
-    public class AddNewPlatformPage
+    public class AddSubPlatformPage
     {
         private IDriver _Driver;
 
@@ -34,18 +34,18 @@ namespace UITest.PageObjects
         //public string URL { get => _URL; set => _URL = value; }
         public IDriver Driver { get => _Driver; }
 
-        public AddNewPlatformPage(IDriver Driver)
+        public AddSubPlatformPage(IDriver Driver)
         {
             _Driver = Driver;
 
-            _PlatformNameTextBox = new TextBox(Driver, Enums.FINDBY.ID, AddNewPlatformPageModel.PlatformNameTextBox);
-            _PlatformCodeTextBox = new TextBox(Driver, Enums.FINDBY.ID, AddNewPlatformPageModel.PlatformCodeTextBox);
-            _EmailForNonComplianceNoticesTextBox = new TextBox(Driver, Enums.FINDBY.ID, AddNewPlatformPageModel.EmailForNonComplianceNoticesTextBox);
-            _EmailForTakedownRequestLettersTextBox = new TextBox(Driver, Enums.FINDBY.ID, AddNewPlatformPageModel.EmailForTakedownRequestLettersTextBox);
-            _SecondaryEmailForNonComplianceNoticesTextBox = new TextBox(Driver, Enums.FINDBY.ID, AddNewPlatformPageModel.SecondaryEmailForNonComplianceNoticesTextBox);
-            _SecondaryEmailForTakedownRequest = new TextBox(Driver, Enums.FINDBY.ID, AddNewPlatformPageModel.SecondaryEmailForTakedownRequest);
-            _SaveButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, AddNewPlatformPageModel.SaveButton);
-            _CancelButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, AddNewPlatformPageModel.CancelButton);
+            _PlatformNameTextBox = new TextBox(Driver, Enums.FINDBY.ID, AddSubPlatformPageModel.PlatformNameTextBox);
+            _PlatformCodeTextBox = new TextBox(Driver, Enums.FINDBY.ID, AddSubPlatformPageModel.PlatformCodeTextBox);
+            _EmailForNonComplianceNoticesTextBox = new TextBox(Driver, Enums.FINDBY.ID, AddSubPlatformPageModel.EmailForNonComplianceNoticesTextBox);
+            _EmailForTakedownRequestLettersTextBox = new TextBox(Driver, Enums.FINDBY.ID, AddSubPlatformPageModel.EmailForTakedownRequestLettersTextBox);
+            _SecondaryEmailForNonComplianceNoticesTextBox = new TextBox(Driver, Enums.FINDBY.ID, AddSubPlatformPageModel.SecondaryEmailForNonComplianceNoticesTextBox);
+            _SecondaryEmailForTakedownRequest = new TextBox(Driver, Enums.FINDBY.ID, AddSubPlatformPageModel.SecondaryEmailForTakedownRequest);
+            _SaveButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, AddSubPlatformPageModel.SaveButton);
+            _CancelButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, AddSubPlatformPageModel.CancelButton);
         }
     }
 }

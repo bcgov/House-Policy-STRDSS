@@ -20,22 +20,22 @@ namespace SpecFlowProjectBDD.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("ManagePlatformsAddSubPlatform")]
-    public partial class ManagePlatformsAddSubPlatformFeature
+    [NUnit.Framework.DescriptionAttribute("ManagePlatformsAddPlatform")]
+    public partial class ManagePlatformsAddPlatformFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
         private static string[] featureTags = ((string[])(null));
         
-#line 1 "AddSubsidiaryPlatform.feature"
+#line 1 "AddPlatform.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ManagePlatformsAddSubPlatform", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-226", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ManagePlatformsAddPlatform", "Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-226", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -74,13 +74,13 @@ namespace SpecFlowProjectBDD.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("AddSubsidiaryPlatform")]
-        [NUnit.Framework.CategoryAttribute("AddSubsidiaryPlatform")]
+        [NUnit.Framework.DescriptionAttribute("AddPlatform")]
+        [NUnit.Framework.CategoryAttribute("AddPlatform")]
         [NUnit.Framework.TestCaseAttribute("CEUATST", "ceu_admin", "all", "pass", null)]
-        public void AddSubsidiaryPlatform(string userName, string userType, string environment, string expectedResult, string[] exampleTags)
+        public void AddPlatform(string userName, string userType, string environment, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {
-                    "AddSubsidiaryPlatform"};
+                    "AddPlatform"};
             if ((exampleTags != null))
             {
                 @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
@@ -91,7 +91,7 @@ namespace SpecFlowProjectBDD.Features
             argumentsOfScenario.Add("UserType", userType);
             argumentsOfScenario.Add("Environment", environment);
             argumentsOfScenario.Add("ExpectedResult", expectedResult);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("AddSubsidiaryPlatform", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("AddPlatform", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 5
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -110,24 +110,18 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("I am directed to the Landing Page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 11
- testRunner.When("I click on the Manage Platforms button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I login and navigate to the Manage Platforms feature", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 13
  testRunner.Then("I should be presented with a list of platforms and sub-platforms", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 16
- testRunner.When("I click the edit button for a platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 17
- testRunner.Then("I am directed to the Platform view page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("I click the add new platform button for a platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 20
- testRunner.When("I click on the add subsidiary platform button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 21
  testRunner.Then("I should be presented with the Add Platform page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 25
+#line 23
  testRunner.Then("I should see a form with the required input fields for creating a sub-platform", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 36

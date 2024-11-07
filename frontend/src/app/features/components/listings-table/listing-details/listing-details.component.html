@@ -104,7 +104,7 @@
             </div>
             <div class="row">
                 <span class="label">Address (Platform Listing):</span>
-                <span class="value">{{listing.originalAddressTxt}}</span>
+                <span class="value">{{listing.originalAddressTxt | textCleanup}}</span>
             </div>
             <div class="row">
                 <span class="label">Entire Unit? (Platform Listing):</span>
@@ -211,7 +211,7 @@
                     <ng-template pTemplate="body" let-addressChange>
                         <tr>
                             <td>{{ addressChange.type }}</td>
-                            <td>{{ addressChange.platformAddress }}</td>
+                            <td>{{ addressChange.platformAddress | textCleanup }}</td>
                             <td>{{ addressChange.bestMatchAddress }}</td>
                             <td>{{ addressChange.date |date:'yyyy-MM-dd' }}</td>
                             <td>{{ addressChange.user }}</td>
@@ -243,7 +243,7 @@
                 <ng-template pTemplate="body" let-actionHistory>
                     <tr class="small-text">
                         <td>{{ actionHistory.action }}</td>
-                        <td>{{ actionHistory.date |date}}</td>
+                        <td>{{ actionHistory.date |date:'yyyy-MM-dd'}}</td>
                         <td>{{ actionHistory.user }}</td>
                     </tr>
                 </ng-template>

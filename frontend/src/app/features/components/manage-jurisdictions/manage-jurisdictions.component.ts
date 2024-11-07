@@ -9,6 +9,8 @@ import { CommonModule } from '@angular/common';
 import { LocalGovernment } from '../../../common/models/jurisdiction';
 import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
+import { UserDataService } from '../../../common/services/user-data.service';
+import { jurisdiction_write } from '../../../common/consts/permissions.const';
 
 @Component({
   selector: 'app-manage-jurisdictions',
@@ -30,9 +32,11 @@ export class ManageJurisdictionsComponent implements OnInit {
   sort!: { prop: string; dir: 'asc' | 'desc' };
   sortSub!: { prop: string; dir: 'asc' | 'desc' };
   currentPage!: PagingResponsePageInfo;
+  canEdit = false;
 
   constructor(
     private organizationsService: OrganizationService,
+    private userService: UserDataService,
     private cd: ChangeDetectorRef,
     private router: Router,
     private loaderService: GlobalLoaderService,
@@ -98,8 +102,6 @@ export class ManageJurisdictionsComponent implements OnInit {
         this.currentPage = result.pageInfo;
         this.jurisdictions = result.sourceList;
 
-        console.info('First jurisdiction', this.jurisdictions[0]);
-
         this.cd.detectChanges();
       },
       complete: () => {
@@ -115,6 +117,11 @@ export class ManageJurisdictionsComponent implements OnInit {
   }
 
   private init(): void {
+    this.canUserEditJurisdiction()
     this.getPlatforms();
+  }
+
+  private canUserEditJurisdiction() {
+    this.canEdit = this.userService.currentUser.permissions.includes(jurisdiction_write);
   }
 }

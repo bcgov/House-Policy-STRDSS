@@ -40,6 +40,27 @@ function initializeKeycloak(keycloak: KeycloakService) {
             initOptions: {
                 onLoad: 'login-required',
                 pkceMethod: 'S256',
+                silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html',
             },
+        }).then(() => {
+            setupTokenRefresh(keycloak);
         });
+}
+
+function setupTokenRefresh(keycloak: KeycloakService) {
+    const refreshInterval = 60 * 1000; // Check every 60 seconds
+
+    setInterval(async () => {
+        if (keycloak.isLoggedIn()) {
+            try {
+                const refreshed = await keycloak.updateToken(30); // Refresh if token will expire in 30 seconds
+                if (refreshed) {
+                    console.log('Token refreshed successfully');
+                }
+            } catch (err) {
+                console.error('Failed to refresh token', err);
+                keycloak.logout();
+            }
+        }
+    }, refreshInterval);
 }

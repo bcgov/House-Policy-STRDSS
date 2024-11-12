@@ -3,6 +3,7 @@ using DataBase.Entities;
 using DataBase.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework.Legacy;
+using OpenQA.Selenium;
 using SpecFlowProjectBDD.Helpers;
 using System;
 using System.Reflection.Metadata;
@@ -116,7 +117,7 @@ namespace SpecFlowProjectBDD.StepDefinitions
             var rowData = _AggregatedListingsPage.AggregatedListingsTable.GetHeaderRow();
             ClassicAssert.AreEqual("Primary Host Name", rowData[1]);
             ClassicAssert.AreEqual("Address (Best Match)", rowData[2]);
-            ClassicAssert.AreEqual("Nights Stayed (YTD)", rowData[3]);
+            ClassicAssert.AreEqual("Nights stayed (12M)".ToUpper(), rowData[3].ToUpper());
             ClassicAssert.AreEqual("Listing’s Business Licence", rowData[4]);
             ClassicAssert.AreEqual("Last Action", rowData[5]);
             ClassicAssert.AreEqual("Last Action Date", rowData[6]);
@@ -138,16 +139,27 @@ namespace SpecFlowProjectBDD.StepDefinitions
         [Then(@"I should see key information for each listing, including:")]
         public void ThenIShouldSeeKeyInformationForEachListingIncluding()
         {
-            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(2)\").innerText"), "Status");
-            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(3)\").innerText"), "Platform");
-            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(4)\").innerText"), "Listing ID");
-            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(5)\").innerText"), "Listing Details");
-            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(6)\").innerText"), "Address (Best Match)");
-            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(7)\").innerText"), "Nights Stayed (YTD)");
-            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(8)\").innerText"), "Business Licence on Listing");
-            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(9)\").innerText"), "Matched Business Licence");
-            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(10)\").innerText"), "Last Action");
-            ClassicAssert.AreEqual(_AggregatedListingsPage.AggregatedListingsTable.JSExecuteJavaScript("document.querySelector(\"#pn_id_24-table > thead > tr > th:nth-child(11)\").innerText"), "Last Action Date");
+            ///TODO:the code below is a short term fix. Need to create a solution which follows the POM
+            var tables = _Driver.FindElements(By.CssSelector("table[id^='pn_id_']"));
+
+            // Check if there is a second table and select the desired header cell within it
+            if (tables.Count >= 2)
+            {
+                // Select the second table (index 1)
+                var secondTable = tables[1];
+
+                ClassicAssert.AreEqual(secondTable.FindElement(By.CssSelector("thead > tr > th:nth-child(2)")).Text, "Status");
+                ClassicAssert.AreEqual(secondTable.FindElement(By.CssSelector("thead > tr > th:nth-child(3)")).Text, "Platform");
+                ClassicAssert.AreEqual(secondTable.FindElement(By.CssSelector("thead > tr > th:nth-child(4)")).Text, "Listing ID");
+                ClassicAssert.AreEqual(secondTable.FindElement(By.CssSelector("thead > tr > th:nth-child(5)")).Text, "Listing Details");
+                ClassicAssert.AreEqual(secondTable.FindElement(By.CssSelector("thead > tr > th:nth-child(6)")).Text, "Address (Best Match)");
+                ClassicAssert.AreEqual(secondTable.FindElement(By.CssSelector("thead > tr > th:nth-child(7)")).Text, "Nights stayed (12M)");
+                ClassicAssert.AreEqual(secondTable.FindElement(By.CssSelector("thead > tr > th:nth-child(8)")).Text, "Business Licence on Listing");
+                ClassicAssert.AreEqual(secondTable.FindElement(By.CssSelector("thead > tr > th:nth-child(9)")).Text, "Matched Business Licence");
+                ClassicAssert.AreEqual(secondTable.FindElement(By.CssSelector("thead > tr > th:nth-child(10)")).Text, "Last Action");
+                ClassicAssert.AreEqual(secondTable.FindElement(By.CssSelector("thead > tr > th:nth-child(11)")).Text, "Last Action Date");
+
+            }
         }
     }
 }

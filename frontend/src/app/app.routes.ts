@@ -34,7 +34,7 @@ import { ViewPlatformComponent } from './features/components/platform-management
 import { EditSubPlatformComponent } from './features/components/platform-management/edit-sub-platform/edit-sub-platform.component';
 import { ManageJurisdictionsComponent } from './features/components/manage-jurisdictions/manage-jurisdictions.component';
 import { UpdateJurisdictionInformationComponent } from './features/components/manage-jurisdictions/update-jurisdiction-information/update-jurisdiction-information.component';
-import { UpdateLocalGvernmentInformationComponent } from './features/components/manage-jurisdictions/update-local-gvernment-information/update-local-gvernment-information.component';
+import { UpdateLocalGovernmentInformationComponent } from './features/components/manage-jurisdictions/update-local-gvernment-information/update-local-gvernment-information.component';
 
 export const routes: Routes = [
     {
@@ -132,7 +132,7 @@ export const routes: Routes = [
     {
         path: 'update-local-government-information/:id',
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
-        component: UpdateLocalGvernmentInformationComponent,
+        component: UpdateLocalGovernmentInformationComponent,
         data: { permissions: [jurisdiction_write] }
     },
     {

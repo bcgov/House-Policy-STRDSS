@@ -50,7 +50,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: bcgov-c/tenant-gitops-b0471a
-        ref: main
+        ref: prod
         token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
     - name: Update Helm Values and Commit
       id: helm

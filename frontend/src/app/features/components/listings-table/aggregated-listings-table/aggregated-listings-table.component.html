@@ -104,10 +104,10 @@
                     <td>{{ row.primaryHostNm }}</td>
                     <td>{{ row.matchAddressTxt }} </td>
                     <td>
-                        <span [class.night-stayed-exceeded]="row.nightsBookedYtdQty>90">
+                        <span [class.night-stayed-exceeded]="row.nightsBookedYtdQty>=90">
                             {{ row.nightsBookedYtdQty }}
                             <i class="pi pi-info-circle" pTooltip="Over 90 nights stayed"
-                                *ngIf="row.nightsBookedYtdQty>90"></i>
+                                *ngIf="row.nightsBookedYtdQty>=90"></i>
                         </span>
                     </td>
                     <td>

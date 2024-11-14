@@ -148,6 +148,6 @@
 </div>
 
 <div class="actions" *ngIf="myForm">
-    <button pButton (click)="onSave()" [disabled]="!myForm.valid">Save</button>
-    <button pButton class="p-button-transparent" (click)="onCancel()">Cancel</button>
+    <button pButton (click)="onSave()" id="save-btn" [disabled]="!myForm.valid">Save</button>
+    <button pButton class="p-button-transparent" (click)="onCancel()" id="cancel-btn">Cancel</button>
 </div>

@@ -25,7 +25,7 @@ import { LocalGovernment, LocalGovernmentUpdate } from '../../../../common/model
   templateUrl: './update-local-gvernment-information.component.html',
   styleUrl: './update-local-gvernment-information.component.scss'
 })
-export class UpdateLocalGvernmentInformationComponent implements OnInit {
+export class UpdateLocalGovernmentInformationComponent implements OnInit {
   myForm!: FormGroup;
   lgTypes = new Array<DropdownOption>();
   id!: any;

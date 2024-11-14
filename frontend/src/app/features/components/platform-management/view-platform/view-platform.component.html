@@ -1,6 +1,6 @@
 <div class="header">
     <h2>Detailed Platform Contact Information</h2>
-    <button pButton class="header-button" (click)="onAddSubPlatform()">
+    <button pButton class="header-button" id="add-sub-platform-btn" (click)="onAddSubPlatform()">
         <span class="edit-icon"></span> Add Subsidiary
         Platform
     </button>
@@ -14,7 +14,8 @@
                         Parent Platform Information
                     </strong>
                     <p-tag class="tag-blue">
-                        <strong class="tag-text">Last Update Date: </strong>{{platform.updDtm|date:'YYYY-MM-dd' || '-'}}
+                        <strong class="tag-text">Last Update Date: </strong>{{(platform.updDtm|date:'YYYY-MM-dd') ??
+                        '-'}}
                     </p-tag>
                 </div>
             </ng-template>
@@ -87,7 +88,8 @@
             </ng-template>
 
             <ng-template pTemplate="footer">
-                <button pButton class="panel-button p-button-link" (click)="onEditPlatform(platform.organizationId)">
+                <button pButton class="panel-button p-button-link" id="edit-platform-btn"
+                    (click)="onEditPlatform(platform.organizationId)">
                     <span class="edit-icon"></span> Update Parent Platform Information
                 </button>
             </ng-template>
@@ -103,7 +105,7 @@
                         Subsidiary Platform Information
                     </strong>
                     <p-tag class="tag-dark-gray">
-                        <strong class="tag-text">Last Update Date:</strong>{{sub.updDtm|date:'YYYY-MM-dd' || '-'}}
+                        <strong class="tag-text">Last Update Date:</strong>{{(sub.updDtm|date:'YYYY-MM-dd') ?? '-'}}
                     </p-tag>
                 </div>
             </ng-template>
@@ -165,7 +167,8 @@
             </ng-template>
 
             <ng-template pTemplate="footer">
-                <button pButton class="panel-button p-button-link" (click)="onEditSubPlatform(sub.organizationId)">
+                <button pButton class="panel-button p-button-link" id="edit-sub-platform-btn"
+                    (click)="onEditSubPlatform(sub.organizationId)">
                     <span class="edit-icon"></span> Update Subsidiary Platform Information
                 </button>
             </ng-template>

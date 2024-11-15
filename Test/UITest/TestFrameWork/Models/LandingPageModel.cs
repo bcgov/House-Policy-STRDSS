@@ -18,5 +18,7 @@
 
         public static string AggregatedListingsButton { get => "aggregated_listings_btn"; }
         public static string ManagePlatformsButton { get => "platformManagement_btn"; }
+
+        public static string ManageJurisdictionsButton { get => "manageJurisdictionst_btn"; }
     }
 }

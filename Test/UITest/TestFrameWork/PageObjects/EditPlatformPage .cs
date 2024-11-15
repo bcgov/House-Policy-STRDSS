@@ -10,7 +10,7 @@ namespace UITest.PageObjects
         private IDriver _Driver;
 
         //No Valid URL since the URL must contain a unique and new platform number
-        //private string _URL = @"http://127.0.0.1:4200/add-sub-platform/590";
+        //private string _URL = @"http://127.0.0.1:4200/add-platform";
 
         private TextBox _PlatformNameTextBox;
 
@@ -55,7 +55,7 @@ namespace UITest.PageObjects
             _CancelButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, EditPlatformPageModel.CancelButton);
             _DisablePlatformButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, EditPlatformPageModel.DisablePlatformButton);
             _EnablePlatformButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, EditPlatformPageModel.EnablePlatformButton);
-            _PlatformTypeDropDown = new DropDownList(Driver, Enums.FINDBY.CSSSELECTOR, AddPlatformPageModel.PlatformNameTextBox);
+            _PlatformTypeDropDown = new DropDownList(Driver, Enums.FINDBY.CSSSELECTOR, EditPlatformPageModel.PlatformTypeDropDown);
         }
     }
 }

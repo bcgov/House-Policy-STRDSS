@@ -162,6 +162,36 @@ namespace UITest.SeleniumObjects
             return (Element.Enabled);
         }
 
+        public bool Exists()
+        {
+            IJavaScriptExecutor js = _Driver.Driver as IJavaScriptExecutor;
+            string script = string.Empty; ;
+            switch (LocatorType)
+            {
+                case Enums.FINDBY.ID:
+                    {
+                        script = @$"if (document.getElementById('{Locator}') != null) return true; return false;";
+                        break;
+                    }
+                case Enums.FINDBY.CSSSELECTOR:
+                    {
+                        script = @$"if (document.querySelector('{Locator}') != null) return true; return false;";
+                        break;
+                    }
+            }
+            object result = js.ExecuteScript(script);
+
+            if ((bool)result)
+            {
+                return (true);
+            }
+            else
+            {
+                return(false);
+            }
+
+        }
+
         /// <summary>
         /// Causes the currently executing test to break when debugging. 
         /// Remove when not debugging as this will cause the test to hang.

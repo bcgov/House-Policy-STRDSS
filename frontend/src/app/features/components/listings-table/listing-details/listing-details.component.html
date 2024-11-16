@@ -25,6 +25,11 @@
             <span class="nonc-icon"></span> Send Notice Of Non-Compliance </button>
         <button *ngIf="!isCEU" pButton (click)="sendTakedownRequest()" class="p-button-outlined do-not-print-it"><span
                 class="tdr-icon"></span> Send Takedown Request</button>
+
+        <button pButton *ngIf="isCEU" icon="pi pi-envelope" id="send_compliance_order_btn" (click)="onContactHost()">
+            &nbsp;Contact Host
+        </button>
+
     </div>
 </div>
 <div class="content" *ngIf="listing">
@@ -34,8 +39,8 @@
                 <div class="property-info-container">
                     <strong class="panel-header-text">Platform Information</strong>
                     <p-tag class="tag-blue">
-                        <strong class="tag-text">Platform Report Month:</strong>{{listing.latestReportPeriodYm
-                        |date:'YYYY-MM' || '-'}}
+                        <strong class="tag-text">Platform Report Month:</strong>{{(listing.latestReportPeriodYm
+                        |date:'YYYY-MM') || '-'}}
                     </p-tag>
                 </div>
             </ng-template>

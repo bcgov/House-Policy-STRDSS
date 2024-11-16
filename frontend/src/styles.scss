@@ -561,7 +561,6 @@ body {
         justify-content: end
     }
 
-
     .p-toast {
         min-width: 25rem;
         width: auto;
@@ -574,6 +573,16 @@ body {
 
         &.h2-big {
             font-size: x-large;
+        }
+    }
+
+    .p-tooltip {
+        &.wide {
+            min-width: 400px;
+        }
+
+        &.text-center {
+            text-align: center;
         }
     }
 

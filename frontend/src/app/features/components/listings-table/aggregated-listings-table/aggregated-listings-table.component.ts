@@ -233,6 +233,15 @@ export class AggregatedListingsTableComponent implements OnInit {
         });
     }
 
+    onContactHost(): void {
+        this.searchStateService.selectedListings = Object.values(
+            this.selectedListings,
+        ) as unknown as Array<ListingDetails>;
+        this.router.navigate(['/send-compliance-order'], {
+            queryParams: { returnUrl: this.getUrlFromState() },
+        });
+    }
+
     onPageChange(value: any): void {
         this.currentPage.pageSize = value.rows;
         this.currentPage.pageNumber = value.page + 1;

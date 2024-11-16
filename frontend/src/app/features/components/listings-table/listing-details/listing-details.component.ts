@@ -181,6 +181,11 @@ export class ListingDetailsComponent implements OnInit {
     this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } });
   }
 
+  onContactHost(): void {
+    this.searchStateService.selectedListings = [this.listing];
+    this.router.navigate(['/send-compliance-order'], { queryParams: { returnUrl: this.getUrlFromState() } });
+  }
+
   onAddressChangeClicked(): void {
     this.isEditAddressShown = true;
   }

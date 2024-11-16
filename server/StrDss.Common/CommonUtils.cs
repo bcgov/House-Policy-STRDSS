@@ -76,6 +76,10 @@ namespace StrDss.Common
         {
             if (string.IsNullOrWhiteSpace(input)) return "";
 
+            // Remove leading zeroes
+            input = Regex.Replace(input, @"^0+", "");
+
+            // Remove non-alphanumeric characters and convert to uppercase
             return Regex.Replace(input, @"[^a-zA-Z0-9]", "").ToUpper();
         }
 

@@ -215,21 +215,26 @@ namespace StrDss.Api.Controllers
         [HttpPost("complianceorders/preview", Name = "GetComplianceOrdersFromListingPreview")]
         public async Task<ActionResult> GetComplianceOrdersFromListingPreview(ComplianceOrderDto[] requests)
         {
-            await Task.CompletedTask;
+            var (errors, preview) = await _delistingService.GetComplianceOrdersFromListingPreviewAsync(requests);
 
-            var preview = new EmailPreview
+            if (errors.Count > 0)
             {
-                Content = "To: john.doe@my.email, jane.smith@my.email<br/><br/><br/>Bcc: young-jin.chung@gov.bc.ca<br/><br/>\r\nDear Host,<br/><br/>\r\nThis message has been sent to you by B.C.'s Short-Term Rental Compliance Unit regarding your short-term rental<br/>\r\nlisting: <b>https://example.com/1000012/</b><br/><br/>\r\ntesting<br/>\r\n"
-            };
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
 
             return Ok(preview);
         }
 
         [ApiAuthorize(Permissions.ProvinceAction)]
-        [HttpPost("complianceorders", Name = "CreateComplianceOrdersFromListingPreview")]
-        public async Task<ActionResult> CreateComplianceOrdersFromListingPreview(ComplianceOrderDto[] requests)
+        [HttpPost("complianceorders", Name = "CreateComplianceOrdersFromListing")]
+        public async Task<ActionResult> CreateComplianceOrdersFromListing(ComplianceOrderDto[] requests)
         {
-            await Task.CompletedTask;
+            var errors = await _delistingService.CreateComplianceOrdersFromListingAsync(requests);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
 
             return NoContent();
         }

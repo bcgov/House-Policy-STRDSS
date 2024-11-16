@@ -36,6 +36,12 @@
         Send Takedown Request
     </button>
 </div>
+<div class="actions left-alignment" *ngIf="isCEU">
+    <button pButton icon="pi pi-envelope" [disabled]="!listingsSelected" id="send_compliance_order_btn"
+        (click)="onContactHost()">
+        &nbsp;Contact Host
+    </button>
+</div>
 <div class="content">
     <p-panel class="listing-table-panel">
         <ng-template pTemplate="header">

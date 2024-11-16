@@ -14,39 +14,33 @@ select 1 from information_schema.tables where table_name like 'dss%')
 as db_has_dss_tab
 \gset
 select exists(
-select 1 from information_schema.columns where column_name='external_identity_cd' and table_name='dss_user_identity' and table_schema=:'dflt_schema')
-as db_has_s16_col
+select 1 from information_schema.routines where routine_definition like'%regexp_replace(regexp_replace(UPPER(%' and routine_name='dss_process_biz_lic_table_update' and routine_schema=:'dflt_schema')
+as db_has_s18_chg
 \gset
 select exists(
 select 1 from information_schema.columns where column_name='business_licence_format_txt' and table_name='dss_organization' and table_schema=:'dflt_schema')
 as db_has_s17_col
 \gset
-\if :db_has_s17_col
-	\echo 'Sprint 17 migration appears complete - Exiting without changes'
-\elif :db_has_s16_col
-	\echo 'Sprint 16 migration appears complete - Beginning upgrade to Sprint 17'
-	\echo 'Calling STR_DSS_Incremental_DB_DDL_Sprint_17_pre_DML.sql'
-	\ir '../ddl/STR_DSS_Incremental_DB_DDL_Sprint_17_pre_DML.sql'
-	\echo 'Adding/replacing views'
-	\ir '../ddl/STR_DSS_Views_Sprint_17.sql'
-	\echo 'Calling STR_DSS_Data_Seeding_Sprint_17.sql'
-	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_17.sql'
-	\echo 'Calling STR_DSS_Data_Seeding_LGs_Sprint_17.sql'
-	\ir '../seeding/STR_DSS_Data_Seeding_LGs_Sprint_17.sql'
-	\echo 'Calling STR_DSS_Data_Seeding_Geometry_Sprint_17.sql'
-	\ir '../seeding/STR_DSS_Data_Seeding_Geometry_Sprint_17.sql'
-	\echo 'Calling STR_DSS_Incremental_DB_DDL_Sprint_17_post_DML.sql'
-	\ir '../ddl/STR_DSS_Incremental_DB_DDL_Sprint_17_post_DML.sql'
+\if :db_has_s18_chg
+	\echo 'Sprint 18 migration appears complete - Exiting without changes'
+\elif :db_has_s17_col
+	\echo 'Sprint 17 migration appears complete - Beginning upgrade to Sprint 18'
+	\echo 'Calling STR_DSS_Incremental_DB_DDL_Sprint_18.sql'
+	\ir '../ddl/STR_DSS_Incremental_DB_DDL_Sprint_18.sql'
+	\echo 'Calling STR_DSS_Routines_Sprint_18.sql'
+	\ir '../ddl/STR_DSS_Routines_Sprint_18.sql'
+	\echo 'Calling STR_DSS_Data_Seeding_Sprint_18.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_18.sql'
+	\echo 'Calling Correct_Rental_Listings_Sprint_18.sql'
+	\ir '../utility/Correct_Rental_Listings_Sprint_18.sql'
 \elif :db_has_dss_tab
 	\echo 'Database migration state is unknown - Try an earlier release - Exiting without changes'
 \else
-	\echo 'Database has no DSS tables - Beginning complete build to Sprint 17'
-	\echo 'Calling STR_DSS_Physical_DB_DDL_Sprint_17.sql'
-	\ir '../ddl/STR_DSS_Physical_DB_DDL_Sprint_17.sql'
-	\echo 'Adding/replacing views'
-	\ir '../ddl/STR_DSS_Views_Sprint_17.sql'
-	\echo 'Calling STR_DSS_Data_Seeding_Sprint_17.sql'
-	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_17.sql'
+	\echo 'Database has no DSS tables - Beginning complete build to Sprint 18'
+	\echo 'Calling STR_DSS_Physical_DB_DDL_Sprint_18.sql'
+	\ir '../ddl/STR_DSS_Physical_DB_DDL_Sprint_18.sql'
+	\echo 'Calling STR_DSS_Data_Seeding_Sprint_18.sql'
+	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_18.sql'
 	\echo 'Calling STR_DSS_Data_Seeding_LGs_Sprint_17.sql'
 	\ir '../seeding/STR_DSS_Data_Seeding_LGs_Sprint_17.sql'
 	\echo 'Calling STR_DSS_Data_Seeding_Geometry_Sprint_17.sql'

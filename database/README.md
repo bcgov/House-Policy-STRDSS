@@ -30,7 +30,7 @@ Often, database object definitions are changed after the sprint modeling activit
 There is always a base set of fixed data that are not managed by the application, and must be populated by script. Some of these are merely temporary situations that will be resolved as stories evolve to replace them.
 
 ## Database Change Summaries
-Each sprint delivers a planned set of incremental changes to the database. The following summarizes these changes.
+Each sprint delivers a planned set of incremental changes to the database. The following summarizes the most recent sets of changes.
 
 ### Sprint 17:
 - Create and populate lookup table `dss_economic_region`:
@@ -47,6 +47,17 @@ Each sprint delivers a planned set of incremental changes to the database. The f
   - `jurisdiction_read` (for `ceu_admin`, `ceu_staff`)
   - `jurisdiction_write` (for `ceu_admin`)
   - `bl_link_write` (for `lg_staff`)
+
+### Sprint 18:
+- Replace procedures:
+  - `dss_process_biz_lic_table_delete`
+  - `dss_process_biz_lic_table_update`
+- Alter table `dss_business_licence`:
+  - Replace index `dss_business_licence_i4`
+- Alter table `dss_rental_listing`:
+  - Replace index `dss_rental_listing_i10`
+- Insert new row in table `dss_business_licence_status_type`
+- Update rows in table `dss_rental_listing`
 
 ## Database Release Management
 Each production release depends on the execution of a fixed set of scripts against the database schema. Generally, these are applied in the same order as they were applied to the UAT database during each sprint. The following is the order list of scripts applied to deliver each release.
@@ -98,7 +109,7 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
   - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_9.sql` **(TIP: run each MERGE statement independently)**
   - `utility/DSS-601_Correct_Rental_Listings_Sprint_9.sql`
 ### Release 5 Scripts:
-- Master Scripts:
+- Master Scripts _(preferred release method)_:
   - `utility/STR_DSS_Migration_Sprint_11.sql`
   - `utility/STR_DSS_Migration_Sprint_12.sql`
   - `utility/STR_DSS_Migration_Sprint_13.sql`
@@ -124,9 +135,11 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
   - `ddl/STR_DSS_Routines_Sprint_13.sql`
   - `utility/Correct_Rental_Listings_Sprint_13.sql`
 ### Release 6 Scripts:
-- Master Scripts:
+- Master Scripts _(preferred release method)_:
   - `utility/STR_DSS_Migration_Sprint_14.sql`
   - `utility/STR_DSS_Migration_Sprint_15.sql`
+  - `utility/STR_DSS_Migration_Sprint_16.sql`
+  - `utility/STR_DSS_Migration_Sprint_17.sql`
 - Sprint 14:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_14.sql`
   - `ddl/STR_DSS_Views_Sprint_14.sql`
@@ -150,3 +163,11 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
   - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_17.sql`
   - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_17.sql` **(TIP: run each MERGE statement independently)**
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_17_post_DML.sql`
+### Release 7 Scripts:
+- Master Scripts _(preferred release method)_:
+  - `utility/STR_DSS_Migration_Sprint_18.sql`
+- Sprint 18:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_18.sql`
+  - `ddl/STR_DSS_Routines_Sprint_18.sql`
+  - `seeding/STR_DSS_Data_Seeding_Sprint_18.sql`
+  - `utility/Correct_Rental_Listings_Sprint_18.sql`

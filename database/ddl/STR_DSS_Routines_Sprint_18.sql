@@ -1,4 +1,4 @@
-DROP PROCEDURE IF EXISTS dss_process_biz_lic_table(lg_id BIGINT);
+/* Sprint 18 Procedure/Function Changes to STR DSS */
 
 CREATE OR REPLACE PROCEDURE dss_process_biz_lic_table_delete(lg_id BIGINT)
 LANGUAGE plpgsql
@@ -17,13 +17,13 @@ BEGIN
         RAISE NOTICE 'biz_lic_table does not exist. Exiting procedure.';
         RETURN;
     END IF;
-
+	--
 	SELECT COUNT(1) INTO source_count
 	FROM biz_lic_table
 	WHERE providing_organization_id = lg_id;
-
+	--
     RAISE NOTICE 'Found % source rows', source_count;
-
+	--
     -- Unlink before Deletion
 	MERGE INTO dss_rental_listing AS tgt
 	USING (
@@ -40,20 +40,20 @@ BEGIN
 			effective_business_licence_no = regexp_replace(regexp_replace(UPPER(tgt.business_licence_no), '[^A-Z0-9]+', '', 'g'), '^0+', ''),
 			governing_business_licence_id = NULL,
 			is_changed_business_licence = false;
-
+	--
 	GET DIAGNOSTICS unlink_count = ROW_COUNT;
-
+	--
     RAISE NOTICE 'Unlinked business licences for % listings', unlink_count;
-
+	--
     -- Deletion 
 	DELETE FROM dss_business_licence AS dbl
 	WHERE providing_organization_id = lg_id
 	  AND NOT EXISTS (
 				SELECT 1 FROM biz_lic_table AS blt
 				WHERE blt.business_licence_no = dbl.business_licence_no AND blt.providing_organization_id = lg_id);
-
+	--
 	GET DIAGNOSTICS delete_count = ROW_COUNT;
-
+	--
     RAISE NOTICE 'Deleted % business licences', delete_count;
 END $$;
 
@@ -73,13 +73,13 @@ BEGIN
         RAISE NOTICE 'biz_lic_table does not exist. Exiting procedure.';
         RETURN;
     END IF;
-
+	--
 	SELECT COUNT(1) INTO source_count
 	FROM biz_lic_table
 	WHERE providing_organization_id = lg_id;
-
+	--
     RAISE NOTICE 'Found % source rows', source_count;
-
+	--
     -- Insert into dss_business_licence from biz_lic_table or update if exists
 	MERGE INTO dss_business_licence AS tgt
 	USING (SELECT * FROM biz_lic_table) AS src
@@ -129,11 +129,11 @@ BEGIN
         src.property_zone_txt, src.available_bedrooms_qty, src.max_guests_allowed_qty, src.is_principal_residence,
         src.is_owner_living_onsite, src.is_owner_property_tenant, src.property_folio_no, src.property_parcel_identifier_no,
         src.property_legal_description_txt, src.licence_status_type, src.providing_organization_id);
-
+	--
 	GET DIAGNOSTICS merged_count = ROW_COUNT;
-
+	--
     RAISE NOTICE 'Created or refreshed % business licences', merged_count;
-
+	--
     -- Optional: Truncate the temporary table after processing
     TRUNCATE TABLE biz_lic_table;
 END $$;
@@ -165,8 +165,8 @@ BEGIN
 		UPDATE SET
 			effective_business_licence_no = src.normalized_business_licence_no,
 			governing_business_licence_id = src.business_licence_id;
-
+	--
 	GET DIAGNOSTICS linked_count = ROW_COUNT;
-
+	--
     RAISE NOTICE 'Linked business licences for % listings', linked_count;
 END $$;

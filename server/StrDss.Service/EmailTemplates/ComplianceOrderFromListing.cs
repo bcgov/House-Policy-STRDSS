@@ -8,7 +8,6 @@ namespace StrDss.Service.EmailTemplates
             : base(emailService)
         {
             EmailMessageType = EmailMessageTypes.ComplianceOrder;
-            //From = Environment.GetEnvironmentVariable("STR_CEU_EMAIL") ?? From;
             Subject = "New mail regarding your short-term rental listing";
         }
 
@@ -23,7 +22,7 @@ namespace StrDss.Service.EmailTemplates
             return (Preview ? GetPreviewHeader() : "") + $@"
 Dear Host,<br/><br/>
 <b>This message has been sent to you by B.C.'s Short-term Rental Compliance Unit regarding your short-term rental listing:</b><br/><b>{Url}</b><br/><br/>
-<b>{Comment}</b><br/>
+<b>{Sanitize(Comment)}</b><br/>
 ";
         }
 

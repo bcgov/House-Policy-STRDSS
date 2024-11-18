@@ -1,6 +1,4 @@
-﻿using StrDss.Common;
-
-namespace StrDss.Service.EmailTemplates
+﻿namespace StrDss.Service.EmailTemplates
 {
     public class TakedownRequestFromListing : TakedownRequest
     {

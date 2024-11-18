@@ -729,7 +729,6 @@ namespace StrDss.Service
                 InvolvedInOrganizationId = dto.PlatformId,
                 RequestingOrganizationId = lg!.OrganizationId,
                 IsWithStandardDetail = dto.IsWithStandardDetail,
-                CustomDetailTxt = dto.CustomDetailTxt,
             };
 
             await _emailRepo.AddEmailMessage(emailEntity);

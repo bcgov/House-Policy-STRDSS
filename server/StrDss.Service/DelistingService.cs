@@ -1103,6 +1103,7 @@ namespace StrDss.Service
         {
             var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
             var commentError = false;
+            var cc = Environment.GetEnvironmentVariable("STR_CEU_EMAIL");
 
             foreach (var listing in listings)
             {
@@ -1111,6 +1112,8 @@ namespace StrDss.Service
                 if (rentalListing == null) continue;
 
                 var template = CreateComplianceOrderTemplate(listing, rentalListing);
+
+                listing.BccList.Add(_currentUser.EmailAddress);
 
                 ValidateEmails(listing.BccList, emailRegex, "bccList", errors);
 
@@ -1123,6 +1126,7 @@ namespace StrDss.Service
                 template.RentalListingId = rentalListing.RentalListingId ?? 0;
                 template.To = listing.HostEmails;
                 template.Bcc = listing.BccList;
+                template.Cc = cc == "" ? [] : new string[] { cc! };
                 template.Comment = listing.Comment;
                 templates.Add(template);
             }
@@ -1194,7 +1198,7 @@ namespace StrDss.Service
                 EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
                 MessageTemplateDsc = template.GetContent(),
-                IsSubmitterCcRequired = true, //todo: 
+                IsSubmitterCcRequired = true, 
                 UnreportedListingNo = template.ListingId,
                 HostEmailAddressDsc = listing.HostEmails.FirstOrDefault(),
                 LgEmailAddressDsc = null,

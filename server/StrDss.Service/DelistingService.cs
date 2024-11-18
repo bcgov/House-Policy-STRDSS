@@ -1105,6 +1105,12 @@ namespace StrDss.Service
             var commentError = false;
             var cc = Environment.GetEnvironmentVariable("STR_CEU_EMAIL");
 
+            if (!Regex.IsMatch(_currentUser.EmailAddress, emailRegex.Regex))
+            {
+                errors.AddItem("email", $"Your email address ({_currentUser.EmailAddress}) is invalid");
+                return;
+            }
+
             foreach (var listing in listings)
             {
                 var rentalListing = await _listingRepo.GetRentalListing(listing.RentalListingId, false);

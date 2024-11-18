@@ -6,6 +6,7 @@
         public static DateTime MinDate = new DateTime(1900, 1, 1);
         public const string VancouverTimeZone = "America/Vancouver";
         public const string PacificTimeZone = "Pacific Standard Time";
+        public const string StandardTakedownDetail = "Remove the listing from the platform, do not allow transactions for payments associated with the listing, and cancel all booking associated with the listing.";
     }
     public static class Entities
     {

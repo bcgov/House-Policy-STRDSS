@@ -22,7 +22,7 @@ namespace StrDss.Service.EmailTemplates
             return (Preview ? GetPreviewHeader() : "") + $@"
 Dear Host,<br/><br/>
 <b>This message has been sent to you by B.C.'s Short-term Rental Compliance Unit regarding your short-term rental listing:</b><br/><b>{Url}</b><br/><br/>
-<b>{Sanitize(Comment)}</b><br/>
+<b>{Comment}</b><br/>
 ";
         }
 

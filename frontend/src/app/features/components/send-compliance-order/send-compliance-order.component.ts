@@ -173,7 +173,7 @@ export class SendComplianceOrderComponent implements OnInit {
 
   private initForm(): void {
     this.myForm = this.fb.group({
-      ccList: ['', [Validators.required, validateEmailListString()]],
+      ccList: ['', [validateEmailListString()]],
       comment: ['', [Validators.required]],
     });
   }

@@ -213,7 +213,7 @@
                         {{ row.lastActionNm || '-'}}
                     </td>
                     <td>
-                        {{ row.lastActionDtm? '-': row.lastActionDtm |date }}
+                        {{ row.lastActionDtm? (row.lastActionDtm |date) : '-' }}
                     </td>
                 </tr>
             </ng-template>

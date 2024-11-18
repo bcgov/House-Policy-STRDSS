@@ -58,7 +58,7 @@ namespace StrDss.Api.Controllers
 
             using var stream = dto.File.OpenReadStream();
 
-            errors = await _uploadService.UploadPlatformData(UploadDeliveryTypes.ListingData, dto.ReportPeriod, dto.OrganizationId, stream);
+            errors = await _uploadService.UploadData(UploadDeliveryTypes.ListingData, dto.ReportPeriod, dto.OrganizationId, stream);
 
             if (errors.Count > 0)
             {
@@ -82,7 +82,7 @@ namespace StrDss.Api.Controllers
         [HttpGet("uploads/{uploadId}/errorfile")]
         public async Task<ActionResult> GetRentalListingErrorFile(long uploadId)
         {
-            var (bytes, hasPermission) = await _uploadService.GetRentalListingErrorFile(uploadId);
+            var (bytes, hasPermission) = await _uploadService.GetErrorFile(uploadId);
 
             if (!hasPermission)
                 return Unauthorized();

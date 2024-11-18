@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -55,6 +56,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownNoticeAsync(TakedownNoticeCreateDto dto)
         {
+            CommonUtils.SanitizeObject(dto);
+
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
@@ -203,6 +206,8 @@ namespace StrDss.Service
         }
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto)
         {
+            CommonUtils.SanitizeObject(dto);
+
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
@@ -250,6 +255,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownNoticesFromListingAsync(TakedownNoticesFromListingDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
             var templates = new List<TakedownNoticeFromListing>();
@@ -392,6 +399,8 @@ namespace StrDss.Service
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticesFromListingPreviewAsync(TakedownNoticesFromListingDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
             var templates = new List<TakedownNoticeFromListing>();
@@ -443,6 +452,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownRequestsFromListingAsync(TakedownRequestsFromListingDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var templates = new List<TakedownRequestFromListing>();
 
@@ -529,6 +540,8 @@ namespace StrDss.Service
                 OrgCd = rentalListing.OrganizationCd,
                 ListingId = rentalListing.PlatformListingNo,
                 Info = $"{rentalListing.OrganizationCd}-{rentalListing.PlatformListingNo}",
+                IsWithStandardDetail = listing.IsWithStandardDetail,
+                TakedownRequestDetail = listing.CustomDetailTxt,
                 To = new string[] { _currentUser.EmailAddress },
                 Cc = listing.CcList ?? new List<string>()
             };
@@ -587,6 +600,8 @@ namespace StrDss.Service
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestsFromListingPreviewAsync(TakedownRequestsFromListingDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var templates = new List<TakedownRequestFromListing>();
 
@@ -624,6 +639,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto)
         {
+            CommonUtils.SanitizeObject(dto);
+
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
@@ -748,6 +765,7 @@ namespace StrDss.Service
                 To = dto.ToList,
                 Cc = dto.CcList,
                 Info = dto.ListingUrl,
+                IsWithStandardDetail = dto.IsWithStandardDetail,
                 Preview = preview
             };
             return template;
@@ -755,6 +773,8 @@ namespace StrDss.Service
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto)
         {
+            CommonUtils.SanitizeObject(dto);
+
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
@@ -813,7 +833,7 @@ namespace StrDss.Service
                     ListingId = x.UnreportedListingNo ?? "", 
                     Url = x.UnreportedListingUrl ?? "", 
                     RequestedBy = x.RequestingOrganization?.OrganizationNm ?? "",
-                    TakedownRequest = (x.IsWithStandardDetail ?? false) ? "Remove the listing from the platform, do not allow transactions for payments associated with the listing, and cancel all booking associated with the listing." : "",
+                    TakedownRequest = (x.IsWithStandardDetail ?? false) ? Constants.StandardTakedownDetail : "",
                     TakedownRequestDetail = x.CustomDetailTxt ?? ""
                 })
                 .ToList();
@@ -1071,6 +1091,8 @@ namespace StrDss.Service
         }
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetComplianceOrdersFromListingPreviewAsync(ComplianceOrderDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var templates = new List<ComplianceOrderFromListing>();
 
@@ -1143,6 +1165,8 @@ namespace StrDss.Service
         }
         public async Task<Dictionary<string, List<string>>> CreateComplianceOrdersFromListingAsync(ComplianceOrderDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
             var templates = new List<ComplianceOrderFromListing>();

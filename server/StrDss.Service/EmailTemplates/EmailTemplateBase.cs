@@ -1,5 +1,4 @@
-﻿using Ganss.Xss;
-using StrDss.Common;
+﻿using StrDss.Common;
 using StrDss.Model;
 
 namespace StrDss.Service.EmailTemplates
@@ -7,12 +6,9 @@ namespace StrDss.Service.EmailTemplates
     public class EmailTemplateBase
     {
         private IEmailMessageService _emailService { get; set; }
-        private HtmlSanitizer _sanitizer { get; set; }
-
         public EmailTemplateBase(IEmailMessageService emailService)
         {
             _emailService = emailService;
-            _sanitizer = new HtmlSanitizer();
         }
 
         public string Subject { get; set;  } = "";
@@ -60,11 +56,6 @@ namespace StrDss.Service.EmailTemplates
             };
 
             return await _emailService.SendEmailAsync(emailContent);
-        }
-
-        public string Sanitize(string? text)
-        {
-            return _sanitizer.Sanitize(text ?? "");
         }
     }
 }

@@ -16,10 +16,10 @@ namespace StrDss.Service
 {
     public interface IUploadDeliveryService
     {
-        Task<Dictionary<string, List<string>>> UploadPlatformData(string reportType, string reportPeriod, long orgId, Stream stream);
+        Task<Dictionary<string, List<string>>> UploadData(string reportType, string reportPeriod, long orgId, Stream stream);
         Task<(Dictionary<string, List<string>>, string header)> ValidateAndParseUploadAsync(string reportPeriod, long orgId, string reportType, string hashValue, string[] mandatoryFields, TextReader textReader, List<DssUploadLine> uploadLines);
         Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes);
-        Task<(byte[]?, bool hasAccess)> GetRentalListingErrorFile(long uploadId);
+        Task<(byte[]?, bool hasAccess)> GetErrorFile(long uploadId);
         Task<DssUploadDelivery?> GetNonTakedownUploadToProcessAsync();
         Task<DssUploadDelivery?> GetUploadToProcessAsync(string reportType);
     }
@@ -37,7 +37,7 @@ namespace StrDss.Service
             _orgRepo = orgRepo;
         }
 
-        public async Task<Dictionary<string, List<string>>> UploadPlatformData(string reportType, string reportPeriod, long orgId, Stream stream)
+        public async Task<Dictionary<string, List<string>>> UploadData(string reportType, string reportPeriod, long orgId, Stream stream)
         {
             if (_currentUser.OrganizationType != OrganizationTypes.BCGov && _currentUser.OrganizationId != orgId)
             {
@@ -501,7 +501,7 @@ namespace StrDss.Service
             return await _uploadRepo.GetUploadHistory(orgId, pageSize, pageNumber, orderBy, direction, reportTypes);
         }
 
-        public async Task<(byte[]?, bool hasAccess)> GetRentalListingErrorFile(long uploadId)
+        public async Task<(byte[]?, bool hasAccess)> GetErrorFile(long uploadId)
         {
             var upload = await _uploadRepo.GetRentalListingUploadWithErrors(uploadId);
 
@@ -532,14 +532,14 @@ namespace StrDss.Service
             var contents = new StringBuilder();
 
             csv.Read();
-            var header = csv.Parser.RawRecord.TrimEndNewLine() + ",errors";
+            var header = "errors," + csv.Parser.RawRecord.TrimEndNewLine();
 
             contents.AppendLine(header);
 
             foreach (var lineId in linesWithError)
             {
                 var line = await _uploadRepo.GetUploadLineWithError(lineId);
-                contents.AppendLine(line.LineText.TrimEndNewLine() + $",\"{line.ErrorText ?? ""}\"");
+                contents.AppendLine($"\"{line.ErrorText ?? ""}\"," + line.LineText.TrimEndNewLine());
             }
 
             return (Encoding.UTF8.GetBytes(contents.ToString()), hasPermission);

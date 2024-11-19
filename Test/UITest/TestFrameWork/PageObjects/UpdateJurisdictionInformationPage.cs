@@ -48,19 +48,25 @@ namespace UITest.PageObjects
             _JurisdictionNameTextBox = new TextBox(Driver, Enums.FINDBY.ID, UpdateJurisdictionInformationPageModel.JurisdictionNameTextBox);
             _ShapeFileIDTextBox = new TextBox(Driver, Enums.FINDBY.ID, UpdateJurisdictionInformationPageModel.ShapeFileIDTextBox);
             _LocalGovernmentNameDropDown = new DropDownList(Driver, Enums.FINDBY.ID, UpdateJurisdictionInformationPageModel.LocalGovernmentNameDropDown);
-            _PrincipleResidenceRequirementTrueButton = new Button(Driver, Enums.FINDBY.ID, UpdateJurisdictionInformationPageModel.PrincipleResidenceRequirementTrueButton);
-            _PrincipleResidenceRequirementFalseButton = new Button(Driver, Enums.FINDBY.ID, UpdateJurisdictionInformationPageModel.PrincipleResidenceRequirementFalseButton);
-            _ShortTermRentalProhibitedTrueButton = new Button(Driver, Enums.FINDBY.ID, UpdateJurisdictionInformationPageModel.ShortTermRentalProhibitedTrueButton);
-            _ShortTermRentalProhibitedFalseButton = new Button(Driver, Enums.FINDBY.ID, UpdateJurisdictionInformationPageModel.ShortTermRentalProhibitedFalseButton);
-            _BusinessLiscenseRequirementTrueButton = new Button(Driver, Enums.FINDBY.ID, UpdateJurisdictionInformationPageModel.BusinessLiscenseRequirementTrueButton);
-            _BusinessLiscenseRequirementFalseButton = new Button(Driver, Enums.FINDBY.ID, UpdateJurisdictionInformationPageModel.BusinessLiscenseRequirementFalseButton);
-            _EconomicRegionDropDown = new DropDownList(Driver, Enums.FINDBY.CSSSELECTOR, UpdateJurisdictionInformationPageModel.EconomicRegionDropDown);
+            _PrincipleResidenceRequirementTrueButton = new Button(Driver, Enums.FINDBY.JAVASCRIPT, UpdateJurisdictionInformationPageModel.PrincipleResidenceRequirementTrueButton);
+            _PrincipleResidenceRequirementFalseButton = new Button(Driver, Enums.FINDBY.JAVASCRIPT, UpdateJurisdictionInformationPageModel.PrincipleResidenceRequirementFalseButton);
+            _ShortTermRentalProhibitedTrueButton = new Button(Driver, Enums.FINDBY.JAVASCRIPT, UpdateJurisdictionInformationPageModel.ShortTermRentalProhibitedTrueButton);
+            _ShortTermRentalProhibitedFalseButton = new Button(Driver, Enums.FINDBY.JAVASCRIPT, UpdateJurisdictionInformationPageModel.ShortTermRentalProhibitedFalseButton);
+            _BusinessLiscenseRequirementTrueButton = new Button(Driver, Enums.FINDBY.JAVASCRIPT, UpdateJurisdictionInformationPageModel.BusinessLiscenseRequirementTrueButton);
+            _BusinessLiscenseRequirementFalseButton = new Button(Driver, Enums.FINDBY.JAVASCRIPT, UpdateJurisdictionInformationPageModel.BusinessLiscenseRequirementFalseButton);
+            _EconomicRegionDropDown = new DropDownList(Driver, Enums.FINDBY.ID, UpdateJurisdictionInformationPageModel.EconomicRegionDropDown);
             _SaveButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, UpdateJurisdictionInformationPageModel.SaveButton);
             _CancelButton = new Button(Driver, Enums.FINDBY.CSSSELECTOR, UpdateJurisdictionInformationPageModel.CancelButton);
+        }
 
-
-
-
+        /// <summary>
+        /// SelectEconomicRegionListItem is a custom page method for the PrimeNG customer dropdown list on this page
+        /// </summary>
+        /// <param name="index"></param>
+        public void SelectEconomicRegionListItem(int index)
+        {
+            if (index >= 0)
+                _EconomicRegionDropDown.JSExecuteJavaScript($"document.querySelector(\"#economicRegionDsc_{index}\").click()");
         }
     }
 }

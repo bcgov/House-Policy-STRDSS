@@ -110,10 +110,20 @@ namespace SpecFlowProjectBDD.StepDefinitions
         public void ThenIShouldHaveTheAbilityToEditKeyInformationAboutEachOneAsAbove()
         {
             _ManageJurisdictionPage.EditJurisdictionButton.Click();
-            //_UpdateJurisdictionInformationPage.JurisdictionNameTextBox.EnterText("Jurisdiction" + _strUtilities.GenerateRandomString(15));
+            _UpdateJurisdictionInformationPage.LocalGovernmentNameDropDown.Click();
+            Thread.Sleep(1000);
+            _UpdateJurisdictionInformationPage.LocalGovernmentNameDropDown.Click();
             _UpdateJurisdictionInformationPage.PrincipleResidenceRequirementTrueButton.Click();
             _UpdateJurisdictionInformationPage.PrincipleResidenceRequirementFalseButton.Click();
+            _UpdateJurisdictionInformationPage.ShortTermRentalProhibitedTrueButton.Click();
+            _UpdateJurisdictionInformationPage.ShortTermRentalProhibitedFalseButton.Click();
+            _UpdateJurisdictionInformationPage.BusinessLiscenseRequirementTrueButton.Click();
+            _UpdateJurisdictionInformationPage.BusinessLiscenseRequirementFalseButton.Click();
+            _UpdateJurisdictionInformationPage.EconomicRegionDropDown.Click();
 
+            _UpdateJurisdictionInformationPage.SelectEconomicRegionListItem(1);
+
+            _UpdateJurisdictionInformationPage.CancelButton.Click();
         }
     }
 }

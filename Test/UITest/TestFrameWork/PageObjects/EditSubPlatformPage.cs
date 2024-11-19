@@ -10,7 +10,7 @@ namespace UITest.PageObjects
         private IDriver _Driver;
 
         //No Valid URL since the URL must contain a unique and new platform number
-        //private string _URL = @"http://127.0.0.1:4200/add-sub-platform/590";
+        //private string _URL = @"http://127.0.0.1:4200/add-sub-platform";
 
         private TextBox _PlatformNameTextBox;
 

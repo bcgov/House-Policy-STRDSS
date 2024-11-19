@@ -64,7 +64,14 @@ namespace UITest.TestDriver
                     }
                 case DRIVERTYPE.EDGE:
                     {
-                        Driver = new EdgeDriver();
+                        var options = new EdgeOptions();
+                        options.SetLoggingPreference(LogType.Driver, LogLevel.All);
+                        options.AddArgument("--ignore-ssl-errors=yes");
+                        options.AddArgument("--ignore-certificate-errors");
+                        options.AddArgument("--start-maximized");
+                        if (Headless)
+                            options.AddArgument("--headless");
+                        Driver = new EdgeDriver(assemblyDirectory, options);
                         break;
                     }
                 case DRIVERTYPE.FIREFOX:

@@ -15,6 +15,7 @@ namespace StrDss.Service
     public interface ITakedownConfirmationService
     {
         Task ProcessTakedownConfirmationUploadAsync(DssUploadDelivery upload);
+        Task ProcessTakedownConfirmationUploadsAsync();
     }
     public class TakedownConfirmationService : ServiceBase, ITakedownConfirmationService
     {
@@ -34,11 +35,21 @@ namespace StrDss.Service
             _orgRepo = orgRepo;
         }
 
+        public async Task ProcessTakedownConfirmationUploadsAsync()
+        {
+            var uploads = await _uploadRepo.GetUploadsToProcessForOneYearAsync(UploadDeliveryTypes.TakedownData);
+
+            foreach (var upload in uploads)
+            {
+                await ProcessTakedownConfirmationUploadAsync(upload);
+            }
+        }
+        
         public async Task ProcessTakedownConfirmationUploadAsync(DssUploadDelivery upload)
         {
             var processStopwatch = Stopwatch.StartNew();
 
-            _logger.LogInformation($"Processing Takedown Confirmation {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
+            _logger.LogInformation($"Processing Takedown Confirmation ({upload.UploadDeliveryId}) {upload.ProvidingOrganization.OrganizationNm} - {upload.ReportPeriodYm}");
 
             var count = 0;
 

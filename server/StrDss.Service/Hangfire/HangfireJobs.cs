@@ -67,7 +67,7 @@ namespace StrDss.Service.Hangfire
                     await _linstingReportService.ProcessRentalReportUploadAsync(upload);
                     break;
                 case UploadDeliveryTypes.TakedownData:
-                    await _tdcService.ProcessTakedownConfirmationUploadAsync(upload);
+                    await _tdcService.ProcessTakedownConfirmationUploadsAsync();
                     break;
                 case UploadDeliveryTypes.LicenceData:
                     await _bizLicService.ProcessBizLicenceUploadMainAsync(upload);

@@ -131,6 +131,8 @@ namespace StrDss.Service
 
             _unitOfWork.Commit();
 
+            _logger.LogInformation($"Takedown Confirmation - listing taken down successfully - ({row.OrgCd} - {row.ListingId})");
+
             return (row.OrgCd, row.ListingId);
         }
     }

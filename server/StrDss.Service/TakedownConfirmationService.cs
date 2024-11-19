@@ -86,7 +86,7 @@ namespace StrDss.Service
 
             var row = csvReader.GetRecord<UploadLine>(); //it has been parsed once, so no exception expected.
 
-            _logger.LogInformation($"Takedown Confirmation - Processing listing ({row.OrgCd} - {row.ListingId})");
+            _logger.LogDebug($"Takedown Confirmation - Processing listing ({row.OrgCd} - {row.ListingId})");
 
             var org = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd);
 
@@ -94,13 +94,13 @@ namespace StrDss.Service
 
             if (listing == null)
             {
-                _logger.LogInformation($"Takedown Confirmation - Skipping listing (not found) - ({row.OrgCd} - {row.ListingId})");
+                _logger.LogDebug($"Takedown Confirmation - Skipping listing (not found) - ({row.OrgCd} - {row.ListingId})");
                 return (row.OrgCd, row.ListingId);
             }
 
             if (listing.IsTakenDown == true)
             {
-                _logger.LogInformation($"Takedown Confirmation - Skipping listing (already taken down) - ({row.OrgCd} - {row.ListingId})");
+                _logger.LogDebug($"Takedown Confirmation - Skipping listing (already taken down) - ({row.OrgCd} - {row.ListingId})");
             }
             else
             {

@@ -36,7 +36,13 @@ namespace UITest.TestDriver
 
         public ReadOnlyCollection<string> WindowHandles { get => Driver.WindowHandles; }
 
-        public SeleniumDriver(DRIVERTYPE DriverType)
+        /// <summary>
+        /// Create a Selenium webdriver for Chrome, Edge, or Firefox.
+        ///   Requires that Nuget driver packages for the correct browser be installed in the solution/projects
+        /// </summary>
+        /// <param name="DriverType"></param>
+        /// <param name="Headless">Enable for headless CICD pipekine operation</param>
+        public SeleniumDriver(DRIVERTYPE DriverType, bool Headless = false)
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var assemblyDirectory = assembly.Location.Replace(assembly.ManifestModule.Name.ToString(), string.Empty);
@@ -50,7 +56,8 @@ namespace UITest.TestDriver
                         options.AddArgument("--ignore-ssl-errors=yes");
                         options.AddArgument("--ignore-certificate-errors");
                         options.AddArgument("--start-maximized");
-                        //options.AddArgument("--headless");
+                        if(Headless)
+                            options.AddArgument("--headless");
 
                         Driver = new ChromeDriver(assemblyDirectory, options);
                         break;

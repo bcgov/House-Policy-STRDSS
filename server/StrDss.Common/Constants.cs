@@ -134,6 +134,7 @@
         public const string IsPrincipalResidenceRequired = "IsPrincipalResidenceRequired";
         public const string IsStrProhibited = "IsStrProhibited";
         public const string IsBusinessLicenceRequired = "IsBusinessLicenceRequired";
+        public const string IsStraaExempt = "IsStraaExempt";
         public const string EconomicRegionDsc = "EconomicRegionDsc";
     }
 

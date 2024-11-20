@@ -71,6 +71,15 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("host/count")]
+        public async Task<ActionResult> CountHostListingsAsync(string hostName)
+        {
+            var count = await _listingService.CountHostListingsAsync(hostName);
+
+            return Ok(count);
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet("{listingId}")]
         public async Task<ActionResult> GetRentalListing(long listingId)
         {

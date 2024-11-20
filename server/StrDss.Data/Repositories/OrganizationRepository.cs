@@ -174,6 +174,7 @@ namespace StrDss.Data.Repositories
         {
             var point = new Point(longitude, latitude) { SRID = 4326 };
 
+            // todo: add is_straa_exempt
             var strRequirement = await _dbContext.DssOrganizations
                 .FromSqlRaw(@"
                     SELECT p.organization_nm, c.is_principal_residence_required, c.is_business_licence_required, c.is_str_prohibited
@@ -186,6 +187,7 @@ namespace StrDss.Data.Repositories
                     IsPrincipalResidenceRequired = o.IsPrincipalResidenceRequired,
                     IsBusinessLicenceRequired = o.IsBusinessLicenceRequired,
                     IsStrProhibited = o.IsStrProhibited,
+                    // todo: IsStraaExempt = o.IsStraaExempt
                 })
                 .OrderBy(o => o.OrganizationNm)
                 .FirstOrDefaultAsync();

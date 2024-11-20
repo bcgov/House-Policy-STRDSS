@@ -12,6 +12,7 @@ namespace StrDss.Model.OrganizationDtos
         public bool? IsPrincipalResidenceRequired { get; set; }
         public bool? IsStrProhibited { get; set; }
         public bool? IsBusinessLicenceRequired { get; set; }
+        public bool? IsStraaExempt { get; set; }
         public string? EconomicRegionDsc { get; set; }
         public DateTime UpdDtm { get; set; }
     }

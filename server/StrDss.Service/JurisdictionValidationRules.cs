@@ -33,6 +33,14 @@ namespace StrDss.Service
             rules.Add(new FieldValidationRule
             {
                 EntityName = Entities.Jurisdiction,
+                FieldName = JurisdictionFields.IsStraaExempt,
+                FieldType = FieldTypes.Bool,
+                Required = true
+            });
+
+            rules.Add(new FieldValidationRule
+            {
+                EntityName = Entities.Jurisdiction,
                 FieldName = JurisdictionFields.EconomicRegionDsc,
                 FieldType = FieldTypes.String,
                 Required = false,

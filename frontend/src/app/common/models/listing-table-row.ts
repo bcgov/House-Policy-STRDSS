@@ -58,6 +58,7 @@ export interface AggregatedListingTableRow {
     listingCount: number;
     listings: Array<ListingTableRow>;
 
+    hasMultipleProperties: boolean;
     selected?: boolean;
     id?: string;
 }

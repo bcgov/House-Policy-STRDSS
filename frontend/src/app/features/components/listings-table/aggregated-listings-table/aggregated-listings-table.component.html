@@ -107,7 +107,13 @@
                             <i class="pi" [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
                         </button>
                     </td>
-                    <td>{{ row.primaryHostNm }}</td>
+                    <td>
+                        <div class="host-name">
+                            {{ row.primaryHostNm }}
+                            <i *ngIf="row.hasMultipleProperties" pTooltip="This Host May have Multiple Properties."
+                                class="multi-host multihost-icon"></i>
+                        </div>
+                    </td>
                     <td>{{ row.matchAddressTxt }} </td>
                     <td>
                         <span [class.night-stayed-exceeded]="row.nightsBookedYtdQty>=90">

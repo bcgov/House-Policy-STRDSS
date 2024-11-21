@@ -28,6 +28,7 @@ namespace StrDss.Model.OrganizationDtos
         public bool? IsBusinessLicenceRequired { get; set; }
         public bool? IsStrProhibited { get; set; }
         public bool? IsStraaExempt { get; set; }
+        public bool? IsActive { get; set; }
         public string? PlatformType { get; set; }
         public string? BusinessLicenceFormatTxt { get; set; }
         public virtual ICollection<ContactPersonDto> ContactPeople { get; set; } = new List<ContactPersonDto>();

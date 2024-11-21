@@ -101,17 +101,16 @@ namespace StrDss.Data.Repositories
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
             var groupedQuery = query
-                .GroupBy(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
-                .Select(g => new RentalListingGroupDto
+                .Select(x => new RentalListingGroupDto
                 {
-                    EffectiveBusinessLicenceNo = g.Key.EffectiveBusinessLicenceNo,
-                    EffectiveHostNm = g.Key.EffectiveHostNm,
-                    MatchAddressTxt = g.Key.MatchAddressTxt
+                    EffectiveBusinessLicenceNo = x.EffectiveBusinessLicenceNo,
+                    EffectiveHostNm = x.EffectiveHostNm,
+                    MatchAddressTxt = x.MatchAddressTxt
                 })
+                .Distinct()
                 .AsNoTracking();
 
             var extraSort = "";
-
 
             var groupedListings = await Page<RentalListingGroupDto, RentalListingGroupDto>(groupedQuery, pageSize, pageNumber, orderBy, direction, extraSort, false);
 

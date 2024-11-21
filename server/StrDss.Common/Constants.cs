@@ -135,6 +135,7 @@
         public const string IsStrProhibited = "IsStrProhibited";
         public const string IsBusinessLicenceRequired = "IsBusinessLicenceRequired";
         public const string IsStraaExempt = "IsStraaExempt";
+        public const string IsActive = "IsActive";
         public const string EconomicRegionDsc = "EconomicRegionDsc";
     }
 

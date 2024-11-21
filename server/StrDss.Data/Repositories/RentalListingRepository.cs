@@ -161,6 +161,26 @@ namespace StrDss.Data.Repositories
 
             return count;
         }
+        //public async Task<int> CountHostListingsAsync(string hostName)
+        //{
+        //    var query = _dbSet.AsNoTracking();
+
+        //    if (_currentUser.OrganizationType == OrganizationTypes.LG)
+        //    {
+        //        query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+        //    }            
+
+        //    return await query
+        //        .Where(x => x.EffectiveHostNm == hostName)
+        //        .GroupBy(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
+        //        .Select(g => new RentalListingGroupDto
+        //        {
+        //            EffectiveBusinessLicenceNo = g.Key.EffectiveBusinessLicenceNo,
+        //            EffectiveHostNm = g.Key.EffectiveHostNm,
+        //            MatchAddressTxt = g.Key.MatchAddressTxt
+        //        })
+        //        .CountAsync();
+        //}
         public async Task<int> CountHostListingsAsync(string hostName)
         {
             var query = _dbSet.AsNoTracking();
@@ -170,7 +190,11 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
             }
 
-            return await query.CountAsync(x => x.EffectiveHostNm == hostName);
+            return await query
+                .Where(x => x.EffectiveHostNm == hostName)
+                .Select(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
+                .Distinct() 
+                .CountAsync(); 
         }
 
         private static void ApplyFilters(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, 

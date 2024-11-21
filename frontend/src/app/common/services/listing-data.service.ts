@@ -148,7 +148,7 @@ export class ListingDataService {
     }
 
     getHostListingsCount(primaryHostNm: string): Observable<{ primaryHostNm: string, hasMultipleProperties: boolean }> {
-        return this.httpClient.get<number>(`${environment.API_HOST}/rentallistings/grouped/count?hostName=${primaryHostNm}`)
+        return this.httpClient.get<number>(`${environment.API_HOST}/rentallistings/host/count?hostName=${primaryHostNm}`)
             .pipe(map(count => ({ primaryHostNm, hasMultipleProperties: count > 1 })));
     }
 

@@ -48,6 +48,7 @@ export interface ListingDetails {
     hasAtLeastOneValidHostEmail: boolean;
     hostsInfo: Array<ListingDetailsHostInfo>;
     bizLicenceInfo: BusinessLicence;
+    hasMultipleProperties: boolean;
 }
 
 export interface ListingDetailsWithHostCheckboxExtension extends ListingDetails {

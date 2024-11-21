@@ -3,7 +3,7 @@ import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ListingDataService } from '../../../../common/services/listing-data.service';
 import { ListingAddressCandidate, ListingDetails } from '../../../../common/models/listing-details';
 import { DialogModule } from 'primeng/dialog';
@@ -24,6 +24,7 @@ import { BusinessLicenceService } from '../../../../common/services/business-lic
 import { BLSearchResultRow } from '../../../../common/models/bl-search-result-row';
 import { UrlProtocolPipe } from '../../../../common/pipes/url-protocol.pipe';
 import { TextCleanupPipe } from '../../../../common/pipes/text-cleanup.pipe';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-listing-details',
@@ -42,6 +43,7 @@ import { TextCleanupPipe } from '../../../../common/pipes/text-cleanup.pipe';
     TagModule,
     UrlProtocolPipe,
     TextCleanupPipe,
+    RouterModule,
   ],
   templateUrl: './listing-details.component.html',
   styleUrl: './listing-details.component.scss'
@@ -67,6 +69,7 @@ export class ListingDetailsComponent implements OnInit {
   selectedBl!: BLSearchResultRow | null;
   searchBlText = '';
   noBlsFound = false;
+  returnUrl!: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -83,6 +86,9 @@ export class ListingDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.loaderService.loadingStart();
     this.id = this.route.snapshot.params['id'];
+
+    this.route.queryParams.subscribe(
+      (param) => { this.returnUrl = param['returnUrl']; });
 
     this.userDataService.getCurrentUser().subscribe({
       next: (user) => {
@@ -223,6 +229,17 @@ export class ListingDetailsComponent implements OnInit {
     this.addressChangeCandidates = [];
   }
 
+  navigateToListingsByHost(): void {
+    const owner = this.listing.hosts.find(x => x.isPropertyOwner);
+    if (owner) {
+      const url = this.router.serializeUrl(this.router.createUrlTree([`/aggregated-listings`], { queryParams: { hostName: owner.fullNm } }));
+      window.open(url, '_blank');
+    }
+    else {
+      this.errorService.showError(`Unable to retrieve the host's name. Neither host is the owner`);
+    }
+  }
+
   onSubmitAddressChange(): void {
     let observableRef;
     this.loaderService.loadingStart();
@@ -262,15 +279,30 @@ export class ListingDetailsComponent implements OnInit {
 
   private getListingDetailsById(id: number): void {
     this.loaderService.loadingStart();
-    this.listingService.getListingDetailsById(id).subscribe({
-      next: (response: ListingDetails) => {
-        this.listing = response;
-        this.blInfo = response.bizLicenceInfo;
-      },
-      complete: () => {
-        this.loaderService.loadingEnd();
-        this.cd.detectChanges();
-      }
-    });
+    this.listingService.getListingDetailsById(id)
+      .pipe(
+        tap((listing) => {
+          if (listing.hosts.length) {
+            const owner = listing.hosts.find(x => x.isPropertyOwner);
+
+            if (owner) {
+              this.listingService.getHostListingsCount(owner.fullNm)
+                .subscribe(x => {
+                  this.listing.hasMultipleProperties = x.hasMultipleProperties;
+                  this.cd.detectChanges();
+                });
+            }
+          }
+        })
+      ).subscribe({
+        next: (response: ListingDetails) => {
+          this.listing = response;
+          this.blInfo = response.bizLicenceInfo;
+        },
+        complete: () => {
+          this.loaderService.loadingEnd();
+          this.cd.detectChanges();
+        }
+      });
   }
 }

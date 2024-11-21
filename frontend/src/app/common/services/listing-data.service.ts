@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
@@ -22,7 +22,7 @@ export class ListingDataService {
 
     textHeaders = new HttpHeaders().set('Content-Type', 'text/plain; charset=utf-8');
 
-    constructor(private httpClient: HttpClient) {}
+    constructor(private httpClient: HttpClient) { }
 
     uploadListings(reportPeriod: string, organizationId: number, file: any): Observable<unknown> {
         const formData = new FormData();
@@ -108,14 +108,12 @@ export class ListingDataService {
         if (filter) {
             if (filter.byLocation) {
                 if (!!filter.byLocation?.isPrincipalResidenceRequired) {
-                    endpointUrl += `&prRequirement=${
-                        filter.byLocation.isPrincipalResidenceRequired == 'Yes'
-                    }`;
+                    endpointUrl += `&prRequirement=${filter.byLocation.isPrincipalResidenceRequired == 'Yes'
+                        }`;
                 }
                 if (!!filter.byLocation?.isBusinessLicenceRequired) {
-                    endpointUrl += `&blRequirement=${
-                        filter.byLocation.isBusinessLicenceRequired == 'Yes'
-                    }`;
+                    endpointUrl += `&blRequirement=${filter.byLocation.isBusinessLicenceRequired == 'Yes'
+                        }`;
                 }
             }
             if (filter.byStatus) {
@@ -147,6 +145,11 @@ export class ListingDataService {
         }
 
         return this.httpClient.get<PagingResponse<ListingTableRow>>(endpointUrl);
+    }
+
+    getHostListingsCount(primaryHostNm: string): Observable<{ primaryHostNm: string, hasMultipleProperties: boolean }> {
+        return this.httpClient.get<number>(`${environment.API_HOST}/rentallistings/grouped/count?hostName=${primaryHostNm}`)
+            .pipe(map(count => ({ primaryHostNm, hasMultipleProperties: count > 1 })));
     }
 
     getAggregatedListings(
@@ -185,14 +188,12 @@ export class ListingDataService {
         if (filter) {
             if (filter.byLocation) {
                 if (!!filter.byLocation?.isPrincipalResidenceRequired) {
-                    listingsEndpointUrl += `&prRequirement=${
-                        filter.byLocation.isPrincipalResidenceRequired == 'Yes'
-                    }`;
+                    listingsEndpointUrl += `&prRequirement=${filter.byLocation.isPrincipalResidenceRequired == 'Yes'
+                        }`;
                 }
                 if (!!filter.byLocation?.isBusinessLicenceRequired) {
-                    listingsEndpointUrl += `&blRequirement=${
-                        filter.byLocation.isBusinessLicenceRequired == 'Yes'
-                    }`;
+                    listingsEndpointUrl += `&blRequirement=${filter.byLocation.isBusinessLicenceRequired == 'Yes'
+                        }`;
                 }
             }
             if (filter.byStatus) {
@@ -224,11 +225,10 @@ export class ListingDataService {
             }
         }
 
-        const listingsCountEndpointUrl = `${
-            environment.API_HOST
-        }/rentallistings/grouped/count${listingsEndpointUrl.substring(
-            listingsEndpointUrl.indexOf('?'),
-        )}`;
+        const listingsCountEndpointUrl = `${environment.API_HOST
+            }/rentallistings/grouped/count${listingsEndpointUrl.substring(
+                listingsEndpointUrl.indexOf('?'),
+            )}`;
 
         //return this.httpClient.get<PagingResponse<AggregatedListingTableRow>>(listingsEndpointUrl);
         return forkJoin({

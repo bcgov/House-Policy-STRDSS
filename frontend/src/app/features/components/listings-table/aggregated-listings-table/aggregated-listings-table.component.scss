@@ -171,6 +171,23 @@
                 font-size: 12px;
                 word-break: break-word;
 
+                .host-name {
+                    width: 100%;
+                    display: flex;
+                    justify-content: start;
+                    align-items: center;
+                    gap: 12px;
+
+                    .multihost-icon {
+                        width: 24px;
+                        height: 24px;
+                        background-image: url(../../../../../assets/images/house-blue.svg);
+                        background-position: center center;
+                        background-repeat: no-repeat;
+                        background-size: cover;
+                    }
+                }
+
                 &.listings-count {
                     font-size: smaller;
                     color: #afadad;

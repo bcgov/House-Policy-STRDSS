@@ -135,7 +135,24 @@
             <ng-template ngFor let-host [ngForOf]="listing.hosts" let-i="index">
                 <div class="row">
                     <span class="label">{{host.isPropertyOwner?'Property':'STR'}} Host (Platform Listing):</span>
-                    <span class="value">{{host.fullNm}}</span>
+                    <span class="value" [class.has-multiple-properties]="listing.hasMultipleProperties">
+                        @if (host.isPropertyOwner) {
+
+                        @if(listing.hasMultipleProperties){
+                        <button pButton class="p-button-link zero-padding"
+                            (click)="navigateToListingsByHost()">{{host.fullNm}}</button>
+                        <i pTooltip="This host may have multiple properties in B.C. Click the host name to view more listings. Note: you can only view listings within your own jurisdiction."
+                            class="multi-host multihost-icon"></i>
+                        }
+                        @else{
+                        {{host.fullNm}}
+                        }
+
+                        }
+                        @else {
+                        {{host.fullNm}}
+                        }
+                    </span>
                 </div>
                 <div class="row">
                     <span class="label">{{host.isPropertyOwner?'Property':'STR'}} Host Address:</span>

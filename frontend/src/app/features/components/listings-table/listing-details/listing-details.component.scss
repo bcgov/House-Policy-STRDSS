@@ -451,4 +451,19 @@
             }
         }
     }
+
+    .has-multiple-properties {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+
+        .multihost-icon {
+            width: 24px;
+            height: 24px;
+            background-image: url(../../../../../assets/images/house-blue.svg);
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    }
 }

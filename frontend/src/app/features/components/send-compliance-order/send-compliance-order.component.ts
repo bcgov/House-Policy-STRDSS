@@ -20,6 +20,7 @@ import { validateEmailListString } from '../../../common/consts/validators.const
 import { TooltipOptions } from 'primeng/api';
 import { ComplianceOrder } from '../../../common/models/compliance-order';
 import { ComplianceService } from '../../../common/services/compliance.service';
+import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
 
 @Component({
   selector: 'app-send-compliance-order',
@@ -38,6 +39,7 @@ import { ComplianceService } from '../../../common/services/compliance.service';
     ReactiveFormsModule,
     FormsModule,
     OverlayPanelModule,
+    EditorModule,
   ],
   templateUrl: './send-compliance-order.component.html',
   styleUrl: './send-compliance-order.component.scss'
@@ -155,6 +157,10 @@ export class SendComplianceOrderComponent implements OnInit {
         this.cd.detectChanges();
       },
     });
+  }
+
+  onEditorChanged(_: EditorTextChangeEvent): void {
+    this.commentControl.updateValueAndValidity();
   }
 
   cancel(): void {

@@ -20,6 +20,7 @@ import { ComplianceNoticeBulk } from '../../../common/models/compliance-notice';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { ListingTableRow } from '../../../common/models/listing-table-row';
+import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
 
 @Component({
   selector: 'app-bulk-compliance-notice',
@@ -37,6 +38,7 @@ import { ListingTableRow } from '../../../common/models/listing-table-row';
     ReactiveFormsModule,
     FormsModule,
     OverlayPanelModule,
+    EditorModule,
   ],
   templateUrl: './bulk-compliance-notice.component.html',
   styleUrl: './bulk-compliance-notice.component.scss'
@@ -61,6 +63,9 @@ export class BulkComplianceNoticeComponent implements OnInit {
   }
   public get lgContactEmailControl(): AbstractControl {
     return this.myForm.controls['lgContactEmail'];
+  }
+  public get commentControl(): AbstractControl {
+    return this.myForm.controls['comment'];
   }
 
   constructor(private fb: FormBuilder,
@@ -91,6 +96,10 @@ export class BulkComplianceNoticeComponent implements OnInit {
           this.cloakParams();
         }
       });
+  }
+
+  onEditorChanged(_: EditorTextChangeEvent): void {
+    this.commentControl.updateValueAndValidity();
   }
 
   onSort(property: keyof ListingDetailsWithHostCheckboxExtension): void {

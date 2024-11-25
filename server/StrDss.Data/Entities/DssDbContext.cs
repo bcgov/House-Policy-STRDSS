@@ -244,18 +244,18 @@ public partial class DssDbContext : DbContext
         {
             entity.HasKey(e => e.LicenceStatusType).HasName("dss_business_licence_status_type_pk");
 
-            entity.ToTable("dss_business_licence_status_type", tb => tb.HasComment("A potential status for a BUSINESS LICENCE (e.g. Pending, Issued, Suspended, Revoked, Cancelled, Expired)"));
+            entity.ToTable("dss_business_licence_status_type", tb => tb.HasComment("A potential status for a BUSINESS LICENCE (e.g. Pending, Denied, Issued, Suspended, Revoked, Cancelled, Expired)"));
 
             entity.Property(e => e.LicenceStatusType)
                 .HasMaxLength(25)
-                .HasComment("System-consistent code for the business licence status (e.g. Pending, Issued, Suspended, Revoked, Cancelled, Expired)")
+                .HasComment("System-consistent code for the business licence status (e.g. Pending, Denied, Issued, Suspended, Revoked, Cancelled, Expired)")
                 .HasColumnName("licence_status_type");
             entity.Property(e => e.LicenceStatusSortNo)
                 .HasComment("Relative order in which the business prefers to see the status listed")
                 .HasColumnName("licence_status_sort_no");
             entity.Property(e => e.LicenceStatusTypeNm)
                 .HasMaxLength(50)
-                .HasComment("Business term for the licence status (e.g. Pending, Issued, Suspended, Revoked, Cancelled, Expired)")
+                .HasComment("Business term for the licence status (e.g. Pending, Denied, Issued, Suspended, Revoked, Cancelled, Expired)")
                 .HasColumnName("licence_status_type_nm");
         });
 
@@ -525,6 +525,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsStrProhibited)
                 .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION entirely prohibits short term housing rentals")
                 .HasColumnName("is_str_prohibited");
+            entity.Property(e => e.IsStraaExempt)
+                .HasComment("Indicates whether a LOCAL GOVERNMENT SUBDIVISION is exempt from all Provincial Short Term Rental restrictions")
+                .HasColumnName("is_straa_exempt");
             entity.Property(e => e.LocalGovernmentType)
                 .HasMaxLength(50)
                 .HasComment("Foreign key for a LOCAL GOVERNMENT")
@@ -548,6 +551,10 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(25)
                 .HasComment("Foreign key for a RENTAL PLATFORM")
                 .HasColumnName("platform_type");
+            entity.Property(e => e.SourceAttributesJson)
+                .HasComment("A JSON object containing non-geometry fields from the Local Government Subdivision information source")
+                .HasColumnType("jsonb")
+                .HasColumnName("source_attributes_json");
             entity.Property(e => e.UpdDtm)
                 .HasComment("Trigger-updated timestamp of last change")
                 .HasColumnName("upd_dtm");

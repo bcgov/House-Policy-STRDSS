@@ -94,6 +94,16 @@ public partial class DssOrganization
     /// </summary>
     public string? BusinessLicenceFormatTxt { get; set; }
 
+    /// <summary>
+    /// Indicates whether a LOCAL GOVERNMENT SUBDIVISION is exempt from all Provincial Short Term Rental restrictions
+    /// </summary>
+    public bool? IsStraaExempt { get; set; }
+
+    /// <summary>
+    /// A JSON object containing non-geometry fields from the Local Government Subdivision information source
+    /// </summary>
+    public string? SourceAttributesJson { get; set; }
+
     public virtual ICollection<DssBusinessLicence> DssBusinessLicences { get; set; } = new List<DssBusinessLicence>();
 
     public virtual ICollection<DssEmailMessage> DssEmailMessageInvolvedInOrganizations { get; set; } = new List<DssEmailMessage>();

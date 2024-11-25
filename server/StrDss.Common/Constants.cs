@@ -561,7 +561,7 @@
 
     public static class ApiTags
     {
-        public const string Default = "stadata";
+        public const string Default = "strdata";
         public const string Aps = "aps";
         public static readonly string[] ApsTagList = { "aps" };
     }

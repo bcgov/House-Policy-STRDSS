@@ -18,6 +18,7 @@ on:
       - crunchydb/**
       - backup-container/**
       - gateway/**
+      - .github/**
 
 jobs:
   test-backend:

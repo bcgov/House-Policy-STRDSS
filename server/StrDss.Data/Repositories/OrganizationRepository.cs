@@ -214,6 +214,9 @@ namespace StrDss.Data.Repositories
         {
             var platform = _mapper.Map<PlatformViewDto>(await _dbContext.DssPlatformVws.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == id));
 
+            if (platform == null)
+                return null;
+
             platform.Subsidiaries = _mapper.Map<List<PlatformViewDto>>(await _dbContext.DssPlatformVws.AsNoTracking().Where(x => x.ManagingOrganizationId == id).ToListAsync());
 
             return platform;

@@ -1,0 +1,39 @@
+name: Run ZAP API Scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_url:
+        type: string
+        description: The base URL of the API to scan
+        default: https://dev.strdata.gov.bc.ca/api
+      spec_url:
+        type: string
+        description: The URL of the OpenAPI/GraphQL spec
+        default: https://dev.strdata.gov.bc.ca/api/swagger/strdata/swagger.json
+
+jobs:
+  zap-api-scan:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: ZAP API Scan
+      uses: zaproxy/action-api-scan@v0.10.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        api_url: ${{ github.event.inputs.api_url }}
+        openapi: ${{ github.event.inputs.spec_url }}
+        rules_file_name: '.zap/rules.tsv'
+        context_file: '.zap/context.context'
+
+    - name: Upload ZAP Scan Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: zap-api-scan-report
+        path: zap_api_scan_report.html

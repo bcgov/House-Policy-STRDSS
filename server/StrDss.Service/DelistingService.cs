@@ -744,6 +744,7 @@ namespace StrDss.Service
                 InvolvedInOrganizationId = dto.PlatformId,
                 RequestingOrganizationId = lg!.OrganizationId,
                 IsWithStandardDetail = dto.IsWithStandardDetail,
+                CustomDetailTxt = dto.CustomDetailTxt,
             };
 
             await _emailRepo.AddEmailMessage(emailEntity);
@@ -764,6 +765,7 @@ namespace StrDss.Service
                 Cc = dto.CcList,
                 Info = dto.ListingUrl,
                 IsWithStandardDetail = dto.IsWithStandardDetail,
+                TakedownRequestDetail = dto.CustomDetailTxt,
                 Preview = preview
             };
             return template;
@@ -812,7 +814,7 @@ namespace StrDss.Service
         }
 
         private async Task ProcessTakedownRequestBatchEmailAsync(OrganizationDto platform, List<DssEmailMessage> allEmails)
-        {            
+        {
             var contacts = platform.ContactPeople
                 .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest)
                 .Select(x => x.EmailAddressDsc)

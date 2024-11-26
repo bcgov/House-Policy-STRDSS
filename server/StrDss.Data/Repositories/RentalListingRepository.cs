@@ -70,6 +70,18 @@ namespace StrDss.Data.Repositories
             {
                 orderBy = "lastActionNm == null, lastActionNm";
             }
+            else if (orderBy == "businessLicenceNo")
+            {
+                orderBy = "string.IsNullOrWhiteSpace(businessLicenceNo), businessLicenceNo";
+            }
+            else if (orderBy == "businessLicenceNoMatched")
+            {
+                orderBy = "string.IsNullOrWhiteSpace(businessLicenceNoMatched), businessLicenceNoMatched";
+            }
+            else if (orderBy == "nightsBookedYtdQty")
+            {
+                orderBy = "nightsBookedYtdQty == null, nightsBookedYtdQty";
+            }
 
             var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
 
@@ -100,6 +112,11 @@ namespace StrDss.Data.Repositories
 
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
+            if (orderBy == "effectiveBusinessLicenceNo")
+            {
+                orderBy = "string.IsNullOrWhiteSpace(effectiveBusinessLicenceNo), effectiveBusinessLicenceNo";
+            }
+
             var groupedQuery = query
                 .Select(x => new RentalListingGroupDto
                 {
@@ -113,7 +130,6 @@ namespace StrDss.Data.Repositories
             var extraSort = "";
 
             var groupedListings = await Page<RentalListingGroupDto, RentalListingGroupDto>(groupedQuery, pageSize, pageNumber, orderBy, direction, extraSort, false);
-
 
             foreach (var group in groupedListings.SourceList)
             {

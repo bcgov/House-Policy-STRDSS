@@ -116,19 +116,29 @@
 
         <div class="form-group-row">
             <div class="form-group-row-col">
-                <label for="customDetailTxt">Provide details of the request</label>
+                <label for="customDetailTxt">Provide details of the request
+                    <strong>{{isWithStandardDetailControl.value?' (Optional)':''}}</strong></label>
             </div>
             <div class="form-group-row-col">
-                <textarea #textarea rows="5" cols="30" maxlength="2000" class="wide custom-details"
-                    formControlName="customDetailTxt"
-                    placeholder="{{isWithStandardDetailControl.value?'Optional':'Required'}}" pInputTextarea
-                    id="customDetailTxt" name="customDetailTxt"></textarea>
-                <span class="limit-text" [class.almost-limit-text]="textarea.value.length > 1950"
-                    [class.limited-text]="textarea.value.length > 1999">{{textarea.value.length}}/2000</span>
+                <p-editor (onTextChange)="onEditorChanged($event)" appendTo="body" #textarea id="customDetailTxt"
+                    name="customDetailTxt" formControlName="customDetailTxt" [style]="{ height: '320px' }">
+                    <ng-template pTemplate="header">
+                        <span class="ql-formats">
+                            <button type="button" class="ql-bold" aria-label="Bold"></button>
+                            <button type="button" class="ql-italic" aria-label="Italic"></button>
+                            <button type="button" class="ql-underline" aria-label="Underline"></button>
+                            <button type="button" class="ql-link" aria-label="Link"></button>
+                            <button class="ql-list" value="ordered" aria-label="List Ordered"></button>
+                            <button class="ql-list" value="bullet" aria-label="List Bullet"></button>
+                        </span>
+                    </ng-template>
+                </p-editor>
+                <span class="limit-text" [class.almost-limit-text]="(commentControl.getRawValue() || '').length > 1950"
+                    [class.limited-text]="(commentControl.getRawValue() || '').length > 1999">{{(commentControl.getRawValue()
+                    || '').length}}/2000</span>
             </div>
-            <div class="form-group-row-col validation-errors"
-                *ngIf="!customDetailTxtControl.pristine && customDetailTxtControl.errors">
-                <small id="customDetailTxtError" *ngIf="customDetailTxtControl.errors?.['required']">Details of the
+            <div class="form-group-row-col validation-errors" *ngIf="!commentControl.pristine && commentControl.errors">
+                <small id="customDetailTxtError" *ngIf="commentControl.errors?.['required']">Details of the
                     request
                     are required</small>
             </div>

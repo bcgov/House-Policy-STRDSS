@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -21,12 +21,14 @@ import { Router } from '@angular/router';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
+import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
 
 @Component({
   selector: 'app-compliance-notice',
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    FormsModule,
     CommonModule,
     DropdownModule,
     InputTextModule,
@@ -39,6 +41,7 @@ import { ErrorHandlingService } from '../../../common/services/error-handling.se
     TooltipModule,
     InputMaskModule,
     ButtonModule,
+    EditorModule,
   ],
   templateUrl: './compliance-notice.component.html',
   styleUrl: './compliance-notice.component.scss'
@@ -52,6 +55,7 @@ export class ComplianceNoticeComponent implements OnInit {
   previewText = 'No preview'
 
   messages = new Array<Message>();
+  comment = '';
 
   public get platformIdControl(): AbstractControl {
     return this.myForm.controls['platformId'];
@@ -127,7 +131,7 @@ export class ComplianceNoticeComponent implements OnInit {
     }
   }
 
-  onSubmit(comment: string, textAreaElement: HTMLTextAreaElement): void {
+  onSubmit(comment: string): void {
     this.messages = [];
 
     if (this.myForm.valid) {
@@ -147,7 +151,7 @@ export class ComplianceNoticeComponent implements OnInit {
             this.myForm.reset();
             this.initForm();
             this.onPreviewClose();
-            this.cleanupPopupComment(textAreaElement);
+            this.comment = '';
             this.loaderService.loadingEnd();
             this.cd.detectChanges();
           }

@@ -18,7 +18,6 @@ import { validateEmailListString } from '../../../common/consts/validators.const
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { ListingTableRow } from '../../../common/models/listing-table-row';
-import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
 
 @Component({
   selector: 'app-bulk-takedown-request',
@@ -34,7 +33,6 @@ import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
     DialogModule,
     ChipsModule,
     ReactiveFormsModule,
-    EditorModule,
   ],
   templateUrl: './bulk-takedown-request.component.html',
   styleUrl: './bulk-takedown-request.component.scss'
@@ -64,7 +62,7 @@ export class BulkTakedownRequestComponent implements OnInit {
   public get isWithStandardDetailControl(): AbstractControl {
     return this.myForm.controls['isWithStandardDetail'];
   }
-  public get commentControl(): AbstractControl {
+  public get customDetailTxtControl(): AbstractControl {
     return this.myForm.controls['customDetailTxt'];
   }
 
@@ -93,10 +91,6 @@ export class BulkTakedownRequestComponent implements OnInit {
           this.cloakParams();
         }
       });
-  }
-
-  onEditorChanged(_: EditorTextChangeEvent): void {
-    this.commentControl.updateValueAndValidity();
   }
 
   onSort(property: keyof ListingDetails): void {
@@ -155,11 +149,11 @@ export class BulkTakedownRequestComponent implements OnInit {
 
   onWithStandardDetailChanged(value: CheckboxChangeEvent): void {
     if (value.checked)
-      this.commentControl.removeValidators([Validators.required]);
+      this.customDetailTxtControl.removeValidators([Validators.required]);
     else
-      this.commentControl.addValidators([Validators.required]);
+      this.customDetailTxtControl.addValidators([Validators.required]);
 
-    this.commentControl.updateValueAndValidity();
+    this.customDetailTxtControl.updateValueAndValidity();
     this.myForm.updateValueAndValidity();
   }
 

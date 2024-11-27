@@ -221,14 +221,14 @@ namespace StrDss.Data.Repositories
 
             if (hostName != null && hostName.IsNotEmpty())
             {
-                var hostNameLower = hostName.ToLower();
-                query = query.Where(x => x.ListingContactNamesTxt != null && x.ListingContactNamesTxt.ToLower().Contains(hostNameLower));
+                var effectiveHostNm = CommonUtils.SanitizeAndUppercaseString(hostName);
+                query = query.Where(x => x.EffectiveHostNm != null && x.EffectiveHostNm.StartsWith(effectiveHostNm));
             }
 
             if (businessLicence != null && businessLicence.IsNotEmpty())
             {
-                var businessLicenceLower = businessLicence.ToLower();
-                query = query.Where(x => x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(businessLicenceLower));
+                var effectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(businessLicence);
+                query = query.Where(x => x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(effectiveBusinessLicenceNo));
             }
 
             if (prRequirement != null)
@@ -244,7 +244,6 @@ namespace StrDss.Data.Repositories
                     ? x.IsBusinessLicenceRequired == true
                     : x.IsBusinessLicenceRequired == null || x.IsBusinessLicenceRequired == false);
             }
-
 
             if (reassigned != null && reassigned.Value == false)
             {

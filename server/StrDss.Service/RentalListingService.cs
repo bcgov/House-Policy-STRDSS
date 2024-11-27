@@ -465,6 +465,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> UpdateAddressAsync(UpdateListingAddressDto dto)
         {
+            CommonUtils.SanitizeObject(dto);
+
             var errors = new Dictionary<string, List<string>>();
 
             var listing = await _listingRepo.GetRentalListing(dto.RentalListingId, false);

@@ -45,4 +45,4 @@ jobs:
           format: openapi
           target: ${{ github.event.inputs.spec_url }}
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-o {{ github.event.inputs.host_url }}'
+          cmd_options: '-O {{ github.event.inputs.host_url }}'

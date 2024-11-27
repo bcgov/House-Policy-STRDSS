@@ -6,7 +6,7 @@ on:
       spec_url:
         type: string
         description: The URL of the OpenAPI/GraphQL spec
-        default: https://uat.strdata.gov.bc.ca/api/swagger/strdata/swagger.json
+        default: https://dev.strdata.gov.bc.ca/api/swagger/strdata/swagger.json
       auth_header_name:
         type: string
         description: The name of the authentication header

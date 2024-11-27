@@ -22,7 +22,6 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { forkJoin } from 'rxjs';
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
-import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
 
 @Component({
   selector: 'app-delisting-request',
@@ -41,7 +40,6 @@ import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
     TooltipModule,
     ButtonModule,
     ToastModule,
-    EditorModule,
   ],
   templateUrl: './delisting-request.component.html',
   styleUrl: './delisting-request.component.scss'
@@ -151,10 +149,6 @@ export class DelistingRequestComponent implements OnInit {
           }
         });
     }
-  }
-
-  onEditorChanged(_: EditorTextChangeEvent): void {
-    this.customDetailTxtControl.updateValueAndValidity();
   }
 
   onPreviewClose(): void {

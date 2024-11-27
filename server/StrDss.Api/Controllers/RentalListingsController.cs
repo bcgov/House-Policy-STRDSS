@@ -177,7 +177,8 @@ namespace StrDss.Api.Controllers
         [ApiAuthorize]
         [HttpGet("addresses/candidates")]
         public async Task<ActionResult<List<AddressDto>>> GetAddressCandidates(string addressString)
-        {
+        {   
+            CommonUtils.SanitizeObject(addressString);
             var addresses = await _listingService.GetAddressCandidatesAsync(addressString, 3);
             return Ok(addresses);
         }

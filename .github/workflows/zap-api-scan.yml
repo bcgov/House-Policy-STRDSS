@@ -3,10 +3,6 @@ name: Run ZAP API Scan
 on:
   workflow_dispatch:
     inputs:
-      host_url:
-        type: string
-        description: The URL of the host to scan
-        default: https://uat.strdata.gov.bc.ca
       spec_url:
         type: string
         description: The URL of the OpenAPI/GraphQL spec
@@ -45,4 +41,4 @@ jobs:
           format: openapi
           target: ${{ github.event.inputs.spec_url }}
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-O {{ github.event.inputs.host_url }}'
+          cmd_options: '-O https://uat.strdata.gov.bc.ca'

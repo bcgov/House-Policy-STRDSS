@@ -5,12 +5,12 @@
         <p-dropdown [options]="searchColumns" [showClear]="searchColumn !== 'all'" (onClear)="clearSearchBy($event)"
             id="search-by-drd" [(ngModel)]="searchColumn" class="search-by-select"></p-dropdown>
         <span class="p-input-icon-right search-input-container">
-            <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()"> <i
-                    class="pi pi-search"></i></button>
+            <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()" aria-label="Search">
+                <i class="pi pi-search" aria-hidden="true"></i></button>
             <button pButton *ngIf="!!searchTerm" id="clear-search-btn" class="colorless p-button-link search-clear-btn"
                 icon="pi pi-times" (click)="onClearSearchBox()"></button>
             <input type="text" id="search-term-inp" (keydown.enter)="onSearch()" class="search-input"
-                placeholder="Search" pInputText [(ngModel)]="searchTerm" />
+                placeholder="Search" pInputText [(ngModel)]="searchTerm" aria-label="Search input" />
         </span>
         <button pButton id="filter-open-btn" class="filter-open-btn p-button-link" [class.colorless]="!isFilterSet"
             icon="pi {{isFilterSet?'pi-filter-fill':'pi-filter'}}" (click)="openFilterSidebar()">

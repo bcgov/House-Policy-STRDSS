@@ -198,7 +198,7 @@ namespace StrDss.Data.Repositories
                                          (x.PlatformListingUrl != null && x.PlatformListingUrl.ToLower().Contains(allLower)) ||
                                          (x.PlatformListingNo != null && x.PlatformListingNo.ToLower().Contains(allLower)) ||
                                          (x.ListingContactNamesTxt != null && x.ListingContactNamesTxt.ToLower().Contains(allLower)) ||
-                                         (x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(allLower)));
+                                         (x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(CommonUtils.SanitizeAndUppercaseString(all))));
             }
 
             if (address != null && address.IsNotEmpty())
@@ -221,8 +221,8 @@ namespace StrDss.Data.Repositories
 
             if (hostName != null && hostName.IsNotEmpty())
             {
-                var effectiveHostNm = CommonUtils.SanitizeAndUppercaseString(hostName);
-                query = query.Where(x => x.EffectiveHostNm != null && x.EffectiveHostNm.StartsWith(effectiveHostNm));
+                var hostNameLower = hostName.ToLower();
+                query = query.Where(x => x.ListingContactNamesTxt != null && x.ListingContactNamesTxt.ToLower().Contains(hostNameLower));
             }
 
             if (businessLicence != null && businessLicence.IsNotEmpty())

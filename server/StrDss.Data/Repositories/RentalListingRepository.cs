@@ -198,7 +198,7 @@ namespace StrDss.Data.Repositories
                                          (x.PlatformListingUrl != null && x.PlatformListingUrl.ToLower().Contains(allLower)) ||
                                          (x.PlatformListingNo != null && x.PlatformListingNo.ToLower().Contains(allLower)) ||
                                          (x.ListingContactNamesTxt != null && x.ListingContactNamesTxt.ToLower().Contains(allLower)) ||
-                                         (x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(allLower)));
+                                         (x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(CommonUtils.SanitizeAndUppercaseString(all))));
             }
 
             if (address != null && address.IsNotEmpty())
@@ -227,8 +227,8 @@ namespace StrDss.Data.Repositories
 
             if (businessLicence != null && businessLicence.IsNotEmpty())
             {
-                var businessLicenceLower = businessLicence.ToLower();
-                query = query.Where(x => x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(businessLicenceLower));
+                var effectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(businessLicence);
+                query = query.Where(x => x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(effectiveBusinessLicenceNo));
             }
 
             if (prRequirement != null)
@@ -244,7 +244,6 @@ namespace StrDss.Data.Repositories
                     ? x.IsBusinessLicenceRequired == true
                     : x.IsBusinessLicenceRequired == null || x.IsBusinessLicenceRequired == false);
             }
-
 
             if (reassigned != null && reassigned.Value == false)
             {

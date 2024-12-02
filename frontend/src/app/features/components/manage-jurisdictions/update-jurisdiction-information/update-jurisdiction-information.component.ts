@@ -77,8 +77,10 @@ export class UpdateJurisdictionInformationComponent implements OnInit {
       managingOrganizationId: number;
       isPrincipalResidenceRequired: boolean;
       isStrProhibited: boolean;
+      isStraaExempt: boolean;
       isBusinessLicenceRequired: boolean;
       economicRegionDsc: string;
+      isActive: boolean;
     } = this.myForm.getRawValue();
 
     const jurisdictionUpdate: JurisdictionUpdate = {
@@ -87,8 +89,10 @@ export class UpdateJurisdictionInformationComponent implements OnInit {
       isBusinessLicenceRequired: formValue.isBusinessLicenceRequired,
       isPrincipalResidenceRequired: formValue.isPrincipalResidenceRequired,
       isStrProhibited: formValue.isStrProhibited,
+      isStraaExempt: formValue.isStraaExempt,
       managingOrganizationId: formValue.managingOrganizationId,
       updDtm: this.jurisdiction.updDtm,
+      isActive: formValue.isActive,
     };
 
     this.loaderService.loadingStart();
@@ -138,8 +142,10 @@ export class UpdateJurisdictionInformationComponent implements OnInit {
       managingOrganizationId: [this.jurisdiction.managingOrganizationId, [Validators.required]],
       isPrincipalResidenceRequired: [this.jurisdiction.isPrincipalResidenceRequired || false, [Validators.required]],
       isStrProhibited: [this.jurisdiction.isStrProhibited || false, [Validators.required]],
+      isStraaExempt: [this.jurisdiction.isStraaExempt || false, [Validators.required]],
       isBusinessLicenceRequired: [this.jurisdiction.isBusinessLicenceRequired || false, [Validators.required]],
       economicRegionDsc: [this.jurisdiction.economicRegionDsc, [Validators.required]],
+      isActive: [this.jurisdiction.isActive || false, [Validators.required]],
     });
 
     this.cd.detectChanges();

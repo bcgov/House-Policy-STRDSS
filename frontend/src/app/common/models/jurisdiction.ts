@@ -24,10 +24,12 @@ export interface Jurisdiction {
     shapeFileId: string;
     isPrincipalResidenceRequired: boolean;
     isStrProhibited: boolean;
+    isStraaExempt: boolean;
     isBusinessLicenceRequired: boolean;
     economicRegionDsc: string;
     managingOrganizationId: number;
     updDtm: string;
+    isActive: boolean;
 }
 
 export interface JurisdictionUpdate {
@@ -35,7 +37,9 @@ export interface JurisdictionUpdate {
     managingOrganizationId: number;
     isPrincipalResidenceRequired: boolean;
     isStrProhibited: boolean;
+    isStraaExempt: boolean;
     isBusinessLicenceRequired: boolean;
     economicRegionDsc: string;
     updDtm: string;
+    isActive: boolean;
 }

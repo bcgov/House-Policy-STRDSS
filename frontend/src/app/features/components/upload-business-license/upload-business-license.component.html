@@ -144,7 +144,7 @@
 </div>
 
 <p-dialog header="Upload Business Licence Data" class="upload-bl-popup" [modal]="true" [closable]="true"
-    [(visible)]="isUploadVisible" [style]="{ width: '640px' }" clo>
+    [(visible)]="isUploadVisible" [style]="{ width: '640px' }">
     <ng-template pTemplate="body">
         <div class="row sub-header">Upload Your Business Licence Data (.CSV File Only)</div>
         <div class="row file-select" [class.has-file]="selectedFile?.name">
@@ -152,7 +152,7 @@
                 (filesSelected)="onFileSelected($event, componentRef)"></app-upload-file>
             <div class="fileName">{{ selectedFile?.name || 'No file selected' }}</div>
             <button pButton class="p-button-transparent clean-btn" (click)="onClear()" *ngIf="selectedFile?.name"
-                icon="pi pi-times" size="small"></button>
+                icon="pi pi-times" aria-label="Clear" size="small"></button>
         </div>
     </ng-template>
     <ng-template pTemplate="footer">

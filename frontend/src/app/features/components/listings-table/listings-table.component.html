@@ -8,7 +8,7 @@
             <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()" aria-label="Search">
                 <i class="pi pi-search" aria-hidden="true"></i></button>
             <button pButton *ngIf="!!searchTerm" id="clear-search-btn" class="colorless p-button-link search-clear-btn"
-                icon="pi pi-times" (click)="onClearSearchBox()"></button>
+                icon="pi pi-times" (click)="onClearSearchBox()" aria-label="Clear search"></button>
             <input type="text" id="search-term-inp" (keydown.enter)="onSearch()" class="search-input"
                 placeholder="Search" pInputText [(ngModel)]="searchTerm" aria-label="Search input" />
         </span>
@@ -86,7 +86,7 @@
                             *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'asc'"></i>
                     </th>
 
-                    <th style="text-align: center;">Listing Details</th>
+                    <th style="text-align: center;">Details</th>
 
                     <th class="sortable-header" id="addressNormalized_header"
                         [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"
@@ -108,7 +108,7 @@
 
                     <th class="sortable-header" id="licence_header"
                         [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNo'"
-                        (click)="onSort('businessLicenceNo')">Business Licence on Listing
+                        (click)="onSort('businessLicenceNo')">Listing BL
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -117,7 +117,7 @@
 
                     <th class="sortable-header" id="licence_matched_header"
                         [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNoMatched'"
-                        (click)="onSort('businessLicenceNoMatched')">Matched Business Licence
+                        (click)="onSort('businessLicenceNoMatched')">Matched BL
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNoMatched' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -155,13 +155,16 @@
                     </td>
                     <td>
                         <div [ngSwitch]="row.listingStatusType" class="align-center status-col">
-                            <div *ngSwitchCase="'N'" class="status-circle status-new" pTooltip="New">
+                            <div *ngSwitchCase="'N'" class="status-circle status-new"
+                                pTooltip="New: Reported for the first time in the most recent monthly data">
                                 N
                             </div>
-                            <div *ngSwitchCase="'A'" class="status-circle status-active" pTooltip="Active">
+                            <div *ngSwitchCase="'A'" class="status-circle status-active"
+                                pTooltip="Active: Reported in the most recent monthly data ">
                                 A
                             </div>
-                            <div *ngSwitchCase="'I'" class="status-circle status-inactive" pTooltip="Inactive">
+                            <div *ngSwitchCase="'I'" class="status-circle status-inactive"
+                                pTooltip="Inactive: Not reported in the most recent monthly data">
                                 I
                             </div>
                             <div *ngIf="row.isLgTransferred" class="status-flag status-reassigned"
@@ -289,7 +292,7 @@
 </div>
 
 <p-sidebar ngClass="listing-filter p-sidebar-lg" [title]="'Filter Listings'" [(visible)]="isFilterOpened"
-    [closeOnEscape]="false" position="right" [modal]="false">
+    [closeOnEscape]="true" position="right" [modal]="false">
     <ng-template pTemplate="header">
         <strong class="h2-big"> Filter Listings</strong>
     </ng-template>

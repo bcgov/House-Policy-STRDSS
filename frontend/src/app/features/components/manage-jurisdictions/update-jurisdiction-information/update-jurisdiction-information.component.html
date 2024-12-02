@@ -62,7 +62,7 @@
             <div class="col">
                 <div class="form-group-row">
                     <div class="form-group-row-col">
-                        <label for="isPrincipalResidenceRequired">Principle Residence Requirement Applies?</label>
+                        <label for="isPrincipalResidenceRequired">Principal Residence Requirement Applies?</label>
                     </div>
                     <div class="form-group-row-col radios">
                         <p-radioButton name="isPrincipalResidenceRequired" id="isPrincipalResidenceRequired-true"
@@ -93,6 +93,21 @@
             <div class="col">
                 <div class="form-group-row">
                     <div class="form-group-row-col">
+                        <label for="isStraaExempt">STRAA Exempt?</label>
+                    </div>
+                    <div class="form-group-row-col radios">
+                        <p-radioButton name="isStraaExempt" id="isStraaExempt-true" [value]="true" label="Yes"
+                            formControlName="isStraaExempt"></p-radioButton> &nbsp;
+                        <p-radioButton name="isStraaExempt" id="isStraaExempt-false" [value]="false" label="No"
+                            formControlName="isStraaExempt"></p-radioButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
                         <label for="isBusinessLicenceRequired">Business Licence Requirement?</label>
                     </div>
                     <div class="form-group-row-col radios">
@@ -105,7 +120,21 @@
                 </div>
             </div>
         </div>
-
+        <div class="row">
+            <div class="col">
+                <div class="form-group-row">
+                    <div class="form-group-row-col">
+                        <label for="isActive">Is Active?</label>
+                    </div>
+                    <div class="form-group-row-col radios">
+                        <p-radioButton name="isActive" id="isActive-true" [value]="true" label="Yes"
+                            formControlName="isActive"></p-radioButton> &nbsp;
+                        <p-radioButton name="isActive" id="isActive-false" [value]="false" label="No"
+                            formControlName="isActive"></p-radioButton>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col">
                 <div class="form-group-row">

@@ -85,28 +85,15 @@
 
     <div class="form-group-row">
         <div class="form-group-row-col">
-            <label for="customDetailTxt">Provide details of the request
-                <strong>{{isWithStandardDetailControl.value?'(Optional)':''}}</strong></label>
+            <label for="customDetailTxt">Provide details of the request</label>
         </div>
         <div class="form-group-row-col">
-            <p-editor (onTextChange)="onEditorChanged($event)" appendTo="body" id="comment" name="comment"
-                placeholder="Enter Additional Comment Here..." formControlName="customDetailTxt"
-                [style]="{ height: '320px' }">
-                <ng-template pTemplate="header">
-                    <span class="ql-formats">
-                        <button type="button" class="ql-bold" aria-label="Bold"></button>
-                        <button type="button" class="ql-italic" aria-label="Italic"></button>
-                        <button type="button" class="ql-underline" aria-label="Underline"></button>
-                        <button type="button" class="ql-link" aria-label="Link"></button>
-                        <button class="ql-list" value="ordered" aria-label="List Ordered"></button>
-                        <button class="ql-list" value="bullet" aria-label="List Bullet"></button>
-                    </span>
-                </ng-template>
-            </p-editor>
-            <span class="limit-text"
-                [class.almost-limit-text]="(customDetailTxtControl.getRawValue() || '').length > 1950"
-                [class.limited-text]="(customDetailTxtControl.getRawValue() || '').length > 1999">{{(customDetailTxtControl.getRawValue()
-                || '').length}}/2000</span>
+            <textarea #textarea rows="5" cols="30" maxlength="2000" class="customDetail-txa"
+                formControlName="customDetailTxt"
+                placeholder="{{isWithStandardDetailControl.value?'Optional':'Required'}}" pInputTextarea
+                id="customDetailTxt" name="customDetailTxt"></textarea>
+            <span class="limit-text" [class.almost-limit-text]="textarea.value.length > 1950"
+                [class.limited-text]="textarea.value.length > 1999">{{textarea.value.length}}/2000</span>
         </div>
         <div class="form-group-row-col validation-errors"
             *ngIf="!customDetailTxtControl.pristine && customDetailTxtControl.errors">

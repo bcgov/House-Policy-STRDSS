@@ -41,4 +41,4 @@ jobs:
           format: openapi
           target: ${{ github.event.inputs.spec_url }}
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a'
+          cmd_options: '-O https://uat.strdata.gov.bc.ca'

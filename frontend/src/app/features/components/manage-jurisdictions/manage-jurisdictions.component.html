@@ -91,7 +91,7 @@
                 </th>
                 <th class="sortable-header" id="isPrincipalResidenceRequired_header"
                     [class.sorted]="this.sortSub && this.sortSub.prop === 'isPrincipalResidenceRequired'"
-                    (click)="onSortSub('isPrincipalResidenceRequired')">Principle Residence Requirement?
+                    (click)="onSortSub('isPrincipalResidenceRequired')">PR Requirement
                     <i class="pi pi-angle-down"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isPrincipalResidenceRequired' && this.sortSub.dir === 'desc'"></i>
                     <i class="pi pi-angle-up"
@@ -100,15 +100,23 @@
 
                 <th class="sortable-header" id="isStrProhibited_header"
                     [class.sorted]="this.sortSub && this.sortSub.prop === 'isStrProhibited'"
-                    (click)="onSortSub('isStrProhibited')">STR Prohibited?
+                    (click)="onSortSub('isStrProhibited')">STR Prohibited
                     <i class="pi pi-angle-down"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isStrProhibited' && this.sortSub.dir === 'desc'"></i>
                     <i class="pi pi-angle-up"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isStrProhibited' && this.sortSub.dir === 'asc'"></i>
                 </th>
+                <th class="sortable-header" id="isStraaExempt_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'isStraaExempt'"
+                    (click)="onSortSub('isStraaExempt')">STRAA Exempt
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isStraaExempt' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isStraaExempt' && this.sortSub.dir === 'asc'"></i>
+                </th>
                 <th class="sortable-header" id="isBusinessLicenceRequired_header"
                     [class.sorted]="this.sortSub && this.sortSub.prop === 'isBusinessLicenceRequired'"
-                    (click)="onSortSub('isBusinessLicenceRequired')"> BL Requirement?
+                    (click)="onSortSub('isBusinessLicenceRequired')"> BL Requirement
                     <i class="pi pi-angle-down"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isBusinessLicenceRequired' && this.sortSub.dir === 'desc'"></i>
                     <i class="pi pi-angle-up"
@@ -124,6 +132,7 @@
                 <td>{{jurisdiction.shapeFileId || '-'}}</td>
                 <td>{{jurisdiction.isPrincipalResidenceRequired?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isStrProhibited?'Yes':'No'}} </td>
+                <td>{{jurisdiction.isStraaExempt?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isBusinessLicenceRequired?'Yes':'No'}} </td>
                 <td *ngIf="canEdit" style="text-align: center">
                     <a id="jurisdiction-edit-{{index}}-icon"

@@ -5,7 +5,6 @@ on:
     types: [published]
 
 jobs:
-
   deploy-emerald:
     runs-on: ubuntu-22.04
     timeout-minutes: 5
@@ -18,36 +17,41 @@ jobs:
         repository: bcgov-c/tenant-gitops-b0471a
         ref: prod
         token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+
     - name: Update Helm Values and Commit
       id: helm
       run: |
-          pwd
+        # Get current date and time
+        datetime=$(date +'%Y-%m-%d %H:%M:%S')
+        vtag=${{ github.ref_name }}
 
-          # Get current date and time
-          datetime=$(date +'%Y-%m-%d %H:%M:%S')
-          vtag=${{ github.ref_name }}
+        echo "Image Tag:"
+        echo ${vtag//v}
 
-          echo "Image Tag:"
-          echo ${vtag//v}
+        # Update image tag
+        sed -i "s/tag: .*/tag: ${vtag//v} # Image Updated on $datetime/" deploy/prod_values.yaml
 
-          # set image tag
-          sed -i "s/tag: .*/tag: ${vtag//v} # Image Updated on $datetime/" deploy/prod_values.yaml
+        # Configure git
+        git config --global user.email "ychung-mot@github.com"
+        git config --global user.name "Young-Jin Chung"
 
-          # Commit and push the changes
-          git config --global user.email "ychung-mot@github.com"
-          git config --global user.name "Young-Jin Chung"
+        # Add and commit changes
+        git add deploy/prod_values.yaml
+        cd charts/gitops/charts
+        helm package ../../frontend/
+        helm package ../../backend/
+        helm package ../../hangfire/
+        git add .
+        git commit -m "Update image tag to ${vtag//v} on $datetime"
+        git push origin prod
 
-          git add deploy/prod_values.yaml
-
-          pwd
-          # Repackage Helm Chart
-          cd charts/gitops/charts
-
-          helm package ../../frontend/
-          helm package ../../backend/
-          helm package ../../hangfire/
-
-          git add .
-
-          git commit -m "Update image tag to ${vtag//v} on $datetime"
-          git push origin prod
+    - name: Create Pull Request to Main
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITOPS }}
+        branch: prod
+        base: main
+        title: "Deploy: Sync prod to main"
+        body: |
+          This PR syncs changes from the `prod` branch to the `main` branch.
+        commit-message: "Sync prod changes to main"

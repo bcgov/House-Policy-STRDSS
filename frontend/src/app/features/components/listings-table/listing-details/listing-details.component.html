@@ -100,7 +100,7 @@
                         *ngIf="listing.matchScoreAmt<=addressWarningScoreLimit && (!listing.isMatchVerified && !listing.isMatchCorrected)"></i>
                 </span>
                 <span *ngIf="canUserEditAddress" class="change-address-button-container">
-                    <button pButton class="p-button-transparent" pTooltip="Edit Address"
+                    <button pButton class="p-button-transparent" pTooltip="Edit Address" aria-label="Edit Address"
                         (click)="onAddressChangeClicked()">
                         <span class="edit-address-icon"></span>
                     </button>

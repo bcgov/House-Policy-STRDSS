@@ -16,19 +16,21 @@ jobs:
       with:
         repository: bcgov-c/tenant-gitops-b0471a
         ref: prod
-        token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+        token: ${{ secrets.GITOPS }}
 
     - name: Update Helm Values and Commit
       id: helm
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITOPS }}
       run: |
+        # Ensure GitHub CLI is authenticated
+        gh auth status || gh auth login --with-token <<< "${{ secrets.GITOPS }}"
+
         # Get current date and time
         datetime=$(date +'%Y-%m-%d %H:%M:%S')
         vtag=${{ github.ref_name }}
 
-        echo "Image Tag:"
-        echo ${vtag//v}
-
-        # Update image tag
+        # Update image tag in Helm values
         sed -i "s/tag: .*/tag: ${vtag//v} # Image Updated on $datetime/" deploy/prod_values.yaml
 
         # Configure git
@@ -45,13 +47,9 @@ jobs:
         git commit -m "Update image tag to ${vtag//v} on $datetime"
         git push origin prod
 
-    - name: Create Pull Request to Main
-      uses: peter-evans/create-pull-request@v6
-      with:
-        token: ${{ secrets.GITOPS }}
-        branch: prod
-        base: main
-        title: "Deploy: Sync prod to main"
-        body: |
-          This PR syncs changes from the `prod` branch to the `main` branch.
-        commit-message: "Sync prod changes to main"
+        # Create PR to main
+        gh pr create \
+          --base main \
+          --head prod \
+          --title "Sync prod to main for ${vtag}" \
+          --body "This PR syncs changes from the `prod` branch to the `main` branch for ${vtag}"

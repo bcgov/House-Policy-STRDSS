@@ -46,7 +46,7 @@ jobs:
         git push origin prod
 
     - name: Create Pull Request to Main
-      uses: peter-evans/create-pull-request@v5
+      uses: peter-evans/create-pull-request@v6
       with:
         token: ${{ secrets.GITOPS }}
         branch: prod

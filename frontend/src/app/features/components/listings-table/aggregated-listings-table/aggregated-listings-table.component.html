@@ -84,7 +84,7 @@
 
                     <th class="sortable-header" id="licence_header"
                         [class.sorted]="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo'"
-                        (click)="onSort('effectiveBusinessLicenceNo')">Listing’s Business Licence
+                        (click)="onSort('effectiveBusinessLicenceNo')">Listing’s Business Licence (BL)
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -95,7 +95,7 @@
 
                     <th> Last Action Date</th>
 
-                    <th> Listings </th>
+                    <th> Count </th>
                 </tr>
             </ng-template>
 
@@ -148,14 +148,14 @@
                             [ariaLabel]="'Select or Deselect listing'"></p-checkbox>
 
                     </th>
-                    <th>Status</th>
+                    <th aria-label="Status"></th>
                     <th>Platform</th>
                     <th>Listing ID</th>
-                    <th>Listing Details</th>
+                    <th>Details</th>
                     <th>Address (Best Match)</th>
                     <th>Nights stayed (12M)</th>
-                    <th>Business Licence on Listing</th>
-                    <th>Matched Business Licence</th>
+                    <th>Listing BL</th>
+                    <th>Matched BL</th>
                     <th>Last Action</th>
                     <th>Last Action Date</th>
                 </tr>
@@ -168,13 +168,16 @@
                     </td>
                     <td>
                         <div [ngSwitch]="listing.listingStatusType" class="align-center status-col">
-                            <div *ngSwitchCase="'N'" class="status-circle status-new" pTooltip="New">
+                            <div *ngSwitchCase="'N'" class="status-circle status-new"
+                                pTooltip="New: Reported for the first time in the most recent monthly data">
                                 N
                             </div>
-                            <div *ngSwitchCase="'A'" class="status-circle status-active" pTooltip="Active">
+                            <div *ngSwitchCase="'A'" class="status-circle status-active"
+                                pTooltip="Active: Reported in the most recent monthly data ">
                                 A
                             </div>
-                            <div *ngSwitchCase="'I'" class="status-circle status-inactive" pTooltip="Inactive">
+                            <div *ngSwitchCase="'I'" class="status-circle status-inactive"
+                                pTooltip="Inactive: Not reported in the most recent monthly data">
                                 I
                             </div>
                             <div *ngIf="listing.isLgTransferred" class="status-flag status-reassigned"
@@ -190,8 +193,7 @@
                             [href]="listing.platformListingUrl | urlProtocol">{{
                             listing.platformListingNo }}</a>
                     </td>
-                    <td class="align-center"><a [ariaLabel]="'open-listing-details'" pButton
-                            class="details-button-with-icon" target="_blank"
+                    <td><a [ariaLabel]="'open-listing-details'" pButton class="details-button-with-icon" target="_blank"
                             [routerLink]="'/listing/'+listing.rentalListingId"><i class="pi pi-list"></i></a></td>
                     <td
                         [class.low-address-score-match]="listing.matchScoreAmt<=addressLowScore && (!listing.isMatchVerified && !listing.isMatchCorrected)">

@@ -1,5 +1,5 @@
 <div class="top-block">
-    <h2 class="title">Listings</h2>
+    <h2 class="title">Individual Listings</h2>
     <div class="search-container">
         <span class="vertical-spacer" *ngIf="isFilterSet"></span>
         <p-dropdown [options]="searchColumns" [showClear]="searchColumn !== 'all'" (onClear)="clearSearchBy($event)"
@@ -233,7 +233,8 @@
             [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
     </p-panel>
 
-    <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
+    <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" ess [style]="{width: '50vw'}"
+        [closeOnEscape]="true">
         <span>
             <strong>Status:</strong> Status of the listing using the following categories:
             <ul class="statuses">

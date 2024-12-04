@@ -233,7 +233,8 @@
             [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
     </p-panel>
 
-    <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
+    <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" ess [style]="{width: '50vw'}"
+        [closeOnEscape]="true">
         <span>
             <strong>Status:</strong> Status of the listing using the following categories:
             <ul class="statuses">

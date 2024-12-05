@@ -107,6 +107,28 @@
     position: sticky;
     bottom: 0;
     z-index: 10;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .contacts {
+        font-size: smaller;
+        text-align: end;
+
+        a {
+            color: #FFFFFF;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+
+            &:visited {
+                color: #FFFFFF;
+            }
+        }
+    }
 }
 
 @media only screen and (max-width: 1500px) {

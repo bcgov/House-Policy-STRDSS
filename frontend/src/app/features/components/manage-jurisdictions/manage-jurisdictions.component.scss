@@ -22,6 +22,11 @@
                     background-color: #C1DDFC;
                 }
             }
+
+            &.inactive-jurisdiction {
+                color: #999999;
+                background-color: #fcfcfc;
+            }
         }
 
         th {

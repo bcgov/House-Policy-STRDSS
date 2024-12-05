@@ -122,18 +122,27 @@
                     <i class="pi pi-angle-up"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isBusinessLicenceRequired' && this.sortSub.dir === 'asc'"></i>
                 </th>
+                <th class="sortable-header" id="isActive_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'isActive'" (click)="onSortSub('isActive')">
+                    Active
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isActive' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isActive' && this.sortSub.dir === 'asc'"></i>
+                </th>
                 <th *ngIf="canEdit"> Update Jurisdiction Info </th>
             </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-jurisdiction let-index>
-            <tr>
+            <tr [class.inactive-jurisdiction]="!jurisdiction.isActive">
                 <td>{{jurisdiction.organizationNm || '-'}}</td>
                 <td>{{jurisdiction.shapeFileId || '-'}}</td>
                 <td>{{jurisdiction.isPrincipalResidenceRequired?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isStrProhibited?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isStraaExempt?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isBusinessLicenceRequired?'Yes':'No'}} </td>
+                <td>{{jurisdiction.isActive?'Yes':'No'}} </td>
                 <td *ngIf="canEdit" style="text-align: center">
                     <a id="jurisdiction-edit-{{index}}-icon"
                         [routerLink]="'/update-jurisdiction-information/'+jurisdiction.organizationId">

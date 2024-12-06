@@ -105,7 +105,7 @@
 
                     <th class="sortable-header" id="nightsStayed_header"
                         [class.sorted]="this.sort && this.sort.prop === 'nightsBookedYtdQty'"
-                        (click)="onSort('nightsBookedYtdQty')">Nights Stayed (YTD)
+                        (click)="onSort('nightsBookedYtdQty')">Nights Stayed (12M)
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'nightsBookedYtdQty' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"

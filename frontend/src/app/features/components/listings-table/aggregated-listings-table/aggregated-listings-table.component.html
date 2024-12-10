@@ -110,7 +110,8 @@
                     <td>
                         <div class="host-name">
                             {{ row.primaryHostNm }}
-                            <i *ngIf="row.hasMultipleProperties" pTooltip="This Host May have Multiple Properties."
+                            <i *ngIf="row.hasMultipleProperties" (click)="onMultihostClicked(row)"
+                                pTooltip="This Host May have Multiple Properties."
                                 class="multi-host multihost-icon"></i>
                         </div>
                     </td>

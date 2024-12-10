@@ -135,7 +135,7 @@ export class SendComplianceOrderComponent implements OnInit {
     this.loaderService.loadingStart();
     this.complianceService.sendComplianceOrdersPreview(this.submissionArray).subscribe({
       next: (preview) => {
-        this.previewText = preview.content;
+        this.previewText = this.fixBrokenLinksInAPreview(preview.content);
         this.showPreviewDialog = true;
       },
       complete: () => {
@@ -170,6 +170,21 @@ export class SendComplianceOrderComponent implements OnInit {
 
   cancelPreview(): void {
     this.showPreviewDialog = false;
+  }
+
+  private fixBrokenLinksInAPreview(content: string): string {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    const links = doc.querySelectorAll('a');
+
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && !/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(href)) {
+        link.setAttribute('href', 'http://' + href);
+      }
+    });
+
+    return doc.body.innerHTML;
   }
 
   private cloakParams(): void {

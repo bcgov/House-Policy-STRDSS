@@ -186,6 +186,13 @@ export class AggregatedListingsTableComponent implements OnInit {
         }
     }
 
+    onMultihostClicked(group: AggregatedListingTableRow) {
+        this.clearFilters();
+        this.searchColumn = 'hostName';
+        this.searchTerm = group.primaryHostNm;
+        this.onSearch();
+    }
+
     onSort(property: string): void {
         if (this.sort) {
             if (this.sort.prop === property) {
@@ -306,17 +313,7 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     onClearFilters(): void {
-        this.filterPersistenceService.listingFilter = {
-            byLocation: {
-                isBusinessLicenceRequired: '',
-                isPrincipalResidenceRequired: '',
-            },
-            community: 0,
-            byStatus: {},
-        };
-
-        this.initFilters();
-        this.isFilterOpened = false;
+        this.clearFilters();
         this.onSearch();
     }
 
@@ -368,6 +365,20 @@ export class AggregatedListingsTableComponent implements OnInit {
 
         this.isFilterOpened = false;
         this.onSearch();
+    }
+
+    private clearFilters(): void {
+        this.filterPersistenceService.listingFilter = {
+            byLocation: {
+                isBusinessLicenceRequired: '',
+                isPrincipalResidenceRequired: '',
+            },
+            community: 0,
+            byStatus: {},
+        };
+
+        this.initFilters();
+        this.isFilterOpened = false;
     }
 
     private getListings(selectedPageNumber: number = 1): void {

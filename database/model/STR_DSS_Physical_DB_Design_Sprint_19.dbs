@@ -1538,12 +1538,12 @@ BEGIN
     RAISE NOTICE 'Linked business licences for % listings', linked_count;
 END $$;]]></string>
 		</procedure>
-		<function name="dss_containing_organization_id" id="Function-12c" isSystem="false" params_known="y" >
+		<function name="dss_containing_organization_id" id="Function-497" isSystem="false" params_known="y" >
 			<string><![CDATA[CREATE OR REPLACE FUNCTION dss.dss_containing_organization_id(p_point geometry)
  RETURNS bigint
  LANGUAGE sql
  IMMUTABLE STRICT
-RETURN (SELECT do1.organization_id FROM dss.dss_organization do1 WHERE (st_intersects(dss_containing_organization_id.p_point, do1.area_geometry) AND (NOT (EXISTS (SELECT do2.organization_nm FROM dss.dss_organization do2 WHERE (st_intersects(dss_containing_organization_id.p_point, do2.area_geometry) AND (do2.organization_id <> do1.organization_id) AND (st_area(do2.area_geometry) < st_area(do1.area_geometry))))))))
+RETURN (SELECT do1.organization_id FROM dss.dss_organization do1 WHERE (st_intersects(dss_containing_organization_id.p_point, do1.area_geometry) AND do1.is_active AND (NOT (EXISTS (SELECT do2.organization_nm FROM dss.dss_organization do2 WHERE (st_intersects(dss_containing_organization_id.p_point, do2.area_geometry) AND do2.is_active AND (do2.organization_id <> do1.organization_id) AND (st_area(do2.area_geometry) < st_area(do1.area_geometry))))))))
 ;]]></string>
 			<input_param name="p_point" jt="-1" type="USER-DEFINED" inOut="1" />
 		</function>

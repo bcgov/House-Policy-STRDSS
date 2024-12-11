@@ -16,6 +16,7 @@ using DataBase.UnitOfWork;
 namespace SpecFlowProjectBDD.StepDefinitions
 {
     [Binding]
+    [Scope(Scenario = "ViewAggregatedListings")]
     public class UploadListingDataPlatformUser
     {
         private IDriver _Driver;

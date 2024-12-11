@@ -198,6 +198,7 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
 ### Release 7 Scripts:
 - Master Scripts _(preferred release method)_:
   - `utility/STR_DSS_Migration_Sprint_18.sql`
+  - `utility/STR_DSS_Migration_Sprint_19.sql`
 
 - Sprint 18:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_18.sql`
@@ -207,3 +208,6 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
 
 - Sprint 19:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_19.sql`
+  - `ddl/STR_DSS_Functions_Sprint_19.sql`
+  - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_19.sql`
+  - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_19.sql`

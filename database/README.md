@@ -18,7 +18,7 @@ The subfolders have the following content and uses:
 ## Database Design and Documentation
 The physical database design is documented and maintained using **DBSchema**. These are stored as XML files with the **`.dbs`** extension.
 
-Generated reports and images are published in https://hous-hpb.atlassian.net/wiki/spaces/DSS/pages/22708294/STR+DSS+Data+model
+Generated reports and images are published in https://hous-hpb.atlassian.net/wiki/spaces/DSS/pages/22708294/STR+DSS+Data+model .
 
 ## DDL Script Generation
 Each sprint, a DDL script is produced to fully instantiate the database objects into an empty schema. In addition, incremental scripts are provided to transform the database structure from the preceding sprint.
@@ -29,8 +29,10 @@ Often, database object definitions are changed after the sprint modeling activit
 ## Data Seeding
 There is always a base set of fixed data that are not managed by the application, and must be populated by script. Some of these are merely temporary situations that will be resolved as stories evolve to replace them.
 
+Some data is periodically refreshed from external sources, as described in https://hous-hpb.atlassian.net/wiki/spaces/DSS/pages/171638798/STR+DSS+Jurisdiction+Geometry+Refresh .
+
 ## Database Change Summaries
-Each sprint delivers a planned set of incremental changes to the database. The following summarizes the most recent sets of changes.
+Each sprint delivers a planned set of incremental changes to the database. The following summarizes the most recent sets of changes. Older design change summaries are documented in https://hous-hpb.atlassian.net/wiki/spaces/DSS/pages/22708294/STR+DSS+Data+model . 
 
 ### Sprint 17:
 - Create and populate lookup table `dss_economic_region`:

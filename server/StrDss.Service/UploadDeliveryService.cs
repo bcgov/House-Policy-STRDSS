@@ -99,7 +99,7 @@ namespace StrDss.Service
             }
             else if (reportType == UploadDeliveryTypes.TakedownData)
             {
-                return new string[] { "rpt_period", "rpt_type", "org_cd", "listing_id" };
+                return new string[] { "rpt_period", "rpt_type", "org_cd", "listing_id", "reason" };
             }
             else if (reportType == UploadDeliveryTypes.LicenceData)
             {

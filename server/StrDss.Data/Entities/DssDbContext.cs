@@ -951,6 +951,10 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.UpdUserGuid)
                 .HasComment("The globally unique identifier (assigned by the identity provider) for the most recent user to record a change")
                 .HasColumnName("upd_user_guid");
+            entity.Property(e => e.TakeDownReason)
+                .HasMaxLength(50)
+                .HasComment("Indicates the reason why the listing was taken down")
+                .HasColumnName("take_down_reason");
 
             entity.HasOne(d => d.DerivedFromRentalListing).WithMany(p => p.InverseDerivedFromRentalListing)
                 .HasForeignKey(d => d.DerivedFromRentalListingId)

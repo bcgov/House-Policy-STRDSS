@@ -148,6 +148,11 @@ public partial class DssRentalListing
     /// </summary>
     public DateTime? LgTransferDtm { get; set; }
 
+    /// <summary>
+    /// Indicates the reason why the listing was taken down
+    /// </summary>
+    public string? TakeDownReason { get; set; }
+
     public virtual DssRentalListing? DerivedFromRentalListing { get; set; }
 
     public virtual ICollection<DssEmailMessage> DssEmailMessages { get; set; } = new List<DssEmailMessage>();

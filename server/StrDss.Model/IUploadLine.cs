@@ -14,5 +14,7 @@ namespace StrDss.Model
         public string ListingId { get; set; } = "";
         [Name("bus_lic_no")]
         public string BusinessLicenceNo { get; set; } = "";
+        [Name("reason")]
+        public string TakeDownReason { get; set; } = "";
     }
 }

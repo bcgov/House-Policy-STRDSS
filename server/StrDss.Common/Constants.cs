@@ -565,4 +565,10 @@
         public const string Aps = "aps";
         public static readonly string[] ApsTagList = { "aps" };
     }
+
+    public static class TakeDownReasonStatus
+    {
+        public const string LGRequest = "LG Request";
+        public const string InvalidRegistration = "Invalid Registration";
+    }
 }

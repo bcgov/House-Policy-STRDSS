@@ -954,7 +954,7 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.TakeDownReason)
                 .HasMaxLength(50)
                 .HasComment("Indicates the reason why the listing was taken down")
-                .HasColumnName("take_down_reason");
+                .HasColumnName("takedown_reason");
 
             entity.HasOne(d => d.DerivedFromRentalListing).WithMany(p => p.InverseDerivedFromRentalListing)
                 .HasForeignKey(d => d.DerivedFromRentalListingId)
@@ -1215,6 +1215,9 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("platform_listing_url");
             entity.Property(e => e.RentalListingId).HasColumnName("rental_listing_id");
             entity.Property(e => e.SeparateReservationsYtdQty).HasColumnName("separate_reservations_ytd_qty");
+            entity.Property(e => e.TakeDownReason)
+                .HasMaxLength(50)
+                .HasColumnName("takedown_reason");
         });
 
         modelBuilder.Entity<DssRentalUploadHistoryView>(entity =>

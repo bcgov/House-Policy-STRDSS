@@ -104,4 +104,6 @@ public partial class DssRentalListingVw
     public bool? IsChangedBusinessLicence { get; set; }
 
     public DateTime? LgTransferDtm { get; set; }
+
+    public string? TakeDownReason { get; set; }
 }

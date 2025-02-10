@@ -8,6 +8,7 @@ export interface ListingDetails {
     isActive: boolean;
     isNew: boolean;
     isTakenDown: boolean;
+    takeDownReason: string;
     offeringOrganizationId: number;
     offeringOrganizationNm: string;
     platformListingNo: number;

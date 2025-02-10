@@ -99,7 +99,7 @@ namespace StrDss.Service
             }
             else if (reportType == UploadDeliveryTypes.TakedownData)
             {
-                return new string[] { "rpt_period", "rpt_type", "org_cd", "listing_id" };
+                return new string[] { "rpt_period", "rpt_type", "org_cd", "listing_id", "reason" };
             }
             else if (reportType == UploadDeliveryTypes.LicenceData)
             {
@@ -202,6 +202,7 @@ namespace StrDss.Service
             var invalidOrgCds = new List<string>();
             var listingIdMissing = 0;
             var bizLicenceMissing = 0;
+            var takedownReasonMismatch = 0;
 
             var listingIds = new List<string>();
             var duplicateListingIds = new List<string>();            
@@ -234,6 +235,18 @@ namespace StrDss.Service
                     if (mandatoryFields.Contains("rpt_type") && row.RptType != reportType)
                     {
                         reportTypeMismatch++;
+                    }
+
+                    if(mandatoryFields.Contains("reason"))
+                    {
+                        if (row.TakeDownReason.IsEmpty())
+                        {
+                            takedownReasonMismatch++;
+                        }
+                        else if (row.TakeDownReason != TakeDownReasonStatus.LGRequest && row.TakeDownReason != TakeDownReasonStatus.InvalidRegistration)
+                        {
+                            takedownReasonMismatch++;
+                        }
                     }
 
                     if (row.OrgCd.IsNotEmpty() && !orgCds.Contains(row.OrgCd.ToUpper())) orgCds.Add(row.OrgCd.ToUpper());
@@ -360,6 +373,11 @@ namespace StrDss.Service
             if (duplicateBizLicences.Count > 0)
             {
                 errors.AddItem("bus_lic_no", $"Duplicate Business Licence No(s) found: {string.Join(", ", duplicateBizLicences.ToArray())}. Each Business Licence No must be unique within an organization code.");
+            }
+
+            if (takedownReasonMismatch > 0)
+            {
+                errors.AddItem("reason", $"Takedown reason missing/mismatch found in {takedownReasonMismatch} record(s). The file contains missing/mismatch takedown reason(s).");
             }
 
             return (errors, header);

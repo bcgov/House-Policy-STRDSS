@@ -14,7 +14,6 @@ import { PanelModule } from 'primeng/panel';
 import { DropdownOption, DropdownOptionOrganization } from '../../../common/models/dropdown-option';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { User } from '../../../common/models/user';
-import { ListingDetailsComponent } from './listing-details/listing-details.component';
 import { ListingSearchRequest } from '../../../common/models/listing-search-request';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SelectedListingsStateService } from '../../../common/services/selected-listings-state.service';
@@ -46,7 +45,6 @@ import { ListingDetails } from '../../../common/models/listing-details';
     PanelModule,
     RouterModule,
     TooltipModule,
-    ListingDetailsComponent,
     TagModule,
     SidebarModule,
     AccordionModule,

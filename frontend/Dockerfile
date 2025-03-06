@@ -1,10 +1,10 @@
-FROM node:18.16.0 as builder-app
+FROM node:18.19.0 as builder-app
 
 ARG generate_sourcemap=false
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --force
 
 COPY . .
 

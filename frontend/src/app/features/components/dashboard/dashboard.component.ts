@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { UserDataService } from '../../../common/services/user-data.service';
@@ -16,7 +16,6 @@ import { GlobalLoaderService } from '../../../common/services/global-loader.serv
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    RouterOutlet,
     CardModule,
     ButtonModule,
     CommonModule,

@@ -748,6 +748,22 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(50)
                 .HasComment("The unitNumber (suite) returned by the address match (e.g. 100)")
                 .HasColumnName("unit_no");
+
+            entity.Property(e => e.RegRentalUnitNo)
+                .HasMaxLength(50)
+                .HasComment("The unit number (suite) provided by the registry validation upload (e.g. 100)")
+                .HasColumnName("reg_rental_unit_no");
+
+            entity.Property(e => e.RegRentalStreetNo)
+                .HasMaxLength(50)
+                .HasComment("The street number provided by the registry validation upload (e.g. 100)")
+                .HasColumnName("reg_rental_street_no");
+
+            entity.Property(e => e.RegRentalPostalCode)
+                .HasMaxLength(7)
+                .HasComment("The postal code provided by the registry validation upload (e.g. 100)")
+                .HasColumnName("reg_rental_postal_code");
+
             entity.Property(e => e.UpdDtm)
                 .HasComment("Trigger-updated timestamp of last change")
                 .HasColumnName("upd_dtm");
@@ -1286,6 +1302,23 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(25)
                 .HasComment("Identifies the treatment applied to ingesting the uploaded information")
                 .HasColumnName("upload_delivery_type");
+
+            entity.Property(e => e.UploadStatus)
+                .HasMaxLength(20)
+                .HasComment("The current processing status of the uploaded file: Pending, Processed, or Failed")
+                .HasColumnName("upload_status");
+            entity.Property(e => e.UploadLinesTotal)
+                 .HasComment("The total number of lines in the uploaded file")
+                .HasColumnName("upload_lines_total");
+            entity.Property(e => e.UploadLinesSuccess)
+                .HasComment("The number of lines int the uploaded file that successfully processed")
+                .HasColumnName("upload_lines_success");
+            entity.Property(e => e.UploadLinesError)
+                .HasComment("The number of lines in the uploaded file that failed to process")
+                .HasColumnName("upload_lines_error");
+            entity.Property(e => e.UploadLinesProcessed)
+                .HasComment("The number of lines in the uploaded file that were processed")
+                .HasColumnName("upload_lines_processed");
 
             entity.HasOne(d => d.ProvidingOrganization).WithMany(p => p.DssUploadDeliveries)
                 .HasForeignKey(d => d.ProvidingOrganizationId)

@@ -79,3 +79,4 @@ FROM dss_physical_address dpa
 JOIN dss_rental_listing drl ON dpa.physical_address_id = drl.locating_physical_address_id
 LEFT JOIN dss_rental_listing_contact drlc ON drl.rental_listing_id = drlc.contacted_through_rental_listing_id
 ORDER BY dpa.physical_address_id, drlc.full_nm;
+

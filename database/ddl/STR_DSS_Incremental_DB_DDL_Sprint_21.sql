@@ -6,11 +6,11 @@ COMMENT ON COLUMN dss_physical_address.reg_rental_unit_no IS 'The rental propert
 COMMENT ON COLUMN dss_physical_address.reg_rental_unit_no IS 'The rental property street number used to validate the bc registry number ';
 COMMENT ON COLUMN dss_physical_address.reg_rental_unit_no IS 'The rental property postal code number used to validate the bc registry number ';
 
-ALTER TABLE dss_upload_delivery ADD upload_status type varchar(20);
-ALTER TABLE dss_upload_delivery ADD upload_lines_total type smallint;
-ALTER TABLE dss_upload_delivery ADD upload_lines_success type smallint;
-ALTER TABLE dss_upload_delivery ADD upload_lines_error type smallint;
-ALTER TABLE dss_upload_delivery ADD upload_lines_processed type smallint;
+ALTER TABLE dss_upload_delivery ADD upload_status varchar(20);
+ALTER TABLE dss_upload_delivery ADD upload_lines_total smallint;
+ALTER TABLE dss_upload_delivery ADD upload_lines_success smallint;
+ALTER TABLE dss_upload_delivery ADD upload_lines_error smallint;
+ALTER TABLE dss_upload_delivery ADD upload_lines_processed smallint;
 
 COMMENT ON COLUMN dss_upload_delivery.upload_status IS 'The current processing status of the uploaded file: Pending, Processed, or Failed';
 COMMENT ON COLUMN dss_upload_delivery.upload_lines_total IS 'The total number of lines in the uploaded file';

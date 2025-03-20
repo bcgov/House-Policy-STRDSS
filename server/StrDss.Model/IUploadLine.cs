@@ -16,5 +16,11 @@ namespace StrDss.Model
         public string BusinessLicenceNo { get; set; } = "";
         [Name("reason")]
         public string TakeDownReason { get; set; } = "";
+        [Name("reg_no")]
+        public string RegNo { get; set; } = "";
+        [Name("rental_street")]
+        public string RentalStreet { get; set; } = "";
+        [Name("rental_postal")]
+        public string RentalPostal { get; set; } = "";
     }
 }

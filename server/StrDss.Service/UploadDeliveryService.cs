@@ -77,6 +77,8 @@ namespace StrDss.Service
                 ProvidingOrganizationId = orgId,
                 UpdUserGuid = _currentUser.UserGuid,
                 SourceHeaderTxt = header,
+                UploadStatus = UploadStatus.Pending,
+                UploadLinesTotal = uploadLines.Count
             };
 
             foreach (var line in uploadLines)
@@ -95,19 +97,23 @@ namespace StrDss.Service
         {
             if (reportType == UploadDeliveryTypes.ListingData)
             {
-                return new string[] { "rpt_period", "org_cd", "listing_id" };
+                return ["rpt_period", "org_cd", "listing_id"];
             }
             else if (reportType == UploadDeliveryTypes.TakedownData)
             {
-                return new string[] { "rpt_period", "rpt_type", "org_cd", "listing_id", "reason" };
+                return ["rpt_period", "rpt_type", "org_cd", "listing_id", "reason"];
             }
             else if (reportType == UploadDeliveryTypes.LicenceData)
             {
-                return new string[] { "org_cd", "bus_lic_no", "bus_lic_exp_dt", "rental_address" };
+                return ["org_cd", "bus_lic_no", "bus_lic_exp_dt", "rental_address"];
+            }
+            else if (reportType == UploadDeliveryTypes.ValidateRegistration)
+            {
+                return ["reg_no", "rental_street", "rental_postal"];
             }
             else
             {
-                return Array.Empty<string>();
+                return [];
             }
         }
 
@@ -203,6 +209,9 @@ namespace StrDss.Service
             var listingIdMissing = 0;
             var bizLicenceMissing = 0;
             var takedownReasonMismatch = 0;
+            var regNoMissing = 0;
+            var rentalStreetMissing = 0;
+            var rentalPostalMissing = 0;
 
             var listingIds = new List<string>();
             var duplicateListingIds = new List<string>();            
@@ -293,6 +302,12 @@ namespace StrDss.Service
                         }
                     }
 
+                    if (mandatoryFields.Contains("reg_no") && row.RegNo.IsEmpty()) regNoMissing++;
+
+                    if (mandatoryFields.Contains("rental_street") && row.RentalStreet.IsEmpty()) rentalStreetMissing++;
+
+                    if (mandatoryFields.Contains("rental_postal") && row.RentalPostal.IsEmpty()) rentalPostalMissing++;
+
                 }
                 catch (TypeConverterException ex)
                 {
@@ -380,6 +395,21 @@ namespace StrDss.Service
                 errors.AddItem("reason", $"Takedown reason missing/mismatch found in {takedownReasonMismatch} record(s). The file contains missing/mismatch takedown reason(s).");
             }
 
+            if (regNoMissing > 0)
+            {
+                errors.AddItem("reg_no", $"Registration No missing in {regNoMissing} record(s). Please provide a Registration No.");
+            }
+
+            if (rentalStreetMissing > 0)
+            {
+                errors.AddItem("rental_street", $"Rental Street missing in {rentalStreetMissing} record(s). Please provide a Rental Street.");
+            }
+
+            if (rentalPostalMissing > 0)
+            {
+                errors.AddItem("rental_postal", $"Rental Postal missing in {rentalPostalMissing} record(s). Please provide a Rental Postal.");
+            }
+
             return (errors, header);
         }
 
@@ -397,121 +427,6 @@ namespace StrDss.Service
                 errors.AddItem("File", "Please ensure the file headers are correct");
 
             return errors.Count == 0;
-        }
-
-        private async Task<Dictionary<string, List<string>>> ParseAndValidate(string reportPeriod, long orgId, CsvReader csv, List<DssUploadLine> uploadLines)
-        {
-            var errors = new Dictionary<string, List<string>>();
-
-            var reportPeriodMismatch = 0;
-            var reportPeriodMissing = 0;
-            var orgCdMissing = 0;
-            var invalidOrgCds = new List<string>();
-            var listingIdMissing = 0;
-            var listingIds = new List<string>();
-            var duplicateListingIds = new List<string>();
-
-            var orgCds = new List<string>();
-
-            while (csv.Read())
-            {
-                UploadLine row = null!;
-
-                try
-                {
-                    row = csv.GetRecord<UploadLine>();
-
-                    if (row.RptPeriod != reportPeriod) reportPeriodMismatch++;
-                    if (row.RptPeriod.IsEmpty()) reportPeriodMissing++;
-                    if (row.OrgCd.IsEmpty()) orgCdMissing++;
-                    if (row.ListingId.IsEmpty()) listingIdMissing++;
-
-                    if (row.OrgCd.IsNotEmpty() && !orgCds.Contains(row.OrgCd.ToUpper())) orgCds.Add(row.OrgCd.ToUpper());
-                    if (!listingIds.Contains($"{row.OrgCd}-{row.ListingId.ToLower()}"))
-                    {
-                        listingIds.Add($"{row.OrgCd}-{row.ListingId.ToLower()}");
-                        uploadLines.Add(new DssUploadLine
-                        {
-                            IsValidationFailure = false,
-                            IsSystemFailure = false,
-                            IsProcessed = false,
-                            SourceOrganizationCd = row.OrgCd,
-                            SourceRecordNo = row.ListingId,
-                            SourceLineTxt = csv.Parser.RawRecord
-                        });
-                    }
-                    else
-                    {
-                        duplicateListingIds.Add($"{row.OrgCd}-{row.ListingId.ToLower()}");
-                    }
-                }
-                catch (TypeConverterException ex)
-                {
-                    errors.AddItem(ex.MemberMapData.Member.Name, ex.Message);
-                    break;
-                }
-                catch (CsvHelper.MissingFieldException)
-                {
-                    break;
-                }
-                catch (CsvHelper.ReaderException ex)
-                {
-                    _logger.LogWarning(ex.Message);
-                    throw;
-                }
-                catch (CsvHelperException ex)
-                {
-                    _logger.LogInformation(ex.ToString());
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.ToString());
-                    throw;
-                }
-            }
-
-            var validOrgCds = await _orgRepo.GetManagingOrgCdsAsync(orgId);
-
-            foreach (var org in orgCds)
-            {
-                if (!validOrgCds.Contains(org))
-                {
-                    invalidOrgCds.Add(org);
-                }
-            }
-
-            if (reportPeriodMismatch > 0)
-            {
-                errors.AddItem("rpt_period", $"Report period mismatch found in {reportPeriodMismatch} record(s). The file contains report period(s) other than the selected period of {reportPeriod}");
-            }
-
-            if (reportPeriodMissing > 0)
-            {
-                errors.AddItem("rpt_period", $"Report period missing in {reportPeriodMissing} record(s). Please provide a report period.");
-            }
-
-            if (orgCdMissing > 0)
-            {
-                errors.AddItem("org_cd", $"Organization code missing in {orgCdMissing} record(s). Please provide an organization code.");
-            }
-
-            if (invalidOrgCds.Count > 0)
-            {
-                errors.AddItem("org_cd", $"Invalid organization code(s) found: {string.Join(", ", invalidOrgCds.ToArray())}. Please use one of the following valid organization code(s): {string.Join(", ", validOrgCds)}");
-            }
-
-            if (listingIdMissing > 0)
-            {
-                errors.AddItem("listing_id", $"Listing ID missing in {listingIdMissing} record(s). Please provide a listing ID.");
-            }
-
-            if (duplicateListingIds.Count > 0)
-            {
-                errors.AddItem("listing_id", $"Duplicate listing ID(s) found: {string.Join(", ", duplicateListingIds.ToArray())}. Each listing ID must be unique within an organization code.");
-            }
-
-            return errors;
         }
 
         public async Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes)

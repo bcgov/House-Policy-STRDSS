@@ -543,6 +543,7 @@
         public const string BlLinkWrite = "bl_link_write";
         public const string JurisdictionRead = "jurisdiction_read";
         public const string JurisdictionWrite = "jurisdiction_write";
+        public const string ValidateRegistration = "validate_reg_no";
     }
 
     public static class UploadDeliveryTypes
@@ -550,6 +551,7 @@
         public const string ListingData = "Listing Data";
         public const string TakedownData = "Takedown Data";
         public const string LicenceData = "Licence Data";
+        public const string ValidateRegistration = "Validate Registration";
     }
 
     public static class ListingExportFileNames
@@ -570,5 +572,12 @@
     {
         public const string LGRequest = "LG Request";
         public const string InvalidRegistration = "Invalid Registration";
+    }
+
+    public static class UploadStatus
+    {
+        public const string Pending = "Pending";
+        public const string Processed = "Processed";
+        public const string Failed = "Failed";
     }
 }

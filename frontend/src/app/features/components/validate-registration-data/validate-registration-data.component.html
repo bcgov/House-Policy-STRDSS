@@ -1,1 +1,41 @@
-<p>validate-registration-data works!</p>
+<div class="title">Validate Registration Data</div>
+<div class="sub-title">
+    All fields are required except where stated
+</div>
+<form [formGroup]="myForm" *ngIf="currentUser">
+    <div class="form-group-row" *ngIf="currentUser.organizationType !== 'Platform'">
+        <div class="form-group-row-col">
+            <label for="platformId">Select Platform Name</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-dropdown [options]="platformOptions" formControlName="platformId" placeholder="Select platform"
+                id="platformId" name="platformId" [required]="true"></p-dropdown>
+        </div>
+        <div class="form-group-row-col validation-errors"
+            *ngIf="!platformIdControl.pristine && platformIdControl.errors">
+            <small id="requiredPlatformId" *ngIf="platformIdControl.errors?.['required']">Platform name is
+                required</small>
+        </div>
+    </div>
+
+    <div class="form-group-row upload-row">
+        <div class="form-group-row-col">
+            <label for="platformId">Upload Your Registration Data (.CSV File Only)</label>
+        </div>
+        <div class="form-group-row-col upload-container" [class.has-file]="uploadedFile?.name">
+            <app-upload-file #componentRef [extension]="'.csv'" [sizeLimit]="maxFileSize"
+                (filesSelected)="onFileSelected($event, componentRef)"></app-upload-file>
+            <div class="file-name">{{uploadedFile?.name ||'No file selected'}}</div>
+            <button pButton class="p-button-transparent clean-btn" (click)="onClear()" *ngIf="uploadedFile?.name"
+                icon="pi pi-times" size="small"></button>
+        </div>
+        <div class="form-group-row-col validation-errors" *ngIf="!fileControl.pristine && fileControl.errors">
+            <small id="file-error-text" *ngIf="fileControl.errors?.['required']">File is required</small>
+        </div>
+    </div>
+
+    <div class="form-group-row actions">
+        <button [disabled]="myForm.invalid || isUploadStarted" pButton id="upload-btn" name="upload-btn"
+            (click)="onUpload()">Upload</button>
+    </div>
+</form>

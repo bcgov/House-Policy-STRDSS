@@ -1,0 +1,114 @@
+:host {
+    width: 100%;
+    padding: 24px;
+    background-color: #FFFFFF;
+
+    .title {
+        font-size: 24px;
+        font-family: 'BcSans-bold';
+        margin-bottom: 8px;
+    }
+
+    .sub-title {
+        font-size: 16px;
+        font-family: 'BcSans-bold';
+        margin-bottom: 18px;
+    }
+
+    .form-group-row {
+        width: 100%;
+
+        &.upload-row {
+            width: auto;
+        }
+
+        .form-group-row-col {
+            &.upload-container {
+                min-width: 366px;
+                width: fit-content;
+                display: flex;
+                gap: 12px;
+                padding: 4px !important;
+                border: 1px solid #353433;
+                border-radius: 4px;
+                align-items: center;
+                margin-top: 6px;
+
+                &.has-file {
+                    justify-content: space-between;
+                }
+
+                .file-name {
+                    padding-right: 8px;
+                }
+
+                .clean-btn {
+                    width: 2rem;
+                    padding: 0.3rem 0;
+                }
+            }
+        }
+
+        .validation-errors {
+            small {
+                color: #D32F2F;
+            }
+        }
+
+        label {
+            line-height: 26px;
+        }
+
+        &.form-spacer {
+            padding-top: 0;
+            margin-top: -14px;
+        }
+
+        &.inline-block {
+            width: 368px;
+            margin-right: 24px;
+            display: inline-block;
+
+            &:last-of-type {
+                margin-right: 0;
+            }
+        }
+
+        span.info-tooltip {
+            background-image: url(../../../../assets/images/info-icon.svg);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            line-height: 26px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 4px;
+        }
+
+        &-col {
+            font-size: 16px;
+
+            &.has-checkbox {
+                :first-child {
+                    margin-right: 8px;
+                }
+
+                padding-bottom: 16px;
+            }
+
+            &:not(&.has-checkbox, &.upload-container) {
+                width: 100%;
+
+                &:last-of-type {
+                    padding: 8px 0 16px 0;
+                }
+            }
+        }
+    }
+
+    .actions {
+        padding-top: 24px;
+        display: flex;
+    }
+}

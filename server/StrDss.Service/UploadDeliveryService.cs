@@ -212,6 +212,7 @@ namespace StrDss.Service
             var regNoMissing = 0;
             var rentalStreetMissing = 0;
             var rentalPostalMissing = 0;
+            var rentalPostalMismatch = 0;
 
             var listingIds = new List<string>();
             var duplicateListingIds = new List<string>();            
@@ -306,7 +307,21 @@ namespace StrDss.Service
 
                     if (mandatoryFields.Contains("rental_street") && row.RentalStreet.IsEmpty()) rentalStreetMissing++;
 
-                    if (mandatoryFields.Contains("rental_postal") && row.RentalPostal.IsEmpty()) rentalPostalMissing++;
+                    if (mandatoryFields.Contains("rental_postal"))
+                    {
+                        if (row.RentalPostal.IsEmpty())
+                        {
+                            rentalPostalMissing++;
+                        }
+                        else
+                        {
+                            var postalCodeRegexInfo = RegexDefs.GetRegexInfo(RegexDefs.CanadianPostalCode);
+                            if (!Regex.IsMatch(row.RentalPostal, postalCodeRegexInfo.Regex, RegexOptions.IgnoreCase))
+                            {
+                                rentalPostalMismatch++;
+                            }
+                        }
+                    }
 
                 }
                 catch (TypeConverterException ex)
@@ -408,6 +423,12 @@ namespace StrDss.Service
             if (rentalPostalMissing > 0)
             {
                 errors.AddItem("rental_postal", $"Rental Postal missing in {rentalPostalMissing} record(s). Please provide a Rental Postal.");
+            }
+
+            if (rentalPostalMismatch > 0)
+            {
+                var postalCodeRegexInfo = RegexDefs.GetRegexInfo(RegexDefs.CanadianPostalCode);
+                errors.AddItem("rental_postal", $"Rental Postal mismatch found in {rentalPostalMismatch} record(s). {postalCodeRegexInfo.ErrorMessage}");
             }
 
             return (errors, header);

@@ -17,6 +17,18 @@ namespace StrDss.Model.RentalReportDtos
         [Name("listing_url")]
         public string ListingUrl { get; set; } = "";
 
+        [Name("reg_no")]
+        public string RegNo { get; set; } = "";
+
+        [Name("rental_unit")]
+        public string RentalUnit { get; set; } = "";
+
+        [Name("rental_street")]
+        public string RentalStreet { get; set; } = "";
+
+        [Name("rental_postal")]
+        public string RentalPostal { get; set; } = "";
+
         [Name("rental_address")]
         public string RentalAddress { get; set; } = "";
 

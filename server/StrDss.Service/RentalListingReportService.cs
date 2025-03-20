@@ -313,6 +313,9 @@ namespace StrDss.Service
                 var newAddress = new DssPhysicalAddress
                 {
                     OriginalAddressTxt = row.RentalAddress,
+                    RegRentalUnitNo = row.RentalUnit,
+                    RegRentalStreetNo = row.RentalStreet,
+                    RegRentalPostalCode = row.RentalPostal,
                 };
 
                 error = await _geocoder.GetAddressAsync(newAddress);
@@ -347,6 +350,10 @@ namespace StrDss.Service
 
                 listing.IsChangedOriginalAddress = true;
 
+                newAddress.RegRentalUnitNo = row.RentalUnit;
+                newAddress.RegRentalStreetNo = row.RentalStreet;
+                newAddress.RegRentalPostalCode = row.RentalPostal;
+
                 _addressRepo.ReplaceAddress(listing, newAddress);
 
                 return (newAddress, error);
@@ -357,6 +364,9 @@ namespace StrDss.Service
                 var newAddress = new DssPhysicalAddress
                 {
                     OriginalAddressTxt = row.RentalAddress,
+                    RegRentalUnitNo = row.RentalUnit,
+                    RegRentalStreetNo = row.RentalStreet,
+                    RegRentalPostalCode = row.RentalPostal,
                 };
 
                 error = await _geocoder.GetAddressAsync(newAddress);

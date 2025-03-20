@@ -72,6 +72,9 @@ namespace StrDss.Service.Hangfire
                 case UploadDeliveryTypes.LicenceData:
                     await _bizLicService.ProcessBizLicenceUploadMainAsync(upload);
                     break;
+                case UploadDeliveryTypes.RegistryData:
+                    await _linstingReportService.ProcessRentalReportUploadAsync(upload);
+                    break;
                 default:
                     break;
             }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TopMenuItem } from '../models/top-menu-item';
-import { ceu_action, jurisdiction_read, licence_file_upload, listing_file_upload, listing_read, platform_read, role_read, takedown_action, upload_history_read, user_write } from '../consts/permissions.const';
+import { ceu_action, jurisdiction_read, licence_file_upload, listing_file_upload, listing_read, platform_read, role_read, takedown_action, upload_history_read, user_write, validate_reg_no } from '../consts/permissions.const';
 import { User } from '../models/user';
 
 @Injectable({
@@ -120,6 +120,23 @@ export class TopMenuService {
         description: 'Upload Business Licence Data',
         title: 'Upload Business Licence Data',
         folderName: 'Upload',
+      },
+
+      {
+        accessPermission: validate_reg_no,
+        buttonId: 'validateRegistrationData_mi_btn',
+        route: '/validate-registration-data',
+        description: 'Validate Registration Data',
+        title: 'Validate Registration Data',
+        folderName: 'Validate',
+      },
+      {
+        accessPermission: validate_reg_no,
+        buttonId: 'registrationValidationHistory_mi_btn',
+        route: '/registration-validation-history',
+        description: 'Registration Validation History',
+        title: 'Registration Validation History',
+        folderName: 'Validate',
       },
 
       {

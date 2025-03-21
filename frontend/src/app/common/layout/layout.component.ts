@@ -77,6 +77,10 @@ export class LayoutComponent {
         items: []
       },
       {
+        label: 'Validate',
+        items: []
+      },
+      {
         label: 'Admin Tools',
         items: []
       },

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DashboardCard, DashboardCardSections } from '../models/dashboard-card';
-import { jurisdiction_read, licence_file_upload, listing_file_upload, listing_read, platform_read, role_read, takedown_action, upload_history_read, user_write } from '../consts/permissions.const';
+import { jurisdiction_read, licence_file_upload, listing_file_upload, listing_read, platform_read, role_read, takedown_action, upload_history_read, user_write, validate_reg_no } from '../consts/permissions.const';
 import { User } from '../models/user';
 
 @Injectable({
@@ -110,6 +110,28 @@ export class DashboardService {
         route: '/upload-business-licence-data',
         boxId: 'uploadBlData_box',
         buttonId: 'uploadBlData_btn',
+        section: 'main',
+      },
+      {
+        title: 'Validate Registration Data',
+        accessPermission: validate_reg_no,
+        buttonIcon: 'upload',
+        buttonText: 'Validate Registration Data',
+        description: 'Upload your registration data to validate',
+        route: '/validate-registration-data',
+        boxId: 'validateRegistrationData_box',
+        buttonId: 'validateRegistrationData_btn',
+        section: 'main',
+      },
+      {
+        title: 'Registration Validation History',
+        accessPermission: validate_reg_no,
+        buttonIcon: 'history',
+        buttonText: 'Registration Validation History',
+        description: 'View all registration validation history here',
+        route: '/registration-validation-history',
+        boxId: 'registrationValidationHistory_box',
+        buttonId: 'registrationValidationHistory_btn',
         section: 'main',
       },
       {

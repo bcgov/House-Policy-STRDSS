@@ -211,6 +211,7 @@ namespace StrDss.Service
             var takedownReasonMismatch = 0;
             var regNoMissing = 0;
             var rentalStreetMissing = 0;
+            var rentalStreetInvalid = 0;
             var rentalPostalMissing = 0;
             var rentalPostalMismatch = 0;
 
@@ -305,7 +306,21 @@ namespace StrDss.Service
 
                     if (mandatoryFields.Contains("reg_no") && row.RegNo.IsEmpty()) regNoMissing++;
 
-                    if (mandatoryFields.Contains("rental_street") && row.RentalStreet.IsEmpty()) rentalStreetMissing++;
+                    if (mandatoryFields.Contains("rental_street"))
+                    {
+                        if (row.RentalStreet.IsEmpty())
+                        {
+                            rentalStreetMissing++;
+                        }
+                        else
+                        {
+                            var streetNumberRegexInfo = RegexDefs.GetRegexInfo(RegexDefs.CanadianStreetNumber);
+                            if (!Regex.IsMatch(row.RentalStreet, streetNumberRegexInfo.Regex))
+                            {
+                                rentalStreetInvalid++;
+                            }
+                        }
+                    }
 
                     if (mandatoryFields.Contains("rental_postal"))
                     {
@@ -418,6 +433,12 @@ namespace StrDss.Service
             if (rentalStreetMissing > 0)
             {
                 errors.AddItem("rental_street", $"Rental Street missing in {rentalStreetMissing} record(s). Please provide a Rental Street.");
+            }
+
+            if (rentalStreetInvalid > 0)
+            {
+                var streetNumberRegexInfo = RegexDefs.GetRegexInfo(RegexDefs.CanadianStreetNumber);
+                errors.AddItem("rental_street", $"Rental Street invalid in {rentalStreetInvalid} record(s). {streetNumberRegexInfo.ErrorMessage}");
             }
 
             if (rentalPostalMissing > 0)

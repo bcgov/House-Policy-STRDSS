@@ -107,7 +107,7 @@ namespace StrDss.Service
             {
                 return ["org_cd", "bus_lic_no", "bus_lic_exp_dt", "rental_address"];
             }
-            else if (reportType == UploadDeliveryTypes.ValidateRegistration)
+            else if (reportType == UploadDeliveryTypes.RegistrationData)
             {
                 return ["reg_no", "rental_street", "rental_postal"];
             }

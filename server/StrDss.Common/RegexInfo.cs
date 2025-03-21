@@ -29,6 +29,7 @@
         public const string YearMonth = "YearMonth";
         public const string YearMonthDay = "YearMonthDay";
         public const string CanadianPostalCode = "CanadianPostalCode";
+        public const string CanadianStreetNumber = "CanadianStreetNumber";
 
         private static readonly Dictionary<string, RegexInfo> _regexInfos;
 
@@ -82,6 +83,12 @@
             {
                 Regex = @"^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$",
                 ErrorMessage = "Invalid postal code format. Please use formats like A1A1A1 or A1A 1A1."
+            });
+
+            _regexInfos.Add(CanadianStreetNumber, new RegexInfo
+            {
+                Regex = @"^\d+[A-Za-z]?(\s?\/\s?\d+)?([\-–]\d+)?$",
+                ErrorMessage = "Invalid street number format. Please provide a valid street number (e.g., 123 or 456B or 789 1/2 or 101-103)."
             });
         }
 

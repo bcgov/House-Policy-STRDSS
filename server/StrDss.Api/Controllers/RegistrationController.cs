@@ -50,7 +50,7 @@ namespace StrDss.Api.Controllers
 
             using var stream = dto.File.OpenReadStream();
 
-            errors = await _uploadService.UploadData(UploadDeliveryTypes.ValidateRegistration, string.Empty, dto.OrganizationId, stream);
+            errors = await _uploadService.UploadData(UploadDeliveryTypes.RegistrationData, string.Empty, dto.OrganizationId, stream);
 
             if (errors.Count > 0)
             {
@@ -65,7 +65,7 @@ namespace StrDss.Api.Controllers
         public async Task<ActionResult> GetRegistrationValidationHistory(long? platformId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
             var history = await _uploadService.GetUploadHistory(platformId, pageSize, pageNumber, orderBy, direction,
-                [UploadDeliveryTypes.ValidateRegistration]);
+                [UploadDeliveryTypes.RegistrationData]);
 
             return Ok(history);
         }

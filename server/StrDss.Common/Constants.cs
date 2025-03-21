@@ -551,7 +551,7 @@
         public const string ListingData = "Listing Data";
         public const string TakedownData = "Takedown Data";
         public const string LicenceData = "Licence Data";
-        public const string ValidateRegistration = "Validate Registration";
+        public const string RegistrationData = "Registration Data";
     }
 
     public static class ListingExportFileNames

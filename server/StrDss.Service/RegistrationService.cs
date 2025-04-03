@@ -171,18 +171,17 @@ namespace StrDss.Service
 
         private async Task<bool> ProcessUploadLine(DssUploadDelivery upload, DssUploadLine uploadLine, RegistrationDataRowUntyped row, bool isLastLine)
         {
-            var errors = new Dictionary<string, List<string>>();
+            var rowErrors = new Dictionary<string, List<string>>();
 
-            _validator.Validate(Entities.RegistrationDataRowUntyped, row, errors);
-            if (errors.Count > 0)
+            _validator.Validate(Entities.RegistrationDataRowUntyped, row, rowErrors);
+            if (rowErrors.Count > 0)
             {
-                SaveUploadLine(uploadLine, errors, true, "");
-                _unitOfWork.Commit();
+                SaveUploadLine(uploadLine, rowErrors, true, false);
                 return false;
             }
 
-            var regResponse = await _validateClient.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
-            if (regResponse.isValid)
+            (bool isValid, Dictionary<string, List<string>> regErrors) = await _validateClient.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
+            if (isValid)
             {
                 using var tran = _unitOfWork.BeginTransaction();
 
@@ -198,29 +197,25 @@ namespace StrDss.Service
                     {
                         // Set the unit, street, and postal code values here
                         physicalAddress.RegRentalUnitNo = row.RentalUnit;
+                        physicalAddress.RegRentalStreetNo = row.RentalStreet;
+                        physicalAddress.RegRentalPostalCode = row.RentalPostal;
 ;                    }
 
                 }
                 tran.Commit();
             }
 
-            SaveUploadLine(uploadLine, errors, !regResponse.isValid, regResponse.error);
-            _unitOfWork.Commit();
-            return regResponse.isValid;
+            SaveUploadLine(uploadLine, regErrors, false, !isValid);
+            return isValid;
         }
 
-        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, string systemError)
+        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, bool isSystemError)
         {
             uploadLine.IsValidationFailure = isValidationFailure;
+            uploadLine.IsSystemFailure = isSystemError;
             uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
-
-            uploadLine.IsSystemFailure = systemError.IsNotEmpty();
-            if (uploadLine.IsSystemFailure)
-            {
-                uploadLine.ErrorTxt = systemError;
-            }
-
             uploadLine.IsProcessed = true;
+            _unitOfWork.Commit();
         }
     }
 }

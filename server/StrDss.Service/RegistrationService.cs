@@ -30,18 +30,16 @@ namespace StrDss.Service
         private IUploadDeliveryRepository _uploadRepo;
         private IRentalListingReportRepository _reportRepo;
         private IPhysicalAddressRepository _addressRepo;
-        private IGeocoderApi _geocoder;
         private IUserRepository _userRepo;
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
-        private IBizLicenceRepository _bizLicRepo;
         private IConfiguration _config;
         private IValidatePermitClient _validateClient;
 
         public RegistrationService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
-            IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBizLicenceRepository bizLicRepo,
-            IConfiguration config, IValidatePermitClient validateClient, ILogger<StrDssLogger> logger)
+            IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IConfiguration config, IValidatePermitClient validateClient,
+            ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _orgRepo = orgRepo;

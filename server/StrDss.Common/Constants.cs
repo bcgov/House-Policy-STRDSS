@@ -11,6 +11,7 @@
     public static class Entities
     {
         public const string RentalListingRowUntyped = "RentalListingRowUntyped";
+        public const string RegistrationDataRowUntyped = "RegistrationDataRowUntyped";
         public const string Role = "Role";
         public const string BizLicenceRowUntyped = "BizLicenceRowUntyped";
         public const string Platform = "Platform";
@@ -519,6 +520,7 @@
         public const string BatchTakedownRequest = "Batch Takedown Request";
         public const string ListingUploadError = "Listing Upload Error";
         public const string CompletedTakedown = "Completed Takedown";
+        public const string RegistrationValidation = "Registration Validation";
     }
 
     public static class Permissions

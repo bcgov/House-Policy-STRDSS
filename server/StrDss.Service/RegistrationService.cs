@@ -34,11 +34,12 @@ namespace StrDss.Service
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
         private IConfiguration _config;
-        private IValidatePermitClient _validateClient;
+        private IRegistrationApiClient _regClient;
+        private string? _apiAccount;
 
         public RegistrationService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
-            IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IConfiguration config, IValidatePermitClient validateClient,
+            IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IConfiguration config, IRegistrationApiClient regClient,
             ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
@@ -49,7 +50,8 @@ namespace StrDss.Service
             _emailService = emailService;
             _emailRepo = emailRepo;
             _config = config;
-            _validateClient = validateClient;
+            _regClient = regClient;
+            _apiAccount = _config.GetValue<string>("REGISTRATION_API_ACCOUNT");
         }
 
         public async Task ProcessRegistrationDataUploadAsync(DssUploadDelivery upload)
@@ -180,7 +182,7 @@ namespace StrDss.Service
                 return false;
             }
 
-            (bool isValid, Dictionary<string, List<string>> regErrors) = await _validateClient.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
+            (bool isValid, Dictionary<string, List<string>> regErrors) = await ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
             if (isValid)
             {
                 using var tran = _unitOfWork.BeginTransaction();
@@ -207,6 +209,54 @@ namespace StrDss.Service
 
             SaveUploadLine(uploadLine, regErrors, false, !isValid);
             return isValid;
+        }
+
+        public async Task<(bool isValid, Dictionary<string, List<string>> errors)> ValidateRegistrationPermitAsync(string regNo, string unitNumber, string streetNumber, string postalCode)
+        {
+            bool isValid = true;
+            Dictionary<string, List<string>> errorDetails = new();
+
+            StrDss.Service.HttpClients.Body body = new()
+            {
+                Identifier = regNo,
+                Address = new()
+                {
+                    UnitNumber = unitNumber,
+                    StreetNumber = streetNumber,
+                    PostalCode = postalCode
+                }
+            };
+
+            try
+            {
+                Response resp = await _regClient.ValidatePermitAsync(body, _apiAccount);
+
+                // If we didn't get a Status field back, then there was an error
+                if (string.IsNullOrEmpty(resp.Status))
+                {
+                    isValid = false;
+                    if (resp.Errors.Count == 0)
+                        errorDetails.Add("UNKNOWN ERROR", new List<string> { "Response did not contain a status or error message." });
+                    else
+                        errorDetails = resp.Errors
+                            .GroupBy(e => e.Code)
+                            .ToDictionary(g => g.Key, g => g.Select(e => e.Message).ToList());
+                }
+
+                // If the status is not "ACTIVE" then there is an issue with the registration
+                if (!string.Equals(resp.Status, "ACTIVE", StringComparison.OrdinalIgnoreCase))
+                {
+                    isValid = false;
+                    errorDetails.Add("INACTIVE PERMIT", new List<string> { "Error: registration status returned as " + resp.Status });
+                }
+            }
+            catch (Exception ex)
+            {
+                isValid = false;
+                errorDetails.Add("EXCEPTION", new List<string> { ex.Message });
+            }
+
+            return (isValid, errorDetails);
         }
 
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, bool isSystemError)

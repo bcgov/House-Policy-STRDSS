@@ -40,7 +40,7 @@ namespace StrDss.Service.HttpClients
                 client.DefaultRequestHeaders.Add("apiKey", $"{apiKey}");
             });
 
-            services.AddHttpClient<RegistrationApiClient>(client =>
+            services.AddHttpClient<IRegistrationApiClient, RegistrationApiClient>(client =>
             {
                 var baseAddress = config.GetValue<string>("REGISTRATION_API_URL") ?? "";
                 var apiKey = config.GetValue<string>("REGISTRATION_API_KEY") ?? "";

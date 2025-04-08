@@ -304,7 +304,25 @@ namespace StrDss.Service
                         }
                     }
 
-                    if (mandatoryFields.Contains("reg_no") && row.RegNo.IsEmpty()) regNoMissing++;
+                    if (mandatoryFields.Contains("reg_no")) 
+                    {
+                        if (row.RegNo.IsEmpty())
+                        {
+                            regNoMissing++;
+                        }
+                        else
+                        {
+                            uploadLines.Add(new DssUploadLine
+                            {
+                                IsValidationFailure = false,
+                                IsSystemFailure = false,
+                                IsProcessed = false,
+                                SourceOrganizationCd = org.OrganizationCd,
+                                SourceRecordNo = row.RegNo,
+                                SourceLineTxt = csv.Parser.RawRecord
+                            });
+                        }
+                    }
 
                     if (mandatoryFields.Contains("rental_street"))
                     {

@@ -22,6 +22,26 @@ export class RegistrationService {
     formData.append('organizationId', organizationId.toString());
     formData.append('file', file);
 
-    return this.httpClient.post<any>(`${environment.API_HOST}/Registration`, formData);
+    return this.httpClient.post<any>(`${environment.API_HOST}/registration`, formData);
+  }
+
+  getRegistrationValidationHistory(
+    pageNumber: number = 1,
+    pageSize: number = 10,
+    orderBy: string = '',
+    direction: 'asc' | 'desc' = 'asc',
+    platformId: number = 0,
+  ): Observable<any> {
+    let url = `${environment.API_HOST}/registration/registrationvalidationhistory?pageSize=${pageSize}&pageNumber=${pageNumber}`;
+
+    if (!!platformId) {
+      url += `&platformId=${platformId}`;
+    }
+
+    if (orderBy) {
+      url += `&orderBy=${orderBy}&direction=${direction}`;
+    }
+
+    return this.httpClient.get<any>(url);
   }
 }

@@ -1,1 +1,117 @@
-<p>registration-validation-history works!</p>
+<h2>Registration Validation History</h2>
+<p-card *ngIf="currentUser" class="registration-validation-history-card">
+    <div class="form-group-row" *ngIf="currentUser.organizationType !== 'Platform'">
+        <div class="form-group-row-col">
+            <label for="platformId">Select Platform</label>
+        </div>
+        <div class="form-group-row-col">
+            <p-dropdown [options]=" platformOptions" [(ngModel)]="selectedPlatformId"
+                (onChange)="onPlatformSelected($event.value)" placeholder="Select platform" id="platformId"
+                name="platformId" [required]="true"></p-dropdown>
+        </div>
+    </div>
+    <p-table [value]="registrationValidationHistory" styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template pTemplate="header">
+            <tr>
+                <th class="sortable-header" id="organizationNm_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'organizationNm'"
+                    (click)="onSort('organizationNm')">Platform
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'asc'"></i>
+                </th>
+
+                <th class="sortable-header" id="status_header" [class.sorted]="this.sort && this.sort.prop === 'status'"
+                    (click)="onSort('status')">Status
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'status' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'status' && this.sort.dir === 'asc'"></i>
+                </th>
+
+                <th class="sortable-header" id="total_header" [class.sorted]="this.sort && this.sort.prop === 'total'"
+                    (click)="onSort('total')">Total Records
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'total' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'total' && this.sort.dir === 'asc'"></i>
+                </th>
+
+                <th class="sortable-header" id="success_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'success'" (click)="onSort('success')">Success
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'success' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'success' && this.sort.dir === 'asc'"></i>
+                </th>
+
+                <th class="sortable-header" id="errors_header" [class.sorted]="this.sort && this.sort.prop === 'errors'"
+                    (click)="onSort('errors')">Errors
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'errors' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'errors' && this.sort.dir === 'asc'"></i>
+                </th>
+
+                <th class="sortable-header" id="updDtm_header" [class.sorted]="this.sort && this.sort.prop === 'updDtm'"
+                    (click)="onSort('updDtm')">Upload Date
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'asc'"></i>
+                </th>
+
+                <th class="sortable-header" id="givenNm_header" [class.sorted]="this.sort && this.sort.prop === 'givenNm'"
+                    (click)="onSort('givenNm')">Uploaded By
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'givenNm' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'givenNm' && this.sort.dir === 'asc'"></i>
+                </th>
+
+                <th class="limit-width">
+                    Report
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+            <tr>
+                <td>{{ row.organizationNm }}</td>
+                <td>
+                    <span *ngIf="row.status==='Processed'; then processed; else pending"></span>
+                    <ng-template #processed> <span class="state-processed">{{row.status}}</span></ng-template>
+                    <ng-template #pending><span class="state-pending">{{row.status}}</span></ng-template>
+                </td>
+                <td>
+                    {{row.total}}
+                </td>
+                <td>
+                    {{row.success}}
+                </td>
+                <td>
+                    {{row.errors}}
+                </td>
+                <td>{{ row.updDtm |date:'yyyy-MM-dd' }}</td>
+                <td>{{ row.givenNm }} {{ row.familyNm }}</td>
+                <td>
+                    <button [id]="'downloadReport_'+row.uploadDeliveryId" pButton
+                        [disabled]="row.status==='Pending'" class="p-button-link zero-padding">
+                        <i class="pi pi-download"></i>
+                    </button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="8">No records found</td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <p-paginator class="upload-history-paginator" #paginator *ngIf="currentPage"
+        (onPageChange)="onPageChange($event)" [rows]="10" [totalRecords]="currentPage.totalCount || 0"
+        [showPageLinks]="false" [showCurrentPageReport]="true" [showFirstLastIcon]="false"
+        [currentPageReportTemplate]="'Rows per page: 10 &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
+
+</p-card>

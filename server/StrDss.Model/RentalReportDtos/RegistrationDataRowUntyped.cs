@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace StrDss.Model.RentalReportDtos
 {
-    public class RentalListingRowUntyped
+    public class RegistrationDataRowUntyped
     {
         [Name("rpt_period")]
         public string RptPeriod { get; set; } = "";

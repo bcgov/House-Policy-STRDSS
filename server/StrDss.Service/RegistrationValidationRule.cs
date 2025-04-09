@@ -2,41 +2,41 @@
 
 namespace StrDss.Service
 {
-    public static class RentalListingReportValidationRule
+    public static class RegistrationValidationRule
     {
-        public static void LoadReportValidationRules(List<FieldValidationRule> rules)
+        public static void LoadRegistrationValidationRules(List<FieldValidationRule> rules)
         {
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.RptPeriod,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.RptPeriod,
                 FieldType = FieldTypes.String,
-                Required = true,
+                Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.YearMonth)
             });
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.OrgCd,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.OrgCd,
                 FieldType = FieldTypes.String,
-                Required = true,
+                Required = false,
                 MaxLength = 25,
             });
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.ListingId,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.ListingId,
                 FieldType = FieldTypes.String,
-                Required = true,
+                Required = false,
                 MaxLength = 25,
             });
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.ListingUrl,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.ListingUrl,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 4000,
@@ -44,8 +44,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.RentalAddress,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.RentalAddress,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 250
@@ -53,8 +53,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.BusLicNo,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.BusLicNo,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -62,27 +62,17 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.BcRegNo,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.BcRegNo,
                 FieldType = FieldTypes.String,
-                Required = false,
-                MaxLength = 25
-            });
-
-
-            rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.RentalUnit,
-                FieldType = FieldTypes.String,
-                Required = false,
+                Required = true,
                 MaxLength = 25
             });
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.RentalStreet,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.RentalUnit,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 25
@@ -90,16 +80,26 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.RentalPostal,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.RentalStreet,
                 FieldType = FieldTypes.String,
-                Required = false,
+                Required = true,
+                MaxLength = 25
+            });
+
+            rules.Add(new FieldValidationRule
+            {
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.RentalPostal,
+                FieldType = FieldTypes.String,
+                Required = true,
                 MaxLength = 6
             });
+
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.IsEntireUnit,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.IsEntireUnit,
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.YN)
@@ -107,8 +107,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.BedroomsQty,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.BedroomsQty,
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Quantity)
@@ -116,8 +116,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.NightsBookedQty,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.NightsBookedQty,
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Quantity)
@@ -125,8 +125,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.ReservationsQty,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.ReservationsQty,
                 FieldType = FieldTypes.String,
                 Required = false,
                 RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Quantity)
@@ -134,8 +134,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.PropertyHostNm,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.PropertyHostNm,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -143,8 +143,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.PropertyHostEmail,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.PropertyHostEmail,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -152,8 +152,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.PropertyHostPhone,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.PropertyHostPhone,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -161,8 +161,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.PropertyHostFax,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.PropertyHostFax,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -170,8 +170,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.PropertyHostAddress,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.PropertyHostAddress,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 250
@@ -181,8 +181,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost1Nm,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost1Nm,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -190,8 +190,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost1Email,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost1Email,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -199,8 +199,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost1Phone,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost1Phone,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -208,8 +208,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost1Fax,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost1Fax,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -217,8 +217,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost1Address,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost1Address,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 250
@@ -226,8 +226,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost1Id,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost1Id,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 25
@@ -237,8 +237,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost2Nm,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost2Nm,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -246,8 +246,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost2Email,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost2Email,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -255,8 +255,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost2Phone,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost2Phone,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -264,8 +264,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost2Fax,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost2Fax,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -273,8 +273,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost2Address,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost2Address,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 250
@@ -282,8 +282,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost2Id,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost2Id,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 25
@@ -293,8 +293,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost3Nm,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost3Nm,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -302,8 +302,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost3Email,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost3Email,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -311,8 +311,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost3Phone,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost3Phone,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -320,8 +320,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost3Fax,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost3Fax,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -329,8 +329,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost3Address,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost3Address,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 250
@@ -338,8 +338,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost3Id,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost3Id,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 25
@@ -349,8 +349,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost4Nm,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost4Nm,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -358,8 +358,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost4Email,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost4Email,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -367,8 +367,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost4Phone,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost4Phone,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -376,8 +376,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost4Fax,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost4Fax,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -385,8 +385,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost4Address,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost4Address,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 250
@@ -394,8 +394,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost4Id,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost4Id,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 25
@@ -405,8 +405,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost5Nm,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost5Nm,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -414,8 +414,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost5Email,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost5Email,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320
@@ -423,8 +423,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost5Phone,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost5Phone,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -432,8 +432,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost5Fax,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost5Fax,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 30
@@ -441,8 +441,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost5Address,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost5Address,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 250
@@ -450,8 +450,8 @@ namespace StrDss.Service
 
             rules.Add(new FieldValidationRule
             {
-                EntityName = Entities.RentalListingRowUntyped,
-                FieldName = RentalListingReportFields.SupplierHost5Id,
+                EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.SupplierHost5Id,
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 25

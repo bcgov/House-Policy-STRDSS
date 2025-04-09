@@ -14,3 +14,4 @@ export const platform_write: string = 'platform_write';
 export const platform_read: string = 'platform_read';
 export const jurisdiction_write: string = 'jurisdiction_write';
 export const jurisdiction_read: string = 'jurisdiction_read';
+export const validate_reg_no: string = 'validate_reg_no';

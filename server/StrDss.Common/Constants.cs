@@ -11,6 +11,7 @@
     public static class Entities
     {
         public const string RentalListingRowUntyped = "RentalListingRowUntyped";
+        public const string RegistrationDataRowUntyped = "RegistrationDataRowUntyped";
         public const string Role = "Role";
         public const string BizLicenceRowUntyped = "BizLicenceRowUntyped";
         public const string Platform = "Platform";
@@ -34,7 +35,63 @@
         public const string ListingUrl = "ListingUrl";
         public const string RentalAddress = "RentalAddress";
         public const string BusLicNo = "BusLicNo";
-        public const string BcRegNo = "BcRegNo";
+        public const string BcRegNo = "RegNo";
+        public const string RentalUnit = "RentalUnit";
+        public const string RentalStreet = "RentalStreet";
+        public const string RentalPostal = "RentalPostal";
+        public const string IsEntireUnit = "IsEntireUnit";
+        public const string BedroomsQty = "BedroomsQty";
+        public const string NightsBookedQty = "NightsBookedQty";
+        public const string ReservationsQty = "ReservationsQty";
+        public const string PropertyHostNm = "PropertyHostNm";
+        public const string PropertyHostEmail = "PropertyHostEmail";
+        public const string PropertyHostPhone = "PropertyHostPhone";
+        public const string PropertyHostFax = "PropertyHostFax";
+        public const string PropertyHostAddress = "PropertyHostAddress";
+        public const string SupplierHost1Nm = "SupplierHost1Nm";
+        public const string SupplierHost1Email = "SupplierHost1Email";
+        public const string SupplierHost1Phone = "SupplierHost1Phone";
+        public const string SupplierHost1Fax = "SupplierHost1Fax";
+        public const string SupplierHost1Address = "SupplierHost1Address";
+        public const string SupplierHost1Id = "SupplierHost1Id";
+        public const string SupplierHost2Nm = "SupplierHost2Nm";
+        public const string SupplierHost2Email = "SupplierHost2Email";
+        public const string SupplierHost2Phone = "SupplierHost2Phone";
+        public const string SupplierHost2Fax = "SupplierHost2Fax";
+        public const string SupplierHost2Address = "SupplierHost2Address";
+        public const string SupplierHost2Id = "SupplierHost2Id";
+        public const string SupplierHost3Nm = "SupplierHost3Nm";
+        public const string SupplierHost3Email = "SupplierHost3Email";
+        public const string SupplierHost3Phone = "SupplierHost3Phone";
+        public const string SupplierHost3Fax = "SupplierHost3Fax";
+        public const string SupplierHost3Address = "SupplierHost3Address";
+        public const string SupplierHost3Id = "SupplierHost3Id";
+        public const string SupplierHost4Nm = "SupplierHost4Nm";
+        public const string SupplierHost4Email = "SupplierHost4Email";
+        public const string SupplierHost4Phone = "SupplierHost4Phone";
+        public const string SupplierHost4Fax = "SupplierHost4Fax";
+        public const string SupplierHost4Address = "SupplierHost4Address";
+        public const string SupplierHost4Id = "SupplierHost4Id";
+        public const string SupplierHost5Nm = "SupplierHost5Nm";
+        public const string SupplierHost5Email = "SupplierHost5Email";
+        public const string SupplierHost5Phone = "SupplierHost5Phone";
+        public const string SupplierHost5Fax = "SupplierHost5Fax";
+        public const string SupplierHost5Address = "SupplierHost5Address";
+        public const string SupplierHost5Id = "SupplierHost5Id";
+    }
+
+    public static class RegistrationValidationFields
+    {
+        public const string RptPeriod = "RptPeriod";
+        public const string OrgCd = "OrgCd";
+        public const string ListingId = "ListingId";
+        public const string ListingUrl = "ListingUrl";
+        public const string RentalAddress = "RentalAddress";
+        public const string BusLicNo = "BusLicNo";
+        public const string BcRegNo = "RegNo";
+        public const string RentalUnit = "RentalUnit";
+        public const string RentalStreet = "RentalStreet";
+        public const string RentalPostal = "RentalPostal";
         public const string IsEntireUnit = "IsEntireUnit";
         public const string BedroomsQty = "BedroomsQty";
         public const string NightsBookedQty = "NightsBookedQty";
@@ -519,6 +576,7 @@
         public const string BatchTakedownRequest = "Batch Takedown Request";
         public const string ListingUploadError = "Listing Upload Error";
         public const string CompletedTakedown = "Completed Takedown";
+        public const string RegistrationValidation = "Registration Validation";
     }
 
     public static class Permissions
@@ -543,6 +601,7 @@
         public const string BlLinkWrite = "bl_link_write";
         public const string JurisdictionRead = "jurisdiction_read";
         public const string JurisdictionWrite = "jurisdiction_write";
+        public const string ValidateRegistration = "validate_reg_no";
     }
 
     public static class UploadDeliveryTypes
@@ -550,6 +609,7 @@
         public const string ListingData = "Listing Data";
         public const string TakedownData = "Takedown Data";
         public const string LicenceData = "Licence Data";
+        public const string RegistrationData = "Registration Data";
     }
 
     public static class ListingExportFileNames
@@ -570,5 +630,12 @@
     {
         public const string LGRequest = "LG Request";
         public const string InvalidRegistration = "Invalid Registration";
+    }
+
+    public static class UploadStatus
+    {
+        public const string Pending = "Pending";
+        public const string Processed = "Processed";
+        public const string Failed = "Failed";
     }
 }

@@ -9,7 +9,7 @@ import { PageNotFoundComponent } from './common/components/page-not-found/page-n
 import { approvedUserGuard } from './common/guards/approved-user.guard';
 import { activeUserGuard } from './common/guards/active-user.guard';
 import { accessRequestTokenGuard } from './common/guards/access-request-token.guard';
-import { ceu_action, jurisdiction_read, jurisdiction_write, licence_file_upload, listing_file_upload, listing_read, platform_read, platform_write, role_read, role_write, takedown_action, upload_history_read, user_read, user_write } from './common/consts/permissions.const';
+import { ceu_action, jurisdiction_read, jurisdiction_write, licence_file_upload, listing_file_upload, listing_read, platform_read, platform_write, role_read, role_write, takedown_action, upload_history_read, user_read, user_write, validate_reg_no } from './common/consts/permissions.const';
 import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 import { TermsAndConditionsComponent } from './common/components/terms-and-conditions/terms-and-conditions.component';
 import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
@@ -36,6 +36,8 @@ import { ManageJurisdictionsComponent } from './features/components/manage-juris
 import { UpdateJurisdictionInformationComponent } from './features/components/manage-jurisdictions/update-jurisdiction-information/update-jurisdiction-information.component';
 import { UpdateLocalGovernmentInformationComponent } from './features/components/manage-jurisdictions/update-local-gvernment-information/update-local-gvernment-information.component';
 import { SendComplianceOrderComponent } from './features/components/send-compliance-order/send-compliance-order.component';
+import { ValidateRegistrationDataComponent } from './features/components/validate-registration-data/validate-registration-data.component';
+import { RegistrationValidationHistoryComponent } from './features/components/registration-validation-history/registration-validation-history.component';
 
 export const routes: Routes = [
     {
@@ -219,6 +221,18 @@ export const routes: Routes = [
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
         component: ExportListingsComponent,
         data: { permissions: [listing_read] }
+    },
+    {
+        path: 'validate-registration-data',
+        canActivate: [approvedUserGuard, activeUserGuard, areTermsAceptedGuard, hasPermissionsGuard],
+        component: ValidateRegistrationDataComponent,
+        data: { permissions: [validate_reg_no] }
+    },
+    {
+        path: 'registration-validation-history',
+        canActivate: [approvedUserGuard, activeUserGuard, areTermsAceptedGuard, hasPermissionsGuard],
+        component: RegistrationValidationHistoryComponent,
+        data: { permissions: [validate_reg_no] }
     },
     {
         path: '401',

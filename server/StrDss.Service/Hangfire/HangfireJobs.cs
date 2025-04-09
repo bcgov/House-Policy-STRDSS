@@ -11,9 +11,10 @@ namespace StrDss.Service.Hangfire
         private ITakedownConfirmationService _tdcService;
         private IBizLicenceService _bizLicService;
         private IUploadDeliveryService _uploadService;
+        private IRegistrationService _registrationService;
 
         public HangfireJobs(IRentalListingReportService listingReportService, IRentalListingService listingService, IDelistingService delistingService,
-            ITakedownConfirmationService tdcService, IBizLicenceService bizLicService, IUploadDeliveryService uploadService)
+            ITakedownConfirmationService tdcService, IBizLicenceService bizLicService, IUploadDeliveryService uploadService, IRegistrationService registrationService)
         {
             _linstingReportService = listingReportService;
             _delistingService = delistingService;
@@ -21,6 +22,7 @@ namespace StrDss.Service.Hangfire
             _tdcService = tdcService;
             _bizLicService = bizLicService;
             _uploadService = uploadService;
+            _registrationService = registrationService;
         }
 
         [Queue("default")]
@@ -71,6 +73,9 @@ namespace StrDss.Service.Hangfire
                     break;
                 case UploadDeliveryTypes.LicenceData:
                     await _bizLicService.ProcessBizLicenceUploadMainAsync(upload);
+                    break;
+                case UploadDeliveryTypes.RegistrationData:
+                    await _registrationService.ProcessRegistrationDataUploadAsync(upload);
                     break;
                 default:
                     break;

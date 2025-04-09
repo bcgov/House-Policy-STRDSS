@@ -39,6 +39,31 @@ public partial class DssUploadDelivery
     public long ProvidingOrganizationId { get; set; }
 
     /// <summary>
+    /// The current processing status of the uploaded file: Pending, Processed, or Failed
+    /// </summary>
+    public string UploadStatus { get; set; } = null;
+
+    /// <summary>
+    /// The total number of lines in the uploaded file
+    /// </summary>
+    public int UploadLinesTotal { get; set; }
+
+    /// <summary>
+    /// The number of lines int the uploaded file that successfully processed
+    /// </summary>
+    public int UploadLinesSuccess { get; set; }
+
+    /// <summary>
+    /// The number of lines in the uploaded file that failed to process
+    /// </summary>
+    public int UploadLinesError { get; set; }
+
+    /// <summary>
+    /// The number of lines in the uploaded file that were processed
+    /// </summary>
+    public int UploadLinesProcessed { get; set; }
+
+    /// <summary>
     /// Trigger-updated timestamp of last change
     /// </summary>
     public DateTime UpdDtm { get; set; }

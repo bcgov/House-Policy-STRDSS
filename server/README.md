@@ -26,6 +26,7 @@ For actual values, refer to the [gitops repo](https://github.com/bcgov-c/tenant-
 
 * RENTAL_LISTING_REPORT_MAX_SIZE:
 * BUISINESS_LICENCE_MAX_SIZE:
+* VALIDATE_REGISTRATION_MAX_SIZE:
 
 ## Service Account for BCeID web service
 

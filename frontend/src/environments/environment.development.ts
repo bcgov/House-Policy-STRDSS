@@ -9,4 +9,5 @@ export const environment = {
     RENTAL_LISTING_REPORT_MAX_SIZE: "10",
     BUISINESS_LICENCE_MAX_SIZE: '10',
     ADDRESS_SCORE: '90',
+    VALIDATE_REGISTRATION_MAX_SIZE: '10',
 };

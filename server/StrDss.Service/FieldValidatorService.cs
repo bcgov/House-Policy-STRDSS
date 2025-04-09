@@ -19,6 +19,7 @@ namespace StrDss.Service
             _rules = new List<FieldValidationRule>();
 
             RentalListingReportValidationRule.LoadReportValidationRules(_rules);
+            RegistrationValidationRule.LoadRegistrationValidationRules(_rules);
             RoleValidationRule.LoadReportValidationRules(_rules);
             BizLicenceValidationRule.LoadBizLicenceValidationRules(_rules);
             PlatformValidationRule.LoadPlatformUpdateValidationRules(_rules);

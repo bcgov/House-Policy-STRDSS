@@ -11,6 +11,7 @@ sed -i "s~__SM_LOGOFF_URL__~$SM_LOGOFF_URL~g" "$target"
 sed -i "s~__RENTAL_LISTING_REPORT_MAX_SIZE__~$RENTAL_LISTING_REPORT_MAX_SIZE~g" "$target"
 sed -i "s~__BUISINESS_LICENCE_MAX_SIZE__~$BUISINESS_LICENCE_MAX_SIZE~g" "$target"
 sed -i "s~__ADDRESS_SCORE__~$ADDRESS_SCORE~g" "$target"
+sed -i "s~__VALIDATE_REGISTRATION_MAX_SIZE__~$VALIDATE_REGISTRATION_MAX_SIZE~g" "$target"
 
 cat >/nginx/nginx.conf <<EOL
 

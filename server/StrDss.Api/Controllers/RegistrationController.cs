@@ -12,19 +12,18 @@ namespace StrDss.Api.Controllers
     [ApiVersion("1.0")]
     [Route("api/[controller]")]
     [ApiController]
-    public class RentalListingReportsController : BaseApiController
+    public class RegistrationController : BaseApiController
     {
         private IUploadDeliveryService _uploadService;
-
-        public RentalListingReportsController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
+        public RegistrationController(ICurrentUser currentUser, IMapper mapper, IConfiguration config, ILogger<StrDssLogger> logger,
             IUploadDeliveryService uploadService) : base(currentUser, mapper, config, logger)
         {
             _uploadService = uploadService;
         }
 
-        [ApiAuthorize(Permissions.ListingFileUpload)]
+        [ApiAuthorize(Permissions.ValidateRegistration)]
         [HttpPost]
-        public async Task<ActionResult> CreateRentalLisingReport([FromForm] PlatformDataUploadDto dto)
+        public async Task<ActionResult> UploadValidateRegistration([FromForm] ValidateRegistrationUploadDto dto)
         {
             Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
 
@@ -34,7 +33,7 @@ namespace StrDss.Api.Controllers
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
             }
 
-            var maxSizeInMb = _config.GetValue<int>("RENTAL_LISTING_REPORT_MAX_SIZE");
+            var maxSizeInMb = _config.GetValue<int>("VALIDATE_REGISTRATION_MAX_SIZE");
             var maxSizeInB = (maxSizeInMb == 0 ? 2 : maxSizeInMb) * 1024 * 1024;
 
             if (dto.File.Length > maxSizeInB)
@@ -51,7 +50,7 @@ namespace StrDss.Api.Controllers
 
             using var stream = dto.File.OpenReadStream();
 
-            errors = await _uploadService.UploadData(UploadDeliveryTypes.ListingData, dto.ReportPeriod, dto.OrganizationId, stream);
+            errors = await _uploadService.UploadData(UploadDeliveryTypes.RegistrationData, string.Empty, dto.OrganizationId, stream);
 
             if (errors.Count > 0)
             {
@@ -61,29 +60,26 @@ namespace StrDss.Api.Controllers
             return Ok();
         }
 
-        [ApiAuthorize(Permissions.UploadHistoryRead)]
-        [HttpGet("rentallistinghistory")]
-        public async Task<ActionResult> GetRentalListingHistory(long? platformId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
+        [ApiAuthorize(Permissions.ValidateRegistration)]
+        [HttpGet("registrationvalidationhistory")]
+        public async Task<ActionResult> GetRegistrationValidationHistory(long? platformId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
-            var history = await _uploadService.GetUploadHistory(platformId, pageSize, pageNumber, orderBy, direction, 
-                new string[] { UploadDeliveryTypes.ListingData, UploadDeliveryTypes.TakedownData });
+            var history = await _uploadService.GetUploadHistory(platformId, pageSize, pageNumber, orderBy, direction,
+                [UploadDeliveryTypes.RegistrationData]);
 
             return Ok(history);
         }
 
-        [ApiAuthorize(Permissions.LicenceFileUpload, Permissions.ListingFileUpload)]
-        [HttpGet("uploads/{uploadId}/errorfile")]
-        public async Task<ActionResult> GetRentalListingErrorFile(long uploadId)
+        [ApiAuthorize(Permissions.ValidateRegistration)]
+        [HttpGet("downloadvalidationreport/{uploadId}")]
+        public async Task<ActionResult> DownloadValidationReport(long uploadId)
         {
-            var (bytes, hasPermission) = await _uploadService.GetErrorFile(uploadId);
-
-            if (!hasPermission)
-                return Unauthorized();
+            var bytes = await _uploadService.DownloadValidationReportAsync(uploadId);
 
             if (bytes == null)
                 return NotFound();
 
-            return File(bytes!, "text/csv", $"errors-{uploadId}.csv");
+            return File(bytes!, "text/csv", $"validation-report-{uploadId}.csv");
         }
     }
 }

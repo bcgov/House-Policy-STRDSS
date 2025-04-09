@@ -44,4 +44,11 @@ export class RegistrationService {
 
     return this.httpClient.get<any>(url);
   }
+
+  downloadValidationReport(id: number): Observable<any> {
+    return this.httpClient.get<any>(
+        `${environment.API_HOST}/registration/downloadvalidationreport/${id}`,
+        { headers: this.textHeaders, responseType: 'text' as 'json' },
+    );
+  }
 }

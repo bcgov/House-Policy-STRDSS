@@ -25,7 +25,6 @@ namespace StrDss.Service
     }
     public class RegistrationService : ServiceBase, IRegistrationService
     {
-        private IOrganizationRepository _orgRepo;
         private IUploadDeliveryRepository _uploadRepo;
         private IRentalListingReportRepository _reportRepo;
         private IPhysicalAddressRepository _addressRepo;
@@ -37,13 +36,13 @@ namespace StrDss.Service
         private string? _apiAccount;
 
         public RegistrationService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
-            IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
+            IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
             IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IConfiguration config, IRegistrationApiClient regClient,
             ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
-            _orgRepo = orgRepo;
             _uploadRepo = uploadRepo;
+            _reportRepo = reportRepo;
             _addressRepo = addressRepo;
             _userRepo = userRepo;
             _emailService = emailService;
@@ -183,25 +182,26 @@ namespace StrDss.Service
             (bool isValid, Dictionary<string, List<string>> regErrors) = await ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
             if (isValid)
             {
-                using var tran = _unitOfWork.BeginTransaction();
-
-                var listing = await _reportRepo.GetMasterListingAsync(OrgId, row.ListingId);
-                if (listing != null)
+                if (!string.IsNullOrEmpty(row.ListingId))
                 {
-                    // Set the registration value here
-                    listing.BcRegistryNo = row.RegNo;
-
-                    var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, row.RentalAddress);
-                    if (physicalAddress != null)
+                    var listing = await _reportRepo.GetMasterListingAsync(OrgId, row.ListingId);
+                    if (listing != null)
                     {
-                        // Set the unit, street, and postal code values here
-                        physicalAddress.RegRentalUnitNo = row.RentalUnit;
-                        physicalAddress.RegRentalStreetNo = row.RentalStreet;
-                        physicalAddress.RegRentalPostalCode = row.RentalPostal;
-;                    }
+                        using var tran = _unitOfWork.BeginTransaction();
+                        // Set the registration value here
+                        listing.BcRegistryNo = row.RegNo;
 
-                }
-                tran.Commit();
+                        var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, row.RentalAddress);
+                        if (physicalAddress != null)
+                        {
+                            // Set the unit, street, and postal code values here
+                            physicalAddress.RegRentalUnitNo = row.RentalUnit;
+                            physicalAddress.RegRentalStreetNo = row.RentalStreet;
+                            physicalAddress.RegRentalPostalCode = row.RentalPostal;                            
+                        }
+                        tran.Commit();
+                    }
+                }                
             }
 
             SaveUploadLine(uploadLine, regErrors, false, !isValid);

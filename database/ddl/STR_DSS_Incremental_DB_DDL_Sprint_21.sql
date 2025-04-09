@@ -235,7 +235,6 @@ AS SELECT dud.upload_delivery_id,
                 WHEN dul.is_processed = true THEN 1
                 ELSE 0
             END) THEN 'Processed'::text
-            ELSE 'Pending'::text
             WHEN dud.upload_delivery_type::text = 'Registration Data'::text AND count(*) = sum(
             CASE
                 WHEN dul.is_processed = true THEN 1

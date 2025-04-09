@@ -22,6 +22,7 @@ namespace StrDss.Service
         Task<(byte[]?, bool hasAccess)> GetErrorFile(long uploadId);
         Task<DssUploadDelivery?> GetNonTakedownUploadToProcessAsync();
         Task<DssUploadDelivery?> GetUploadToProcessAsync(string reportType);
+        Task<byte[]?> DownloadValidationReportAsync(long uploadId);
     }
     public class UploadDeliveryService : ServiceBase, IUploadDeliveryService
     {
@@ -304,7 +305,25 @@ namespace StrDss.Service
                         }
                     }
 
-                    if (mandatoryFields.Contains("reg_no") && row.RegNo.IsEmpty()) regNoMissing++;
+                    if (mandatoryFields.Contains("reg_no")) 
+                    {
+                        if (row.RegNo.IsEmpty())
+                        {
+                            regNoMissing++;
+                        }
+                        else
+                        {
+                            uploadLines.Add(new DssUploadLine
+                            {
+                                IsValidationFailure = false,
+                                IsSystemFailure = false,
+                                IsProcessed = false,
+                                SourceOrganizationCd = org.OrganizationCd,
+                                SourceRecordNo = row.RegNo,
+                                SourceLineTxt = csv.Parser.RawRecord
+                            });
+                        }
+                    }
 
                     if (mandatoryFields.Contains("rental_street"))
                     {
@@ -528,6 +547,36 @@ namespace StrDss.Service
         public async Task<DssUploadDelivery?> GetUploadToProcessAsync(string reportType)
         {
             return await _uploadRepo.GetUploadToProcessAsync(reportType);
+        }
+
+        public async Task<byte[]?> DownloadValidationReportAsync(long uploadId)
+        {
+            var upload = await _uploadRepo.GetUploadDeliveryAsync(uploadId);
+            if (upload == null) return null;
+            var lines = await _uploadRepo.GetUploadLineIdsWithErrors(uploadId, true);
+
+            var memoryStream = new MemoryStream(upload.SourceBin!);
+            using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
+
+            var report = new Dictionary<string, List<string>>();
+            var csvConfig = CsvHelperUtils.GetConfig(report, false);
+
+            using var csv = new CsvReader(textReader, csvConfig);
+
+            var contents = new StringBuilder();
+
+            csv.Read();
+            var header = "validation_result," + csv.Parser.RawRecord.TrimEndNewLine();
+
+            contents.AppendLine(header);
+
+            foreach (var lineId in lines)
+            {
+                var line = await _uploadRepo.GetUploadLineWithError(lineId);
+                contents.AppendLine($"\"{line.ErrorText ?? "Success"}\"," + line.LineText.TrimEndNewLine());
+            }
+
+            return Encoding.UTF8.GetBytes(contents.ToString());
         }
     }
 }

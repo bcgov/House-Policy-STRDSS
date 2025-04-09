@@ -69,5 +69,17 @@ namespace StrDss.Api.Controllers
 
             return Ok(history);
         }
+
+        [ApiAuthorize(Permissions.ValidateRegistration)]
+        [HttpGet("downloadvalidationreport/{uploadId}")]
+        public async Task<ActionResult> DownloadValidationReport(long uploadId)
+        {
+            var bytes = await _uploadService.DownloadValidationReportAsync(uploadId);
+
+            if (bytes == null)
+                return NotFound();
+
+            return File(bytes!, "text/csv", $"validation-report-{uploadId}.csv");
+        }
     }
 }

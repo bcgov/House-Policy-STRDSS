@@ -14,7 +14,6 @@ using StrDss.Model.RentalReportDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
-using StrDss.Service.HttpClients.RegistrationAPI;
 using System.Diagnostics;
 using System.Text;
 

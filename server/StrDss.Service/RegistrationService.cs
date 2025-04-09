@@ -57,9 +57,8 @@ namespace StrDss.Service
         {
             var processStopwatch = Stopwatch.StartNew();
 
-            _logger.LogInformation($"Processing Registration Data {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
+            _logger.LogInformation($"Processing Registration Data {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
 
-            DateOnly reportPeriodYm = (DateOnly)upload.ReportPeriodYm!;
             int lineCount = await _uploadRepo.GetTotalNumberOfUploadLines(upload.UploadDeliveryId);
             int count = 0;
             List<UploadLineToProcess> linesToProcess = await _uploadRepo.GetUploadLinesToProcessAsync(upload.UploadDeliveryId);
@@ -82,17 +81,17 @@ namespace StrDss.Service
                 isLastLine = count == lineCount;
                 RegistrationDataRowUntyped row = csv.GetRecord<RegistrationDataRowUntyped>(); //it has been parsed once, so no exception expected.
 
-                if (!linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.SourceRecordNo == row.ListingId)) continue;
+                if (!linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.SourceRecordNo == row.RegNo)) continue;
 
-                var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.ListingId);
+                var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.RegNo);
 
                 if (uploadLine == null || uploadLine.IsProcessed)
                 {
-                    _logger.LogInformation($"Skipping registration data - ({row.OrgCd} - {row.ListingId})");
+                    _logger.LogInformation($"Skipping registration data - ({row.OrgCd} - {row.RegNo})");
                     continue;
                 }
 
-                _logger.LogInformation($"Processing registration data - ({row.OrgCd} - {row.ListingId})");
+                _logger.LogInformation($"Processing registration data - ({row.OrgCd} - {row.RegNo})");
 
                 var stopwatch = Stopwatch.StartNew();
                 hasError = !await ProcessUploadLine(upload, uploadLine, row, isLastLine);
@@ -101,13 +100,13 @@ namespace StrDss.Service
                 processedCount++;
                 if (hasError) errorCount++;
 
-                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}");
+                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.RegNo}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}");
             }
 
             if (!isLastLine)
             {
                 processStopwatch.Stop();
-                _logger.LogInformation($"Processed {processedCount} lines: {upload.ReportPeriodYm}, {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
+                _logger.LogInformation($"Processed {processedCount} lines: {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
                 return;
             }
 
@@ -167,7 +166,7 @@ namespace StrDss.Service
 
 
             processStopwatch.Stop();
-            _logger.LogInformation($"Finished: {upload.ReportPeriodYm}, {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogInformation($"Finished: {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
         private async Task<bool> ProcessUploadLine(DssUploadDelivery upload, DssUploadLine uploadLine, RegistrationDataRowUntyped row, bool isLastLine)

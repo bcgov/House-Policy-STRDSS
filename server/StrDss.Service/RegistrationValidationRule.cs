@@ -20,7 +20,7 @@ namespace StrDss.Service
                 EntityName = Entities.RegistrationDataRowUntyped,
                 FieldName = RegistrationValidationFields.OrgCd,
                 FieldType = FieldTypes.String,
-                Required = true,
+                Required = false,
                 MaxLength = 25,
             });
 
@@ -29,7 +29,7 @@ namespace StrDss.Service
                 EntityName = Entities.RegistrationDataRowUntyped,
                 FieldName = RegistrationValidationFields.ListingId,
                 FieldType = FieldTypes.String,
-                Required = true,
+                Required = false,
                 MaxLength = 25,
             });
 

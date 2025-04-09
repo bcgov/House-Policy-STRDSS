@@ -94,7 +94,7 @@ namespace StrDss.Service
                 _logger.LogInformation($"Processing registration data - ({row.OrgCd} - {row.RegNo})");
 
                 var stopwatch = Stopwatch.StartNew();
-                hasError = !await ProcessUploadLine(upload, uploadLine, row, isLastLine);
+                hasError = !await ProcessUploadLine(upload, upload.ProvidingOrganizationId, uploadLine, row, isLastLine);
                 stopwatch.Stop();
 
                 processedCount++;
@@ -111,12 +111,12 @@ namespace StrDss.Service
             }
 
             // Update the upload with the status and counts
-            upload.UploadStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
-            upload.UploadLinesTotal = lineCount;
-            upload.UploadLinesProcessed = processedCount;
-            upload.UploadLinesSuccess = processedCount - errorCount;
-            upload.UploadLinesError = errorCount;
-            _unitOfWork.Commit();
+            //upload.UploadStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
+            //upload.UploadLinesTotal = lineCount;
+            //upload.UploadLinesProcessed = processedCount;
+            //upload.UploadLinesSuccess = processedCount - errorCount;
+            //upload.UploadLinesError = errorCount;
+            //_unitOfWork.Commit();
 
             if (upload.UpdUserGuid == null) return;
             var user = await _userRepo.GetUserByGuid((Guid)upload.UpdUserGuid!);
@@ -169,7 +169,7 @@ namespace StrDss.Service
             _logger.LogInformation($"Finished: {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
-        private async Task<bool> ProcessUploadLine(DssUploadDelivery upload, DssUploadLine uploadLine, RegistrationDataRowUntyped row, bool isLastLine)
+        private async Task<bool> ProcessUploadLine(DssUploadDelivery upload, long OrgId, DssUploadLine uploadLine, RegistrationDataRowUntyped row, bool isLastLine)
         {
             var rowErrors = new Dictionary<string, List<string>>();
 
@@ -185,8 +185,7 @@ namespace StrDss.Service
             {
                 using var tran = _unitOfWork.BeginTransaction();
 
-                var offeringOrg = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd); // already validated in the file upload
-                var listing = await _reportRepo.GetMasterListingAsync(offeringOrg.OrganizationId, row.ListingId);
+                var listing = await _reportRepo.GetMasterListingAsync(OrgId, row.ListingId);
                 if (listing != null)
                 {
                     // Set the registration value here

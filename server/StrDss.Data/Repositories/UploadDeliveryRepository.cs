@@ -25,6 +25,7 @@ namespace StrDss.Data.Repositories
         Task<int> GetTotalNumberOfUploadLines(long uploadId);
         Task<PagedDto<UploadHistoryViewDto>> GetUploadHistory(long? orgId, int pageSize, int pageNumber, string orderBy, string direction, string[] reportTypes);
         Task<DssRentalUploadHistoryView?> GetRentalListingUpload(long deliveryId);
+        Task<DssUploadDelivery?> GetUploadDeliveryAsync(long uploadId);
     }
 
     public class UploadDeliveryRepository : RepositoryBase<DssUploadDelivery>, IUploadDeliveryRepository
@@ -190,6 +191,19 @@ namespace StrDss.Data.Repositories
             _logger.LogDebug($"GetRentalListingUpload = {stopwatch.Elapsed.TotalMilliseconds} milliseconds");
 
             return history;
+        }
+
+        public async Task<DssUploadDelivery?> GetUploadDeliveryAsync(long uploadId)
+        {
+            var query = _dbSet.AsNoTracking()
+                .Where(x => x.UploadDeliveryId == uploadId);
+
+            if (_currentUser.OrganizationType != OrganizationTypes.BCGov)
+            {
+                query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            return await query.FirstOrDefaultAsync();
         }
     }
 }

@@ -46,7 +46,7 @@ namespace StrDss.Service.HttpClients
                 var apiKey = config.GetValue<string>("REGISTRATION_API_KEY") ?? "";
 
                 client.BaseAddress = new Uri(baseAddress);
-                client.DefaultRequestHeaders.Add("apikey", apiKey);
+                client.DefaultRequestHeaders.Add("x-apikey", apiKey);
             });
 
         }

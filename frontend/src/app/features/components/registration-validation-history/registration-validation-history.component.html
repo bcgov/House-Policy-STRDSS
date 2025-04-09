@@ -96,7 +96,8 @@
                 <td>{{ row.givenNm }} {{ row.familyNm }}</td>
                 <td>
                     <button [id]="'downloadReport_'+row.uploadDeliveryId" pButton
-                        [disabled]="row.status==='Pending'" class="p-button-link zero-padding">
+                        [disabled]="row.status==='Pending'" class="p-button-link zero-padding"
+                        (click)="onDownloadValidationReport(row.uploadDeliveryId,row.organizationNm)">
                         <i class="pi pi-download"></i>
                     </button>
                 </td>

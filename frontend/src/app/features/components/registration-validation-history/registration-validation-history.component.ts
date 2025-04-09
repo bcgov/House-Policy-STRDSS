@@ -116,4 +116,21 @@ export class RegistrationValidationHistoryComponent {
       }
     });
   }
+
+  onDownloadValidationReport(rowId: number, platform: string): void {
+    this.loaderService.loadingStart(' It may take several minutes to prepare your download file. Please do not close this tab until your download is complete.');
+    this.registrationService.downloadValidationReport(rowId).subscribe({
+      next: (content) => {
+        const element = document.createElement('a');
+        element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(content)}`);
+        element.setAttribute('download', `validation_report_${platform}_${rowId}.csv`);
+
+        element.click();
+      },
+      complete: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
+      },
+    });
+  }
 }

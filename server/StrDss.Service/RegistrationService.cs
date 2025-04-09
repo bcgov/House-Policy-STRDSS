@@ -59,7 +59,6 @@ namespace StrDss.Service
 
             _logger.LogInformation($"Processing Registration Data {upload.ProvidingOrganizationId} - {upload.ReportPeriodYm} - {upload.ProvidingOrganization.OrganizationNm}");
 
-            DateOnly reportPeriodYm = (DateOnly)upload.ReportPeriodYm!;
             int lineCount = await _uploadRepo.GetTotalNumberOfUploadLines(upload.UploadDeliveryId);
             int count = 0;
             List<UploadLineToProcess> linesToProcess = await _uploadRepo.GetUploadLinesToProcessAsync(upload.UploadDeliveryId);

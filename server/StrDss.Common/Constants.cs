@@ -35,7 +35,7 @@
         public const string ListingUrl = "ListingUrl";
         public const string RentalAddress = "RentalAddress";
         public const string BusLicNo = "BusLicNo";
-        public const string BcRegNo = "BcRegNo";
+        public const string BcRegNo = "RegNo";
         public const string RentalUnit = "RentalUnit";
         public const string RentalStreet = "RentalStreet";
         public const string RentalPostal = "RentalPostal";
@@ -88,7 +88,7 @@
         public const string ListingUrl = "ListingUrl";
         public const string RentalAddress = "RentalAddress";
         public const string BusLicNo = "BusLicNo";
-        public const string BcRegNo = "BcRegNo";
+        public const string BcRegNo = "RegNo";
         public const string RentalUnit = "RentalUnit";
         public const string RentalStreet = "RentalStreet";
         public const string RentalPostal = "RentalPostal";

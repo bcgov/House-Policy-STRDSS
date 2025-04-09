@@ -71,7 +71,8 @@ USING ( SELECT * FROM (VALUES
 ('Compliance Order','Provincial Compliance Order'),
 ('Access Requested','Access Requested Notification'),
 ('Access Granted','Access Granted Notification'),
-('Access Denied','Access Denied Notification'))
+('Access Denied','Access Denied Notification'),
+('Registration Validation', 'Registration Validation'))
 AS s (email_message_type, email_message_type_nm)
 ) AS src
 ON (tgt.email_message_type=src.email_message_type)

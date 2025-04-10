@@ -23,7 +23,7 @@ namespace StrDss.Data.Mappings
                 .ForMember(dest => dest.PlatformListingNo, opt => opt.MapFrom(src => src.ListingId))
                 .ForMember(dest => dest.PlatformListingUrl, opt => opt.MapFrom(src => src.ListingUrl))
                 .ForMember(dest => dest.BusinessLicenceNo, opt => opt.MapFrom(src => src.BusLicNo))
-                .ForMember(dest => dest.BcRegistryNo, opt => opt.MapFrom(src => src.BcRegNo))
+                .ForMember(dest => dest.BcRegistryNo, opt => opt.MapFrom(src => src.RegNo))
                 .ForMember(dest => dest.IsEntireUnit, opt => opt.MapFrom(src => src.IsEntireUnit == "Y"))
                 .ForMember(dest => dest.AvailableBedroomsQty, opt => opt.MapFrom(src => CommonUtils.StringToShort(src.BedroomsQty)))
                 .ForMember(dest => dest.NightsBookedQty, opt => opt.MapFrom(src => CommonUtils.StringToShort(src.NightsBookedQty)))

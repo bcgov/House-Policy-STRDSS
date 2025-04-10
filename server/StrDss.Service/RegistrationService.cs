@@ -3,13 +3,11 @@ using CsvHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Geometries;
 using StrDss.Common;
 using StrDss.Data;
 using StrDss.Data.Entities;
 using StrDss.Data.Repositories;
 using StrDss.Model;
-using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
@@ -133,7 +131,7 @@ namespace StrDss.Service
             {
                 UserName = $"{user!.GivenNm}",
                 NumErrors = errorCount,
-                Link = GetHostUrl() + "/upload-listing-history",
+                Link = GetHostUrl() + "/registration-validation-history",
                 To = new string[] { user!.EmailAddressDsc! },
                 Info = $"{EmailMessageTypes.ListingUploadError} for {user.FamilyNm}, {user.GivenNm}",
                 From = adminEmail

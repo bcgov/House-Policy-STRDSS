@@ -116,6 +116,14 @@ namespace StrDss.Test.AutoDomainDataBuilder
                     return "531 Superior St, Victoria, BC";
                 case nameof(RentalListingRowUntyped.SupplierHost5Id):
                     return "host5";
+                case nameof(RentalListingRowUntyped.RegNo):
+                    return "REG123";
+                case nameof(RentalListingRowUntyped.RentalUnit):
+                    return "123";
+                case nameof(RentalListingRowUntyped.RentalStreet):
+                    return "12345";
+                case nameof(RentalListingRowUntyped.RentalPostal):
+                    return "V0P1G0";
                 default:
                     return new NoSpecimen();
             }

@@ -573,7 +573,12 @@ namespace StrDss.Service
             foreach (var lineId in lines)
             {
                 var line = await _uploadRepo.GetUploadLineWithError(lineId);
-                contents.AppendLine($"\"{line.ErrorText ?? "Success"}\"," + line.LineText.TrimEndNewLine());
+                var text = line.ErrorText;
+                if (string.IsNullOrEmpty(text))
+                {
+                    text = "Success";
+                }
+                contents.AppendLine($"\"{text}\"," + line.LineText.TrimEndNewLine());
             }
 
             return Encoding.UTF8.GetBytes(contents.ToString());

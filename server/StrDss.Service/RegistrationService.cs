@@ -16,6 +16,7 @@ using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace StrDss.Service
 {
@@ -204,7 +205,7 @@ namespace StrDss.Service
                 }                
             }
 
-            SaveUploadLine(uploadLine, regErrors, false, !isValid);
+            SaveUploadLine(uploadLine, regErrors, false, !isValid, false);
             return isValid;
         }
 
@@ -239,9 +240,7 @@ namespace StrDss.Service
                             .GroupBy(e => e.Code)
                             .ToDictionary(g => g.Key, g => g.Select(e => e.Message).ToList());
                 }
-
-                // If the status is not "ACTIVE" then there is an issue with the registration
-                if (!string.Equals(resp.Status, "ACTIVE", StringComparison.OrdinalIgnoreCase))
+                else if (!string.Equals(resp.Status, "ACTIVE", StringComparison.OrdinalIgnoreCase))
                 {
                     isValid = false;
                     errorDetails.Add("INACTIVE PERMIT", new List<string> { "Error: registration status returned as " + resp.Status });
@@ -250,19 +249,27 @@ namespace StrDss.Service
             catch (Exception ex)
             {
                 isValid = false;
-                errorDetails.Add("EXCEPTION", new List<string> { ex.Message });
+                string rootCause = ParseRootCause(ex.Message);
+                errorDetails.Add("EXCEPTION", new List<string> { rootCause });
             }
 
             return (isValid, errorDetails);
         }
 
-        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, bool isSystemError)
+        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, bool isSystemError, bool useUnderscores = true)
         {
             uploadLine.IsValidationFailure = isValidationFailure;
             uploadLine.IsSystemFailure = isSystemError;
-            uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
+            uploadLine.ErrorTxt = useUnderscores ? errors.ParseErrorWithUnderScoredKeyName() : errors.ParseError();
             uploadLine.IsProcessed = true;
             _unitOfWork.Commit();
+        }
+
+        private string ParseRootCause(string message)
+        {
+            // Example regex pattern to match "rootCause: <rootCauseValue>"
+            var match = Regex.Match(message, @"rootCause:\s*(.*)");
+            return match.Success ? match.Groups[1].Value : message;
         }
     }
 }

@@ -244,11 +244,20 @@ namespace StrDss.Service
                     errorDetails.Add("INACTIVE PERMIT", new List<string> { "Error: registration status returned as " + resp.Status });
                 }
             }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                isValid = false;
+                errorDetails.Add("NOT FOUND", new List<string> { "Error: Permit not found not found (404)." });
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                isValid = false;
+                errorDetails.Add("UNAUTHORIZED", new List<string> { "Error: Unauthorized access (401)." });
+            }
             catch (Exception ex)
             {
                 isValid = false;
-                string rootCause = ParseRootCause(ex.Message);
-                errorDetails.Add("EXCEPTION", new List<string> { rootCause });
+                errorDetails.Add("EXCEPTION", new List<string> { "Error: Service threw an undhandled exception." });
             }
 
             return (isValid, errorDetails);
@@ -261,13 +270,6 @@ namespace StrDss.Service
             uploadLine.ErrorTxt = useUnderscores ? errors.ParseErrorWithUnderScoredKeyName() : errors.ParseError();
             uploadLine.IsProcessed = true;
             _unitOfWork.Commit();
-        }
-
-        private string ParseRootCause(string message)
-        {
-            // Example regex pattern to match "rootCause: <rootCauseValue>"
-            var match = Regex.Match(message, @"rootCause:\s*(.*)");
-            return match.Success ? match.Groups[1].Value : message;
         }
     }
 }

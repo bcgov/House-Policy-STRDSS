@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StrDss.Service.HttpClients
 {
-    public abstract class BaseRegistrationApiClient
+    public abstract class BaseRegistrationApi
     {
         private string _apiKey;
 

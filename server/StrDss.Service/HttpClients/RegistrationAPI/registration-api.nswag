@@ -11,7 +11,7 @@
   },
   "codeGenerators": {
     "openApiToCSharpClient": {
-      "clientBaseClass": "StrDss.Service.HttpClients.BaseRegistrationApiClient",
+      "clientBaseClass": "StrDss.Service.HttpClients.BaseRegistrationApi",
       "configurationClass": null,
       "generateClientClasses": true,
       "suppressClientClassesOutput": false,

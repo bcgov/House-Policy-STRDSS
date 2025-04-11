@@ -139,7 +139,7 @@ namespace StrDss.Service.HttpClients
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class RegistrationApiClient : StrDss.Service.HttpClients.BaseRegistrationApiClient, IRegistrationApiClient
+    public partial class RegistrationApiClient : StrDss.Service.HttpClients.BaseRegistrationApi, IRegistrationApiClient
     {
         private System.Net.Http.HttpClient _httpClient;
         private static System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings, true);

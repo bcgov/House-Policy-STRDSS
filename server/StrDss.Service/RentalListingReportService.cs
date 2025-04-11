@@ -35,12 +35,13 @@ namespace StrDss.Service
         private IEmailMessageService _emailService;
         private IEmailMessageRepository _emailRepo;
         private IBizLicenceRepository _bizLicRepo;
+        private IPermitValidationService _permitValidation;
         private IConfiguration _config;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
             IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBizLicenceRepository bizLicRepo,
-            IConfiguration config, ILogger<StrDssLogger> logger)
+            IPermitValidationService permitValidation, IConfiguration config, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _orgRepo = orgRepo;
@@ -52,6 +53,7 @@ namespace StrDss.Service
             _emailService = emailService;
             _emailRepo = emailRepo;
             _bizLicRepo = bizLicRepo;
+            _permitValidation = permitValidation;
             _config = config;
         }
 
@@ -216,6 +218,17 @@ namespace StrDss.Service
                 return false;
             }
 
+            // Should we validate the Registration?
+            bool isRegistrationValid = false;
+            if (_currentUser.Permissions.Any(p => p == Permissions.ValidateRegistration))
+            {
+                // Do we have what we need to validate the registration?
+                if (!string.IsNullOrEmpty(row.RegNo) && !string.IsNullOrEmpty(row.RentalStreet) && !string.IsNullOrEmpty(row.RentalPostal))
+                {
+                    (isRegistrationValid, Dictionary<string, List<string>> regErrors) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
+                }
+            }
+
             var offeringOrg = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd); //already validated in the file upload
 
             using var tran = _unitOfWork.BeginTransaction();
@@ -224,7 +237,7 @@ namespace StrDss.Service
 
             AddContacts(listing, row);
 
-            var (physicalAddress, systemError) = await CreateOrGetPhysicalAddress(listing, row);
+            var (physicalAddress, systemError) = await CreateOrGetPhysicalAddress(listing, row, isRegistrationValid);
 
             listing.LocatingPhysicalAddress = physicalAddress;
 
@@ -262,6 +275,8 @@ namespace StrDss.Service
             }
 
             tran.Commit();
+
+
             return true;
         }
 
@@ -300,7 +315,7 @@ namespace StrDss.Service
             return listing;
         }
 
-        private async Task<(DssPhysicalAddress, string)> CreateOrGetPhysicalAddress(DssRentalListing listing, RentalListingRowUntyped row)
+        private async Task<(DssPhysicalAddress, string)> CreateOrGetPhysicalAddress(DssRentalListing listing, RentalListingRowUntyped row, bool isRegistrationValid)
         {
             var address = row.RentalAddress;
 
@@ -312,10 +327,7 @@ namespace StrDss.Service
             {
                 var newAddress = new DssPhysicalAddress
                 {
-                    OriginalAddressTxt = row.RentalAddress,
-                    RegRentalUnitNo = row.RentalUnit,
-                    RegRentalStreetNo = row.RentalStreet,
-                    RegRentalPostalCode = row.RentalPostal,
+                    OriginalAddressTxt = row.RentalAddress
                 };
 
                 error = await _geocoder.GetAddressAsync(newAddress);
@@ -350,9 +362,12 @@ namespace StrDss.Service
 
                 listing.IsChangedOriginalAddress = true;
 
-                newAddress.RegRentalUnitNo = row.RentalUnit;
-                newAddress.RegRentalStreetNo = row.RentalStreet;
-                newAddress.RegRentalPostalCode = row.RentalPostal;
+                if (isRegistrationValid)
+                {
+                    newAddress.RegRentalUnitNo = row.RentalUnit;
+                    newAddress.RegRentalStreetNo = row.RentalStreet;
+                    newAddress.RegRentalPostalCode = row.RentalPostal;
+                }
 
                 _addressRepo.ReplaceAddress(listing, newAddress);
 
@@ -363,11 +378,15 @@ namespace StrDss.Service
             {
                 var newAddress = new DssPhysicalAddress
                 {
-                    OriginalAddressTxt = row.RentalAddress,
-                    RegRentalUnitNo = row.RentalUnit,
-                    RegRentalStreetNo = row.RentalStreet,
-                    RegRentalPostalCode = row.RentalPostal,
+                    OriginalAddressTxt = row.RentalAddress
                 };
+
+                if (isRegistrationValid)
+                {
+                    newAddress.RegRentalUnitNo = row.RentalUnit;
+                    newAddress.RegRentalStreetNo = row.RentalStreet;
+                    newAddress.RegRentalPostalCode = row.RentalPostal;
+                }
 
                 error = await _geocoder.GetAddressAsync(newAddress);
 

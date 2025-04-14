@@ -1,16 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using StrDss.Common;
-using StrDss.Data.Entities;
-using StrDss.Model;
 using StrDss.Service.HttpClients;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 using StrDss.Service;
 
 namespace StrDss.Service
@@ -60,16 +51,22 @@ public class PermitValidationService : IPermitValidationService
             {
                 isValid = false;
                 if (resp.Errors.Count == 0)
+                {
                     errorDetails.Add("UNKNOWN ERROR", new List<string> { "Response did not contain a status or error message." });
+                    _logger.LogError("Response did not contain a status or error message.");
+                }
                 else
+                {
                     errorDetails = resp.Errors
                         .GroupBy(e => e.Code)
                         .ToDictionary(g => g.Key, g => g.Select(e => e.Message).ToList());
+                }                    
             }
             else if (!string.Equals(resp.Status, "ACTIVE", StringComparison.OrdinalIgnoreCase))
             {
                 isValid = false;
                 errorDetails.Add("INACTIVE PERMIT", new List<string> { "Error: registration status returned as " + resp.Status });
+                _logger.LogError("Registration status returned as " + resp.Status);
             }
         }
         catch (ApiException ex)
@@ -87,11 +84,13 @@ public class PermitValidationService : IPermitValidationService
             {
                 errorDetails.Add("EXCEPTION", new List<string> { "Error: Service threw an undhandled exception." });
             }
+            _logger.LogError($"API Exception: {ex.StatusCode} - {ex.Message}", ex);
         }
         catch (Exception ex)
         {
             isValid = false;
             errorDetails.Add("EXCEPTION", new List<string> { "Error: Service threw an undhandled exception." });
+            _logger.LogError($"General Exception: {ex.Message}", ex);
         }
 
         return (isValid, errorDetails);

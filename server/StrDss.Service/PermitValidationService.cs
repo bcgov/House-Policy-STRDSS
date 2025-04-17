@@ -1,17 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using StrDss.Common;
-using StrDss.Data.Entities;
-using StrDss.Model;
 using StrDss.Service.HttpClients;
-using NetTopologySuite.Geometries;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 using StrDss.Service;
 using NetTopologySuite.Operation.Valid;
 using StrDss.Data.Repositories;
@@ -83,6 +73,7 @@ public class PermitValidationService : IPermitValidationService
             {
                 isValid = false;
                 registrationText = resp.Status;
+
             }
         }
         catch (ApiException ex)
@@ -154,6 +145,7 @@ public class PermitValidationService : IPermitValidationService
                     isExempt = false;
                 }
             }
+            _logger.LogError($"API Exception: {ex.StatusCode} - {ex.Message}", ex);
         }
 
         return (isExempt, registrationText);

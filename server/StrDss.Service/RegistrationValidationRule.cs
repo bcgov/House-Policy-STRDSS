@@ -11,8 +11,7 @@ namespace StrDss.Service
                 EntityName = Entities.RegistrationDataRowUntyped,
                 FieldName = RegistrationValidationFields.RptPeriod,
                 FieldType = FieldTypes.String,
-                Required = false,
-                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.YearMonth)
+                Required = false
             });
 
             rules.Add(new FieldValidationRule
@@ -29,8 +28,7 @@ namespace StrDss.Service
                 EntityName = Entities.RegistrationDataRowUntyped,
                 FieldName = RegistrationValidationFields.ListingId,
                 FieldType = FieldTypes.String,
-                Required = false,
-                MaxLength = 25,
+                Required = false
             });
 
             rules.Add(new FieldValidationRule
@@ -65,7 +63,7 @@ namespace StrDss.Service
                 EntityName = Entities.RegistrationDataRowUntyped,
                 FieldName = RegistrationValidationFields.BcRegNo,
                 FieldType = FieldTypes.String,
-                Required = true,
+                Required = false,
                 MaxLength = 25
             });
 
@@ -83,7 +81,7 @@ namespace StrDss.Service
                 EntityName = Entities.RegistrationDataRowUntyped,
                 FieldName = RegistrationValidationFields.RentalStreet,
                 FieldType = FieldTypes.String,
-                Required = true,
+                Required = false,
                 MaxLength = 25
             });
 

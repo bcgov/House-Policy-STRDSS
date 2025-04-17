@@ -190,6 +190,10 @@ CREATE  TABLE dss_upload_delivery (
     upload_lines_success smallint,
     upload_lines_error smallint,
     upload_lines_processed smallint,
+	registration_status varchar(20),
+	registration_lines_failure smallint,
+	registration_lines_success smallint,
+	upload_user_guid uuid,	
 	upd_dtm              timestamptz  NOT NULL  ,
 	upd_user_guid        uuid    ,
 	CONSTRAINT dss_upload_delivery_pk PRIMARY KEY ( upload_delivery_id )
@@ -199,11 +203,13 @@ CREATE  TABLE dss_upload_line (
 	upload_line_id       bigint  NOT NULL GENERATED ALWAYS AS IDENTITY  ,
 	is_validation_failure boolean  NOT NULL  ,
 	is_system_failure    boolean  NOT NULL  ,
+	is_registration_failure boolean  NOT NULL  ,
 	is_processed         boolean  NOT NULL  ,
 	source_organization_cd varchar(25)  NOT NULL  ,
 	source_record_no     varchar(50)  NOT NULL  ,
 	source_line_txt      varchar(32000)  NOT NULL  ,
 	error_txt            varchar(32000)    ,
+	registration_txt varchar(32000)	,
 	including_upload_delivery_id bigint  NOT NULL  ,
 	CONSTRAINT dss_upload_line_pk PRIMARY KEY ( upload_line_id ),
 	CONSTRAINT dss_upload_line_uk UNIQUE ( including_upload_delivery_id, source_organization_cd, source_record_no ) 
@@ -580,99 +586,23 @@ AS SELECT dud.upload_delivery_id,
     dud.upload_delivery_type,
     dud.report_period_ym,
     dud.providing_organization_id,
+    dud.upload_status AS status,
+    dud.registration_status AS registration_status,
     do2.organization_nm,
     dud.upd_dtm,
     dui.given_nm,
     dui.family_nm,
-    count(*) AS total,
-    sum(
-        CASE
-            WHEN dul.is_processed = true THEN 1
-            ELSE 0
-        END) AS processed,
-    sum(
-        CASE
-            WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1
-            ELSE 0
-        END) AS errors,
-    sum(
-        CASE
-            WHEN dul.is_processed = true AND dul.is_validation_failure = false AND dul.is_system_failure = false THEN 1
-            ELSE 0
-        END) AS success,
-        CASE
-            WHEN dud.upload_delivery_type::text = 'Takedown Data'::text THEN 'Processed'::text
-            WHEN dud.upload_delivery_type::text = 'Licence Data'::text AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND sum(
-            CASE
-                WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1
-                ELSE 0
-            END) = 0 THEN 'Processed'::text
-            WHEN dud.upload_delivery_type::text = 'Licence Data'::text AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND sum(
-            CASE
-                WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1
-                ELSE 0
-            END) > 0 THEN 'Failed'::text
-            WHEN count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) THEN 'Processed'::text
-            ELSE 'Pending'::text
-            WHEN dud.upload_delivery_type::text = 'Registration Data'::text AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND sum(
-            CASE
-                WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1
-                ELSE 0
-            END) = 0 THEN 'Processed'::text
-            WHEN dud.upload_delivery_type::text = 'Registration Data'::text AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND sum(
-            CASE
-                WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1
-                ELSE 0
-            END) > 0 THEN 'Failed'::text
-            WHEN count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) THEN 'Processed'::text
-            ELSE 'Pending'::text            
-        END AS status
+    dud.upload_lines_total AS total,
+    dud.upload_lines_processed AS processed,
+    dud.upload_lines_success AS success,
+    dud.upload_lines_error AS errors,
+    dud.registration_lines_failure AS registration_errors,
+    dud.registration_lines_success AS registration_success
    FROM dss_upload_delivery dud
      JOIN dss_upload_line dul ON dul.including_upload_delivery_id = dud.upload_delivery_id
-     JOIN dss_user_identity dui ON dud.upd_user_guid = dui.user_guid
+     JOIN dss_user_identity dui ON dud.upload_user_guid = dui.user_guid
      JOIN dss_organization do2 ON dud.providing_organization_id = do2.organization_id
   GROUP BY dud.upload_delivery_id, dud.upload_delivery_type, dud.report_period_ym, dud.providing_organization_id, do2.organization_nm, dud.upd_dtm, dui.given_nm, dui.family_nm;
-
 
 CREATE OR REPLACE VIEW dss_user_identity_view AS SELECT u.user_identity_id,
     u.is_enabled,
@@ -1165,11 +1095,19 @@ COMMENT ON COLUMN dss_upload_delivery.upload_status IS 'The current processing s
 
 COMMENT ON COLUMN dss_upload_delivery.upload_lines_total IS 'The total number of lines in the uploaded file';
 
-COMMENT ON COLUMN dss_upload_delivery.upload_lines_success IS 'The number of lines int the uploaded file that successfully processed'; 
+COMMENT ON COLUMN dss_upload_delivery.upload_lines_success IS 'The number of lines int the uploaded file that successfully processed';
 
 COMMENT ON COLUMN dss_upload_delivery.upload_lines_error IS 'The number of lines in the uploaded file that failed to process';
 
 COMMENT ON COLUMN dss_upload_delivery.upload_lines_processed IS 'The number of lines in the uploaded file that were processed';
+
+COMMENT ON COLUMN dss_upload_delivery.registration_status IS 'The current processing status of the registration validation: Pending, Processed, or Failed';
+
+COMMENT ON COLUMN dss_upload_delivery.registration_lines_failure IS 'The number of lines in the uploaded file that failed to validate the registration number';
+
+COMMENT ON COLUMN dss_upload_delivery.registration_lines_success IS 'The number of lines in the uploaded file that successfully validated the registration number';
+
+COMMENT ON COLUMN dss_upload_delivery.upload_user_guid uuid IS 'The globally unique identifier (assigned by the identity provider) for the user who uploaded the file';
 
 COMMENT ON TABLE dss_upload_line IS 'An upload delivery line that has been extracted from the source';
 
@@ -1188,6 +1126,10 @@ COMMENT ON COLUMN dss_upload_line.source_record_no IS 'The immutable identificat
 COMMENT ON COLUMN dss_upload_line.source_line_txt IS 'Full text of the upload line';
 
 COMMENT ON COLUMN dss_upload_line.error_txt IS 'Freeform description of the problem found while attempting to interpret the report line';
+
+COMMENT ON COLUMN dss_upload_line.is_registration_failure IS 'Indicates that there has been a problem validating the reg no, or determining if the property is straa exempt';
+
+COMMENT ON COLUMN dss_upload_line.registration_text IS 'Freeform description of the problem found while attempting to validate the reg no, or determine if the property is straa exempt';
 
 COMMENT ON COLUMN dss_upload_line.including_upload_delivery_id IS 'Foreign key';
 

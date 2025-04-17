@@ -13,12 +13,40 @@ ALTER TABLE dss_upload_delivery ADD upload_lines_total smallint;
 ALTER TABLE dss_upload_delivery ADD upload_lines_success smallint;
 ALTER TABLE dss_upload_delivery ADD upload_lines_error smallint;
 ALTER TABLE dss_upload_delivery ADD upload_lines_processed smallint;
+ALTER TABLE dss_upload_delivery ADD registration_status varchar(20);
+ALTER TABLE dss_upload_delivery ADD registration_lines_failure smallint;
+ALTER TABLE dss_upload_delivery ADD registration_lines_success smallint;
+ALTER TABLE dss_upload_delivery ADD upload_user_guid uuid;
 
 COMMENT ON COLUMN dss_upload_delivery.upload_status IS 'The current processing status of the uploaded file: Pending, Processed, or Failed';
 COMMENT ON COLUMN dss_upload_delivery.upload_lines_total IS 'The total number of lines in the uploaded file';
 COMMENT ON COLUMN dss_upload_delivery.upload_lines_success IS 'The number of lines int the uploaded file that successfully processed'; 
 COMMENT ON COLUMN dss_upload_delivery.upload_lines_error IS 'The number of lines in the uploaded file that failed to process';
 COMMENT ON COLUMN dss_upload_delivery.upload_lines_processed IS 'The number of lines in the uploaded file that were processed';
+COMMENT ON COLUMN dss_upload_delivery.registration_status IS 'The current processing status of the registration validation: Pending, Processed, or Failed';
+COMMENT ON COLUMN dss_upload_delivery.registration_lines_failure IS 'The number of lines in the uploaded file that failed to validate the registration number';
+COMMENT ON COLUMN dss_upload_delivery.registration_lines_success IS 'The number of lines in the uploaded file that successfully validated the registration number';
+COMMENT ON COLUMN dss_upload_delivery.upload_user_guid IS 'The globally unique identifier (assigned by the identity provider) for the user who uploaded the file';
+
+-- Create new columns in the upload line for holding registration validation status and text
+ALTER TABLE dss_upload_line ADD is_registration_failure boolean;
+ALTER TABLE dss_upload_line ADD registration_text varchar(32000);
+
+COMMENT ON COLUMN dss_upload_line.is_registration_failure IS 'Indicates that there has been a problem validating the reg no, or determining if the property is straa exempt';
+COMMENT ON COLUMN dss_upload_line.registration_text IS 'Freeform description of the problem found while attempting to validate the reg no, or determine if the property is straa exempt';
+
+-- populate the upload_user_guid field
+-- Disable the trigger
+ALTER TABLE dss_upload_delivery DISABLE TRIGGER ALL;
+
+-- Populate the upload_user_guid column with the current value of upd_user_guid
+UPDATE dss_upload_delivery
+SET upload_user_guid = upd_user_guid
+WHERE upload_user_guid IS NULL;
+
+-- Re-enable the trigger
+ALTER TABLE dss_upload_delivery ENABLE TRIGGER ALL; 
+
 
 -- Populate the upload_lines_total column
 UPDATE dss_upload_delivery dud
@@ -165,6 +193,11 @@ FROM (
 ) AS subquery
 WHERE dud.upload_delivery_id = subquery.upload_delivery_id;
 
+UPDATE dss_upload_delivery dud
+SET registration_status = dud.upload_status,
+    registration_lines_failure = dud.upload_lines_error,
+    registration_lines_success = dud.upload_lines_success;
+
 -- Now that we've populated the columns, we can set the not null constraint on status and total lines
 ALTER TABLE dss_upload_delivery ALTER COLUMN upload_status SET NOT NULL;
 ALTER TABLE dss_upload_delivery ALTER COLUMN upload_lines_total SET NOT NULL;
@@ -182,95 +215,21 @@ AS SELECT dud.upload_delivery_id,
     dud.upload_delivery_type,
     dud.report_period_ym,
     dud.providing_organization_id,
+    dud.upload_status AS status,
+    dud.registration_status AS registration_status,
     do2.organization_nm,
     dud.upd_dtm,
     dui.given_nm,
     dui.family_nm,
-    count(*) AS total,
-    sum(
-        CASE
-            WHEN dul.is_processed = true THEN 1
-            ELSE 0
-        END) AS processed,
-    sum(
-        CASE
-            WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1
-            ELSE 0
-        END) AS errors,
-    sum(
-        CASE
-            WHEN dul.is_processed = true AND dul.is_validation_failure = false AND dul.is_system_failure = false THEN 1
-            ELSE 0
-        END) AS success,
-        CASE
-            WHEN dud.upload_delivery_type::text = 'Takedown Data'::text THEN 'Processed'::text
-            WHEN dud.upload_delivery_type::text = 'Licence Data'::text AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND sum(
-            CASE
-                WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1
-                ELSE 0
-            END) = 0 THEN 'Processed'::text
-            WHEN dud.upload_delivery_type::text = 'Licence Data'::text AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND sum(
-            CASE
-                WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1
-                ELSE 0
-            END) > 0 THEN 'Failed'::text
-            WHEN count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) THEN 'Processed'::text
-            WHEN dud.upload_delivery_type::text = 'Registration Data'::text AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND sum(
-            CASE
-                WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1
-                ELSE 0
-            END) = 0 THEN 'Processed'::text
-            WHEN dud.upload_delivery_type::text = 'Registration Data'::text AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) AND sum(
-            CASE
-                WHEN dul.is_validation_failure = true OR dul.is_system_failure = true THEN 1
-                ELSE 0
-            END) > 0 THEN 'Failed'::text
-            WHEN count(*) = sum(
-            CASE
-                WHEN dul.is_processed = true THEN 1
-                ELSE 0
-            END) THEN 'Processed'::text
-            ELSE 'Pending'::text            
-        END AS status
+    dud.upload_lines_total AS total,
+    dud.upload_lines_processed AS processed,
+    dud.upload_lines_success AS success,
+    dud.upload_lines_error AS errors,
+    dud.registration_lines_failure AS registration_errors,
+    dud.registration_lines_success AS registration_success
    FROM dss_upload_delivery dud
      JOIN dss_upload_line dul ON dul.including_upload_delivery_id = dud.upload_delivery_id
-     JOIN dss_user_identity dui ON dud.upd_user_guid = dui.user_guid
+     JOIN dss_user_identity dui ON dud.upload_user_guid = dui.user_guid
      JOIN dss_organization do2 ON dud.providing_organization_id = do2.organization_id
   GROUP BY dud.upload_delivery_id, dud.upload_delivery_type, dud.report_period_ym, dud.providing_organization_id, do2.organization_nm, dud.upd_dtm, dui.given_nm, dui.family_nm;
 

@@ -27,7 +27,13 @@ public partial class DssRentalUploadHistoryView
 
     public long? Errors { get; set; }
 
+    public long? RegistrationErrors { get; set; }
+
     public long? Success { get; set; }
 
+    public long? RegistrationSuccess { get; set; }
+
     public string? Status { get; set; }
+
+    public string? RegistrationStatus { get; set; }
 }

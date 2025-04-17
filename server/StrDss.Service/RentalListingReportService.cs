@@ -95,14 +95,16 @@ namespace StrDss.Service
 
             csv.Read();
             var headerExists = csv.ReadHeader();
-            var hasError = false;
-            var isLastLine = false;
-            var processedCount = 0;
-            var linesPerJob = 500;
+            bool isSuccessful = false;
+            bool isValid = false;
+            bool isLastLine = false;
+            int processedCount = 0;
+            int errorCount = 0;
+            int regErrorCount = 0;
 
             while (csv.Read())
             {
-                if (processedCount >= linesPerJob) break; //To process x lines per job
+                //if (processedCount >= linesPerJob) break; //To process x lines per job
 
                 count++;
                 isLastLine = count == lineCount;
@@ -124,12 +126,14 @@ namespace StrDss.Service
                 _logger.LogInformation($"Processing listing ({row.OrgCd} - {row.ListingId})");
 
                 var stopwatch = Stopwatch.StartNew();
-                hasError = !await ProcessUploadLine(report, upload, uploadLine, row, isLastLine);
+                (isSuccessful, isValid) = await ProcessUploadLine(report, upload, uploadLine, row, isLastLine);
                 stopwatch.Stop();
 
                 processedCount++;
+                if (!isSuccessful) errorCount++;
+                if (!isValid) regErrorCount++;
 
-                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/{linesPerJob}");
+                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/{lineCount}");
             }
 
             if (!isLastLine)
@@ -139,7 +143,18 @@ namespace StrDss.Service
                 return;
             }
 
-            if (hasError || (await _uploadRepo.UploadHasErrors(upload.UploadDeliveryId)))
+            // Update the delivery record with the stats we need.
+            upload.UploadStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
+            upload.RegistrationStatus = regErrorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
+            upload.UploadLinesTotal = lineCount;
+            upload.UploadLinesProcessed = processedCount;
+            upload.UploadLinesSuccess = processedCount - errorCount;
+            upload.UploadLinesError = errorCount;
+            upload.RegistrationLinesSuccess = processedCount - regErrorCount;
+            upload.RegistrationLinesError = regErrorCount;
+            _unitOfWork.Commit();
+
+            if (errorCount > 0)
             {
                 if (upload.UpdUserGuid == null) return;
 
@@ -199,33 +214,30 @@ namespace StrDss.Service
             _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
-        private async Task<bool> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, bool isLastLine)
+        private async Task<(bool, bool)> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, bool isLastLine)
         {
             var errors = new Dictionary<string, List<string>>();
-            
-            _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
+            bool doValidateRegistration = _currentUser.Permissions.Any(p => p == Permissions.ValidateRegistration); // Should we be validating the registration?
+            bool isRegistrationValid = false;
+            string registrationTxt = "";
 
+            // Validate of the incoming line
+            _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
             if (errors.Count > 0)
             {
-                SaveUploadLine(uploadLine, errors, true, "");
-
-                if (isLastLine)
-                {
-                    await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
-                }
-
+                SaveUploadLine(uploadLine, errors, true, "", doValidateRegistration, true, errors.ParseError());
+                if (isLastLine)  await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
                 _unitOfWork.Commit();
-                return false;
+                return (false, isRegistrationValid);
             }
-
-            // Should we validate the Registration?
-            bool isRegistrationValid = false;
-            if (_currentUser.Permissions.Any(p => p == Permissions.ValidateRegistration))
+            
+            // Attempt to validate the registration number if it exists, and the user is allowed to do it this weay
+            if (doValidateRegistration)
             {
                 // Do we have what we need to validate the registration?
-                if (!string.IsNullOrEmpty(row.RegNo) && !string.IsNullOrEmpty(row.RentalStreet) && !string.IsNullOrEmpty(row.RentalPostal))
+                if (!string.IsNullOrEmpty(row.RegNo) && !string.IsNullOrEmpty(row.RentalPostal))
                 {
-                    (isRegistrationValid, Dictionary<string, List<string>> regErrors) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
+                    (isRegistrationValid, registrationTxt) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
                 }
             }
 
@@ -234,14 +246,17 @@ namespace StrDss.Service
             using var tran = _unitOfWork.BeginTransaction();
 
             var listing = await CreateOrUpdateRentalListing(report, offeringOrg, row);
-
             AddContacts(listing, row);
-
             var (physicalAddress, systemError) = await CreateOrGetPhysicalAddress(listing, row, isRegistrationValid);
-
             listing.LocatingPhysicalAddress = physicalAddress;
 
-            SaveUploadLine(uploadLine, errors, false, systemError);
+            // Check to see if the registration is valid due to being in a straa exempt jurisdiction
+            if (doValidateRegistration && !isRegistrationValid && string.IsNullOrEmpty(row.RegNo) && !string.IsNullOrEmpty(row.RentalAddress))
+            {
+                (isRegistrationValid, registrationTxt) = await _permitValidation.CheckStraaExemptionStatus(row.RentalAddress);
+            }
+
+            SaveUploadLine(uploadLine, errors, false, systemError, doValidateRegistration, !isRegistrationValid, registrationTxt);
 
             _unitOfWork.Commit();
 
@@ -253,7 +268,7 @@ namespace StrDss.Service
                 }
 
                 tran.Commit();
-                return false;
+                return (false, isRegistrationValid);
             }
 
             var (needUpdate, masterListing) = await CreateOrUpdateMasterListing(report.ReportPeriodYm, listing, offeringOrg, row, physicalAddress);
@@ -277,11 +292,18 @@ namespace StrDss.Service
             tran.Commit();
 
 
-            return true;
+            return (true, isRegistrationValid);
         }
 
-        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, string systemError)
+        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, string systemError,
+            bool doValidateRegistration, bool isRegistrationFailure, string registrationTxt)
         {
+            if (doValidateRegistration)
+            {
+                uploadLine.IsRegistrationFailure = isRegistrationFailure;
+                uploadLine.RegistrationTxt = registrationTxt;
+            }
+
             uploadLine.IsValidationFailure = isValidationFailure;
             uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
 

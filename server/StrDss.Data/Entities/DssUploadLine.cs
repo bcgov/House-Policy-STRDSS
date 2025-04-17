@@ -24,6 +24,11 @@ public partial class DssUploadLine
     public bool IsSystemFailure { get; set; }
 
     /// <summary>
+    /// Indicates that there has been a problem validating the reg no, or determining if the property is straa exempt
+    /// </summary>
+    public bool IsRegistrationFailure { get; set; }
+
+    /// <summary>
     /// An immutable system code identifying the organization who created the information in the upload line (e.g. AIRBNB)
     /// </summary>
     public string SourceOrganizationCd { get; set; } = null!;
@@ -42,6 +47,11 @@ public partial class DssUploadLine
     /// Freeform description of the problem found while attempting to interpret the report line
     /// </summary>
     public string? ErrorTxt { get; set; }
+
+    /// <summary>
+    /// Freeform description of the problem found while attempting to validate the reg no, or determine if the property is straa exempt
+    /// </summary>
+    public string? RegistrationTxt { get; set; }
 
     /// <summary>
     /// Foreign key

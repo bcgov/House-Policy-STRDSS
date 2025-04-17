@@ -3,6 +3,7 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Service.HttpClients;
+using NetTopologySuite.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,33 +13,40 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 using StrDss.Service;
+using NetTopologySuite.Operation.Valid;
+using StrDss.Data.Repositories;
 
 namespace StrDss.Service
 {
     public interface IPermitValidationService
     {
-        Task<(bool isValid, Dictionary<string, List<string>> errors)> ValidateRegistrationPermitAsync(string regNo, string unitNumber, string streetNumber, string postalCode);
+        Task<(bool isValid, string registrationText)> ValidateRegistrationPermitAsync(string regNo, string unitNumber, string streetNumber, string postalCode);
+        Task<(bool isStraaExempt, string registrationText)> CheckStraaExemptionStatus(string rentalAddress);
     }
 }
 public class PermitValidationService : IPermitValidationService
 {
     private IRegistrationApiClient _regApiClient;
+    private IGeocoderApi _geocoder;
+    private IOrganizationRepository _orgRepo;
     private IConfiguration _config;
     private ILogger<StrDssLogger> _logger;
     private readonly string? _apiAccount;
 
-    public PermitValidationService(IRegistrationApiClient regApiClient, IConfiguration config, ILogger<StrDssLogger> logger)
+    public PermitValidationService(IRegistrationApiClient regApiClient, IGeocoderApi geocoder, IOrganizationRepository orgRepo,  IConfiguration config, ILogger<StrDssLogger> logger)
     {
         _regApiClient = regApiClient;
+        _geocoder = geocoder;
+        _orgRepo = orgRepo;
         _config = config;
         _logger = logger;
         _apiAccount = _config.GetValue<string>("REGISTRATION_API_ACCOUNT");
     }
 
-    public async Task<(bool isValid, Dictionary<string, List<string>> errors)> ValidateRegistrationPermitAsync(string regNo, string unitNumber, string streetNumber, string postalCode)
+    public async Task<(bool isValid, string registrationText)> ValidateRegistrationPermitAsync(string regNo, string unitNumber, string streetNumber, string postalCode)
     {
         bool isValid = true;
-        Dictionary<string, List<string>> errorDetails = new();
+        string registrationText = RegistrationValidationText.Success;
 
         Body body = new()
         {
@@ -60,40 +68,94 @@ public class PermitValidationService : IPermitValidationService
             {
                 isValid = false;
                 if (resp.Errors.Count == 0)
-                    errorDetails.Add("UNKNOWN ERROR", new List<string> { "Response did not contain a status or error message." });
+                {
+                    registrationText = RegistrationValidationText.StatusNotFound;
+                }
                 else
-                    errorDetails = resp.Errors
+                {
+                   Dictionary<string, List<string>> errorDetails = resp.Errors
                         .GroupBy(e => e.Code)
                         .ToDictionary(g => g.Key, g => g.Select(e => e.Message).ToList());
+                    registrationText = errorDetails.ParseError();
+                }
             }
             else if (!string.Equals(resp.Status, "ACTIVE", StringComparison.OrdinalIgnoreCase))
             {
                 isValid = false;
-                errorDetails.Add("INACTIVE PERMIT", new List<string> { "Error: registration status returned as " + resp.Status });
+                registrationText = resp.Status;
             }
         }
         catch (ApiException ex)
         {
             isValid = false;
-            if (ex.StatusCode == 404)
-            {
-                errorDetails.Add("NOT FOUND", new List<string> { "Error: Permit not found (404)." });
-            }
-            else if (ex.StatusCode == 401)
-            {
-                errorDetails.Add("UNAUTHORIZED", new List<string> { "Error: Unauthorized access (401)." });
-            }
-            else
-            {
-                errorDetails.Add("EXCEPTION", new List<string> { "Error: Service threw an undhandled exception." });
-            }
+            registrationText = ex.StatusCode == 404 ? RegistrationValidationText.ValidationException404 :
+                ex.StatusCode == 401 ? RegistrationValidationText.ValidationException401 :
+                RegistrationValidationText.ValidationException;
         }
         catch (Exception ex)
         {
             isValid = false;
-            errorDetails.Add("EXCEPTION", new List<string> { "Error: Service threw an undhandled exception." });
+            registrationText = RegistrationValidationText.ValidationException;
         }
 
-        return (isValid, errorDetails);
+        return (isValid, registrationText);
+    }
+
+    public async Task<(bool isStraaExempt, string registrationText)> CheckStraaExemptionStatus(string rentalAddress)
+    {
+        bool isExempt = true;
+        string registrationText = RegistrationValidationText.STRAAExempt;
+
+        DssPhysicalAddress newAddress = new()
+        {
+            OriginalAddressTxt = rentalAddress
+        };
+
+        try
+        {
+            var geoError = await _geocoder.GetAddressAsync(newAddress);
+            if (!string.IsNullOrEmpty(geoError))
+            {
+                _logger.LogError($"Geocoder error: {geoError}");
+                 registrationText = RegistrationValidationText.AddressNotFound;
+                isExempt = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Geocoder Api threw an undhandled exception: {ex.Message}");
+            registrationText = RegistrationValidationText.AddressNotFound;
+            isExempt = false;
+        }
+
+        if (isExempt && newAddress.LocationGeometry is not null && newAddress.LocationGeometry is Point point)
+        {
+            var containingOrganizationId = await _orgRepo.GetContainingOrganizationId(point);
+            if (containingOrganizationId == null)
+            {
+                _logger.LogError("Could not determine containing jurisdiction from rental address.");
+                registrationText = RegistrationValidationText.JurisdictionNotFound;
+                isExempt = false;
+            }
+            else
+            {
+                var org = await _orgRepo.GetOrganizationByIdAsync(containingOrganizationId.Value);
+                if (org == null || org.IsStraaExempt == null)
+                {
+                    _logger.LogError("Could not determine straaExempt status from the containing jurisdiction.");
+                    registrationText = RegistrationValidationText.ExemptionStatusNotFound;
+                    isExempt = false;
+                }
+
+                if (org.IsStraaExempt == false)
+                {
+                    _logger.LogError("Organization is not exempt from STRAA.");
+                    registrationText = RegistrationValidationText.NotSTRAAExempt;
+                    isExempt = false;
+                }
+            }
+        }
+
+        return (isExempt, registrationText);
     }
 }

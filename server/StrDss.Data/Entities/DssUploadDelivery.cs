@@ -64,6 +64,27 @@ public partial class DssUploadDelivery
     public int UploadLinesProcessed { get; set; }
 
     /// <summary>
+    /// The current processing status of the uploaded file: Pending, Processed, or Failed
+    /// </summary>
+    public string RegistrationStatus { get; set; } = null;
+
+
+    /// <summary>
+    /// The current processing status of the registration validation: Pending, Processed, or Failed
+    /// </summary>
+    public int RegistrationLinesSuccess { get; set; }
+
+    /// <summary>
+    /// The number of lines in the uploaded file that failed to validate the registration number
+    /// </summary>
+    public int RegistrationLinesError { get; set; }
+
+    /// <summary>
+    /// The globally unique identifier (assigned by the identity provider) for the user who uploaded the file
+    /// </summary>
+    public Guid? UploadUserGuid { get; set; }
+
+    /// <summary>
     /// Trigger-updated timestamp of last change
     /// </summary>
     public DateTime UpdDtm { get; set; }

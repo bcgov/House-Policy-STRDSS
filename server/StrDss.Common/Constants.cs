@@ -1,4 +1,6 @@
-﻿namespace StrDss.Common
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace StrDss.Common
 {
     public class Constants
     {
@@ -637,5 +639,20 @@
         public const string Pending = "Pending";
         public const string Processed = "Processed";
         public const string Failed = "Failed";
+    }
+
+    public static class RegistrationValidationText
+    {
+        public const string Success = "Success";
+        public const string DataInvalid = "To validate the registration, please provide the registration number or the rental address associated with this listing.";
+        public const string STRAAExempt = "FN reserve land. This address is exempt from the STRAA.";
+        public const string NotSTRAAExempt = "Please verify if this STR offer is not required to be registered.";
+        public const string AddressNotFound = "Address not found.";
+        public const string JurisdictionNotFound = "Jurisdiction not found.";
+        public const string ExemptionStatusNotFound = "Exemption status not found.";
+        public const string StatusNotFound = "Registration validation Api did not return a registration status.";
+        public const string ValidationException = "Registration validation Api threw an undhandled exception.";
+        public const string ValidationException404 = "Registration validation Api return a status of 404 (Permit not found).";
+        public const string ValidationException401 = "Registration validation Api return a status of 401 (Unauthorized access).";
     }
 }

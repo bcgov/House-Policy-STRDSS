@@ -1243,6 +1243,7 @@ public partial class DssDbContext : DbContext
                 .ToView("dss_rental_upload_history_view");
 
             entity.Property(e => e.Errors).HasColumnName("errors");
+            entity.Property(e => e.RegistrationErrors).HasColumnName("registration_errors");
             entity.Property(e => e.FamilyNm)
                 .HasMaxLength(25)
                 .HasColumnName("family_nm");
@@ -1256,7 +1257,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.ProvidingOrganizationId).HasColumnName("providing_organization_id");
             entity.Property(e => e.ReportPeriodYm).HasColumnName("report_period_ym");
             entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.RegistrationStatus).HasColumnName("registration_status");
             entity.Property(e => e.Success).HasColumnName("success");
+            entity.Property(e => e.RegistrationSuccess).HasColumnName("registration_success");
             entity.Property(e => e.Total).HasColumnName("total");
             entity.Property(e => e.UpdDtm).HasColumnName("upd_dtm");
             entity.Property(e => e.UploadDeliveryId).HasColumnName("upload_delivery_id");
@@ -1320,6 +1323,21 @@ public partial class DssDbContext : DbContext
                 .HasComment("The number of lines in the uploaded file that were processed")
                 .HasColumnName("upload_lines_processed");
 
+            entity.Property(e => e.RegistrationStatus)
+                .HasMaxLength(20)
+                .HasComment("The current processing status of the registration validation: Pending, Processed, or Failed")
+                .HasColumnName("registration_status");
+            entity.Property(e => e.RegistrationLinesSuccess)
+                .HasComment("The number of lines in the uploaded file that successfully validated the registration number")
+                .HasColumnName("registration_lines_success");
+            entity.Property(e => e.RegistrationLinesError)
+                .HasComment("The number of lines in the uploaded file that failed to validate the registration number")
+                .HasColumnName("registration_lines_error");
+
+            entity.Property(e => e.UploadUserGuid)
+                .HasComment("The globally unique identifier (assigned by the identity provider) for the user who uploaded the file")
+                .HasColumnName("upload_user_guid");
+
             entity.HasOne(d => d.ProvidingOrganization).WithMany(p => p.DssUploadDeliveries)
                 .HasForeignKey(d => d.ProvidingOrganizationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -1344,6 +1362,10 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(32000)
                 .HasComment("Freeform description of the problem found while attempting to interpret the report line")
                 .HasColumnName("error_txt");
+            entity.Property(e => e.RegistrationTxt)
+                .HasMaxLength(32000)
+                .HasComment("Freeform description of the problem found while attempting to validate the reg no, or determine if the property is straa exempt")
+                .HasColumnName("registration_text");
             entity.Property(e => e.IncludingUploadDeliveryId)
                 .HasComment("Foreign key")
                 .HasColumnName("including_upload_delivery_id");
@@ -1356,6 +1378,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.IsValidationFailure)
                 .HasComment("Indicates that there has been a validation problem that prevents successful ingestion of the upload line")
                 .HasColumnName("is_validation_failure");
+            entity.Property(e => e.IsRegistrationFailure)
+                .HasComment("Indicates that there has been a problem validating the reg no, or determining if the property is straa exempt")
+                .HasColumnName("is_registration_failure");
             entity.Property(e => e.SourceLineTxt)
                 .HasMaxLength(32000)
                 .HasComment("Full text of the upload line")

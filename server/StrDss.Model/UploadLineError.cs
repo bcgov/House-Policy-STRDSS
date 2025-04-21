@@ -4,5 +4,6 @@
     {
         public string LineText { get; set; } = "";
         public string? ErrorText { get; set; } = "";
+        public string? RegistrationTxt { get; set; } = "";
     }
 }

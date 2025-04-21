@@ -303,12 +303,8 @@ namespace StrDss.Service
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, string systemError,
             bool doValidateRegistration, bool isRegistrationFailure, string registrationTxt)
         {
-            if (doValidateRegistration)
-            {
-                uploadLine.IsRegistrationFailure = isRegistrationFailure;
-                uploadLine.RegistrationTxt = registrationTxt;
-            }
-
+            uploadLine.IsRegistrationFailure = isRegistrationFailure;
+            uploadLine.RegistrationTxt = registrationTxt;
             uploadLine.IsValidationFailure = isValidationFailure;
             uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
 

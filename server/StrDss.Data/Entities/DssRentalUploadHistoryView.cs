@@ -36,4 +36,6 @@ public partial class DssRentalUploadHistoryView
     public string? Status { get; set; }
 
     public string? RegistrationStatus { get; set; }
+
+    public DateTime? UploadDate { get; set; }
 }

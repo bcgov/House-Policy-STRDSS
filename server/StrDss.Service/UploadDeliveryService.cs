@@ -69,6 +69,7 @@ namespace StrDss.Service
             DateOnly? reportPeriodYm = 
                 mandatoryFields.Contains("rpt_period") ? new DateOnly(Convert.ToInt32(reportPeriod.Substring(0, 4)), Convert.ToInt32(reportPeriod.Substring(5, 2)), 1) : null;
 
+            DateTime utcNow = DateTime.UtcNow;
             var entity = new DssUploadDelivery
             {
                 UploadDeliveryType = reportType,
@@ -79,7 +80,8 @@ namespace StrDss.Service
                 UpdUserGuid = _currentUser.UserGuid,
                 SourceHeaderTxt = header,
                 UploadStatus = UploadStatus.Pending,
-                UploadLinesTotal = uploadLines.Count
+                UploadLinesTotal = uploadLines.Count,
+                UploadDate = utcNow,
             };
 
             foreach (var line in uploadLines)

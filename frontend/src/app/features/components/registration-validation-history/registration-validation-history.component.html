@@ -103,7 +103,7 @@
                 <td>
                     {{row.registrationErrors}}
                 </td>
-                <td>{{ row.updDtm |date:'yyyy-MM-dd' }}</td>
+                <td>{{ row.uploadDate |date:'yyyy-MM-dd' }}</td>
                 <td>{{ row.givenNm }} {{ row.familyNm }}</td>
                 <td>
                     <button [id]="'downloadReport_'+row.uploadDeliveryId" pButton

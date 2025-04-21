@@ -1266,6 +1266,7 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.UploadDeliveryType)
                 .HasMaxLength(25)
                 .HasColumnName("upload_delivery_type");
+            entity.Property(e => e.UploadDate).HasColumnName("upload_date");
         });
 
         modelBuilder.Entity<DssUploadDelivery>(entity =>
@@ -1337,6 +1338,9 @@ public partial class DssDbContext : DbContext
             entity.Property(e => e.UploadUserGuid)
                 .HasComment("The globally unique identifier (assigned by the identity provider) for the user who uploaded the file")
                 .HasColumnName("upload_user_guid");
+            entity.Property(e => e.UploadDate)
+                .HasComment("Date and time the file was uploaded")
+                .HasColumnName("upload_date");
 
             entity.HasOne(d => d.ProvidingOrganization).WithMany(p => p.DssUploadDeliveries)
                 .HasForeignKey(d => d.ProvidingOrganizationId)

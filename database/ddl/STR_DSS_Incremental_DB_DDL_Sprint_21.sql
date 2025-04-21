@@ -43,7 +43,7 @@ ALTER TABLE dss_upload_delivery DISABLE TRIGGER ALL;
 
 -- Populate the upload_user_guid column with the current value of upd_user_guid
 UPDATE dss_upload_delivery
-SET upload_user_guid = upd_user_guid
+SET upload_user_guid = upd_user_guid,
 SET upload_date = upd_dtm;
 
 -- Re-enable the trigger

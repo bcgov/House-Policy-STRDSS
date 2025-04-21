@@ -51,7 +51,7 @@ namespace StrDss.Service
 
             _logger.LogInformation($"Processing Takedown Confirmation ({upload.UploadDeliveryId}) {upload.ProvidingOrganization.OrganizationNm} - {upload.ReportPeriodYm}");
 
-            var count = 0;
+            var processedCount = 0;
 
             var header = upload.SourceHeaderTxt ?? "";
 
@@ -60,7 +60,6 @@ namespace StrDss.Service
 
             foreach (var line in linesToProcess)
             {
-                count++;
                 var errors = new Dictionary<string, List<string>>();
                 var csvConfig = CsvHelperUtils.GetConfig(errors, false);
 
@@ -69,7 +68,18 @@ namespace StrDss.Service
                 var csvReader = new CsvReader(textReader, csvConfig);
 
                 var (orgCd, listingId) = await ProcessLine(upload, header, line, csvReader);
+                processedCount++;
             }
+
+            upload.UploadStatus = UploadStatus.Processed;
+            upload.RegistrationStatus = UploadStatus.Processed;
+            upload.UploadLinesTotal = lineCount;
+            upload.UploadLinesProcessed = processedCount;
+            upload.UploadLinesSuccess = processedCount;
+            upload.UploadLinesError = 0;
+            upload.RegistrationLinesSuccess = 0;
+            upload.RegistrationLinesError = 0;
+            _unitOfWork.Commit();
 
             processStopwatch.Stop();
 

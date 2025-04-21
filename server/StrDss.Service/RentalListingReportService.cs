@@ -104,7 +104,7 @@ namespace StrDss.Service
 
             while (csv.Read())
             {
-                //if (processedCount >= linesPerJob) break; //To process x lines per job
+                if (processedCount >= 500) break; //To process x lines per job
 
                 count++;
                 isLastLine = count == lineCount;
@@ -136,23 +136,28 @@ namespace StrDss.Service
                 _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.ListingId}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}/{lineCount}");
             }
 
+            // Because we may be processing these uploads in blocks of 500, we need to do some running totals and update the upload record with the stats we need.
+            var totalProcessed = upload.UploadLinesProcessed + processedCount;
+            var totalRegErrors = upload.RegistrationLinesError + regErrorCount;
+            var totalErrors = upload.UploadLinesError + errorCount;
+
+            // Update the delivery record with the stats we need.
+            upload.UploadStatus = totalProcessed == lineCount ? UploadStatus.Processed : UploadStatus.Pending; // Current logic has only processed or pending for this upload
+            upload.RegistrationStatus = totalProcessed == lineCount ? totalRegErrors > 0 ? UploadStatus.Failed : UploadStatus.Processed : UploadStatus.Pending;
+            upload.UploadLinesTotal = lineCount;
+            upload.UploadLinesProcessed = totalProcessed;
+            upload.UploadLinesSuccess = totalProcessed - totalErrors;
+            upload.UploadLinesError = totalErrors;
+            upload.RegistrationLinesSuccess = totalProcessed - totalRegErrors;
+            upload.RegistrationLinesError = regErrorCount;
+            _unitOfWork.Commit();
+
             if (!isLastLine)
             {
                 processStopwatch.Stop();
                 _logger.LogInformation($"Processed {processedCount} lines: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
                 return;
             }
-
-            // Update the delivery record with the stats we need.
-            upload.UploadStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
-            upload.RegistrationStatus = regErrorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
-            upload.UploadLinesTotal = lineCount;
-            upload.UploadLinesProcessed = processedCount;
-            upload.UploadLinesSuccess = processedCount - errorCount;
-            upload.UploadLinesError = errorCount;
-            upload.RegistrationLinesSuccess = processedCount - regErrorCount;
-            upload.RegistrationLinesError = regErrorCount;
-            _unitOfWork.Commit();
 
             if (errorCount > 0)
             {

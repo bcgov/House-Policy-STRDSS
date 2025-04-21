@@ -80,6 +80,7 @@ namespace StrDss.Service
                 UpdUserGuid = _currentUser.UserGuid,
                 SourceHeaderTxt = header,
                 UploadStatus = UploadStatus.Pending,
+                RegistrationStatus = UploadStatus.Pending,
                 UploadLinesTotal = uploadLines.Count,
                 UploadDate = utcNow,
             };
@@ -345,19 +346,22 @@ namespace StrDss.Service
                         }
                         else
                         {
-                            // Check which fields are missing
-                            if (!hasRegNo)
+                            if (!hasRentalAddress)
                             {
-                                regNoMissing++;
-                            }
-                            if (!hasRentalStreet)
-                            {
-                                rentalStreetMissing++;
-                            }
-                            if (!hasRentalPostal)
-                            {
-                                rentalPostalMissing++;
-                            }
+                                // Check which fields are missing
+                                if (!hasRegNo)
+                                {
+                                    regNoMissing++;
+                                }
+                                if (!hasRentalStreet)
+                                {
+                                    rentalStreetMissing++;
+                                }
+                                if (!hasRentalPostal)
+                                {
+                                    rentalPostalMissing++;
+                                }
+                            }                            
                         }
 
                         // Add to uploadLines
@@ -367,7 +371,7 @@ namespace StrDss.Service
                             IsSystemFailure = false,
                             IsProcessed = false,
                             SourceOrganizationCd = org.OrganizationCd,
-                            SourceRecordNo = row.RegNo ?? org.OrganizationCd,
+                            SourceRecordNo = row.RegNo ?? "REG",
                             SourceLineTxt = csv.Parser.RawRecord
                         });
                     }

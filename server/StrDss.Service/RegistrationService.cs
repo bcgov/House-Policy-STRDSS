@@ -134,8 +134,7 @@ namespace StrDss.Service
             var template = new RegistrationValidationComplete(_emailService)
             {
                 UserName = $"{user!.GivenNm}",
-                NumErrors = errorCount,
-                Link = GetHostUrl() + "/registration-validation-history",
+                Link = "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/short-term-rentals/quickstartguide_validation_for_minor_platforms_final.pdf",
                 To = new string[] { user!.EmailAddressDsc! },
                 Info = $"{EmailMessageTypes.ListingUploadError} for {user.FamilyNm}, {user.GivenNm}",
                 From = adminEmail

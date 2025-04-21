@@ -162,6 +162,7 @@ namespace StrDss.Service
         {
             uploadLine.IsValidationFailure = isValidationFailure;
             uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
+            uploadLine.IsRegistrationFailure = false;
 
             uploadLine.IsSystemFailure = systemError.IsNotEmpty();
             if (uploadLine.IsSystemFailure)

@@ -139,6 +139,7 @@ namespace StrDss.Service
             }
 
             line.IsProcessed = true;
+            line.IsRegistrationFailure = false;
 
             _unitOfWork.Commit();
 

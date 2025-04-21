@@ -29,7 +29,7 @@ COMMENT ON COLUMN dss_upload_delivery.registration_lines_success IS 'The number 
 COMMENT ON COLUMN dss_upload_delivery.upload_user_guid IS 'The globally unique identifier (assigned by the identity provider) for the user who uploaded the file';
 
 -- Create new columns in the upload line for holding registration validation status and text
-ALTER TABLE dss_upload_line ADD is_registration_failure boolean;
+ALTER TABLE dss_upload_line ADD is_registration_failure boolean DEFAULT false;
 ALTER TABLE dss_upload_line ADD registration_text varchar(32000);
 
 COMMENT ON COLUMN dss_upload_line.is_registration_failure IS 'Indicates that there has been a problem validating the reg no, or determining if the property is straa exempt';
@@ -197,6 +197,10 @@ UPDATE dss_upload_delivery dud
 SET registration_status = dud.upload_status,
     registration_lines_failure = dud.upload_lines_error,
     registration_lines_success = dud.upload_lines_success;
+
+update dss_upload_line dul
+ set is_registration_failure = false
+ where is_registration_failure is NULL;
 
 -- Now that we've populated the columns, we can set the not null constraint on status and total lines
 ALTER TABLE dss_upload_delivery ALTER COLUMN upload_status SET NOT NULL;

@@ -29,5 +29,6 @@
         public long RegistrationSuccess { get; set; }
         public string Status { get; set; }
         public string RegistrationStatus { get; set; }
+        public DateTime UploadDate { get; set; }
     }
 }

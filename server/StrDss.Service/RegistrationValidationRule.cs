@@ -90,7 +90,7 @@ namespace StrDss.Service
                 EntityName = Entities.RegistrationDataRowUntyped,
                 FieldName = RegistrationValidationFields.RentalPostal,
                 FieldType = FieldTypes.String,
-                Required = true,
+                Required = false,
                 MaxLength = 6
             });
 

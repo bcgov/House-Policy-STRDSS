@@ -77,7 +77,7 @@ namespace StrDss.Service
                 SourceHashDsc = hashValue,
                 SourceBin = sourceBin,
                 ProvidingOrganizationId = orgId,
-                UpdUserGuid = _currentUser.UserGuid,
+                UploadUserGuid = _currentUser.UserGuid,
                 SourceHeaderTxt = header,
                 UploadStatus = UploadStatus.Pending,
                 RegistrationStatus = UploadStatus.Pending,

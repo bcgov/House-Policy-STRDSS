@@ -110,7 +110,7 @@ namespace StrDss.Service
             }
             else if (reportType == UploadDeliveryTypes.RegistrationData)
             {
-                return ["reg_no", "rental_street", "rental_postal"];
+                return ["reg_no", "rental_street", "rental_postal", "rental_address"];
             }
             else
             {
@@ -210,6 +210,7 @@ namespace StrDss.Service
             var listingIdMissing = 0;
             var bizLicenceMissing = 0;
             var takedownReasonMismatch = 0;
+            var registrationDataMissing = 0;
             var regNoMissing = 0;
             var rentalStreetMissing = 0;
             var rentalStreetInvalid = 0;
@@ -307,56 +308,67 @@ namespace StrDss.Service
 
                     if (mandatoryFields.Contains("reg_no")) 
                     {
-                        if (row.RegNo.IsEmpty())
-                        {
-                            regNoMissing++;
-                        }
-                        else
-                        {
-                            uploadLines.Add(new DssUploadLine
-                            {
-                                IsValidationFailure = false,
-                                IsSystemFailure = false,
-                                IsProcessed = false,
-                                SourceOrganizationCd = org.OrganizationCd,
-                                SourceRecordNo = row.RegNo,
-                                SourceLineTxt = csv.Parser.RawRecord
-                            });
-                        }
-                    }
+                        // Determine if 'rental_address' is provided
+                        bool hasRentalAddress = !row.RentalAddress.IsEmpty();
 
-                    if (mandatoryFields.Contains("rental_street"))
-                    {
-                        if (row.RentalStreet.IsEmpty())
+                        // Determine if 'reg_no', 'rental_street', and 'rental_postal' are provided
+                        bool hasRegNo = !row.RegNo.IsEmpty();
+                        bool hasRentalStreet = !row.RentalStreet.IsEmpty();
+                        bool hasRentalPostal = !row.RentalPostal.IsEmpty();
+                        bool hasCompleteAddressFields = hasRegNo && hasRentalStreet && hasRentalPostal;
+
+                        // Validate that either 'rental_address' is provided, or all 'reg_no', 'rental_street', and 'rental_postal' are provided
+                        if (!hasRentalAddress && !hasCompleteAddressFields)
                         {
-                            rentalStreetMissing++;
+                            registrationDataMissing++;
+                            continue; // Skip further processing for this row
                         }
-                        else
+
+                        // If all address fields are provided, validate them
+                        if (hasCompleteAddressFields)
                         {
+                            // Validate 'rental_street'
                             var streetNumberRegexInfo = RegexDefs.GetRegexInfo(RegexDefs.CanadianStreetNumber);
                             if (!Regex.IsMatch(row.RentalStreet, streetNumberRegexInfo.Regex))
                             {
                                 rentalStreetInvalid++;
                             }
-                        }
-                    }
 
-                    if (mandatoryFields.Contains("rental_postal"))
-                    {
-                        if (row.RentalPostal.IsEmpty())
-                        {
-                            rentalPostalMissing++;
-                        }
-                        else
-                        {
+                            // Validate 'rental_postal'
                             var postalCodeRegexInfo = RegexDefs.GetRegexInfo(RegexDefs.CanadianPostalCode);
                             if (!Regex.IsMatch(row.RentalPostal, postalCodeRegexInfo.Regex, RegexOptions.IgnoreCase))
                             {
                                 rentalPostalMismatch++;
                             }
                         }
-                    }
+                        else
+                        {
+                            // Check which fields are missing
+                            if (!hasRegNo)
+                            {
+                                regNoMissing++;
+                            }
+                            if (!hasRentalStreet)
+                            {
+                                rentalStreetMissing++;
+                            }
+                            if (!hasRentalPostal)
+                            {
+                                rentalPostalMissing++;
+                            }
+                        }
 
+                        // Add to uploadLines
+                        uploadLines.Add(new DssUploadLine
+                        {
+                            IsValidationFailure = false,
+                            IsSystemFailure = false,
+                            IsProcessed = false,
+                            SourceOrganizationCd = org.OrganizationCd,
+                            SourceRecordNo = row.RegNo ?? org.OrganizationCd,
+                            SourceLineTxt = csv.Parser.RawRecord
+                        });
+                    }
                 }
                 catch (TypeConverterException ex)
                 {
@@ -442,6 +454,11 @@ namespace StrDss.Service
             if (takedownReasonMismatch > 0)
             {
                 errors.AddItem("reason", $"Takedown reason missing/mismatch found in {takedownReasonMismatch} record(s). The file contains missing/mismatch takedown reason(s).");
+            }
+
+            if (registrationDataMissing > 0)
+            {
+                errors.AddItem("RegistrationData", $"Either 'rental_address' or all of 'reg_no', 'rental_street', and 'rental_postal' must be provided. Missing in {registrationDataMissing} record(s).");
             }
 
             if (regNoMissing > 0)
@@ -573,7 +590,7 @@ namespace StrDss.Service
             foreach (var lineId in lines)
             {
                 var line = await _uploadRepo.GetUploadLineWithError(lineId);
-                var text = line.ErrorText;
+                var text = line.RegistrationTxt;
                 if (string.IsNullOrEmpty(text))
                 {
                     text = "Success";

@@ -65,7 +65,7 @@ namespace StrDss.Api.Controllers
         public async Task<ActionResult> GetRegistrationValidationHistory(long? platformId, int pageSize, int pageNumber, string orderBy = "UpdDtm", string direction = "desc")
         {
             var history = await _uploadService.GetUploadHistory(platformId, pageSize, pageNumber, orderBy, direction,
-                [UploadDeliveryTypes.RegistrationData]);
+                [UploadDeliveryTypes.RegistrationData, UploadDeliveryTypes.ListingData]);
 
             return Ok(history);
         }

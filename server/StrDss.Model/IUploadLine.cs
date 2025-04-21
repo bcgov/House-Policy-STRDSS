@@ -22,5 +22,7 @@ namespace StrDss.Model
         public string RentalStreet { get; set; } = "";
         [Name("rental_postal")]
         public string RentalPostal { get; set; } = "";
+        [Name("rental_address")]
+        public string RentalAddress { get; set; } = "";
     }
 }

@@ -17,6 +17,7 @@ ALTER TABLE dss_upload_delivery ADD registration_status varchar(20);
 ALTER TABLE dss_upload_delivery ADD registration_lines_failure smallint;
 ALTER TABLE dss_upload_delivery ADD registration_lines_success smallint;
 ALTER TABLE dss_upload_delivery ADD upload_user_guid uuid;
+ALTER TABLE dss_upload_delivery ADD upload_date timestamptz;
 
 COMMENT ON COLUMN dss_upload_delivery.upload_status IS 'The current processing status of the uploaded file: Pending, Processed, or Failed';
 COMMENT ON COLUMN dss_upload_delivery.upload_lines_total IS 'The total number of lines in the uploaded file';
@@ -27,6 +28,7 @@ COMMENT ON COLUMN dss_upload_delivery.registration_status IS 'The current proces
 COMMENT ON COLUMN dss_upload_delivery.registration_lines_failure IS 'The number of lines in the uploaded file that failed to validate the registration number';
 COMMENT ON COLUMN dss_upload_delivery.registration_lines_success IS 'The number of lines in the uploaded file that successfully validated the registration number';
 COMMENT ON COLUMN dss_upload_delivery.upload_user_guid IS 'The globally unique identifier (assigned by the identity provider) for the user who uploaded the file';
+COMMENT ON COLUMN dss_upload_delivery.upload_date IS 'Date and time the file was uploaded';
 
 -- Create new columns in the upload line for holding registration validation status and text
 ALTER TABLE dss_upload_line ADD is_registration_failure boolean DEFAULT false;
@@ -42,7 +44,7 @@ ALTER TABLE dss_upload_delivery DISABLE TRIGGER ALL;
 -- Populate the upload_user_guid column with the current value of upd_user_guid
 UPDATE dss_upload_delivery
 SET upload_user_guid = upd_user_guid
-WHERE upload_user_guid IS NULL;
+SET upload_date = upd_dtm;
 
 -- Re-enable the trigger
 ALTER TABLE dss_upload_delivery ENABLE TRIGGER ALL; 
@@ -218,6 +220,7 @@ CREATE OR REPLACE VIEW public.dss_rental_upload_history_view
 AS SELECT dud.upload_delivery_id,
     dud.upload_delivery_type,
     dud.report_period_ym,
+    dud.upload_date,
     dud.providing_organization_id,
     dud.upload_status AS status,
     dud.registration_status AS registration_status,

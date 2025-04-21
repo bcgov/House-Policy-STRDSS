@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using StrDss.Service;
 using NetTopologySuite.Operation.Valid;
 using StrDss.Data.Repositories;
+using StrDss.Data.Entities;
+using NetTopologySuite.Geometries;
 
 namespace StrDss.Service
 {
@@ -145,7 +147,6 @@ public class PermitValidationService : IPermitValidationService
                     isExempt = false;
                 }
             }
-            _logger.LogError($"API Exception: {ex.StatusCode} - {ex.Message}", ex);
         }
 
         return (isExempt, registrationText);

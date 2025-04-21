@@ -1332,7 +1332,7 @@ public partial class DssDbContext : DbContext
                 .HasColumnName("registration_lines_success");
             entity.Property(e => e.RegistrationLinesError)
                 .HasComment("The number of lines in the uploaded file that failed to validate the registration number")
-                .HasColumnName("registration_lines_error");
+                .HasColumnName("registration_lines_failure");
 
             entity.Property(e => e.UploadUserGuid)
                 .HasComment("The globally unique identifier (assigned by the identity provider) for the user who uploaded the file")

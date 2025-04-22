@@ -14,7 +14,7 @@ namespace StrDss.Service.EmailTemplates
         public string DownloadLink { get; set; } = "";
         public override string GetContent()
         {
-            Subject = "B.C. STR Data Portal: Validation report ready ";
+            Subject = "B.C. STR Data Portal: Validation report ready";
 
             return
 $@"Dear {UserName},<br/><br/>

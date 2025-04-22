@@ -196,7 +196,7 @@ FROM (
 WHERE dud.upload_delivery_id = subquery.upload_delivery_id;
 
 UPDATE dss_upload_delivery dud
-SET registration_status = dud.upload_status,
+SET registration_status = 'Not Applicable',
     registration_lines_failure = dud.upload_lines_error,
     registration_lines_success = dud.upload_lines_success;
 

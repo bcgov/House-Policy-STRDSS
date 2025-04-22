@@ -96,7 +96,7 @@ namespace StrDss.Service
             var hasError = false;
             var isLastLine = false;
             var processedCount = 0;
-            var linesPerJob = 1000;
+            var linesPerJob = 500;
 
             while (csv.Read())
             {

@@ -17,6 +17,9 @@ namespace StrDss.Model.RentalReportDtos
         public bool? IsNew { get; set; }
 
         public bool? IsTakenDown { get; set; }
+
+        public string? TakeDownReason { get; set; }
+
         public bool? IsLgTransferred { get; set; }
 
         public bool? IsChangedAddress { get; set; }

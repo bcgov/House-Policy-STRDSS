@@ -71,6 +71,15 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("host/count")]
+        public async Task<ActionResult> CountHostListingsAsync(string hostName)
+        {
+            var count = await _listingService.CountHostListingsAsync(hostName);
+
+            return Ok(count);
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet("{listingId}")]
         public async Task<ActionResult> GetRentalListing(long listingId)
         {
@@ -168,7 +177,8 @@ namespace StrDss.Api.Controllers
         [ApiAuthorize]
         [HttpGet("addresses/candidates")]
         public async Task<ActionResult<List<AddressDto>>> GetAddressCandidates(string addressString)
-        {
+        {   
+            CommonUtils.SanitizeObject(addressString);
             var addresses = await _listingService.GetAddressCandidatesAsync(addressString, 3);
             return Ok(addresses);
         }
@@ -202,7 +212,7 @@ namespace StrDss.Api.Controllers
 
             using var stream = dto.File.OpenReadStream();
 
-            errors = await _uploadService.UploadPlatformData(UploadDeliveryTypes.TakedownData, dto.ReportPeriod, dto.OrganizationId, stream);
+            errors = await _uploadService.UploadData(UploadDeliveryTypes.TakedownData, dto.ReportPeriod, dto.OrganizationId, stream);
 
             if (errors.Count > 0)
             {

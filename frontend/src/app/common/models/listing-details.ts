@@ -8,6 +8,7 @@ export interface ListingDetails {
     isActive: boolean;
     isNew: boolean;
     isTakenDown: boolean;
+    takeDownReason: string;
     offeringOrganizationId: number;
     offeringOrganizationNm: string;
     platformListingNo: number;
@@ -48,6 +49,7 @@ export interface ListingDetails {
     hasAtLeastOneValidHostEmail: boolean;
     hostsInfo: Array<ListingDetailsHostInfo>;
     bizLicenceInfo: BusinessLicence;
+    hasMultipleProperties: boolean;
 }
 
 export interface ListingDetailsWithHostCheckboxExtension extends ListingDetails {

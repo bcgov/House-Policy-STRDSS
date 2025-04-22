@@ -4,6 +4,7 @@ note
 **/Properties/launchSettings.json
 secrets
 .terraform
+.vs
 docker.env
 backup.sql
 docker-compose.yml
@@ -12,3 +13,4 @@ Scaffolding.txt
 /Test/UITest/Configuration/AppSettings.dev.json
 /Test/UITest/Configuration/AppSettings.test.json
 /Test/UITest/Configuration/AppSettings.uat.json
+zap-results

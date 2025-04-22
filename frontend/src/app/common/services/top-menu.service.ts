@@ -50,7 +50,7 @@ export class TopMenuService {
         accessPermission: listing_read,
         buttonId: 'listings_mi_btn',
         route: '/listings',
-        title: 'Listing Data',
+        title: 'Individual Listing Data',
         folderName: 'Listings',
       },
       {

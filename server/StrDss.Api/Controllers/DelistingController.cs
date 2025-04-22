@@ -135,101 +135,30 @@ namespace StrDss.Api.Controllers
             return Ok(preview);
         }
 
-        [ApiAuthorize(Permissions.TakedownAction)]
-        [HttpPost("batchtakedownrequest", Name = "SendBatchTakedownRequest")]
-        public async Task<ActionResult> SendBatchTakedownRequest([FromForm] BatchTakedownRequestCreateDto dto)
-        {
-            Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
-
-            if (dto.File == null || dto.File.Length == 0)
-            {
-                errors.AddItem("File", $"File is null or empty.");
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
-            }
-
-            var maxSizeInMb = _config.GetValue<int>("RENTAL_LISTING_REPORT_MAX_SIZE");
-            var maxSizeInB = (maxSizeInMb == 0 ? 2 : maxSizeInMb) * 1024 * 1024;
-
-            if (dto.File.Length > maxSizeInB)
-            {
-                errors.AddItem("File", $"The file size exceeds the maximum size {maxSizeInMb}MB.");
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
-            }
-
-            if (!CommonUtils.IsTextFile(dto.File.ContentType))
-            {
-                errors.AddItem("File", $"Uploaded file is not a text file.");
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
-            }
-
-            using var stream = dto.File.OpenReadStream();
-
-            errors = await _delistingService.SendBatchTakedownRequestAsync(dto.PlatformId, stream);
-            if (errors.Count > 0)
-            {
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
-            }
-
-            return NoContent();
-        }
-
-        [ApiAuthorize(Permissions.TakedownAction)]
-        [HttpPost("batchtakedownnotice", Name = "SendBatchTakedownNotice")]
-        public async Task<ActionResult> SendBatchtakedownNotice([FromForm] BatchTakedownNoticeCreateDto dto)
-        {
-            Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
-
-            if (dto.File == null || dto.File.Length == 0)
-            {
-                errors.AddItem("File", $"File is null or empty.");
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
-            }
-
-            var maxSizeInMb = _config.GetValue<int>("RENTAL_LISTING_REPORT_MAX_SIZE");
-            var maxSizeInB = (maxSizeInMb == 0 ? 2 : maxSizeInMb) * 1024 * 1024;
-
-            if (dto.File.Length > maxSizeInB)
-            {
-                errors.AddItem("File", $"The file size exceeds the maximum size {maxSizeInMb}MB.");
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
-            }
-
-            if (!CommonUtils.IsTextFile(dto.File.ContentType))
-            {
-                errors.AddItem("File", $"Uploaded file is not a text file.");
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
-            }
-
-            using var stream = dto.File.OpenReadStream();
-
-            errors = await _delistingService.SendBatchTakedownNoticeAsync(dto.PlatformId, stream);
-            if (errors.Count > 0)
-            {
-                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
-            }
-
-            return NoContent();
-        }
-
         [ApiAuthorize(Permissions.ProvinceAction)]
         [HttpPost("complianceorders/preview", Name = "GetComplianceOrdersFromListingPreview")]
         public async Task<ActionResult> GetComplianceOrdersFromListingPreview(ComplianceOrderDto[] requests)
         {
-            await Task.CompletedTask;
+            var (errors, preview) = await _delistingService.GetComplianceOrdersFromListingPreviewAsync(requests);
 
-            var preview = new EmailPreview
+            if (errors.Count > 0)
             {
-                Content = "To: john.doe@my.email, jane.smith@my.email<br/><br/><br/>Bcc: young-jin.chung@gov.bc.ca<br/><br/>\r\nDear Host,<br/><br/>\r\nThis message has been sent to you by B.C.'s Short-Term Rental Compliance Unit regarding your short-term rental<br/>\r\nlisting: <b>https://example.com/1000012/</b><br/><br/>\r\ntesting<br/>\r\n"
-            };
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
 
             return Ok(preview);
         }
 
         [ApiAuthorize(Permissions.ProvinceAction)]
-        [HttpPost("complianceorders", Name = "CreateComplianceOrdersFromListingPreview")]
-        public async Task<ActionResult> CreateComplianceOrdersFromListingPreview(ComplianceOrderDto[] requests)
+        [HttpPost("complianceorders", Name = "CreateComplianceOrdersFromListing")]
+        public async Task<ActionResult> CreateComplianceOrdersFromListing(ComplianceOrderDto[] requests)
         {
-            await Task.CompletedTask;
+            var errors = await _delistingService.CreateComplianceOrdersFromListingAsync(requests);
+
+            if (errors.Count > 0)
+            {
+                return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
+            }
 
             return NoContent();
         }

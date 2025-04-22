@@ -1,16 +1,16 @@
 <div class="top-block">
-    <h2 class="title">Listings</h2>
+    <h2 class="title">Individual Listings</h2>
     <div class="search-container">
         <span class="vertical-spacer" *ngIf="isFilterSet"></span>
         <p-dropdown [options]="searchColumns" [showClear]="searchColumn !== 'all'" (onClear)="clearSearchBy($event)"
             id="search-by-drd" [(ngModel)]="searchColumn" class="search-by-select"></p-dropdown>
         <span class="p-input-icon-right search-input-container">
-            <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()"> <i
-                    class="pi pi-search"></i></button>
+            <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()" aria-label="Search">
+                <i class="pi pi-search" aria-hidden="true"></i></button>
             <button pButton *ngIf="!!searchTerm" id="clear-search-btn" class="colorless p-button-link search-clear-btn"
-                icon="pi pi-times" (click)="onClearSearchBox()"></button>
+                icon="pi pi-times" (click)="onClearSearchBox()" aria-label="Clear search"></button>
             <input type="text" id="search-term-inp" (keydown.enter)="onSearch()" class="search-input"
-                placeholder="Search" pInputText [(ngModel)]="searchTerm" />
+                placeholder="Search" pInputText [(ngModel)]="searchTerm" aria-label="Search input" />
         </span>
         <button pButton id="filter-open-btn" class="filter-open-btn p-button-link" [class.colorless]="!isFilterSet"
             icon="pi {{isFilterSet?'pi-filter-fill':'pi-filter'}}" (click)="openFilterSidebar()">
@@ -34,6 +34,12 @@
     </button>
     <button pButton [disabled]="!selectedListings.length" id="send_takedown_request_btn" (click)="onTakedownOpen()">
         Send Takedown Request
+    </button>
+</div>
+<div class="actions left-alignment" *ngIf="isCEU">
+    <button pButton icon="pi pi-envelope" [disabled]="!listingsSelected" id="send_compliance_order_btn"
+        (click)="onContactHost()">
+        &nbsp;Contact Host
     </button>
 </div>
 <div class="content">
@@ -86,7 +92,7 @@
                             *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'asc'"></i>
                     </th>
 
-                    <th style="text-align: center;">Listing Details</th>
+                    <th style="text-align: center;">Details</th>
 
                     <th class="sortable-header" id="addressNormalized_header"
                         [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"
@@ -99,7 +105,7 @@
 
                     <th class="sortable-header" id="nightsStayed_header"
                         [class.sorted]="this.sort && this.sort.prop === 'nightsBookedYtdQty'"
-                        (click)="onSort('nightsBookedYtdQty')">Nights Stayed (YTD)
+                        (click)="onSort('nightsBookedYtdQty')">Nights Stayed (12M)
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'nightsBookedYtdQty' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -108,7 +114,7 @@
 
                     <th class="sortable-header" id="licence_header"
                         [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNo'"
-                        (click)="onSort('businessLicenceNo')">Business Licence on Listing
+                        (click)="onSort('businessLicenceNo')">Listing BL
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -117,7 +123,7 @@
 
                     <th class="sortable-header" id="licence_matched_header"
                         [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNoMatched'"
-                        (click)="onSort('businessLicenceNoMatched')">Matched Business Licence
+                        (click)="onSort('businessLicenceNoMatched')">Matched BL
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNoMatched' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -155,13 +161,16 @@
                     </td>
                     <td>
                         <div [ngSwitch]="row.listingStatusType" class="align-center status-col">
-                            <div *ngSwitchCase="'N'" class="status-circle status-new" pTooltip="New">
+                            <div *ngSwitchCase="'N'" class="status-circle status-new"
+                                pTooltip="New: Reported for the first time in the most recent monthly data">
                                 N
                             </div>
-                            <div *ngSwitchCase="'A'" class="status-circle status-active" pTooltip="Active">
+                            <div *ngSwitchCase="'A'" class="status-circle status-active"
+                                pTooltip="Active: Reported in the most recent monthly data ">
                                 A
                             </div>
-                            <div *ngSwitchCase="'I'" class="status-circle status-inactive" pTooltip="Inactive">
+                            <div *ngSwitchCase="'I'" class="status-circle status-inactive"
+                                pTooltip="Inactive: Not reported in the most recent monthly data">
                                 I
                             </div>
                             <div *ngIf="row.isLgTransferred" class="status-flag status-reassigned"
@@ -224,12 +233,14 @@
             </ng-template>
         </p-table>
         <p-paginator #paginator class="listings-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
-            [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
-            [showCurrentPageReport]="true" [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
+            [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0"
+            [showCurrentPageReport]="true" [showJumpToPageInput]="true" [showPageLinks]="true"
+            [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
             [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
     </p-panel>
 
-    <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
+    <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" ess [style]="{width: '50vw'}"
+        [closeOnEscape]="true">
         <span>
             <strong>Status:</strong> Status of the listing using the following categories:
             <ul class="statuses">
@@ -289,7 +300,7 @@
 </div>
 
 <p-sidebar ngClass="listing-filter p-sidebar-lg" [title]="'Filter Listings'" [(visible)]="isFilterOpened"
-    [closeOnEscape]="false" position="right" [modal]="false">
+    [closeOnEscape]="true" position="right" [modal]="false">
     <ng-template pTemplate="header">
         <strong class="h2-big"> Filter Listings</strong>
     </ng-template>

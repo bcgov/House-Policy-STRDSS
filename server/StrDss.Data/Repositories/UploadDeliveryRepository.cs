@@ -153,8 +153,14 @@ namespace StrDss.Data.Repositories
         {
             var query = _dbContext.DssRentalUploadHistoryViews.AsNoTracking();
 
-            if (_currentUser.OrganizationType != OrganizationTypes.BCGov)
+            if (reportTypes.Contains(UploadDeliveryTypes.LicenceData) && _currentUser.OrganizationType != OrganizationTypes.BCGov)
+            {
                 query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
+            }
+            else if (_currentUser.OrganizationType != OrganizationTypes.BCGov && _currentUser.OrganizationType != OrganizationTypes.LG)
+            {
+                query = query.Where(x => x.ProvidingOrganizationId == _currentUser.OrganizationId);
+            }
 
             if (orgId != null)
             {

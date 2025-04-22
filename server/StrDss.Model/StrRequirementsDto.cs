@@ -6,5 +6,6 @@
         public bool? IsPrincipalResidenceRequired { get; set; }
         public bool? IsBusinessLicenceRequired { get; set; }
         public bool? IsStrProhibited { get; set; }
+        public bool? IsStraaExempt { get; set; }
     }
 }

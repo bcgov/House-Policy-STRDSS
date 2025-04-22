@@ -3,8 +3,8 @@
 </div>
 
 <div class="content">
-    <p-table [value]="jurisdictions" dataKey="organizationId" [tableStyle]="{ 'min-width': '60rem' }"
-        styleClass="p-datatable-sm">
+    <p-table [value]="jurisdictions" dataKey="organizationId" id="jurisdiction-table"
+        [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-sm">
         <ng-template pTemplate="header">
             <tr class="header-panel">
                 <th style="width: 4rem"></th>
@@ -70,7 +70,7 @@
         <ng-template pTemplate="rowexpansion" let-lg>
             <tr>
                 <td colspan="9">
-                    <p-table [value]="lg.jurisdictions">
+                    <p-table [value]="lg.jurisdictions" id="jurisdiction-{{lg.organizationId}}-table">
                         <ng-template pTemplate="header">
             <tr>
                 <th class="sortable-header" id="organizationNm_header"
@@ -91,7 +91,7 @@
                 </th>
                 <th class="sortable-header" id="isPrincipalResidenceRequired_header"
                     [class.sorted]="this.sortSub && this.sortSub.prop === 'isPrincipalResidenceRequired'"
-                    (click)="onSortSub('isPrincipalResidenceRequired')">Principle Residence Requirement?
+                    (click)="onSortSub('isPrincipalResidenceRequired')">PR Requirement
                     <i class="pi pi-angle-down"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isPrincipalResidenceRequired' && this.sortSub.dir === 'desc'"></i>
                     <i class="pi pi-angle-up"
@@ -100,31 +100,49 @@
 
                 <th class="sortable-header" id="isStrProhibited_header"
                     [class.sorted]="this.sortSub && this.sortSub.prop === 'isStrProhibited'"
-                    (click)="onSortSub('isStrProhibited')">STR Prohibited?
+                    (click)="onSortSub('isStrProhibited')">STR Prohibited
                     <i class="pi pi-angle-down"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isStrProhibited' && this.sortSub.dir === 'desc'"></i>
                     <i class="pi pi-angle-up"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isStrProhibited' && this.sortSub.dir === 'asc'"></i>
                 </th>
+                <th class="sortable-header" id="isStraaExempt_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'isStraaExempt'"
+                    (click)="onSortSub('isStraaExempt')">STRAA Exempt
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isStraaExempt' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isStraaExempt' && this.sortSub.dir === 'asc'"></i>
+                </th>
                 <th class="sortable-header" id="isBusinessLicenceRequired_header"
                     [class.sorted]="this.sortSub && this.sortSub.prop === 'isBusinessLicenceRequired'"
-                    (click)="onSortSub('isBusinessLicenceRequired')"> BL Requirement?
+                    (click)="onSortSub('isBusinessLicenceRequired')"> BL Requirement
                     <i class="pi pi-angle-down"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isBusinessLicenceRequired' && this.sortSub.dir === 'desc'"></i>
                     <i class="pi pi-angle-up"
                         *ngIf="this.sortSub && this.sortSub.prop === 'isBusinessLicenceRequired' && this.sortSub.dir === 'asc'"></i>
+                </th>
+                <th class="sortable-header" id="isActive_header"
+                    [class.sorted]="this.sortSub && this.sortSub.prop === 'isActive'" (click)="onSortSub('isActive')">
+                    Active
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isActive' && this.sortSub.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sortSub && this.sortSub.prop === 'isActive' && this.sortSub.dir === 'asc'"></i>
                 </th>
                 <th *ngIf="canEdit"> Update Jurisdiction Info </th>
             </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-jurisdiction let-index>
-            <tr>
+            <tr [class.inactive-jurisdiction]="!jurisdiction.isActive">
                 <td>{{jurisdiction.organizationNm || '-'}}</td>
                 <td>{{jurisdiction.shapeFileId || '-'}}</td>
                 <td>{{jurisdiction.isPrincipalResidenceRequired?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isStrProhibited?'Yes':'No'}} </td>
+                <td>{{jurisdiction.isStraaExempt?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isBusinessLicenceRequired?'Yes':'No'}} </td>
+                <td>{{jurisdiction.isActive?'Yes':'No'}} </td>
                 <td *ngIf="canEdit" style="text-align: center">
                     <a id="jurisdiction-edit-{{index}}-icon"
                         [routerLink]="'/update-jurisdiction-information/'+jurisdiction.organizationId">
@@ -139,8 +157,9 @@
     </tr>
     </ng-template>
     </p-table>
-    <p-paginator #paginator class="jurisdiction-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
-        [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false"
-        [showCurrentPageReport]="true" [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
+    <p-paginator #paginator class="jurisdiction-paginator" *ngIf="currentPage" id="paging"
+        (onPageChange)="onPageChange($event)" [rows]="currentPage.pageSize || 25"
+        [totalRecords]="currentPage.totalCount || 0" [showPageLinks]="false" [showCurrentPageReport]="true"
+        [showFirstLastIcon]="true" [rowsPerPageOptions]="[10, 25, 50, 100]"
         [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
 </div>

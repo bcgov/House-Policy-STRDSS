@@ -17,6 +17,7 @@ namespace UITest.PageObjects
         private Button _ViewListingsButton;
         private Button _AggregatedListingsButton;
         private Button _ManagePlatformsButton;
+        private Button _ManageJurisdictionsButton;
 
         private IDriver _Driver;
 
@@ -32,7 +33,7 @@ namespace UITest.PageObjects
         public Button ViewListingsButton { get => _ViewListingsButton; }
         public Button AggregatedListingsButton { get => _AggregatedListingsButton; }
         public Button ManagePlatformsButton {get => _ManagePlatformsButton; }
-
+        public Button ManageJurisdictionsButton { get => _ManageJurisdictionsButton;}
 
         public LandingPage(IDriver Driver)
         {
@@ -47,6 +48,7 @@ namespace UITest.PageObjects
             _ViewListingsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ListingsButton);
             _AggregatedListingsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.AggregatedListingsButton);
             _ManagePlatformsButton = new Button(Driver, Enums.FINDBY.ID,LandingPageModel.ManagePlatformsButton);
+            _ManageJurisdictionsButton = new Button(Driver, Enums.FINDBY.ID, LandingPageModel.ManageJurisdictionsButton);
         }
 
         public bool Navigate()

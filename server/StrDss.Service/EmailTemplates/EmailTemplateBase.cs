@@ -5,7 +5,7 @@ namespace StrDss.Service.EmailTemplates
 {
     public class EmailTemplateBase
     {
-        public IEmailMessageService _emailService { get; }
+        private IEmailMessageService _emailService { get; set; }
         public EmailTemplateBase(IEmailMessageService emailService)
         {
             _emailService = emailService;

@@ -108,7 +108,13 @@ export class RegistrationValidationHistoryComponent {
       this.selectedPlatformId).subscribe({
       next: (records) => {
         this.currentPage = records.pageInfo;
-        this.registrationValidationHistory = records.sourceList;
+        const today = new Date();
+        this.registrationValidationHistory = records.sourceList.filter(
+          (item: any) =>
+            !(item.uploadDeliveryType === 'Listing Data' &&
+              item.uploadDate &&
+              new Date(item.uploadDate).setHours(0, 0, 0, 0) < today.getTime())
+        );
       },
       complete: () => {
         this.loaderService.loadingEnd();

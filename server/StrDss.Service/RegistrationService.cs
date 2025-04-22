@@ -106,8 +106,9 @@ namespace StrDss.Service
             {
                 UserName = $"{user!.GivenNm}",
                 Link = "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/short-term-rentals/quickstartguide_validation_for_minor_platforms_final.pdf",
+                DownloadLink = GetHostUrl() + "/registration-validation-history",
                 To = new string[] { user!.EmailAddressDsc! },
-                Info = $"{EmailMessageTypes.ListingUploadError} for {user.FamilyNm}, {user.GivenNm}",
+                Info = $"{EmailMessageTypes.RegistrationValidation} for {user.FamilyNm}, {user.GivenNm}",
                 From = adminEmail
             };
 

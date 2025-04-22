@@ -25,7 +25,7 @@ Your upload has been processed, and the validation report is now available for <
 <b>Next Steps</b><br/>
 Platforms are required to take specific actions when a registration is determined to be invalid. See the <a href='{Link}'>Guide to STR Registration validation for Minor Platforms</a> for more details.<br/>
 <br/>
-Please contact <a href='emailto:{From}'>{From}</a> for technical support if needed.<br/>
+Please contact <a href='mailto:{From}'>{From}</a> for technical support if needed.<br/>
 ";
         }
     }

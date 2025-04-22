@@ -108,12 +108,8 @@ export class RegistrationValidationHistoryComponent {
       this.selectedPlatformId).subscribe({
       next: (records) => {
         this.currentPage = records.pageInfo;
-        const today = new Date();
         this.registrationValidationHistory = records.sourceList.filter(
-          (item: any) =>
-            !(item.uploadDeliveryType === 'Listing Data' &&
-              item.uploadDate &&
-              new Date(item.uploadDate).setHours(0, 0, 0, 0) < today.getTime())
+          (item: any) => item.registrationStatus !== 'Not Applicable'
         );
       },
       complete: () => {

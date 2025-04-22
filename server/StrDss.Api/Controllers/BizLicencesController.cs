@@ -6,8 +6,6 @@ using StrDss.Api.Models;
 using StrDss.Common;
 using StrDss.Model;
 using StrDss.Service;
-using System.Security.Cryptography;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace StrDss.Api.Controllers
 {
@@ -56,7 +54,7 @@ namespace StrDss.Api.Controllers
 
             using var stream = dto.File.OpenReadStream();
 
-            errors = await _uploadService.UploadPlatformData(UploadDeliveryTypes.LicenceData, dto.ReportPeriod, dto.OrganizationId, stream);
+            errors = await _uploadService.UploadData(UploadDeliveryTypes.LicenceData, dto.ReportPeriod, dto.OrganizationId, stream);
 
             if (errors.Count > 0)
             {

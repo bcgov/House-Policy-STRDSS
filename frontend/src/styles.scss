@@ -1,6 +1,8 @@
 @import 'primeng/resources/themes/lara-light-blue/theme.css';
 @import 'primeng/resources/primeng.css';
 @import "primeicons/primeicons.css";
+@import "../node_modules/quill/dist/quill.core.css";
+@import "../node_modules/quill/dist/quill.snow.css";
 
 @font-face {
     font-family: 'BcSans-regular';
@@ -561,7 +563,6 @@ body {
         justify-content: end
     }
 
-
     .p-toast {
         min-width: 25rem;
         width: auto;
@@ -574,6 +575,16 @@ body {
 
         &.h2-big {
             font-size: x-large;
+        }
+    }
+
+    .p-tooltip {
+        &.wide {
+            min-width: 400px;
+        }
+
+        &.text-center {
+            text-align: center;
         }
     }
 
@@ -614,4 +625,8 @@ body {
             }
         }
     }
+}
+
+.ql-tooltip {
+    left: 1rem !important;
 }

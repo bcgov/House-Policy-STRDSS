@@ -16,8 +16,9 @@
             styleClass="p-datatable-sm" [(selection)]="selectedListings">
             <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 4rem">
-                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    <th style="width: 4rem" aria-labelledby="selectAll_checkbox_header">
+                        <p-tableHeaderCheckbox id="selectAll_checkbox_header"
+                            ariaLabel="'Select or Deselect All'"></p-tableHeaderCheckbox>
                     </th>
                     <th class="sortable-header" id="status_header"
                         [class.sorted]="this.sort && this.sort.prop === 'offeringOrganizationNm'"
@@ -60,7 +61,7 @@
             <ng-template pTemplate="body" let-listing>
                 <tr class="small-text">
                     <td>
-                        <p-tableCheckbox [value]="listing"></p-tableCheckbox>
+                        <p-tableCheckbox [value]="listing" ariaLabel="'Include Listing'"></p-tableCheckbox>
                     </td>
                     <td>{{ listing.offeringOrganizationNm }}</td>
                     <td>

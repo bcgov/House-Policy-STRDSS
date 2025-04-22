@@ -1,7 +1,7 @@
 ﻿Feature: ViewAggregatedListings
 Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-505
 
-@LandingPage
+@ViewAggregatedListings
 Scenario: ViewAggregatedListings 
 #User Authentication
 	#Given that I am an authenticated user "<UserName>" with the necessary permissions to view listings View listings (listing_read)  and the expected result is

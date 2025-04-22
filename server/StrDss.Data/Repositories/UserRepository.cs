@@ -168,6 +168,8 @@ namespace StrDss.Data.Repositories
 
             var user = _mapper.Map<UserDto>(entity);
 
+            if (user == null) return null;
+
             user.RoleCds = entity!.DssUserRoleAssignments.Select(x => x.UserRoleCd).ToList();
 
             var grantedMessage = await _dbContext.DssEmailMessages

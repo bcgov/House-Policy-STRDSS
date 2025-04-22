@@ -58,11 +58,11 @@ export class DashboardService {
         section: 'main',
       },
       {
-        title: 'Listing Data',
+        title: 'Individual Listing Data',
         accessPermission: listing_read,
         buttonIcon: 'eye',
         buttonText: 'View Listing Data',
-        description: 'View platform listing data for your community',
+        description: 'View individual platforms listings for your community',
         route: 'listings',
         boxId: 'listings_box',
         buttonId: 'listings_btn',

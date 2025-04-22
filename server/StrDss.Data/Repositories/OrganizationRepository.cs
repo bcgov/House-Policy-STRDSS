@@ -176,7 +176,7 @@ namespace StrDss.Data.Repositories
 
             var strRequirement = await _dbContext.DssOrganizations
                 .FromSqlRaw(@"
-                    SELECT p.organization_nm, c.is_principal_residence_required, c.is_business_licence_required, c.is_str_prohibited
+                    SELECT p.organization_nm, c.is_principal_residence_required, c.is_business_licence_required, c.is_str_prohibited, c.is_straa_exempt
                     FROM dss_organization c, dss_organization p
                     WHERE p.organization_id = c.managing_organization_id and c.organization_id = dss_containing_organization_id({0})", point)
 
@@ -186,6 +186,7 @@ namespace StrDss.Data.Repositories
                     IsPrincipalResidenceRequired = o.IsPrincipalResidenceRequired,
                     IsBusinessLicenceRequired = o.IsBusinessLicenceRequired,
                     IsStrProhibited = o.IsStrProhibited,
+                    IsStraaExempt = o.IsStraaExempt
                 })
                 .OrderBy(o => o.OrganizationNm)
                 .FirstOrDefaultAsync();
@@ -212,6 +213,9 @@ namespace StrDss.Data.Repositories
         {
             var platform = _mapper.Map<PlatformViewDto>(await _dbContext.DssPlatformVws.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == id));
 
+            if (platform == null)
+                return null;
+
             platform.Subsidiaries = _mapper.Map<List<PlatformViewDto>>(await _dbContext.DssPlatformVws.AsNoTracking().Where(x => x.ManagingOrganizationId == id).ToListAsync());
 
             return platform;
@@ -230,6 +234,8 @@ namespace StrDss.Data.Repositories
             CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.SecondaryNoticeOfTakedownContactEmail, false);
             CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
             CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
+            CreateContact(entity, EmailMessageTypes.BatchTakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
+            CreateContact(entity, EmailMessageTypes.BatchTakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
 
             return entity;
         }
@@ -264,6 +270,8 @@ namespace StrDss.Data.Repositories
             UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.SecondaryNoticeOfTakedownContactEmail, false);
             UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
             UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
+            UpdateContact(entity, EmailMessageTypes.BatchTakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
+            UpdateContact(entity, EmailMessageTypes.BatchTakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
         }
 
         private void UpdateContact(DssOrganization entity, string messageType, string? emailAddress, bool isPrimary)
@@ -302,6 +310,8 @@ namespace StrDss.Data.Repositories
             CreateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.SecondaryNoticeOfTakedownContactEmail, false);
             CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
             CreateContact(entity, EmailMessageTypes.TakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
+            CreateContact(entity, EmailMessageTypes.BatchTakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
+            CreateContact(entity, EmailMessageTypes.BatchTakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
 
             return entity;
         }
@@ -318,6 +328,8 @@ namespace StrDss.Data.Repositories
             UpdateContact(entity, EmailMessageTypes.NoticeOfTakedown, dto.SecondaryNoticeOfTakedownContactEmail, false);
             UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
             UpdateContact(entity, EmailMessageTypes.TakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
+            UpdateContact(entity, EmailMessageTypes.BatchTakedownRequest, dto.PrimaryTakedownRequestContactEmail, true);
+            UpdateContact(entity, EmailMessageTypes.BatchTakedownRequest, dto.SecondaryTakedownRequestContactEmail, false);
         }
 
         public async Task<PagedDto<LocalGovViewDto>> GetLocalGovs(int pageSize, int pageNumber, string orderBy, string direction)

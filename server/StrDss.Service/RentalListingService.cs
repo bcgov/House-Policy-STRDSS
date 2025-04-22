@@ -21,6 +21,7 @@ namespace StrDss.Service
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
         Task<int> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete);
+        Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
         Task CreateRentalListingExportFiles();
         Task<List<RentalListingExtractDto>> GetRetalListingExportsAsync();
@@ -91,6 +92,12 @@ namespace StrDss.Service
 
             return count;
         }
+
+        public async Task<int> CountHostListingsAsync(string hostName)
+        {
+            return await _listingRepo.CountHostListingsAsync(CommonUtils.SanitizeAndUppercaseString(hostName));
+        }
+
         public async Task<RentalListingViewDto?> GetRentalListing(long rentalListingId)
         {
             var listing = await _listingRepo.GetRentalListing(rentalListingId);
@@ -458,6 +465,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> UpdateAddressAsync(UpdateListingAddressDto dto)
         {
+            CommonUtils.SanitizeObject(dto);
+
             var errors = new Dictionary<string, List<string>>();
 
             var listing = await _listingRepo.GetRentalListing(dto.RentalListingId, false);

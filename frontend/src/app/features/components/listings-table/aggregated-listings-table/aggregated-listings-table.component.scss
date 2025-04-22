@@ -112,7 +112,13 @@
     }
 
     .actions {
+        display: flex;
+        width: 100%;
         padding-bottom: 12px;
+
+        &.left-alignment {
+            justify-content: end;
+        }
 
         button {
             margin-right: 6px;
@@ -164,6 +170,24 @@
             td {
                 font-size: 12px;
                 word-break: break-word;
+
+                .host-name {
+                    width: 100%;
+                    display: flex;
+                    justify-content: start;
+                    align-items: center;
+                    gap: 12px;
+
+                    .multihost-icon {
+                        cursor: pointer;
+                        width: 24px;
+                        height: 24px;
+                        background-image: url(../../../../../assets/images/house-blue.svg);
+                        background-position: center center;
+                        background-repeat: no-repeat;
+                        background-size: cover;
+                    }
+                }
 
                 &.listings-count {
                     font-size: smaller;
@@ -237,7 +261,7 @@
 
         p-paginator {
             display: flex;
-            justify-content: end;
+            justify-content: center;
         }
     }
 

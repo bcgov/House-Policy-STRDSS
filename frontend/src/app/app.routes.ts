@@ -9,7 +9,7 @@ import { PageNotFoundComponent } from './common/components/page-not-found/page-n
 import { approvedUserGuard } from './common/guards/approved-user.guard';
 import { activeUserGuard } from './common/guards/active-user.guard';
 import { accessRequestTokenGuard } from './common/guards/access-request-token.guard';
-import { jurisdiction_read, jurisdiction_write, licence_file_upload, listing_file_upload, listing_read, platform_read, platform_write, role_read, role_write, takedown_action, upload_history_read, user_read, user_write } from './common/consts/permissions.const';
+import { ceu_action, jurisdiction_read, jurisdiction_write, licence_file_upload, listing_file_upload, listing_read, platform_read, platform_write, role_read, role_write, takedown_action, upload_history_read, user_read, user_write } from './common/consts/permissions.const';
 import { hasPermissionsGuard } from './common/guards/has-permissions.guard';
 import { TermsAndConditionsComponent } from './common/components/terms-and-conditions/terms-and-conditions.component';
 import { areTermsAceptedGuard } from './common/guards/are-terms-acepted.guard';
@@ -34,7 +34,8 @@ import { ViewPlatformComponent } from './features/components/platform-management
 import { EditSubPlatformComponent } from './features/components/platform-management/edit-sub-platform/edit-sub-platform.component';
 import { ManageJurisdictionsComponent } from './features/components/manage-jurisdictions/manage-jurisdictions.component';
 import { UpdateJurisdictionInformationComponent } from './features/components/manage-jurisdictions/update-jurisdiction-information/update-jurisdiction-information.component';
-import { UpdateLocalGvernmentInformationComponent } from './features/components/manage-jurisdictions/update-local-gvernment-information/update-local-gvernment-information.component';
+import { UpdateLocalGovernmentInformationComponent } from './features/components/manage-jurisdictions/update-local-gvernment-information/update-local-gvernment-information.component';
+import { SendComplianceOrderComponent } from './features/components/send-compliance-order/send-compliance-order.component';
 
 export const routes: Routes = [
     {
@@ -90,6 +91,12 @@ export const routes: Routes = [
         data: { permissions: [takedown_action] }
     },
     {
+        path: 'send-compliance-order',
+        canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
+        component: SendComplianceOrderComponent,
+        data: { permissions: [ceu_action] }
+    },
+    {
         path: 'listings',
         component: ListingsTableComponent,
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
@@ -132,7 +139,7 @@ export const routes: Routes = [
     {
         path: 'update-local-government-information/:id',
         canActivate: [approvedUserGuard, activeUserGuard, hasPermissionsGuard, areTermsAceptedGuard],
-        component: UpdateLocalGvernmentInformationComponent,
+        component: UpdateLocalGovernmentInformationComponent,
         data: { permissions: [jurisdiction_write] }
     },
     {

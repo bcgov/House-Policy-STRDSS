@@ -1,30 +1,35 @@
-<div class="header">
+<div class="header" role="banner">
     <div class="header-top">
         <div class="tile-container">
             <div class="logo-container"></div>
-            <div class="main-title">Short-Term Rental Data Portal</div>
+            <div>
+                <h1 class="main-title">Short-Term Rental Data Portal</h1>
+            </div>
         </div>
         <div *ngIf="userDataService.currentUser" class="user-container">
-            {{userDataService.currentUser.displayName || 'Unknown User'}} <button pButton class="do-not-print-it"
-                icon="pi pi-angle-down" (click)="op.toggle($event)"></button>
+            {{userDataService.currentUser.displayName || 'Unknown User'}} <button aria-label="Toggle dropdown to logout"
+                pButton class="do-not-print-it" icon="pi pi-angle-down" (click)="op.toggle($event)"></button>
             <p-overlayPanel #op>
-                <button pButton [iconPos]="'right'" class="p-button-transparent" icon="pi pi-sign-out"
-                    (click)="logout()">Logout</button>
+                <button pButton [iconPos]="'right'" aria-label="Log out" class="p-button-transparent"
+                    icon="pi pi-sign-out" (click)="logout()">Logout</button>
             </p-overlayPanel>
         </div>
     </div>
     <div class="header-menu do-not-print-it">
-        <div class="menu-container">
+        <div class="menu-container" role="navigation" aria-label="Main Navigation">
             <p-menubar [model]="items"></p-menubar>
         </div>
     </div>
 </div>
 
-<div class="content">
+<div class="content" role="main">
     <router-outlet />
 </div>
-<div class="footer do-not-print-it">
+<div class="footer do-not-print-it" role="contentinfo">
     <div class="cc">© 2024 Government of British Columbia.</div>
+    <div class="contacts">
+        For technical support, contact <a href="mailto:DSSadmin@gov.bc.ca">DSSadmin&#64;gov.bc.ca</a>
+    </div>
 </div>
 
 <p-toast [life]="25000"></p-toast>

@@ -75,12 +75,12 @@ namespace SpecFlowProjectBDD.Features
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("ViewAggregatedListings")]
-        [NUnit.Framework.CategoryAttribute("LandingPage")]
+        [NUnit.Framework.CategoryAttribute("ViewAggregatedListings")]
         [NUnit.Framework.TestCaseAttribute("STRDSSLg1Dev", "lg_staff", "dev", "pass", null)]
         public void ViewAggregatedListings(string userName, string userType, string environment, string expectedResult, string[] exampleTags)
         {
             string[] @__tags = new string[] {
-                    "LandingPage"};
+                    "ViewAggregatedListings"};
             if ((exampleTags != null))
             {
                 @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));

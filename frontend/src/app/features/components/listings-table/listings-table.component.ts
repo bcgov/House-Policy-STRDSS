@@ -14,7 +14,6 @@ import { PanelModule } from 'primeng/panel';
 import { DropdownOption, DropdownOptionOrganization } from '../../../common/models/dropdown-option';
 import { UserDataService } from '../../../common/services/user-data.service';
 import { User } from '../../../common/models/user';
-import { ListingDetailsComponent } from './listing-details/listing-details.component';
 import { ListingSearchRequest } from '../../../common/models/listing-search-request';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SelectedListingsStateService } from '../../../common/services/selected-listings-state.service';
@@ -29,6 +28,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { FilterPersistenceService } from '../../../common/services/filter-persistence.service';
 import { OrganizationService } from '../../../common/services/organization.service';
 import { UrlProtocolPipe } from '../../../common/pipes/url-protocol.pipe';
+import { ListingDetails } from '../../../common/models/listing-details';
 
 @Component({
   selector: 'app-listings-table',
@@ -45,7 +45,6 @@ import { UrlProtocolPipe } from '../../../common/pipes/url-protocol.pipe';
     PanelModule,
     RouterModule,
     TooltipModule,
-    ListingDetailsComponent,
     TagModule,
     SidebarModule,
     AccordionModule,
@@ -75,6 +74,10 @@ export class ListingsTableComponent implements OnInit {
   cancelableFilter!: ListingFilter;
 
   readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
+
+  get listingsSelected(): number {
+    return Object.keys(this.selectedListings).length;
+  }
 
   constructor(
     private listingService: ListingDataService,
@@ -177,6 +180,15 @@ export class ListingsTableComponent implements OnInit {
   onTakedownOpen(): void {
     this.searchStateService.selectedListings = this.selectedListings;
     this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } });
+  }
+
+  onContactHost(): void {
+    this.searchStateService.selectedListings = Object.values(
+      this.selectedListings,
+    ) as unknown as Array<ListingDetails>;
+    this.router.navigate(['/send-compliance-order'], {
+      queryParams: { returnUrl: this.getUrlFromState() },
+    });
   }
 
   onPageChange(value: any): void {

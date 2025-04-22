@@ -6,6 +6,7 @@
         public static DateTime MinDate = new DateTime(1900, 1, 1);
         public const string VancouverTimeZone = "America/Vancouver";
         public const string PacificTimeZone = "Pacific Standard Time";
+        public const string StandardTakedownDetail = "Remove the listing from the platform, do not allow transactions for payments associated with the listing, and cancel all booking associated with the listing.";
     }
     public static class Entities
     {
@@ -133,6 +134,8 @@
         public const string IsPrincipalResidenceRequired = "IsPrincipalResidenceRequired";
         public const string IsStrProhibited = "IsStrProhibited";
         public const string IsBusinessLicenceRequired = "IsBusinessLicenceRequired";
+        public const string IsStraaExempt = "IsStraaExempt";
+        public const string IsActive = "IsActive";
         public const string EconomicRegionDsc = "EconomicRegionDsc";
     }
 
@@ -558,8 +561,14 @@
 
     public static class ApiTags
     {
-        public const string Default = "stadata";
+        public const string Default = "strdata";
         public const string Aps = "aps";
         public static readonly string[] ApsTagList = { "aps" };
+    }
+
+    public static class TakeDownReasonStatus
+    {
+        public const string LGRequest = "LG Request";
+        public const string InvalidRegistration = "Invalid Registration";
     }
 }

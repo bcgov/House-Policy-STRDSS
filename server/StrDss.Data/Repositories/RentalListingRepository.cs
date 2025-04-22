@@ -19,6 +19,7 @@ namespace StrDss.Data.Repositories
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
         Task<int> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete);
+        Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
         Task<List<long>> GetRentalListingIdsToExport();
@@ -69,6 +70,18 @@ namespace StrDss.Data.Repositories
             {
                 orderBy = "lastActionNm == null, lastActionNm";
             }
+            else if (orderBy == "businessLicenceNo")
+            {
+                orderBy = "string.IsNullOrWhiteSpace(businessLicenceNo), businessLicenceNo";
+            }
+            else if (orderBy == "businessLicenceNoMatched")
+            {
+                orderBy = "string.IsNullOrWhiteSpace(businessLicenceNoMatched), businessLicenceNoMatched";
+            }
+            else if (orderBy == "nightsBookedYtdQty")
+            {
+                orderBy = "nightsBookedYtdQty == null, nightsBookedYtdQty";
+            }
 
             var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
 
@@ -99,21 +112,24 @@ namespace StrDss.Data.Repositories
 
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
+            if (orderBy == "effectiveBusinessLicenceNo")
+            {
+                orderBy = "string.IsNullOrWhiteSpace(effectiveBusinessLicenceNo), effectiveBusinessLicenceNo";
+            }
+
             var groupedQuery = query
-                .GroupBy(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
-                .Select(g => new RentalListingGroupDto
+                .Select(x => new RentalListingGroupDto
                 {
-                    EffectiveBusinessLicenceNo = g.Key.EffectiveBusinessLicenceNo,
-                    EffectiveHostNm = g.Key.EffectiveHostNm,
-                    MatchAddressTxt = g.Key.MatchAddressTxt
+                    EffectiveBusinessLicenceNo = x.EffectiveBusinessLicenceNo,
+                    EffectiveHostNm = x.EffectiveHostNm,
+                    MatchAddressTxt = x.MatchAddressTxt
                 })
+                .Distinct()
                 .AsNoTracking();
 
             var extraSort = "";
 
-
             var groupedListings = await Page<RentalListingGroupDto, RentalListingGroupDto>(groupedQuery, pageSize, pageNumber, orderBy, direction, extraSort, false);
-
 
             foreach (var group in groupedListings.SourceList)
             {
@@ -145,13 +161,8 @@ namespace StrDss.Data.Repositories
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
             var count = await query
-                .GroupBy(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
-                .Select(g => new RentalListingGroupDto
-                {
-                    EffectiveBusinessLicenceNo = g.Key.EffectiveBusinessLicenceNo,
-                    EffectiveHostNm = g.Key.EffectiveHostNm,
-                    MatchAddressTxt = g.Key.MatchAddressTxt
-                })
+                .Select(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
+                .Distinct()
                 .CountAsync();
 
             stopwatch.Stop();
@@ -159,6 +170,22 @@ namespace StrDss.Data.Repositories
             _logger.LogDebug($"Get Grouped Listings Count - Total Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return count;
+        }
+
+        public async Task<int> CountHostListingsAsync(string hostName)
+        {
+            var query = _dbSet.AsNoTracking();
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG)
+            {
+                query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            return await query
+                .Where(x => x.EffectiveHostNm == hostName)
+                .Select(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
+                .Distinct() 
+                .CountAsync(); 
         }
 
         private static void ApplyFilters(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, 
@@ -171,7 +198,7 @@ namespace StrDss.Data.Repositories
                                          (x.PlatformListingUrl != null && x.PlatformListingUrl.ToLower().Contains(allLower)) ||
                                          (x.PlatformListingNo != null && x.PlatformListingNo.ToLower().Contains(allLower)) ||
                                          (x.ListingContactNamesTxt != null && x.ListingContactNamesTxt.ToLower().Contains(allLower)) ||
-                                         (x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(allLower)));
+                                         (x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(CommonUtils.SanitizeAndUppercaseString(all))));
             }
 
             if (address != null && address.IsNotEmpty())
@@ -200,8 +227,8 @@ namespace StrDss.Data.Repositories
 
             if (businessLicence != null && businessLicence.IsNotEmpty())
             {
-                var businessLicenceLower = businessLicence.ToLower();
-                query = query.Where(x => x.BusinessLicenceNo != null && x.BusinessLicenceNo.ToLower().Contains(businessLicenceLower));
+                var effectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(businessLicence);
+                query = query.Where(x => x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(effectiveBusinessLicenceNo));
             }
 
             if (prRequirement != null)
@@ -217,7 +244,6 @@ namespace StrDss.Data.Repositories
                     ? x.IsBusinessLicenceRequired == true
                     : x.IsBusinessLicenceRequired == null || x.IsBusinessLicenceRequired == false);
             }
-
 
             if (reassigned != null && reassigned.Value == false)
             {

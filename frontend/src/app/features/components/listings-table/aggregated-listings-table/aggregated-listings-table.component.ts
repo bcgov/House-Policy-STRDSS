@@ -14,7 +14,6 @@ import { SidebarModule } from 'primeng/sidebar';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { ListingDetailsComponent } from '../listing-details/listing-details.component';
 import { ListingFilter } from '../../../../common/models/listing-filter';
 import { environment } from '../../../../../environments/environment';
 import { PagingResponsePageInfo } from '../../../../common/models/paging-response';
@@ -36,6 +35,7 @@ import { ListingSearchRequest } from '../../../../common/models/listing-search-r
 import { ListingDetails } from '../../../../common/models/listing-details';
 import { OrganizationService } from '../../../../common/services/organization.service';
 import { UrlProtocolPipe } from '../../../../common/pipes/url-protocol.pipe';
+import { forkJoin, tap } from 'rxjs';
 
 @Component({
     selector: 'app-aggregated-listings-table',
@@ -52,7 +52,6 @@ import { UrlProtocolPipe } from '../../../../common/pipes/url-protocol.pipe';
         PanelModule,
         RouterModule,
         TooltipModule,
-        ListingDetailsComponent,
         TagModule,
         SidebarModule,
         AccordionModule,
@@ -74,6 +73,7 @@ export class AggregatedListingsTableComponent implements OnInit {
     searchColumns = new Array<DropdownOption>();
     communities = new Array<DropdownOptionOrganization>();
     groupedCommunities = new Array();
+    hosts = new Array<{ primaryHostNm: string, hasMultipleProperties: boolean }>();
 
     isCEU = false;
     isLegendShown = false;
@@ -137,6 +137,11 @@ export class AggregatedListingsTableComponent implements OnInit {
                 if (prms['searchTerm']) {
                     this.searchTerm = prms['searchTerm'];
                 }
+                if (prms['hostName']) {
+                    this.searchColumn = 'hostName';
+                    this.searchTerm = prms['hostName'];
+                }
+                this.cd.detectChanges();
                 this.cloakParams();
 
                 this.userService.getCurrentUser().subscribe({
@@ -181,6 +186,13 @@ export class AggregatedListingsTableComponent implements OnInit {
         }
     }
 
+    onMultihostClicked(group: AggregatedListingTableRow) {
+        this.clearFilters();
+        this.searchColumn = 'hostName';
+        this.searchTerm = group.primaryHostNm;
+        this.onSearch();
+    }
+
     onSort(property: string): void {
         if (this.sort) {
             if (this.sort.prop === property) {
@@ -212,7 +224,9 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     onDetailsOpen(row: ListingTableRow): void {
-        this.router.navigateByUrl(`/listings/${row.rentalListingId}`);
+        this.router.navigate([`/listings/${row.rentalListingId}`], {
+            queryParams: { returnUrl: this.getUrlFromState() },
+        });
     }
 
     onNoticeOpen(): void {
@@ -229,6 +243,15 @@ export class AggregatedListingsTableComponent implements OnInit {
             this.selectedListings,
         ) as unknown as Array<ListingDetails>;
         this.router.navigate(['/bulk-takedown-request'], {
+            queryParams: { returnUrl: this.getUrlFromState() },
+        });
+    }
+
+    onContactHost(): void {
+        this.searchStateService.selectedListings = Object.values(
+            this.selectedListings,
+        ) as unknown as Array<ListingDetails>;
+        this.router.navigate(['/send-compliance-order'], {
             queryParams: { returnUrl: this.getUrlFromState() },
         });
     }
@@ -290,17 +313,7 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     onClearFilters(): void {
-        this.filterPersistenceService.listingFilter = {
-            byLocation: {
-                isBusinessLicenceRequired: '',
-                isPrincipalResidenceRequired: '',
-            },
-            community: 0,
-            byStatus: {},
-        };
-
-        this.initFilters();
-        this.isFilterOpened = false;
+        this.clearFilters();
         this.onSearch();
     }
 
@@ -354,6 +367,20 @@ export class AggregatedListingsTableComponent implements OnInit {
         this.onSearch();
     }
 
+    private clearFilters(): void {
+        this.filterPersistenceService.listingFilter = {
+            byLocation: {
+                isBusinessLicenceRequired: '',
+                isPrincipalResidenceRequired: '',
+            },
+            community: 0,
+            byStatus: {},
+        };
+
+        this.initFilters();
+        this.isFilterOpened = false;
+    }
+
     private getListings(selectedPageNumber: number = 1): void {
         this.loaderService.loadingStart();
 
@@ -368,6 +395,8 @@ export class AggregatedListingsTableComponent implements OnInit {
                 this.sort?.dir || 'asc',
                 searchReq,
                 this.currentFilter,
+            ).pipe(
+                tap(res => { this.calculateIfHostsHaveMoreThanOneProperty(res.listings.sourceList); })
             )
             .subscribe({
                 next: (res) => {
@@ -432,6 +461,24 @@ export class AggregatedListingsTableComponent implements OnInit {
         }
 
         this.cd.detectChanges();
+    }
+
+    private calculateIfHostsHaveMoreThanOneProperty(listings: Array<AggregatedListingTableRow>): void {
+        const uniqueObjects = new Map<string, AggregatedListingTableRow>();
+
+        listings.forEach(obj => {
+            uniqueObjects.set(obj.primaryHostNm, obj);
+        });
+
+        const hosts = Array.from(uniqueObjects.values()).map(x => ({ primaryHostNm: x.primaryHostNm, hasMultipleProperties: false }));
+
+        forkJoin(hosts.map(h => this.listingService.getHostListingsCount(h.primaryHostNm)))
+            .subscribe(hostCount => {
+                this.aggregatedListings.forEach(al => {
+                    al.hasMultipleProperties = hostCount.find(x => x.primaryHostNm === al.primaryHostNm)?.hasMultipleProperties ?? false;
+                    this.cd.detectChanges();
+                })
+            });
     }
 
     private getUrlFromState(): string {

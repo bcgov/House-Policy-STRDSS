@@ -8,6 +8,8 @@
         public bool? IsStrProhibited { get; set; }
         public bool? IsBusinessLicenceRequired { get; set; }
         public string? EconomicRegionDsc { get; set; }
+        public bool? IsStraaExempt { get; set; }
+        public bool? IsActive { get; set; }
         public DateTime UpdDtm { get; set; }
     }
 }

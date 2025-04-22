@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -23,8 +24,6 @@ namespace StrDss.Service
         Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto);
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto);
         Task ProcessTakedownRequestBatchEmailsAsync();
-        Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream);
-        Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, Stream stream);
         Task<Dictionary<string, List<string>>> CreateTakedownNoticesFromListingAsync(TakedownNoticesFromListingDto[] listings);
         Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticesFromListingPreviewAsync(TakedownNoticesFromListingDto[] listings);
         Task<Dictionary<string, List<string>>> CreateTakedownRequestsFromListingAsync(TakedownRequestsFromListingDto[] listings);
@@ -55,6 +54,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownNoticeAsync(TakedownNoticeCreateDto dto)
         {
+            CommonUtils.SanitizeObject(dto);
+
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
@@ -203,6 +204,8 @@ namespace StrDss.Service
         }
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticePreviewAsync(TakedownNoticeCreateDto dto)
         {
+            CommonUtils.SanitizeObject(dto);
+
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
@@ -250,6 +253,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownNoticesFromListingAsync(TakedownNoticesFromListingDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
             var templates = new List<TakedownNoticeFromListing>();
@@ -392,6 +397,8 @@ namespace StrDss.Service
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticesFromListingPreviewAsync(TakedownNoticesFromListingDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
             var templates = new List<TakedownNoticeFromListing>();
@@ -443,6 +450,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownRequestsFromListingAsync(TakedownRequestsFromListingDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var templates = new List<TakedownRequestFromListing>();
 
@@ -529,6 +538,8 @@ namespace StrDss.Service
                 OrgCd = rentalListing.OrganizationCd,
                 ListingId = rentalListing.PlatformListingNo,
                 Info = $"{rentalListing.OrganizationCd}-{rentalListing.PlatformListingNo}",
+                IsWithStandardDetail = listing.IsWithStandardDetail,
+                TakedownRequestDetail = listing.CustomDetailTxt,
                 To = new string[] { _currentUser.EmailAddress },
                 Cc = listing.CcList ?? new List<string>()
             };
@@ -587,6 +598,8 @@ namespace StrDss.Service
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestsFromListingPreviewAsync(TakedownRequestsFromListingDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var templates = new List<TakedownRequestFromListing>();
 
@@ -624,6 +637,8 @@ namespace StrDss.Service
 
         public async Task<Dictionary<string, List<string>>> CreateTakedownRequestAsync(TakedownRequestCreateDto dto)
         {
+            CommonUtils.SanitizeObject(dto);
+
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
@@ -749,6 +764,8 @@ namespace StrDss.Service
                 To = dto.ToList,
                 Cc = dto.CcList,
                 Info = dto.ListingUrl,
+                IsWithStandardDetail = dto.IsWithStandardDetail,
+                TakedownRequestDetail = dto.CustomDetailTxt,
                 Preview = preview
             };
             return template;
@@ -756,6 +773,8 @@ namespace StrDss.Service
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestPreviewAsync(TakedownRequestCreateDto dto)
         {
+            CommonUtils.SanitizeObject(dto);
+
             var platform = await _orgService.GetOrganizationByIdAsync(dto.PlatformId);
             var lg = await _orgService.GetOrganizationByIdAsync(_currentUser.OrganizationId);
 
@@ -795,7 +814,7 @@ namespace StrDss.Service
         }
 
         private async Task ProcessTakedownRequestBatchEmailAsync(OrganizationDto platform, List<DssEmailMessage> allEmails)
-        {            
+        {
             var contacts = platform.ContactPeople
                 .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest)
                 .Select(x => x.EmailAddressDsc)
@@ -814,7 +833,7 @@ namespace StrDss.Service
                     ListingId = x.UnreportedListingNo ?? "", 
                     Url = x.UnreportedListingUrl ?? "", 
                     RequestedBy = x.RequestingOrganization?.OrganizationNm ?? "",
-                    TakedownRequest = (x.IsWithStandardDetail ?? false) ? "Remove the listing from the platform, do not allow transactions for payments associated with the listing, and cancel all booking associated with the listing." : "",
+                    TakedownRequest = (x.IsWithStandardDetail ?? false) ? Constants.StandardTakedownDetail : "",
                     TakedownRequestDetail = x.CustomDetailTxt ?? ""
                 })
                 .ToList();
@@ -874,204 +893,10 @@ namespace StrDss.Service
 
             _unitOfWork.CommitTransaction(transaction);
         }
-
-        public async Task<Dictionary<string, List<string>>> SendBatchTakedownRequestAsync(long platformId, Stream stream)
-        {
-            var platform = await _orgService.GetOrganizationByIdAsync(platformId);
-
-            var errors = await ValidateBatchTakedownRequestAsync(platform);
-            if (errors.Count > 0)
-            {
-                return errors;
-            }
-
-            //the existence of the contact email has been validated above
-            var contacts = platform!.ContactPeople
-                .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest)
-                .Select(x => x.EmailAddressDsc)
-                .ToArray();
-
-            var content = CommonUtils.StreamToBase64(stream);
-            var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyy-MM-dd-HH-mm");
-            var fileName = $"{platform.OrganizationNm} - {date}.csv";
-            var adminEmail = _config.GetValue<string>("ADMIN_EMAIL") ?? throw new Exception($"There's no admin eamil.");
-
-            var template = new BatchTakedownRequest(_emailService)
-            {
-                To = contacts,
-                Bcc = new string[] { adminEmail! },
-                Info = $"{EmailMessageTypes.BatchTakedownRequest} for {platform.OrganizationNm}",
-                Attachments = new EmailAttachment[] { new EmailAttachment {
-                    Content = content,
-                    ContentType = "text/csv",
-                    Encoding = "base64",
-                    Filename = fileName
-                }},
-            };
-
-            var emailEntity = new DssEmailMessage
-            {
-                EmailMessageType = template.EmailMessageType,
-                MessageDeliveryDtm = DateTime.UtcNow,
-                MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName}",
-                IsHostContactedExternally = false,
-                IsSubmitterCcRequired = false,
-                LgPhoneNo = null,
-                UnreportedListingNo = null,
-                HostEmailAddressDsc = null,
-                LgEmailAddressDsc = null,
-                CcEmailAddressDsc = null,
-                UnreportedListingUrl = null,
-                LgStrBylawUrl = null,
-                InitiatingUserIdentityId = _currentUser.Id,
-                AffectedByUserIdentityId = null,
-                InvolvedInOrganizationId = platform.OrganizationId,
-                RequestingOrganizationId = null
-            };
-
-            await _emailRepo.AddEmailMessage(emailEntity);
-
-            emailEntity.ExternalMessageNo = await template.SendEmail();
-
-            using var transaction = _unitOfWork.BeginTransaction();
-
-            _unitOfWork.Commit();
-
-            emailEntity.BatchingEmailMessageId = emailEntity.EmailMessageId;
-
-            _unitOfWork.Commit();
-
-            _unitOfWork.CommitTransaction(transaction);
-
-            return errors;
-        }
-
-        private async Task<Dictionary<string, List<string>>> ValidateBatchTakedownRequestAsync(OrganizationDto? platform)
-        {
-            await Task.CompletedTask;
-
-            var errors = new Dictionary<string, List<string>>();
-
-            if (platform == null)
-            {
-                errors.AddItem("platformId", $"Platform ID ({platform!.OrganizationId}) does not exist.");
-            }
-            else
-            {
-                if (platform.OrganizationType != OrganizationTypes.Platform)
-                {
-                    errors.AddItem("platformId", $"Organization ({platform!.OrganizationId}) is not a platform");
-                }
-
-                if (platform.ContactPeople == null ||
-                    !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest))
-                {
-                    errors.AddItem("platformId", $"Platform ({platform!.OrganizationId}) does not have the primary '{EmailMessageTypes.BatchTakedownRequest}' contact info");
-                }
-            }
-
-            return errors;
-        }
-
-        public async Task<Dictionary<string, List<string>>> SendBatchTakedownNoticeAsync(long platformId, Stream stream)
-        {
-            var platform = await _orgService.GetOrganizationByIdAsync(platformId);
-
-            var errors = await ValidateBatchTakedownNoticeAsync(platform);
-            if (errors.Count > 0)
-            {
-                return errors;
-            }
-
-            //the existence of the contact email has been validated above
-            var contacts = platform!.ContactPeople
-                .Where(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.NoticeOfTakedown)
-                .Select(x => x.EmailAddressDsc)
-                .ToArray();
-
-            var content = CommonUtils.StreamToBase64(stream);
-            var date = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow).ToString("yyyy-MM-dd-HH-mm");
-            var fileName = $"Notice of non-compliance - {platform.OrganizationNm} - {date}.csv";
-            var adminEmail = _config.GetValue<string>("ADMIN_EMAIL") ?? throw new Exception($"There's no admin eamil.");
-
-            var template = new BatchTakedownNotice(_emailService)
-            {
-                To = contacts,
-                Bcc = new string[] { adminEmail! },
-                Info = $"{EmailMessageTypes.NoticeOfTakedown} for {platform.OrganizationNm}",
-                Attachments = new EmailAttachment[] { new EmailAttachment {
-                    Content = content,
-                    ContentType = "text/csv",
-                    Encoding = "base64",
-                    Filename = fileName
-                }},
-            };
-
-            var emailEntity = new DssEmailMessage
-            {
-                EmailMessageType = template.EmailMessageType,
-                MessageDeliveryDtm = DateTime.UtcNow,
-                MessageTemplateDsc = template.GetContent() + $" Attachement: {fileName}",
-                IsHostContactedExternally = false,
-                IsSubmitterCcRequired = false,
-                LgPhoneNo = null,
-                UnreportedListingNo = null,
-                HostEmailAddressDsc = null,
-                LgEmailAddressDsc = null,
-                CcEmailAddressDsc = null,
-                UnreportedListingUrl = null,
-                LgStrBylawUrl = null,
-                InitiatingUserIdentityId = _currentUser.Id,
-                AffectedByUserIdentityId = null,
-                InvolvedInOrganizationId = platform.OrganizationId,
-                RequestingOrganizationId = null
-            };
-
-            await _emailRepo.AddEmailMessage(emailEntity);
-
-            emailEntity.ExternalMessageNo = await template.SendEmail();
-
-            using var transaction = _unitOfWork.BeginTransaction();
-
-            _unitOfWork.Commit();
-
-            emailEntity.BatchingEmailMessageId = emailEntity.EmailMessageId;
-
-            _unitOfWork.Commit();
-
-            _unitOfWork.CommitTransaction(transaction);
-
-            return errors;
-        }
-
-        private async Task<Dictionary<string, List<string>>> ValidateBatchTakedownNoticeAsync(OrganizationDto? platform)
-        {
-            await Task.CompletedTask;
-
-            var errors = new Dictionary<string, List<string>>();
-
-            if (platform == null)
-            {
-                errors.AddItem("platformId", $"Platform ID ({platform!.OrganizationId}) does not exist.");
-            }
-            else
-            {
-                if (platform.OrganizationType != OrganizationTypes.Platform)
-                {
-                    errors.AddItem("platformId", $"Organization ({platform!.OrganizationId}) is not a platform");
-                }
-
-                if (platform.ContactPeople == null ||
-                    !platform.ContactPeople.Any(x => x.IsPrimary && x.EmailAddressDsc.IsNotEmpty() && x.EmailMessageType == EmailMessageTypes.BatchTakedownRequest))
-                {
-                    errors.AddItem("platformId", $"Platform ({platform!.OrganizationId}) does not have the primary '{EmailMessageTypes.BatchTakedownRequest}' contact info");
-                }
-            }
-
-            return errors;
-        }
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetComplianceOrdersFromListingPreviewAsync(ComplianceOrderDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var templates = new List<ComplianceOrderFromListing>();
 
@@ -1103,6 +928,13 @@ namespace StrDss.Service
         {
             var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
             var commentError = false;
+            var cc = Environment.GetEnvironmentVariable("STR_CEU_EMAIL");
+
+            if (!Regex.IsMatch(_currentUser.EmailAddress, emailRegex.Regex))
+            {
+                errors.AddItem("email", $"Your email address ({_currentUser.EmailAddress}) is invalid");
+                return;
+            }
 
             foreach (var listing in listings)
             {
@@ -1111,6 +943,8 @@ namespace StrDss.Service
                 if (rentalListing == null) continue;
 
                 var template = CreateComplianceOrderTemplate(listing, rentalListing);
+
+                listing.BccList.Add(_currentUser.EmailAddress);
 
                 ValidateEmails(listing.BccList, emailRegex, "bccList", errors);
 
@@ -1123,6 +957,7 @@ namespace StrDss.Service
                 template.RentalListingId = rentalListing.RentalListingId ?? 0;
                 template.To = listing.HostEmails;
                 template.Bcc = listing.BccList;
+                template.Cc = cc == "" ? [] : new string[] { cc! };
                 template.Comment = listing.Comment;
                 templates.Add(template);
             }
@@ -1134,6 +969,8 @@ namespace StrDss.Service
         }
         public async Task<Dictionary<string, List<string>>> CreateComplianceOrdersFromListingAsync(ComplianceOrderDto[] listings)
         {
+            CommonUtils.SanitizeObject(listings);
+
             var errors = new Dictionary<string, List<string>>();
             var emailRegex = RegexDefs.GetRegexInfo(RegexDefs.Email);
             var templates = new List<ComplianceOrderFromListing>();
@@ -1194,7 +1031,7 @@ namespace StrDss.Service
                 EmailMessageType = template.EmailMessageType,
                 MessageDeliveryDtm = DateTime.UtcNow,
                 MessageTemplateDsc = template.GetContent(),
-                IsSubmitterCcRequired = true, //todo: 
+                IsSubmitterCcRequired = true, 
                 UnreportedListingNo = template.ListingId,
                 HostEmailAddressDsc = listing.HostEmails.FirstOrDefault(),
                 LgEmailAddressDsc = null,

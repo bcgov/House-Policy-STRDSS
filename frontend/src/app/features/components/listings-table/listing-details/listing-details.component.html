@@ -25,6 +25,11 @@
             <span class="nonc-icon"></span> Send Notice Of Non-Compliance </button>
         <button *ngIf="!isCEU" pButton (click)="sendTakedownRequest()" class="p-button-outlined do-not-print-it"><span
                 class="tdr-icon"></span> Send Takedown Request</button>
+
+        <button pButton *ngIf="isCEU" icon="pi pi-envelope" id="send_compliance_order_btn" (click)="onContactHost()">
+            &nbsp;Contact Host
+        </button>
+
     </div>
 </div>
 <div class="content" *ngIf="listing">
@@ -34,8 +39,8 @@
                 <div class="property-info-container">
                     <strong class="panel-header-text">Platform Information</strong>
                     <p-tag class="tag-blue">
-                        <strong class="tag-text">Platform Report Month:</strong>{{listing.latestReportPeriodYm
-                        |date:'YYYY-MM' || '-'}}
+                        <strong class="tag-text">Platform Report Month:</strong>{{(listing.latestReportPeriodYm
+                        |date:'YYYY-MM') || '-'}}
                     </p-tag>
                 </div>
             </ng-template>
@@ -95,7 +100,7 @@
                         *ngIf="listing.matchScoreAmt<=addressWarningScoreLimit && (!listing.isMatchVerified && !listing.isMatchCorrected)"></i>
                 </span>
                 <span *ngIf="canUserEditAddress" class="change-address-button-container">
-                    <button pButton class="p-button-transparent" pTooltip="Edit Address"
+                    <button pButton class="p-button-transparent" pTooltip="Edit Address" aria-label="Edit Address"
                         (click)="onAddressChangeClicked()">
                         <span class="edit-address-icon"></span>
                     </button>
@@ -130,7 +135,24 @@
             <ng-template ngFor let-host [ngForOf]="listing.hosts" let-i="index">
                 <div class="row">
                     <span class="label">{{host.isPropertyOwner?'Property':'STR'}} Host (Platform Listing):</span>
-                    <span class="value">{{host.fullNm}}</span>
+                    <span class="value" [class.has-multiple-properties]="listing.hasMultipleProperties">
+                        @if (host.isPropertyOwner) {
+
+                        @if(listing.hasMultipleProperties){
+                        <button pButton class="p-button-link zero-padding"
+                            (click)="navigateToListingsByHost()">{{host.fullNm}}</button>
+                        <i pTooltip="This host may have multiple properties in B.C. Click the host name to view more listings. Note: you can only view listings within your own jurisdiction."
+                            class="multi-host multihost-icon"></i>
+                        }
+                        @else{
+                        {{host.fullNm}}
+                        }
+
+                        }
+                        @else {
+                        {{host.fullNm}}
+                        }
+                    </span>
                 </div>
                 <div class="row">
                     <span class="label">{{host.isPropertyOwner?'Property':'STR'}} Host Address:</span>
@@ -155,7 +177,7 @@
                 Listing History (for This Listing ID)
             </div>
             <div class="row night-stayed-row">
-                <span class="label">Night Stayed YTD:</span>
+                <span class="label">Night Stayed (12M):</span>
                 <span class="value">{{listing.nightsBookedYtdQty}}</span>
             </div>
             <div class="row">
@@ -242,7 +264,9 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-actionHistory>
                     <tr class="small-text">
-                        <td>{{ actionHistory.action }}</td>
+                        <td>{{ actionHistory.action }} 
+                            <span *ngIf="actionHistory.action == 'Takedown Reported' && listing.takeDownReason">: {{ listing.takeDownReason }}</span>
+                        </td>
                         <td>{{ actionHistory.date |date:'yyyy-MM-dd'}}</td>
                         <td>{{ actionHistory.user }}</td>
                     </tr>

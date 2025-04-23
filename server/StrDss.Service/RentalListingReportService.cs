@@ -222,7 +222,7 @@ namespace StrDss.Service
         private async Task<(bool, bool)> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, bool isLastLine)
         {
             var errors = new Dictionary<string, List<string>>();
-            bool doValidateRegistration = _currentUser.Permissions.Any(p => p == Permissions.ValidateRegistration); // Should we be validating the registration?
+            bool doValidateRegistration = await DoRegistrationValidation(upload.UpdUserGuid);
             bool isRegistrationValid = false;
             string registrationTxt = "";
 
@@ -636,7 +636,15 @@ namespace StrDss.Service
             return errors;
         }
 
-
-
+        private async Task<bool> DoRegistrationValidation(Guid? userGuid)
+        {
+            bool hasPermission = false;
+            if (userGuid.HasValue)
+            {
+                (var user, List<string> permissions) = await _userRepo.GetUserAndPermissionsByGuidAsync(userGuid.Value);
+                hasPermission = permissions.Any(p => p == Permissions.ValidateRegistration);
+            }
+            return hasPermission;
+        }
     }
 }

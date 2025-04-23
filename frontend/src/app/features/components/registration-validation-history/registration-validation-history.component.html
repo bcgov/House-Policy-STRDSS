@@ -22,6 +22,16 @@
                         *ngIf="this.sort && this.sort.prop === 'organizationNm' && this.sort.dir === 'asc'"></i>
                 </th>
 
+                <th class="sortable-header" id="uploadDeliveryType_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'uploadDeliveryType'"
+                    (click)="onSort('uploadDeliveryType')">Report
+                    Type
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'uploadDeliveryType' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'uploadDeliveryType' && this.sort.dir === 'asc'"></i>
+                </th>
+
                 <th class="sortable-header" id="status_header" [class.sorted]="this.sort && this.sort.prop === 'status'"
                     (click)="onSort('status')">Status
                     <i class="pi pi-angle-down"
@@ -78,21 +88,22 @@
         <ng-template pTemplate="body" let-row>
             <tr>
                 <td>{{ row.organizationNm }}</td>
+                <td>{{ row.uploadDeliveryType }}</td>
                 <td>
-                    <span *ngIf="row.status==='Processed'; then processed; else pending"></span>
-                    <ng-template #processed> <span class="state-processed">{{row.status}}</span></ng-template>
-                    <ng-template #pending><span class="state-pending">{{row.status}}</span></ng-template>
+                    <span *ngIf="row.registrationStatus==='Processed'; then processed; else pending"></span>
+                    <ng-template #processed> <span class="state-processed">{{row.registrationStatus}}</span></ng-template>
+                    <ng-template #pending><span class="state-pending">{{row.registrationStatus}}</span></ng-template>
                 </td>
                 <td>
                     {{row.total}}
                 </td>
                 <td>
-                    {{row.success}}
+                    {{row.registrationSuccess}}
                 </td>
                 <td>
-                    {{row.errors}}
+                    {{row.registrationErrors}}
                 </td>
-                <td>{{ row.updDtm |date:'yyyy-MM-dd' }}</td>
+                <td>{{ row.uploadDate |date:'yyyy-MM-dd' }}</td>
                 <td>{{ row.givenNm }} {{ row.familyNm }}</td>
                 <td>
                     <button [id]="'downloadReport_'+row.uploadDeliveryId" pButton

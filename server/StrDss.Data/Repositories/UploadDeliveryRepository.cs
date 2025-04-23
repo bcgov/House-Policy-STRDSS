@@ -136,7 +136,7 @@ namespace StrDss.Data.Repositories
         {
             return await _dbContext.DssUploadLines.AsNoTracking()
                 .Where(x => x.UploadLineId == lineId)
-                .Select(x => new UploadLineError { LineText = x.SourceLineTxt, ErrorText = x.ErrorTxt })
+                .Select(x => new UploadLineError { LineText = x.SourceLineTxt, ErrorText = x.ErrorTxt, RegistrationTxt = x.RegistrationTxt })
                 .FirstAsync();
         }
 

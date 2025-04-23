@@ -14,4 +14,5 @@ export interface ListingUploadHistoryRecord {
     updDtm: string;
     uploadDeliveryId: number;
     uploadDeliveryType?: string;
+    uploadDate: string;
 }

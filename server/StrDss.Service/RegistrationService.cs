@@ -15,8 +15,10 @@ using StrDss.Service.EmailTemplates;
 using StrDss.Service.HttpClients;
 using System.Diagnostics;
 using System.Text;
+using CsvHelper.Configuration;
 using NetTopologySuite.Geometries;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Formats.Asn1;
 
 namespace StrDss.Service
 {
@@ -54,64 +56,34 @@ namespace StrDss.Service
 
         public async Task ProcessRegistrationDataUploadAsync(DssUploadDelivery upload)
         {
-            var processStopwatch = Stopwatch.StartNew();
+            Stopwatch processStopwatch = Stopwatch.StartNew();
 
             _logger.LogInformation($"Processing Registration Data {upload.ProvidingOrganizationId} - {upload.ProvidingOrganization.OrganizationNm}");
 
-            int lineCount = await _uploadRepo.GetTotalNumberOfUploadLines(upload.UploadDeliveryId);
-            int count = 0;
-            List<UploadLineToProcess> linesToProcess = await _uploadRepo.GetUploadLinesToProcessAsync(upload.UploadDeliveryId);
-            Dictionary<string, List<string>> errors = new();
-            CsvHelper.Configuration.CsvConfiguration csvConfig = CsvHelperUtils.GetConfig(errors, false);
-            MemoryStream memoryStream = new(upload.SourceBin!);
-
-            using TextReader textReader = new StreamReader(memoryStream, Encoding.UTF8);
-            using var csv = new CsvReader(textReader, csvConfig);
-            csv.Read();
-            bool headerExists = csv.ReadHeader();
-            bool hasError = false;
-            bool isLastLine = false;
             int processedCount = 0;
+            string? header = upload.SourceHeaderTxt ?? "";
+            List<DssUploadLine> linesToProcess = await _uploadRepo.GetUploadLineEntitiesToProcessAsync(upload.UploadDeliveryId);
+            int lineCount = linesToProcess.Count;
+            bool hasError = false;
             int errorCount = 0;
 
-            while (csv.Read())
+            foreach (var line in linesToProcess)
             {
-                count++;
-                isLastLine = count == lineCount;
-                RegistrationDataRowUntyped row = csv.GetRecord<RegistrationDataRowUntyped>(); //it has been parsed once, so no exception expected.
+                Dictionary<string, List<string>> errors = new();
+                CsvConfiguration csvConfig = CsvHelperUtils.GetConfig(errors, false);
 
-                if (!linesToProcess.Any(x => x.OrgCd == row.OrgCd && x.SourceRecordNo == row.RegNo)) continue;
+                string? csv = header + Environment.NewLine + line.SourceLineTxt;
+                StringReader? textReader = new StringReader(csv);
+                CsvReader? csvReader = new CsvReader(textReader, csvConfig);
 
-                var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, row.OrgCd, row.RegNo);
-
-                if (uploadLine == null || uploadLine.IsProcessed)
-                {
-                    _logger.LogInformation($"Skipping registration data - ({row.OrgCd} - {row.RegNo})");
-                    continue;
-                }
-
-                _logger.LogInformation($"Processing registration data - ({row.OrgCd} - {row.RegNo})");
-
-                var stopwatch = Stopwatch.StartNew();
-                hasError = !await ProcessUploadLine(upload, upload.ProvidingOrganizationId, uploadLine, row, isLastLine);
-                stopwatch.Stop();
-
+                hasError = !await ProcessLine(upload, line, csvReader);
                 processedCount++;
                 if (hasError) errorCount++;
-
-                _logger.LogInformation($"Finishing listing ({row.OrgCd} - {row.RegNo}): {stopwatch.Elapsed.TotalMilliseconds} milliseconds - {processedCount}");
-            }
-
-            if (!isLastLine)
-            {
-                processStopwatch.Stop();
-                _logger.LogInformation($"Processed {processedCount} lines: {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
-                return;
             }
 
             // Update the upload with the status and counts
-            upload.UploadStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
-            upload.RegistrationStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
+            upload.UploadStatus = UploadStatus.Processed;
+            upload.RegistrationStatus = UploadStatus.Processed;
             upload.UploadLinesTotal = lineCount;
             upload.UploadLinesProcessed = processedCount;
             upload.UploadLinesSuccess = processedCount - errorCount;
@@ -124,7 +96,6 @@ namespace StrDss.Service
             var user = await _userRepo.GetUserByGuid((Guid)upload.UploadUserGuid!);
             if (user == null) return;
 
-
             var adminEmail = _config.GetValue<string>("ADMIN_EMAIL");
             if (adminEmail == null) return;
 
@@ -135,8 +106,9 @@ namespace StrDss.Service
             {
                 UserName = $"{user!.GivenNm}",
                 Link = "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/short-term-rentals/quickstartguide_validation_for_minor_platforms_final.pdf",
+                DownloadLink = GetHostUrl() + "/registration-validation-history",
                 To = new string[] { user!.EmailAddressDsc! },
-                Info = $"{EmailMessageTypes.ListingUploadError} for {user.FamilyNm}, {user.GivenNm}",
+                Info = $"{EmailMessageTypes.RegistrationValidation} for {user.FamilyNm}, {user.GivenNm}",
                 From = adminEmail
             };
 
@@ -170,10 +142,15 @@ namespace StrDss.Service
             _logger.LogInformation($"Finished: {upload.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
-        private async Task<bool> ProcessUploadLine(DssUploadDelivery upload, long OrgId, DssUploadLine uploadLine, RegistrationDataRowUntyped row, bool isLastLine)
+        private async Task<bool> ProcessLine(DssUploadDelivery upload, DssUploadLine uploadLine, CsvReader csvReader)
         {
+            csvReader.Read();
+            csvReader.ReadHeader();
+            csvReader.Read();
+            RegistrationDataRowUntyped row = csvReader.GetRecord<RegistrationDataRowUntyped>(); //it has been parsed once, so no exception expected.
+
             // Does this upload line meet the validation rules
-            var errors = new Dictionary<string, List<string>>();
+            Dictionary<string, List<string>> errors = new();
             _validator.Validate(Entities.RegistrationDataRowUntyped, row, errors);
             if (errors.Count > 0)
             {
@@ -191,7 +168,7 @@ namespace StrDss.Service
                 {
                     if (!string.IsNullOrEmpty(row.ListingId))
                     {
-                        var listing = await _reportRepo.GetMasterListingAsync(OrgId, row.ListingId);
+                        DssRentalListing? listing = await _reportRepo.GetMasterListingAsync(upload.ProvidingOrganizationId, row.ListingId);
                         if (listing != null)
                         {
                             using var tran = _unitOfWork.BeginTransaction();

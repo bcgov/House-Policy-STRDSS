@@ -10,6 +10,7 @@
             FamilyNm = "";
             Status = "";
             UploadDeliveryType = "";
+            RegistrationStatus = "";
         }
 
         public long UploadDeliveryId { get; set; }
@@ -23,7 +24,11 @@
         public int Total { get; set; }
         public int Processed { get; set; }
         public int Errors { get; set; }
+        public long RegistrationErrors { get; set; }
         public int Success { get; set; }
+        public long RegistrationSuccess { get; set; }
         public string Status { get; set; }
+        public string RegistrationStatus { get; set; }
+        public DateTime UploadDate { get; set; }
     }
 }

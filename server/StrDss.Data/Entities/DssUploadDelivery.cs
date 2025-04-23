@@ -99,6 +99,11 @@ public partial class DssUploadDelivery
     /// </summary>
     public string? SourceHeaderTxt { get; set; }
 
+    /// <summary>
+    /// Date and time the file was uploaded
+    /// </summary>
+    public DateTime UploadDate { get; set; }
+
     public virtual ICollection<DssUploadLine> DssUploadLines { get; set; } = new List<DssUploadLine>();
 
     public virtual DssOrganization ProvidingOrganization { get; set; } = null!;

@@ -108,7 +108,9 @@ export class RegistrationValidationHistoryComponent {
       this.selectedPlatformId).subscribe({
       next: (records) => {
         this.currentPage = records.pageInfo;
-        this.registrationValidationHistory = records.sourceList;
+        this.registrationValidationHistory = records.sourceList.filter(
+          (item: any) => item.registrationStatus !== 'Not Applicable'
+        );
       },
       complete: () => {
         this.loaderService.loadingEnd();

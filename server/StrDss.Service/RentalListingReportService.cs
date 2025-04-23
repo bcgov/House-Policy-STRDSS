@@ -126,7 +126,8 @@ namespace StrDss.Service
                 _logger.LogInformation($"Processing listing ({row.OrgCd} - {row.ListingId})");
 
                 var stopwatch = Stopwatch.StartNew();
-                (isSuccessful, isValid) = await ProcessUploadLine(report, upload, uploadLine, row, isLastLine);
+                bool doValidateRegistration = await DoRegistrationValidation(upload.UpdUserGuid);
+                (isSuccessful, isValid) = await ProcessUploadLine(report, upload, uploadLine, row, doValidateRegistration, isLastLine);
                 stopwatch.Stop();
 
                 processedCount++;
@@ -219,10 +220,10 @@ namespace StrDss.Service
             _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
 
-        private async Task<(bool, bool)> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row, bool isLastLine)
+        private async Task<(bool, bool)> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row,
+            bool doValidateRegistration, bool isLastLine)
         {
             var errors = new Dictionary<string, List<string>>();
-            bool doValidateRegistration = await DoRegistrationValidation(upload.UpdUserGuid);
             bool isRegistrationValid = false;
             string registrationTxt = "";
 
@@ -230,7 +231,7 @@ namespace StrDss.Service
             _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
             if (errors.Count > 0)
             {
-                SaveUploadLine(uploadLine, errors, true, "", doValidateRegistration, true, errors.ParseError());
+                SaveUploadLine(uploadLine, errors, true, "", true, errors.ParseError());
                 if (isLastLine)  await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
                 _unitOfWork.Commit();
                 return (false, isRegistrationValid);
@@ -261,7 +262,7 @@ namespace StrDss.Service
                 (isRegistrationValid, registrationTxt) = await _permitValidation.CheckStraaExemptionStatus(row.RentalAddress);
             }
 
-            SaveUploadLine(uploadLine, errors, false, systemError, doValidateRegistration, !isRegistrationValid, registrationTxt);
+            SaveUploadLine(uploadLine, errors, false, systemError, !isRegistrationValid, registrationTxt);
 
             _unitOfWork.Commit();
 
@@ -301,7 +302,7 @@ namespace StrDss.Service
         }
 
         private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, string systemError,
-            bool doValidateRegistration, bool isRegistrationFailure, string registrationTxt)
+            bool isRegistrationFailure, string registrationTxt)
         {
             uploadLine.IsRegistrationFailure = isRegistrationFailure;
             uploadLine.RegistrationTxt = registrationTxt;

@@ -82,8 +82,8 @@ namespace StrDss.Service
             }
 
             // Update the upload with the status and counts
-            upload.UploadStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
-            upload.RegistrationStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
+            upload.UploadStatus = UploadStatus.Processed;
+            upload.RegistrationStatus = UploadStatus.Processed;
             upload.UploadLinesTotal = lineCount;
             upload.UploadLinesProcessed = processedCount;
             upload.UploadLinesSuccess = processedCount - errorCount;

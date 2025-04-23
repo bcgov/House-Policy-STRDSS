@@ -10,23 +10,21 @@ namespace StrDss.Service.EmailTemplates
             From = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? From;
         }
         public string UserName { get; set; } = "";
-        public long NumErrors { get; set; }
         public string Link { get; set; } = "";
         public override string GetContent()
         {
-            Subject = "B.C. STR Data Portal: Registration Validation";
+            Subject = "B.C. STR Data Portal: Validation report ready ";
 
             return
 $@"Dear {UserName},<br/><br/>
-Thank you for uploading a monthly registration validation report to British Columbia’s Short-term Rental Data Portal. Your upload has been processed and {NumErrors} error(s) have been found in your uploaded file.<br/><br/>
-Here’s how to fix errors: <br/><br/>
-<ol>
-<li>Download the file containing the error rows <a href='{Link}'>here</a>.</li>
-<li>Fix the highlighted errors in the columns.</li>
-<li>Upload the corrected file to the STR Data Portal like you would normally upload your monthly report.</li>
-</ol>
+Thank you for submitting your listings to British Columbia’s Short-term Rental Data Portal to validate that all listings include a valid host registration, as required under s. 17(1)(b)(ii) of the <i>Short-term Rental Accommodations Act</i>.<br/> 
 <br/>
-Please contact DSSadmin@gov.bc.ca if you encounter any problems.<br/>
+Your upload has been processed, and the validation report is now available for download. The validation results are listed in the first column of the report. For any listings that failed validation, corresponding error messages are provided.<br/> 
+<br/>
+<b>Next Steps</b><br/>
+Platforms are required to take specific actions when a registration is determined to be invalid. See the <a href={Link}>Guide to STR Registration validation for Minor Platforms</a> for more details.<br/>
+<br/>
+Please contact <a href=emailto:{From}>DSSadmin@gov.bc.ca</a> for technical support if needed.<br/>
 ";
         }
     }

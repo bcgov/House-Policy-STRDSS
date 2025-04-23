@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CsvHelper;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -11,8 +12,11 @@ using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
+using StrDss.Service.HttpClients;
 using System.Diagnostics;
 using System.Text;
+using NetTopologySuite.Geometries;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace StrDss.Service
 {
@@ -106,15 +110,18 @@ namespace StrDss.Service
             }
 
             // Update the upload with the status and counts
-            //upload.UploadStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
-            //upload.UploadLinesTotal = lineCount;
-            //upload.UploadLinesProcessed = processedCount;
-            //upload.UploadLinesSuccess = processedCount - errorCount;
-            //upload.UploadLinesError = errorCount;
-            //_unitOfWork.Commit();
+            upload.UploadStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
+            upload.RegistrationStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
+            upload.UploadLinesTotal = lineCount;
+            upload.UploadLinesProcessed = processedCount;
+            upload.UploadLinesSuccess = processedCount - errorCount;
+            upload.UploadLinesError = errorCount;
+            upload.RegistrationLinesSuccess = processedCount - errorCount;
+            upload.RegistrationLinesError = errorCount;
+            _unitOfWork.Commit();
 
-            if (upload.UpdUserGuid == null) return;
-            var user = await _userRepo.GetUserByGuid((Guid)upload.UpdUserGuid!);
+            if (upload.UploadUserGuid == null) return;
+            var user = await _userRepo.GetUserByGuid((Guid)upload.UploadUserGuid!);
             if (user == null) return;
 
 
@@ -127,8 +134,7 @@ namespace StrDss.Service
             var template = new RegistrationValidationComplete(_emailService)
             {
                 UserName = $"{user!.GivenNm}",
-                NumErrors = errorCount,
-                Link = GetHostUrl() + "/registration-validation-history",
+                Link = "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/short-term-rentals/quickstartguide_validation_for_minor_platforms_final.pdf",
                 To = new string[] { user!.EmailAddressDsc! },
                 Info = $"{EmailMessageTypes.ListingUploadError} for {user.FamilyNm}, {user.GivenNm}",
                 From = adminEmail
@@ -166,49 +172,64 @@ namespace StrDss.Service
 
         private async Task<bool> ProcessUploadLine(DssUploadDelivery upload, long OrgId, DssUploadLine uploadLine, RegistrationDataRowUntyped row, bool isLastLine)
         {
-            var rowErrors = new Dictionary<string, List<string>>();
-
-            _validator.Validate(Entities.RegistrationDataRowUntyped, row, rowErrors);
-            if (rowErrors.Count > 0)
+            // Does this upload line meet the validation rules
+            var errors = new Dictionary<string, List<string>>();
+            _validator.Validate(Entities.RegistrationDataRowUntyped, row, errors);
+            if (errors.Count > 0)
             {
-                SaveUploadLine(uploadLine, rowErrors, true, false);
+                SaveUploadLine(uploadLine, errors.ParseErrorWithUnderScoredKeyName(), true);
                 return false;
             }
 
-            (bool isValid, Dictionary<string, List<string>> regErrors) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
-            if (isValid)
+            bool isValid = false;
+            string registrationTxt = "";
+            if (!string.IsNullOrEmpty(row.RegNo))
             {
-                if (!string.IsNullOrEmpty(row.ListingId))
+                // There is a reg no present, so we need to validate it
+                (isValid, registrationTxt) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
+                if (isValid)
                 {
-                    var listing = await _reportRepo.GetMasterListingAsync(OrgId, row.ListingId);
-                    if (listing != null)
+                    if (!string.IsNullOrEmpty(row.ListingId))
                     {
-                        using var tran = _unitOfWork.BeginTransaction();
-                        // Set the registration value here
-                        listing.BcRegistryNo = row.RegNo;
-
-                        var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, row.RentalAddress);
-                        if (physicalAddress != null)
+                        var listing = await _reportRepo.GetMasterListingAsync(OrgId, row.ListingId);
+                        if (listing != null)
                         {
-                            // Set the unit, street, and postal code values here
-                            physicalAddress.RegRentalUnitNo = row.RentalUnit;
-                            physicalAddress.RegRentalStreetNo = row.RentalStreet;
-                            physicalAddress.RegRentalPostalCode = row.RentalPostal;                            
+                            using var tran = _unitOfWork.BeginTransaction();
+                            // Set the registration value here
+                            listing.BcRegistryNo = row.RegNo;
+
+                            var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, row.RentalAddress);
+                            if (physicalAddress != null)
+                            {
+                                // Set the unit, street, and postal code values here
+                                physicalAddress.RegRentalUnitNo = row.RentalUnit;
+                                physicalAddress.RegRentalStreetNo = row.RentalStreet;
+                                physicalAddress.RegRentalPostalCode = row.RentalPostal;
+                            }
+                            tran.Commit();
                         }
-                        tran.Commit();
                     }
-                }                
+                }
+            }
+            else if (!string.IsNullOrEmpty(row.RentalAddress)) // We have an address, so we need to determine if the property is in an exempt jurisdiction
+            {
+                (isValid, registrationTxt) = await _permitValidation.CheckStraaExemptionStatus(row.RentalAddress);
+             }
+            else
+            {
+                // We shouldn't ever hit here, but here we are.
+                isValid = false;
+                registrationTxt = RegistrationValidationText.DataInvalid;
             }
 
-            SaveUploadLine(uploadLine, regErrors, false, !isValid, false);
+            SaveUploadLine(uploadLine, registrationTxt, !isValid);
             return isValid;
         }
 
-        private void SaveUploadLine(DssUploadLine uploadLine, Dictionary<string, List<string>> errors, bool isValidationFailure, bool isSystemError, bool useUnderscores = true)
+        private void SaveUploadLine(DssUploadLine uploadLine, string registrationTxt, bool isRegistrationFailure)
         {
-            uploadLine.IsValidationFailure = isValidationFailure;
-            uploadLine.IsSystemFailure = isSystemError;
-            uploadLine.ErrorTxt = useUnderscores ? errors.ParseErrorWithUnderScoredKeyName() : errors.ParseError();
+            uploadLine.IsRegistrationFailure = isRegistrationFailure;
+            uploadLine.RegistrationTxt = registrationTxt;
             uploadLine.IsProcessed = true;
             _unitOfWork.Commit();
         }

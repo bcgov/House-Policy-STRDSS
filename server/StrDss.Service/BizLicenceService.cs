@@ -85,8 +85,8 @@ namespace StrDss.Service
 
         private async Task ProcessBizLicenceUploadSubAsync(DssUploadDelivery upload)
         {
-            var count = 0;
-
+            var processedCount = 0;
+            var errorCount = 0;
             var header = upload.SourceHeaderTxt ?? "";
 
             var linesToProcess = await _uploadRepo.GetUploadLinesToProcessAsync(upload.UploadDeliveryId);
@@ -95,8 +95,6 @@ namespace StrDss.Service
             foreach (var lineToProcess in linesToProcess)
             {
                 var uploadLine = await _uploadRepo.GetUploadLineAsync(upload.UploadDeliveryId, lineToProcess.OrgCd, lineToProcess.SourceRecordNo);
-
-                count++;
                 var errors = new Dictionary<string, List<string>>();
                 var csvConfig = CsvHelperUtils.GetConfig(errors, false);
 
@@ -105,7 +103,19 @@ namespace StrDss.Service
                 var csvReader = new CsvReader(textReader, csvConfig);
 
                 var (orgCd, sourceRecordNo) = await ProcessLine(upload, header, uploadLine, csvReader);
-            }
+                processedCount++;
+                if (uploadLine.IsValidationFailure == true || uploadLine.IsSystemFailure == true) errorCount++;
+             }
+
+            upload.UploadStatus = errorCount > 0 ? UploadStatus.Failed : UploadStatus.Processed;
+            upload.RegistrationStatus = UploadStatus.Processed;
+            upload.UploadLinesTotal = lineCount;
+            upload.UploadLinesProcessed = processedCount;
+            upload.UploadLinesSuccess = processedCount - errorCount;
+            upload.UploadLinesError = errorCount;
+            upload.RegistrationLinesSuccess = 0;
+            upload.RegistrationLinesError = 0;
+            _unitOfWork.Commit();
         }
 
         private async Task<(string orgCd, string sourceRecordNo)> ProcessLine(DssUploadDelivery upload, string header, DssUploadLine line, CsvReader csvReader)
@@ -152,6 +162,7 @@ namespace StrDss.Service
         {
             uploadLine.IsValidationFailure = isValidationFailure;
             uploadLine.ErrorTxt = errors.ParseErrorWithUnderScoredKeyName();
+            uploadLine.IsRegistrationFailure = false;
 
             uploadLine.IsSystemFailure = systemError.IsNotEmpty();
             if (uploadLine.IsSystemFailure)

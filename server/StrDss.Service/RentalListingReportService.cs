@@ -143,7 +143,7 @@ namespace StrDss.Service
 
             // Update the delivery record with the stats we need.
             upload.UploadStatus = totalProcessed == lineCount ? UploadStatus.Processed : UploadStatus.Pending; // Current logic has only processed or pending for this upload
-            upload.RegistrationStatus = totalProcessed == lineCount ? totalRegErrors > 0 ? UploadStatus.Failed : UploadStatus.Processed : UploadStatus.Pending;
+            upload.RegistrationStatus = totalProcessed == lineCount ? UploadStatus.Processed : UploadStatus.Pending;
             upload.UploadLinesTotal = lineCount;
             upload.UploadLinesProcessed = totalProcessed;
             upload.UploadLinesSuccess = totalProcessed - totalErrors;

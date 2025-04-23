@@ -128,6 +128,12 @@ namespace StrDss.Data.Repositories
                 .Where(x => x.ProvidingOrganizationId == providingPlatformId && x.DssRentalListings.Any())
                 .ToListAsync();
 
+            if (reports.Count == 0)
+            {
+                stopwatch.Stop();
+                _logger.LogDebug($"UpdateInactiveListings - skipping due to no report with associated listing.");
+                return;
+            }
             var latestPeriodYm = reports.Max(x => x.ReportPeriodYm);
             var lastestReport = reports.First(x => x.ReportPeriodYm == latestPeriodYm);
 

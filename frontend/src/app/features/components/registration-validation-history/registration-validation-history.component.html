@@ -91,8 +91,8 @@
                 <td>{{ row.uploadDeliveryType }}</td>
                 <td>
                     <span *ngIf="row.registrationStatus==='Processed'; then processed; else pending"></span>
-                    <ng-template #processed> <span class="state-processed">{{row.status}}</span></ng-template>
-                    <ng-template #pending><span class="state-pending">{{row.status}}</span></ng-template>
+                    <ng-template #processed> <span class="state-processed">{{row.registrationStatus}}</span></ng-template>
+                    <ng-template #pending><span class="state-pending">{{row.registrationStatus}}</span></ng-template>
                 </td>
                 <td>
                     {{row.total}}

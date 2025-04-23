@@ -371,7 +371,7 @@ namespace StrDss.Service
                             IsSystemFailure = false,
                             IsProcessed = false,
                             SourceOrganizationCd = org.OrganizationCd,
-                            SourceRecordNo = row.RegNo ?? "REG",
+                            SourceRecordNo = string.IsNullOrEmpty(row.RegNo) ? $"REG_{Guid.NewGuid()}" : row.RegNo,
                             SourceLineTxt = csv.Parser.RawRecord
                         });
                     }

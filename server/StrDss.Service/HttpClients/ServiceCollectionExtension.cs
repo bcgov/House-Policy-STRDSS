@@ -46,7 +46,7 @@ namespace StrDss.Service.HttpClients
                 var apiKey = config.GetValue<string>("REGISTRATION_API_KEY") ?? "";
 
                 client.BaseAddress = new Uri(baseAddress);
-                client.Timeout = new TimeSpan(0, 2, 0);
+                client.Timeout = new TimeSpan(0, 0, 20);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Add("x-apikey", apiKey);

@@ -77,39 +77,64 @@ public class PermitValidationService : IPermitValidationService
                 {
                     _logger.LogInformation("Validate permit returned an error.");
                     List<string> errorDetails = resp.Errors
-                        .Select(e => $"{e.Code}: {e.Message}")
+                        .Select(e => $"{e.Code}:{e.Message}")
                         .ToList();
 
-                    registrationText = string.Join("\n", resp.Errors.Select(e => $"{e.Code}: {e.Message}"));
+                    registrationText = string.Join("\n", resp.Errors.Select(e => $"{e.Code}:{e.Message}"));
                 }
             }
             else
             {
                 _logger.LogInformation("Permit status is: ." + resp.Status);
 
-                registrationText = resp.Status;
+                registrationText = "200:"+resp.Status;
             }
         }
-        catch (ApiException ex) when (ex.StatusCode == 401)
+        catch (ApiException<Response2> ex)
         {
-            _logger.LogInformation("Validate permit call return 401: " + ex.Message);
             isValid = false;
-            registrationText = RegistrationValidationText.ValidationException401;
-        }
-        catch (ApiException ex) when (ex.StatusCode == 404)
-        {
-            _logger.LogInformation("Validate permit call returned 404: " + ex.Message);
-            isValid = false;
-            registrationText = RegistrationValidationText.ValidationException404;
+            _logger.LogError($"Error Code: {ex.StatusCode}, Additional Properties: {string.Join(", ", ex.Result.AdditionalProperties)}");
+            // Extract the rootCause from AdditionalProperties
+            if (ex.Result.AdditionalProperties.TryGetValue("rootCause", out var rootCauseObj) && rootCauseObj is string rootCause)
+            {
+                // Use regex to extract the specific error message
+                var match = Regex.Match(rootCause, @"message:(?<message>[^\]]+)");
+                if (match.Success)
+                {
+                    string errorMessage = match.Groups["message"].Value.Trim();
+                    registrationText = $"{ex.StatusCode}:{errorMessage}";
+                }
+                else
+                {
+                    registrationText = $"{ex.StatusCode}:Unknown error in rootCause.";
+                }
+            }
+            else
+            {
+                registrationText = $"{ex.StatusCode}:Unknown error.";
+            }
 
         }
         catch (ApiException ex)
         {
-            registrationText = HandleApiException(ex);
+            isValid = false;
+            if(ex.StatusCode == 401)
+            {                
+                registrationText = ex.StatusCode + ":" + RegistrationValidationText.ValidationException401;
+            } 
+            else if (ex.StatusCode == 404)
+            {
+                registrationText = ex.StatusCode + ":" + RegistrationValidationText.ValidationException404;
+            }
+            else
+            {
+                registrationText = ex.StatusCode + ":" + RegistrationValidationText.ValidationException;
+            }
+            _logger.LogError($"Validate permit call return {ex.StatusCode}: {ex.Message}");
         }
         catch (Exception ex)
         {
-            _logger.LogInformation("Validate permit call threw an exception: " + ex.Message);
+            _logger.LogError("Validate permit call threw an exception: " + ex.Message);
             isValid = false;
             registrationText = RegistrationValidationText.ValidationException;
         }
@@ -173,41 +198,5 @@ public class PermitValidationService : IPermitValidationService
         }
 
         return (isExempt, registrationText);
-    }
-
-    private string HandleApiException(ApiException ex)
-    {
-        if (ex.StatusCode == 401)
-        {
-            _logger.LogInformation("Validate permit call return 401: " + ex.Message);
-            return RegistrationValidationText.ValidationException401;
-        }
-        if (ex.StatusCode == 404)
-        {
-            _logger.LogInformation("Validate permit call returned 404: " + ex.Message);
-            return RegistrationValidationText.ValidationException404;
-
-        }
-        if (ex.StatusCode == 400)
-        {
-            _logger.LogInformation("Validate permit call returned 400.");
-            return RegistrationValidationText.ValidationException;
-            //var errorResponse = JsonSerializer.Deserialize<ApiErrorResponse>(ex.Response);
-            //if (errorResponse?.RootCause != null)
-            //{
-            //    var match = Regex.Match(errorResponse.RootCause, @"code:(?<code>[^,]+),message:(?<message>[^,\]]+)");
-            //    if (match.Success)
-            //    {
-            //        string code = match.Groups["code"].Value;
-            //        string message = match.Groups["message"].Value;
-            //        return $"{code}: {message}";
-            //    }
-            //    else
-            //    {
-            //        return errorResponse.RootCause; // Fallback to the raw rootCause
-            //    }
-            //}
-        }
-        return RegistrationValidationText.ValidationException;
     }
 }

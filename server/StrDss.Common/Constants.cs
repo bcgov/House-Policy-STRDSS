@@ -639,6 +639,7 @@ namespace StrDss.Common
         public const string Pending = "Pending";
         public const string Processed = "Processed";
         public const string Failed = "Failed";
+        public const string NotApplicable = "Not Applicable";
     }
 
     public static class RegistrationValidationText

@@ -652,7 +652,7 @@ namespace StrDss.Common
         public const string ExemptionStatusNotFound = "Exemption status not found.";
         public const string StatusNotFound = "Registration validation Api did not return a registration status.";
         public const string ValidationException = "Registration validation Api threw an undhandled exception.";
-        public const string ValidationException404 = "Registration validation Api return a status of 404 (Permit not found).";
-        public const string ValidationException401 = "Registration validation Api return a status of 401 (Unauthorized access).";
+        public const string ValidationException404 = "404: Permit not found.";
+        public const string ValidationException401 = "401: Unauthorized access.";
     }
 }

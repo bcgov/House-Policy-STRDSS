@@ -53,7 +53,8 @@ public class PermitValidationService : IPermitValidationService
 
         try
         {
-            Response resp = await _regApiClient.ValidatePermitAsync(body, _apiAccount);
+            _logger.LogInformation("Calling validate permit.");
+           Response resp = await _regApiClient.ValidatePermitAsync(body, _apiAccount);
 
             // If we didn't get a Status field back, then there was an error
             if (string.IsNullOrEmpty(resp.Status))
@@ -65,7 +66,8 @@ public class PermitValidationService : IPermitValidationService
                 }
                 else
                 {
-                   Dictionary<string, List<string>> errorDetails = resp.Errors
+                    _logger.LogInformation("Validate permit returned an error.");
+                    Dictionary<string, List<string>> errorDetails = resp.Errors
                         .GroupBy(e => e.Code)
                         .ToDictionary(g => g.Key, g => g.Select(e => e.Message).ToList());
                     registrationText = errorDetails.ParseError();
@@ -73,6 +75,7 @@ public class PermitValidationService : IPermitValidationService
             }
             else if (!string.Equals(resp.Status, "ACTIVE", StringComparison.OrdinalIgnoreCase))
             {
+                _logger.LogInformation("Permit status is not ACTIVE.");
                 isValid = false;
                 registrationText = resp.Status;
 
@@ -80,6 +83,7 @@ public class PermitValidationService : IPermitValidationService
         }
         catch (ApiException ex)
         {
+            _logger.LogInformation("Validate permit call threw an Api exception: " + ex.Message);
             isValid = false;
             registrationText = ex.StatusCode == 404 ? RegistrationValidationText.ValidationException404 :
                 ex.StatusCode == 401 ? RegistrationValidationText.ValidationException401 :
@@ -87,6 +91,7 @@ public class PermitValidationService : IPermitValidationService
         }
         catch (Exception ex)
         {
+            _logger.LogInformation("Validate permit call threw an exception: " + ex.Message);
             isValid = false;
             registrationText = RegistrationValidationText.ValidationException;
         }

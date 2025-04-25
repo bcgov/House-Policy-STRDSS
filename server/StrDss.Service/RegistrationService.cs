@@ -162,8 +162,10 @@ namespace StrDss.Service
             string registrationTxt = "";
             if (!string.IsNullOrEmpty(row.RegNo))
             {
+                _logger.LogInformation($"Processing: {row.RegNo} - {row.RentalUnit} - {row.RentalStreet} - {row.RentalPostal}");
                 // There is a reg no present, so we need to validate it
                 (isValid, registrationTxt) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
+                _logger.LogInformation("Validate permit response: " + registrationTxt);
                 if (isValid)
                 {
                     if (!string.IsNullOrEmpty(row.ListingId))

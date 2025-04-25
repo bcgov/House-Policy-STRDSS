@@ -190,21 +190,23 @@ public class PermitValidationService : IPermitValidationService
         }
         if (ex.StatusCode == 400)
         {
-            var errorResponse = JsonSerializer.Deserialize<ApiErrorResponse>(ex.Response);
-            if (errorResponse?.RootCause != null)
-            {
-                var match = Regex.Match(errorResponse.RootCause, @"code:(?<code>[^,]+),message:(?<message>[^,\]]+)");
-                if (match.Success)
-                {
-                    string code = match.Groups["code"].Value;
-                    string message = match.Groups["message"].Value;
-                    return $"{code}: {message}";
-                }
-                else
-                {
-                    return errorResponse.RootCause; // Fallback to the raw rootCause
-                }
-            }
+            _logger.LogInformation("Validate permit call returned 400.");
+            return RegistrationValidationText.ValidationException;
+            //var errorResponse = JsonSerializer.Deserialize<ApiErrorResponse>(ex.Response);
+            //if (errorResponse?.RootCause != null)
+            //{
+            //    var match = Regex.Match(errorResponse.RootCause, @"code:(?<code>[^,]+),message:(?<message>[^,\]]+)");
+            //    if (match.Success)
+            //    {
+            //        string code = match.Groups["code"].Value;
+            //        string message = match.Groups["message"].Value;
+            //        return $"{code}: {message}";
+            //    }
+            //    else
+            //    {
+            //        return errorResponse.RootCause; // Fallback to the raw rootCause
+            //    }
+            //}
         }
         return RegistrationValidationText.ValidationException;
     }

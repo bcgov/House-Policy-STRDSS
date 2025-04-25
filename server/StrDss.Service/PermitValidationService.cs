@@ -7,9 +7,17 @@ using NetTopologySuite.Operation.Valid;
 using StrDss.Data.Repositories;
 using StrDss.Data.Entities;
 using NetTopologySuite.Geometries;
+using System.Text.RegularExpressions;
+using System.Text.Json;
 
 namespace StrDss.Service
 {
+    public class ApiErrorResponse
+    {
+        public string ErrorMessage { get; set; }
+        public string RootCause { get; set; }
+    }
+
     public interface IPermitValidationService
     {
         Task<(bool isValid, string registrationText)> ValidateRegistrationPermitAsync(string regNo, string unitNumber, string streetNumber, string postalCode);
@@ -51,10 +59,11 @@ public class PermitValidationService : IPermitValidationService
             }
         };
 
+        Response resp;
         try
         {
             _logger.LogInformation("Calling validate permit.");
-           Response resp = await _regApiClient.ValidatePermitAsync(body, _apiAccount);
+           resp = await _regApiClient.ValidatePermitAsync(body, _apiAccount);
 
             // If we didn't get a Status field back, then there was an error
             if (string.IsNullOrEmpty(resp.Status))
@@ -67,27 +76,36 @@ public class PermitValidationService : IPermitValidationService
                 else
                 {
                     _logger.LogInformation("Validate permit returned an error.");
-                    Dictionary<string, List<string>> errorDetails = resp.Errors
-                        .GroupBy(e => e.Code)
-                        .ToDictionary(g => g.Key, g => g.Select(e => e.Message).ToList());
-                    registrationText = errorDetails.ParseError();
+                    List<string> errorDetails = resp.Errors
+                        .Select(e => $"{e.Code}: {e.Message}")
+                        .ToList();
+
+                    registrationText = string.Join("\n", resp.Errors.Select(e => $"{e.Code}: {e.Message}"));
                 }
             }
-            else if (!string.Equals(resp.Status, "ACTIVE", StringComparison.OrdinalIgnoreCase))
+            else
             {
-                _logger.LogInformation("Permit status is not ACTIVE.");
-                isValid = false;
-                registrationText = resp.Status;
+                _logger.LogInformation("Permit status is: ." + resp.Status);
 
+                registrationText = resp.Status;
             }
+        }
+        catch (ApiException ex) when (ex.StatusCode == 401)
+        {
+            _logger.LogInformation("Validate permit call return 401: " + ex.Message);
+            isValid = false;
+            registrationText = RegistrationValidationText.ValidationException401;
+        }
+        catch (ApiException ex) when (ex.StatusCode == 404)
+        {
+            _logger.LogInformation("Validate permit call returned 404: " + ex.Message);
+            isValid = false;
+            registrationText = RegistrationValidationText.ValidationException404;
+
         }
         catch (ApiException ex)
         {
-            _logger.LogInformation("Validate permit call threw an Api exception: " + ex.Message);
-            isValid = false;
-            registrationText = ex.StatusCode == 404 ? RegistrationValidationText.ValidationException404 :
-                ex.StatusCode == 401 ? RegistrationValidationText.ValidationException401 :
-                RegistrationValidationText.ValidationException;
+            registrationText = HandleApiException(ex);
         }
         catch (Exception ex)
         {
@@ -155,5 +173,39 @@ public class PermitValidationService : IPermitValidationService
         }
 
         return (isExempt, registrationText);
+    }
+
+    private string HandleApiException(ApiException ex)
+    {
+        if (ex.StatusCode == 401)
+        {
+            _logger.LogInformation("Validate permit call return 401: " + ex.Message);
+            return RegistrationValidationText.ValidationException401;
+        }
+        if (ex.StatusCode == 404)
+        {
+            _logger.LogInformation("Validate permit call returned 404: " + ex.Message);
+            return RegistrationValidationText.ValidationException404;
+
+        }
+        if (ex.StatusCode == 400)
+        {
+            var errorResponse = JsonSerializer.Deserialize<ApiErrorResponse>(ex.Response);
+            if (errorResponse?.RootCause != null)
+            {
+                var match = Regex.Match(errorResponse.RootCause, @"code:(?<code>[^,]+),message:(?<message>[^,\]]+)");
+                if (match.Success)
+                {
+                    string code = match.Groups["code"].Value;
+                    string message = match.Groups["message"].Value;
+                    return $"{code}: {message}";
+                }
+                else
+                {
+                    return errorResponse.RootCause; // Fallback to the raw rootCause
+                }
+            }
+        }
+        return RegistrationValidationText.ValidationException;
     }
 }

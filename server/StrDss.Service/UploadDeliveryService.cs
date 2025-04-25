@@ -589,19 +589,30 @@ namespace StrDss.Service
             var contents = new StringBuilder();
 
             csv.Read();
-            var header = "validation_result," + csv.Parser.RawRecord.TrimEndNewLine();
+            var header = "code,validation_result," + csv.Parser.RawRecord.TrimEndNewLine();
 
             contents.AppendLine(header);
 
             foreach (var lineId in lines)
             {
                 var line = await _uploadRepo.GetUploadLineWithError(lineId);
-                var text = line.RegistrationTxt;
-                if (string.IsNullOrEmpty(text))
+                var text = string.IsNullOrEmpty(line.RegistrationTxt) ? "Success" : line.RegistrationTxt;
+
+                string? code = null;
+                string? message = null;
+
+                if (text.Contains(":"))
                 {
-                    text = "Success";
+                    var parts = text.Split(':', 2);
+                    code = parts[0].Trim();
+                    message = parts.Length > 1 ? parts[1].Trim() : null;
                 }
-                contents.AppendLine($"\"{text}\"," + line.LineText.TrimEndNewLine());
+                else
+                {
+                    message = text;
+                }
+
+                contents.AppendLine($"\"{code}\",\"{message}\"," + line.LineText.TrimEndNewLine());
             }
 
             return Encoding.UTF8.GetBytes(contents.ToString());

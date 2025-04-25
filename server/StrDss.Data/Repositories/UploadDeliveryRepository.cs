@@ -171,6 +171,10 @@ namespace StrDss.Data.Repositories
             if (reportTypes.Any())
             {
                 query = query.Where(x => reportTypes.Contains(x.UploadDeliveryType));
+                if (reportTypes.Contains(UploadDeliveryTypes.RegistrationData))
+                {
+                    query = query.Where(x => x.RegistrationStatus != "Not Applicable");
+                }
             }
 
             var history = await Page<DssRentalUploadHistoryView, UploadHistoryViewDto>(query, pageSize, pageNumber, orderBy, direction);

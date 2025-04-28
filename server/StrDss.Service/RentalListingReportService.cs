@@ -227,40 +227,37 @@ namespace StrDss.Service
             bool isRegistrationValid = false;
             string registrationTxt = "";
 
+            // Attempt to validate the registration number if it exists, and the user is allowed to do it this weay
+            if (doValidateRegistration)
+            {
+                // either validate the registration number, or check if the property is straa exempt
+                if (!string.IsNullOrEmpty(row.RegNo) && !string.IsNullOrEmpty(row.RentalPostal)) 
+                {
+                    (isRegistrationValid, registrationTxt) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
+                }
+                else if (!isRegistrationValid && string.IsNullOrEmpty(row.RegNo) && !string.IsNullOrEmpty(row.RentalAddress))
+                {
+                    (isRegistrationValid, registrationTxt) = await _permitValidation.CheckStraaExemptionStatus(row.RentalAddress);
+                }
+            }
+
             // Validate of the incoming line
             _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
             if (errors.Count > 0)
             {
-                SaveUploadLine(uploadLine, errors, true, "", true, errors.ParseError());
+                SaveUploadLine(uploadLine, errors, true, "", !isRegistrationValid, registrationTxt);
                 if (isLastLine)  await _reportRepo.UpdateInactiveListings(upload.ProvidingOrganizationId);
                 _unitOfWork.Commit();
                 return (false, isRegistrationValid);
             }
-            
-            // Attempt to validate the registration number if it exists, and the user is allowed to do it this weay
-            if (doValidateRegistration)
-            {
-                // Do we have what we need to validate the registration?
-                if (!string.IsNullOrEmpty(row.RegNo) && !string.IsNullOrEmpty(row.RentalPostal))
-                {
-                    (isRegistrationValid, registrationTxt) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
-                }
-            }
+
 
             var offeringOrg = await _orgRepo.GetOrganizationByOrgCdAsync(row.OrgCd); //already validated in the file upload
-
             using var tran = _unitOfWork.BeginTransaction();
-
             var listing = await CreateOrUpdateRentalListing(report, offeringOrg, row);
             AddContacts(listing, row);
             var (physicalAddress, systemError) = await CreateOrGetPhysicalAddress(listing, row, isRegistrationValid);
             listing.LocatingPhysicalAddress = physicalAddress;
-
-            // Check to see if the registration is valid due to being in a straa exempt jurisdiction
-            if (doValidateRegistration && !isRegistrationValid && string.IsNullOrEmpty(row.RegNo) && !string.IsNullOrEmpty(row.RentalAddress))
-            {
-                (isRegistrationValid, registrationTxt) = await _permitValidation.CheckStraaExemptionStatus(row.RentalAddress);
-            }
 
             SaveUploadLine(uploadLine, errors, false, systemError, !isRegistrationValid, registrationTxt);
 

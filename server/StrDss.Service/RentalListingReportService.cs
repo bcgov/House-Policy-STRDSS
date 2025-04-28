@@ -101,6 +101,7 @@ namespace StrDss.Service
             int processedCount = 0;
             int errorCount = 0;
             int regErrorCount = 0;
+            bool doValidateRegistration = await DoRegistrationValidation(upload.UploadUserGuid);
 
             while (csv.Read())
             {
@@ -126,7 +127,6 @@ namespace StrDss.Service
                 _logger.LogInformation($"Processing listing ({row.OrgCd} - {row.ListingId})");
 
                 var stopwatch = Stopwatch.StartNew();
-                bool doValidateRegistration = await DoRegistrationValidation(upload.UpdUserGuid);
                 (isSuccessful, isValid) = await ProcessUploadLine(report, upload, uploadLine, row, doValidateRegistration, isLastLine);
                 stopwatch.Stop();
 
@@ -160,62 +160,8 @@ namespace StrDss.Service
                 return;
             }
 
-            if (errorCount > 0)
-            {
-                if (upload.UpdUserGuid == null) return;
-
-                var user = await _userRepo.GetUserByGuid((Guid)upload.UpdUserGuid!);
-
-                if (user == null) return;
-
-                var history = await _uploadRepo.GetRentalListingUpload(upload.UploadDeliveryId);
-
-                if (history == null) return;
-
-                var adminEmail = _config.GetValue<string>("ADMIN_EMAIL");
-                if (adminEmail == null) return;
-
-                using var transaction = _unitOfWork.BeginTransaction();
-
-                //upload.UploadDeliveryId
-                var template = new ListingUploadError(_emailService)
-                {
-                    UserName = $"{user!.GivenNm}",
-                    NumErrors = (long)history.Errors!,
-                    Link = GetHostUrl() + "/upload-listing-history",
-                    To = new string[] { user!.EmailAddressDsc! },
-                    Info = $"{EmailMessageTypes.ListingUploadError} for {user.FamilyNm}, {user.GivenNm}",
-                    From = adminEmail
-                };
-
-                var emailEntity = new DssEmailMessage
-                {
-                    EmailMessageType = template.EmailMessageType,
-                    MessageDeliveryDtm = DateTime.UtcNow,
-                    MessageTemplateDsc = template.GetContent(),
-                    IsHostContactedExternally = false,
-                    IsSubmitterCcRequired = false,
-                    LgPhoneNo = null,
-                    UnreportedListingNo = null,
-                    HostEmailAddressDsc = null,
-                    LgEmailAddressDsc = null,
-                    CcEmailAddressDsc = null,
-                    UnreportedListingUrl = null,
-                    LgStrBylawUrl = null,
-                    InitiatingUserIdentityId = user.UserIdentityId,
-                    AffectedByUserIdentityId = user.UserIdentityId,
-                    InvolvedInOrganizationId = upload.ProvidingOrganizationId
-                };
-
-                await _emailRepo.AddEmailMessage(emailEntity);
-
-                emailEntity.ExternalMessageNo = await template.SendEmail();
-
-                _unitOfWork.Commit();
-
-                _unitOfWork.CommitTransaction(transaction);
-            }
-
+            SendEmails(upload, doValidateRegistration, errorCount);
+            
             processStopwatch.Stop();
             _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
@@ -643,6 +589,93 @@ namespace StrDss.Service
                 hasPermission = permissions.Any(p => p == Permissions.ValidateRegistration);
             }
             return hasPermission;
+        }
+
+        private async void SendEmails(DssUploadDelivery upload, bool doValidateRegistration, int errorCount)
+        {
+            if (upload.UploadUserGuid == null) return;
+            var user = await _userRepo.GetUserByGuid((Guid)upload.UploadUserGuid!);
+            if (user == null) return;
+            var history = await _uploadRepo.GetRentalListingUpload(upload.UploadDeliveryId);
+            if (history == null) return;
+            var adminEmail = _config.GetValue<string>("ADMIN_EMAIL");
+            if (adminEmail == null) return;
+            using var transaction = _unitOfWork.BeginTransaction();
+
+            if (doValidateRegistration)
+            {
+                //upload.UploadDeliveryId
+                var template = new RegistrationValidationComplete(_emailService)
+                {
+                    UserName = $"{user!.GivenNm}",
+                    Link = "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/short-term-rentals/quickstartguide_validation_for_minor_platforms_final.pdf",
+                    DownloadLink = GetHostUrl() + "/registration-validation-history",
+                    To = new string[] { user!.EmailAddressDsc! },
+                    Info = $"{EmailMessageTypes.RegistrationValidation} for {user.FamilyNm}, {user.GivenNm}",
+                    From = adminEmail
+                };
+
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = template.EmailMessageType,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = false,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = null,
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = null,
+                    UnreportedListingUrl = null,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = user.UserIdentityId,
+                    AffectedByUserIdentityId = user.UserIdentityId,
+                    InvolvedInOrganizationId = upload.ProvidingOrganizationId
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+                emailEntity.ExternalMessageNo = await template.SendEmail();
+                _unitOfWork.Commit();
+            }
+
+            if (errorCount > 0)
+            {
+                //upload.UploadDeliveryId
+                var template = new ListingUploadError(_emailService)
+                {
+                    UserName = $"{user!.GivenNm}",
+                    NumErrors = (long)history.Errors!,
+                    Link = GetHostUrl() + "/upload-listing-history",
+                    To = new string[] { user!.EmailAddressDsc! },
+                    Info = $"{EmailMessageTypes.ListingUploadError} for {user.FamilyNm}, {user.GivenNm}",
+                    From = adminEmail
+                };
+
+                var emailEntity = new DssEmailMessage
+                {
+                    EmailMessageType = template.EmailMessageType,
+                    MessageDeliveryDtm = DateTime.UtcNow,
+                    MessageTemplateDsc = template.GetContent(),
+                    IsHostContactedExternally = false,
+                    IsSubmitterCcRequired = false,
+                    LgPhoneNo = null,
+                    UnreportedListingNo = null,
+                    HostEmailAddressDsc = null,
+                    LgEmailAddressDsc = null,
+                    CcEmailAddressDsc = null,
+                    UnreportedListingUrl = null,
+                    LgStrBylawUrl = null,
+                    InitiatingUserIdentityId = user.UserIdentityId,
+                    AffectedByUserIdentityId = user.UserIdentityId,
+                    InvolvedInOrganizationId = upload.ProvidingOrganizationId
+                };
+
+                await _emailRepo.AddEmailMessage(emailEntity);
+                emailEntity.ExternalMessageNo = await template.SendEmail();
+                _unitOfWork.Commit();
+            }
+            _unitOfWork.CommitTransaction(transaction);
         }
     }
 }

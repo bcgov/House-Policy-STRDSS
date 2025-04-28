@@ -160,8 +160,8 @@ namespace StrDss.Service
                 return;
             }
 
-            SendEmails(upload, doValidateRegistration, errorCount);
-            
+            await SendEmails(upload, doValidateRegistration, errorCount);
+
             processStopwatch.Stop();
             _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
         }
@@ -591,7 +591,7 @@ namespace StrDss.Service
             return hasPermission;
         }
 
-        private async void SendEmails(DssUploadDelivery upload, bool doValidateRegistration, int errorCount)
+        private async Task SendEmails(DssUploadDelivery upload, bool doValidateRegistration, int errorCount)
         {
             if (upload.UploadUserGuid == null) return;
             var user = await _userRepo.GetUserByGuid((Guid)upload.UploadUserGuid!);
@@ -600,8 +600,8 @@ namespace StrDss.Service
             if (history == null) return;
             var adminEmail = _config.GetValue<string>("ADMIN_EMAIL");
             if (adminEmail == null) return;
-            using var transaction = _unitOfWork.BeginTransaction();
 
+            using var transaction = _unitOfWork.BeginTransaction();
             if (doValidateRegistration)
             {
                 //upload.UploadDeliveryId
@@ -636,7 +636,6 @@ namespace StrDss.Service
 
                 await _emailRepo.AddEmailMessage(emailEntity);
                 emailEntity.ExternalMessageNo = await template.SendEmail();
-                _unitOfWork.Commit();
             }
 
             if (errorCount > 0)
@@ -673,8 +672,9 @@ namespace StrDss.Service
 
                 await _emailRepo.AddEmailMessage(emailEntity);
                 emailEntity.ExternalMessageNo = await template.SendEmail();
-                _unitOfWork.Commit();
             }
+
+            _unitOfWork.Commit();
             _unitOfWork.CommitTransaction(transaction);
         }
     }

@@ -102,8 +102,8 @@ public class PermitValidationService : IPermitValidationService
                 if (matches.Count > 0)
                 {
                     // Combine all messages into a single string separated by commas
-                    var errorMessages = matches.Select(m => m.Groups["message"].Value.Trim());
-                    registrationText = $"{ex.StatusCode}:{string.Join(", ", errorMessages)}";
+                    var errorMessages = matches.Select(m => m.Groups["message"].Value.TrimEnd(']').Trim());
+                    registrationText = $"{ex.StatusCode}:{string.Join(" ", errorMessages)}";
                 }
                 else
                 {

@@ -596,7 +596,7 @@ namespace StrDss.Service
             foreach (var lineId in lines)
             {
                 var line = await _uploadRepo.GetUploadLineWithError(lineId);
-                var text = string.IsNullOrEmpty(line.RegistrationTxt) ? "Success" : line.RegistrationTxt;
+                var text = string.IsNullOrEmpty(line.RegistrationTxt) ? "" : line.RegistrationTxt;
 
                 string? code = null;
                 string? message = null;

@@ -97,12 +97,13 @@ public class PermitValidationService : IPermitValidationService
             // Extract the rootCause from AdditionalProperties
             if (ex.Result.AdditionalProperties.TryGetValue("rootCause", out var rootCauseObj) && rootCauseObj is string rootCause)
             {
-                // Use regex to extract the specific error message
-                var match = Regex.Match(rootCause, @"message:(?<message>[^\]]+)");
-                if (match.Success)
+                // Use regex to extract all "message" fields
+                var matches = Regex.Matches(rootCause, @"message:(?<message>[^,]+)");
+                if (matches.Count > 0)
                 {
-                    string errorMessage = match.Groups["message"].Value.Trim();
-                    registrationText = $"{ex.StatusCode}:{errorMessage}";
+                    // Combine all messages into a single string separated by commas
+                    var errorMessages = matches.Select(m => m.Groups["message"].Value.Trim());
+                    registrationText = $"{ex.StatusCode}:{string.Join(", ", errorMessages)}";
                 }
                 else
                 {

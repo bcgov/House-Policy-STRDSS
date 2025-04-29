@@ -150,7 +150,7 @@ namespace StrDss.Service
             upload.UploadLinesSuccess = totalProcessed - totalErrors;
             upload.UploadLinesError = totalErrors;
             upload.RegistrationLinesSuccess = totalProcessed - totalRegErrors;
-            upload.RegistrationLinesError = regErrorCount;
+            upload.RegistrationLinesError = totalRegErrors;
             _unitOfWork.Commit();
 
             if (!isLastLine)
@@ -160,7 +160,7 @@ namespace StrDss.Service
                 return;
             }
 
-            await SendEmails(upload, doValidateRegistration, errorCount);
+            await SendEmails(upload, doValidateRegistration, totalErrors);
 
             processStopwatch.Stop();
             _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
@@ -171,13 +171,13 @@ namespace StrDss.Service
         {
             var errors = new Dictionary<string, List<string>>();
             bool isRegistrationValid = false;
-            string registrationTxt = "";
+            string registrationTxt = RegistrationValidationText.DataInvalid;
 
             // Attempt to validate the registration number if it exists, and the user is allowed to do it this weay
             if (doValidateRegistration)
             {
                 // either validate the registration number, or check if the property is straa exempt
-                if (!string.IsNullOrEmpty(row.RegNo) && !string.IsNullOrEmpty(row.RentalPostal)) 
+                if (!string.IsNullOrEmpty(row.RegNo)) 
                 {
                     (isRegistrationValid, registrationTxt) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
                 }

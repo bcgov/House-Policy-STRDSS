@@ -646,8 +646,8 @@ namespace StrDss.Common
     {
         public const string Success = "Success";
         public const string DataInvalid = "To validate the registration, please provide the registration number or the rental address associated with this listing.";
-        public const string STRAAExempt = "FN reserve land. This address is exempt from the STRAA.";
-        public const string NotSTRAAExempt = "Please verify if this STR offer is not required to be registered.";
+        public const string STRAAExempt = "Registration not required.";
+        public const string NotSTRAAExempt = "Registration required for this address unless they qualify for exemption.";
         public const string AddressNotFound = "Address not found.";
         public const string JurisdictionNotFound = "Jurisdiction not found.";
         public const string ExemptionStatusNotFound = "Exemption status not found.";

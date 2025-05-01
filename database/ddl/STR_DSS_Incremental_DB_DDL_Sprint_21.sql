@@ -7,15 +7,17 @@ COMMENT ON COLUMN dss_physical_address.reg_rental_unit_no IS 'The rental propert
 COMMENT ON COLUMN dss_physical_address.reg_rental_street_no IS 'The rental property street number used to validate the bc registry number ';
 COMMENT ON COLUMN dss_physical_address.reg_rental_postal_code IS 'The rental property postal code number used to validate the bc registry number ';
 
+
+
 -- Create new columns for holding upload status information for delivery files
 ALTER TABLE dss_upload_delivery ADD upload_status varchar(20);
-ALTER TABLE dss_upload_delivery ADD upload_lines_total smallint;
-ALTER TABLE dss_upload_delivery ADD upload_lines_success smallint;
-ALTER TABLE dss_upload_delivery ADD upload_lines_error smallint;
-ALTER TABLE dss_upload_delivery ADD upload_lines_processed smallint;
+ALTER TABLE dss_upload_delivery ADD upload_lines_total int;
+ALTER TABLE dss_upload_delivery ADD upload_lines_success int;
+ALTER TABLE dss_upload_delivery ADD upload_lines_error int;
+ALTER TABLE dss_upload_delivery ADD upload_lines_processed int;
 ALTER TABLE dss_upload_delivery ADD registration_status varchar(20);
-ALTER TABLE dss_upload_delivery ADD registration_lines_failure smallint;
-ALTER TABLE dss_upload_delivery ADD registration_lines_success smallint;
+ALTER TABLE dss_upload_delivery ADD registration_lines_failure int;
+ALTER TABLE dss_upload_delivery ADD registration_lines_success int;
 ALTER TABLE dss_upload_delivery ADD upload_user_guid uuid;
 ALTER TABLE dss_upload_delivery ADD upload_date timestamptz;
 

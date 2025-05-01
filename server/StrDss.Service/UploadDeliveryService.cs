@@ -589,7 +589,7 @@ namespace StrDss.Service
             var contents = new StringBuilder();
 
             csv.Read();
-            var header = "code,validation_result," + csv.Parser.RawRecord.TrimEndNewLine();
+            var header = "validation_result,code,details" + csv.Parser.RawRecord.TrimEndNewLine();
 
             contents.AppendLine(header);
 
@@ -600,19 +600,32 @@ namespace StrDss.Service
 
                 string? code = null;
                 string? message = null;
+                string result = "Fail";
 
                 if (text.Contains(":"))
                 {
                     var parts = text.Split(':', 2);
                     code = parts[0].Trim();
                     message = parts.Length > 1 ? parts[1].Trim() : null;
+
+                    // Check for API Failure?
+                    if (string.Compare(code, "500") == 0)
+                    {
+                        result = "API Failure";
+                        message = "";
+                    }
+                    
+                    // We are only a pass if the message is "Active"
+                    if (string.Compare(message, "Active", StringComparison.OrdinalIgnoreCase) == 0) result = "Pass";
                 }
                 else
                 {
+                    // This is the case where there was no API call, but we checked to see if they were STRAA exempt
                     message = text;
+                    result = string.Compare(message, RegistrationValidationText.STRAAExempt, StringComparison.OrdinalIgnoreCase) == 0 ? "Pass" : "Fail";
                 }
 
-                contents.AppendLine($"\"{code}\",\"{message}\"," + line.LineText.TrimEndNewLine());
+                contents.AppendLine($"\"{result}\",\"{code}\",\"{message}\"," + line.LineText.TrimEndNewLine());
             }
 
             return Encoding.UTF8.GetBytes(contents.ToString());

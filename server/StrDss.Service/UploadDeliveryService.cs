@@ -589,7 +589,7 @@ namespace StrDss.Service
             var contents = new StringBuilder();
 
             csv.Read();
-            var header = "validation_result,code,details" + csv.Parser.RawRecord.TrimEndNewLine();
+            var header = "validation_result,code,details," + csv.Parser.RawRecord.TrimEndNewLine();
 
             contents.AppendLine(header);
 

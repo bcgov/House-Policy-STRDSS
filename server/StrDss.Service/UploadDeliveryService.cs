@@ -616,13 +616,13 @@ namespace StrDss.Service
                     }
                     
                     // We are only a pass if the message is "Active"
-                    if (string.Compare(message, "Active") == 0) result = "Pass";
+                    if (string.Compare(message, "Active", StringComparison.OrdinalIgnoreCase) == 0) result = "Pass";
                 }
                 else
                 {
                     // This is the case where there was no API call, but we checked to see if they were STRAA exempt
                     message = text;
-                    result = string.Compare(message, RegistrationValidationText.STRAAExempt) == 0 ? "Pass" : "Fail";
+                    result = string.Compare(message, RegistrationValidationText.STRAAExempt, StringComparison.OrdinalIgnoreCase) == 0 ? "Pass" : "Fail";
                 }
 
                 contents.AppendLine($"\"{result}\",\"{code}\",\"{message}\"," + line.LineText.TrimEndNewLine());

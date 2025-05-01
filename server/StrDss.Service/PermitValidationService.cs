@@ -86,7 +86,7 @@ public class PermitValidationService : IPermitValidationService
             else
             {
                 _logger.LogInformation("Permit status is: ." + resp.Status);
-
+                isValid = string.Compare(resp.Status, "ACTIVE", StringComparison.OrdinalIgnoreCase) == 0;
                 registrationText = "200:"+resp.Status;
             }
         }

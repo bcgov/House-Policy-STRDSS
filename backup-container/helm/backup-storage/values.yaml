@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 image:
-  repository: artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container
+  repository: artifacts.developer.gov.bc.ca/sb04-strdss/backup-container
   pullPolicy: Always
   tag: 16
 

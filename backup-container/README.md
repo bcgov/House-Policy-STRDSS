@@ -37,9 +37,9 @@ cd into [docker](./src/docker/)
 
 ```sh
 docker build -t backup-container .
-docker tag backup-container artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container:latest
+docker tag backup-container artifacts.developer.gov.bc.ca/sb04-strdss/backup-container:latest
 docker login artifacts.developer.gov.bc.ca
-docker push artifacts.developer.gov.bc.ca/sf4a-strdss/backup-container:latest
+docker push artifacts.developer.gov.bc.ca/sb04-strdss/backup-container:latest
 ```
 
 ## Helm deploy

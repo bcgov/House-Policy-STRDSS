@@ -1,4 +1,4 @@
-<h2>Registration Validation History</h2>
+<h2>Validation Reports</h2>
 <p-card *ngIf="currentUser" class="registration-validation-history-card">
     <div class="form-group-row" *ngIf="currentUser.organizationType !== 'Platform'">
         <div class="form-group-row-col">
@@ -88,7 +88,13 @@
         <ng-template pTemplate="body" let-row>
             <tr>
                 <td>{{ row.organizationNm }}</td>
-                <td>{{ row.uploadDeliveryType }}</td>
+                <td>
+                    <ng-container [ngSwitch]="row.uploadDeliveryType">
+                        <span *ngSwitchCase="'Listing Data'">Monthly Listings</span>
+                        <span *ngSwitchCase="'Registration Data'">New/Updated Listings</span>
+                        <span *ngSwitchDefault>{{ row.uploadDeliveryType }}</span>
+                    </ng-container>
+                </td>
                 <td>
                     <span *ngIf="row.registrationStatus==='Processed'; then processed; else pending"></span>
                     <ng-template #processed> <span class="state-processed">{{row.registrationStatus}}</span></ng-template>

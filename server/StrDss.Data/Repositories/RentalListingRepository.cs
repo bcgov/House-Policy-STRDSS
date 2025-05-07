@@ -80,7 +80,7 @@ namespace StrDss.Data.Repositories
             }
             else if (orderBy == "nightsBookedYtdQty")
             {
-                orderBy = "nightsBookedYtdQty == null, nightsBookedYtdQty";
+                orderBy = "nightsBookedYtdQty";
             }
 
             var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);

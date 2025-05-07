@@ -137,16 +137,16 @@ public partial class DssPhysicalAddress
     /// <summary>
     /// The unit number of the rental property as provided by the Registration Validation upload
     /// </summary>
-    public string RegRentalUnitNo { get; set; }
+    public string? RegRentalUnitNo { get; set; }
     /// <summary>
     /// The street number of the rental property as provided by the Registration Validation upload
     /// </summary>
-    public string RegRentalStreetNo { get; set; }
+    public string? RegRentalStreetNo { get; set; }
 
     /// <summary>
     /// The postal code of the rental property as provided by the Registration Validation upload
     /// </summary>
-    public string RegRentalPostalCode { get; set; }
+    public string? RegRentalPostalCode { get; set; }
 
     public virtual DssOrganization? ContainingOrganization { get; set; }
 

@@ -64,23 +64,23 @@ namespace StrDss.Data.Repositories
 
             if (orderBy == "lastActionDtm")
             {
-                orderBy = "lastActionDtm == null, lastActionDtm";
+                orderBy = "lastActionDtm ?? System.DateTime.MinValue";
             }
             else if (orderBy == "lastActionNm")
             {
-                orderBy = "lastActionNm == null, lastActionNm";
+                orderBy = "lastActionNm ?? \"ZZZZ\"";
             }
             else if (orderBy == "businessLicenceNo")
             {
-                orderBy = "string.IsNullOrWhiteSpace(businessLicenceNo), businessLicenceNo";
+                orderBy = "businessLicenceNo ?? \"ZZZZ\"";
             }
             else if (orderBy == "businessLicenceNoMatched")
             {
-                orderBy = "string.IsNullOrWhiteSpace(businessLicenceNoMatched), businessLicenceNoMatched";
+                orderBy = "businessLicenceNoMatched ?? \"ZZZZ\"";
             }
             else if (orderBy == "nightsBookedYtdQty")
             {
-                orderBy = "nightsBookedYtdQty";
+                orderBy = "nightsBookedYtdQty ?? -1";
             }
 
             var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
@@ -114,7 +114,7 @@ namespace StrDss.Data.Repositories
 
             if (orderBy == "effectiveBusinessLicenceNo")
             {
-                orderBy = "string.IsNullOrWhiteSpace(effectiveBusinessLicenceNo), effectiveBusinessLicenceNo";
+                orderBy = "effectiveBusinessLicenceNo ?? \"ZZZZ\"";
             }
 
             var groupedQuery = query

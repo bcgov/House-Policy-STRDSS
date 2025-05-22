@@ -145,12 +145,15 @@ namespace StrDss.Service
                 }
             }
 
-            var isDuplicate = await _uploadRepo.IsDuplicateRentalReportUploadAsnyc(firstDayOfReportMonth, orgId, hashValue);
-            if (isDuplicate)
+            if (!mandatoryFields.Contains("reg_no"))
             {
-                errors.AddItem("File", "The file has already been uploaded");
-                return (errors, "");
-            }
+                var isDuplicate = await _uploadRepo.IsDuplicateRentalReportUploadAsnyc(firstDayOfReportMonth, orgId, hashValue);
+                if (isDuplicate)
+                {
+                    errors.AddItem("File", "The file has already been uploaded");
+                    return (errors, "");
+                }
+            }            
 
             var org = await _orgRepo.GetOrganizationByIdAsync(orgId);
             if (org == null)
@@ -371,7 +374,7 @@ namespace StrDss.Service
                             IsSystemFailure = false,
                             IsProcessed = false,
                             SourceOrganizationCd = org.OrganizationCd,
-                            SourceRecordNo = string.IsNullOrEmpty(row.RegNo) ? $"REG_{Guid.NewGuid()}" : row.RegNo,
+                            SourceRecordNo = $"{Guid.NewGuid()}",
                             SourceLineTxt = csv.Parser.RawRecord
                         });
                     }

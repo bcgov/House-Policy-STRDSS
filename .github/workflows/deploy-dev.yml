@@ -153,6 +153,7 @@ jobs:
       uses: webfactory/ssh-agent@v0.5.4
       with:
         ssh-private-key: ${{ secrets.COMMIT_KEY }}
+        
     - name: Update Helm Values and Commit backend
       id: helm
       run: |

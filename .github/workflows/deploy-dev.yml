@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - artifactory
     paths-ignore:
       - database/**
       - package.json
@@ -19,7 +19,6 @@ on:
       - backup-container/**
       - gateway/**
       - .github/**
-
 jobs:
   test-backend:
     runs-on: ubuntu-22.04
@@ -143,27 +142,33 @@ jobs:
     timeout-minutes: 10
 
     steps:
-    - name: Checkout ArgoCD Repo
-      id: gitops
-      uses: actions/checkout@v4
-      with:
-        repository: bcgov-c/tenant-gitops-b0471a
-        ref: develop
-        token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+    #- name: Checkout ArgoCD Repo
+    #  id: gitops
+    #  uses: actions/checkout@v4
+    #  with:
+    #    repository: bcgov-c/tenant-gitops-b0471a
+    #    ref: develop
+    #    token: ${{ secrets.GITOPS }} # `GITOPS` is a secret that contains your PAT
+    - name: Set GitOps SSH Key
+        if: steps.publish.outcome == 'success'
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.COMMIT_KEY }}
     - name: Update Helm Values and Commit backend
       id: helm
       run: |
           pwd
+
+          # Commit and push the changes
+          git config --global user.email "housing@github.com"
+          git config --global user.name "STRDSS Housing Github Actions"
+          git clone -b develop --single-branch git@github.com:bcgov-c/tenant-gitops-b0471a.git
 
           # Get current date and time
           DATETIME=$(date +'%Y-%m-%d %H:%M:%S')
 
           # set image tag
           sed -i "s/tag: .*/tag: dev # Image Updated on $DATETIME/" deploy/dev_values.yaml
-
-          # Commit and push the changes
-          git config --global user.email "ychung-mot@github.com"
-          git config --global user.name "Young-Jin Chung"
 
           git add deploy/dev_values.yaml
 

@@ -33,8 +33,14 @@ namespace StrDss.Common
 
         public static bool IsTextFile(string contentType)
         {
-            return contentType == "text/plain" ||
-                   contentType == "text/csv" ;
+            return contentType == "text/plain"
+               || contentType == "text/csv"
+               || contentType == "application/csv"
+               || contentType == "application/vnd.ms-excel"
+               || contentType == "application/x-csv"
+               || contentType == "text/x-csv"
+               || contentType == "text/tab-separated-values"
+               || contentType == "application/octet-stream";
         }
 
         public static string StreamToBase64(Stream stream)

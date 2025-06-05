@@ -276,6 +276,7 @@ namespace StrDss.Service
                 { CsvCols.BlRequirement, l => l.IsBusinessLicenceRequired },
                 { CsvCols.PlatformCode, l => l.OfferingOrganizationCd },
                 { CsvCols.ListingId, l => l.PlatformListingNo },
+                { CsvCols.RegistrationNumber, l => l.BcRegistryNo },
                 { CsvCols.UrlAddress, l => l.PlatformListingUrl },
                 { CsvCols.PlatformListingAddress, l => l.OriginalAddressTxt },
                 { CsvCols.GeocoderBestMatchAddressComplete, l => l.MatchAddressTxt },

@@ -206,7 +206,7 @@ namespace StrDss.Api.Controllers
 
             if (!CommonUtils.IsTextFile(dto.File.ContentType))
             {
-                errors.AddItem("File", $"Uploaded file is not a text file.");
+                errors.AddItem("File", $"Uploaded file is not a CSV file.");
                 return ValidationUtils.GetValidationErrorResult(errors, ControllerContext);
             }
 

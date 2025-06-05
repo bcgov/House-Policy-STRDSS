@@ -208,6 +208,7 @@ namespace StrDss.Common
         public const string BlRequirement = "BL_requirement";
         public const string PlatformCode = "Platform Code";
         public const string ListingId = "Listing ID";
+        public const string RegistrationNumber = "Registration Number";
         public const string UrlAddress = "URL Address";
         public const string PlatformListingAddress = "Platform listing address";
         public const string GeocoderBestMatchAddressComplete = "Geocoder Best match address (current month) - complete address";
@@ -295,6 +296,7 @@ namespace StrDss.Common
             CsvCols.BlRequirement,
             CsvCols.PlatformCode,
             CsvCols.ListingId,
+            CsvCols.RegistrationNumber,
             CsvCols.UrlAddress,
             CsvCols.PlatformListingAddress,
             CsvCols.GeocoderBestMatchAddressComplete,
@@ -380,6 +382,7 @@ namespace StrDss.Common
             CsvCols.BlRequirement,
             CsvCols.PlatformCode,
             CsvCols.ListingId,
+            CsvCols.RegistrationNumber,
             CsvCols.UrlAddress,
             CsvCols.PlatformListingAddress,
             CsvCols.GeocoderBestMatchAddressComplete,

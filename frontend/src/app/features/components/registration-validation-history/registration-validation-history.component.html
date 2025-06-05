@@ -32,6 +32,15 @@
                         *ngIf="this.sort && this.sort.prop === 'uploadDeliveryType' && this.sort.dir === 'asc'"></i>
                 </th>
 
+                <th class="sortable-header" id="reportPeriodYM_header"
+                    [class.sorted]="this.sort && this.sort.prop === 'reportPeriodYM'"
+                    (click)="onSort('reportPeriodYM')">Reported Month
+                    <i class="pi pi-angle-down"
+                        *ngIf="this.sort && this.sort.prop === 'reportPeriodYM' && this.sort.dir === 'desc'"></i>
+                    <i class="pi pi-angle-up"
+                        *ngIf="this.sort && this.sort.prop === 'reportPeriodYM' && this.sort.dir === 'asc'"></i>
+                </th>
+
                 <th class="sortable-header" id="status_header" [class.sorted]="this.sort && this.sort.prop === 'status'"
                     (click)="onSort('status')">Status
                     <i class="pi pi-angle-down"
@@ -95,6 +104,7 @@
                         <span *ngSwitchDefault>{{ row.uploadDeliveryType }}</span>
                     </ng-container>
                 </td>
+                <td>{{ row.reportPeriodYM }}</td>
                 <td>
                     <span *ngIf="row.registrationStatus==='Processed'; then processed; else pending"></span>
                     <ng-template #processed> <span class="state-processed">{{row.registrationStatus}}</span></ng-template>

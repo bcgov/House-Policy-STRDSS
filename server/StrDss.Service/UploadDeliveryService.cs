@@ -219,9 +219,7 @@ namespace StrDss.Service
             var registrationDataMissing = 0;
             var regNoMissing = 0;
             var rentalStreetMissing = 0;
-            var rentalStreetInvalid = 0;
             var rentalPostalMissing = 0;
-            var rentalPostalMismatch = 0;
 
             var listingIds = new List<string>();
             var duplicateListingIds = new List<string>();            
@@ -327,44 +325,10 @@ namespace StrDss.Service
                         if (!hasRentalAddress && !hasCompleteAddressFields)
                         {
                             registrationDataMissing++;
+                            if (!hasRegNo) regNoMissing++;
+                            if (!hasRentalStreet) rentalStreetMissing++;
+                            if (!hasRentalPostal) rentalPostalMissing++;
                             continue; // Skip further processing for this row
-                        }
-
-                        // If all address fields are provided, validate them
-                        if (hasCompleteAddressFields)
-                        {
-                            // Validate 'rental_street'
-                            var streetNumberRegexInfo = RegexDefs.GetRegexInfo(RegexDefs.CanadianStreetNumber);
-                            if (!Regex.IsMatch(row.RentalStreet, streetNumberRegexInfo.Regex))
-                            {
-                                rentalStreetInvalid++;
-                            }
-
-                            // Validate 'rental_postal'
-                            var postalCodeRegexInfo = RegexDefs.GetRegexInfo(RegexDefs.CanadianPostalCode);
-                            if (!Regex.IsMatch(row.RentalPostal, postalCodeRegexInfo.Regex, RegexOptions.IgnoreCase))
-                            {
-                                rentalPostalMismatch++;
-                            }
-                        }
-                        else
-                        {
-                            if (!hasRentalAddress)
-                            {
-                                // Check which fields are missing
-                                if (!hasRegNo)
-                                {
-                                    regNoMissing++;
-                                }
-                                if (!hasRentalStreet)
-                                {
-                                    rentalStreetMissing++;
-                                }
-                                if (!hasRentalPostal)
-                                {
-                                    rentalPostalMissing++;
-                                }
-                            }                            
                         }
 
                         // Add to uploadLines
@@ -480,21 +444,9 @@ namespace StrDss.Service
                 errors.AddItem("rental_street", $"Rental Street missing in {rentalStreetMissing} record(s). Please provide a Rental Street.");
             }
 
-            if (rentalStreetInvalid > 0)
-            {
-                var streetNumberRegexInfo = RegexDefs.GetRegexInfo(RegexDefs.CanadianStreetNumber);
-                errors.AddItem("rental_street", $"Rental Street invalid in {rentalStreetInvalid} record(s). {streetNumberRegexInfo.ErrorMessage}");
-            }
-
             if (rentalPostalMissing > 0)
             {
                 errors.AddItem("rental_postal", $"Rental Postal missing in {rentalPostalMissing} record(s). Please provide a Rental Postal.");
-            }
-
-            if (rentalPostalMismatch > 0)
-            {
-                var postalCodeRegexInfo = RegexDefs.GetRegexInfo(RegexDefs.CanadianPostalCode);
-                errors.AddItem("rental_postal", $"Rental Postal mismatch found in {rentalPostalMismatch} record(s). {postalCodeRegexInfo.ErrorMessage}");
             }
 
             return (errors, header);

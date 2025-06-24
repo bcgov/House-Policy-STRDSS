@@ -69,6 +69,7 @@ export class ValidateRegistrationDataComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // ngOnInt Function comment
     const getCurrentUser = this.userDataService.getCurrentUser();
     const getPlatforms = this.delistingService.getPlatforms();
 

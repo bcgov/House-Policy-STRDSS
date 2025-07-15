@@ -1,4 +1,5 @@
 ﻿using StrDss.Common.Converters;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace StrDss.Model
@@ -67,7 +68,8 @@ namespace StrDss.Model
     public class GeocoderResponse
     {
         public string Type { get; set; } = "";
-        public string QueryAddress { get; set; } = "";
+        [JsonConverter(typeof(FlexibleStringConverter))]
+        public string? QueryAddress { get; set; }
         public string SearchTimestamp { get; set; }
         public double ExecutionTime { get; set; }
         public string Version { get; set; } = "";
@@ -83,5 +85,24 @@ namespace StrDss.Model
         public string CopyrightNotice { get; set; } = "";
         public string CopyrightLicense { get; set; } = "";
         public Feature[] Features { get; set; }
+    }
+
+    public class FlexibleStringConverter : JsonConverter<string?>
+    {
+        public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return reader.TokenType switch
+            {
+                JsonTokenType.String => reader.GetString(),
+                JsonTokenType.Number => reader.GetDouble().ToString(), // or GetInt64() if you expect integers
+                JsonTokenType.Null => null,
+                _ => throw new JsonException()
+            };
+        }
+
+        public override void Write(Utf8JsonWriter writer, string? value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value);
+        }
     }
 }

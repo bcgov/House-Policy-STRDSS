@@ -48,7 +48,7 @@ namespace StrDss.Service
                 FieldName = RegistrationValidationFields.RentalPostal,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 6
+                MaxLength = 7
             });
         }
     }

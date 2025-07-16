@@ -375,7 +375,7 @@ namespace StrDss.Service
             var template = new AccessRequestApproval(_emailService)
             {
                 Link = GetHostUrl(),
-                AdminEmail = _currentUser.EmailAddress,
+                AdminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? "dssadmin@gov.bc.ca",
                 To = new string[] { user.EmailAddressDsc! },
                 Info = $"Approval email for {user.DisplayNm}"
             };

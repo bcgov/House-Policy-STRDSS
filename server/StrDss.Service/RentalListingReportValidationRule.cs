@@ -94,7 +94,7 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.RentalPostal,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 6
+                MaxLength = 7
             });
             rules.Add(new FieldValidationRule
             {

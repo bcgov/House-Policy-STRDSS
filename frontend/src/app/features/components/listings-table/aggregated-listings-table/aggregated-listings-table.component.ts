@@ -69,7 +69,7 @@ export class AggregatedListingsTableComponent implements OnInit {
     sort!: { prop: string; dir: 'asc' | 'desc' };
     currentPage!: PagingResponsePageInfo;
     searchTerm!: string;
-    searchColumn: 'all' | 'address' | 'url' | 'listingId' | 'hostName' | 'businessLicence' = 'all';
+    searchColumn: 'all' | 'address' | 'url' | 'listingId' | 'hostName' | 'businessLicence' | 'registrationNumber' = 'all';
     searchColumns = new Array<DropdownOption>();
     communities = new Array<DropdownOptionOrganization>();
     groupedCommunities = new Array();
@@ -109,6 +109,7 @@ export class AggregatedListingsTableComponent implements OnInit {
             { label: 'Listing ID', value: 'listingId' },
             { label: 'Host Name', value: 'hostName' },
             { label: 'Business Licence', value: 'businessLicence' },
+            { label: 'Registration Number', value: 'registrationNumber' }
         ];
 
         this.route.queryParams.subscribe({

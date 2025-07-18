@@ -82,6 +82,10 @@ namespace StrDss.Data.Repositories
             {
                 orderBy = "nightsBookedYtdQty ?? -1";
             }
+            else if (orderBy == "registrationNumber")
+            {
+                orderBy = "bcRegistryNo ?? \"ZZZZ\"";
+            }
 
             var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
 

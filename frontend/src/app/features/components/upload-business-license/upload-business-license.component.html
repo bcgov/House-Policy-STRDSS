@@ -68,14 +68,14 @@
                                 this.sort && this.sort.prop === 'errors' && this.sort.dir === 'asc'
                             "></i>
                     </th>
-                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'updDtm'"
-                        (click)="onSort('updDtm')">
+                    <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'uploadDate'"
+                        (click)="onSort('uploadDate')">
                         Upload Date
                         <i class="pi pi-angle-down" *ngIf="
-                                this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'desc'
+                                this.sort && this.sort.prop === 'uploadDate' && this.sort.dir === 'desc'
                             "></i>
                         <i class="pi pi-angle-up" *ngIf="
-                                this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'asc'
+                                this.sort && this.sort.prop === 'uploadDate' && this.sort.dir === 'asc'
                             "></i>
                     </th>
                     <th class="sortable-header" [class.sorted]="this.sort && this.sort.prop === 'givenNm'"

@@ -29,13 +29,13 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet]
-        public async Task<ActionResult> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+        public async Task<ActionResult> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete,
             int pageSize = 10, int pageNumber = 1, string orderBy = "ListingStatusSortNo", string direction = "asc")
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
-            var listings = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicence, 
+            var listings = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
                 pageSize, pageNumber, orderBy, direction);
 
@@ -44,13 +44,13 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet("grouped")]
-        public async Task<ActionResult> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+        public async Task<ActionResult> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete,
             int pageSize = 10, int pageNumber = 1, string orderBy = "matchAddressTxt", string direction = "asc")
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
-            var listings = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence,
+            var listings = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete,
                 pageSize, pageNumber, orderBy, direction);
 
@@ -59,12 +59,12 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet("grouped/count")]
-        public async Task<ActionResult> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence,
+        public async Task<ActionResult> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete)
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
-            var count = await _listingService.GetGroupedRentalListingsCount(all, address, url, listingId, hostName, businessLicence,
+            var count = await _listingService.GetGroupedRentalListingsCount(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete);
 
             return Ok(count);

@@ -152,6 +152,7 @@
                     <th aria-label="Status"></th>
                     <th>Platform</th>
                     <th>Listing ID</th>
+                    <th>Registration</th>
                     <th>Details</th>
                     <th>Address (Best Match)</th>
                     <th>Nights stayed (12M)</th>
@@ -194,6 +195,7 @@
                             [href]="listing.platformListingUrl | urlProtocol">{{
                             listing.platformListingNo }}</a>
                     </td>
+                    <td>{{ listing.bcRegistryNo || '-' }}</td>
                     <td><a [ariaLabel]="'open-listing-details'" pButton class="details-button-with-icon" target="_blank"
                             [routerLink]="'/listing/'+listing.rentalListingId"><i class="pi pi-list"></i></a></td>
                     <td

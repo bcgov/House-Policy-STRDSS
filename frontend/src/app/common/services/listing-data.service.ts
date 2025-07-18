@@ -104,6 +104,9 @@ export class ListingDataService {
         if (searchReq.businessLicence) {
             endpointUrl += `&businessLicence=${searchReq.businessLicence}`;
         }
+        if (searchReq.registrationNumber) {
+            endpointUrl += `&registrationNumber=${searchReq.registrationNumber}`;
+        }
 
         if (filter) {
             if (filter.byLocation) {
@@ -183,6 +186,9 @@ export class ListingDataService {
         }
         if (searchReq.businessLicence) {
             listingsEndpointUrl += `&businessLicence=${searchReq.businessLicence}`;
+        }
+        if (searchReq.registrationNumber) {
+            listingsEndpointUrl += `&registrationNumber=${searchReq.registrationNumber}`;
         }
 
         if (filter) {

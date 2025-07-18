@@ -5,4 +5,5 @@ export interface ListingSearchRequest {
     listingId?: string;
     hostName?: string;
     businessLicence?: string;
+    registrationNumber?: string;
 }

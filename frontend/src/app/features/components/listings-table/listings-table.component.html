@@ -92,6 +92,16 @@
                             *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'asc'"></i>
                     </th>
 
+                    <th class="sortable-header" id="registrationNumber_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'registrationNumber'"
+                        (click)="onSort('registrationNumber')">
+                        Registration
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'registrationNumber' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'registrationNumber' && this.sort.dir === 'asc'"></i>
+                    </th>
+
                     <th style="text-align: center;">Details</th>
 
                     <th class="sortable-header" id="addressNormalized_header"
@@ -187,6 +197,7 @@
                             [href]="row.platformListingUrl | urlProtocol">{{
                             row.platformListingNo }}</a>
                     </td>
+                    <td>{{ row.bcRegistryNo || '-' }}</td>
                     <td class="align-center">
                         <a [ariaLabel]="'open-listing-details'" pButton class="details-button-with-icon" target="_blank"
                             [routerLink]="'/listing/'+row.rentalListingId"><i class="pi pi-list"></i></a>

@@ -132,6 +132,16 @@
 
             <div class="spacer-hr"> </div>
 
+            <div class="row">
+                <span class="label">Registration Number:</span>
+                <span class="value" [class.status-red]="!listing.bcRegistryNo">{{listing.bcRegistryNo || '-'}}
+                    <i class="pi pi-info-circle" pTooltip="Registration exemption claimed"
+                        *ngIf="!listing.bcRegistryNo"></i>
+                </span>
+            </div>
+
+            <div class="spacer-hr"> </div>
+
             <ng-template ngFor let-host [ngForOf]="listing.hosts" let-i="index">
                 <div class="row">
                     <span class="label">{{host.isPropertyOwner?'Property':'STR'}} Host (Platform Listing):</span>

@@ -239,7 +239,11 @@ namespace StrDss.Service
 
                     if (mandatoryFields.Contains("rpt_period"))
                     {
-                        if (row.RptPeriod != reportPeriod) reportPeriodMismatch++;
+                        var normalizedRowPeriod = DateUtils.NormalizeReportPeriod(row.RptPeriod);
+                        if (normalizedRowPeriod == null || reportPeriod != normalizedRowPeriod)
+                        {
+                            reportPeriodMismatch++;
+                        }
                         if (row.RptPeriod.IsEmpty()) reportPeriodMissing++;
                     }
 

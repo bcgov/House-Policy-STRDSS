@@ -187,6 +187,12 @@ namespace StrDss.Service
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(row.RptPeriod))
+            {
+                var normalized = DateUtils.NormalizeReportPeriod(row.RptPeriod);
+                if (normalized != null)
+                    row.RptPeriod = normalized;
+            }
             // Validate of the incoming line
             _validator.Validate(Entities.RentalListingRowUntyped, row, errors);
             if (errors.Count > 0)

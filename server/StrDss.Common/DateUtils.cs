@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace StrDss.Common
 {
@@ -99,6 +100,54 @@ namespace StrDss.Common
             var utcDateTo = ConvertPacificToUtcTime(pstDateTo);
 
             return (utcDateFrom, utcDateTo);
+        }
+
+        public static string? NormalizeReportPeriod(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return null;
+
+            input = input.Trim();
+
+            // Try YYYY-MM or YYYY-MM-DD
+            if (DateTime.TryParseExact(input, new[] { "yyyy-MM", "yyyy-MM-dd", "yyyy-M", "yyyy-M-d" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt1))
+                return $"{dt1.Year:D4}-{dt1.Month:D2}";
+
+            // Try Month-YYYY or Month-YY
+            var monthYearMatch = Regex.Match(input, @"^(?<month>[A-Za-z]+)[\s\-](?<year>\d{4}|\d{2})$");
+            if (monthYearMatch.Success)
+            {
+                var monthName = monthYearMatch.Groups["month"].Value;
+                var yearStr = monthYearMatch.Groups["year"].Value;
+                if (DateTime.TryParseExact(monthName, "MMMM", CultureInfo.InvariantCulture, DateTimeStyles.None, out var monthDt) ||
+                    DateTime.TryParseExact(monthName, "MMM", CultureInfo.InvariantCulture, DateTimeStyles.None, out monthDt))
+                {
+                    int year = yearStr.Length == 2 ? 2000 + int.Parse(yearStr) : int.Parse(yearStr);
+                    return $"{year:D4}-{monthDt.Month:D2}";
+                }
+            }
+
+            // Try YYYY-Month
+            var yearMonthMatch = Regex.Match(input, @"^(?<year>\d{4})[\s\-](?<month>[A-Za-z]+)$");
+            if (yearMonthMatch.Success)
+            {
+                var year = int.Parse(yearMonthMatch.Groups["year"].Value);
+                var monthName = yearMonthMatch.Groups["month"].Value;
+                if (DateTime.TryParseExact(monthName, "MMMM", CultureInfo.InvariantCulture, DateTimeStyles.None, out var monthDt) ||
+                    DateTime.TryParseExact(monthName, "MMM", CultureInfo.InvariantCulture, DateTimeStyles.None, out monthDt))
+                {
+                    return $"{year:D4}-{monthDt.Month:D2}";
+                }
+            }
+
+            // Try YYYY-DD (treat as YYYY-MM)
+            var yearDashMonth = Regex.Match(input, @"^(?<year>\d{4})-(?<month>\d{2})$");
+            if (yearDashMonth.Success)
+            {
+                return input;
+            }
+
+            return null;
         }
     }
 }

@@ -69,7 +69,7 @@ namespace StrDss.Service.HttpClients
                     address.IsMatchVerified = false;
                 }
 
-                return "";
+                return address.MatchScoreAmt < _config.GetValue<int>("GEOCODER_MATCH_SCORE_THRESHOLD") ? "No address found, Geocoder match score: " + address.MatchScoreAmt : "";
             }
             catch (Exception ex)
             {

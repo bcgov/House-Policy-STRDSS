@@ -7,7 +7,7 @@
         <div class="form-group-row-col">
             <p-dropdown [options]=" platformOptions" [(ngModel)]="selectedPlatformId"
                 (onChange)="onPlatformSelected($event.value)" placeholder="Select platform" id="platformId"
-                name="platformId" [required]="true"></p-dropdown>
+                name="platformId" [required]="true" [filter]="true" filterBy="label"></p-dropdown>
         </div>
     </div>
     <p-table [value]="registrationValidationHistory" styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }">

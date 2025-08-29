@@ -102,7 +102,8 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.OrganizationType != OrganizationTypes.LGSub);
             }
 
-            query = query.Include(x => x.DssOrganizationContactPeople);
+            query = query.Include(x => x.DssOrganizationContactPeople)
+                         .OrderBy(x => x.OrganizationNm);
 
             return _mapper.Map<List<OrganizationDto>>(await query.ToListAsync());
         }

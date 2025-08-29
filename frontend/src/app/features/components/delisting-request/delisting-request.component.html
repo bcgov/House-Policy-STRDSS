@@ -16,7 +16,7 @@
         </div>
         <div class="form-group-row-col">
             <p-dropdown [options]="platformOptions" formControlName="platformId" placeholder="Select platform"
-                id="platformId" name="platformId" [required]="true"></p-dropdown>
+                id="platformId" name="platformId" [required]="true" [filter]="true" filterBy="label"></p-dropdown>
         </div>
         <div class="form-group-row-col validation-errors"
             *ngIf="!platformIdControl.pristine && platformIdControl.errors">

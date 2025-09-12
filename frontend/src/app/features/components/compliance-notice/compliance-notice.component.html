@@ -1,5 +1,14 @@
 <div class="title">Send Notice of Non-Compliance</div>
-<p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
+<div *ngFor="let message of messages">
+    <p-message [severity]="message.severity" [closable]="message.closable">
+        <ng-template pTemplate>
+            <div class="p-message-wrapper">
+                <span class="p-message-summary">{{ message.summary }}</span>
+                <div class="p-message-detail">{{ message.detail }}</div>
+            </div>
+        </ng-template>
+    </p-message>
+</div>
 <div class="sub-title">Complete the following fields to send a Notice of Non-Compliance with a local
     government short-term rental (STR) business licence requirement to an STR Host and Platform Representative. All
     fields are required except where stated.</div>
@@ -106,7 +115,7 @@
             <label for="ccList">Add any additional recipients to receive a copy of the Notice (optional)</label>
         </div>
         <div class="form-group-row-col">
-            <textarea formControlName="ccList" placeholder="Enter email address" rows="1" cols="20" pInputTextarea
+            <textarea formControlName="ccList" placeholder="Enter email address" rows="1" cols="20" pTextarea
                 id="ccList" name="ccList"></textarea>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine && ccListControl.errors">

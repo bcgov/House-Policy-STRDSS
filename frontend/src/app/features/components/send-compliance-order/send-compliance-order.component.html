@@ -9,7 +9,7 @@
     </ng-template>
 
     <p-table [value]="extendedListings" [scrollable]="true" scrollDirection="vertical" scrollHeight="425px"
-        styleClass="p-datatable-sm" [(selection)]="selectedListings">
+        size="small" [(selection)]="selectedListings">
         <ng-template pTemplate="header">
             <tr>
                 <th style="width: 4rem">
@@ -71,11 +71,11 @@
                     <span class="tip" (click)="op.toggle($event)">
                         <i class="pi pi-info-circle"></i>
                     </span>
-                    <p-overlayPanel #op>
+                    <p-popover #op>
                         <span class="host-data" *ngFor="let hostData of listing.hosts"
                             [class.invalid-email]="!hostData.hasValidEmail">{{hostData.fullNm}}
                             {{hostData.emailAddressDsc}}<br></span>
-                    </p-overlayPanel>
+                    </p-popover>
                     <span class="host-data" *ngFor="let hostData of listing.hosts">
                         {{hostData.emailAddressDsc}};</span>
                 </td>
@@ -136,7 +136,7 @@
                 <label for="ccList">Add BCCs (Optional)</label>
             </div>
             <div class="form-group-row-col">
-                <textarea formControlName="ccList" placeholder="Enter Emails Here..." rows="1" cols="20" pInputTextarea
+                <textarea formControlName="ccList" placeholder="Enter Emails Here..." rows="1" cols="20" pTextarea
                     id="ccList" name="ccList" class="full-width-text-field"></textarea>
             </div>
             <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine && ccListControl.errors">

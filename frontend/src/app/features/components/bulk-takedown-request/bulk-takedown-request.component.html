@@ -13,7 +13,7 @@
         </ng-template>
 
         <p-table [value]="listings" [scrollable]="true" scrollDirection="vertical" scrollHeight="425px"
-            styleClass="p-datatable-sm" [(selection)]="selectedListings">
+            size="small" [(selection)]="selectedListings">
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width: 4rem" aria-labelledby="selectAll_checkbox_header">
@@ -94,7 +94,7 @@
                     (optional)</label>
             </div>
             <div class="form-group-row-col">
-                <textarea formControlName="ccList" placeholder="Enter email address" rows="1" cols="20" pInputTextarea
+                <textarea formControlName="ccList" placeholder="Enter email address" rows="1" cols="20" pTextarea
                     id="ccList" name="ccList" class="wide"></textarea>
             </div>
             <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine && ccListControl.errors">
@@ -122,7 +122,7 @@
             <div class="form-group-row-col">
                 <textarea #textarea rows="5" cols="30" maxlength="2000" class="wide custom-details"
                     formControlName="customDetailTxt"
-                    placeholder="{{isWithStandardDetailControl.value?'Optional':'Required'}}" pInputTextarea
+                    placeholder="{{isWithStandardDetailControl.value?'Optional':'Required'}}" pTextarea
                     id="customDetailTxt" name="customDetailTxt"></textarea>
                 <span class="limit-text" [class.almost-limit-text]="textarea.value.length > 1950"
                     [class.limited-text]="textarea.value.length > 1999">{{textarea.value.length}}/2000</span>

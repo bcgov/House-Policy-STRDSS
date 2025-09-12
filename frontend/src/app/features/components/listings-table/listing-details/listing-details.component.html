@@ -194,7 +194,7 @@
                 <p-table [value]="listing.listingHistory" [paginator]="listing.listingHistory.length>12"
                     [showPageLinks]="false" currentPageReportTemplate="{first}-{last} of {totalRecords}"
                     [showFirstLastIcon]="false" [showCurrentPageReport]="true" paginatorStyleClass="paging-right"
-                    [rows]="12" styleClass="p-datatable-sm" class="table-paging-right">
+                    [rows]="12" size="small" class="table-paging-right">
                     <ng-template pTemplate="header">
                         <tr>
                             <th>Month</th>
@@ -230,7 +230,7 @@
                 <p-table [value]="listing.addressChangeHistory" [paginator]="listing.addressChangeHistory.length>12"
                     [showPageLinks]="false" currentPageReportTemplate="{first}-{last} of {totalRecords}"
                     [showFirstLastIcon]="false" [showCurrentPageReport]="true" paginatorStyleClass="paging-right"
-                    [rows]="12" styleClass="p-datatable-sm" class="table-paging-right">
+                    [rows]="12" size="small" class="table-paging-right">
                     <ng-template pTemplate="header">
                         <tr>
                             <th>Type</th>
@@ -264,7 +264,7 @@
     </div>
     <div class="sidebar">
         <p-panel class="details-block action-history" header="Action History">
-            <p-table [value]="listing.actionHistory" styleClass="p-datatable-sm">
+            <p-table [value]="listing.actionHistory" size="small">
                 <ng-template pTemplate="header">
                     <tr>
                         <th>Action</th>
@@ -595,9 +595,11 @@
         <div class="row"><strong>Address (Best Match):</strong> {{listing.matchAddressTxt}}</div>
         <div class="row"><strong>Address (Platform Listing):</strong> {{listing.originalAddressTxt}}</div>
         <div class="row">
-            <p-checkbox labelStyleClass="warn" label="Confirm the Best Match Address on this Listing is Correct"
-                [binary]="true" name="accept" [(ngModel)]="confirmTheBestMatchAddress" inputId="accept-chb"
-                (ngModelChange)="onConfirmFlagChanged($event)"></p-checkbox>
+            <div class="radio-checkbox-item">
+                <p-checkbox [binary]="true" name="accept" [(ngModel)]="confirmTheBestMatchAddress" inputId="accept-chb"
+                    (ngModelChange)="onConfirmFlagChanged($event)"></p-checkbox>
+                <label for="accept-chb" class="warn">Confirm the Best Match Address on this Listing is Correct</label>
+            </div>
         </div>
         <div class="spacer"></div>
         <div class="row">
@@ -613,10 +615,11 @@
             <div class="spacer"></div>
             <div class="row"><strong>Best Match Candidates</strong></div>
             <div class="row" *ngFor="let candidate of addressChangeCandidates; let i=index">
-                <p-radioButton name="address-candidate-radio" [label]="candidate.address" [value]="candidate"
+                <p-radioButton name="address-candidate-radio" [value]="candidate"
                     [(ngModel)]="selectedCandidate" inputId="address-candidate-radio-{{i}}"
                     (ngModelChange)="onCandidateSelected($event)">
                 </p-radioButton>
+                <label for="address-candidate-radio-{{i}}" class="radio-label">{{candidate.address}}</label>
             </div>
         </div>
     </div>

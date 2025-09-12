@@ -5,7 +5,7 @@ import { ListingTableRow } from '../../../common/models/listing-table-row';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
@@ -21,7 +21,7 @@ import { environment } from '../../../../environments/environment';
 import { TooltipModule } from 'primeng/tooltip';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { TagModule } from 'primeng/tag';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { ListingFilter } from '../../../common/models/listing-filter';
 import { AccordionModule } from 'primeng/accordion';
 import { RadioButtonModule } from 'primeng/radiobutton';
@@ -29,6 +29,7 @@ import { FilterPersistenceService } from '../../../common/services/filter-persis
 import { OrganizationService } from '../../../common/services/organization.service';
 import { UrlProtocolPipe } from '../../../common/pipes/url-protocol.pipe';
 import { ListingDetails } from '../../../common/models/listing-details';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-listings-table',
@@ -37,7 +38,7 @@ import { ListingDetails } from '../../../common/models/listing-details';
     CommonModule,
     TableModule,
     ButtonModule,
-    DropdownModule,
+    SelectModule,
     CheckboxModule,
     PaginatorModule,
     DialogModule,
@@ -46,10 +47,11 @@ import { ListingDetails } from '../../../common/models/listing-details';
     RouterModule,
     TooltipModule,
     TagModule,
-    SidebarModule,
+    DrawerModule,
     AccordionModule,
     RadioButtonModule,
     UrlProtocolPipe,
+    FormsModule,
   ],
   templateUrl: './listings-table.component.html',
   styleUrl: './listings-table.component.scss'

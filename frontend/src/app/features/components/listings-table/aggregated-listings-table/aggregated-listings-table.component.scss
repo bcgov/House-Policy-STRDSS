@@ -44,35 +44,53 @@
             }
 
             display: flex;
-            align-items: center;
+            align-items: stretch;
             height: 46px;
 
             .search-input-container {
                 height: 45px;
                 display: flex;
-                gap: 12px;
+                align-items: stretch;
+                position: relative;
+                overflow: hidden;
 
                 button {
                     &.search-submit-btn {
                         position: absolute;
-                        right: 0px;
+                        right: 0;
+                        top: 0;
+                        bottom: 0;
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        z-index: 10;
 
-                        height: 100%;
                         width: 45px;
                         margin: 0;
                         padding: 0;
+                        box-sizing: border-box;
+                        background: transparent;
+                        border: none;
+                        cursor: pointer;
+                        color: #FFFFFF;
+                        background-color: #053662;
+                        border-top-left-radius: 0px;
+                        border-bottom-left-radius: 0px;
 
-                        border-radius: 6px;
-                        border-top-left-radius: 0;
-                        border-bottom-left-radius: 0;
+                        &:hover {
+                            background-color: #003366;
+                        }
                     }
 
                     &.search-clear-btn {
                         position: absolute;
-                        right: 38px;
+                        right: 50px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        z-index: 11;
+                        background: transparent;
+                        border: none;
+                        padding: 4px;
 
                         &:hover {
                             text-decoration: none;
@@ -90,9 +108,17 @@
                 }
 
                 input.search-input {
+                    height: 45px;
+                    padding-right: 45px; // Exact space for search button
+                    padding-left: 12px;
+                    border: 1px solid #ced4da;
                     border-top-left-radius: 0;
                     border-bottom-left-radius: 0;
+                    border-top-right-radius: 6px;
+                    border-bottom-right-radius: 6px;
+                    border-right: none; // No right border since button covers it
                     font-size: 16px;
+                    box-sizing: border-box;
                 }
             }
         }

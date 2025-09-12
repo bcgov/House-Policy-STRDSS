@@ -151,10 +151,18 @@
                         <label for="platformType">Platform Status</label>
                     </div>
                     <div class="form-group-row-col">
-                        <p-radioButton name="isActive" id="isActive-true" [value]="true" label="Active"
-                            formControlName="isActive"></p-radioButton> &nbsp;
-                        <p-radioButton name="isActive" id="isActive-false" [value]="false" label="Disabled"
-                            formControlName="isActive"></p-radioButton>
+                        <div class="radio-group">
+                            <div class="radio-checkbox-item">
+                                <p-radioButton name="isActive" inputId="isActive-true" [value]="true"
+                                    formControlName="isActive"></p-radioButton>
+                                <label for="isActive-true">Active</label>
+                            </div>
+                            <div class="radio-checkbox-item">
+                                <p-radioButton name="isActive" inputId="isActive-false" [value]="false"
+                                    formControlName="isActive"></p-radioButton>
+                                <label for="isActive-false">Disabled</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

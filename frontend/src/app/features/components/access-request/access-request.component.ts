@@ -1,9 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Message } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { DropdownModule } from 'primeng/dropdown';
-import { MessagesModule } from 'primeng/messages';
+import { SelectModule } from 'primeng/select';
+import { MessageModule } from 'primeng/message';
 import { DropdownOption } from '../../../common/models/dropdown-option';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -14,6 +13,7 @@ import { UserDataService } from '../../../common/services/user-data.service';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { forkJoin } from 'rxjs';
 import { OrganizationService } from '../../../common/services/organization.service';
+import { ToastMessageOptions } from 'primeng/api';
 
 @Component({
   selector: 'app-access-request',
@@ -23,8 +23,8 @@ import { OrganizationService } from '../../../common/services/organization.servi
     CommonModule,
     CardModule,
     ButtonModule,
-    DropdownModule,
-    MessagesModule,
+    SelectModule,
+    MessageModule,
     InputTextModule,
   ],
   templateUrl: './access-request.component.html',
@@ -33,7 +33,7 @@ import { OrganizationService } from '../../../common/services/organization.servi
 export class AccessRequestComponent implements OnInit {
   myForm!: FormGroup;
 
-  messages = new Array<Message>();
+  messages = new Array<ToastMessageOptions>();
   roles = new Array<DropdownOption>();
   currentUser: any;
 

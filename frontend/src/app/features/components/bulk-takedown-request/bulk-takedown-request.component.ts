@@ -6,7 +6,7 @@ import { TableModule } from 'primeng/table';
 import { PanelModule } from 'primeng/panel';
 import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TextareaModule } from 'primeng/textarea';
 import { ListingDetails } from '../../../common/models/listing-details';
 import { DialogModule } from 'primeng/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -29,7 +29,7 @@ import { ListingTableRow } from '../../../common/models/listing-table-row';
     PanelModule,
     TooltipModule,
     CheckboxModule,
-    InputTextareaModule,
+    TextareaModule,
     DialogModule,
     ChipsModule,
     ReactiveFormsModule,

@@ -9,9 +9,9 @@ import { AccessRequestTableItem } from '../../../common/models/access-request-ta
 import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { DialogModule } from 'primeng/dialog';
 import { Paginator, PaginatorModule } from 'primeng/paginator';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { DateFormatPipe } from '../../../common/pipes/date-format.pipe';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { UserDataService } from '../../../common/services/user-data.service';
@@ -26,6 +26,7 @@ import { OrganizationService } from '../../../common/services/organization.servi
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    FormsModule,
     CommonModule,
     DropdownModule,
     TableModule,
@@ -33,7 +34,7 @@ import { OrganizationService } from '../../../common/services/organization.servi
     DialogModule,
     PaginatorModule,
     DateFormatPipe,
-    InputSwitchModule,
+    ToggleSwitchModule,
     ConfirmDialogModule,
     InputTextModule,
     ToastModule,

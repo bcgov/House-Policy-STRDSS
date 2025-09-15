@@ -1,8 +1,8 @@
-import { APP_INITIALIZER, ApplicationConfig, CSP_NONCE } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, CSP_NONCE, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { KeycloakService } from 'keycloak-angular';
+import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { environment } from '../environments/environment';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -17,6 +17,12 @@ export const appConfig: ApplicationConfig = {
         provideAnimations(),
         provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
         provideRouter(routes),
+        // Provide CSP_NONCE first so it can be injected by other providers
+        {
+            provide: CSP_NONCE,
+            useFactory: () => document.querySelector('meta[name="csp-nonce"]')?.getAttribute('content'),
+        },
+        // Use standard PrimeNG provider
         providePrimeNG({
             theme: {
                 preset: Aura,
@@ -27,7 +33,8 @@ export const appConfig: ApplicationConfig = {
                 }
             }
         }),
-        KeycloakService,
+        // Use modern provider pattern for Keycloak
+        importProvidersFrom(KeycloakAngularModule),
         {
             provide: APP_INITIALIZER,
             useFactory: initializeKeycloak,
@@ -35,10 +42,6 @@ export const appConfig: ApplicationConfig = {
             deps: [KeycloakService],
         },
         MessageService,
-        {
-            provide: CSP_NONCE,
-            useValue: document.querySelector('meta[name="csp-nonce"]')?.getAttribute('content'),
-        },
     ],
 }
 

@@ -61,7 +61,7 @@
             [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
             <ng-template pTemplate="header">
                 <tr>
-                    <th [ariaLabel]="'select-listing'" style="width: 4rem">
+                    <th [ariaLabel]="'select-listing'" class="width-4rem">
                         <p-tableHeaderCheckbox inputId="select-all-chb"></p-tableHeaderCheckbox>
                     </th>
                     <th class="sortable-header" id="status_header"
@@ -102,7 +102,7 @@
                             *ngIf="this.sort && this.sort.prop === 'registrationNumber' && this.sort.dir === 'asc'"></i>
                     </th>
 
-                    <th style="text-align: center;">Details</th>
+                    <th class="text-align-center">Details</th>
 
                     <th class="sortable-header" id="addressNormalized_header"
                         [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"
@@ -250,7 +250,7 @@
             [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
     </p-panel>
 
-    <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" ess [style]="{width: '50vw'}"
+    <p-dialog header="Legend" class="width-50vw" [modal]="true" [(visible)]="isLegendShown"
         [closeOnEscape]="true">
         <span>
             <strong>Status:</strong> Status of the listing using the following categories:

@@ -10,7 +10,7 @@
         size="small">
         <ng-template pTemplate="header">
             <tr>
-                <th style="width: 4rem"></th>
+                <th class="width-4rem"></th>
                 <th class="sortable-header" id="organizationNm_header"
                     [class.sorted]="this.sort && this.sort.prop === 'organizationNm'"
                     (click)="onSort('organizationNm')">Platform Name
@@ -58,12 +58,12 @@
                     <i class="pi pi-angle-up"
                         *ngIf="this.sort && this.sort.prop === 'updDtm' && this.sort.dir === 'asc'"></i>
                 </th>
-                <th style="width: 4rem">Edit</th>
+                <th class="width-4rem">Edit</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-platform let-index="rowIndex" let-expanded="expanded">
             <tr>
-                <td style="width: 4rem">
+                <td class="width-4rem">
                     <button [disabled]="!platform.subsidiaries || !platform.subsidiaries.length"
                         [pRowTogglerDisabled]="!platform.subsidiaries || !platform.subsidiaries.length" pButton
                         [pTooltip]="(!platform.subsidiaries || !platform.subsidiaries.length)?'Does Not Contain Subsidiary Platforms':'Expand / Collapse'"
@@ -82,7 +82,7 @@
                 <td class="status" [class.active]="platform.isActive">
                     {{platform.isActive?'Active':'Disabled'}}</td>
                 <td>{{platform.updDtm |date:'yyyy-MM-dd'}}</td>
-                <td style="width: 4rem">
+                <td class="width-4rem">
                     <a id="platform-edit-{{index}}-icon" class="edit-icon"
                         [routerLink]="'/platform/'+platform.organizationId">
                         <i class="pi pi-list"></i>

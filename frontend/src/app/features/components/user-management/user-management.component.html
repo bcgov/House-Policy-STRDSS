@@ -34,7 +34,7 @@
     </div>
     <div class="table-container">
 
-        <p-table [id]="'user-table'" [styleClass]="'p-datatable-sm'" [value]="accessRequests" [rows]="10">
+        <p-table [id]="'user-table'" size="small" [value]="accessRequests" [rows]="10">
             <ng-template pTemplate="header">
                 <tr id="table-header">
                     <th [class.sorted]="this.sort && this.sort.prop === 'accessRequestDtm'"
@@ -130,10 +130,10 @@
                     <td class="action non-header-cell">
                         <span
                             (click)="accessRequest.accessRequestStatusCd === 'Requested' || onActivateDeactivateToggle($event, accessRequest)">
-                            <p-inputSwitch class="table-small-switch" id="access-status-{{index}}-insw"
+                            <p-toggleSwitch class="table-small-switch" id="access-status-{{index}}-insw"
                                 [inputId]="'access-status-{{index}}-input-insw'"
                                 [disabled]="accessRequest.accessRequestStatusCd ==='Requested'"
-                                [(ngModel)]="accessRequest.isEnabled" [readonly]="true"></p-inputSwitch>
+                                [(ngModel)]="accessRequest.isEnabled" [readonly]="true"></p-toggleSwitch>
                         </span>
 
                         <span id="user-edit-{{index}}-icon" class="user-edit-icon" *ngIf="accessRequest.accessRequestStatusCd

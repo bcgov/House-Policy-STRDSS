@@ -6,7 +6,7 @@ import { TableModule } from 'primeng/table';
 import { PanelModule } from 'primeng/panel';
 import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxModule } from 'primeng/checkbox';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TextareaModule } from 'primeng/textarea';
 import { ListingDetails, ListingDetailsWithHostCheckboxExtension } from '../../../common/models/listing-details';
 import { DialogModule } from 'primeng/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -17,7 +17,7 @@ import { DelistingService } from '../../../common/services/delisting.service';
 import { validateEmailListString } from '../../../common/consts/validators.const';
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
 import { ComplianceNoticeBulk } from '../../../common/models/compliance-notice';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { PopoverModule } from 'primeng/popover';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { ListingTableRow } from '../../../common/models/listing-table-row';
 import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
@@ -32,12 +32,12 @@ import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
     PanelModule,
     TooltipModule,
     CheckboxModule,
-    InputTextareaModule,
+    TextareaModule,
     DialogModule,
     ChipsModule,
     ReactiveFormsModule,
     FormsModule,
-    OverlayPanelModule,
+    PopoverModule,
     EditorModule,
   ],
   templateUrl: './bulk-compliance-notice.component.html',

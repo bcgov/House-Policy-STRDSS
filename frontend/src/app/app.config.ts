@@ -9,11 +9,24 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './common/services/auth.interceptor';
 import { MessageService } from 'primeng/api';
 import { errorInterceptor } from './common/consts/error-interceptor.const';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
+
 export const appConfig: ApplicationConfig = {
     providers: [
         provideAnimations(),
         provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
         provideRouter(routes),
+        providePrimeNG({
+            theme: {
+                preset: Aura,
+                options: {
+                    prefix: 'p',
+                    darkModeSelector: false,
+                    cssLayer: false
+                }
+            }
+        }),
         KeycloakService,
         {
             provide: APP_INITIALIZER,

@@ -21,9 +21,10 @@
     <div class="header">Select Jurisdiction to Download Listing Data</div>
     <div class="content">
         <div class="row" *ngFor="let item of jurisdictions; let i=index">
-            <p-radioButton name="jurisdiction-radio" [label]="item.rentalListingExtractNm"
-                [value]="item.rentalListingExtractId" [(ngModel)]="selectedJurisdiction" inputId="disabled-radio_{{i}}">
+            <p-radioButton name="jurisdiction-radio" [value]="item.rentalListingExtractId" 
+                [(ngModel)]="selectedJurisdiction" inputId="disabled-radio_{{i}}">
             </p-radioButton>
+            <label for="disabled-radio_{{i}}" class="radio-label">{{item.rentalListingExtractNm}}</label>
         </div>
 
         <div class="row" *ngIf="!jurisdictions.length">

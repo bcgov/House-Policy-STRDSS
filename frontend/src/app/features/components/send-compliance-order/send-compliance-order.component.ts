@@ -5,8 +5,8 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ChipsModule } from 'primeng/chips';
 import { DialogModule } from 'primeng/dialog';
-import { InputTextareaModule } from 'primeng/inputtextarea';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { TextareaModule } from 'primeng/textarea';
+import { PopoverModule } from 'primeng/popover';
 import { PanelModule } from 'primeng/panel';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
@@ -33,12 +33,12 @@ import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
     PanelModule,
     TooltipModule,
     CheckboxModule,
-    InputTextareaModule,
+    TextareaModule,
     DialogModule,
     ChipsModule,
     ReactiveFormsModule,
     FormsModule,
-    OverlayPanelModule,
+    PopoverModule,
     EditorModule,
   ],
   templateUrl: './send-compliance-order.component.html',

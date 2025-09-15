@@ -8,7 +8,7 @@ import { GlobalLoaderService } from '../../../common/services/global-loader.serv
 import { forkJoin } from 'rxjs';
 import { RegistrationService } from '../../../common/services/registration.service';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -28,6 +28,7 @@ import { TableModule } from 'primeng/table';
     RouterModule,
     CardModule,
     ReactiveFormsModule,
+    FormsModule,
   ],
   templateUrl: './registration-validation-history.component.html',
   styleUrl: './registration-validation-history.component.scss'

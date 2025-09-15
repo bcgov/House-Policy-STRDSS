@@ -1,5 +1,14 @@
 <div class="title">Send Takedown Request</div>
-<p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
+<div *ngFor="let message of messages">
+    <p-message [severity]="message.severity" [closable]="message.closable">
+        <ng-template pTemplate>
+            <div class="p-message-wrapper">
+                <span class="p-message-summary">{{ message.summary }}</span>
+                <div class="p-message-detail">{{ message.detail }}</div>
+            </div>
+        </ng-template>
+    </p-message>
+</div>
 <div class="sub-title">Complete the following fields to send a Takedown Request to an STR Platform
     representative.
     <br>
@@ -63,7 +72,7 @@
                 (optional)</label>
         </div>
         <div class="form-group-row-col">
-            <textarea formControlName="ccList" placeholder="Enter email address" rows="1" cols="20" pInputTextarea
+            <textarea formControlName="ccList" placeholder="Enter email address" rows="1" cols="20" pTextarea
                 id="ccList" name="ccList"></textarea>
         </div>
         <div class="form-group-row-col validation-errors" *ngIf="!ccListControl.pristine && ccListControl.errors">
@@ -90,7 +99,7 @@
         <div class="form-group-row-col">
             <textarea #textarea rows="5" cols="30" maxlength="2000" class="customDetail-txa"
                 formControlName="customDetailTxt"
-                placeholder="{{isWithStandardDetailControl.value?'Optional':'Required'}}" pInputTextarea
+                placeholder="{{isWithStandardDetailControl.value?'Optional':'Required'}}" pTextarea
                 id="customDetailTxt" name="customDetailTxt"></textarea>
             <span class="limit-text" [class.almost-limit-text]="textarea.value.length > 1950"
                 [class.limited-text]="textarea.value.length > 1999">{{textarea.value.length}}/2000</span>

@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { UserDataService } from '../services/user-data.service';
 import { AuthService } from '../services/auth.service';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { PopoverModule } from 'primeng/popover';
 import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
@@ -18,7 +18,7 @@ import { listing_read } from '../consts/permissions.const';
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, ButtonModule, MenubarModule, TooltipModule, OverlayPanelModule, CommonModule, ToastModule],
+  imports: [RouterOutlet, ButtonModule, MenubarModule, TooltipModule, PopoverModule, CommonModule, ToastModule],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })

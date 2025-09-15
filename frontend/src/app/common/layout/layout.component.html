@@ -9,10 +9,10 @@
         <div *ngIf="userDataService.currentUser" class="user-container">
             {{userDataService.currentUser.displayName || 'Unknown User'}} <button aria-label="Toggle dropdown to logout"
                 pButton class="do-not-print-it" icon="pi pi-angle-down" (click)="op.toggle($event)"></button>
-            <p-overlayPanel #op>
+            <p-popover #op>
                 <button pButton [iconPos]="'right'" aria-label="Log out" class="p-button-transparent"
                     icon="pi pi-sign-out" (click)="logout()">Logout</button>
-            </p-overlayPanel>
+            </p-popover>
         </div>
     </div>
     <div class="header-menu do-not-print-it">

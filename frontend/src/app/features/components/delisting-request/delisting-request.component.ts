@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TextareaModule } from 'primeng/textarea';
 import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { CommonModule } from '@angular/common';
 import { ChipsModule } from 'primeng/chips';
@@ -13,15 +13,15 @@ import { ButtonModule } from 'primeng/button';
 import { validateEmailListString, validateUrl } from '../../../common/consts/validators.const';
 import { ToastModule } from 'primeng/toast';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Message } from 'primeng/api';
 import { DelistingRequest } from '../../../common/models/delisting-request';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessagesModule } from 'primeng/messages';
+import { MessageModule } from 'primeng/message';
 import { Router } from '@angular/router';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { forkJoin } from 'rxjs';
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
+import { ToastMessageOptions } from 'primeng/api';
 
 @Component({
   selector: 'app-delisting-request',
@@ -31,8 +31,8 @@ import { ErrorHandlingService } from '../../../common/services/error-handling.se
     DropdownModule,
     InputTextModule,
     InputNumberModule,
-    InputTextareaModule,
-    MessagesModule,
+    TextareaModule,
+    MessageModule,
     CheckboxModule,
     CommonModule,
     ChipsModule,
@@ -53,7 +53,7 @@ export class DelistingRequestComponent implements OnInit {
   isPreviewVisible = false;
   previewText = 'No preview'
 
-  messages = new Array<Message>();
+  messages = new Array<ToastMessageOptions>();
 
   public get lgIdControl(): AbstractControl {
     return this.myForm.controls['lgId'];

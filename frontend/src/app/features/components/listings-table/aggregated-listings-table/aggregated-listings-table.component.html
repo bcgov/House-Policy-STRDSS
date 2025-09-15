@@ -2,8 +2,8 @@
     <h2 class="title">Aggregated Listings</h2>
     <div class="search-container">
         <span class="vertical-spacer" *ngIf="isFilterSet"></span>
-        <p-dropdown [options]="searchColumns" [showClear]="searchColumn !== 'all'" (onClear)="clearSearchBy($event)"
-            id="search-by-drd" [(ngModel)]="searchColumn" class="search-by-select"></p-dropdown>
+        <p-select [options]="searchColumns" [showClear]="searchColumn !== 'all'" (onClear)="clearSearchBy($event)"
+            id="search-by-drd" [(ngModel)]="searchColumn" class="search-by-select"></p-select>
         <span class="p-input-icon-right search-input-container">
             <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()" aria-label="Search">
                 <i class="pi pi-search"></i></button>
@@ -57,7 +57,7 @@
 
         <p-table dataKey="id" [value]="aggregatedListings" #table [ariaLabel]="'table-of-listings'" id="listings-table"
             [scrollable]="true" scrollHeight="{{isCEU?'635px':'585px'}}" [(selection)]="selectedListings"
-            styleClass="p-datatable-sm" [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
+            size="small" [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
 
             <ng-template pTemplate="header">
                 <tr>
@@ -136,7 +136,7 @@
                 </tr>
             </ng-template>
 
-            <ng-template pTemplate="rowexpansion" let-row>
+            <ng-template pTemplate="expandedrow" let-row>
                 <tr>
                     <td colspan="8">
                         <div class="expand">
@@ -312,80 +312,118 @@
 </p-dialog>
 </div>
 
-<p-sidebar ngClass="listing-filter p-sidebar-lg" [title]="'Filter Listings'" [(visible)]="isFilterOpened"
+<p-drawer ngClass="listing-filter p-drawer-lg" [title]="'Filter Listings'" [(visible)]="isFilterOpened"
     [closeOnEscape]="false" position="right" [modal]="false">
     <ng-template pTemplate="header">
         <strong class="h2-big"> Filter Listings</strong>
     </ng-template>
     <ng-template pTemplate="content">
         <p-accordion *ngIf="cancelableFilter" class="borderless filter-sidebar" [multiple]="true"
-            [activeIndex]="[0,1,2]">
-            <p-accordionTab *ngIf="isCEU" iconPos="end" header="By Location">
-                <div class="row"><strong>Principal Residence Requirement Applies?</strong></div>
-                <div class="row">
-                    <p-radioButton name="principalResidenceRequired" value="Yes"
-                        [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
-                        inputId="principalResidenceRequired_true" label="Yes"></p-radioButton>
-                    <p-radioButton name="principalResidenceRequired" value="No"
-                        [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
-                        inputId="principalResidenceRequired_false" label="No"></p-radioButton>
-                    <p-radioButton name="principalResidenceRequired" value=""
-                        [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
-                        inputId="principalResidenceRequired_null" label="Both"></p-radioButton>
-                </div>
-                <div class="row"><strong>Business Licence Required?</strong></div>
-                <div class="row">
-                    <p-radioButton name="businessLicenceRequired" value="Yes"
-                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
-                        inputId="businessLicenceRequired_true" label="Yes"></p-radioButton>
-                    <p-radioButton name="businessLicenceRequired" value="No"
-                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
-                        inputId="businessLicenceRequired_false" label="No"></p-radioButton>
-                    <p-radioButton name="businessLicenceRequired" value=""
-                        [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
-                        inputId="businessLicenceRequired_null" label="Both"></p-radioButton>
-                </div>
-            </p-accordionTab>
-            <p-accordionTab *ngIf="isCEU" iconPos="end" header="By Community ">
-                <p-dropdown [showClear]="true" placeholder="Select a Community" appendTo="body"
-                    panelStyleClass="select-community" [inputId]="'community-filter-dropdown'" [filter]="true"
-                    [filterBy]="'label'" class="auto-width" [options]="groupedCommunities" [group]="true"
-                    [(ngModel)]="cancelableFilter.community">
-                    <ng-template let-group pTemplate="group">
-                        <strong>{{group.label}}</strong>
-                    </ng-template>
-                </p-dropdown>
-
-            </p-accordionTab>
-            <p-accordionTab iconPos="end" header="By Status">
-                <div class="row"><strong>Primary Statuses</strong></div>
-                <div class="row">
-                    <p-checkbox label="New" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.new"
-                        inputId="n-filter-cb">
-                    </p-checkbox>
-                </div>
-                <div class="row">
-                    <p-checkbox label="Active" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.active"
-                        inputId="a-filter-cb">
-                    </p-checkbox>
-                </div>
-                <div class="row">
-                    <p-checkbox label="Inactive" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.inactive"
-                        inputId="i-filter-cb">
-                    </p-checkbox>
-                </div>
-                <div class="row"><strong>Secondary Statuses</strong></div>
-                <div class="row">
-                    <p-checkbox label="Reassigned" [binary]="true" [(ngModel)]="cancelableFilter.byStatus.reassigned"
-                        inputId="i-filter-cb">
-                    </p-checkbox>
-                </div>
-                <div class="row">
-                    <p-checkbox label="Takedown Reported" [binary]="true"
-                        [(ngModel)]="cancelableFilter.byStatus.takedownComplete" inputId="t-filter-cb">
-                    </p-checkbox>
-                </div>
-            </p-accordionTab>
+            [value]="['0','1','2']">
+            <p-accordion-panel *ngIf="isCEU" value="0">
+                <p-accordion-header>By Location</p-accordion-header>
+                <p-accordion-content>
+                    <div class="row"><strong>Principal Residence Requirement Applies?</strong></div>
+                    <div class="row radio-row">
+                        <div class="radio-checkbox-item">
+                            <p-radioButton name="principalResidenceRequired" value="Yes"
+                                [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
+                                inputId="principalResidenceRequired_true"></p-radioButton>
+                            <label for="principalResidenceRequired_true">Yes</label>
+                        </div>
+                        <div class="radio-checkbox-item">
+                            <p-radioButton name="principalResidenceRequired" value="No"
+                                [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
+                                inputId="principalResidenceRequired_false"></p-radioButton>
+                            <label for="principalResidenceRequired_false">No</label>
+                        </div>
+                        <div class="radio-checkbox-item">
+                            <p-radioButton name="principalResidenceRequired" value=""
+                                [(ngModel)]="cancelableFilter.byLocation.isPrincipalResidenceRequired"
+                                inputId="principalResidenceRequired_null"></p-radioButton>
+                            <label for="principalResidenceRequired_null">Both</label>
+                        </div>
+                    </div>
+                    <div class="row"><strong>Business Licence Required?</strong></div>
+                    <div class="row radio-row">
+                        <div class="radio-checkbox-item">
+                            <p-radioButton name="businessLicenceRequired" value="Yes"
+                                [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
+                                inputId="businessLicenceRequired_true"></p-radioButton>
+                            <label for="businessLicenceRequired_true">Yes</label>
+                        </div>
+                        <div class="radio-checkbox-item">
+                            <p-radioButton name="businessLicenceRequired" value="No"
+                                [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
+                                inputId="businessLicenceRequired_false"></p-radioButton>
+                            <label for="businessLicenceRequired_false">No</label>
+                        </div>
+                        <div class="radio-checkbox-item">
+                            <p-radioButton name="businessLicenceRequired" value=""
+                                [(ngModel)]="cancelableFilter.byLocation.isBusinessLicenceRequired"
+                                inputId="businessLicenceRequired_null"></p-radioButton>
+                            <label for="businessLicenceRequired_null">Both</label>
+                        </div>
+                    </div>
+                </p-accordion-content>
+            </p-accordion-panel>
+            
+            <p-accordion-panel *ngIf="isCEU" value="1">
+                <p-accordion-header>By Community</p-accordion-header>
+                <p-accordion-content>
+                    <p-select [showClear]="true" placeholder="Select a Community" appendTo="body"
+                        panelStyleClass="select-community" [inputId]="'community-filter-dropdown'" [filter]="true"
+                        [filterBy]="'label'" class="auto-width" [options]="groupedCommunities" [group]="true"
+                        [(ngModel)]="cancelableFilter.community">
+                        <ng-template let-group pTemplate="group">
+                            <strong>{{group.label}}</strong>
+                        </ng-template>
+                    </p-select>
+                </p-accordion-content>
+            </p-accordion-panel>
+            
+            <p-accordion-panel value="2">
+                <p-accordion-header>By Status</p-accordion-header>
+                <p-accordion-content>
+                    <div class="row"><strong>Primary Statuses</strong></div>
+                    <div class="row">
+                        <div class="radio-checkbox-item">
+                            <p-checkbox [binary]="true" [(ngModel)]="cancelableFilter.byStatus.new"
+                                inputId="n-filter-cb"></p-checkbox>
+                            <label for="n-filter-cb">New</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="radio-checkbox-item">
+                            <p-checkbox [binary]="true" [(ngModel)]="cancelableFilter.byStatus.active"
+                                inputId="a-filter-cb"></p-checkbox>
+                            <label for="a-filter-cb">Active</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="radio-checkbox-item">
+                            <p-checkbox [binary]="true" [(ngModel)]="cancelableFilter.byStatus.inactive"
+                                inputId="i-filter-cb"></p-checkbox>
+                            <label for="i-filter-cb">Inactive</label>
+                        </div>
+                    </div>
+                    <div class="row"><strong>Secondary Statuses</strong></div>
+                    <div class="row">
+                        <div class="radio-checkbox-item">
+                            <p-checkbox [binary]="true" [(ngModel)]="cancelableFilter.byStatus.reassigned"
+                                inputId="r-filter-cb"></p-checkbox>
+                            <label for="r-filter-cb">Reassigned</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="radio-checkbox-item">
+                            <p-checkbox [binary]="true"
+                                [(ngModel)]="cancelableFilter.byStatus.takedownComplete" inputId="t-filter-cb"></p-checkbox>
+                            <label for="t-filter-cb">Takedown Reported</label>
+                        </div>
+                    </div>
+                </p-accordion-content>
+            </p-accordion-panel>
         </p-accordion>
     </ng-template>
     <ng-template pTemplate="footer">
@@ -400,4 +438,4 @@
                 (click)="onCancelFilters()"></button>
         </div>
     </ng-template>
-</p-sidebar>
+</p-drawer>

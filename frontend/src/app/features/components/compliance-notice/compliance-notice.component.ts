@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TextareaModule } from 'primeng/textarea';
 import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { CommonModule } from '@angular/common';
 import { ChipsModule } from 'primeng/chips';
@@ -11,17 +11,17 @@ import { DropdownOption } from '../../../common/models/dropdown-option';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { validateEmailListString, validateUrl } from '../../../common/consts/validators.const';
-import { Message } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { InputMaskModule } from 'primeng/inputmask';
 import { TooltipModule } from 'primeng/tooltip';
 import { ComplianceNotice } from '../../../common/models/compliance-notice';
-import { MessagesModule } from 'primeng/messages';
+import { MessageModule } from 'primeng/message';
 import { Router } from '@angular/router';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 import { ErrorHandlingService } from '../../../common/services/error-handling.service';
 import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
+import { ToastMessageOptions } from 'primeng/api';
 
 @Component({
   selector: 'app-compliance-notice',
@@ -33,8 +33,8 @@ import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
     DropdownModule,
     InputTextModule,
     InputNumberModule,
-    InputTextareaModule,
-    MessagesModule,
+    TextareaModule,
+    MessageModule,
     CheckboxModule,
     ChipsModule,
     DialogModule,
@@ -54,7 +54,7 @@ export class ComplianceNoticeComponent implements OnInit {
   isPreviewVisible = false;
   previewText = 'No preview'
 
-  messages = new Array<Message>();
+  messages = new Array<ToastMessageOptions>();
   comment = '';
 
   public get platformIdControl(): AbstractControl {

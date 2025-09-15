@@ -5,12 +5,12 @@ import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { PanelModule } from 'primeng/panel';
 import { RadioButtonModule } from 'primeng/radiobutton';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
@@ -36,6 +36,7 @@ import { ListingDetails } from '../../../../common/models/listing-details';
 import { OrganizationService } from '../../../../common/services/organization.service';
 import { UrlProtocolPipe } from '../../../../common/pipes/url-protocol.pipe';
 import { forkJoin, tap } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-aggregated-listings-table',
@@ -44,7 +45,7 @@ import { forkJoin, tap } from 'rxjs';
         CommonModule,
         TableModule,
         ButtonModule,
-        DropdownModule,
+        SelectModule,
         CheckboxModule,
         PaginatorModule,
         DialogModule,
@@ -53,10 +54,11 @@ import { forkJoin, tap } from 'rxjs';
         RouterModule,
         TooltipModule,
         TagModule,
-        SidebarModule,
+        DrawerModule,
         AccordionModule,
         RadioButtonModule,
         UrlProtocolPipe,
+        FormsModule,
     ],
     templateUrl: './aggregated-listings-table.component.html',
     styleUrl: './aggregated-listings-table.component.scss',

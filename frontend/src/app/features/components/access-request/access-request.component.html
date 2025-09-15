@@ -17,9 +17,9 @@
                 <label for="organizationType">What role best describes you?</label>
             </div>
             <div class="form-group-row-col">
-                <p-dropdown [options]="roles" formControlName="organizationType" placeholder="Please Select..."
+                <p-select [options]="roles" formControlName="organizationType" placeholder="Please Select..."
                     id="organizationType" name="organizationType" [ngClass]="'full-width-text-field'"
-                    [required]="true"></p-dropdown>
+                    [required]="true"></p-select>
             </div>
             <div class="validation-errors" *ngIf="!organizationTypeControl.pristine">
 
@@ -46,7 +46,7 @@
         </div>
     </form>
 
-    <p-messages *ngIf="showRequestedSuccessfullyMessage" severity="success">
+    <p-message *ngIf="showRequestedSuccessfullyMessage" severity="success">
         <ng-template pTemplate>
             <div class="message-icon-block">
                 <img src="../../../../assets/images/circle-check.svg" alt="Success icon" width="20" />
@@ -58,9 +58,9 @@
                 <p> You will receive an email with further details once your request has been processed.</p>
             </div>
         </ng-template>
-    </p-messages>
+    </p-message>
 
-    <p-messages *ngIf="showRequestedFailedMessage" severity="error">
+    <p-message *ngIf="showRequestedFailedMessage" severity="error">
         <ng-template pTemplate>
             <div class="message-icon-block">
                 <img src="../../../../assets/images/circle-failed.svg" alt="Error icon" width="20" />
@@ -72,7 +72,7 @@
                 </div>
             </div>
         </ng-template>
-    </p-messages>
+    </p-message>
 
     <button *ngIf="!hideForm" pButton (click)="onRequest()" id="form-submit-btn"
         [disabled]="!myForm.valid || alreadyClicked">Submit</button>

@@ -10,7 +10,7 @@ import { CardModule } from 'primeng/card';
 import { DropdownOption } from '../models/dropdown-option';
 import { DelistingService } from '../services/delisting.service';
 import { DropdownModule } from 'primeng/dropdown';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { PagingResponse, PagingResponsePageInfo } from '../models/paging-response';
 import { UserDataService } from '../services/user-data.service';
 import { forkJoin } from 'rxjs';
@@ -29,6 +29,7 @@ import { GlobalLoaderService } from '../services/global-loader.service';
     RouterModule,
     CardModule,
     ReactiveFormsModule,
+    FormsModule,
   ],
   templateUrl: './listing-upload-history-table.component.html',
   styleUrl: './listing-upload-history-table.component.scss'

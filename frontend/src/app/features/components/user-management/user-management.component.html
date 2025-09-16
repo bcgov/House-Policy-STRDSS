@@ -111,10 +111,10 @@
                     <td>
                         <ng-container [ngSwitch]="accessRequest.accessRequestStatusCd">
                             <ng-container *ngSwitchCase="'Approved'">
-                                <span class="status-approved">Approved</span>
+                                <span [style]="{'color':'#42814A'}">Approved</span>
                             </ng-container>
                             <ng-container *ngSwitchCase="'Denied'">
-                                <span class="status-denied">Denied</span>
+                                <span [style]="{'color':'#CE3E39'}">Denied</span>
                             </ng-container>
                             <ng-container *ngSwitchCase="'Requested'">
                                 <button pButton name="form-approve-btn" id="form-approve-{{index}}-btn"
@@ -153,7 +153,7 @@
 </div>
 
 <p-dialog *ngIf="currentTableItem" id="approve-popup-dialog" header="Approve Access Request" [modal]="true"
-    [(visible)]="showApprovePopup" class="width-50vw">
+    [(visible)]="showApprovePopup" [style]="{width: '50vw'}">
     <div class="form-group-row"><strong class="bold-text">User Email: </strong>{{currentTableItem.emailAddressDsc}}
     </div>
     <div class="form-group-row"><strong class="bold-text">ID Provider: </strong>
@@ -193,7 +193,7 @@
 </p-dialog>
 
 <p-dialog id="reject-popup-dialog" *ngIf="currentTableItem" header="Reject Access Request" [modal]="true"
-    [(visible)]="showRejectPopup" class="width-50vw">
+    [(visible)]="showRejectPopup" [style]="{width: '50vw'}">
     <div class="form-group-row-col"><strong class="bold-text">User ID: </strong>{{currentTableItem.emailAddressDsc}}
     </div>
     <div class="form-group-row-col"><strong class="bold-text">Requested User

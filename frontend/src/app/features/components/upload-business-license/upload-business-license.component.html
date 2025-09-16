@@ -143,8 +143,8 @@
     </div>
 </div>
 
-<p-dialog header="Upload Business Licence Data" class="upload-bl-popup width-640px" [modal]="true" [closable]="true"
-    [(visible)]="isUploadVisible">
+<p-dialog header="Upload Business Licence Data" class="upload-bl-popup" [modal]="true" [closable]="true"
+    [(visible)]="isUploadVisible" [style]="{ width: '640px' }">
     <ng-template pTemplate="body">
         <div class="row sub-header">Upload Your Business Licence Data (.CSV File Only)</div>
         <div class="row file-select" [class.has-file]="selectedFile?.name">

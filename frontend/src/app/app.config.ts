@@ -12,6 +12,9 @@ import { errorInterceptor } from './common/consts/error-interceptor.const';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 
+// Get the nonce value once and reuse it
+const cspNonce = document.querySelector('meta[name="csp-nonce"]')?.getAttribute('content') || undefined;
+
 export const appConfig: ApplicationConfig = {
     providers: [
         provideAnimations(),
@@ -25,6 +28,9 @@ export const appConfig: ApplicationConfig = {
                     darkModeSelector: false,
                     cssLayer: false
                 }
+            },
+            csp: {
+                nonce: cspNonce
             }
         }),
         KeycloakService,
@@ -37,7 +43,7 @@ export const appConfig: ApplicationConfig = {
         MessageService,
         {
             provide: CSP_NONCE,
-            useValue: document.querySelector('meta[name="csp-nonce"]')?.getAttribute('content'),
+            useValue: cspNonce,
         },
     ],
 }

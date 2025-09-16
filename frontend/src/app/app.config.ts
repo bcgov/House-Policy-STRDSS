@@ -31,9 +31,6 @@ export const appConfig: ApplicationConfig = {
                     darkModeSelector: false,
                     cssLayer: false
                 }
-            },
-            csp: {
-                nonce: '...'
             }
         }),
         // Use modern provider pattern for Keycloak

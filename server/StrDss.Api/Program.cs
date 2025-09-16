@@ -221,7 +221,7 @@ app.UseHealthChecks("/healthz");
 
 app.Use(async (context, next) =>
 {
-    context.Response.Headers.Append("content-security-policy", $"default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';");
+    context.Response.Headers.Append("content-security-policy", $"default-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';");
     context.Response.Headers.Append("strict-transport-security", "max-age=15768000; includeSubDomains; preload");
     context.Response.Headers.Append("x-content-type-options", "nosniff");
     context.Response.Headers.Append("x-frame-options", "SAMEORIGIN");

@@ -16,7 +16,7 @@
             size="small" [(selection)]="selectedListings">
             <ng-template pTemplate="header">
                 <tr>
-                    <th class="width-4rem" aria-labelledby="selectAll_checkbox_header">
+                    <th style="width: 4rem" aria-labelledby="selectAll_checkbox_header">
                         <p-tableHeaderCheckbox id="selectAll_checkbox_header"
                             ariaLabel="'Select or Deselect All'"></p-tableHeaderCheckbox>
                     </th>
@@ -142,8 +142,8 @@
         (click)="submit()">Review</button>
     <button pButton id="cancel-btn" class="outline-btn" (click)="cancel()">Cancel</button>
 </div>
-<p-dialog class="preview-dialog width-50vw" header="Send Takedown Request" [(visible)]="showPreviewDialog" [modal]="true"
-    [draggable]="false" [resizable]="false">
+<p-dialog class="preview-dialog" header="Send Takedown Request" [(visible)]="showPreviewDialog" [modal]="true"
+    [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
 
     <div class="note">
         <div class="title">

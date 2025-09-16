@@ -470,8 +470,8 @@
     </div>
 </div>
 
-<p-dialog header="Match a Business Licence to Listing" class="bl-match-popup width-50vw" [modal]="true" [closable]="false"
-    [(visible)]="isMatchBlShown">
+<p-dialog header="Match a Business Licence to Listing" class="bl-match-popup" [modal]="true" [closable]="false"
+    [(visible)]="isMatchBlShown" [style]="{width: '50vw'}">
     <div class="search-label"><strong>Enter a Business Licence Number</strong></div>
     <div class="search-row">
         <input pInputText type="text" class="full-width-text-field" [(ngModel)]="searchBlText"
@@ -502,8 +502,8 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog header="Unlink a business licence from Listing" class="bl-unlink-popup width-50vw" [modal]="true" [closable]="false"
-    [(visible)]="isUnlinkBlShow">
+<p-dialog header="Unlink a business licence from Listing" class="bl-unlink-popup" [modal]="true" [closable]="false"
+    [(visible)]="isUnlinkBlShow" [style]="{width: '50vw'}">
     <div class="search-label" *ngIf="this.listing && this.listing.bizLicenceInfo"><strong>Are you sure you want to
             unlink business
             licence number
@@ -518,7 +518,7 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog header="Legend" class="width-50vw" [modal]="true" [(visible)]="isLegendShown">
+<p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
     <span>
         <strong>Status:</strong> Status of the listing using the following categories:
         <ul class="statuses">
@@ -578,8 +578,8 @@
     </p>
 </p-dialog>
 
-<p-dialog header="Suggest a New Address" class="address-change-popup width-50vw" [modal]="true" [closable]="false"
-    [(visible)]="isEditAddressShown">
+<p-dialog header="Suggest a New Address" class="address-change-popup" [modal]="true" [closable]="false"
+    [(visible)]="isEditAddressShown" [style]="{width: '50vw'}">
     <div class="content" *ngIf="listing">
         <div class="message warn" *ngIf="isJurisdictionDifferent">
             <div class="header">

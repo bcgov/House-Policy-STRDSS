@@ -7,8 +7,8 @@
         [tableStyle]="{ 'min-width': '60rem' }" size="small">
         <ng-template pTemplate="header">
             <tr class="header-panel">
-                <th class="width-4rem"></th>
-                <th class="width-24rem sortable-header" id="organizationNm_header"
+                <th style="width: 4rem"></th>
+                <th style="width: 24rem" class="sortable-header" id="organizationNm_header"
                     [class.sorted]="this.sort && this.sort.prop === 'organizationNm'"
                     (click)="onSort('organizationNm')">Local Government Name
                     <i class="pi pi-angle-down"
@@ -40,13 +40,13 @@
                     <i class="pi pi-angle-up"
                         *ngIf="this.sort && this.sort.prop === 'businessLicenceFormatTxt' && this.sort.dir === 'asc'"></i>
                 </th>
-                <th *ngIf="canEdit" class="width-19rem">Update Local Government Information</th>
+                <th *ngIf="canEdit" style="width: 19rem">Update Local Government Information</th>
             </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-jurisdiction let-index="rowIndex" let-expanded="expanded">
             <tr>
-                <td class="width-4rem">
+                <td style="width: 4rem">
                     <button [disabled]="!jurisdiction.jurisdictions || !jurisdiction.jurisdictions.length"
                         [pRowTogglerDisabled]="!jurisdiction.jurisdictions || !jurisdiction.jurisdictions.length"
                         pButton [pTooltip]="(!jurisdiction.jurisdictions || !jurisdiction.jurisdictions.length)?
@@ -58,7 +58,7 @@
                 <td>{{jurisdiction.localGovernmentTypeNm || '-'}}</td>
                 <td>{{jurisdiction.organizationCd || '-'}}</td>
                 <td>{{jurisdiction.businessLicenceFormatTxt || '-'}} </td>
-                <td *ngIf="canEdit" class="text-align-center">
+                <td *ngIf="canEdit" style="text-align: center">
                     <a id="lg-edit-{{index}}-icon"
                         [routerLink]="'/update-local-government-information/'+jurisdiction.organizationId">
                         <span class="edit-icon"></span>
@@ -143,7 +143,7 @@
                 <td>{{jurisdiction.isStraaExempt?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isBusinessLicenceRequired?'Yes':'No'}} </td>
                 <td>{{jurisdiction.isActive?'Yes':'No'}} </td>
-                <td *ngIf="canEdit" class="text-align-center">
+                <td *ngIf="canEdit" style="text-align: center">
                     <a id="jurisdiction-edit-{{index}}-icon"
                         [routerLink]="'/update-jurisdiction-information/'+jurisdiction.organizationId">
                         <span class="edit-icon"></span>

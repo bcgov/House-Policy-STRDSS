@@ -61,7 +61,7 @@
 
             <ng-template pTemplate="header">
                 <tr>
-                    <th [ariaLabel]="'expand-listing'" class="width-2rem"> </th>
+                    <th [ariaLabel]="'expand-listing'" style="width: 2rem"> </th>
                     <th class="sortable-header" id="primaryHostNm_header"
                         [class.sorted]="this.sort && this.sort.prop === 'effectiveHostNm'"
                         (click)="onSort('effectiveHostNm')">Primary Host Name
@@ -253,7 +253,7 @@
 </p-paginator>
 </p-panel>
 
-<p-dialog header="Legend" class="width-50vw" [modal]="true" [(visible)]="isLegendShown">
+<p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
     <span>
         <strong>Status:</strong> Status of the listing using the following categories:
         <ul class="statuses">

@@ -11,7 +11,7 @@ namespace StrDss.Service.HttpClients
 {
     public interface IGeocoderApi
     {
-        Task<string> GetAddressAsync(DssPhysicalAddress addressText);
+        Task<string> GetAddressAsync(DssPhysicalAddress addressText, bool bCheckThreshold = false);
         Task<List<AddressDto>> GetAddressCandidatesAsync(string addressText, int maxResults);
     }
     public class GeocoderApi : IGeocoderApi
@@ -27,7 +27,7 @@ namespace StrDss.Service.HttpClients
             _logger = logger;
         }
 
-        public async Task<string> GetAddressAsync(DssPhysicalAddress address)
+        public async Task<string> GetAddressAsync(DssPhysicalAddress address, bool bCheckThreshold = false)
         {
             _logger.LogInformation($"[Egress] Calling Geocoder API: {_client.BaseAddress}");
 
@@ -69,7 +69,7 @@ namespace StrDss.Service.HttpClients
                     address.IsMatchVerified = false;
                 }
 
-                return address.MatchScoreAmt < _config.GetValue<int>("GEOCODER_MATCH_SCORE_THRESHOLD") ? "No address found, Geocoder match score: " + address.MatchScoreAmt : "";
+                return bCheckThreshold ? address.MatchScoreAmt < _config.GetValue<int>("GEOCODER_MATCH_SCORE_THRESHOLD") ? "No address found, Geocoder match score: " + address.MatchScoreAmt : "" : "";
             }
             catch (Exception ex)
             {

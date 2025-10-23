@@ -155,7 +155,7 @@ public class PermitValidationService : IPermitValidationService
 
         try
         {
-            var geoError = await _geocoder.GetAddressAsync(newAddress);
+            var geoError = await _geocoder.GetAddressAsync(newAddress, true);
             if (!string.IsNullOrEmpty(geoError))
             {
                 _logger.LogError($"Geocoder error: {geoError}");

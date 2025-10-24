@@ -384,7 +384,8 @@ namespace StrDss.Data.Repositories
 
             if (!loadHistory) return listing;
 
-            listing.ListingHistory = (await
+            // Get the existing listing history from the database
+            var existingHistory = await
                 _dbContext.DssRentalListings.AsNoTracking()
                 .Include(x => x.IncludingRentalListingReport)
                 .Where(x => x.PlatformListingNo == listing.PlatformListingNo && x.OfferingOrganizationId == listing.OfferingOrganizationId && x.DerivedFromRentalListingId == null)
@@ -392,9 +393,52 @@ namespace StrDss.Data.Repositories
                     ReportPeriodYM = x.IncludingRentalListingReport!.ReportPeriodYm!.ToString("yyyy-MM"),
                     NightsBookedQty = x.NightsBookedQty,
                     SeparateReservationsQty = x.SeparateReservationsQty
-                }).ToListAsync())
-                .OrderByDescending(x => x.ReportPeriodYM)
-                .ToList();
+                }).ToListAsync();
+
+            // If there's history, fill in missing months
+            if (existingHistory.Any())
+            {
+                // Create a dictionary for quick lookup
+                var historyDict = existingHistory.ToDictionary(x => x.ReportPeriodYM);
+
+                // Get the date range - use current month as latest date
+                var sortedHistory = existingHistory.OrderBy(x => x.ReportPeriodYM).ToList();
+                var earliestDate = DateOnly.ParseExact(sortedHistory.First().ReportPeriodYM, "yyyy-MM", null);
+                var today = DateTime.UtcNow;
+                var latestDate = new DateOnly(today.Year, today.Month, 1); // Current month
+
+                // Generate all months between earliest and latest (current month)
+                var allMonths = new List<ListingHistoryDto>();
+                var currentMonth = earliestDate;
+
+                while (currentMonth <= latestDate)
+                {
+                    var periodKey = currentMonth.ToString("yyyy-MM");
+                    
+                    if (historyDict.TryGetValue(periodKey, out var existingEntry))
+                    {
+                        allMonths.Add(existingEntry);
+                    }
+                    else
+                    {
+                        // Add missing month with -1 values
+                        allMonths.Add(new ListingHistoryDto
+                        {
+                            ReportPeriodYM = periodKey,
+                            NightsBookedQty = -1,
+                            SeparateReservationsQty = -1
+                        });
+                    }
+
+                    currentMonth = currentMonth.AddMonths(1);
+                }
+
+                listing.ListingHistory = allMonths.OrderByDescending(x => x.ReportPeriodYM).ToList();
+            }
+            else
+            {
+                listing.ListingHistory = existingHistory;
+            }
 
             listing.ActionHistory = (await
                 _dbContext.DssEmailMessages.AsNoTracking()

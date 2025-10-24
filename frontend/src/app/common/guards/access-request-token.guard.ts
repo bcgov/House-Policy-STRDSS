@@ -9,8 +9,10 @@ export const accessRequestTokenGuard: CanActivateFn = (route, _state) => {
 
   return userDataService.getCurrentUser().pipe(
     map((user) => {
-      if (user.accessRequestStatus === "Requested" || user.accessRequestStatus === "Approved") {
+      if (user.accessRequestStatus === "Requested") {
         return router.createUrlTree(['401']);
+      } else if (user.accessRequestStatus === "Approved") {
+        return router.createUrlTree(['']);
       }
 
       if (route.routeConfig?.path) {

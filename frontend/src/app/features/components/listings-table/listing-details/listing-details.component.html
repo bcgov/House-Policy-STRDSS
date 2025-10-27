@@ -209,8 +209,8 @@
                     <ng-template pTemplate="body" let-listingHistory>
                         <tr>
                             <td>{{ listingHistory.reportPeriodYM }}</td>
-                            <td>{{ listingHistory.nightsBookedQty }}</td>
-                            <td>{{ listingHistory.separateReservationsQty }}</td>
+                            <td>{{ listingHistory.nightsBookedQty | notReported }}</td>
+                            <td>{{ listingHistory.separateReservationsQty | notReported }}</td>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="emptymessage">

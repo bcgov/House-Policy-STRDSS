@@ -264,9 +264,16 @@ namespace StrDss.Service
                         {
                             takedownReasonMismatch++;
                         }
-                        else if (row.TakeDownReason != TakeDownReasonStatus.LGRequest && row.TakeDownReason != TakeDownReasonStatus.InvalidRegistration)
+                        else
                         {
-                            takedownReasonMismatch++;
+                            // Normalize by removing spaces for comparison
+                            var normalizedReason = row.TakeDownReason.Replace(" ", "");
+
+                            if (!string.Equals(normalizedReason, TakeDownReasonStatus.LGRequest, StringComparison.OrdinalIgnoreCase)
+                                && !string.Equals(normalizedReason, TakeDownReasonStatus.InvalidRegistration, StringComparison.OrdinalIgnoreCase))
+                            {
+                                takedownReasonMismatch++;
+                            }
                         }
                     }
 

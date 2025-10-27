@@ -401,13 +401,12 @@ namespace StrDss.Data.Repositories
                 // Create a dictionary for quick lookup
                 var historyDict = existingHistory.ToDictionary(x => x.ReportPeriodYM);
 
-                // Get the date range - use current month as latest date
+                // Get the date range
                 var sortedHistory = existingHistory.OrderBy(x => x.ReportPeriodYM).ToList();
                 var earliestDate = DateOnly.ParseExact(sortedHistory.First().ReportPeriodYM, "yyyy-MM", null);
-                var today = DateTime.UtcNow;
-                var latestDate = new DateOnly(today.Year, today.Month, 1); // Current month
+                var latestDate = DateOnly.ParseExact(sortedHistory.Last().ReportPeriodYM, "yyyy-MM", null);
 
-                // Generate all months between earliest and latest (current month)
+                // Generate all months between earliest and latest
                 var allMonths = new List<ListingHistoryDto>();
                 var currentMonth = earliestDate;
 

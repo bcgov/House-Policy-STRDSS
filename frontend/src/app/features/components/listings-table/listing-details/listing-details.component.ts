@@ -24,6 +24,7 @@ import { BusinessLicenceService } from '../../../../common/services/business-lic
 import { BLSearchResultRow } from '../../../../common/models/bl-search-result-row';
 import { UrlProtocolPipe } from '../../../../common/pipes/url-protocol.pipe';
 import { TextCleanupPipe } from '../../../../common/pipes/text-cleanup.pipe';
+import { NotReportedPipe } from '../../../../common/pipes/not-reported.pipe';
 import { tap } from 'rxjs';
 
 @Component({
@@ -43,6 +44,7 @@ import { tap } from 'rxjs';
     TagModule,
     UrlProtocolPipe,
     TextCleanupPipe,
+    NotReportedPipe,
     RouterModule,
   ],
   templateUrl: './listing-details.component.html',

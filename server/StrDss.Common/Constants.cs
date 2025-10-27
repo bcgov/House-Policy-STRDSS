@@ -633,8 +633,8 @@ namespace StrDss.Common
 
     public static class TakeDownReasonStatus
     {
-        public const string LGRequest = "LGREQUEST";
-        public const string InvalidRegistration = "INVALIDREGISTRATION";
+        public const string LGRequest = "LG Request";
+        public const string InvalidRegistration = "Invalid Registration";
     }
 
     public static class UploadStatus

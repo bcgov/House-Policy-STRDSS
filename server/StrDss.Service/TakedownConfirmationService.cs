@@ -115,7 +115,7 @@ namespace StrDss.Service
             else
             {
                 listing.IsTakenDown = true;
-                listing.TakeDownReason = row.TakeDownReason;
+                listing.TakeDownReason = CommonUtils.NormalizeTakedownReason(row.TakeDownReason) ?? row.TakeDownReason;
 
                 var emailEntity = new DssEmailMessage
                 {

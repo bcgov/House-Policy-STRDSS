@@ -162,5 +162,34 @@ namespace StrDss.Common
                 }
             }
         }
+
+        /// <summary>
+        /// Normalizes takedown reason to canonical form ("LG Request" or "Invalid Registration")
+        /// regardless of input spacing or case
+        /// </summary>
+        /// <param name="reason">The takedown reason from user input</param>
+        /// <returns>The normalized takedown reason, or null if the input doesn't match any valid reason</returns>
+        public static string? NormalizeTakedownReason(string? reason)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                return null;
+            }
+
+            // Normalize by removing spaces and converting to uppercase for comparison
+            var normalizedInput = reason.Replace(" ", "").ToUpperInvariant();
+
+            if (normalizedInput == TakeDownReasonStatus.LGRequest.Replace(" ", "").ToUpperInvariant())
+            {
+                return TakeDownReasonStatus.LGRequest;
+            }
+            else if (normalizedInput == TakeDownReasonStatus.InvalidRegistration.Replace(" ", "").ToUpperInvariant())
+            {
+                return TakeDownReasonStatus.InvalidRegistration;
+            }
+
+            // Return null if no match
+            return null;
+        }
     }
 }

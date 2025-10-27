@@ -266,11 +266,10 @@ namespace StrDss.Service
                         }
                         else
                         {
-                            // Normalize by removing spaces for comparison
-                            var normalizedReason = row.TakeDownReason.Replace(" ", "");
+                            // Validate that the reason is valid (can be normalized)
+                            var normalizedReason = CommonUtils.NormalizeTakedownReason(row.TakeDownReason);
 
-                            if (!string.Equals(normalizedReason, TakeDownReasonStatus.LGRequest, StringComparison.OrdinalIgnoreCase)
-                                && !string.Equals(normalizedReason, TakeDownReasonStatus.InvalidRegistration, StringComparison.OrdinalIgnoreCase))
+                            if (normalizedReason == null)
                             {
                                 takedownReasonMismatch++;
                             }

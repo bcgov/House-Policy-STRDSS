@@ -561,7 +561,7 @@ namespace StrDss.Service
                     { nameof(DssPhysicalAddress.MatchAddressTxt), 250 },
                     { nameof(DssPhysicalAddress.SiteNo), 50 },
                     { nameof(DssPhysicalAddress.BlockNo), 50 },
-                    { nameof(DssPhysicalAddress.UnitNo), 50 },
+                    { nameof(DssPhysicalAddress.UnitNo), 100 },
                     { nameof(DssPhysicalAddress.CivicNo), 50 },
                     { nameof(DssPhysicalAddress.StreetNm), 50 },
                     { nameof(DssPhysicalAddress.StreetTypeDsc), 50 },

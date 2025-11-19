@@ -18,6 +18,8 @@ namespace StrDss.Model
         public string TakeDownReason { get; set; } = "";
         [Name("reg_no")]
         public string RegNo { get; set; } = "";
+        [Name("bc_reg_no")]
+        public string BcRegNo { get; set; } = "";
         [Name("rental_street")]
         public string RentalStreet { get; set; } = "";
         [Name("rental_postal")]

@@ -160,11 +160,15 @@ namespace StrDss.Service
 
             bool isValid = false;
             string registrationTxt = "";
-            if (!string.IsNullOrEmpty(row.RegNo))
+            
+            // Use whichever registration number column is provided (reg_no or bc_reg_no)
+            string registrationNo = !string.IsNullOrEmpty(row.RegNo) ? row.RegNo : row.BcRegNo;
+            
+            if (!string.IsNullOrEmpty(registrationNo))
             {
-                _logger.LogInformation($"Processing: {row.RegNo} - {row.RentalUnit} - {row.RentalStreet} - {row.RentalPostal}");
+                _logger.LogInformation($"Processing: {registrationNo} - {row.RentalUnit} - {row.RentalStreet} - {row.RentalPostal}");
                 // There is a reg no present, so we need to validate it
-                (isValid, registrationTxt) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
+                (isValid, registrationTxt) = await _permitValidation.ValidateRegistrationPermitAsync(registrationNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
                 _logger.LogInformation("Validate permit response: " + registrationTxt);
                 if (isValid)
                 {
@@ -175,7 +179,7 @@ namespace StrDss.Service
                         {
                             using var tran = _unitOfWork.BeginTransaction();
                             // Set the registration value here
-                            listing.BcRegistryNo = row.RegNo;
+                            listing.BcRegistryNo = registrationNo;
 
                             var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, row.RentalAddress);
                             if (physicalAddress != null)

@@ -18,6 +18,15 @@ namespace StrDss.Service
             rules.Add(new FieldValidationRule
             {
                 EntityName = Entities.RegistrationDataRowUntyped,
+                FieldName = RegistrationValidationFields.RegNo,
+                FieldType = FieldTypes.String,
+                Required = false,
+                MaxLength = 25
+            });
+
+            rules.Add(new FieldValidationRule
+            {
+                EntityName = Entities.RegistrationDataRowUntyped,
                 FieldName = RegistrationValidationFields.BcRegNo,
                 FieldType = FieldTypes.String,
                 Required = false,

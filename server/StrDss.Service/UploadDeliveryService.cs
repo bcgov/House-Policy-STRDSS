@@ -113,7 +113,8 @@ namespace StrDss.Service
             }
             else if (reportType == UploadDeliveryTypes.RegistrationData)
             {
-                return ["reg_no", "rental_street", "rental_postal", "rental_address"];
+                // Note: reg_no and bc_reg_no are alternatives - one of them must be present
+                return ["rental_street", "rental_postal", "rental_address"];
             }
             else
             {
@@ -145,7 +146,7 @@ namespace StrDss.Service
                 }
             }
 
-            if (!mandatoryFields.Contains("reg_no"))
+            if (!mandatoryFields.Contains("rental_street"))
             {
                 var isDuplicate = await _uploadRepo.IsDuplicateRentalReportUploadAsnyc(firstDayOfReportMonth, orgId, hashValue);
                 if (isDuplicate)
@@ -206,6 +207,20 @@ namespace StrDss.Service
             if (!CheckCommonMandatoryFields(csv.HeaderRecord, mandatoryFields, errors))
             {
                 return (errors, header);
+            }
+
+            // For RegistrationData, check that either reg_no or bc_reg_no is present
+            if (reportType == UploadDeliveryTypes.RegistrationData)
+            {
+                var headers = CsvHelperUtils.GetLowercaseFieldsFromCsvHeaders(csv.HeaderRecord);
+                bool hasRegNo = headers.Any(x => x.ToLower() == "reg_no");
+                bool hasBcRegNo = headers.Any(x => x.ToLower() == "bc_reg_no");
+
+                if (!hasRegNo && !hasBcRegNo)
+                {
+                    errors.AddItem("File", "Either 'reg_no' or 'bc_reg_no' column must be present in the file");
+                    return (errors, header);
+                }
             }
 
             var reportPeriodMismatch = 0;
@@ -320,18 +335,20 @@ namespace StrDss.Service
                         }
                     }
 
-                    if (mandatoryFields.Contains("reg_no")) 
+                    if (reportType == UploadDeliveryTypes.RegistrationData) 
                     {
                         // Determine if 'rental_address' is provided
                         bool hasRentalAddress = !row.RentalAddress.IsEmpty();
 
-                        // Determine if 'reg_no', 'rental_street', and 'rental_postal' are provided
-                        bool hasRegNo = !row.RegNo.IsEmpty();
+                        // Determine if 'reg_no' or 'bc_reg_no', 'rental_street', and 'rental_postal' are provided
+                        // Use whichever registration number column is provided
+                        string regNoValue = !row.RegNo.IsEmpty() ? row.RegNo : row.BcRegNo;
+                        bool hasRegNo = !regNoValue.IsEmpty();
                         bool hasRentalStreet = !row.RentalStreet.IsEmpty();
                         bool hasRentalPostal = !row.RentalPostal.IsEmpty();
                         bool hasCompleteAddressFields = hasRegNo && hasRentalStreet && hasRentalPostal;
 
-                        // Validate that either 'rental_address' is provided, or all 'reg_no', 'rental_street', and 'rental_postal' are provided
+                        // Validate that either 'rental_address' is provided, or all 'reg_no'/'bc_reg_no', 'rental_street', and 'rental_postal' are provided
                         if (!hasRentalAddress && !hasCompleteAddressFields)
                         {
                             registrationDataMissing++;
@@ -441,12 +458,12 @@ namespace StrDss.Service
 
             if (registrationDataMissing > 0)
             {
-                errors.AddItem("RegistrationData", $"Either 'rental_address' or all of 'reg_no', 'rental_street', and 'rental_postal' must be provided. Missing in {registrationDataMissing} record(s).");
+                errors.AddItem("RegistrationData", $"Either 'rental_address' or all of 'reg_no'/'bc_reg_no', 'rental_street', and 'rental_postal' must be provided. Missing in {registrationDataMissing} record(s).");
             }
 
             if (regNoMissing > 0)
             {
-                errors.AddItem("reg_no", $"Registration No missing in {regNoMissing} record(s). Please provide a Registration No.");
+                errors.AddItem("reg_no", $"Registration No (reg_no or bc_reg_no) missing in {regNoMissing} record(s). Please provide a Registration No.");
             }
 
             if (rentalStreetMissing > 0)

@@ -173,15 +173,18 @@ namespace StrDss.Service
             bool isRegistrationValid = false;
             string registrationTxt = RegistrationValidationText.DataInvalid;
 
-            // Attempt to validate the registration number if it exists, and the user is allowed to do it this weay
+            // Attempt to validate the registration number if it exists, and the user is allowed to do it this way
             if (doValidateRegistration)
             {
+                // Use whichever registration number column is provided (reg_no or bc_reg_no)
+                string registrationNo = !string.IsNullOrEmpty(row.RegNo) ? row.RegNo : row.BcRegNo;
+                
                 // either validate the registration number, or check if the property is straa exempt
-                if (!string.IsNullOrEmpty(row.RegNo)) 
+                if (!string.IsNullOrEmpty(registrationNo)) 
                 {
-                    (isRegistrationValid, registrationTxt) = await _permitValidation.ValidateRegistrationPermitAsync(row.RegNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
+                    (isRegistrationValid, registrationTxt) = await _permitValidation.ValidateRegistrationPermitAsync(registrationNo, row.RentalUnit, row.RentalStreet, row.RentalPostal);
                 }
-                else if (!isRegistrationValid && string.IsNullOrEmpty(row.RegNo) && !string.IsNullOrEmpty(row.RentalAddress))
+                else if (!isRegistrationValid && string.IsNullOrEmpty(registrationNo) && !string.IsNullOrEmpty(row.RentalAddress))
                 {
                     (isRegistrationValid, registrationTxt) = await _permitValidation.CheckStraaExemptionStatus(row.RentalAddress);
                 }

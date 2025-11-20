@@ -8,7 +8,7 @@ runs:
     uses: asdf-vm/actions/setup@8b8467c5522bb0aea4977082037e4f2956d67e52
 
   - name: Cache tools
-    uses: actions/cache@67b839edb68371cc5014f6cea11c9aa77238de78
+    uses: actions/cache@v4
     with:
       path: /home/runner/.asdf
       key: ${{ runner.os }}-${{ hashFiles('**/.tool-versions') }}

@@ -275,7 +275,7 @@
                 <ng-template pTemplate="body" let-actionHistory>
                     <tr class="small-text">
                         <td>{{ actionHistory.action }} 
-                            <span *ngIf="actionHistory.action == 'Takedown Reported' && listing.takeDownReason">: {{ listing.takeDownReason }}</span>
+                            <span *ngIf="actionHistory.action == 'Takedown Reported' && listing.takeDownReason">: {{ listing.takeDownReason === 'Invalid Registration' ? 'Registration Check Failed' : listing.takeDownReason }}</span>
                         </td>
                         <td>{{ actionHistory.date |date:'yyyy-MM-dd'}}</td>
                         <td>{{ actionHistory.user }}</td>

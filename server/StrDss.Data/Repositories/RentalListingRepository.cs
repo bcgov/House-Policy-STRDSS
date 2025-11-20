@@ -97,6 +97,12 @@ namespace StrDss.Data.Repositories
             foreach (var listing in listings.SourceList)            {
                 listing.LastActionDtm = listing.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(listing.LastActionDtm.Value);
                 listing.Hosts = contacts.Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId).ToList();
+                
+                // Override LastActionNm if takedown reason is "Invalid Registration"
+                if (listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
+                {
+                    listing.LastActionNm = "Reg Check Failed";
+                }
             }
 
             return listings;
@@ -333,6 +339,12 @@ namespace StrDss.Data.Repositories
                 listing.Filtered = filteredIdSet.Contains(listing.RentalListingId ?? 0);
                 listing.Hosts = contacts.Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId).ToList();
                 group.NightsBookedYtdQty += listing.NightsBookedYtdQty ?? 0;
+                
+                // Override LastActionNm if takedown reason is "Invalid Registration"
+                if (listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
+                {
+                    listing.LastActionNm = "Reg Check Failed";
+                }
             }
 
             stopwatch.Stop();
@@ -375,6 +387,12 @@ namespace StrDss.Data.Repositories
             }
 
             listing.LastActionDtm = listing.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(listing.LastActionDtm.Value);
+
+            // Override LastActionNm if takedown reason is "Invalid Registration"
+            if (listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
+            {
+                listing.LastActionNm = "Reg Check Failed";
+            }
 
             listing.Hosts =
                 _mapper.Map<List<RentalListingContactDto>>(await
@@ -555,6 +573,12 @@ namespace StrDss.Data.Repositories
         {
             var listing = _mapper.Map<RentalListingExportDto>(await _dbSet.AsNoTracking().FirstAsync(x => x.RentalListingId == rentalListingId));
 
+            // Override LastActionNm if takedown reason is "Invalid Registration"
+            if (listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
+            {
+                listing.LastActionNm = "Reg Check Failed";
+            }
+
             await LoadHistoryFields(listing);
 
             await LoadPropertyHostsFields(listing);
@@ -584,12 +608,34 @@ namespace StrDss.Data.Repositories
                 case 2:
                     listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
                     listing.LastActionNm1 = actions[0].EmailMessageTypeNm;
+                    
+                    // Override if it's a completed takedown with invalid registration reason
+                    if (actions[0].EmailMessageTypeNm == EmailMessageTypes.CompletedTakedown && 
+                        listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
+                    {
+                        listing.LastActionNm1 = "Reg Check Failed";
+                    }
+                    
                     listing.LastActionDtm2 = actions[1].MessageDeliveryDtm;
                     listing.LastActionNm2 = actions[1].EmailMessageTypeNm;
+                    
+                    // Override if it's a completed takedown with invalid registration reason
+                    if (actions[1].EmailMessageTypeNm == EmailMessageTypes.CompletedTakedown && 
+                        listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
+                    {
+                        listing.LastActionNm2 = "Reg Check Failed";
+                    }
                     break;
                 case 1:
                     listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
                     listing.LastActionNm1 = actions[0].EmailMessageTypeNm;
+                    
+                    // Override if it's a completed takedown with invalid registration reason
+                    if (actions[0].EmailMessageTypeNm == EmailMessageTypes.CompletedTakedown && 
+                        listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
+                    {
+                        listing.LastActionNm1 = "Reg Check Failed";
+                    }
                     break;
             }
         }

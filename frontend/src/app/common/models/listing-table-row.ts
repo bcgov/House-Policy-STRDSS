@@ -18,6 +18,7 @@ export interface ListingTableRow {
     isActive?: boolean;
     isNew?: boolean;
     isTakenDown?: boolean;
+    takeDownReason?: string;
     platformListingUrl?: string;
     matchScoreAmt?: number;
     addressSort1ProvinceCd?: string;

@@ -139,7 +139,7 @@ namespace StrDss.Service
 
             // Because we may be processing these uploads in blocks of 500, we need to do some running totals and update the upload record with the stats we need.
             var totalProcessed = upload.UploadLinesProcessed + processedCount;
-            var totalRegErrors = upload.RegistrationLinesError + regErrorCount;
+            var totalRegErrors = doValidateRegistration ? 0 : upload.RegistrationLinesError + regErrorCount;
             var totalErrors = upload.UploadLinesError + errorCount;
 
             // Update the delivery record with the stats we need.
@@ -149,7 +149,7 @@ namespace StrDss.Service
             upload.UploadLinesProcessed = totalProcessed;
             upload.UploadLinesSuccess = totalProcessed - totalErrors;
             upload.UploadLinesError = totalErrors;
-            upload.RegistrationLinesSuccess = totalProcessed - totalRegErrors;
+            upload.RegistrationLinesSuccess = doValidateRegistration ? 0 : totalProcessed - totalRegErrors;
             upload.RegistrationLinesError = totalRegErrors;
             _unitOfWork.Commit();
 
@@ -188,6 +188,11 @@ namespace StrDss.Service
                 {
                     (isRegistrationValid, registrationTxt) = await _permitValidation.CheckStraaExemptionStatus(row.RentalAddress);
                 }
+            }
+            else
+            {
+                isRegistrationValid = false;
+                registrationTxt = RegistrationValidationText.ValidationNotExecuted;
             }
 
             if (!string.IsNullOrWhiteSpace(row.RptPeriod))

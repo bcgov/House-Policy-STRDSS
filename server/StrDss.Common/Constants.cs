@@ -659,5 +659,6 @@ namespace StrDss.Common
         public const string ValidationException = "Registration validation Api threw an undhandled exception.";
         public const string ValidationException404 = "Permit not found.";
         public const string ValidationException401 = "Unauthorized access.";
+        public const string ValidationNotExecuted = "Validation not performed for major platforms.";
     }
 }

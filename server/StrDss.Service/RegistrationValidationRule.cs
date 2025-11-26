@@ -39,7 +39,7 @@ namespace StrDss.Service
                 FieldName = RegistrationValidationFields.RentalUnit,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 25
+                MaxLength = 100
             });
 
             rules.Add(new FieldValidationRule

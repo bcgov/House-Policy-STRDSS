@@ -139,7 +139,7 @@ namespace StrDss.Service
 
             // Because we may be processing these uploads in blocks of 500, we need to do some running totals and update the upload record with the stats we need.
             var totalProcessed = upload.UploadLinesProcessed + processedCount;
-            var totalRegErrors = doValidateRegistration ? 0 : upload.RegistrationLinesError + regErrorCount;
+            var totalRegErrors = doValidateRegistration ? upload.RegistrationLinesError + regErrorCount : 0;
             var totalErrors = upload.UploadLinesError + errorCount;
 
             // Update the delivery record with the stats we need.

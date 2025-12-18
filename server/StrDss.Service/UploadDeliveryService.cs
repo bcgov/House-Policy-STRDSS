@@ -82,6 +82,9 @@ namespace StrDss.Service
                 UploadStatus = UploadStatus.Pending,
                 RegistrationStatus = UploadStatus.Pending,
                 UploadLinesTotal = uploadLines.Count,
+                UploadLinesProcessed = 0,
+                UploadLinesSuccess = 0,
+                UploadLinesError = 0,
                 UploadDate = utcNow,
             };
 

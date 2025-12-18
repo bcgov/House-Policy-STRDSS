@@ -68,14 +68,13 @@ namespace StrDss.Service
                 var csvReader = new CsvReader(textReader, csvConfig);
 
                 var (orgCd, listingId) = await ProcessLine(upload, header, line, csvReader);
-                processedCount++;
+                if(line.IsProcessed) processedCount++;
             }
 
             upload.UploadStatus = UploadStatus.Processed;
             upload.RegistrationStatus = UploadStatus.Processed;
-            upload.UploadLinesTotal = lineCount;
-            upload.UploadLinesProcessed = processedCount;
-            upload.UploadLinesSuccess = processedCount;
+            upload.UploadLinesProcessed += processedCount;
+            upload.UploadLinesSuccess += processedCount;
             upload.UploadLinesError = 0;
             upload.RegistrationLinesSuccess = 0;
             upload.RegistrationLinesError = 0;

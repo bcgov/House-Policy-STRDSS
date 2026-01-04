@@ -150,8 +150,6 @@
 
                     </th>
                     <th aria-label="Status"></th>
-                    <th>Platform</th>
-                    <th>Listing ID</th>
                     <th>Registration</th>
                     <th>Details</th>
                     <th>Address (Best Match)</th>
@@ -160,6 +158,7 @@
                     <th>Matched BL</th>
                     <th>Last Action</th>
                     <th>Last Action Date</th>
+                    <th>Count</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-listing let-index="rowIndex">
@@ -189,11 +188,6 @@
                                 pTooltip="Takedown Reported">
                             </div>
                         </div>
-                    </td>
-                    <td>{{ listing.offeringOrganizationNm }}</td>
-                    <td> <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
-                            [href]="listing.platformListingUrl | urlProtocol">{{
-                            listing.platformListingNo }}</a>
                     </td>
                     <td>{{ listing.bcRegistryNo || '-' }}</td>
                     <td><a [ariaLabel]="'open-listing-details'" pButton class="details-button-with-icon" target="_blank"
@@ -229,6 +223,10 @@
                     </td>
                     <td>{{ listing.lastActionNm }}</td>
                     <td>{{ listing.lastActionDtm |date:'yyyy-MM-dd' }}</td>
+                    <td> <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
+                            [href]="listing.platformListingUrl | urlProtocol">{{
+                            listing.offeringOrganizationNm }}</a>
+                    </td>
                 </tr>
             </ng-template>
         </p-table>

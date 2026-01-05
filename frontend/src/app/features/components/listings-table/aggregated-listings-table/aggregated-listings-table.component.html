@@ -151,7 +151,6 @@
                     </th>
                     <th aria-label="Status"></th>
                     <th>Registration</th>
-                    <th>Details</th>
                     <th>Address (Best Match)</th>
                     <th>Nights stayed (12M)</th>
                     <th>Listing BL</th>
@@ -162,8 +161,8 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-listing let-index="rowIndex">
-                <tr [class.filtered-out]="!listing.filtered">
-                    <td>
+                <tr [class.filtered-out]="!listing.filtered" (click)="onRowClick($event, listing)" class="clickable-row">
+                    <td (click)="$event.stopPropagation()">
                         <p-checkbox [(ngModel)]="listing.selected" [binary]="true" [inputId]="'listing-select-chbx'"
                             (onChange)="onListingRowSelected($event,listing)" ariaLabel="Select listing"></p-checkbox>
                     </td>
@@ -190,8 +189,6 @@
                         </div>
                     </td>
                     <td>{{ listing.bcRegistryNo || '-' }}</td>
-                    <td><a [ariaLabel]="'open-listing-details'" pButton class="details-button-with-icon" target="_blank"
-                            [routerLink]="'/listing/'+listing.rentalListingId"><i class="pi pi-list"></i></a></td>
                     <td
                         [class.low-address-score-match]="listing.matchScoreAmt<=addressLowScore && (!listing.isMatchVerified && !listing.isMatchCorrected)">
                         <div class="address-col">
@@ -224,7 +221,7 @@
                     <td>{{ listing.lastActionNm }}</td>
                     <td>{{ listing.lastActionDtm |date:'yyyy-MM-dd' }}</td>
                     <td> <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
-                            [href]="listing.platformListingUrl | urlProtocol">{{
+                            [href]="listing.platformListingUrl | urlProtocol" (click)="$event.stopPropagation()">{{
                             listing.offeringOrganizationNm }}</a>
                     </td>
                 </tr>
@@ -238,7 +235,7 @@
 <ng-template pTemplate="emptymessage">
     <tr>
         <td></td>
-        <td colspan="7">No listings matched your search. Please try again. </td>
+        <td colspan="9">No listings matched your search. Please try again. </td>
     </tr>
 </ng-template>
 </p-table>

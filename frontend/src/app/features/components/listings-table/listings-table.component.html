@@ -179,7 +179,11 @@
                             </div>
                         </div>
                     </td>
-                    <td>{{ row.bcRegistryNo || '-' }}</td>
+                    <td>
+                        <span [class.no-reg-number]="!row.bcRegistryNo">
+                            {{ row.bcRegistryNo || 'No Reg Number' }}
+                        </span>
+                    </td>
                     <td
                         [class.low-address-score-match]="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)">
                         <div class="address-col">

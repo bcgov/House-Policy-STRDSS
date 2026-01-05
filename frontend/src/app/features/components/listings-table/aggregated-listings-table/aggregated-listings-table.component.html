@@ -188,7 +188,11 @@
                             </div>
                         </div>
                     </td>
-                    <td>{{ listing.bcRegistryNo || '-' }}</td>
+                    <td>
+                        <span [class.no-reg-number]="!listing.bcRegistryNo">
+                            {{ listing.bcRegistryNo || 'No Reg Number' }}
+                        </span>
+                    </td>
                     <td
                         [class.low-address-score-match]="listing.matchScoreAmt<=addressLowScore && (!listing.isMatchVerified && !listing.isMatchCorrected)">
                         <div class="address-col">

@@ -83,8 +83,6 @@
                             *ngIf="this.sort && this.sort.prop === 'registrationNumber' && this.sort.dir === 'asc'"></i>
                     </th>
 
-                    <th style="text-align: center;">Details</th>
-
                     <th class="sortable-header" id="addressNormalized_header"
                         [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"
                         (click)="onSort('matchAddressTxt')">Address (Best Match)
@@ -154,8 +152,8 @@
             </ng-template>
 
             <ng-template pTemplate="body" let-row let-index="rowIndex">
-                <tr>
-                    <td>
+                <tr (click)="onRowClick($event, row)" class="clickable-row">
+                    <td (click)="$event.stopPropagation()">
                         <p-tableCheckbox [ariaLabel]="'select-listing-row'" inputId="select-listing-row-{{index}}"
                             [value]="row"></p-tableCheckbox>
                     </td>
@@ -182,10 +180,6 @@
                         </div>
                     </td>
                     <td>{{ row.bcRegistryNo || '-' }}</td>
-                    <td class="align-center">
-                        <a [ariaLabel]="'open-listing-details'" pButton class="details-button-with-icon" target="_blank"
-                            [routerLink]="'/listing/'+row.rentalListingId"><i class="pi pi-list"></i></a>
-                    </td>
                     <td
                         [class.low-address-score-match]="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)">
                         <div class="address-col">
@@ -221,14 +215,14 @@
                     </td>
                     <td>
                         <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
-                            [href]="row.platformListingUrl | urlProtocol">{{
+                            [href]="row.platformListingUrl | urlProtocol" (click)="$event.stopPropagation()">{{
                             row.offeringOrganizationNm }}</a>
                     </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="11">No listings matched your search. Please try again. </td>
+                    <td colspan="10">No listings matched your search. Please try again. </td>
                 </tr>
             </ng-template>
         </p-table>

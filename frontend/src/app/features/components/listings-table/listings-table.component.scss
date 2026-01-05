@@ -203,6 +203,44 @@
                 }
             }
 
+            &.clickable-row {
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #f5f5f5;
+                }
+
+                td {
+                    &:first-child {
+                        cursor: default !important;
+
+                        ::ng-deep .p-checkbox-input {
+                            cursor: default !important;
+                        }
+                    }
+
+                    &:nth-child(2) {
+                        cursor: default;
+
+                        .status-col,
+                        .status-circle,
+                        .status-flag {
+                            cursor: default;
+                        }
+                    }
+
+                    .listing-id-link {
+                        cursor: default;
+                    }
+
+                    .address-col {
+                        i.pi.pi-info-circle {
+                            cursor: default;
+                        }
+                    }
+                }
+            }
+
             td {
                 font-size: 12px;
                 word-break: break-word;

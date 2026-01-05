@@ -175,6 +175,22 @@ export class ListingsTableComponent implements OnInit {
     this.router.navigateByUrl(`/listings/${row.rentalListingId}`);
   }
 
+  onRowClick(event: MouseEvent, row: ListingTableRow): void {
+    // Don't trigger if clicking on checkbox, link, or button
+    const target = event.target as HTMLElement;
+    if (target.closest('p-tablecheckbox') || 
+        target.closest('a') || 
+        target.closest('button') ||
+        target.closest('input') ||
+        target.closest('p-checkbox')) {
+      return;
+    }
+    
+    // Open listing details in a new tab
+    const url = this.router.serializeUrl(this.router.createUrlTree(['/listing', row.rentalListingId]));
+    window.open(url, '_blank');
+  }
+
   onNoticeOpen(): void {
     this.searchStateService.selectedListings = this.selectedListings;
     this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } });

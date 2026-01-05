@@ -232,6 +232,22 @@ export class AggregatedListingsTableComponent implements OnInit {
         });
     }
 
+    onRowClick(event: MouseEvent, listing: ListingTableRow): void {
+        // Don't trigger if clicking on checkbox, link, or button
+        const target = event.target as HTMLElement;
+        if (target.closest('p-checkbox') || 
+            target.closest('a') || 
+            target.closest('button') ||
+            target.closest('input') ||
+            target.closest('.multihost-icon')) {
+            return;
+        }
+        
+        // Open listing details in a new tab
+        const url = this.router.serializeUrl(this.router.createUrlTree(['/listing', listing.rentalListingId]));
+        window.open(url, '_blank');
+    }
+
     onNoticeOpen(): void {
         this.searchStateService.selectedListings = Object.values(
             this.selectedListings,

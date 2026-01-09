@@ -14,11 +14,11 @@ namespace StrDss.Data.Repositories
     public interface IRentalListingRepository
     {
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction);
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction);
         Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, string orderBy, string direction);
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, string orderBy, string direction);
         Task<int> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete);
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
@@ -48,13 +48,19 @@ namespace StrDss.Data.Repositories
             _userRepo = userRepo;
         }
         public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, int pageSize, int pageNumber, string orderBy, string direction)
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction)
         {
             var query = _dbSet.AsNoTracking();
 
             if (_currentUser.OrganizationType == OrganizationTypes.LG)
             {
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            // Apply recent filter if requested
+            if (recent)
+            {
+                query = ApplyRecentFilter(query);
             }
 
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
@@ -109,7 +115,7 @@ namespace StrDss.Data.Repositories
         }
 
         public async Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, string orderBy, string direction)
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, string orderBy, string direction)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -118,6 +124,12 @@ namespace StrDss.Data.Repositories
             if (_currentUser.OrganizationType == OrganizationTypes.LG)
             {
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            // Apply recent filter if requested
+            if (recent)
+            {
+                query = ApplyRecentFilter(query);
             }
 
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, 
@@ -178,6 +190,39 @@ namespace StrDss.Data.Repositories
             _logger.LogDebug($"Get Grouped Listings - Total Groups: {sortedGroups.Count}, Total Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return sortedGroups;
+        }
+
+        private IQueryable<DssRentalListingVw> ApplyRecentFilter(IQueryable<DssRentalListingVw> query)
+        {
+            // Get current date in Pacific time
+            var currentDate = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow);
+            var currentDayOfMonth = currentDate.Day;
+            var currentMonth = new DateOnly(currentDate.Year, currentDate.Month, 1);
+            var previousMonth = currentMonth.AddMonths(-1);
+
+            // Get all platforms/organizations that have reported for the current month
+            var platformsReportedCurrentMonth = _dbContext.DssRentalListingReports
+                .AsNoTracking()
+                .Where(r => r.ReportPeriodYm == currentMonth)
+                .Select(r => r.ProvidingOrganizationId)
+                .Distinct()
+                .ToList();
+
+            if (currentDayOfMonth <= 19)
+            {
+                // Days 1-19: Show current month for platforms that reported, previous month for those that haven't
+                query = query.Where(x => 
+                    (platformsReportedCurrentMonth.Contains(x.OfferingOrganizationId ?? 0) && x.LatestReportPeriodYm == currentMonth) ||
+                    (!platformsReportedCurrentMonth.Contains(x.OfferingOrganizationId ?? 0) && x.LatestReportPeriodYm == previousMonth)
+                );
+            }
+            else
+            {
+                // Days 20-31: Show only current month listings
+                query = query.Where(x => x.LatestReportPeriodYm == currentMonth);
+            }
+
+            return query;
         }
 
         private RentalListingGroupDto CreateGroup(
@@ -265,7 +310,7 @@ namespace StrDss.Data.Repositories
         }
 
         public async Task<int> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete)
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -274,6 +319,12 @@ namespace StrDss.Data.Repositories
             if (_currentUser.OrganizationType == OrganizationTypes.LG)
             {
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            // Apply recent filter if requested
+            if (recent)
+            {
+                query = ApplyRecentFilter(query);
             }
 
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);

@@ -273,9 +273,9 @@
 
                 .value {
                     padding-left: 8px;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+                    white-space: normal;
+                    word-wrap: break-word;
+                    overflow-wrap: break-word;
 
                     &.warning {
                         color: #CE3E39;

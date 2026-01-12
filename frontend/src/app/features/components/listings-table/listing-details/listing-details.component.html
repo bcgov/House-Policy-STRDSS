@@ -520,14 +520,8 @@
 
 <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
     <span>
-        <strong>Status:</strong> Status of the listing using the following categories:
-        <ul class="statuses">
-            <li><span class="status-circle status-new">N</span>&nbsp;New: Listing reported for the first time in
-                current monthly data</li>
-            <li><span class="status-circle status-active">A</span>&nbsp;Active: Listing appeared in previous and
-                current monthly data</li>
-            <li><span class="status-circle status-inactive">I</span>&nbsp;Inactive: Listing appeared in previous
-                but not current monthly data </li>
+        <strong>Flags:</strong>
+        <ul class="statuses">                
             <li><span class="status-flag status-takedown-complete"></span>&nbsp;Takedown Reported: Platform reported
                 takedown of the listing</li>
             <li><span class="status-flag status-reassigned"></span>&nbsp;Reassigned: Address (best
@@ -535,14 +529,12 @@
         </ul>
     </span>
     <p>
-        <strong>Listing ID:</strong> Platform ID number for the listing.
+        <strong>Last Reported:</strong> The most recent month the platform reported the listing to the Province.
     </p>
-
     <p>
         <strong>Address (Best Match):</strong> Best physical address match provided by the BC Address Geocoder based
         on the address from the platform listing (accuracy of {{addressWarningScoreLimit}}% or above).
     </p>
-
     <p>
         <strong>Address (from platform listing):</strong> Property address of the short-term rental accommodation
         provided to the platform by the host. May be incomplete or inaccurate.

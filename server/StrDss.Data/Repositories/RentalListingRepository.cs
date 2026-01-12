@@ -276,6 +276,9 @@ namespace StrDss.Data.Repositories
                 group.LicenceStatusType = listingWithLatestAction.LicenceStatusType;
             }
 
+            // Set the LatestReportPeriodYm from the most recent listing
+            group.LatestReportPeriodYm = listingDtos.Max(x => x.LatestReportPeriodYm);
+
             group.Listings = listingDtos;
             
             return group;

@@ -62,6 +62,16 @@
             <ng-template pTemplate="header">
                 <tr>
                     <th [ariaLabel]="'expand-listing'" style="width: 2rem"> </th>
+
+                    <th class="sortable-header" id="lastReported_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'latestReportPeriodYm'"
+                        (click)="onSort('latestReportPeriodYm')">Last Reported
+                        <i class="pi pi-angle-down"
+                            *ngIf="this.sort && this.sort.prop === 'latestReportPeriodYm' && this.sort.dir === 'desc'"></i>
+                        <i class="pi pi-angle-up"
+                            *ngIf="this.sort && this.sort.prop === 'latestReportPeriodYm' && this.sort.dir === 'asc'"></i>
+                    </th>
+
                     <th class="sortable-header" id="primaryHostNm_header"
                         [class.sorted]="this.sort && this.sort.prop === 'effectiveHostNm'"
                         (click)="onSort('effectiveHostNm')">Primary Host Name
@@ -107,6 +117,7 @@
                             <i class="pi" [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
                         </button>
                     </td>
+                    <td>{{ (row.latestReportPeriodYm|date:'MMM-YY') || '-' }}</td>
                     <td>
                         <div class="host-name">
                             {{ row.primaryHostNm }}
@@ -149,7 +160,7 @@
                             [ariaLabel]="'Select or Deselect listing'"></p-checkbox>
 
                     </th>
-                    <th aria-label="Status"></th>
+                    <th>Last Reported</th>
                     <th>Registration</th>
                     <th>Address (Best Match)</th>
                     <th>Nights stayed (12M)</th>
@@ -167,19 +178,8 @@
                             (onChange)="onListingRowSelected($event,listing)" ariaLabel="Select listing"></p-checkbox>
                     </td>
                     <td>
-                        <div [ngSwitch]="listing.listingStatusType" class="align-center status-col">
-                            <div *ngSwitchCase="'N'" class="status-circle status-new"
-                                pTooltip="New: Reported for the first time in the most recent monthly data">
-                                N
-                            </div>
-                            <div *ngSwitchCase="'A'" class="status-circle status-active"
-                                pTooltip="Active: Reported in the most recent monthly data ">
-                                A
-                            </div>
-                            <div *ngSwitchCase="'I'" class="status-circle status-inactive"
-                                pTooltip="Inactive: Not reported in the most recent monthly data">
-                                I
-                            </div>
+                        <div class="align-center status-col">
+                            <span>{{ (listing.latestReportPeriodYm|date:'MMM-YY') || '-' }}</span>
                             <div *ngIf="listing.isLgTransferred" class="status-flag status-reassigned"
                                 pTooltip="Reassigned">
                             </div>

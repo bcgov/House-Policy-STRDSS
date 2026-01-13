@@ -64,13 +64,13 @@
                     <th [ariaLabel]="'select-listing'" style="width: 4rem">
                         <p-tableHeaderCheckbox inputId="select-all-chb"></p-tableHeaderCheckbox>
                     </th>
-                    <th class="sortable-header" id="status_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'listingStatusType'"
-                        (click)="onSort('listingStatusType')">Status
+                    <th class="sortable-header" id="lastReported_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'latestReportPeriodYm'"
+                        (click)="onSort('latestReportPeriodYm')">Last Reported
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'listingStatusType' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'latestReportPeriodYm' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'listingStatusType' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'latestReportPeriodYm' && this.sort.dir === 'asc'"></i>
                     </th>
 
                     <th class="sortable-header" id="registrationNumber_header"
@@ -158,19 +158,8 @@
                             [value]="row"></p-tableCheckbox>
                     </td>
                     <td>
-                        <div [ngSwitch]="row.listingStatusType" class="align-center status-col">
-                            <div *ngSwitchCase="'N'" class="status-circle status-new"
-                                pTooltip="New: Reported for the first time in the most recent monthly data">
-                                N
-                            </div>
-                            <div *ngSwitchCase="'A'" class="status-circle status-active"
-                                pTooltip="Active: Reported in the most recent monthly data ">
-                                A
-                            </div>
-                            <div *ngSwitchCase="'I'" class="status-circle status-inactive"
-                                pTooltip="Inactive: Not reported in the most recent monthly data">
-                                I
-                            </div>
+                        <div class="align-center status-col">
+                            <span>{{ (row.latestReportPeriodYm|date:'MMM-YY') || '-' }}</span>
                             <div *ngIf="row.isLgTransferred" class="status-flag status-reassigned"
                                 pTooltip="Reassigned">
                             </div>

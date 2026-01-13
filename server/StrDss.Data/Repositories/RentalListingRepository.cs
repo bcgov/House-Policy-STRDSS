@@ -92,6 +92,10 @@ namespace StrDss.Data.Repositories
             {
                 orderBy = "bcRegistryNo ?? \"ZZZZ\"";
             }
+            else if (orderBy == "latestReportPeriodYm")
+            {
+                orderBy = "latestReportPeriodYm ?? System.DateOnly.MinValue";
+            }
 
             var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
 
@@ -304,6 +308,9 @@ namespace StrDss.Data.Repositories
                 "effectivebusinesslicenceno" => isAscending
                     ? query.OrderBy(x => x.EffectiveBusinessLicenceNo ?? "ZZZZ")
                     : query.OrderByDescending(x => x.EffectiveBusinessLicenceNo ?? "ZZZZ"),
+                "latestreportperiodym" => isAscending
+                    ? query.OrderBy(x => x.LatestReportPeriodYm ?? DateOnly.MinValue)
+                    : query.OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue),
                 _ => isAscending
                     ? query.OrderBy(x => x.MatchAddressTxt ?? "ZZZZ")
                     : query.OrderByDescending(x => x.MatchAddressTxt ?? "ZZZZ")

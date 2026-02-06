@@ -152,7 +152,7 @@
             </ng-template>
 
             <ng-template pTemplate="body" let-row let-index="rowIndex">
-                <tr (click)="onRowClick($event, row)" class="clickable-row">
+                <tr [class.row-selected]="selectedListings.indexOf(row) !== -1" (click)="onRowClick($event, row)" class="clickable-row">
                     <td (click)="$event.stopPropagation()">
                         <p-tableCheckbox [ariaLabel]="'select-listing-row'" inputId="select-listing-row-{{index}}"
                             [value]="row"></p-tableCheckbox>
@@ -209,7 +209,7 @@
                     <td>
                         <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
                             [href]="row.platformListingUrl | urlProtocol" (click)="$event.stopPropagation()">{{
-                            row.offeringOrganizationNm }}</a>
+                            row.offeringOrganizationNm }}<i class="pi pi-external-link"></i></a>
                     </td>
                 </tr>
             </ng-template>

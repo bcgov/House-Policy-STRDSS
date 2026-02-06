@@ -55,7 +55,7 @@
             </div>
         </ng-template>
 
-        <p-table dataKey="id" [value]="aggregatedListings" #table [ariaLabel]="'table-of-listings'" id="listings-table"
+        <p-table dataKey="id" [value]="displayedListings" #table [ariaLabel]="'table-of-listings'" id="listings-table"
             [scrollable]="true" scrollHeight="{{isCEU?'635px':'585px'}}" [(selection)]="selectedListings"
             size="small" [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
 
@@ -172,7 +172,7 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-listing let-index="rowIndex">
-                <tr [class.filtered-out]="!listing.filtered" (click)="onRowClick($event, listing)" class="clickable-row">
+                <tr [class.filtered-out]="!listing.filtered" [class.row-selected]="listing.selected" (click)="onRowClick($event, listing)" class="clickable-row">
                     <td (click)="$event.stopPropagation()">
                         <p-checkbox [(ngModel)]="listing.selected" [binary]="true" [inputId]="'listing-select-chbx'"
                             (onChange)="onListingRowSelected($event,listing)" ariaLabel="Select listing"></p-checkbox>
@@ -226,7 +226,7 @@
                     <td>{{ listing.lastActionDtm |date:'yyyy-MM-dd' }}</td>
                     <td> <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
                             [href]="listing.platformListingUrl | urlProtocol" (click)="$event.stopPropagation()">{{
-                            listing.offeringOrganizationNm }}</a>
+                            listing.offeringOrganizationNm }}<i class="pi pi-external-link"></i></a>
                     </td>
                 </tr>
             </ng-template>

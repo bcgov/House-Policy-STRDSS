@@ -53,6 +53,7 @@ export interface AggregatedListingTableRow {
     businessLicenceNo: string;
     lastActionNm?: string;
     lastActionDtm?: string;
+    latestReportPeriodYm?: string;
     businessLicenceExpiryDt?: string;
     businessLicenceId?: number;
     licenceStatusType?: 'EXPIRED' | 'REVOKED' | 'ISSUED' | 'CANCELLED' | 'PENDING' | 'SUSPENDED';

@@ -45,44 +45,15 @@ namespace StrDss.Api.Controllers
         [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet("grouped")]
         public async Task<ActionResult> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = false,
-            string orderBy = "matchAddressTxt", string direction = "asc")
+            bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = false)
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
             var listings = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent,
-                orderBy, direction);
-
-            // Wrap in PagedDto-compatible structure for frontend
-            var response = new
-            {
-                sourceList = listings,
-                pageInfo = new
-                {
-                    pageNumber = 1,
-                    pageSize = listings.Count,
-                    totalCount = listings.Count,
-                    orderBy = orderBy,
-                    direction = direction,
-                    itemCount = listings.Count
-                }
-            };
-
-            return Ok(response);
-        }
-
-        [ApiAuthorize(Permissions.ListingRead)]
-        [HttpGet("grouped/count")]
-        public async Task<ActionResult> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = true)
-        {
-            var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
-
-            var count = await _listingService.GetGroupedRentalListingsCount(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
 
-            return Ok(count);
+            // Return just the listings array directly
+            return Ok(listings);
         }
 
         [ApiAuthorize(Permissions.ListingRead)]

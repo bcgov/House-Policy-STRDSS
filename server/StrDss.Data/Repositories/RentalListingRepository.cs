@@ -144,41 +144,53 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Restart();
 
-            // Get all rental listing IDs for contacts query
-            var rentalListingIds = allListings.Select(x => x.RentalListingId ?? 0).ToList();
+            // Use HashSet for faster Contains lookup
+            var rentalListingIds = new HashSet<long>(allListings.Select(x => x.RentalListingId ?? 0));
             
-            // Get all contacts in one query
-            var allContacts = await _dbContext.DssRentalListingContacts
+            // Get all contacts in one query and map them all at once
+            var allContactEntities = await _dbContext.DssRentalListingContacts
                 .AsNoTracking()
                 .Where(contact => rentalListingIds.Contains(contact.ContactedThroughRentalListingId))
                 .ToListAsync();
             
-            var contactsByListing = allContacts
+            // Map all contacts at once, then group
+            var allContactDtos = _mapper.Map<List<RentalListingContactDto>>(allContactEntities);
+            var contactsByListing = allContactDtos
                 .GroupBy(x => x.ContactedThroughRentalListingId)
-                .ToDictionary(g => g.Key, g => _mapper.Map<List<RentalListingContactDto>>(g.ToList()));
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-            _logger.LogDebug($"Get Grouped Listings - Contacts Fetched: {allContacts.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogDebug($"Get Grouped Listings - Contacts Fetched: {allContactEntities.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             stopwatch.Restart();
 
-            // Separate listings with and without registration numbers
-            var listingsWithRegNo = allListings.Where(x => !string.IsNullOrWhiteSpace(x.BcRegistryNo)).ToList();
-            var listingsWithoutRegNo = allListings.Where(x => string.IsNullOrWhiteSpace(x.BcRegistryNo)).ToList();
+            // Single pass partitioning using lists with pre-allocated capacity estimate
+            var listingsWithRegNo = new List<DssRentalListingVw>(allListings.Count / 2);
+            var listingsWithoutRegNo = new List<DssRentalListingVw>(allListings.Count / 2);
+            
+            foreach (var listing in allListings)
+            {
+                if (!string.IsNullOrWhiteSpace(listing.BcRegistryNo))
+                    listingsWithRegNo.Add(listing);
+                else
+                    listingsWithoutRegNo.Add(listing);
+            }
 
             // Group listings with registration numbers by BcRegistryNo
             var groupedByRegNo = listingsWithRegNo
                 .GroupBy(x => x.BcRegistryNo)
-                .Select(g => CreateGroup(g.ToList(), contactsByListing))
+                .Select(g => CreateGroup(g, contactsByListing))
                 .ToList();
 
             // Group listings without registration numbers by existing logic (address, host, business licence)
             var groupedByOther = listingsWithoutRegNo
                 .GroupBy(x => new { x.MatchAddressTxt, x.EffectiveHostNm, x.EffectiveBusinessLicenceNo })
-                .Select(g => CreateGroup(g.ToList(), contactsByListing))
+                .Select(g => CreateGroup(g, contactsByListing))
                 .ToList();
 
-            // Combine both groups
-            var grouped = groupedByRegNo.Concat(groupedByOther).ToList();
+            // Combine both groups - use capacity to avoid resizing
+            var grouped = new List<RentalListingGroupDto>(groupedByRegNo.Count + groupedByOther.Count);
+            grouped.AddRange(groupedByRegNo);
+            grouped.AddRange(groupedByOther);
 
             stopwatch.Stop();
 
@@ -221,18 +233,25 @@ namespace StrDss.Data.Repositories
         }
 
         private RentalListingGroupDto CreateGroup(
-            List<DssRentalListingVw> listings, 
+            IEnumerable<DssRentalListingVw> listings, 
             Dictionary<long, List<RentalListingContactDto>> contactsByListing)
         {
+            var listingsList = listings as IList<DssRentalListingVw> ?? listings.ToList();
+            var firstListing = listingsList[0];
+            
             var group = new RentalListingGroupDto
             {
-                EffectiveBusinessLicenceNo = listings.First().EffectiveBusinessLicenceNo,
-                EffectiveHostNm = listings.First().EffectiveHostNm,
-                MatchAddressTxt = listings.First().MatchAddressTxt,
+                EffectiveBusinessLicenceNo = firstListing.EffectiveBusinessLicenceNo,
+                EffectiveHostNm = firstListing.EffectiveHostNm,
+                MatchAddressTxt = firstListing.MatchAddressTxt,
                 NightsBookedYtdQty = 0
             };
 
-            var listingDtos = _mapper.Map<List<RentalListingViewDto>>(listings);
+            var listingDtos = _mapper.Map<List<RentalListingViewDto>>(listingsList);
+            
+            DateTime? maxLastActionDtm = null;
+            RentalListingViewDto? listingWithLatestAction = null;
+            DateOnly? maxReportPeriod = null;
             
             foreach (var listing in listingDtos)
             {
@@ -245,7 +264,7 @@ namespace StrDss.Data.Repositories
                 }
                 else
                 {
-                    listing.Hosts = new List<RentalListingContactDto>();
+                    listing.Hosts = [];
                 }
                 
                 group.NightsBookedYtdQty += listing.NightsBookedYtdQty ?? 0;
@@ -255,10 +274,19 @@ namespace StrDss.Data.Repositories
                 {
                     listing.LastActionNm = "Reg Check Failed";
                 }
+                
+                // Track max values in single pass
+                if (listing.LastActionDtm > maxLastActionDtm || maxLastActionDtm == null)
+                {
+                    maxLastActionDtm = listing.LastActionDtm;
+                    listingWithLatestAction = listing;
+                }
+                
+                if (listing.LatestReportPeriodYm > maxReportPeriod || maxReportPeriod == null)
+                {
+                    maxReportPeriod = listing.LatestReportPeriodYm;
+                }
             }
-
-            var lastActionDtm = listingDtos.Max(x => x.LastActionDtm);
-            var listingWithLatestAction = listingDtos.FirstOrDefault(x => x.LastActionDtm == lastActionDtm);
 
             if (listingWithLatestAction != null)
             {
@@ -272,7 +300,7 @@ namespace StrDss.Data.Repositories
             }
 
             // Set the LatestReportPeriodYm from the most recent listing
-            group.LatestReportPeriodYm = listingDtos.Max(x => x.LatestReportPeriodYm);
+            group.LatestReportPeriodYm = maxReportPeriod;
 
             group.Listings = listingDtos;
             

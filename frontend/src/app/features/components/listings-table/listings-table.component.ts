@@ -59,7 +59,7 @@ import { FormsModule } from '@angular/forms';
 export class ListingsTableComponent implements OnInit {
   @ViewChild("paginator") paginator!: Paginator;
 
-  selectedListings = []
+  selectedListings: ListingTableRow[] = []
   listings = new Array<ListingTableRow>();
   sort!: { prop: string, dir: 'asc' | 'desc' }
   currentPage!: PagingResponsePageInfo;
@@ -192,12 +192,12 @@ export class ListingsTableComponent implements OnInit {
   }
 
   onNoticeOpen(): void {
-    this.searchStateService.selectedListings = this.selectedListings;
+    this.searchStateService.selectedListings = this.selectedListings as unknown as Array<ListingDetails>;
     this.router.navigate(['/bulk-compliance-notice'], { queryParams: { returnUrl: this.getUrlFromState() } });
   }
 
   onTakedownOpen(): void {
-    this.searchStateService.selectedListings = this.selectedListings;
+    this.searchStateService.selectedListings = this.selectedListings as unknown as Array<ListingDetails>;
     this.router.navigate(['/bulk-takedown-request'], { queryParams: { returnUrl: this.getUrlFromState() } });
   }
 

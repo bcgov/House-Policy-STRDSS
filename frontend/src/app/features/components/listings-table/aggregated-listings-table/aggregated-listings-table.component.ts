@@ -67,7 +67,8 @@ export class AggregatedListingsTableComponent implements OnInit {
     @ViewChild('paginator') paginator!: Paginator;
 
     selectedListings: { [key: string]: ListingTableRow } = {};
-    aggregatedListings = new Array<AggregatedListingTableRow>();
+    aggregatedListings = new Array<AggregatedListingTableRow>(); // Store complete dataset
+    displayedListings = new Array<AggregatedListingTableRow>(); // Paginated subset for display
     sort!: { prop: string; dir: 'asc' | 'desc' };
     currentPage!: PagingResponsePageInfo;
     searchTerm!: string;
@@ -150,7 +151,18 @@ export class AggregatedListingsTableComponent implements OnInit {
                 this.userService.getCurrentUser().subscribe({
                     next: (currentUser: User) => {
                         this.isCEU = currentUser.organizationType === 'BCGov';
-                        this.getListings(page);
+                        // Initialize currentPage with page from query params
+                        if (!this.currentPage) {
+                            this.currentPage = {
+                                pageNumber: page,
+                                pageSize: 25,
+                                totalCount: 0,
+                                itemCount: 0
+                            };
+                        } else {
+                            this.currentPage.pageNumber = page;
+                        }
+                        this.getListings();
                     },
                 });
             },
@@ -208,7 +220,10 @@ export class AggregatedListingsTableComponent implements OnInit {
             this.sort = { prop: property, dir: 'asc' };
         }
 
-        this.paginator.changePage(0);
+        this.applySortingAndPagination();
+        if (this.paginator) {
+            this.paginator.changePage(0);
+        }
     }
 
     unselectAll(): void {
@@ -276,10 +291,13 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     onPageChange(value: any): void {
+        if (!this.currentPage) {
+            this.currentPage = {};
+        }
         this.currentPage.pageSize = value.rows;
         this.currentPage.pageNumber = value.page + 1;
 
-        this.getListings(this.currentPage.pageNumber);
+        this.applySortingAndPagination();
     }
 
     showLegend(): void {
@@ -287,8 +305,14 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     onSearch(): void {
-        this.getListings(0);
-        this.paginator.changePage(0);
+        // Reset to first page when searching
+        if (this.currentPage) {
+            this.currentPage.pageNumber = 1;
+        }
+        this.getListings();
+        if (this.paginator) {
+            this.paginator.changePage(0);
+        }
     }
 
     clearSearchBy(_event: any): void {
@@ -400,28 +424,24 @@ export class AggregatedListingsTableComponent implements OnInit {
         this.isFilterOpened = false;
     }
 
-    private getListings(selectedPageNumber: number = 1): void {
+    private getListings(): void {
         this.loaderService.loadingStart();
 
         const searchReq = {} as ListingSearchRequest;
         searchReq[this.searchColumn] = this.searchTerm;
 
+        // Fetch all data - backend returns complete dataset, pagination and sorting handled on frontend
         this.listingService
             .getAggregatedListings(
-                selectedPageNumber ?? (this.currentPage?.pageNumber || 0),
-                this.currentPage?.pageSize || 25,
-                this.sort?.prop || '',
-                this.sort?.dir || 'asc',
                 searchReq,
                 this.currentFilter,
             ).pipe(
-                tap(res => { this.calculateIfHostsHaveMoreThanOneProperty(res.listings.sourceList); })
+                tap(listings => { this.calculateIfHostsHaveMoreThanOneProperty(listings); })
             )
             .subscribe({
-                next: (res) => {
-                    this.currentPage = res.listings.pageInfo;
-                    this.currentPage.totalCount = res.count;
-                    this.aggregatedListings = res.listings.sourceList.map(
+                next: (listings) => {
+                    // Store all data - API now returns array directly
+                    this.aggregatedListings = listings.map(
                         (l: AggregatedListingTableRow, index: number) => {
                             return {
                                 ...l,
@@ -434,13 +454,93 @@ export class AggregatedListingsTableComponent implements OnInit {
                         },
                     );
 
+                    // Initialize currentPage if not exists
+                    if (!this.currentPage) {
+                        this.currentPage = {
+                            pageNumber: 1,
+                            pageSize: 25,
+                            totalCount: this.aggregatedListings.length,
+                            itemCount: 0
+                        };
+                    } else {
+                        this.currentPage.totalCount = this.aggregatedListings.length;
+                    }
+
+                    // Apply sorting and pagination
+                    this.applySortingAndPagination();
                     this.restoreSelectedListings();
+                    
+                    // Initialize paginator to show correct page (PrimeNG uses 0-based indexing)
+                    if (this.paginator && this.currentPage && this.currentPage.pageNumber) {
+                        this.paginator.changePage(this.currentPage.pageNumber - 1);
+                    }
                 },
                 complete: () => {
                     this.loaderService.loadingEnd();
                     this.cd.detectChanges();
                 },
             });
+    }
+
+    private applySortingAndPagination(): void {
+        let sortedListings = [...this.aggregatedListings];
+
+        // Apply sorting if sort is defined
+        if (this.sort && this.sort.prop) {
+            sortedListings.sort((a, b) => {
+                let aValue: any;
+                let bValue: any;
+
+                switch (this.sort.prop) {
+                    case 'effectiveHostNm':
+                        aValue = a.primaryHostNm || '';
+                        bValue = b.primaryHostNm || '';
+                        break;
+                    case 'matchAddressTxt':
+                        aValue = a.matchAddressTxt || '';
+                        bValue = b.matchAddressTxt || '';
+                        break;
+                    case 'effectiveBusinessLicenceNo':
+                        aValue = a.businessLicenceNo || '';
+                        bValue = b.businessLicenceNo || '';
+                        break;
+                    case 'latestReportPeriodYm':
+                        // Compare as date strings (format: YYYY-MM-DD or YYYY-MM)
+                        aValue = a.latestReportPeriodYm || '';
+                        bValue = b.latestReportPeriodYm || '';
+                        break;
+                    default:
+                        return 0;
+                }
+
+                // Handle string comparison
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    const comparison = aValue.localeCompare(bValue);
+                    return this.sort.dir === 'asc' ? comparison : -comparison;
+                }
+
+                // Handle numeric comparison
+                if (typeof aValue === 'number' && typeof bValue === 'number') {
+                    return this.sort.dir === 'asc' ? aValue - bValue : bValue - aValue;
+                }
+
+                return 0;
+            });
+        }
+
+        // Apply pagination
+        const pageSize = this.currentPage?.pageSize || 25;
+        const pageNumber = this.currentPage?.pageNumber || 1;
+        const startIndex = (pageNumber - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        this.displayedListings = sortedListings.slice(startIndex, endIndex);
+
+        // Update currentPage info
+        if (this.currentPage) {
+            this.currentPage.itemCount = this.displayedListings.length;
+            this.currentPage.totalCount = sortedListings.length;
+        }
     }
 
     private cloakParams(): void {
@@ -495,8 +595,8 @@ export class AggregatedListingsTableComponent implements OnInit {
             .subscribe(hostCount => {
                 this.aggregatedListings.forEach(al => {
                     al.hasMultipleProperties = hostCount.find(x => x.primaryHostNm === al.primaryHostNm)?.hasMultipleProperties ?? false;
-                    this.cd.detectChanges();
-                })
+                });
+                this.cd.detectChanges();
             });
     }
 

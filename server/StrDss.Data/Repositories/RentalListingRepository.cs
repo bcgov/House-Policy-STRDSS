@@ -16,8 +16,6 @@ namespace StrDss.Data.Repositories
         Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction);
         Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, string orderBy, string direction);
-        Task<int> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
@@ -119,7 +117,7 @@ namespace StrDss.Data.Repositories
         }
 
         public async Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, string orderBy, string direction)
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -182,18 +180,11 @@ namespace StrDss.Data.Repositories
             // Combine both groups
             var grouped = groupedByRegNo.Concat(groupedByOther).ToList();
 
-            _logger.LogDebug($"Get Grouped Listings - Groups Created: {grouped.Count} (RegNo: {groupedByRegNo.Count}, Other: {groupedByOther.Count}), Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            stopwatch.Restart();
-
-            // Apply sorting
-            var sortedGroups = ApplySorting(grouped, orderBy, direction);
-
             stopwatch.Stop();
 
-            _logger.LogDebug($"Get Grouped Listings - Total Groups: {sortedGroups.Count}, Total Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogDebug($"Get Grouped Listings - Groups Created: {grouped.Count} (RegNo: {groupedByRegNo.Count}, Other: {groupedByOther.Count}), Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            return sortedGroups;
+            return grouped;
         }
 
         private IQueryable<DssRentalListingVw> ApplyRecentFilter(IQueryable<DssRentalListingVw> query)
@@ -286,80 +277,6 @@ namespace StrDss.Data.Repositories
             group.Listings = listingDtos;
             
             return group;
-        }
-
-        private List<RentalListingGroupDto> ApplySorting(
-            List<RentalListingGroupDto> groups, 
-            string orderBy, 
-            string direction)
-        {
-            var query = groups.AsQueryable();
-            
-            var isAscending = direction?.ToLower() == "asc";
-            
-            query = orderBy?.ToLower() switch
-            {
-                "matchaddresstxt" => isAscending 
-                    ? query.OrderBy(x => x.MatchAddressTxt ?? "ZZZZ")
-                    : query.OrderByDescending(x => x.MatchAddressTxt ?? "ZZZZ"),
-                "effectivehostnm" => isAscending
-                    ? query.OrderBy(x => x.EffectiveHostNm ?? "ZZZZ")
-                    : query.OrderByDescending(x => x.EffectiveHostNm ?? "ZZZZ"),
-                "effectivebusinesslicenceno" => isAscending
-                    ? query.OrderBy(x => x.EffectiveBusinessLicenceNo ?? "ZZZZ")
-                    : query.OrderByDescending(x => x.EffectiveBusinessLicenceNo ?? "ZZZZ"),
-                "latestreportperiodym" => isAscending
-                    ? query.OrderBy(x => x.LatestReportPeriodYm ?? DateOnly.MinValue)
-                    : query.OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue),
-                _ => isAscending
-                    ? query.OrderBy(x => x.MatchAddressTxt ?? "ZZZZ")
-                    : query.OrderByDescending(x => x.MatchAddressTxt ?? "ZZZZ")
-            };
-            
-            return query.ToList();
-        }
-
-        public async Task<int> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
-        {
-            var stopwatch = Stopwatch.StartNew();
-
-            var query = _dbSet.AsNoTracking();
-
-            if (_currentUser.OrganizationType == OrganizationTypes.LG)
-            {
-                query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
-            }
-
-            // Apply recent filter if requested
-            if (recent)
-            {
-                query = ApplyRecentFilter(query);
-            }
-
-            ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
-
-            // Count groups with registration numbers (grouped by BcRegistryNo)
-            var countWithRegNo = await query
-                .Where(x => x.BcRegistryNo != null && x.BcRegistryNo != "")
-                .Select(x => x.BcRegistryNo)
-                .Distinct()
-                .CountAsync();
-
-            // Count groups without registration numbers (grouped by address, host, business licence)
-            var countWithoutRegNo = await query
-                .Where(x => x.BcRegistryNo == null || x.BcRegistryNo == "")
-                .Select(x => new { x.EffectiveBusinessLicenceNo, x.EffectiveHostNm, x.MatchAddressTxt })
-                .Distinct()
-                .CountAsync();
-
-            var totalCount = countWithRegNo + countWithoutRegNo;
-
-            stopwatch.Stop();
-
-            _logger.LogDebug($"Get Grouped Listings Count - Total: {totalCount} (RegNo: {countWithRegNo}, Other: {countWithoutRegNo}), Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            return totalCount;
         }
 
         public async Task<int> CountHostListingsAsync(string hostName)

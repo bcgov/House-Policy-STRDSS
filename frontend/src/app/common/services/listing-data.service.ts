@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { forkJoin, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
@@ -156,50 +156,41 @@ export class ListingDataService {
     }
 
     getAggregatedListings(
-        pageNumber: number = 1,
-        pageSize: number = 10,
-        orderBy: string = '',
-        direction: 'asc' | 'desc' = 'asc',
         searchReq: ListingSearchRequest = {},
         filter?: ListingFilter,
-    ): Observable<{ count: number; listings: PagingResponse<AggregatedListingTableRow> }> {
-        let listingsEndpointUrl = `${environment.API_HOST}/rentallistings/grouped?pageSize=${pageSize}&pageNumber=${pageNumber}`;
-
-        if (orderBy) {
-            listingsEndpointUrl += `&orderBy=${orderBy}&direction=${direction}`;
-        }
+    ): Observable<AggregatedListingTableRow[]> {
+        let listingsEndpointUrl = `${environment.API_HOST}/rentallistings/grouped`;
+        const params: string[] = [];
 
         if (searchReq.all) {
-            listingsEndpointUrl += `&all=${searchReq.all}`;
+            params.push(`all=${searchReq.all}`);
         }
         if (searchReq.address) {
-            listingsEndpointUrl += `&address=${searchReq.address}`;
+            params.push(`address=${searchReq.address}`);
         }
         if (searchReq.url) {
-            listingsEndpointUrl += `&url=${searchReq.url}`;
+            params.push(`url=${searchReq.url}`);
         }
         if (searchReq.listingId) {
-            listingsEndpointUrl += `&listingId=${searchReq.listingId}`;
+            params.push(`listingId=${searchReq.listingId}`);
         }
         if (searchReq.hostName) {
-            listingsEndpointUrl += `&hostName=${searchReq.hostName}`;
+            params.push(`hostName=${searchReq.hostName}`);
         }
         if (searchReq.businessLicence) {
-            listingsEndpointUrl += `&businessLicence=${searchReq.businessLicence}`;
+            params.push(`businessLicence=${searchReq.businessLicence}`);
         }
         if (searchReq.registrationNumber) {
-            listingsEndpointUrl += `&registrationNumber=${searchReq.registrationNumber}`;
+            params.push(`registrationNumber=${searchReq.registrationNumber}`);
         }
 
         if (filter) {
             if (filter.byLocation) {
                 if (!!filter.byLocation?.isPrincipalResidenceRequired) {
-                    listingsEndpointUrl += `&prRequirement=${filter.byLocation.isPrincipalResidenceRequired == 'Yes'
-                        }`;
+                    params.push(`prRequirement=${filter.byLocation.isPrincipalResidenceRequired == 'Yes'}`);
                 }
                 if (!!filter.byLocation?.isBusinessLicenceRequired) {
-                    listingsEndpointUrl += `&blRequirement=${filter.byLocation.isBusinessLicenceRequired == 'Yes'
-                        }`;
+                    params.push(`blRequirement=${filter.byLocation.isBusinessLicenceRequired == 'Yes'}`);
                 }
             }
             if (filter.byStatus) {
@@ -207,14 +198,13 @@ export class ListingDataService {
                     filter.byStatus.reassigned !== null &&
                     filter.byStatus.reassigned !== undefined
                 ) {
-                    listingsEndpointUrl += `&reassigned=${!!filter.byStatus.reassigned}`;
+                    params.push(`reassigned=${!!filter.byStatus.reassigned}`);
                 }
                 if (
                     filter.byStatus.takedownComplete !== null &&
                     filter.byStatus.takedownComplete !== undefined
                 ) {
-                    listingsEndpointUrl += `&takedownComplete=${!!filter.byStatus
-                        .takedownComplete}`;
+                    params.push(`takedownComplete=${!!filter.byStatus.takedownComplete}`);
                 }
 
                 const statuses = new Array();
@@ -223,25 +213,20 @@ export class ListingDataService {
                 if (filter.byStatus.new) statuses.push('N');
 
                 if (statuses.length) {
-                    listingsEndpointUrl += `&statuses=${statuses.join(',')}`;
+                    params.push(`statuses=${statuses.join(',')}`);
                 }
             }
             if (!!filter.community) {
-                listingsEndpointUrl += `&lgId=${filter.community}`;
+                params.push(`lgId=${filter.community}`);
             }
         }
 
-        const listingsCountEndpointUrl = `${environment.API_HOST
-            }/rentallistings/grouped/count${listingsEndpointUrl.substring(
-                listingsEndpointUrl.indexOf('?'),
-            )}`;
+        if (params.length > 0) {
+            listingsEndpointUrl += `?${params.join('&')}`;
+        }
 
-        //return this.httpClient.get<PagingResponse<AggregatedListingTableRow>>(listingsEndpointUrl);
-        return forkJoin({
-            count: this.httpClient.get<number>(listingsCountEndpointUrl), // First request: Get the total count
-            listings:
-                this.httpClient.get<PagingResponse<AggregatedListingTableRow>>(listingsEndpointUrl), // Second request: Get the listings
-        });
+        // API now returns just the array of listings directly
+        return this.httpClient.get<AggregatedListingTableRow[]>(listingsEndpointUrl);
     }
 
     getListingDetailsById(id: number): Observable<ListingDetails> {

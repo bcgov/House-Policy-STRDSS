@@ -84,6 +84,16 @@ export class AggregatedListingsTableComponent implements OnInit {
     currentFilter!: ListingFilter;
     cancelableFilter!: ListingFilter;
     readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
+    
+    // Track which rows are currently loading/expanding to prevent multiple clicks
+    expandingRows = new Set<string>();
+    // Virtual scroll item size for nested tables (in pixels)
+    // With scrollHeight="400px" and itemSize=50px:
+    // - Visible rows: ~8 rows (400px / 50px)
+    // - Rendered rows: ~20-30 rows (PrimeNG adds buffer for smooth scrolling)
+    // Virtual scrolling maintains a fixed pool of DOM elements and reuses them as you scroll,
+    // only rendering what's visible plus a buffer, not all 30,000+ items
+    readonly virtualScrollItemSize = 50;
 
     get listingsSelected(): number {
         return Object.keys(this.selectedListings).length;
@@ -206,6 +216,55 @@ export class AggregatedListingsTableComponent implements OnInit {
         this.searchColumn = 'hostName';
         this.searchTerm = group.primaryHostNm;
         this.onSearch();
+    }
+
+    onRowExpand(event: any): void {
+        const row = event.data as AggregatedListingTableRow;
+        const rowId = this.getRowId(row);
+        
+        // If already expanding, ignore
+        if (this.expandingRows.has(rowId)) {
+            return;
+        }
+        
+        // Mark as expanding
+        this.expandingRows.add(rowId);
+        this.cd.detectChanges();
+        
+        // Use requestAnimationFrame to defer rendering and allow UI to update
+        // This gives the browser a chance to show the loading indicator
+        requestAnimationFrame(() => {
+            // For large datasets, use multiple frames to ensure smooth rendering
+            if (row.listings.length > 1000) {
+                // For very large datasets, keep loading state longer
+                setTimeout(() => {
+                    this.expandingRows.delete(rowId);
+                    this.cd.detectChanges();
+                }, 300);
+            } else {
+                // For smaller datasets, remove loading state quickly
+                setTimeout(() => {
+                    this.expandingRows.delete(rowId);
+                    this.cd.detectChanges();
+                }, 50);
+            }
+        });
+    }
+
+    onRowCollapse(event: any): void {
+        const row = event.data as AggregatedListingTableRow;
+        const rowId = this.getRowId(row);
+        this.expandingRows.delete(rowId);
+    }
+
+    isRowExpanding(row: AggregatedListingTableRow): boolean {
+        const rowId = this.getRowId(row);
+        return this.expandingRows.has(rowId);
+    }
+
+
+    private getRowId(row: AggregatedListingTableRow): string {
+        return row.id || `${row.effectiveHostNm}-${row.matchAddressTxt}-${row.effectiveBusinessLicenceNo}`;
     }
 
     onSort(property: string): void {

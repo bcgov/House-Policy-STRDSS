@@ -234,9 +234,6 @@
 
                 .listing-id-link {
                     color: #053662;
-                    padding: 2px 4px;
-                    border: 1px solid transparent;
-                    border-radius: 2px;
 
                     &:visited {
                         color: #3470B1;
@@ -249,11 +246,11 @@
                     }
 
                     &:hover {
-                        border-color: #053662;
+                        color: #1E5189;
                     }
 
                     &:visited:hover {
-                        border-color: #3470B1;
+                        color: #1E5189;
                     }
                 }
 

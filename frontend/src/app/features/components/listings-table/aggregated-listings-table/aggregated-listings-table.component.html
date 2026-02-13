@@ -57,11 +57,12 @@
 
         <p-table dataKey="id" [value]="displayedListings" #table [ariaLabel]="'table-of-listings'" id="listings-table"
             [scrollable]="true" scrollHeight="{{isCEU?'635px':'585px'}}" [(selection)]="selectedListings"
-            size="small" [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
+            size="small" [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true"
+            (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)">
 
             <ng-template pTemplate="header">
                 <tr>
-                    <th [ariaLabel]="'expand-listing'" style="width: 2rem"> </th>
+                    <th [ariaLabel]="'expand-listing'" class="expand-header-col"> </th>
 
                     <th class="sortable-header" id="lastReported_header"
                         [class.sorted]="this.sort && this.sort.prop === 'latestReportPeriodYm'"
@@ -113,7 +114,7 @@
                 <tr>
                     <td>
                         <button pButton id="expand-listing-row-{{index}}" class="p-button-transparent round-42"
-                            [pRowToggler]="row" aria-label="Expand or Collapse Listing">
+                            [pRowToggler]="row" [disabled]="isRowExpanding(row)" aria-label="Expand or Collapse Listing">
                             <i class="pi" [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
                         </button>
                     </td>
@@ -149,9 +150,18 @@
 
             <ng-template pTemplate="expandedrow" let-row>
                 <tr>
-                    <td colspan="8">
+                    <td colspan="9">
                         <div class="expand">
-                            <p-table [value]="row.listings" dataKey="rentalListingId">
+                            <div *ngIf="isRowExpanding(row)" class="loading-container">
+                                <i class="pi pi-spinner pi-spin text-2xl"></i>
+                                <p>Loading listings...</p>
+                            </div>
+                            <p-table [value]="row.listings" dataKey="rentalListingId"
+                                [virtualScroll]="row.listings.length > 50"
+                                [virtualScrollItemSize]="virtualScrollItemSize"
+                                [scrollable]="true"
+                                scrollHeight="400px"
+                                *ngIf="!isRowExpanding(row)">
                                 <ng-template pTemplate="header" let-listing>
                 <tr>
                     <th [ariaLabel]="'select-listing'">

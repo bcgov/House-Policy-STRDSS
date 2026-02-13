@@ -248,9 +248,6 @@
 
                 .listing-id-link {
                     color: #053662;
-                    padding: 2px 4px;
-                    border: 1px solid transparent;
-                    border-radius: 2px;
 
                     &:visited {
                         color: #3470B1;
@@ -263,11 +260,11 @@
                     }
 
                     &:hover {
-                        border-color: #053662;
+                        color: #1E5189;
                     }
 
                     &:visited:hover {
-                        border-color: #3470B1;
+                        color: #1E5189;
                     }
                 }
 
@@ -415,6 +412,35 @@
             font-weight: 600;
         }
     }
+
+    .expand {
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            gap: 1rem;
+            min-height: 200px;
+            width: 100%;
+            
+            p {
+                margin: 0;
+                color: #666;
+                font-size: 14px;
+            }
+
+            i.pi-spinner,
+            i.pi-spinner.text-2xl {
+                font-size: 2.5rem !important;
+                color: #053662;
+            }
+        }
+    }
+
+    .expand-header-col {
+        width: 2rem;
+    }
 }
 
 @media only screen and (max-width: 1500px) {
@@ -440,11 +466,26 @@
         th {
             font-size: 12px !important;
             padding: 0.25rem 0.125rem;
+        }
 
-            td,
-            tr {
-                font-size: 9px !important;
-                padding: 0.25rem 0.125rem;
+        td {
+            font-size: 9px !important;
+            padding: 0.25rem 0.125rem;
+        }
+
+        .expand {
+            .loading-container {
+                padding: 1.5rem;
+                min-height: 150px;
+
+                p {
+                    font-size: 12px;
+                }
+
+                i.pi-spinner,
+                i.pi-spinner.text-2xl {
+                    font-size: 2rem !important;
+                }
             }
         }
     }
@@ -473,11 +514,26 @@
         th {
             font-size: 12px !important;
             padding: 0.25rem 0.125rem;
+        }
 
-            td,
-            tr {
-                font-size: 9px !important;
-                padding: 0.25rem 0.125rem;
+        td {
+            font-size: 9px !important;
+            padding: 0.25rem 0.125rem;
+        }
+
+        .expand {
+            .loading-container {
+                padding: 1rem;
+                min-height: 120px;
+
+                p {
+                    font-size: 11px;
+                }
+
+                i.pi-spinner,
+                i.pi-spinner.text-2xl {
+                    font-size: 1.75rem !important;
+                }
             }
         }
     }

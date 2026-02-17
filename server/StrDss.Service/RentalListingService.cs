@@ -15,9 +15,9 @@ namespace StrDss.Service
 {
     public interface IRentalListingService
     {
-        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<RentalListingResponseWithCountsDto> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
@@ -49,7 +49,7 @@ namespace StrDss.Service
             _orgRepo = orgRepo;
             _bizLicenceRepo = bizLicenceRepo;
         }
-        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<RentalListingResponseWithCountsDto> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction)
         {
             var listings = await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
@@ -64,13 +64,13 @@ namespace StrDss.Service
             return listings;
         }
 
-        public async Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
         {
-            var listings = await _listingRepo.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+            var response = await _listingRepo.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
 
-            foreach (var group in listings)
+            foreach (var group in response.Data)
             {
                 foreach(var listing in group.Listings)
                 {
@@ -78,7 +78,7 @@ namespace StrDss.Service
                 }
             }
 
-            return listings;
+            return response;
         }
 
         public async Task<int> CountHostListingsAsync(string hostName)

@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ListingDataService } from '../../../common/services/listing-data.service';
-import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
+import { PagingResponsePageInfo } from '../../../common/models/paging-response';
+import { ListingResponseWithCounts } from '../../../common/models/listing-response-with-counts';
 import { ListingTableRow } from '../../../common/models/listing-table-row';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
@@ -30,6 +31,7 @@ import { OrganizationService } from '../../../common/services/organization.servi
 import { UrlProtocolPipe } from '../../../common/pipes/url-protocol.pipe';
 import { ListingDetails } from '../../../common/models/listing-details';
 import { FormsModule } from '@angular/forms';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 @Component({
   selector: 'app-listings-table',
@@ -52,6 +54,7 @@ import { FormsModule } from '@angular/forms';
     RadioButtonModule,
     UrlProtocolPipe,
     FormsModule,
+    ToggleSwitchModule,
   ],
   templateUrl: './listings-table.component.html',
   styleUrl: './listings-table.component.scss'
@@ -74,6 +77,9 @@ export class ListingsTableComponent implements OnInit {
   isFilterOpened = false;
   currentFilter!: ListingFilter;
   cancelableFilter!: ListingFilter;
+  showRecentOnly = true; // Default to "Reported Recently"
+  recentCount = 0;
+  allCount = 0;
 
   readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
 
@@ -337,6 +343,12 @@ export class ListingsTableComponent implements OnInit {
     return url;
   }
 
+  onToggleChange(): void {
+    this.selectedListings = [];
+    this.paginator.changePage(0);
+    this.getListings(1);
+  }
+
   private getListings(selectedPageNumber: number = 1): void {
     this.loaderService.loadingStart();
 
@@ -350,10 +362,13 @@ export class ListingsTableComponent implements OnInit {
       this.sort?.dir || 'asc',
       searchReq,
       this.currentFilter,
+      this.showRecentOnly,
     ).subscribe({
-      next: (res: PagingResponse<ListingTableRow>) => {
+      next: (res: ListingResponseWithCounts<ListingTableRow>) => {
         this.currentPage = res.pageInfo;
         this.listings = res.sourceList;
+        this.recentCount = res.recentCount;
+        this.allCount = res.allCount;
       },
       complete: () => {
         this.loaderService.loadingEnd();

@@ -4,11 +4,12 @@ import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
-import { AggregatedListingTableRow, ListingTableRow } from '../models/listing-table-row';
+import { ListingTableRow } from '../models/listing-table-row';
 import { ListingSearchRequest } from '../models/listing-search-request';
 import { ListingAddressCandidate, ListingDetails } from '../models/listing-details';
 import { ExportJurisdiction } from '../models/export-listing';
 import { ListingFilter } from '../models/listing-filter';
+import { ListingResponseWithCounts, AggregatedListingResponseWithCounts } from '../models/listing-response-with-counts';
 
 @Injectable({
     providedIn: 'root',
@@ -79,11 +80,16 @@ export class ListingDataService {
         direction: 'asc' | 'desc' = 'asc',
         searchReq: ListingSearchRequest = {},
         filter?: ListingFilter,
-    ): Observable<PagingResponse<ListingTableRow>> {
+        recent: boolean = false,
+    ): Observable<ListingResponseWithCounts<ListingTableRow>> {
         let endpointUrl = `${environment.API_HOST}/rentallistings?pageSize=${pageSize}&pageNumber=${pageNumber}`;
 
         if (orderBy) {
             endpointUrl += `&orderBy=${orderBy}&direction=${direction}`;
+        }
+
+        if (recent) {
+            endpointUrl += `&recent=${recent}`;
         }
 
         if (searchReq.all) {
@@ -147,7 +153,7 @@ export class ListingDataService {
             }
         }
 
-        return this.httpClient.get<PagingResponse<ListingTableRow>>(endpointUrl);
+        return this.httpClient.get<ListingResponseWithCounts<ListingTableRow>>(endpointUrl);
     }
 
     getHostListingsCount(primaryHostNm: string): Observable<{ primaryHostNm: string, hasMultipleProperties: boolean }> {
@@ -158,9 +164,14 @@ export class ListingDataService {
     getAggregatedListings(
         searchReq: ListingSearchRequest = {},
         filter?: ListingFilter,
-    ): Observable<AggregatedListingTableRow[]> {
+        recent: boolean = false,
+    ): Observable<AggregatedListingResponseWithCounts> {
         let listingsEndpointUrl = `${environment.API_HOST}/rentallistings/grouped`;
         const params: string[] = [];
+
+        if (recent) {
+            params.push(`recent=${recent}`);
+        }
 
         if (searchReq.all) {
             params.push(`all=${searchReq.all}`);
@@ -225,8 +236,8 @@ export class ListingDataService {
             listingsEndpointUrl += `?${params.join('&')}`;
         }
 
-        // API now returns just the array of listings directly
-        return this.httpClient.get<AggregatedListingTableRow[]>(listingsEndpointUrl);
+        // API now returns object with data, recentCount, and allCount
+        return this.httpClient.get<AggregatedListingResponseWithCounts>(listingsEndpointUrl);
     }
 
     getListingDetailsById(id: number): Observable<ListingDetails> {

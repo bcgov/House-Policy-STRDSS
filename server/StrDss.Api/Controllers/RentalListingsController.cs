@@ -35,11 +35,11 @@ namespace StrDss.Api.Controllers
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
-            var listings = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+            var response = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent,
                 pageSize, pageNumber, orderBy, direction);
 
-            return Ok(listings);
+            return Ok(response);
         }
 
         [ApiAuthorize(Permissions.ListingRead)]
@@ -49,11 +49,10 @@ namespace StrDss.Api.Controllers
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
-            var listings = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+            var response = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
 
-            // Return just the listings array directly
-            return Ok(listings);
+            return Ok(response);
         }
 
         [ApiAuthorize(Permissions.ListingRead)]

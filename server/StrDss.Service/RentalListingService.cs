@@ -67,18 +67,8 @@ namespace StrDss.Service
         public async Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
         {
-            var listings = await _listingRepo.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+            return await _listingRepo.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
-
-            foreach (var group in listings)
-            {
-                foreach(var listing in group.Listings)
-                {
-                    ProcessHosts(listing, true);
-                }
-            }
-
-            return listings;
         }
 
         public async Task<int> CountHostListingsAsync(string hostName)

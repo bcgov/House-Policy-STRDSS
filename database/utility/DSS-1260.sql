@@ -128,6 +128,13 @@ GROUP BY
     org.organization_cd
 ORDER BY month_start, org.organization_nm;
 
+
+-- what reasons exist
+SELECT DISTINCT takedown_reason 
+FROM dss_rental_listing 
+WHERE takedown_reason IS NOT NULL
+ORDER BY takedown_reason;
+
 -- Monthly Takedown Request report by platform since May 2024
 SELECT 
     TO_CHAR(dem.message_delivery_dtm, 'YYYY-MM') AS month,

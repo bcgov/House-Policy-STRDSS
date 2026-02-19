@@ -48,7 +48,7 @@
             <div class="rows-info-wrapper">
                 <div class="panel-header-left">
                     <div class="toggle-container">
-                        <span class="toggle-label" [class.active]="showRecentOnly">Reported Recently ({{recentCount}})</span>
+                        <span class="toggle-label" [class.active]="showRecentOnly">Recently Reported ({{recentCount}})</span>
                         <p-toggleSwitch [ngModel]="!showRecentOnly" (ngModelChange)="showRecentOnly = !$event; onToggleChange()" 
                             [inputId]="'recent-toggle-aggregated'"></p-toggleSwitch>
                         <span class="toggle-label" [class.active]="!showRecentOnly">All Listings ({{allCount}})</span>

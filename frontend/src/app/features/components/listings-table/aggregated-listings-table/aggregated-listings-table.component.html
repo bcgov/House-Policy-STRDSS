@@ -46,10 +46,18 @@
     <p-panel class="listing-table-panel">
         <ng-template pTemplate="header">
             <div class="rows-info-wrapper">
-                <span class="panel-header-small" [style.visibility]="listingsSelected ? 'visible' : 'hidden'">Selected
-                    {{listingsSelected}} items. <button pButton class="p-button-link zero-padding small-text"
-                        (click)="unselectAll()" aria-label="Unselect all items in the table">Unselect All</button>
-                </span>
+                <div class="panel-header-left">
+                    <div class="toggle-container">
+                        <span class="toggle-label" [class.active]="showRecentOnly">Reported Recently ({{recentCount}})</span>
+                        <p-toggleSwitch [ngModel]="!showRecentOnly" (ngModelChange)="showRecentOnly = !$event; onToggleChange()" 
+                            [inputId]="'recent-toggle-aggregated'"></p-toggleSwitch>
+                        <span class="toggle-label" [class.active]="!showRecentOnly">All Listings ({{allCount}})</span>
+                    </div>
+                    <span class="panel-header-small" [class.hidden]="!listingsSelected">Selected
+                        {{listingsSelected}} items. <button pButton class="p-button-link zero-padding small-text"
+                            (click)="unselectAll()" aria-label="Unselect all items in the table">Unselect All</button>
+                    </span>
+                </div>
                 <span class="panel-header-small" *ngIf="currentPage">Showing {{ currentPage.itemCount}} of
                     {{currentPage.totalCount || 0}} listings</span>
             </div>

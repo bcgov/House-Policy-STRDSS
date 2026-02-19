@@ -65,6 +65,9 @@
         display: flex;
         justify-content: space-between;
         width: 100%;
+        flex-wrap: wrap;
+        gap: 8px;
+        min-width: 0;
 
         strong {
             &.panel-header-text {
@@ -157,6 +160,8 @@
         padding-right: 24px;
         width: 100%;
         display: flex;
+        min-width: 0;
+        box-sizing: border-box;
 
         .main-block {
             display: flex;
@@ -164,6 +169,8 @@
             flex-direction: column;
             padding: 12px 12px 0 0;
             width: 50%;
+            min-width: 0;
+            box-sizing: border-box;
         }
 
         .sidebar {
@@ -172,9 +179,57 @@
             flex-direction: column;
             padding: 12px 0 0 12px;
             width: 50%;
+            min-width: 0;
+            box-sizing: border-box;
         }
 
         p-panel {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+
+            ::ng-deep .p-panel-content {
+                overflow-x: auto;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            &.prop-info {
+                .row {
+                    flex-wrap: wrap;
+                    min-width: 0;
+
+                    .label {
+                        flex-shrink: 0;
+                        min-width: fit-content;
+                    }
+
+                    .value {
+                        flex: 1 1 auto;
+                        min-width: 0;
+                        max-width: 100%;
+                    }
+
+                    &.address {
+                        flex-wrap: wrap;
+                        align-items: flex-start;
+
+                        .label {
+                            flex-shrink: 0;
+                        }
+
+                        .value {
+                            flex: 1 1 auto;
+                            min-width: 0;
+                        }
+
+                        .change-address-button-container {
+                            flex-shrink: 0;
+                        }
+                    }
+                }
+            }
+
             &.bl-info {
                 .row {
                     display: flex;
@@ -252,7 +307,6 @@
 
                 &.address {
                     display: flex;
-                    gap: 10px;
                 }
 
                 button {
@@ -477,6 +531,203 @@
             .radio-label {
                 cursor: pointer;
                 user-select: none;
+            }
+        }
+    }
+
+    // Responsive styles for Platform Information section on smaller screens
+    // Keep panels side-by-side, only fix text overflow
+    @media screen and (max-width: 1024px) {
+        .content {
+            .main-block {
+                p-panel.prop-info {
+                    .property-info-container {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 8px;
+
+                        .tag-blue {
+                            width: 100%;
+                            margin-top: 4px;
+                        }
+                    }
+
+                    .row {
+                        .label {
+                            white-space: normal;
+                            word-wrap: break-word;
+                            overflow-wrap: break-word;
+                        }
+
+                        .value {
+                            max-width: 100%;
+                        }
+
+                        .status-container {
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 4px;
+                            min-width: auto;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Stack panels vertically only at very small screens
+    @media screen and (max-width: 768px) {
+        .content {
+            flex-direction: column;
+
+            .main-block,
+            .sidebar {
+                width: 100%;
+                padding: 12px 0;
+            }
+
+            .main-block {
+                p-panel.prop-info {
+                    .property-info-container {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 8px;
+
+                        .tag-blue {
+                            width: 100%;
+                        }
+                    }
+
+                    .row {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 4px;
+
+                        .label {
+                            white-space: normal;
+                            word-wrap: break-word;
+                            overflow-wrap: break-word;
+                            width: 100%;
+                        }
+
+                        .value {
+                            padding-left: 0;
+                            width: 100%;
+                        }
+
+                        .status-container {
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 4px;
+                            min-width: auto;
+                        }
+
+                        &.address {
+                            flex-direction: column;
+                            align-items: flex-start;
+
+                            .value {
+                                width: 100%;
+                            }
+
+                            .change-address-button-container {
+                                align-self: flex-start;
+                                margin-top: 4px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        .header-container {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+
+            .legend-container {
+                padding-top: 0;
+            }
+        }
+
+        .subtitle {
+            flex-direction: column;
+            height: auto;
+            gap: 12px;
+
+            .column {
+                width: 100%;
+
+                &:last-child {
+                    justify-content: flex-start;
+                    flex-wrap: wrap;
+                }
+
+                .row {
+                    .last-updated-container,
+                    .platform-container,
+                    .status-container,
+                    .organization-container {
+                        min-width: auto;
+                        flex-direction: column;
+                        align-items: flex-start;
+                    }
+                }
+            }
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .header-container {
+            .title {
+                h2 {
+                    font-size: 18px;
+                }
+
+                .listing-url-lnk {
+                    font-size: 14px;
+                }
+            }
+        }
+
+        .subtitle {
+            .column {
+                button {
+                    font-size: 14px;
+                    padding: 6px 10px;
+                }
+            }
+        }
+
+        .content {
+            .main-block {
+                p-panel.prop-info {
+                    .property-info-container {
+                        .panel-header-text {
+                            font-size: 16px;
+                        }
+
+                        .tag-blue {
+                            font-size: 12px;
+                            padding: 4px 8px;
+                        }
+                    }
+
+                    .row {
+                        .label,
+                        .value {
+                            font-size: 14px;
+                        }
+
+                        .status-container {
+                            strong {
+                                font-size: 14px;
+                            }
+                        }
+                    }
+                }
             }
         }
     }

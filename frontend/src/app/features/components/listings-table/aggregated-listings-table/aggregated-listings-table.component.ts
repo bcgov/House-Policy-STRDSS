@@ -87,7 +87,7 @@ export class AggregatedListingsTableComponent implements OnInit {
     isFilterOpened = false;
     currentFilter!: ListingFilter;
     cancelableFilter!: ListingFilter;
-    showRecentOnly = true; // Default to "Reported Recently"
+    showRecentOnly = true; // Default to "Recently Reported"
     recentCount = 0;
     allCount = 0;
     readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);

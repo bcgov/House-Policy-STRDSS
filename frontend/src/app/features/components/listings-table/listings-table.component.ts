@@ -77,7 +77,7 @@ export class ListingsTableComponent implements OnInit {
   isFilterOpened = false;
   currentFilter!: ListingFilter;
   cancelableFilter!: ListingFilter;
-  showRecentOnly = true; // Default to "Reported Recently"
+  showRecentOnly = true; // Default to "Recently Reported"
   recentCount = 0;
   allCount = 0;
 

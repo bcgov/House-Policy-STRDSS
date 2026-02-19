@@ -13,9 +13,9 @@ namespace StrDss.Data.Repositories
 {
     public interface IRentalListingRepository
     {
-        Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<RentalListingResponseWithCountsDto> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
@@ -45,7 +45,7 @@ namespace StrDss.Data.Repositories
         {
             _userRepo = userRepo;
         }
-        public async Task<PagedDto<RentalListingViewDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<RentalListingResponseWithCountsDto> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction)
         {
             var query = _dbSet.AsNoTracking();
@@ -55,12 +55,21 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
             }
 
-            // Apply recent filter if requested
+            // Get allCount before applying filters (only organization filter applied)
+            var allCount = await query.CountAsync();
+
+            // Get recentCount with recent filter applied (before other filters)
+            var queryForRecentCount = query;
+            queryForRecentCount = ApplyRecentFilter(queryForRecentCount);
+            var recentCount = await queryForRecentCount.CountAsync();
+
+            // Apply recent filter if requested for data retrieval
             if (recent)
             {
                 query = ApplyRecentFilter(query);
             }
 
+            // Apply all other filters for data retrieval
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
             var extraSort
@@ -113,10 +122,16 @@ namespace StrDss.Data.Repositories
                 }
             }
 
-            return listings;
+            return new RentalListingResponseWithCountsDto
+            {
+                SourceList = listings.SourceList,
+                PageInfo = listings.PageInfo,
+                RecentCount = recentCount,
+                AllCount = allCount
+            };
         }
 
-        public async Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -128,12 +143,21 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
             }
 
-            // Apply recent filter if requested
+            // Get allCount before applying filters (only organization filter applied)
+            var allCount = await query.CountAsync();
+
+            // Get recentCount with recent filter applied (before other filters)
+            var queryForRecentCount = query;
+            queryForRecentCount = ApplyRecentFilter(queryForRecentCount);
+            var recentCount = await queryForRecentCount.CountAsync();
+
+            // Apply recent filter if requested for data retrieval
             if (recent)
             {
                 query = ApplyRecentFilter(query);
             }
 
+            // Apply all other filters for data retrieval
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, 
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
@@ -196,7 +220,12 @@ namespace StrDss.Data.Repositories
 
             _logger.LogDebug($"Get Grouped Listings - Groups Created: {grouped.Count} (RegNo: {groupedByRegNo.Count}, Other: {groupedByOther.Count}), Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            return grouped;
+            return new AggregatedListingResponseWithCountsDto
+            {
+                Data = grouped,
+                RecentCount = recentCount,
+                AllCount = allCount
+            };
         }
 
         private IQueryable<DssRentalListingVw> ApplyRecentFilter(IQueryable<DssRentalListingVw> query)
@@ -347,37 +376,38 @@ namespace StrDss.Data.Repositories
         {
             if (all != null && all.IsNotEmpty())
             {
-                var allLower = all.ToLower();
-                query = query.Where(x => (x.MatchAddressTxt != null && x.MatchAddressTxt.ToLower().Contains(allLower)) ||
-                                         (x.PlatformListingUrl != null && x.PlatformListingUrl.ToLower().Contains(allLower)) ||
-                                         (x.PlatformListingNo != null && x.PlatformListingNo.ToLower().Contains(allLower)) ||
-                                         (x.ListingContactNamesTxt != null && x.ListingContactNamesTxt.ToLower().Contains(allLower)) ||
-                                         (x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(CommonUtils.SanitizeAndUppercaseString(all))) ||
-                                         (x.BcRegistryNo != null && EF.Functions.ILike(x.BcRegistryNo, $"%{all}%")));
+                var allPattern = $"%{all}%";
+                var sanitizedAll = CommonUtils.SanitizeAndUppercaseString(all);
+                query = query.Where(x => 
+                    (x.MatchAddressTxt != null && EF.Functions.ILike(x.MatchAddressTxt, allPattern)) ||
+                    (x.PlatformListingUrl != null && EF.Functions.ILike(x.PlatformListingUrl, allPattern)) ||
+                    (x.PlatformListingNo != null && EF.Functions.ILike(x.PlatformListingNo, allPattern)) ||
+                    (x.ListingContactNamesTxt != null && EF.Functions.ILike(x.ListingContactNamesTxt, allPattern)) ||
+                    (x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(sanitizedAll)) ||
+                    (x.BcRegistryNo != null && EF.Functions.ILike(x.BcRegistryNo, allPattern)));
             }
 
             if (address != null && address.IsNotEmpty())
             {
-                var addressLower = address.ToLower();
-                query = query.Where(x => x.MatchAddressTxt != null && x.MatchAddressTxt.ToLower().Contains(addressLower));
+                var addressPattern = $"%{address}%";
+                query = query.Where(x => x.MatchAddressTxt != null && EF.Functions.ILike(x.MatchAddressTxt, addressPattern));
             }
 
             if (url != null && url.IsNotEmpty())
             {
-                var urlLower = url.ToLower();
-                query = query.Where(x => x.PlatformListingUrl != null && x.PlatformListingUrl.ToLower().Contains(urlLower));
+                var urlPattern = $"%{url}%";
+                query = query.Where(x => x.PlatformListingUrl != null && EF.Functions.ILike(x.PlatformListingUrl, urlPattern));
             }
 
             if (listingId != null && listingId.IsNotEmpty())
             {
-                var listingIdLower = listingId.ToLower();
-                query = query.Where(x => x.PlatformListingNo != null && x.PlatformListingNo.ToLower() == listingIdLower);
+                query = query.Where(x => x.PlatformListingNo != null && EF.Functions.ILike(x.PlatformListingNo, listingId));
             }
 
             if (hostName != null && hostName.IsNotEmpty())
             {
-                var hostNameLower = hostName.ToLower();
-                query = query.Where(x => x.ListingContactNamesTxt != null && x.ListingContactNamesTxt.ToLower().Contains(hostNameLower));
+                var hostNamePattern = $"%{hostName}%";
+                query = query.Where(x => x.ListingContactNamesTxt != null && EF.Functions.ILike(x.ListingContactNamesTxt, hostNamePattern));
             }
 
             if (businessLicence != null && businessLicence.IsNotEmpty())
@@ -388,7 +418,8 @@ namespace StrDss.Data.Repositories
 
             if (registrationNumber != null && registrationNumber.IsNotEmpty())
             {
-                query = query.Where(x => x.BcRegistryNo != null && EF.Functions.ILike(x.BcRegistryNo, $"%{registrationNumber}%"));
+                var registrationPattern = $"%{registrationNumber}%";
+                query = query.Where(x => x.BcRegistryNo != null && EF.Functions.ILike(x.BcRegistryNo, registrationPattern));
             }
 
             if (prRequirement != null)

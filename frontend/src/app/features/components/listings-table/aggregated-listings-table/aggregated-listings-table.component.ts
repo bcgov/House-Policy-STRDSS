@@ -11,12 +11,13 @@ import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { PanelModule } from 'primeng/panel';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { DrawerModule } from 'primeng/drawer';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ListingFilter } from '../../../../common/models/listing-filter';
 import { environment } from '../../../../../environments/environment';
 import { PagingResponsePageInfo } from '../../../../common/models/paging-response';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import {
     DropdownOption,
     DropdownOptionOrganization,
@@ -26,6 +27,7 @@ import {
     ListingTableRow,
 } from '../../../../common/models/listing-table-row';
 import { ListingDataService } from '../../../../common/services/listing-data.service';
+import { AggregatedListingResponseWithCounts } from '../../../../common/models/listing-response-with-counts';
 import { FilterPersistenceService } from '../../../../common/services/filter-persistence.service';
 import { GlobalLoaderService } from '../../../../common/services/global-loader.service';
 import { SelectedListingsStateService } from '../../../../common/services/selected-listings-state.service';
@@ -59,12 +61,14 @@ import { FormsModule } from '@angular/forms';
         RadioButtonModule,
         UrlProtocolPipe,
         FormsModule,
+        ToggleSwitchModule,
     ],
     templateUrl: './aggregated-listings-table.component.html',
     styleUrl: './aggregated-listings-table.component.scss',
 })
 export class AggregatedListingsTableComponent implements OnInit {
     @ViewChild('paginator') paginator!: Paginator;
+    @ViewChild('table') table!: Table;
 
     selectedListings: { [key: string]: ListingTableRow } = {};
     aggregatedListings = new Array<AggregatedListingTableRow>(); // Store complete dataset
@@ -83,6 +87,9 @@ export class AggregatedListingsTableComponent implements OnInit {
     isFilterOpened = false;
     currentFilter!: ListingFilter;
     cancelableFilter!: ListingFilter;
+    showRecentOnly = true; // Default to "Reported Recently"
+    recentCount = 0;
+    allCount = 0;
     readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
     
     // Track which rows are currently loading/expanding to prevent multiple clicks
@@ -374,6 +381,21 @@ export class AggregatedListingsTableComponent implements OnInit {
         }
     }
 
+    onToggleChange(): void {
+        this.unselectAll();
+        // Collapse all expanded rows
+        if (this.table) {
+            this.table.expandedRowKeys = {};
+        }
+        if (this.paginator) {
+            this.paginator.changePage(0);
+        }
+        if (this.currentPage) {
+            this.currentPage.pageNumber = 1;
+        }
+        this.getListings();
+    }
+
     clearSearchBy(_event: any): void {
         this.searchColumn = 'all';
         this.cd.detectChanges();
@@ -494,13 +516,16 @@ export class AggregatedListingsTableComponent implements OnInit {
             .getAggregatedListings(
                 searchReq,
                 this.currentFilter,
-            ).pipe(
-                tap(listings => { this.calculateIfHostsHaveMoreThanOneProperty(listings); })
+                this.showRecentOnly,
             )
             .subscribe({
-                next: (listings) => {
-                    // Store all data - API now returns array directly
-                    this.aggregatedListings = listings.map(
+                next: (response: AggregatedListingResponseWithCounts) => {
+                    // Store counts from API response
+                    this.recentCount = response.recentCount;
+                    this.allCount = response.allCount;
+                    
+                    // Store all data - API now returns object with data array
+                    this.aggregatedListings = response.data.map(
                         (l: AggregatedListingTableRow, index: number) => {
                             return {
                                 ...l,
@@ -512,6 +537,9 @@ export class AggregatedListingsTableComponent implements OnInit {
                             };
                         },
                     );
+                    
+                    // Calculate host properties after data is loaded
+                    this.calculateIfHostsHaveMoreThanOneProperty(response.data);
 
                     // Initialize currentPage if not exists
                     if (!this.currentPage) {

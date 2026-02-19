@@ -157,12 +157,56 @@
                 width: 100%;
                 display: flex;
                 justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 16px;
+
+                .panel-header-left {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    flex-wrap: wrap;
+
+                    .toggle-container {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+
+                        .toggle-label {
+                            font-size: small;
+                            font-weight: normal;
+                            cursor: pointer;
+                            user-select: none;
+                            white-space: nowrap;
+
+                            &.active {
+                                font-weight: 600;
+                            }
+                        }
+
+                        ::ng-deep .p-toggleswitch {
+                            width: 2.5rem;
+                            height: 1.25rem;
+                            margin-top: 2px;
+
+                            .p-toggleswitch-slider {
+                                background: #053662;
+                            }
+
+                            .p-toggleswitch-slider:before {
+                                width: 1rem;
+                                height: 1rem;
+                            }
+                        }
+                    }
+                }
 
                 .panel-header-small {
                     font-size: small;
+                    white-space: nowrap;
 
-                    &:not(:last-child) {
-                        margin-right: 24px;
+                    &.hidden {
+                        visibility: hidden;
                     }
                 }
             }

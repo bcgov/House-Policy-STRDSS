@@ -51,27 +51,6 @@
             <div class="row">
                 <div class="status-container" [ngSwitch]="listing.listingStatusType">
                     <strong>Listing Status: </strong>
-                    <span class="status-item" *ngSwitchCase="'N'">New
-                        <span class="status-circle status-new">
-                            N
-                        </span>
-                    </span>
-                    <span class="status-item" *ngSwitchCase="'A'">
-                        <span>
-                            Active
-                        </span>
-                        <span class="status-circle status-active">
-                            A
-                        </span>
-                    </span>
-                    <span class="status-item" *ngSwitchCase="'I'">
-                        <span>
-                            Inactive
-                        </span>
-                        <span class="status-circle status-inactive">
-                            I
-                        </span>
-                    </span>
                     <span class="status-item" *ngIf="listing.isLgTransferred">
                         <span>
                             Reassigned
@@ -86,6 +65,7 @@
                         <span class="status-flag status-takedown-complete">
                         </span>
                     </span>
+                    <span *ngIf="!listing.isLgTransferred && !listing.isTakenDown">-</span>
                 </div>
             </div>
 

@@ -234,28 +234,34 @@ namespace StrDss.Data.Repositories
             var currentDate = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow);
             var currentDayOfMonth = currentDate.Day;
             var currentMonth = new DateOnly(currentDate.Year, currentDate.Month, 1);
-            var previousMonth = currentMonth.AddMonths(-1);
+            
+            // Reports for a month are uploaded in the following month (e.g., January reports are uploaded in mid-February)
+            // So we need to look at the previous month's reports, not the current month's
+            var targetReportMonth = currentMonth.AddMonths(-1);  // The month we expect recent reports for
+            var fallbackReportMonth = targetReportMonth.AddMonths(-1);  // The month before that for platforms that haven't reported yet
 
-            // Get all platforms/organizations that have reported for the current month
-            var platformsReportedCurrentMonth = _dbContext.DssRentalListingReports
+            // Get all platforms/organizations that have reported for the target month
+            var platformsReportedTargetMonth = _dbContext.DssRentalListingReports
                 .AsNoTracking()
-                .Where(r => r.ReportPeriodYm == currentMonth)
+                .Where(r => r.ReportPeriodYm == targetReportMonth)
                 .Select(r => r.ProvidingOrganizationId)
                 .Distinct()
                 .ToList();
 
             if (currentDayOfMonth <= 19)
             {
-                // Days 1-19: Show current month for platforms that reported, previous month for those that haven't
+                // Days 1-19: Show target month for platforms that reported, fallback month for those that haven't
+                // Example: Feb 1-19 → Show January reports if uploaded, otherwise December reports
                 query = query.Where(x => 
-                    (platformsReportedCurrentMonth.Contains(x.OfferingOrganizationId ?? 0) && x.LatestReportPeriodYm == currentMonth) ||
-                    (!platformsReportedCurrentMonth.Contains(x.OfferingOrganizationId ?? 0) && x.LatestReportPeriodYm == previousMonth)
+                    (platformsReportedTargetMonth.Contains(x.OfferingOrganizationId ?? 0) && x.LatestReportPeriodYm == targetReportMonth) ||
+                    (!platformsReportedTargetMonth.Contains(x.OfferingOrganizationId ?? 0) && x.LatestReportPeriodYm == fallbackReportMonth)
                 );
             }
             else
             {
-                // Days 20-31: Show only current month listings
-                query = query.Where(x => x.LatestReportPeriodYm == currentMonth);
+                // Days 20-31: Show only target month listings (expect all platforms to have reported by now)
+                // Example: Feb 20-28 → Show only January reports
+                query = query.Where(x => x.LatestReportPeriodYm == targetReportMonth);
             }
 
             return query;
@@ -296,6 +302,16 @@ namespace StrDss.Data.Repositories
                     listing.Hosts = [];
                 }
                 
+                // Process hosts - set HasValidEmail on each host and HasAtLeastOneValidHostEmail on listing
+                foreach (var host in listing.Hosts)
+                {
+                    if (host.EmailAddressDsc != null)
+                    {
+                        host.HasValidEmail = CommonUtils.IsValidEmailAddress(host.EmailAddressDsc);
+                    }
+                }
+                listing.HasAtLeastOneValidHostEmail = listing.Hosts.Any(h => h.HasValidEmail);
+                
                 group.NightsBookedYtdQty += listing.NightsBookedYtdQty ?? 0;
                 
                 // Override LastActionNm if takedown reason is "Invalid Registration"
@@ -331,7 +347,10 @@ namespace StrDss.Data.Repositories
             // Set the LatestReportPeriodYm from the most recent listing
             group.LatestReportPeriodYm = maxReportPeriod;
 
-            group.Listings = listingDtos;
+            // Sort listings by most recently reported date (descending), with most recent at the top
+            group.Listings = listingDtos
+                .OrderByDescending(x => x.LatestReportPeriodYm)
+                .ToList();
             
             return group;
         }

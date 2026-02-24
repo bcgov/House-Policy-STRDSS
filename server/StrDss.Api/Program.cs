@@ -37,7 +37,7 @@ var dbUser = builder.Configuration.GetValue<string>("DB_USER");
 var dbPass = builder.Configuration.GetValue<string>("DB_PASS");
 var dbPort = builder.Configuration.GetValue<string>("DB_PORT");
 
-var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
+var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};CommandTimeout=180";
 
 builder.Services.AddHttpContextAccessor();
 

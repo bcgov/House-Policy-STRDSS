@@ -2,7 +2,7 @@ import { BusinessLicence } from "./business-licence";
 
 export interface ListingDetails {
     rentalListingId: number;
-    listingStatusType: 'N' | 'I' | 'R' | 'A' | 'T' | 'D';
+    listingStatusType: 'N' | 'I' | 'R' | 'A' | 'T' | 'D' | 'U';
     listingStatusSortNo: number;
     latestReportPeriodYm: string;
     isActive: boolean;

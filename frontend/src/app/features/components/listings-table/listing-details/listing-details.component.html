@@ -5,6 +5,16 @@
         Listing has been replaced with corrected listings. Search by the Listing ID to find related listings which will appear as Listing ID - Room ID. Previous local government actions remain on record, but new actions cannot be taken and do not carry forward to corrected listings.
     </div>
 </div>
+<div class="id-updated-banner" *ngIf="listing && isListingStatusU && !isIdUpdatedBannerDismissed" role="alert">
+    <i class="pi pi-info-circle" aria-hidden="true"></i>
+    <div class="id-updated-banner-text">
+        <strong>Platform updated the listing ID - March 2026</strong>
+        This update reflects a change to the listing ID only. All associated information has been retained.
+    </div>
+    <button type="button" class="id-updated-banner-dismiss do-not-print-it" (click)="dismissIdUpdatedBanner()" aria-label="Dismiss">
+        <i class="pi pi-times"></i>
+    </button>
+</div>
 <div class="header-container" *ngIf="listing">
     <div class="title">
         <h2>Detailed Listing Information for</h2>
@@ -15,6 +25,7 @@
                 [attr.tabindex]="isDeactivated ? -1 : null">{{listing.platformListingNo}}</a>
             <i class="pi pi-external-link do-not-print-it"></i>
             <span *ngIf="isDeactivated" class="id-deactivated-tag">ID deactivated</span>
+            <span *ngIf="isListingStatusU" class="id-updated-tag">ID updated</span>
         </span>
     </div>
     <div class="legend-container">
@@ -63,21 +74,22 @@
                 <div class="status-container">
                     <strong>Listing Status: </strong>
                     <span class="status-item" *ngIf="listing.listingStatusType === 'D'">Deactivated</span>
-                    <span class="status-item" *ngIf="listing.listingStatusType !== 'D' && listing.isLgTransferred">
+                    <span class="status-item" *ngIf="listing.listingStatusType === 'U'">ID updated</span>
+                    <span class="status-item" *ngIf="listing.listingStatusType !== 'D' && listing.listingStatusType !== 'U' && listing.isLgTransferred">
                         <span>
                             Reassigned
                         </span>
                         <span class="status-flag status-reassigned">
                         </span>
                     </span>
-                    <span class="status-item" *ngIf="listing.listingStatusType !== 'D' && listing.isTakenDown">
+                    <span class="status-item" *ngIf="listing.listingStatusType !== 'D' && listing.listingStatusType !== 'U' && listing.isTakenDown">
                         <span>
                             Takedown Reported
                         </span>
                         <span class="status-flag status-takedown-complete">
                         </span>
                     </span>
-                    <span *ngIf="listing.listingStatusType !== 'D' && !listing.isLgTransferred && !listing.isTakenDown">-</span>
+                    <span *ngIf="listing.listingStatusType !== 'D' && listing.listingStatusType !== 'U' && !listing.isLgTransferred && !listing.isTakenDown">-</span>
                 </div>
             </div>
 

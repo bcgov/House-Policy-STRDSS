@@ -54,6 +54,74 @@
         vertical-align: middle;
     }
 
+    .id-updated-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px;
+        margin-top: 20px;
+        width: calc(100% - 24px);
+        box-sizing: border-box;
+        background-color: #F7F9FC;
+        border: 1px solid #053662;
+        color: #333;
+        font-size: 16px;
+        line-height: 1.4;
+        font-weight: normal;
+        border-radius: 5px;
+
+        i.pi-info-circle {
+            flex-shrink: 0;
+            margin-top: 2px;
+            font-size: 1rem;
+            color: #053662;
+        }
+
+        .id-updated-banner-text {
+            flex: 1;
+            min-width: 0;
+
+            strong {
+                display: block;
+                margin-bottom: 4px;
+                color: #333;
+                font-weight: 600;
+            }
+        }
+
+        .id-updated-banner-dismiss {
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+            color: #053662;
+            line-height: 1;
+            border-radius: 4px;
+
+            &:hover {
+                background-color: rgba(5, 54, 98, 0.08);
+            }
+
+            .pi-times {
+                font-size: 1rem;
+            }
+        }
+    }
+
+    .id-updated-tag {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background-color: #F7F9FC;
+        border: 1px solid #053662;
+        color: #333;
+        font-size: 12px;
+        font-weight: 500;
+        vertical-align: middle;
+    }
+
     .status-red {
         color: #CE3E39 !important;
         display: flex;

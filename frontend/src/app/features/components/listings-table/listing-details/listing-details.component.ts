@@ -114,6 +114,14 @@ export class ListingDetailsComponent implements OnInit {
     return this.listing?.listingStatusType === 'D';
   }
 
+  /** True when listing status is U (platform updated the listing ID). */
+  get isListingStatusU(): boolean {
+    return this.listing?.listingStatusType === 'U';
+  }
+
+  /** Whether the ID updated banner has been dismissed (closed) for the current page view. */
+  isIdUpdatedBannerDismissed = false;
+
   /**
    * Returns true if any month in listing history has nights stayed greater than
    * the number of calendar days in that month (indicates multiple units under one listing).
@@ -147,6 +155,11 @@ export class ListingDetailsComponent implements OnInit {
 
   showLegend(): void {
     this.isLegendShown = true;
+  }
+
+  dismissIdUpdatedBanner(): void {
+    this.isIdUpdatedBannerDismissed = true;
+    this.cd.detectChanges();
   }
 
   showBlMatchPopup(): void {

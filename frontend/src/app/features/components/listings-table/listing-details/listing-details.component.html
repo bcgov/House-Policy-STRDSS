@@ -1,10 +1,21 @@
+<div class="deactivated-banner" *ngIf="listing && isDeactivated" role="alert">
+    <i class="pi pi-ban" aria-hidden="true"></i>
+    <div class="deactivated-banner-text">
+        <strong>Listing ID deactivated due to platform data issue - March 2026</strong>
+        Listing has been replaced with corrected listings. Search by the Listing ID to find related listings which will appear as Listing ID - Room ID. Previous local government actions remain on record, but new actions cannot be taken and do not carry forward to corrected listings.
+    </div>
+</div>
 <div class="header-container" *ngIf="listing">
     <div class="title">
         <h2>Detailed Listing Information for</h2>
 
-        <a target="_blank" class="listing-url-lnk"
-            [href]="listing.platformListingUrl | urlProtocol">{{listing.platformListingNo}}</a>&nbsp; <i
-            class="pi pi-external-link do-not-print-it"></i>
+        <span class="listing-id-row">
+            <a target="_blank" class="listing-url-lnk" [class.disabled]="isDeactivated"
+                [attr.href]="isDeactivated ? null : (listing.platformListingUrl | urlProtocol)"
+                [attr.tabindex]="isDeactivated ? -1 : null">{{listing.platformListingNo}}</a>
+            <i class="pi pi-external-link do-not-print-it"></i>
+            <span *ngIf="isDeactivated" class="id-deactivated-tag">ID deactivated</span>
+        </span>
     </div>
     <div class="legend-container">
         <button pButton id="view-more-history-btn" class="p-button-link do-not-print-it" (click)="showLegend()">
@@ -21,12 +32,12 @@
         </div>
     </div>
     <div class="column">
-        <button *ngIf="!isCEU" pButton (click)="sendNoticeOfNonCompliance()" class="p-button-outlined do-not-print-it">
+        <button *ngIf="!isCEU" pButton (click)="sendNoticeOfNonCompliance()" class="p-button-outlined do-not-print-it" [disabled]="isDeactivated">
             <span class="nonc-icon"></span> Send Notice Of Non-Compliance </button>
-        <button *ngIf="!isCEU" pButton (click)="sendTakedownRequest()" class="p-button-outlined do-not-print-it"><span
+        <button *ngIf="!isCEU" pButton (click)="sendTakedownRequest()" class="p-button-outlined do-not-print-it" [disabled]="isDeactivated"><span
                 class="tdr-icon"></span> Send Takedown Request</button>
 
-        <button pButton *ngIf="isCEU" icon="pi pi-envelope" id="send_compliance_order_btn" (click)="onContactHost()">
+        <button pButton *ngIf="isCEU" icon="pi pi-envelope" id="send_compliance_order_btn" (click)="onContactHost()" [disabled]="isDeactivated">
             &nbsp;Contact Host
         </button>
 
@@ -49,23 +60,24 @@
                 <span class="value">{{listing.offeringOrganizationNm || '-'}}</span>
             </div>
             <div class="row">
-                <div class="status-container" [ngSwitch]="listing.listingStatusType">
+                <div class="status-container">
                     <strong>Listing Status: </strong>
-                    <span class="status-item" *ngIf="listing.isLgTransferred">
+                    <span class="status-item" *ngIf="listing.listingStatusType === 'D'">Deactivated</span>
+                    <span class="status-item" *ngIf="listing.listingStatusType !== 'D' && listing.isLgTransferred">
                         <span>
                             Reassigned
                         </span>
                         <span class="status-flag status-reassigned">
                         </span>
                     </span>
-                    <span class="status-item" *ngIf="listing.isTakenDown">
+                    <span class="status-item" *ngIf="listing.listingStatusType !== 'D' && listing.isTakenDown">
                         <span>
                             Takedown Reported
                         </span>
                         <span class="status-flag status-takedown-complete">
                         </span>
                     </span>
-                    <span *ngIf="!listing.isLgTransferred && !listing.isTakenDown">-</span>
+                    <span *ngIf="listing.listingStatusType !== 'D' && !listing.isLgTransferred && !listing.isTakenDown">-</span>
                 </div>
             </div>
 
@@ -81,7 +93,7 @@
                 </span>
                 <span *ngIf="canUserEditAddress" class="change-address-button-container">
                     <button pButton class="p-button-transparent" pTooltip="Edit Address" aria-label="Edit Address"
-                        (click)="onAddressChangeClicked()">
+                        (click)="onAddressChangeClicked()" [disabled]="isDeactivated">
                         <span class="edit-address-icon"></span>
                     </button>
                 </span>
@@ -169,6 +181,15 @@
             <div class="row night-stayed-row">
                 <span class="label">Night Stayed (12M):</span>
                 <span class="value">{{listing.nightsBookedYtdQty}}</span>
+            </div>
+            <div class="row nights-stayed-warning-row" *ngIf="hasNightsExceedingDaysInAnyMonth">
+                <div class="message info">
+                    <i class="pi pi-info-circle"></i>
+                    <div class="message-info-content">
+                        <strong class="message-info-title">Multiple units under one listing</strong>
+                        <p class="message-info-body">This listing may include more than one physical unit of the same room type, which can cause nights stayed to exceed the days in a month.</p>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <p-table [value]="listing.listingHistory" [paginator]="listing.listingHistory.length>12"

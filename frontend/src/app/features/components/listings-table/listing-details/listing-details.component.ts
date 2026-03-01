@@ -109,6 +109,38 @@ export class ListingDetailsComponent implements OnInit {
     return !this.searchBlText.trim();
   }
 
+  /** True when listing status is D (deactivated due to platform data issue). */
+  get isDeactivated(): boolean {
+    return this.listing?.listingStatusType === 'D';
+  }
+
+  /**
+   * Returns true if any month in listing history has nights stayed greater than
+   * the number of calendar days in that month (indicates multiple units under one listing).
+   */
+  get hasNightsExceedingDaysInAnyMonth(): boolean {
+    if (!this.listing?.listingHistory?.length) {
+      return false;
+    }
+    return this.listing.listingHistory.some(
+      (h) =>
+        typeof h.nightsBookedQty === 'number' &&
+        h.nightsBookedQty !== -1 &&
+        h.nightsBookedQty > this.getDaysInMonth(h.reportPeriodYM)
+    );
+  }
+
+  /** Returns the number of calendar days in the given YYYY-MM period. */
+  getDaysInMonth(periodYm: string): number {
+    const match = /^(\d{4})-(\d{2})$/.exec(periodYm);
+    if (!match) {
+      return 0;
+    }
+    const year = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10); // 1-12
+    return new Date(year, month, 0).getDate();
+  }
+
   isBoolDefined(prop: boolean | undefined): boolean {
     return typeof prop === 'boolean';
   }

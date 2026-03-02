@@ -158,8 +158,22 @@ export class ListingDetailsComponent implements OnInit {
   }
 
   dismissIdUpdatedBanner(): void {
-    this.isIdUpdatedBannerDismissed = true;
-    this.cd.detectChanges();
+    if (!this.listing || this.listing.listingStatusType !== 'U') {
+      this.isIdUpdatedBannerDismissed = true;
+      this.cd.detectChanges();
+      return;
+    }
+    this.listingService.dismissIdUpdated(this.listing.rentalListingId).subscribe({
+      next: () => {
+        this.listing!.listingStatusType = 'A';
+        this.isIdUpdatedBannerDismissed = true;
+        this.cd.detectChanges();
+      },
+      error: () => {
+        this.isIdUpdatedBannerDismissed = true;
+        this.cd.detectChanges();
+      },
+    });
   }
 
   showBlMatchPopup(): void {

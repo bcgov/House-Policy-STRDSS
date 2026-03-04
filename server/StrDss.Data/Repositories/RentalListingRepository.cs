@@ -49,6 +49,8 @@ namespace StrDss.Data.Repositories
         public async Task<RentalListingResponseWithCountsDto> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var query = _dbSet.AsNoTracking();
 
             if (_currentUser.OrganizationType == OrganizationTypes.LG)
@@ -57,7 +59,7 @@ namespace StrDss.Data.Repositories
             }
 
             // Get allCount before applying filters (only organization filter applied)
-            var allCount = await query.CountAsync();
+            var allCount = await query.CountAsync();            
 
             // Get recentCount with recent filter applied (before other filters)
             var queryForRecentCount = query;
@@ -69,9 +71,13 @@ namespace StrDss.Data.Repositories
             {
                 query = ApplyRecentFilter(query);
             }
+            _logger.LogInformation($"Get Rental Listings - Total Listings Fetched: {allCount}, Reported Recently: {recentCount}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             // Apply all other filters for data retrieval
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+
+            var countAfterFilters = await query.CountAsync();
+            _logger.LogInformation($"Get Rental Listings - Total Listings After Filter: {countAfterFilters}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             var extraSort
                 = "AddressSort1ProvinceCd asc, AddressSort2LocalityNm asc, AddressSort3LocalityTypeDsc asc, AddressSort4StreetNm asc, AddressSort5StreetTypeDsc asc, AddressSort6StreetDirectionDsc asc, AddressSort7CivicNo asc, AddressSort8UnitNo asc";
@@ -107,10 +113,15 @@ namespace StrDss.Data.Repositories
 
             var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
 
+            _logger.LogInformation($"Get Rental Listings - Total Listings After Paging: {listings.SourceList.Count()}, Page: {pageNumber}, PageSize: {pageSize}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
             var contacts = _mapper.Map<List<RentalListingContactDto>>(await _dbContext.DssRentalListingContacts
                 .AsNoTracking()
                 .Where(contact => listings.SourceList.Select(listing => listing.RentalListingId).Contains(contact.ContactedThroughRentalListingId))
-                .ToListAsync());            
+                .ToListAsync());
+
+            stopwatch.Stop();
+            _logger.LogInformation($"Get Rental Listings - Contacts Fetched: {contacts.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             foreach (var listing in listings.SourceList)            {
                 listing.LastActionDtm = listing.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(listing.LastActionDtm.Value);
@@ -121,7 +132,7 @@ namespace StrDss.Data.Repositories
                 {
                     listing.LastActionNm = "Reg Check Failed";
                 }
-            }
+            }            
 
             return new RentalListingResponseWithCountsDto
             {
@@ -158,6 +169,8 @@ namespace StrDss.Data.Repositories
                 query = ApplyRecentFilter(query);
             }
 
+            _logger.LogInformation($"Get Grouped Listings - Total Listings Fetched: {allCount}, Recent Listings: {recentCount}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
             // Apply all other filters for data retrieval
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, 
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
@@ -165,9 +178,7 @@ namespace StrDss.Data.Repositories
             // Get all listings that match filters in one query
             var allListings = await query.ToListAsync();
             
-            _logger.LogDebug($"Get Grouped Listings - Total Listings Fetched: {allListings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            stopwatch.Restart();
+            _logger.LogInformation($"Get Grouped Listings - Total Listings After Filters: {allListings.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             // Use HashSet for faster Contains lookup
             var rentalListingIds = new HashSet<long>(allListings.Select(x => x.RentalListingId ?? 0));
@@ -184,9 +195,7 @@ namespace StrDss.Data.Repositories
                 .GroupBy(x => x.ContactedThroughRentalListingId)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            _logger.LogDebug($"Get Grouped Listings - Contacts Fetched: {allContactEntities.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            stopwatch.Restart();
+            _logger.LogInformation($"Get Grouped Listings - Contacts Fetched: {allContactEntities.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             // Single pass partitioning using lists with pre-allocated capacity estimate
             var listingsWithRegNo = new List<DssRentalListingVw>(allListings.Count / 2);
@@ -218,8 +227,7 @@ namespace StrDss.Data.Repositories
             grouped.AddRange(groupedByOther);
 
             stopwatch.Stop();
-
-            _logger.LogDebug($"Get Grouped Listings - Groups Created: {grouped.Count} (RegNo: {groupedByRegNo.Count}, Other: {groupedByOther.Count}), Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogInformation($"Get Grouped Listings - Groups Created: {grouped.Count} (RegNo: {groupedByRegNo.Count}, Other: {groupedByOther.Count}), Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return new AggregatedListingResponseWithCountsDto
             {

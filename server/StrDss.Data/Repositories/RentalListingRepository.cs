@@ -120,7 +120,6 @@ namespace StrDss.Data.Repositories
                 .Where(contact => listings.SourceList.Select(listing => listing.RentalListingId).Contains(contact.ContactedThroughRentalListingId))
                 .ToListAsync());
 
-            stopwatch.Stop();
             _logger.LogInformation($"Get Rental Listings - Contacts Fetched: {contacts.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             foreach (var listing in listings.SourceList)            {
@@ -132,7 +131,10 @@ namespace StrDss.Data.Repositories
                 {
                     listing.LastActionNm = "Reg Check Failed";
                 }
-            }            
+            }
+
+            stopwatch.Stop();
+            _logger.LogInformation($"Get Rental Listings - Final Mapping and Processing Completed, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return new RentalListingResponseWithCountsDto
             {

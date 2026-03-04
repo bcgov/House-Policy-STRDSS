@@ -272,7 +272,6 @@ export class ListingsTableComponent implements OnInit {
     this.initFilters();
     this.isFilterOpened = false;
     this.currentPage.pageNumber = 1;
-    this.getListings(0);
     this.onSearch();
   }
 

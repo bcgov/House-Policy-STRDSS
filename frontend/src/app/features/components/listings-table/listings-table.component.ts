@@ -83,6 +83,9 @@ export class ListingsTableComponent implements OnInit {
 
   readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
 
+  /** When true, the next onPageChange was triggered by onSearch (paginator.changePage); skip calling getListings again. */
+  private skipNextPageChange = false;
+
   get listingsSelected(): number {
     return Object.keys(this.selectedListings).length;
   }
@@ -217,6 +220,12 @@ export class ListingsTableComponent implements OnInit {
   }
 
   onPageChange(value: any): void {
+    if (this.skipNextPageChange) {
+      this.skipNextPageChange = false;
+      this.currentPage.pageSize = value.rows;
+      this.currentPage.pageNumber = value.page + 1;
+      return;
+    }
     this.currentPage.pageSize = value.rows;
     this.currentPage.pageNumber = value.page + 1;
 
@@ -228,6 +237,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   onSearch(): void {
+    this.skipNextPageChange = true;
     this.getListings(0);
     this.paginator.changePage(0);
   }
@@ -344,6 +354,7 @@ export class ListingsTableComponent implements OnInit {
 
   onToggleChange(): void {
     this.selectedListings = [];
+    this.skipNextPageChange = true;
     this.paginator.changePage(0);
     this.getListings(1);
   }

@@ -92,16 +92,16 @@
 
                     &.search-clear-btn {
                         position: absolute;
-                        right: 45px;
+                        right: 50px;
+                        top: 50%;
+                        transform: translateY(-50%);
                         z-index: 4;
-                        background: transparent !important;
-                        border: none !important;
-                        color: #666 !important;
+                        background: transparent;
+                        border: none;
+                        padding: 4px;
 
                         &:hover {
                             text-decoration: none;
-                            background: transparent !important;
-                            color: #333 !important;
                         }
                     }
 

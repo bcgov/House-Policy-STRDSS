@@ -37,7 +37,7 @@ import { ListingSearchRequest } from '../../../../common/models/listing-search-r
 import { ListingDetails } from '../../../../common/models/listing-details';
 import { OrganizationService } from '../../../../common/services/organization.service';
 import { UrlProtocolPipe } from '../../../../common/pipes/url-protocol.pipe';
-import { forkJoin, tap } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -94,6 +94,8 @@ export class AggregatedListingsTableComponent implements OnInit {
     
     // Track which rows are currently loading/expanding to prevent multiple clicks
     expandingRows = new Set<string>();
+    /** Prevents duplicate getListings calls (e.g. Enter key + button activation). */
+    private getListingsInProgress = false;
     // Virtual scroll item size for nested tables (in pixels)
     // With scrollHeight="400px" and itemSize=50px:
     // - Visible rows: ~8 rows (400px / 50px)
@@ -434,6 +436,7 @@ export class AggregatedListingsTableComponent implements OnInit {
 
     onClearSearchBox(): void {
         this.searchTerm = '';
+        this.onSearch();
     }
 
     onClearFilters(): void {
@@ -506,6 +509,10 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     private getListings(): void {
+        if (this.getListingsInProgress) {
+            return;
+        }
+        this.getListingsInProgress = true;
         this.loaderService.loadingStart();
 
         const searchReq = {} as ListingSearchRequest;
@@ -562,7 +569,13 @@ export class AggregatedListingsTableComponent implements OnInit {
                         this.paginator.changePage(this.currentPage.pageNumber - 1);
                     }
                 },
+                error: () => {
+                    this.getListingsInProgress = false;
+                    this.loaderService.loadingEnd();
+                    this.cd.detectChanges();
+                },
                 complete: () => {
+                    this.getListingsInProgress = false;
                     this.loaderService.loadingEnd();
                     this.cd.detectChanges();
                 },

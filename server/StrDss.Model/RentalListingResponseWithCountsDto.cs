@@ -2,7 +2,7 @@ using StrDss.Model.RentalReportDtos;
 
 namespace StrDss.Model
 {
-    public class RentalListingResponseWithCountsDto : PagedDto<RentalListingViewDto>
+    public class RentalListingResponseWithCountsDto<T> : PagedDto<T>
     {
         public int RecentCount { get; set; }
         public int AllCount { get; set; }

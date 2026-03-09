@@ -1,5 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using StrDss.Common;
@@ -8,6 +10,7 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.RentalReportDtos;
 using StrDss.Service.HttpClients;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text;
 
@@ -15,7 +18,7 @@ namespace StrDss.Service
 {
     public interface IRentalListingService
     {
-        Task<RentalListingResponseWithCountsDto> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<RentalListingResponseWithCountsDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction);
         Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
@@ -36,33 +39,97 @@ namespace StrDss.Service
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
-        private IRentalListingRepository _listingRepo;
-        private IGeocoderApi _geocoder;
-        private IOrganizationRepository _orgRepo;
-        private IBizLicenceRepository _bizLicenceRepo;
+        private readonly IRentalListingRepository _listingRepo;
+        private readonly IGeocoderApi _geocoder;
+        private readonly IOrganizationRepository _orgRepo;
+        private readonly IBizLicenceRepository _bizLicenceRepo;
+        private readonly IMemoryCache _memoryCache;
+        private readonly IConfiguration _configuration;
 
         public RentalListingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
-            IRentalListingRepository listingRep, IGeocoderApi geocoder, IOrganizationRepository orgRepo, IBizLicenceRepository bizLicenceRepo)
+            IRentalListingRepository listingRep, IGeocoderApi geocoder, IOrganizationRepository orgRepo, IBizLicenceRepository bizLicenceRepo,
+            IMemoryCache memoryCache, IConfiguration configuration)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _listingRepo = listingRep;
             _geocoder = geocoder;
             _orgRepo = orgRepo;
             _bizLicenceRepo = bizLicenceRepo;
+            _memoryCache = memoryCache;
+            _configuration = configuration;
         }
-        public async Task<RentalListingResponseWithCountsDto> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+
+        /// <summary>
+        /// Per-key semaphores to avoid cache stampede: only one request per key fetches from the repository at a time.
+        /// Entries are removed after use so the dictionary does not grow unbounded with unique keys.
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, SemaphoreSlim> _listingTableCacheLocks = new();
+
+        public async Task<RentalListingResponseWithCountsDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction)
         {
-            var listings = await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent,
-                pageSize, pageNumber, orderBy, direction);
+            var cacheKey = BuildListingTableCacheKey(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, pageSize, pageNumber, orderBy, direction);
 
-            foreach (var listing in listings.SourceList)
+            var cacheMinutes = _configuration.GetValue("ListingTableCacheMinutes", 2);
+            if (cacheMinutes <= 0)
             {
-                ProcessHosts(listing, true);
+                return await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent,
+                    pageSize, pageNumber, orderBy, direction);
             }
 
-            return listings;
+            // Avoid cache stampede: only one thread per key calls the repository; others wait and then read from cache.
+            var semaphore = _listingTableCacheLocks.GetOrAdd(cacheKey, _ => new SemaphoreSlim(1, 1));
+            await semaphore.WaitAsync();
+            try
+            {
+                if (_memoryCache.TryGetValue(cacheKey, out RentalListingResponseWithCountsDto<RentalListingTableRowDto>? cached))
+                {
+                    return cached!;
+                }
+
+                var listings = await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent,
+                    pageSize, pageNumber, orderBy, direction);
+
+                var options = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(cacheMinutes));
+                _memoryCache.Set(cacheKey, listings, options);
+
+                return listings;
+            }
+            finally
+            {
+                semaphore.Release();
+                _listingTableCacheLocks.TryRemove(cacheKey, out _);
+            }
+        }
+
+        private string BuildListingTableCacheKey(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent,
+            int pageSize, int pageNumber, string orderBy, string direction)
+        {
+            var statuses = statusArray != null && statusArray.Length > 0 ? string.Join(",", statusArray.OrderBy(x => x)) : "";
+            var sb = new StringBuilder("listing_table:");
+            sb.Append(_currentUser.OrganizationId);
+            sb.Append('|').Append(all ?? "");
+            sb.Append('|').Append(address ?? "");
+            sb.Append('|').Append(url ?? "");
+            sb.Append('|').Append(listingId ?? "");
+            sb.Append('|').Append(hostName ?? "");
+            sb.Append('|').Append(businessLicence ?? "");
+            sb.Append('|').Append(registrationNumber ?? "");
+            sb.Append('|').Append(prRequirement?.ToString() ?? "");
+            sb.Append('|').Append(blRequirement?.ToString() ?? "");
+            sb.Append('|').Append(lgId?.ToString() ?? "");
+            sb.Append('|').Append(statuses);
+            sb.Append('|').Append(reassigned?.ToString() ?? "");
+            sb.Append('|').Append(takedownComplete?.ToString() ?? "");
+            sb.Append('|').Append(recent);
+            sb.Append('|').Append(pageSize).Append('|').Append(pageNumber);
+            sb.Append('|').Append(orderBy ?? "").Append('|').Append(direction ?? "");
+            return sb.ToString();
         }
 
         public async Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,

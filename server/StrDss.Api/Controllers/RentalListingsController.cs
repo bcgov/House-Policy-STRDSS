@@ -31,7 +31,7 @@ namespace StrDss.Api.Controllers
         [HttpGet]
         public async Task<ActionResult> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = false,
-            int pageSize = 10, int pageNumber = 1, string orderBy = "ListingStatusSortNo", string direction = "asc")
+            int pageSize = 10, int pageNumber = 1, string orderBy = "latestReportPeriodYm", string direction = "desc")
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 

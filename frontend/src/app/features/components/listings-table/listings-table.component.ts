@@ -354,7 +354,6 @@ export class ListingsTableComponent implements OnInit {
 
   onToggleChange(): void {
     this.selectedListings = [];
-    this.skipNextPageChange = true;
     this.paginator.changePage(0);
     this.getListings(1);
   }

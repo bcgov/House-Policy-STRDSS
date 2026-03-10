@@ -31,6 +31,7 @@ import { UrlProtocolPipe } from '../../../common/pipes/url-protocol.pipe';
 import { ListingDetails } from '../../../common/models/listing-details';
 import { FormsModule } from '@angular/forms';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-listings-table',
@@ -361,23 +362,37 @@ export class ListingsTableComponent implements OnInit {
     const searchReq = {} as ListingSearchRequest;
     searchReq[this.searchColumn] = this.searchTerm;
 
-    this.listingService.getListings(
-      selectedPageNumber ?? (this.currentPage?.pageNumber || 0),
-      this.currentPage?.pageSize || 25,
-      this.sort?.prop || '',
-      this.sort?.dir || 'asc',
-      searchReq,
-      this.currentFilter,
-      this.showRecentOnly,
-    ).subscribe({
-      next: (res: PagingResponse<ListingTableRow>) => {
-        this.currentPage = res.pageInfo;
-        this.listings = res.sourceList;
+    const pageNumber = selectedPageNumber ?? (this.currentPage?.pageNumber || 0);
+    const pageSize = this.currentPage?.pageSize || 25;
+    const orderBy = this.sort?.prop || '';
+    const direction = this.sort?.dir || 'asc';
+
+    forkJoin({
+      count: this.listingService.getListingsCount(searchReq, this.currentFilter, this.showRecentOnly),
+      data: this.listingService.getListings(
+        pageNumber,
+        pageSize,
+        orderBy,
+        direction,
+        searchReq,
+        this.currentFilter,
+        this.showRecentOnly,
+        false,
+      ),
+    }).subscribe({
+      next: ({ count, data }: { count: number; data: PagingResponse<ListingTableRow> }) => {
+        this.currentPage = data.pageInfo;
+        this.currentPage.totalCount = count;
+        this.listings = data.sourceList;
+      },
+      error: () => {
+        this.loaderService.loadingEnd();
+        this.cd.detectChanges();
       },
       complete: () => {
         this.loaderService.loadingEnd();
         this.cd.detectChanges();
-      }
+      },
     });
   }
 

@@ -14,7 +14,9 @@ namespace StrDss.Data.Repositories
     public interface IRentalListingRepository
     {
         Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction);
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
+        Task<int> GetRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
         Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
         Task<int> CountHostListingsAsync(string hostName);
@@ -274,8 +276,28 @@ namespace StrDss.Data.Repositories
             };
         }
 
+        public async Task<int> GetRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
+        {
+            var query = GetRentalListingsTableBaseQuery();
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG)
+            {
+                query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+            }
+
+            if (recent)
+            {
+                query = ApplyRecentFilterTable(query);
+            }
+
+            ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+
+            return await query.CountAsync();
+        }
+
         public async Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction)
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -296,8 +318,12 @@ namespace StrDss.Data.Repositories
             // Apply all other filters for data retrieval
             ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
-            var countAfterFilters = await query.CountAsync();
-            _logger.LogInformation($"Get Rental Listings - Total Listings After Filter: {countAfterFilters}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            int? countAfterFilters = null;
+            if (includeTotalCount)
+            {
+                countAfterFilters = await query.CountAsync();
+                _logger.LogInformation($"Get Rental Listings - Total Listings After Filter: {countAfterFilters}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            }
 
             // Whitelist sort: only columns used by the frontend table
             if (string.IsNullOrEmpty(orderBy) || !AllowedSortColumns.Contains(orderBy))
@@ -337,7 +363,7 @@ namespace StrDss.Data.Repositories
                 {
                     PageNumber = pageNumber,
                     PageSize = pageSize,
-                    TotalCount = countAfterFilters,
+                    TotalCount = countAfterFilters ?? 0,
                     OrderBy = orderBy,
                     Direction = direction,
                     ItemCount = pagedList.Count

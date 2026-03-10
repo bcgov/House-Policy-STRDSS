@@ -139,8 +139,11 @@ export class ListingDataService {
                     endpointUrl += `&takedownComplete=${!!filter.byStatus.takedownComplete}`;
                 }
 
-                const statuses = new Array();
-                if (filter.byStatus.active) statuses.push('A');
+                const statuses = new Array<string>();
+                if (filter.byStatus.active) {
+                    statuses.push('A');
+                    statuses.push('U'); // Include Update when Active is selected
+                }
                 if (filter.byStatus.inactive) statuses.push('I');
                 if (filter.byStatus.new) statuses.push('N');
 
@@ -218,8 +221,11 @@ export class ListingDataService {
                     params.push(`takedownComplete=${!!filter.byStatus.takedownComplete}`);
                 }
 
-                const statuses = new Array();
-                if (filter.byStatus.active) statuses.push('A');
+                const statuses = new Array<string>();
+                if (filter.byStatus.active) {
+                    statuses.push('A');
+                    statuses.push('U'); // Include Update when Active is selected
+                }
                 if (filter.byStatus.inactive) statuses.push('I');
                 if (filter.byStatus.new) statuses.push('N');
 
@@ -278,6 +284,17 @@ export class ListingDataService {
     confirmAddress(id: number): Observable<any> {
         return this.httpClient.put<any>(
             `${environment.API_HOST}/rentallistings/${id}/address/confirm`,
+            {},
+        );
+    }
+
+    /**
+     * Dismisses the "ID updated" banner by setting the listing status from U to A (Active).
+     * Returns the response; 204 No Content on success, 404 when listing not found or not in status U.
+     */
+    dismissIdUpdated(rentalListingId: number): Observable<void> {
+        return this.httpClient.put<void>(
+            `${environment.API_HOST}/rentallistings/${rentalListingId}/dismissidupdated`,
             {},
         );
     }

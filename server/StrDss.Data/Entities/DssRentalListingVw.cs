@@ -106,4 +106,6 @@ public partial class DssRentalListingVw
     public DateTime? LgTransferDtm { get; set; }
 
     public string? TakeDownReason { get; set; }
+
+    public bool? IsTakedownActionSuspended { get; set; }
 }

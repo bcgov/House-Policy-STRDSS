@@ -105,6 +105,7 @@ namespace StrDss.Model.RentalReportDtos
         public virtual ICollection<ListingHistoryDto> ListingHistory { get; set; } = new List<ListingHistoryDto>();
         public virtual ICollection<ActionHistoryDto> ActionHistory { get; set; } = new List<ActionHistoryDto>();
         public virtual ICollection<AddressChangeHistoryDto> AddressChangeHistory { get; set; } = new List<AddressChangeHistoryDto>();
+        public bool? IsTakedownActionSuspended { get; set; }
 
     }
 

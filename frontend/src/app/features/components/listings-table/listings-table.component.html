@@ -5,11 +5,11 @@
         <p-select [options]="searchColumns" [showClear]="searchColumn !== 'all'" (onClear)="clearSearchBy($event)"
             id="search-by-drd" [(ngModel)]="searchColumn" class="search-by-select"></p-select>
         <span class="p-input-icon-right search-input-container">
-            <button pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()" aria-label="Search">
+            <button type="button" pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()" aria-label="Search">
                 <i class="pi pi-search" aria-hidden="true"></i></button>
             <button pButton *ngIf="!!searchTerm" id="clear-search-btn" class="colorless p-button-link search-clear-btn"
                 icon="pi pi-times" (click)="onClearSearchBox()" aria-label="Clear search"></button>
-            <input type="text" id="search-term-inp" (keydown.enter)="onSearch()" class="search-input"
+            <input type="text" id="search-term-inp" (keydown.enter)="$event.preventDefault(); onSearch()" class="search-input"
                 placeholder="Search" pInputText [(ngModel)]="searchTerm" aria-label="Search input" />
         </span>
         <button pButton id="filter-open-btn" class="filter-open-btn p-button-link" [class.colorless]="!isFilterSet"
@@ -234,7 +234,7 @@
             [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'"></p-paginator>
     </p-panel>
 
-    <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" ess [style]="{width: '50vw'}"
+    <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}"
         [closeOnEscape]="true">
         <span>
             <strong>Flags:</strong>

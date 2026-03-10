@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ListingDataService } from '../../../common/services/listing-data.service';
-import { PagingResponsePageInfo } from '../../../common/models/paging-response';
-import { ListingResponseWithCounts } from '../../../common/models/listing-response-with-counts';
+import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { ListingTableRow } from '../../../common/models/listing-table-row';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
@@ -78,8 +77,6 @@ export class ListingsTableComponent implements OnInit {
   currentFilter!: ListingFilter;
   cancelableFilter!: ListingFilter;
   showRecentOnly = true; // Default to "Recently Reported"
-  recentCount = 0;
-  allCount = 0;
 
   readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
 
@@ -373,11 +370,9 @@ export class ListingsTableComponent implements OnInit {
       this.currentFilter,
       this.showRecentOnly,
     ).subscribe({
-      next: (res: ListingResponseWithCounts<ListingTableRow>) => {
+      next: (res: PagingResponse<ListingTableRow>) => {
         this.currentPage = res.pageInfo;
         this.listings = res.sourceList;
-        this.recentCount = res.recentCount;
-        this.allCount = res.allCount;
       },
       complete: () => {
         this.loaderService.loadingEnd();

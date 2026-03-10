@@ -27,7 +27,6 @@ import {
     ListingTableRow,
 } from '../../../../common/models/listing-table-row';
 import { ListingDataService } from '../../../../common/services/listing-data.service';
-import { AggregatedListingResponseWithCounts } from '../../../../common/models/listing-response-with-counts';
 import { FilterPersistenceService } from '../../../../common/services/filter-persistence.service';
 import { GlobalLoaderService } from '../../../../common/services/global-loader.service';
 import { SelectedListingsStateService } from '../../../../common/services/selected-listings-state.service';
@@ -88,8 +87,6 @@ export class AggregatedListingsTableComponent implements OnInit {
     currentFilter!: ListingFilter;
     cancelableFilter!: ListingFilter;
     showRecentOnly = true; // Default to "Recently Reported"
-    recentCount = 0;
-    allCount = 0;
     readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
     
     // Track which rows are currently loading/expanding to prevent multiple clicks
@@ -526,13 +523,8 @@ export class AggregatedListingsTableComponent implements OnInit {
                 this.showRecentOnly,
             )
             .subscribe({
-                next: (response: AggregatedListingResponseWithCounts) => {
-                    // Store counts from API response
-                    this.recentCount = response.recentCount;
-                    this.allCount = response.allCount;
-                    
-                    // Store all data - API now returns object with data array
-                    this.aggregatedListings = response.data.map(
+                next: (response: AggregatedListingTableRow[]) => {
+                    this.aggregatedListings = response.map(
                         (l: AggregatedListingTableRow, index: number) => {
                             return {
                                 ...l,
@@ -546,7 +538,7 @@ export class AggregatedListingsTableComponent implements OnInit {
                     );
                     
                     // Calculate host properties after data is loaded
-                    this.calculateIfHostsHaveMoreThanOneProperty(response.data);
+                    this.calculateIfHostsHaveMoreThanOneProperty(response);
 
                     // Initialize currentPage if not exists
                     if (!this.currentPage) {

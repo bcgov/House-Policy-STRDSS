@@ -13,9 +13,9 @@ namespace StrDss.Data.Repositories
 {
     public interface IRentalListingRepository
     {
-        Task<RentalListingResponseWithCountsDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
@@ -274,7 +274,7 @@ namespace StrDss.Data.Repositories
             };
         }
 
-        public async Task<RentalListingResponseWithCountsDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -286,19 +286,12 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
             }
 
-            // Get allCount before applying filters (only organization filter applied)
-            var allCount = await query.CountAsync();
-
-            // Get recentCount with recent filter applied (before other filters)
-            var queryForRecentCount = ApplyRecentFilterTable(query);
-            var recentCount = await queryForRecentCount.CountAsync();
-
             // Apply recent filter if requested for data retrieval
             if (recent)
             {
                 query = ApplyRecentFilterTable(query);
             }
-            _logger.LogInformation($"Get Rental Listings - Total Listings Fetched: {allCount}, Reported Recently: {recentCount}, Recent: {recent}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogInformation($"Get Rental Listings - Total Listings Fetched, Recent: {recent}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             // Apply all other filters for data retrieval
             ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
@@ -337,7 +330,7 @@ namespace StrDss.Data.Repositories
             stopwatch.Stop();
             _logger.LogInformation($"Get Rental Listings - Final Mapping and Processing Completed, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            return new RentalListingResponseWithCountsDto<RentalListingTableRowDto>
+            return new PagedDto<RentalListingTableRowDto>
             {
                 SourceList = pagedList,
                 PageInfo = new PageInfo
@@ -348,13 +341,11 @@ namespace StrDss.Data.Repositories
                     OrderBy = orderBy,
                     Direction = direction,
                     ItemCount = pagedList.Count
-                },
-                RecentCount = recentCount,
-                AllCount = allCount
+                }
             };
         }
 
-        public async Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -366,21 +357,13 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
             }
 
-            // Get allCount before applying filters (only organization filter applied)
-            var allCount = await query.CountAsync();
-
-            // Get recentCount with recent filter applied (before other filters)
-            var queryForRecentCount = query;
-            queryForRecentCount = ApplyRecentFilter(queryForRecentCount);
-            var recentCount = await queryForRecentCount.CountAsync();
-
             // Apply recent filter if requested for data retrieval
             if (recent)
             {
                 query = ApplyRecentFilter(query);
             }
 
-            _logger.LogInformation($"Get Grouped Listings - Total Listings Fetched: {allCount}, Recent Listings: {recentCount}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogInformation($"Get Grouped Listings - Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             // Apply all other filters for data retrieval
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, 
@@ -440,12 +423,7 @@ namespace StrDss.Data.Repositories
             stopwatch.Stop();
             _logger.LogInformation($"Get Grouped Listings - Groups Created: {grouped.Count} (RegNo: {groupedByRegNo.Count}, Other: {groupedByOther.Count}), Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            return new AggregatedListingResponseWithCountsDto
-            {
-                Data = grouped,
-                RecentCount = recentCount,
-                AllCount = allCount
-            };
+            return grouped;
         }
 
         private IQueryable<DssRentalListingVw> ApplyRecentFilter(IQueryable<DssRentalListingVw> query)

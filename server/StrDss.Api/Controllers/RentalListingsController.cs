@@ -44,15 +44,15 @@ namespace StrDss.Api.Controllers
 
         [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet("grouped")]
-        public async Task<ActionResult> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<ActionResult<List<RentalListingGroupDto>>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = false)
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
-            var response = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+            var list = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
 
-            return Ok(response);
+            return Ok(list);
         }
 
         [ApiAuthorize(Permissions.ListingRead)]

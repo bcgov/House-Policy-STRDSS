@@ -18,9 +18,9 @@ namespace StrDss.Service
 {
     public interface IRentalListingService
     {
-        Task<RentalListingResponseWithCountsDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
@@ -65,7 +65,7 @@ namespace StrDss.Service
         /// </summary>
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _listingTableCacheLocks = new();
 
-        public async Task<RentalListingResponseWithCountsDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction)
         {
             var cacheKey = BuildListingTableCacheKey(all, address, url, listingId, hostName, businessLicence, registrationNumber,
@@ -84,7 +84,7 @@ namespace StrDss.Service
             await semaphore.WaitAsync();
             try
             {
-                if (_memoryCache.TryGetValue(cacheKey, out RentalListingResponseWithCountsDto<RentalListingTableRowDto>? cached))
+                if (_memoryCache.TryGetValue(cacheKey, out PagedDto<RentalListingTableRowDto>? cached))
                 {
                     return cached!;
                 }
@@ -132,7 +132,7 @@ namespace StrDss.Service
             return sb.ToString();
         }
 
-        public async Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
         {
             return await _listingRepo.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,

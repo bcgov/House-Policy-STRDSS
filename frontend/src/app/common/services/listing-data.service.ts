@@ -4,12 +4,11 @@ import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
-import { ListingTableRow } from '../models/listing-table-row';
+import { AggregatedListingTableRow, ListingTableRow } from '../models/listing-table-row';
 import { ListingSearchRequest } from '../models/listing-search-request';
 import { ListingAddressCandidate, ListingDetails } from '../models/listing-details';
 import { ExportJurisdiction } from '../models/export-listing';
 import { ListingFilter } from '../models/listing-filter';
-import { ListingResponseWithCounts, AggregatedListingResponseWithCounts } from '../models/listing-response-with-counts';
 
 @Injectable({
     providedIn: 'root',
@@ -81,7 +80,7 @@ export class ListingDataService {
         searchReq: ListingSearchRequest = {},
         filter?: ListingFilter,
         recent: boolean = false,
-    ): Observable<ListingResponseWithCounts<ListingTableRow>> {
+    ): Observable<PagingResponse<ListingTableRow>> {
         let endpointUrl = `${environment.API_HOST}/rentallistings?pageSize=${pageSize}&pageNumber=${pageNumber}`;
 
         if (orderBy) {
@@ -156,7 +155,7 @@ export class ListingDataService {
             }
         }
 
-        return this.httpClient.get<ListingResponseWithCounts<ListingTableRow>>(endpointUrl);
+        return this.httpClient.get<PagingResponse<ListingTableRow>>(endpointUrl);
     }
 
     getHostListingsCount(primaryHostNm: string): Observable<{ primaryHostNm: string, hasMultipleProperties: boolean }> {
@@ -168,7 +167,7 @@ export class ListingDataService {
         searchReq: ListingSearchRequest = {},
         filter?: ListingFilter,
         recent: boolean = false,
-    ): Observable<AggregatedListingResponseWithCounts> {
+    ): Observable<AggregatedListingTableRow[]> {
         let listingsEndpointUrl = `${environment.API_HOST}/rentallistings/grouped`;
         const params: string[] = [];
 
@@ -242,8 +241,7 @@ export class ListingDataService {
             listingsEndpointUrl += `?${params.join('&')}`;
         }
 
-        // API now returns object with data, recentCount, and allCount
-        return this.httpClient.get<AggregatedListingResponseWithCounts>(listingsEndpointUrl);
+        return this.httpClient.get<AggregatedListingTableRow[]>(listingsEndpointUrl);
     }
 
     getListingDetailsById(id: number): Observable<ListingDetails> {

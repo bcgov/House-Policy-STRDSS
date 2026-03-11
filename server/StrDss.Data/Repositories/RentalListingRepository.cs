@@ -516,6 +516,7 @@ namespace StrDss.Data.Repositories
                     OrganizationCd = x.OfferingOrganizationCd ?? "",
                     OfferingPlatformId = x.OfferingOrganizationId ?? 0,
                     LocalGovernmentId = x.ManagingOrganizationId ?? 0,
+                    IsTakedownActionSuspended = x.IsTakedownActionSuspended
                 })
                 .FirstOrDefaultAsync();
         }

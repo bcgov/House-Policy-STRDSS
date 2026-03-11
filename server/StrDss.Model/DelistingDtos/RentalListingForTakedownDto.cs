@@ -11,6 +11,7 @@
         public long LocalGovernmentId { get; set; }
         public List<string> HostEmails { get; set; } = new List<string>();
         public List<string> PlatformEmails { get; set; } = new List<string>();
+        public bool? IsTakedownActionSuspended { get; set; }
 
     }
 }

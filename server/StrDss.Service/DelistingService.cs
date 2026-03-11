@@ -526,6 +526,12 @@ namespace StrDss.Service
                 return false;
             }
 
+            if (rentalListing.IsTakedownActionSuspended == true)
+            {
+                errors.AddItem("listingSuspended", $"Takedown actions are temporarily suspended for listing {rentalListing.OrganizationCd} - {rentalListing.PlatformListingNo}");
+                return false;
+            }
+
             return true;
         }
 

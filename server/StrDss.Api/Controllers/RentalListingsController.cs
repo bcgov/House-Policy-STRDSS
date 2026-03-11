@@ -249,5 +249,18 @@ namespace StrDss.Api.Controllers
 
             return Ok(listing);
         }
+
+        /// <summary>
+        /// Dismisses the "ID updated" banner by setting the listing status from U to A (Active).
+        /// </summary>
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpPut("{rentalListingId}/dismissidupdated")]
+        public async Task<ActionResult> DismissIdUpdated(long rentalListingId)
+        {
+            var updated = await _listingService.DismissIdUpdatedStatusAsync(rentalListingId);
+            if (!updated)
+                return NotFound();
+            return NoContent();
+        }
     }
 }

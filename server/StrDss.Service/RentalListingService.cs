@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using StrDss.Common;
@@ -34,6 +35,7 @@ namespace StrDss.Service
         Task<(Dictionary<string, List<string>>, RentalListingViewDto?)> UnLinkBizLicence(long rentalListingId);
         Task ResetLgTransferFlag();
         Task<bool> ListingDataToProcessExists();
+        Task<bool> DismissIdUpdatedStatusAsync(long rentalListingId);
     }
     public class RentalListingService : ServiceBase, IRentalListingService
     {
@@ -591,6 +593,18 @@ namespace StrDss.Service
             _unitOfWork.Commit();
 
             return (errors, await GetRentalListing(rentalListingId));
+        }
+
+        public async Task<bool> DismissIdUpdatedStatusAsync(long rentalListingId)
+        {
+            var listing = await GetRentalListing(rentalListingId);
+            if (listing == null || listing.ListingStatusType != "U")
+                return false;
+
+            var updated = await _listingRepo.DismissIdUpdatedStatusAsync(rentalListingId);
+            if (updated)
+                _unitOfWork.Commit();
+            return updated;
         }
 
         public async Task ResetLgTransferFlag()

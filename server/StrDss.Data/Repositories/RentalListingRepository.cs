@@ -36,6 +36,7 @@ namespace StrDss.Data.Repositories
         Task LinkBizLicence(long rentalListingId, long licenceId);
         Task UnLinkBizLicence(long rentalListingId);
         Task ResetLgTransferFlag();
+        Task<bool> DismissIdUpdatedStatusAsync(long rentalListingId);
     }
     public class RentalListingRepository : RepositoryBase<DssRentalListingVw>, IRentalListingRepository
     {
@@ -953,6 +954,18 @@ namespace StrDss.Data.Repositories
             listing.GoverningBusinessLicenceId = null;
             listing.EffectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(listing.BusinessLicenceNo);
             listing.IsChangedBusinessLicence = true;
+        }
+
+        public async Task<bool> DismissIdUpdatedStatusAsync(long rentalListingId)
+        {
+            var listing = await _dbContext.DssRentalListings
+                .FirstOrDefaultAsync(x => x.RentalListingId == rentalListingId);
+
+            if (listing == null || listing.ListingStatusType != "U")
+                return false;
+
+            listing.ListingStatusType = "A";
+            return true;
         }
 
         public async Task ResetLgTransferFlag()

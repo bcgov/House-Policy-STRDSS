@@ -93,3 +93,12 @@ WHERE rl.platform_listing_no = m.hotel_id
   AND rl.offering_organization_id = 203
   AND rl.including_rental_listing_report_id IS NULL
   AND m.new_status = 'D';
+
+----------------------------------------------------------------------------
+-- Mark the new incoming listings as not available for takedown actions
+----------------------------------------------------------------------------
+UPDATE dss_rental_listing rl
+SET is_takedown_action_suspended = TRUE
+FROM dss_rental_listing_mapping m
+WHERE rl.platform_listing_no = m.listing_id
+  AND m.new_status = 'D';

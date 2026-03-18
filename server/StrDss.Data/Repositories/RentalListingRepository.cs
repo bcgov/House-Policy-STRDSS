@@ -56,14 +56,37 @@ namespace StrDss.Data.Repositories
 
         /// <summary>
         /// Builds the base IQueryable for GetRentalListings from base tables (no view).
-        /// Joins only the entities needed for table + filter columns; uses subqueries for LatestReportPeriodYm and last email action.
-        /// Projects directly to <see cref="RentalListingTableRowDto"/>.
+        /// Uses set-based LEFT JOINs to pre-aggregated subqueries for LatestReportPeriodYm and last email action
+        /// instead of correlated scalar subqueries. Projects directly to <see cref="RentalListingTableRowDto"/>.
+        /// For performance tuning: run EXPLAIN (ANALYZE, BUFFERS) on the generated SQL; indexes are defined in
+        /// STR_DSS_Physical_DB_DDL (R14) and STR_DSS_Incremental_DB_Sprint_R15 (partial indexes i12, i13 on dss_rental_listing).
         /// </summary>
         private IQueryable<RentalListingTableRowDto> GetRentalListingsTableBaseQuery()
         {
             var currentListings = _dbContext.DssRentalListings
                 .AsNoTracking()
                 .Where(drl => drl.IncludingRentalListingReportId == null);
+
+            // Pre-aggregated: max report period per (OfferingOrganizationId, PlatformListingNo) from reported listings
+            var latestReportPeriod = from rl in _dbContext.DssRentalListings
+                                    where rl.IncludingRentalListingReportId != null
+                                    join rpt in _dbContext.DssRentalListingReports on rl.IncludingRentalListingReportId equals rpt.RentalListingReportId
+                                    group rpt by new { rl.OfferingOrganizationId, rl.PlatformListingNo } into g
+                                    select new { g.Key.OfferingOrganizationId, g.Key.PlatformListingNo, MaxReportPeriodYm = g.Max(x => x.ReportPeriodYm) };
+
+            // Pre-aggregated: latest email per listing (one row per ConcernedWithRentalListingId with max MessageDeliveryDtm and type name)
+            var maxEmailDatePerListing = _dbContext.DssEmailMessages
+                .AsNoTracking()
+                .Where(em => em.ConcernedWithRentalListingId != null)
+                .GroupBy(em => em.ConcernedWithRentalListingId)
+                .Select(g => new { ConcernedWithRentalListingId = g.Key, MessageDeliveryDtm = g.Max(x => x.MessageDeliveryDtm) });
+
+            // One row per listing: join back to get type name; use Max(EmailMessageTypeNm) for tie-break when multiple messages share same max timestamp (translates to SQL)
+            var latestEmailPerListing = from maxD in maxEmailDatePerListing
+                                        join em in _dbContext.DssEmailMessages on new { maxD.ConcernedWithRentalListingId, maxD.MessageDeliveryDtm } equals new { em.ConcernedWithRentalListingId, em.MessageDeliveryDtm }
+                                        join emt in _dbContext.DssEmailMessageTypes on em.EmailMessageType equals emt.EmailMessageType
+                                        group new { maxD.ConcernedWithRentalListingId, maxD.MessageDeliveryDtm, emt.EmailMessageTypeNm } by maxD.ConcernedWithRentalListingId into g
+                                        select new { ConcernedWithRentalListingId = g.Key, MessageDeliveryDtm = g.Max(x => x.MessageDeliveryDtm), EmailMessageTypeNm = g.Max(x => x.EmailMessageTypeNm) };
 
             return from drl in currentListings
                    join org in _dbContext.DssOrganizations on drl.OfferingOrganizationId equals org.OrganizationId
@@ -77,15 +100,14 @@ namespace StrDss.Data.Repositories
                    from lg in lgJ.DefaultIfEmpty()
                    join dbl in _dbContext.DssBusinessLicences on drl.GoverningBusinessLicenceId equals (long?)dbl.BusinessLicenceId into dblJ
                    from dbl in dblJ.DefaultIfEmpty()
+                   join lrp in latestReportPeriod on new { drl.OfferingOrganizationId, drl.PlatformListingNo } equals new { lrp.OfferingOrganizationId, lrp.PlatformListingNo } into lrpJ
+                   from lrp in lrpJ.DefaultIfEmpty()
+                   join le in latestEmailPerListing on drl.RentalListingId equals le.ConcernedWithRentalListingId into leJ
+                   from le in leJ.DefaultIfEmpty()
                    select new RentalListingTableRowDto
                    {
                        RentalListingId = drl.RentalListingId,
-                       LatestReportPeriodYm = _dbContext.DssRentalListingReports
-                           .Where(r => _dbContext.DssRentalListings.Any(rl2 =>
-                               rl2.IncludingRentalListingReportId == r.RentalListingReportId
-                               && rl2.OfferingOrganizationId == drl.OfferingOrganizationId
-                               && rl2.PlatformListingNo == drl.PlatformListingNo))
-                           .Max(r => (DateOnly?)r.ReportPeriodYm),
+                       LatestReportPeriodYm = lrp != null ? (DateOnly?)lrp.MaxReportPeriodYm : null,
                        OfferingOrganizationId = drl.OfferingOrganizationId,
                        PlatformListingNo = drl.PlatformListingNo,
                        EffectiveBusinessLicenceNo = drl.EffectiveBusinessLicenceNo,
@@ -101,16 +123,8 @@ namespace StrDss.Data.Repositories
                        BusinessLicenceNo = drl.BusinessLicenceNo,
                        BusinessLicenceNoMatched = dbl != null ? dbl.BusinessLicenceNo : null,
                        IsChangedBusinessLicence = drl.IsChangedBusinessLicence,
-                       LastActionDtm = _dbContext.DssEmailMessages
-                           .Where(em => em.ConcernedWithRentalListingId == drl.RentalListingId)
-                           .OrderByDescending(em => em.MessageDeliveryDtm)
-                           .Select(em => (DateTime?)em.MessageDeliveryDtm)
-                           .FirstOrDefault(),
-                       LastActionNm = _dbContext.DssEmailMessages
-                           .Where(em => em.ConcernedWithRentalListingId == drl.RentalListingId)
-                           .OrderByDescending(em => em.MessageDeliveryDtm)
-                           .Select(em => em.EmailMessageTypeNavigation.EmailMessageTypeNm)
-                           .FirstOrDefault(),
+                       LastActionDtm = le != null ? (DateTime?)le.MessageDeliveryDtm : null,
+                       LastActionNm = le != null ? le.EmailMessageTypeNm : null,
                        PlatformListingUrl = drl.PlatformListingUrl,
                        OfferingOrganizationNm = org.OrganizationNm,
                        TakeDownReason = drl.TakeDownReason,
@@ -121,6 +135,10 @@ namespace StrDss.Data.Repositories
                    };
         }
 
+        /// <summary>
+        /// Applies the "recent" filter in a single SQL round trip by using a subquery for platforms
+        /// that reported for the target month instead of materializing a list with .ToList().
+        /// </summary>
         private IQueryable<RentalListingTableRowDto> ApplyRecentFilterTable(IQueryable<RentalListingTableRowDto> query)
         {
             var currentDate = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow);
@@ -129,12 +147,12 @@ namespace StrDss.Data.Repositories
             var targetReportMonth = currentMonth.AddMonths(-1);
             var fallbackReportMonth = targetReportMonth.AddMonths(-1);
 
+            // Subquery: organizations that reported for the target month (translated to SQL IN (subquery), no extra round trip)
             var platformsReportedTargetMonth = _dbContext.DssRentalListingReports
                 .AsNoTracking()
                 .Where(r => r.ReportPeriodYm == targetReportMonth)
                 .Select(r => r.ProvidingOrganizationId)
-                .Distinct()
-                .ToList();
+                .Distinct();
 
             if (currentDayOfMonth <= 19)
             {

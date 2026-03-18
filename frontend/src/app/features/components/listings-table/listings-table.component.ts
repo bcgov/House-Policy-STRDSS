@@ -352,7 +352,6 @@ export class ListingsTableComponent implements OnInit {
 
   onToggleChange(): void {
     this.selectedListings = [];
-    this.paginator.changePage(0);
     this.getListings(1);
   }
 
@@ -362,7 +361,7 @@ export class ListingsTableComponent implements OnInit {
     const searchReq = {} as ListingSearchRequest;
     searchReq[this.searchColumn] = this.searchTerm;
 
-    const pageNumber = selectedPageNumber ?? (this.currentPage?.pageNumber || 0);
+    const pageNumber = Math.max(1, selectedPageNumber ?? this.currentPage?.pageNumber ?? 1);
     const pageSize = this.currentPage?.pageSize || 25;
     const orderBy = this.sort?.prop || '';
     const direction = this.sort?.dir || 'asc';
@@ -384,6 +383,13 @@ export class ListingsTableComponent implements OnInit {
         this.currentPage = data.pageInfo;
         this.currentPage.totalCount = count;
         this.listings = data.sourceList;
+        // Sync paginator to first page after load so subsequent paging works (e.g. after toggle Recent/All)
+        if (this.paginator && data.pageInfo.pageNumber === 1) {
+          this.skipNextPageChange = true;
+          this.paginator.changePage(0);
+          // If paginator was already on page 0 it may not emit; clear flag so next page click works
+          setTimeout(() => { this.skipNextPageChange = false; }, 0);
+        }
       },
       error: () => {
         this.loaderService.loadingEnd();

@@ -13,9 +13,11 @@ namespace StrDss.Data.Repositories
 {
     public interface IRentalListingRepository
     {
-        Task<RentalListingResponseWithCountsDto> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction);
-        Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
+        Task<int> GetRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
+        Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
@@ -46,106 +48,348 @@ namespace StrDss.Data.Repositories
         {
             _userRepo = userRepo;
         }
-        public async Task<RentalListingResponseWithCountsDto> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction)
+        private static readonly HashSet<string> AllowedSortColumns = new(StringComparer.OrdinalIgnoreCase)
         {
-            var stopwatch = Stopwatch.StartNew();
+            "latestReportPeriodYm", "registrationNumber", "matchAddressTxt", "nightsBookedYtdQty",
+            "businessLicenceNo", "businessLicenceNoMatched", "lastActionNm", "lastActionDtm", "offeringOrganizationNm"
+        };
 
-            var query = _dbSet.AsNoTracking();
+        /// <summary>
+        /// Builds the base IQueryable for GetRentalListings from base tables (no view).
+        /// Uses set-based LEFT JOINs to pre-aggregated subqueries for LatestReportPeriodYm and last email action
+        /// instead of correlated scalar subqueries. Projects directly to <see cref="RentalListingTableRowDto"/>.
+        /// For performance tuning: run EXPLAIN (ANALYZE, BUFFERS) on the generated SQL; indexes are defined in
+        /// STR_DSS_Physical_DB_DDL (R14) and STR_DSS_Incremental_DB_Sprint_R15 (partial indexes i12, i13 on dss_rental_listing).
+        /// </summary>
+        private IQueryable<RentalListingTableRowDto> GetRentalListingsTableBaseQuery()
+        {
+            var currentListings = _dbContext.DssRentalListings
+                .AsNoTracking()
+                .Where(drl => drl.IncludingRentalListingReportId == null);
+
+            // Pre-aggregated: max report period per (OfferingOrganizationId, PlatformListingNo) from reported listings
+            var latestReportPeriod = from rl in _dbContext.DssRentalListings
+                                    where rl.IncludingRentalListingReportId != null
+                                    join rpt in _dbContext.DssRentalListingReports on rl.IncludingRentalListingReportId equals rpt.RentalListingReportId
+                                    group rpt by new { rl.OfferingOrganizationId, rl.PlatformListingNo } into g
+                                    select new { g.Key.OfferingOrganizationId, g.Key.PlatformListingNo, MaxReportPeriodYm = g.Max(x => x.ReportPeriodYm) };
+
+            // Pre-aggregated: latest email per listing (one row per ConcernedWithRentalListingId with max MessageDeliveryDtm and type name)
+            var maxEmailDatePerListing = _dbContext.DssEmailMessages
+                .AsNoTracking()
+                .Where(em => em.ConcernedWithRentalListingId != null)
+                .GroupBy(em => em.ConcernedWithRentalListingId)
+                .Select(g => new { ConcernedWithRentalListingId = g.Key, MessageDeliveryDtm = g.Max(x => x.MessageDeliveryDtm) });
+
+            // One row per listing: join back to get type name; use Max(EmailMessageTypeNm) for tie-break when multiple messages share same max timestamp (translates to SQL)
+            var latestEmailPerListing = from maxD in maxEmailDatePerListing
+                                        join em in _dbContext.DssEmailMessages on new { maxD.ConcernedWithRentalListingId, maxD.MessageDeliveryDtm } equals new { em.ConcernedWithRentalListingId, em.MessageDeliveryDtm }
+                                        join emt in _dbContext.DssEmailMessageTypes on em.EmailMessageType equals emt.EmailMessageType
+                                        group new { maxD.ConcernedWithRentalListingId, maxD.MessageDeliveryDtm, emt.EmailMessageTypeNm } by maxD.ConcernedWithRentalListingId into g
+                                        select new { ConcernedWithRentalListingId = g.Key, MessageDeliveryDtm = g.Max(x => x.MessageDeliveryDtm), EmailMessageTypeNm = g.Max(x => x.EmailMessageTypeNm) };
+
+            return from drl in currentListings
+                   join org in _dbContext.DssOrganizations on drl.OfferingOrganizationId equals org.OrganizationId
+                   join dlst in _dbContext.DssListingStatusTypes on drl.ListingStatusType equals dlst.ListingStatusType into dlstJ
+                   from dlst in dlstJ.DefaultIfEmpty()
+                   join dpa in _dbContext.DssPhysicalAddresses on drl.LocatingPhysicalAddressId equals dpa.PhysicalAddressId into dpaJ
+                   from dpa in dpaJ.DefaultIfEmpty()
+                   join lgs in _dbContext.DssOrganizations on (dpa != null && dpa.MatchScoreAmt > 1 && dpa.ContainingOrganizationId != null ? dpa.ContainingOrganizationId : (long?)null) equals (long?)lgs.OrganizationId into lgsJ
+                   from lgs in lgsJ.DefaultIfEmpty()
+                   join lg in _dbContext.DssOrganizations on (lgs != null ? lgs.ManagingOrganizationId : (long?)null) equals (long?)lg.OrganizationId into lgJ
+                   from lg in lgJ.DefaultIfEmpty()
+                   join dbl in _dbContext.DssBusinessLicences on drl.GoverningBusinessLicenceId equals (long?)dbl.BusinessLicenceId into dblJ
+                   from dbl in dblJ.DefaultIfEmpty()
+                   join lrp in latestReportPeriod on new { drl.OfferingOrganizationId, drl.PlatformListingNo } equals new { lrp.OfferingOrganizationId, lrp.PlatformListingNo } into lrpJ
+                   from lrp in lrpJ.DefaultIfEmpty()
+                   join le in latestEmailPerListing on drl.RentalListingId equals le.ConcernedWithRentalListingId into leJ
+                   from le in leJ.DefaultIfEmpty()
+                   select new RentalListingTableRowDto
+                   {
+                       RentalListingId = drl.RentalListingId,
+                       LatestReportPeriodYm = lrp != null ? (DateOnly?)lrp.MaxReportPeriodYm : null,
+                       OfferingOrganizationId = drl.OfferingOrganizationId,
+                       PlatformListingNo = drl.PlatformListingNo,
+                       EffectiveBusinessLicenceNo = drl.EffectiveBusinessLicenceNo,
+                       IsLgTransferred = drl.IsLgTransferred,
+                       IsTakenDown = drl.IsTakenDown,
+                       BcRegistryNo = drl.BcRegistryNo,
+                       MatchAddressTxt = dpa != null ? dpa.MatchAddressTxt : null,
+                       MatchScoreAmt = dpa != null ? dpa.MatchScoreAmt : null,
+                       IsMatchVerified = dpa != null ? dpa.IsMatchVerified : null,
+                       IsMatchCorrected = dpa != null ? dpa.IsMatchCorrected : null,
+                       IsChangedAddress = drl.IsChangedAddress,
+                       NightsBookedYtdQty = drl.NightsBookedQty,
+                       BusinessLicenceNo = drl.BusinessLicenceNo,
+                       BusinessLicenceNoMatched = dbl != null ? dbl.BusinessLicenceNo : null,
+                       IsChangedBusinessLicence = drl.IsChangedBusinessLicence,
+                       LastActionDtm = le != null ? (DateTime?)le.MessageDeliveryDtm : null,
+                       LastActionNm = le != null ? le.EmailMessageTypeNm : null,
+                       PlatformListingUrl = drl.PlatformListingUrl,
+                       OfferingOrganizationNm = org.OrganizationNm,
+                       TakeDownReason = drl.TakeDownReason,
+                       ManagingOrganizationId = (dpa != null && dpa.MatchScoreAmt > 1 && lg != null) ? lg.OrganizationId : (long?)null,
+                       ListingStatusType = dlst != null ? dlst.ListingStatusType : drl.ListingStatusType,
+                       IsPrincipalResidenceRequired = (dpa != null && dpa.MatchScoreAmt > 1 && lgs != null) ? lgs.IsPrincipalResidenceRequired : null,
+                       IsBusinessLicenceRequired = (dpa != null && dpa.MatchScoreAmt > 1 && lgs != null) ? lgs.IsBusinessLicenceRequired : null
+                   };
+        }
+
+        /// <summary>
+        /// Applies the "recent" filter in a single SQL round trip by using a subquery for platforms
+        /// that reported for the target month instead of materializing a list with .ToList().
+        /// </summary>
+        private IQueryable<RentalListingTableRowDto> ApplyRecentFilterTable(IQueryable<RentalListingTableRowDto> query)
+        {
+            var currentDate = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow);
+            var currentDayOfMonth = currentDate.Day;
+            var currentMonth = new DateOnly(currentDate.Year, currentDate.Month, 1);
+            var targetReportMonth = currentMonth.AddMonths(-1);
+            var fallbackReportMonth = targetReportMonth.AddMonths(-1);
+
+            // Subquery: organizations that reported for the target month (translated to SQL IN (subquery), no extra round trip)
+            var platformsReportedTargetMonth = _dbContext.DssRentalListingReports
+                .AsNoTracking()
+                .Where(r => r.ReportPeriodYm == targetReportMonth)
+                .Select(r => r.ProvidingOrganizationId)
+                .Distinct();
+
+            if (currentDayOfMonth <= 19)
+            {
+                query = query.Where(x =>
+                    (platformsReportedTargetMonth.Contains(x.OfferingOrganizationId ?? 0) && x.LatestReportPeriodYm == targetReportMonth) ||
+                    (!platformsReportedTargetMonth.Contains(x.OfferingOrganizationId ?? 0) && x.LatestReportPeriodYm == fallbackReportMonth));
+            }
+            else
+            {
+                query = query.Where(x => x.LatestReportPeriodYm == targetReportMonth);
+            }
+
+            return query;
+        }
+
+        private void ApplyFiltersTable(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, ref IQueryable<RentalListingTableRowDto> query)
+        {
+            if (all != null && all.IsNotEmpty())
+            {
+                var allPattern = $"%{all}%";
+                var sanitizedAll = CommonUtils.SanitizeAndUppercaseString(all);
+                query = query.Where(x =>
+                    (x.MatchAddressTxt != null && EF.Functions.ILike(x.MatchAddressTxt, allPattern)) ||
+                    (x.PlatformListingUrl != null && EF.Functions.ILike(x.PlatformListingUrl, allPattern)) ||
+                    (x.PlatformListingNo != null && EF.Functions.ILike(x.PlatformListingNo, allPattern)) ||
+                    (x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(sanitizedAll)) ||
+                    (x.BcRegistryNo != null && EF.Functions.ILike(x.BcRegistryNo, allPattern)) ||
+                    (x.RentalListingId != null && _dbContext.DssRentalListingContacts.Any(c => c.ContactedThroughRentalListingId == x.RentalListingId && c.FullNm != null && EF.Functions.ILike(c.FullNm, allPattern))));
+            }
+
+            if (address != null && address.IsNotEmpty())
+            {
+                var addressPattern = $"%{address}%";
+                query = query.Where(x => x.MatchAddressTxt != null && EF.Functions.ILike(x.MatchAddressTxt, addressPattern));
+            }
+
+            if (url != null && url.IsNotEmpty())
+            {
+                var urlPattern = $"%{url}%";
+                query = query.Where(x => x.PlatformListingUrl != null && EF.Functions.ILike(x.PlatformListingUrl, urlPattern));
+            }
+
+            if (listingId != null && listingId.IsNotEmpty())
+            {
+                query = query.Where(x => x.PlatformListingNo != null && EF.Functions.ILike(x.PlatformListingNo, listingId));
+            }
+
+            if (hostName != null && hostName.IsNotEmpty())
+            {
+                var hostNamePattern = $"%{hostName}%";
+                query = query.Where(x => x.RentalListingId != null && _dbContext.DssRentalListingContacts.Any(c => c.ContactedThroughRentalListingId == x.RentalListingId && c.FullNm != null && EF.Functions.ILike(c.FullNm, hostNamePattern)));
+            }
+
+            if (businessLicence != null && businessLicence.IsNotEmpty())
+            {
+                var effectiveBusinessLicenceNo = CommonUtils.SanitizeAndUppercaseString(businessLicence);
+                query = query.Where(x => x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(effectiveBusinessLicenceNo));
+            }
+
+            if (registrationNumber != null && registrationNumber.IsNotEmpty())
+            {
+                var registrationPattern = $"%{registrationNumber}%";
+                query = query.Where(x => x.BcRegistryNo != null && EF.Functions.ILike(x.BcRegistryNo, registrationPattern));
+            }
+
+            if (prRequirement != null)
+            {
+                query = query.Where(x => prRequirement.Value
+                    ? x.IsPrincipalResidenceRequired == true
+                    : x.IsPrincipalResidenceRequired == null || x.IsPrincipalResidenceRequired == false);
+            }
+
+            if (blRequirement != null)
+            {
+                query = query.Where(x => blRequirement.Value
+                    ? x.IsBusinessLicenceRequired == true
+                    : x.IsBusinessLicenceRequired == null || x.IsBusinessLicenceRequired == false);
+            }
+
+            if (reassigned != null && reassigned.Value == false)
+                reassigned = null;
+            if (takedownComplete != null && takedownComplete.Value == false)
+                takedownComplete = null;
+
+            if (reassigned != null && takedownComplete != null)
+                query = query.Where(x => x.IsTakenDown == true || x.IsLgTransferred == true);
+            else if (reassigned != null)
+                query = query.Where(x => x.IsLgTransferred == true);
+            else if (takedownComplete != null)
+                query = query.Where(x => x.IsTakenDown == true);
+
+            if (lgId != null)
+                query = query.Where(x => x.ManagingOrganizationId == lgId);
+
+            if (statusArray.Length > 0)
+                query = query.Where(x => x.ListingStatusType != null && statusArray.Contains(x.ListingStatusType));
+        }
+
+        /// <summary>
+        /// Applies server-side sort for the listings table using explicit OrderBy/OrderByDescending
+        /// so EF translates to SQL ORDER BY (avoids client evaluation from DynamicOrderBy).
+        /// </summary>
+        private static IQueryable<RentalListingTableRowDto> ApplyOrderByTable(IQueryable<RentalListingTableRowDto> query, string orderBy, string direction)
+        {
+            var isDesc = string.Equals(direction, "desc", StringComparison.OrdinalIgnoreCase);
+            var key = orderBy ?? "latestReportPeriodYm";
+
+            return key switch
+            {
+                "lastActionDtm" => isDesc
+                    ? query.OrderByDescending(x => x.LastActionDtm ?? DateTime.MinValue)
+                    : query.OrderBy(x => x.LastActionDtm ?? DateTime.MinValue),
+                "lastActionNm" => isDesc
+                    ? query.OrderByDescending(x => x.LastActionNm ?? "ZZZZ")
+                    : query.OrderBy(x => x.LastActionNm ?? "ZZZZ"),
+                "businessLicenceNo" => isDesc
+                    ? query.OrderByDescending(x => x.BusinessLicenceNo ?? "ZZZZ")
+                    : query.OrderBy(x => x.BusinessLicenceNo ?? "ZZZZ"),
+                "businessLicenceNoMatched" => isDesc
+                    ? query.OrderByDescending(x => x.BusinessLicenceNoMatched ?? "ZZZZ")
+                    : query.OrderBy(x => x.BusinessLicenceNoMatched ?? "ZZZZ"),
+                "nightsBookedYtdQty" => isDesc
+                    ? query.OrderByDescending(x => x.NightsBookedYtdQty ?? -1)
+                    : query.OrderBy(x => x.NightsBookedYtdQty ?? -1),
+                "registrationNumber" => isDesc
+                    ? query.OrderByDescending(x => x.BcRegistryNo ?? "ZZZZ")
+                    : query.OrderBy(x => x.BcRegistryNo ?? "ZZZZ"),
+                "latestReportPeriodYm" => isDesc
+                    ? query.OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue)
+                    : query.OrderBy(x => x.LatestReportPeriodYm ?? DateOnly.MinValue),
+                "matchAddressTxt" => isDesc
+                    ? query.OrderByDescending(x => x.MatchAddressTxt ?? "ZZZZ")
+                    : query.OrderBy(x => x.MatchAddressTxt ?? "ZZZZ"),
+                "offeringOrganizationNm" => isDesc
+                    ? query.OrderByDescending(x => x.OfferingOrganizationNm ?? "ZZZZ")
+                    : query.OrderBy(x => x.OfferingOrganizationNm ?? "ZZZZ"),
+                _ => query.OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue)
+            };
+        }
+
+        public async Task<int> GetRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
+        {
+            var query = GetRentalListingsTableBaseQuery();
 
             if (_currentUser.OrganizationType == OrganizationTypes.LG)
             {
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
             }
 
-            // Get allCount before applying filters (only organization filter applied)
-            var allCount = await query.CountAsync();            
+            if (recent)
+            {
+                query = ApplyRecentFilterTable(query);
+            }
 
-            // Get recentCount with recent filter applied (before other filters)
-            var queryForRecentCount = query;
-            queryForRecentCount = ApplyRecentFilter(queryForRecentCount);
-            var recentCount = await queryForRecentCount.CountAsync();
+            ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+
+            return await query.CountAsync();
+        }
+
+        public async Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var query = GetRentalListingsTableBaseQuery();
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG)
+            {
+                query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+            }
 
             // Apply recent filter if requested for data retrieval
             if (recent)
             {
-                query = ApplyRecentFilter(query);
+                query = ApplyRecentFilterTable(query);
             }
-            _logger.LogInformation($"Get Rental Listings - Total Listings Fetched: {allCount}, Reported Recently: {recentCount}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogInformation($"Get Rental Listings - Total Listings Fetched, Recent: {recent}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             // Apply all other filters for data retrieval
-            ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+            ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
-            var countAfterFilters = await query.CountAsync();
-            _logger.LogInformation($"Get Rental Listings - Total Listings After Filter: {countAfterFilters}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            var extraSort
-                = "AddressSort1ProvinceCd asc, AddressSort2LocalityNm asc, AddressSort3LocalityTypeDsc asc, AddressSort4StreetNm asc, AddressSort5StreetTypeDsc asc, AddressSort6StreetDirectionDsc asc, AddressSort7CivicNo asc, AddressSort8UnitNo asc";
-
-            if (orderBy == "lastActionDtm")
+            int? countAfterFilters = null;
+            if (includeTotalCount)
             {
-                orderBy = "lastActionDtm ?? System.DateTime.MinValue";
-            }
-            else if (orderBy == "lastActionNm")
-            {
-                orderBy = "lastActionNm ?? \"ZZZZ\"";
-            }
-            else if (orderBy == "businessLicenceNo")
-            {
-                orderBy = "businessLicenceNo ?? \"ZZZZ\"";
-            }
-            else if (orderBy == "businessLicenceNoMatched")
-            {
-                orderBy = "businessLicenceNoMatched ?? \"ZZZZ\"";
-            }
-            else if (orderBy == "nightsBookedYtdQty")
-            {
-                orderBy = "nightsBookedYtdQty ?? -1";
-            }
-            else if (orderBy == "registrationNumber")
-            {
-                orderBy = "bcRegistryNo ?? \"ZZZZ\"";
-            }
-            else if (orderBy == "latestReportPeriodYm")
-            {
-                orderBy = "latestReportPeriodYm ?? System.DateOnly.MinValue";
+                countAfterFilters = await query.CountAsync();
+                _logger.LogInformation($"Get Rental Listings - Total Listings After Filter: {countAfterFilters}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
             }
 
-            var listings = await Page<DssRentalListingVw, RentalListingViewDto>(query, pageSize, pageNumber, orderBy, direction, extraSort);
+            // Whitelist sort: only columns used by the frontend table
+            if (string.IsNullOrEmpty(orderBy) || !AllowedSortColumns.Contains(orderBy))
+            {
+                orderBy = "latestReportPeriodYm";
+                direction = "desc";
+            }
 
-            _logger.LogInformation($"Get Rental Listings - Total Listings After Paging: {listings.SourceList.Count()}, Page: {pageNumber}, PageSize: {pageSize}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            // Sort and page at DB with explicit OrderBy (server-side; no DynamicOrderBy/client eval)
+            var ordered = ApplyOrderByTable(query, orderBy, direction);
+            if (pageNumber <= 0) pageNumber = 1;
+            var skipRecordCount = pageSize > 0 ? (pageNumber - 1) * pageSize : 0;
+            var pagedQuery = pageSize > 0
+                ? ordered.Skip(skipRecordCount).Take(pageSize)
+                : ordered;
+            var pagedList = await pagedQuery.ToListAsync();
 
-            var contacts = _mapper.Map<List<RentalListingContactDto>>(await _dbContext.DssRentalListingContacts
-                .AsNoTracking()
-                .Where(contact => listings.SourceList.Select(listing => listing.RentalListingId).Contains(contact.ContactedThroughRentalListingId))
-                .ToListAsync());
+            _logger.LogInformation($"Get Rental Listings - Total Listings After Paging: {pagedList.Count}, Page: {pageNumber}, PageSize: {pageSize}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            _logger.LogInformation($"Get Rental Listings - Contacts Fetched: {contacts.Count}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
-
-            foreach (var listing in listings.SourceList)            {
-                listing.LastActionDtm = listing.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(listing.LastActionDtm.Value);
-                listing.Hosts = contacts.Where(x => x.ContactedThroughRentalListingId == listing.RentalListingId).ToList();
-                
-                // Override LastActionNm if takedown reason is "Invalid Registration"
-                if (listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
+            // Timezone and "Reg Check Failed" override in-memory (no contacts fetch for table)
+            foreach (var row in pagedList)
+            {
+                row.LastActionDtm = row.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(row.LastActionDtm.Value);
+                if (row.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
                 {
-                    listing.LastActionNm = "Reg Check Failed";
+                    row.LastActionNm = "Reg Check Failed";
                 }
             }
 
             stopwatch.Stop();
             _logger.LogInformation($"Get Rental Listings - Final Mapping and Processing Completed, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            return new RentalListingResponseWithCountsDto
+            return new PagedDto<RentalListingTableRowDto>
             {
-                SourceList = listings.SourceList,
-                PageInfo = listings.PageInfo,
-                RecentCount = recentCount,
-                AllCount = allCount
+                SourceList = pagedList,
+                PageInfo = new PageInfo
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalCount = countAfterFilters ?? 0,
+                    OrderBy = orderBy,
+                    Direction = direction,
+                    ItemCount = pagedList.Count
+                }
             };
         }
 
-        public async Task<AggregatedListingResponseWithCountsDto> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -157,21 +401,13 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
             }
 
-            // Get allCount before applying filters (only organization filter applied)
-            var allCount = await query.CountAsync();
-
-            // Get recentCount with recent filter applied (before other filters)
-            var queryForRecentCount = query;
-            queryForRecentCount = ApplyRecentFilter(queryForRecentCount);
-            var recentCount = await queryForRecentCount.CountAsync();
-
             // Apply recent filter if requested for data retrieval
             if (recent)
             {
                 query = ApplyRecentFilter(query);
             }
 
-            _logger.LogInformation($"Get Grouped Listings - Total Listings Fetched: {allCount}, Recent Listings: {recentCount}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
+            _logger.LogInformation($"Get Grouped Listings - Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             // Apply all other filters for data retrieval
             ApplyFilters(all, address, url, listingId, hostName, businessLicence, registrationNumber, 
@@ -231,12 +467,7 @@ namespace StrDss.Data.Repositories
             stopwatch.Stop();
             _logger.LogInformation($"Get Grouped Listings - Groups Created: {grouped.Count} (RegNo: {groupedByRegNo.Count}, Other: {groupedByOther.Count}), Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            return new AggregatedListingResponseWithCountsDto
-            {
-                Data = grouped,
-                RecentCount = recentCount,
-                AllCount = allCount
-            };
+            return grouped;
         }
 
         private IQueryable<DssRentalListingVw> ApplyRecentFilter(IQueryable<DssRentalListingVw> query)

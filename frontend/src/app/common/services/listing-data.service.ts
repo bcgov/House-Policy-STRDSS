@@ -4,12 +4,11 @@ import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PagingResponse } from '../models/paging-response';
 import { ListingUploadHistoryRecord } from '../models/listing-upload-history-record';
-import { ListingTableRow } from '../models/listing-table-row';
+import { AggregatedListingTableRow, ListingTableRow } from '../models/listing-table-row';
 import { ListingSearchRequest } from '../models/listing-search-request';
 import { ListingAddressCandidate, ListingDetails } from '../models/listing-details';
 import { ExportJurisdiction } from '../models/export-listing';
 import { ListingFilter } from '../models/listing-filter';
-import { ListingResponseWithCounts, AggregatedListingResponseWithCounts } from '../models/listing-response-with-counts';
 
 @Injectable({
     providedIn: 'root',
@@ -73,6 +72,91 @@ export class ListingDataService {
         );
     }
 
+    /**
+     * Builds query string for listings filter params (searchReq, filter, recent).
+     * Used by both getListings and getListingsCount.
+     */
+    private buildListingsFilterParams(
+        searchReq: ListingSearchRequest,
+        filter?: ListingFilter,
+        recent: boolean = false,
+    ): string {
+        const params: string[] = [];
+        if (recent) {
+            params.push(`recent=${recent}`);
+        }
+        if (searchReq.all) {
+            params.push(`all=${encodeURIComponent(searchReq.all)}`);
+        }
+        if (searchReq.address) {
+            params.push(`address=${encodeURIComponent(searchReq.address)}`);
+        }
+        if (searchReq.url) {
+            params.push(`url=${encodeURIComponent(searchReq.url)}`);
+        }
+        if (searchReq.listingId) {
+            params.push(`listingId=${encodeURIComponent(searchReq.listingId)}`);
+        }
+        if (searchReq.hostName) {
+            params.push(`hostName=${encodeURIComponent(searchReq.hostName)}`);
+        }
+        if (searchReq.businessLicence) {
+            params.push(`businessLicence=${encodeURIComponent(searchReq.businessLicence)}`);
+        }
+        if (searchReq.registrationNumber) {
+            params.push(`registrationNumber=${encodeURIComponent(searchReq.registrationNumber)}`);
+        }
+        if (filter) {
+            if (filter.byLocation) {
+                if (!!filter.byLocation?.isPrincipalResidenceRequired) {
+                    params.push(`prRequirement=${filter.byLocation.isPrincipalResidenceRequired == 'Yes'}`);
+                }
+                if (!!filter.byLocation?.isBusinessLicenceRequired) {
+                    params.push(`blRequirement=${filter.byLocation.isBusinessLicenceRequired == 'Yes'}`);
+                }
+            }
+            if (filter.byStatus) {
+                if (
+                    filter.byStatus.reassigned !== null &&
+                    filter.byStatus.reassigned !== undefined
+                ) {
+                    params.push(`reassigned=${!!filter.byStatus.reassigned}`);
+                }
+                if (
+                    filter.byStatus.takedownComplete !== null &&
+                    filter.byStatus.takedownComplete !== undefined
+                ) {
+                    params.push(`takedownComplete=${!!filter.byStatus.takedownComplete}`);
+                }
+                const statuses = new Array<string>();
+                if (filter.byStatus.active) {
+                    statuses.push('A');
+                    statuses.push('U');
+                }
+                if (filter.byStatus.inactive) statuses.push('I');
+                if (filter.byStatus.new) statuses.push('N');
+                if (statuses.length) {
+                    params.push(`statuses=${statuses.join(',')}`);
+                }
+            }
+            if (!!filter.community) {
+                params.push(`lgId=${filter.community}`);
+            }
+        }
+        return params.length ? '&' + params.join('&') : '';
+    }
+
+    getListingsCount(
+        searchReq: ListingSearchRequest = {},
+        filter?: ListingFilter,
+        recent: boolean = false,
+    ): Observable<number> {
+        const baseUrl = `${environment.API_HOST}/rentallistings/count`;
+        const filterParams = this.buildListingsFilterParams(searchReq, filter, recent);
+        const url = filterParams ? `${baseUrl}?${filterParams.slice(1)}` : baseUrl;
+        return this.httpClient.get<number>(url);
+    }
+
     getListings(
         pageNumber: number = 1,
         pageSize: number = 10,
@@ -81,82 +165,21 @@ export class ListingDataService {
         searchReq: ListingSearchRequest = {},
         filter?: ListingFilter,
         recent: boolean = false,
-    ): Observable<ListingResponseWithCounts<ListingTableRow>> {
+        includeTotalCount: boolean = true,
+    ): Observable<PagingResponse<ListingTableRow>> {
         let endpointUrl = `${environment.API_HOST}/rentallistings?pageSize=${pageSize}&pageNumber=${pageNumber}`;
 
         if (orderBy) {
             endpointUrl += `&orderBy=${orderBy}&direction=${direction}`;
         }
 
-        if (recent) {
-            endpointUrl += `&recent=${recent}`;
+        if (!includeTotalCount) {
+            endpointUrl += '&includeTotalCount=false';
         }
 
-        if (searchReq.all) {
-            endpointUrl += `&all=${searchReq.all}`;
-        }
-        if (searchReq.address) {
-            endpointUrl += `&address=${searchReq.address}`;
-        }
-        if (searchReq.url) {
-            endpointUrl += `&url=${searchReq.url}`;
-        }
-        if (searchReq.listingId) {
-            endpointUrl += `&listingId=${searchReq.listingId}`;
-        }
-        if (searchReq.hostName) {
-            endpointUrl += `&hostName=${searchReq.hostName}`;
-        }
-        if (searchReq.businessLicence) {
-            endpointUrl += `&businessLicence=${searchReq.businessLicence}`;
-        }
-        if (searchReq.registrationNumber) {
-            endpointUrl += `&registrationNumber=${searchReq.registrationNumber}`;
-        }
+        endpointUrl += this.buildListingsFilterParams(searchReq, filter, recent);
 
-        if (filter) {
-            if (filter.byLocation) {
-                if (!!filter.byLocation?.isPrincipalResidenceRequired) {
-                    endpointUrl += `&prRequirement=${filter.byLocation.isPrincipalResidenceRequired == 'Yes'
-                        }`;
-                }
-                if (!!filter.byLocation?.isBusinessLicenceRequired) {
-                    endpointUrl += `&blRequirement=${filter.byLocation.isBusinessLicenceRequired == 'Yes'
-                        }`;
-                }
-            }
-            if (filter.byStatus) {
-                if (
-                    filter.byStatus.reassigned !== null &&
-                    filter.byStatus.reassigned !== undefined
-                ) {
-                    endpointUrl += `&reassigned=${!!filter.byStatus.reassigned}`;
-                }
-                if (
-                    filter.byStatus.takedownComplete !== null &&
-                    filter.byStatus.takedownComplete !== undefined
-                ) {
-                    endpointUrl += `&takedownComplete=${!!filter.byStatus.takedownComplete}`;
-                }
-
-                const statuses = new Array<string>();
-                if (filter.byStatus.active) {
-                    statuses.push('A');
-                    statuses.push('U'); // Include Update when Active is selected
-                }
-                if (filter.byStatus.inactive) statuses.push('I');
-                if (filter.byStatus.new) statuses.push('N');
-
-                if (statuses.length) {
-                    endpointUrl += `&statuses=${statuses.join(',')}`;
-                }
-            }
-            if (!!filter.community) {
-                endpointUrl += `&lgId=${filter.community}`;
-            }
-        }
-
-        return this.httpClient.get<ListingResponseWithCounts<ListingTableRow>>(endpointUrl);
+        return this.httpClient.get<PagingResponse<ListingTableRow>>(endpointUrl);
     }
 
     getHostListingsCount(primaryHostNm: string): Observable<{ primaryHostNm: string, hasMultipleProperties: boolean }> {
@@ -168,7 +191,7 @@ export class ListingDataService {
         searchReq: ListingSearchRequest = {},
         filter?: ListingFilter,
         recent: boolean = false,
-    ): Observable<AggregatedListingResponseWithCounts> {
+    ): Observable<AggregatedListingTableRow[]> {
         let listingsEndpointUrl = `${environment.API_HOST}/rentallistings/grouped`;
         const params: string[] = [];
 
@@ -242,8 +265,7 @@ export class ListingDataService {
             listingsEndpointUrl += `?${params.join('&')}`;
         }
 
-        // API now returns object with data, recentCount, and allCount
-        return this.httpClient.get<AggregatedListingResponseWithCounts>(listingsEndpointUrl);
+        return this.httpClient.get<AggregatedListingTableRow[]>(listingsEndpointUrl);
     }
 
     getListingDetailsById(id: number): Observable<ListingDetails> {

@@ -18,6 +18,10 @@ export interface ListingTableRow {
     isActive?: boolean;
     isNew?: boolean;
     isTakenDown?: boolean;
+    isLgTransferred?: boolean;
+    isMatchVerified?: boolean;
+    isMatchCorrected?: boolean;
+    isChangedAddress?: boolean;
     takeDownReason?: string;
     platformListingUrl?: string;
     matchScoreAmt?: number;

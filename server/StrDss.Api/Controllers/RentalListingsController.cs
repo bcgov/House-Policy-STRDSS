@@ -31,28 +31,41 @@ namespace StrDss.Api.Controllers
         [HttpGet]
         public async Task<ActionResult> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = false,
-            int pageSize = 10, int pageNumber = 1, string orderBy = "ListingStatusSortNo", string direction = "asc")
+            int pageSize = 10, int pageNumber = 1, string orderBy = "latestReportPeriodYm", string direction = "desc", bool includeTotalCount = true)
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
             var response = await _listingService.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent,
-                pageSize, pageNumber, orderBy, direction);
+                pageSize, pageNumber, orderBy, direction, includeTotalCount);
 
             return Ok(response);
         }
 
         [ApiAuthorize(Permissions.ListingRead)]
-        [HttpGet("grouped")]
-        public async Task<ActionResult> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        [HttpGet("count")]
+        public async Task<ActionResult<int>> GetRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = false)
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
-            var response = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+            var count = await _listingService.GetRentalListingsCountAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
 
-            return Ok(response);
+            return Ok(count);
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("grouped")]
+        public async Task<ActionResult<List<RentalListingGroupDto>>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = false)
+        {
+            var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
+
+            var list = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
+
+            return Ok(list);
         }
 
         [ApiAuthorize(Permissions.ListingRead)]

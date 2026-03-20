@@ -83,7 +83,7 @@ export class UploadListingsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.monthsOptions = this.yearMonthGenService.getPreviousMonths(10);
+    this.monthsOptions = this.yearMonthGenService.getPreviousMonths(24);
     const getCurrentUser = this.userDataService.getCurrentUser();
     const getPlatforms = this.delistingService.getPlatforms();
 

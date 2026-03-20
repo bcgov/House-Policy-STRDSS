@@ -11,7 +11,7 @@ export class YearMonthGenService {
 
     for (let i = 0; i < numberOfMonths; i++) {
       const prevMonth = today.getMonth() - i - 1;
-      const year = prevMonth < 0 ? today.getFullYear() - 1 : today.getFullYear();
+      const year = today.getFullYear() + Math.floor(prevMonth / 12);
       const month = (prevMonth % 12 + 12) % 12 + 1;
       const monthString = month.toString().padStart(2, '0');
 

@@ -15,6 +15,17 @@ CREATE TABLE booking_id_map (
 -- Add a new column to hold the new status (Updated or Deactivated)
 ----------------------------------------------------------------------------
 ALTER TABLE booking_id_map ADD COLUMN new_status varchar(1);
+ALTER TABLE booking_id_map ADD COLUMN old_status varchar(1);
+
+----------------------------------------------------------------------------
+-- Populate old_status from the current listing status in dss_rental_listing
+----------------------------------------------------------------------------
+UPDATE booking_id_map m
+SET old_status = rl.listing_status_type
+FROM dss_rental_listing rl
+WHERE rl.platform_listing_no = m.hotel_id
+  AND rl.offering_organization_id = 203
+  AND rl.including_rental_listing_report_id IS NULL;
 
 
 ----------------------------------------------------------------------------
@@ -30,7 +41,7 @@ WHERE hotel_id IN (
 );
 
 ----------------------------------------------------------------------------
--- Set the status to 'U' if there is a 1:1 mapping for ids
+-- Set the status to 'D' if there is a 1:many mapping for ids
 ----------------------------------------------------------------------------
 UPDATE booking_id_map
 SET new_status = 'D'
@@ -38,7 +49,7 @@ WHERE hotel_id IN (
     SELECT hotel_id
     FROM booking_id_map
     GROUP BY hotel_id
-    HAVING COUNT(DISTINCT listing_id) = 1
+    HAVING COUNT(DISTINCT listing_id) > 1
 );
 
 ----------------------------------------------------------------------------
@@ -87,8 +98,9 @@ WHERE rl.offering_organization_id = 203
 -- Deactivate 1:many listings
 UPDATE dss_rental_listing rl
 SET listing_status_type = 'D',
+    is_takedown_action_suspended = TRUE,
     upd_dtm = CURRENT_TIMESTAMP
-FROM tmp_booking_id_map m
+FROM booking_id_map m
 WHERE rl.platform_listing_no = m.hotel_id
   AND rl.offering_organization_id = 203
   AND rl.including_rental_listing_report_id IS NULL
@@ -99,6 +111,7 @@ WHERE rl.platform_listing_no = m.hotel_id
 ----------------------------------------------------------------------------
 UPDATE dss_rental_listing rl
 SET is_takedown_action_suspended = TRUE
-FROM dss_rental_listing_mapping m
+FROM booking_id_map m
 WHERE rl.platform_listing_no = m.listing_id
   AND m.new_status = 'D';
+

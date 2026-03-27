@@ -41,7 +41,7 @@ import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
     EditorModule,
   ],
   templateUrl: './bulk-compliance-notice.component.html',
-  styleUrl: './bulk-compliance-notice.component.scss'
+  styleUrls: ['./bulk-compliance-notice.component.scss', '../../../common/styles/editor-quill.scss']
 })
 export class BulkComplianceNoticeComponent implements OnInit {
   listings!: Array<ListingDetails | ListingTableRow>;

@@ -8,7 +8,7 @@ RUN npm install --force
 
 COPY . .
 
-RUN npm run build -- --configuration production --output-hashing=none
+RUN npm run build -- --configuration production
 
 FROM nginx:1.27.2-alpine as builder-modules
 

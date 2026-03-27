@@ -1,12 +1,11 @@
 @import "primeicons/primeicons.css";
-@import "../node_modules/quill/dist/quill.core.css";
-@import "../node_modules/quill/dist/quill.snow.css";
 
 @font-face {
     font-family: 'BcSans-regular';
     src: url('assets/fonts/BcSansFont_Web/2023_01_01_BCSans-Regular_2f.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -14,6 +13,7 @@
     src: url('assets/fonts/BcSansFont_Web/2023_01_01_BCSans-Bold_2f.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -21,6 +21,7 @@
     src: url('assets/fonts/BcSansFont_Web/2023_03_14_BCSans-Light_2g.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 :root {
@@ -770,8 +771,4 @@ body {
             }
         }
     }
-}
-
-.ql-tooltip {
-    left: 1rem !important;
 }

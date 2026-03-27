@@ -4,14 +4,16 @@ set -e
 
 echo "hit entrypoint..."
 
-target=/nginx/html/main.js
-sed -i "s~__SSO_HOST__~$SSO_HOST~g" "$target"
-sed -i "s~__ENV_NAME__~$ENV_NAME~g" "$target"
-sed -i "s~__SM_LOGOFF_URL__~$SM_LOGOFF_URL~g" "$target"
-sed -i "s~__RENTAL_LISTING_REPORT_MAX_SIZE__~$RENTAL_LISTING_REPORT_MAX_SIZE~g" "$target"
-sed -i "s~__BUISINESS_LICENCE_MAX_SIZE__~$BUISINESS_LICENCE_MAX_SIZE~g" "$target"
-sed -i "s~__ADDRESS_SCORE__~$ADDRESS_SCORE~g" "$target"
-sed -i "s~__VALIDATE_REGISTRATION_MAX_SIZE__~$VALIDATE_REGISTRATION_MAX_SIZE~g" "$target"
+for target in /nginx/html/main*.js; do
+  [ -f "$target" ] || continue
+  sed -i "s~__SSO_HOST__~$SSO_HOST~g" "$target"
+  sed -i "s~__ENV_NAME__~$ENV_NAME~g" "$target"
+  sed -i "s~__SM_LOGOFF_URL__~$SM_LOGOFF_URL~g" "$target"
+  sed -i "s~__RENTAL_LISTING_REPORT_MAX_SIZE__~$RENTAL_LISTING_REPORT_MAX_SIZE~g" "$target"
+  sed -i "s~__BUISINESS_LICENCE_MAX_SIZE__~$BUISINESS_LICENCE_MAX_SIZE~g" "$target"
+  sed -i "s~__ADDRESS_SCORE__~$ADDRESS_SCORE~g" "$target"
+  sed -i "s~__VALIDATE_REGISTRATION_MAX_SIZE__~$VALIDATE_REGISTRATION_MAX_SIZE~g" "$target"
+done
 
 cat >/nginx/nginx.conf <<EOL
 

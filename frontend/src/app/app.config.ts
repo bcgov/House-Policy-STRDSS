@@ -59,6 +59,8 @@ function initializeKeycloak(keycloak: KeycloakService) {
             initOptions: {
                 onLoad: 'login-required',
                 pkceMethod: 'S256',
+                // Avoid hanging when third-party iframe / cookies are blocked (common with strict CSP).
+                checkLoginIframe: false,
                 silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html',
             },
         }).then(() => {

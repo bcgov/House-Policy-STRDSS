@@ -60,6 +60,8 @@ function initializeKeycloak(keycloak: KeycloakService) {
                 onLoad: 'login-required',
                 pkceMethod: 'S256',
                 silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html',
+                // Avoids "Timeout when waiting for 3rd party check iframe message" when iframe/postMessage fails (CSP, cookies, proxy)
+                checkLoginIframe: false,
             },
         }).then(() => {
             setupTokenRefresh(keycloak);

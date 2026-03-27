@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ReactiveFormsModule, FormsModule, FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -42,7 +42,8 @@ import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
     EditorModule,
   ],
   templateUrl: './send-compliance-order.component.html',
-  styleUrl: './send-compliance-order.component.scss'
+  styleUrls: ['./send-compliance-order.component.scss', '../../styles/quill-editor.styles.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SendComplianceOrderComponent implements OnInit {
   listings!: Array<ListingDetails | ListingTableRow>;

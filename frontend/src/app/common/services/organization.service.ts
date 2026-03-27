@@ -17,7 +17,7 @@ export class OrganizationService {
 
   constructor(private httpClient: HttpClient) {
     this.organizationsLg$ = this.httpClient
-      .get<Array<DropdownOption>>(`${environment.API_HOST}/organizations?type=LG`)
+      .get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/dropdown?type=LG`)
       .pipe(shareReplay({ bufferSize: 1, refCount: false }));
   }
 

@@ -4,8 +4,8 @@ set -e
 
 echo "hit entrypoint..."
 
-for target in /nginx/html/main*.js; do
-  [ -f "$target" ] || continue
+# Placeholders from environment.ts can land in any chunk after code-splitting, not only main-*.js.
+find /nginx/html -type f -name '*.js' | while IFS= read -r target; do
   sed -i "s~__SSO_HOST__~$SSO_HOST~g" "$target"
   sed -i "s~__ENV_NAME__~$ENV_NAME~g" "$target"
   sed -i "s~__SM_LOGOFF_URL__~$SM_LOGOFF_URL~g" "$target"

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { environment } from '../../../../environments/environment';
 import { TableModule } from 'primeng/table';
@@ -41,7 +41,8 @@ import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
     EditorModule,
   ],
   templateUrl: './bulk-compliance-notice.component.html',
-  styleUrl: './bulk-compliance-notice.component.scss'
+  styleUrls: ['./bulk-compliance-notice.component.scss', '../../styles/quill-editor.styles.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class BulkComplianceNoticeComponent implements OnInit {
   listings!: Array<ListingDetails | ListingTableRow>;

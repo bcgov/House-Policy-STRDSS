@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -44,7 +44,8 @@ import { ToastMessageOptions } from 'primeng/api';
     EditorModule,
   ],
   templateUrl: './compliance-notice.component.html',
-  styleUrl: './compliance-notice.component.scss'
+  styleUrls: ['./compliance-notice.component.scss', '../../styles/quill-editor.styles.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ComplianceNoticeComponent implements OnInit {
   myForm!: FormGroup;

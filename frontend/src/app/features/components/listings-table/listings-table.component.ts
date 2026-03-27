@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ListingDataService } from '../../../common/services/listing-data.service';
 import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { ListingTableRow } from '../../../common/models/listing-table-row';
@@ -84,6 +84,10 @@ export class ListingsTableComponent implements OnInit {
   /** When true, the next onPageChange was triggered by onSearch (paginator.changePage); skip calling getListings again. */
   private skipNextPageChange = false;
 
+  private organizationsRequested = false;
+
+  readonly trackByRentalListingId = (_index: number, row: ListingTableRow) => row.rentalListingId;
+
   get listingsSelected(): number {
     return Object.keys(this.selectedListings).length;
   }
@@ -101,7 +105,6 @@ export class ListingsTableComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getOrganizations();
     this.initFilters();
     let page = 1;
     this.searchColumns = [
@@ -264,6 +267,7 @@ export class ListingsTableComponent implements OnInit {
   }
 
   openFilterSidebar(): void {
+    this.ensureOrganizationsLoaded();
     this.isFilterOpened = true;
     this.cancelableFilter.byLocation = Object.assign({}, this.currentFilter.byLocation);
     this.cancelableFilter.byStatus = Object.assign({}, this.currentFilter.byStatus);
@@ -402,6 +406,14 @@ export class ListingsTableComponent implements OnInit {
     });
   }
 
+  private ensureOrganizationsLoaded(): void {
+    if (this.organizationsRequested) {
+      return;
+    }
+    this.organizationsRequested = true;
+    this.getOrganizations();
+  }
+
   private getOrganizations(): void {
     this.organizationsService.getOrganizations('LG').subscribe({
       next: (orgs) => {
@@ -447,6 +459,7 @@ export class ListingsTableComponent implements OnInit {
           sorted.push(...uncategorized);
 
         this.groupedCommunities = sorted;
+        this.cd.markForCheck();
       }
     });
   }

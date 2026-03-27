@@ -1,4 +1,7 @@
-FROM node:18.19.0 as builder-app
+# AWS Public ECR mirrors Docker Hub — avoids docker.io anonymous pull limits / "failed to authorize" in GitHub Actions
+ARG NODE_IMAGE=public.ecr.aws/docker/library/node:18.19.0
+ARG NGINX_IMAGE=public.ecr.aws/docker/library/nginx:1.27.2-alpine
+FROM ${NODE_IMAGE} as builder-app
 
 ARG generate_sourcemap=false
 WORKDIR /app
@@ -10,7 +13,7 @@ COPY . .
 
 RUN npm run build -- --configuration production --output-hashing=none
 
-FROM nginx:1.27.2-alpine as builder-modules
+FROM ${NGINX_IMAGE} as builder-modules
 
 ENV NGINX_VERSION 1.27.2
 ENV MORE_HEADERS_VERSION=0.34
@@ -42,7 +45,7 @@ RUN mkdir -p ${DOWNLOADS} && \
   ./configure --with-compat $CONFARGS --add-dynamic-module=${HEADERS_MORE_MODULE} && \
   make && make install
 
-FROM nginx:1.27.2-alpine
+FROM ${NGINX_IMAGE}
 
 ENV NGINX_DIR /usr/share/nginx
 

@@ -19,14 +19,15 @@ replace_placeholders_in_dir() {
       -e "s~__VALIDATE_REGISTRATION_MAX_SIZE__~$VALIDATE_REGISTRATION_MAX_SIZE~g" \
       "$target" 2>/dev/null
     then
-      echo "WARN: could not patch $target (read-only filesystem?). Keycloak/env may be broken until /nginx/html is writable." >&2
+      echo "WARN: could not patch $target (read-only?). Keycloak/env will be wrong until /nginx/html is writable." >&2
     fi
   done
 }
 
-echo "Substituting env placeholders in *.js under /nginx/html and /usr/share/nginx/html ..."
+# Nginx serves from /usr/share/nginx/html only in stock images; this app uses root /nginx/html (see nginx.conf).
+# Do not patch /usr/share/nginx/html — it is often read-only on OpenShift and is not what clients get anyway.
+echo "Substituting env placeholders in *.js under /nginx/html ..."
 replace_placeholders_in_dir /nginx/html
-replace_placeholders_in_dir /usr/share/nginx/html
 
 js_count=0
 placeholder_left=0

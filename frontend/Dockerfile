@@ -48,7 +48,7 @@ ENV NGINX_DIR /usr/share/nginx
 
 COPY --from=builder-modules /usr/local/nginx/modules/ngx_http_headers_more_filter_module.so ${NGINX_DIR}/modules/ngx_http_headers_more_filter_module.so
 COPY --from=builder-app /app/dist/frontend/browser ${NGINX_DIR}/html
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf nginx-security-headers.inc /etc/nginx/
 
 COPY ./docker-entrypoint.sh /_docker-entrypoint.sh
 RUN chmod +x /_docker-entrypoint.sh

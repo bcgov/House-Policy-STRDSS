@@ -59,8 +59,8 @@ function initializeKeycloak(keycloak: KeycloakService) {
             initOptions: {
                 onLoad: 'login-required',
                 pkceMethod: 'S256',
-                silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html',
-                // Avoids "Timeout when waiting for 3rd party check iframe message" when iframe/postMessage fails (CSP, cookies, proxy)
+                // Omit silentCheckSsoRedirectUri: keycloak-js still runs the 3p-cookie iframe if it is set (even with
+                // checkLoginIframe: false), which caused iframe postMessage timeouts. Not needed for login-required.
                 checkLoginIframe: false,
             },
         }).then(() => {

@@ -44,7 +44,7 @@ import { ToastMessageOptions } from 'primeng/api';
     EditorModule,
   ],
   templateUrl: './compliance-notice.component.html',
-  styleUrl: './compliance-notice.component.scss'
+  styleUrls: ['./compliance-notice.component.scss', '../../../common/styles/editor-quill.scss']
 })
 export class ComplianceNoticeComponent implements OnInit {
   myForm!: FormGroup;

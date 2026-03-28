@@ -1,26 +1,33 @@
 @import "primeicons/primeicons.css";
-@import "../node_modules/quill/dist/quill.core.css";
-@import "../node_modules/quill/dist/quill.snow.css";
+
+// BC Sans WOFF2/WOFF from @bcgov/bc-sans (Angular resolves url() at build time; files must exist).
+$bc-sans-font-dir: '../node_modules/@bcgov/bc-sans/fonts';
 
 @font-face {
     font-family: 'BcSans-regular';
-    src: url('assets/fonts/BcSansFont_Web/2023_01_01_BCSans-Regular_2f.ttf') format('truetype');
+    src: url('#{$bc-sans-font-dir}/BCSans-Regular.woff2') format('woff2'),
+         url('#{$bc-sans-font-dir}/BCSans-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
     font-family: 'BcSans-bold';
-    src: url('assets/fonts/BcSansFont_Web/2023_01_01_BCSans-Bold_2f.ttf') format('truetype');
+    src: url('#{$bc-sans-font-dir}/BCSans-Bold.woff2') format('woff2'),
+         url('#{$bc-sans-font-dir}/BCSans-Bold.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
     font-family: 'BcSans-light';
-    src: url('assets/fonts/BcSansFont_Web/2023_03_14_BCSans-Light_2g.ttf') format('truetype');
+    src: url('#{$bc-sans-font-dir}/BCSans-Light.woff2') format('woff2'),
+         url('#{$bc-sans-font-dir}/BCSans-Light.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 :root {
@@ -770,8 +777,4 @@ body {
             }
         }
     }
-}
-
-.ql-tooltip {
-    left: 1rem !important;
 }

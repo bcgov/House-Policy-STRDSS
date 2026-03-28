@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { DropdownOption } from '../models/dropdown-option';
+import { OrganizationService } from './organization.service';
 import { ComplianceNotice, ComplianceNoticeBulk } from '../models/compliance-notice';
 import { DelistingRequest, DelistingRequestBulk } from '../models/delisting-request';
 
@@ -12,14 +13,17 @@ import { DelistingRequest, DelistingRequestBulk } from '../models/delisting-requ
 export class DelistingService {
   textHeaders = new HttpHeaders().set('Content-Type', 'application/json');
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(
+    private httpClient: HttpClient,
+    private organizationService: OrganizationService
+  ) { }
 
   getPlatforms(): Observable<Array<DropdownOption>> {
     return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/dropdown/?type=Platform`)
   }
 
   getLocalGovernments(): Observable<Array<DropdownOption>> {
-    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations?type=LG`)
+    return this.organizationService.getOrganizations('LG');
   }
 
   getReasons(): Observable<Array<DropdownOption>> {

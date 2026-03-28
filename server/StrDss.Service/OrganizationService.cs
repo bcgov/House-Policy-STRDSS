@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
@@ -66,7 +66,12 @@ namespace StrDss.Service
         public async Task<List<DropdownNumDto>> GetOrganizationsDropdownAsync(string? type)
         {
             var orgs = await _orgRepo.GetOrganizationsAsync(type);
-            return orgs.Select(x => new DropdownNumDto { Id = x.OrganizationId, Description = x.OrganizationNm }).ToList();
+            return orgs.Select(x => new DropdownNumDto
+            {
+                Id = x.OrganizationId,
+                Description = x.OrganizationNm,
+                LocalGovernmentType = x.LocalGovernmentType,
+            }).ToList();
         }
 
         public async Task<OrganizationDto?> GetOrganizationByIdAsync(long id)

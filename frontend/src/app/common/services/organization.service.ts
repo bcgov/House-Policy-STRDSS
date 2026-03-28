@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { DropdownOption } from '../models/dropdown-option';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { Platform, SubPlatform, SubPlatformCreate, UpdatePlatform, UpdateSubPlatform } from '../models/platform';
 import { PagingResponse } from '../models/paging-response';
 import { LocalGovernment, Jurisdiction, LocalGovernmentUpdate, JurisdictionUpdate } from '../models/jurisdiction';
@@ -12,18 +12,27 @@ import { LocalGovernment, Jurisdiction, LocalGovernmentUpdate, JurisdictionUpdat
 })
 export class OrganizationService {
 
-  constructor(private httpClient: HttpClient) { }
+  /** Session cache: large LG dropdown reused across listings, delisting, uploads, etc. */
+  private readonly organizationsLg$: Observable<Array<DropdownOption>>;
+
+  constructor(private httpClient: HttpClient) {
+    this.organizationsLg$ = this.httpClient
+      .get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/dropdown?type=LG`)
+      .pipe(shareReplay({ bufferSize: 1, refCount: false }));
+  }
 
   getOrganizationTypes(): Observable<Array<DropdownOption>> {
     return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations/types`);
   }
 
   getOrganizations(type?: string): Observable<Array<DropdownOption>> {
+    if (type === 'LG') {
+      return this.organizationsLg$;
+    }
     if (type) {
       return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations?type=${type}`);
-    } else {
-      return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations`);
     }
+    return this.httpClient.get<Array<DropdownOption>>(`${environment.API_HOST}/organizations`);
   }
 
   getJurisdictions(pageSize = 1000, pageNumber = 1, orderBy?: string, direction?: 'asc'): Observable<PagingResponse<LocalGovernment>> {

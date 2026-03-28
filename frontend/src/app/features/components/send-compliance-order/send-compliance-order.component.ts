@@ -42,7 +42,7 @@ import { EditorModule, EditorTextChangeEvent } from 'primeng/editor';
     EditorModule,
   ],
   templateUrl: './send-compliance-order.component.html',
-  styleUrl: './send-compliance-order.component.scss'
+  styleUrls: ['./send-compliance-order.component.scss', '../../../common/styles/editor-quill.scss']
 })
 export class SendComplianceOrderComponent implements OnInit {
   listings!: Array<ListingDetails | ListingTableRow>;

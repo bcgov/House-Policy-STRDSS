@@ -93,8 +93,12 @@ export class LayoutComponent {
   }
 
   private initMenu(): void {
+    const user = this.userDataService.currentUser;
+    if (!user) {
+      return;
+    }
 
-    const usersMenuItems = this.topMenuService.getMenuItemsPerUserType(this.userDataService.currentUser);
+    const usersMenuItems = this.topMenuService.getMenuItemsPerUserType(user);
     this.items?.forEach((folder) => {
       folder.items = usersMenuItems
         .filter((mItem) => mItem.folderName === folder.label)

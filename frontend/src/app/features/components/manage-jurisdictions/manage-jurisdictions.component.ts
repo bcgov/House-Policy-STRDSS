@@ -122,6 +122,7 @@ export class ManageJurisdictionsComponent implements OnInit {
   }
 
   private canUserEditJurisdiction() {
-    this.canEdit = this.userService.currentUser.permissions.includes(jurisdiction_write);
+    this.canEdit =
+      this.userService.currentUser?.permissions.includes(jurisdiction_write) ?? false;
   }
 }

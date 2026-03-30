@@ -179,7 +179,7 @@ export class UploadBusinessLicenseComponent implements OnInit {
     this.userDataService.getCurrentUser().subscribe({
       next: (x) => {
         this.currentUser = x;
-        this.isCEU = this.userDataService.currentUser.organizationType === 'BCGov';
+        this.isCEU = x.organizationType === 'BCGov';
         this.cd.detectChanges();
         this.getHistoryRecords();
       }

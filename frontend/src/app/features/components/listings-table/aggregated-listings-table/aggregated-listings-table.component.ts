@@ -16,7 +16,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ListingFilter } from '../../../../common/models/listing-filter';
 import { environment } from '../../../../../environments/environment';
-import { PagingResponsePageInfo } from '../../../../common/models/paging-response';
+import { PagingResponse, PagingResponsePageInfo } from '../../../../common/models/paging-response';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import {
     DropdownOption,
@@ -70,8 +70,7 @@ export class AggregatedListingsTableComponent implements OnInit {
     @ViewChild('table') table!: Table;
 
     selectedListings: { [key: string]: ListingTableRow } = {};
-    aggregatedListings = new Array<AggregatedListingTableRow>(); // Store complete dataset
-    displayedListings = new Array<AggregatedListingTableRow>(); // Paginated subset for display
+    displayedListings = new Array<AggregatedListingTableRow>();
     sort!: { prop: string; dir: 'asc' | 'desc' };
     currentPage!: PagingResponsePageInfo;
     searchTerm!: string;
@@ -79,7 +78,6 @@ export class AggregatedListingsTableComponent implements OnInit {
     searchColumns = new Array<DropdownOption>();
     communities = new Array<DropdownOptionOrganization>();
     groupedCommunities = new Array();
-    hosts = new Array<{ primaryHostNm: string, hasMultipleProperties: boolean }>();
 
     isCEU = false;
     isLegendShown = false;
@@ -93,14 +91,8 @@ export class AggregatedListingsTableComponent implements OnInit {
     expandingRows = new Set<string>();
     /** Prevents duplicate getListings calls (e.g. Enter key + button activation). */
     private getListingsInProgress = false;
-    // Virtual scroll item size for nested tables (in pixels)
-    // With scrollHeight="400px" and itemSize=50px:
-    // - Visible rows: ~8 rows (400px / 50px)
-    // - Rendered rows: ~20-30 rows (PrimeNG adds buffer for smooth scrolling)
-    // Virtual scrolling maintains a fixed pool of DOM elements and reuses them as you scroll,
-    // only rendering what's visible plus a buffer, not all 30,000+ items
-    readonly virtualScrollItemSize = 50;
-
+    /** When true, the next onPageChange came from paginator sync after load/search; skip duplicate fetch. */
+    private skipNextPageChange = false;
     get listingsSelected(): number {
         return Object.keys(this.selectedListings).length;
     }
@@ -146,7 +138,7 @@ export class AggregatedListingsTableComponent implements OnInit {
                     this.searchColumn = prms['searchBy'];
                 }
                 if (!this.sort) {
-                    this.sort = { dir: 'asc', prop: '' };
+                    this.sort = { dir: 'desc', prop: 'latestReportPeriodYm' };
                 }
                 if (prms['sortDirection']) {
                     this.sort.dir = prms['sortDirection'];
@@ -186,6 +178,9 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     onGroupRowSelected(e: any, group: AggregatedListingTableRow): void {
+        if (!group.listings?.length) {
+            return;
+        }
         if (e.checked) {
             group.listings.forEach((l) => {
                 l.selected = true;
@@ -200,14 +195,14 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     onListingRowSelected(e: any, listing: ListingTableRow): void {
-        const listingGroup = this.aggregatedListings.find((g) =>
-            g.listings.some((l) => l.rentalListingId === listing.rentalListingId),
+        const listingGroup = this.displayedListings.find((g) =>
+            g.listings?.some((l) => l.rentalListingId === listing.rentalListingId),
         );
 
         if (listingGroup) {
             if (e.checked) {
                 this.selectedListings[listing.rentalListingId] = listing;
-                if (listingGroup.listings.every((l) => l.selected)) {
+                if (listingGroup.listings?.every((l) => l.selected)) {
                     listingGroup.selected = true;
                 }
             } else {
@@ -220,41 +215,54 @@ export class AggregatedListingsTableComponent implements OnInit {
     onMultihostClicked(group: AggregatedListingTableRow) {
         this.clearFilters();
         this.searchColumn = 'hostName';
-        this.searchTerm = group.primaryHostNm;
+        this.searchTerm = group.effectiveHostNm ?? group.primaryHostNm ?? '';
         this.onSearch();
     }
 
     onRowExpand(event: any): void {
         const row = event.data as AggregatedListingTableRow;
         const rowId = this.getRowId(row);
-        
-        // If already expanding, ignore
+
         if (this.expandingRows.has(rowId)) {
             return;
         }
-        
-        // Mark as expanding
+
+        if (row.listings?.length > 0) {
+            return;
+        }
+
+        row.expandLoadError = false;
         this.expandingRows.add(rowId);
         this.cd.detectChanges();
-        
-        // Use requestAnimationFrame to defer rendering and allow UI to update
-        // This gives the browser a chance to show the loading indicator
-        requestAnimationFrame(() => {
-            // For large datasets, use multiple frames to ensure smooth rendering
-            if (row.listings.length > 1000) {
-                // For very large datasets, keep loading state longer
-                setTimeout(() => {
+
+        const searchReq = {} as ListingSearchRequest;
+        searchReq[this.searchColumn] = this.searchTerm;
+
+        this.listingService
+            .getAggregatedGroupListings(
+                searchReq,
+                this.currentFilter,
+                this.showRecentOnly,
+                row.bcRegistryNo,
+                row.matchAddressTxt,
+                row.matchUnitNo,
+                row.effectiveHostNm,
+                row.effectiveBusinessLicenceNo,
+            )
+            .subscribe({
+                next: (raw) => {
+                    row.listings = raw.map((dto) => this.mapChildListingRow(dto));
+                    this.restoreSelectedListingsForGroup(row);
+                },
+                error: () => {
+                    row.expandLoadError = true;
+                    row.listings = [];
+                },
+                complete: () => {
                     this.expandingRows.delete(rowId);
                     this.cd.detectChanges();
-                }, 300);
-            } else {
-                // For smaller datasets, remove loading state quickly
-                setTimeout(() => {
-                    this.expandingRows.delete(rowId);
-                    this.cd.detectChanges();
-                }, 50);
-            }
-        });
+                },
+            });
     }
 
     onRowCollapse(event: any): void {
@@ -270,7 +278,7 @@ export class AggregatedListingsTableComponent implements OnInit {
 
 
     private getRowId(row: AggregatedListingTableRow): string {
-        return row.id || `${row.effectiveHostNm}-${row.matchAddressTxt}-${row.effectiveBusinessLicenceNo}`;
+        return row.id ?? '';
     }
 
     onSort(property: string): void {
@@ -285,17 +293,24 @@ export class AggregatedListingsTableComponent implements OnInit {
             this.sort = { prop: property, dir: 'asc' };
         }
 
-        this.applySortingAndPagination();
+        if (this.currentPage) {
+            this.currentPage.pageNumber = 1;
+        }
+        this.skipNextPageChange = true;
+        this.getListings();
         if (this.paginator) {
             this.paginator.changePage(0);
+            setTimeout(() => {
+                this.skipNextPageChange = false;
+            }, 0);
         }
     }
 
     unselectAll(): void {
         const listings = Object.values(this.selectedListings);
         listings.forEach((listing) => {
-            const listingGroup = this.aggregatedListings.find((g) =>
-                g.listings.some((l) => l.rentalListingId === listing.rentalListingId),
+            const listingGroup = this.displayedListings.find((g) =>
+                g.listings?.some((l) => l.rentalListingId === listing.rentalListingId),
             );
             if (listingGroup) {
                 listingGroup.selected = false;
@@ -359,10 +374,15 @@ export class AggregatedListingsTableComponent implements OnInit {
         if (!this.currentPage) {
             this.currentPage = {};
         }
+        if (this.skipNextPageChange) {
+            this.skipNextPageChange = false;
+            this.currentPage.pageSize = value.rows;
+            this.currentPage.pageNumber = value.page + 1;
+            return;
+        }
         this.currentPage.pageSize = value.rows;
         this.currentPage.pageNumber = value.page + 1;
-
-        this.applySortingAndPagination();
+        this.getListings();
     }
 
     showLegend(): void {
@@ -370,19 +390,21 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     onSearch(): void {
-        // Reset to first page when searching
         if (this.currentPage) {
             this.currentPage.pageNumber = 1;
         }
+        this.skipNextPageChange = true;
         this.getListings();
         if (this.paginator) {
             this.paginator.changePage(0);
+            setTimeout(() => {
+                this.skipNextPageChange = false;
+            }, 0);
         }
     }
 
     onToggleChange(): void {
         this.unselectAll();
-        // Collapse all expanded rows
         if (this.table) {
             this.table.expandedRowKeys = {};
         }
@@ -515,123 +537,124 @@ export class AggregatedListingsTableComponent implements OnInit {
         const searchReq = {} as ListingSearchRequest;
         searchReq[this.searchColumn] = this.searchTerm;
 
-        // Fetch all data - backend returns complete dataset, pagination and sorting handled on frontend
-        this.listingService
-            .getAggregatedListings(
+        const pageNumber = Math.max(1, this.currentPage?.pageNumber ?? 1);
+        const pageSize = this.currentPage?.pageSize ?? 25;
+        const orderBy = this.sort?.prop || '';
+        const direction = this.sort?.dir || 'asc';
+
+        forkJoin({
+            count: this.listingService.getAggregatedListingsCount(
                 searchReq,
                 this.currentFilter,
                 this.showRecentOnly,
-            )
-            .subscribe({
-                next: (response: AggregatedListingTableRow[]) => {
-                    this.aggregatedListings = response.map(
-                        (l: AggregatedListingTableRow, index: number) => {
-                            return {
-                                ...l,
-                                id:
-                                    l.effectiveHostNm +
-                                    l.matchAddressTxt +
-                                    l.effectiveBusinessLicenceNo +
-                                    index,
-                            };
-                        },
-                    );
-                    
-                    // Calculate host properties after data is loaded
-                    this.calculateIfHostsHaveMoreThanOneProperty(response);
-
-                    // Initialize currentPage if not exists
-                    if (!this.currentPage) {
-                        this.currentPage = {
-                            pageNumber: 1,
-                            pageSize: 25,
-                            totalCount: this.aggregatedListings.length,
-                            itemCount: 0
-                        };
-                    } else {
-                        this.currentPage.totalCount = this.aggregatedListings.length;
-                    }
-
-                    // Apply sorting and pagination
-                    this.applySortingAndPagination();
-                    this.restoreSelectedListings();
-                    
-                    // Initialize paginator to show correct page (PrimeNG uses 0-based indexing)
-                    if (this.paginator && this.currentPage && this.currentPage.pageNumber) {
-                        this.paginator.changePage(this.currentPage.pageNumber - 1);
-                    }
-                },
-                error: () => {
-                    this.getListingsInProgress = false;
-                    this.loaderService.loadingEnd();
-                    this.cd.detectChanges();
-                },
-                complete: () => {
-                    this.getListingsInProgress = false;
-                    this.loaderService.loadingEnd();
-                    this.cd.detectChanges();
-                },
-            });
+            ),
+            data: this.listingService.getAggregatedListings(
+                pageNumber,
+                pageSize,
+                orderBy,
+                direction,
+                searchReq,
+                this.currentFilter,
+                this.showRecentOnly,
+                false,
+            ),
+        }).subscribe({
+            next: ({ count, data }: { count: number; data: PagingResponse<AggregatedListingTableRow> }) => {
+                this.currentPage = data.pageInfo;
+                this.currentPage.totalCount = count;
+                this.displayedListings = (data.sourceList ?? []).map((row) =>
+                    this.normalizeAggregatedSummaryRow(row),
+                );
+                if (this.table) {
+                    this.table.expandedRowKeys = {};
+                }
+                this.restoreSelectedListings();
+                if (this.paginator && data.pageInfo.pageNumber === 1) {
+                    this.skipNextPageChange = true;
+                    this.paginator.changePage(0);
+                    setTimeout(() => {
+                        this.skipNextPageChange = false;
+                    }, 0);
+                }
+            },
+            error: () => {
+                this.getListingsInProgress = false;
+                this.loaderService.loadingEnd();
+                this.cd.detectChanges();
+            },
+            complete: () => {
+                this.getListingsInProgress = false;
+                this.loaderService.loadingEnd();
+                this.cd.detectChanges();
+            },
+        });
     }
 
-    private applySortingAndPagination(): void {
-        let sortedListings = [...this.aggregatedListings];
-
-        // Apply sorting if sort is defined
-        if (this.sort && this.sort.prop) {
-            sortedListings.sort((a, b) => {
-                let aValue: any;
-                let bValue: any;
-
-                switch (this.sort.prop) {
-                    case 'effectiveHostNm':
-                        aValue = a.primaryHostNm || '';
-                        bValue = b.primaryHostNm || '';
-                        break;
-                    case 'matchAddressTxt':
-                        aValue = a.matchAddressTxt || '';
-                        bValue = b.matchAddressTxt || '';
-                        break;
-                    case 'effectiveBusinessLicenceNo':
-                        aValue = a.businessLicenceNo || '';
-                        bValue = b.businessLicenceNo || '';
-                        break;
-                    case 'latestReportPeriodYm':
-                        // Compare as date strings (format: YYYY-MM-DD or YYYY-MM)
-                        aValue = a.latestReportPeriodYm || '';
-                        bValue = b.latestReportPeriodYm || '';
-                        break;
-                    default:
-                        return 0;
-                }
-
-                // Handle string comparison
-                if (typeof aValue === 'string' && typeof bValue === 'string') {
-                    const comparison = aValue.localeCompare(bValue);
-                    return this.sort.dir === 'asc' ? comparison : -comparison;
-                }
-
-                // Handle numeric comparison
-                if (typeof aValue === 'number' && typeof bValue === 'number') {
-                    return this.sort.dir === 'asc' ? aValue - bValue : bValue - aValue;
-                }
-
-                return 0;
-            });
+    private stableGroupRowId(row: AggregatedListingTableRow): string {
+        if (row.bcRegistryNo?.trim()) {
+            return `reg:${row.bcRegistryNo.trim()}`;
         }
+        const delim = '|';
+        return `cmp:${encodeURIComponent(row.matchAddressTxt ?? '')}${delim}${encodeURIComponent(row.matchUnitNo ?? '')}${delim}${encodeURIComponent(row.effectiveHostNm ?? '')}${delim}${encodeURIComponent(row.effectiveBusinessLicenceNo ?? '')}`;
+    }
 
-        // Apply pagination
-        const pageSize = this.currentPage?.pageSize || 25;
-        const pageNumber = this.currentPage?.pageNumber || 1;
-        const startIndex = (pageNumber - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
+    private normalizeAggregatedSummaryRow(row: AggregatedListingTableRow): AggregatedListingTableRow {
+        return {
+            ...row,
+            id: this.stableGroupRowId(row),
+            listings: [],
+            nightsBookedYtdQty: row.nightsBookedYtdQty ?? 0,
+            listingCount: row.listingCount ?? 0,
+            hasMultipleProperties: row.hasMultipleProperties ?? false,
+            expandLoadError: false,
+        };
+    }
 
-        this.displayedListings = sortedListings.slice(startIndex, endIndex);
+    private mapChildListingRow(dto: Record<string, unknown>): ListingTableRow {
+        const id = Number(dto['rentalListingId']);
+        return {
+            rentalListingId: id,
+            listingStatusType: (dto['listingStatusType'] as string) ?? '',
+            offeringOrganizationNm: (dto['offeringOrganizationNm'] as string) ?? '',
+            platformListingNo: (dto['platformListingNo'] as string) ?? '',
+            originalAddressTxt: (dto['originalAddressTxt'] as string) ?? '',
+            matchAddressTxt: (dto['matchAddressTxt'] as string) ?? '',
+            isEntireUnit: !!dto['isEntireUnit'],
+            nightsBookedYtdQty: Number(dto['nightsBookedYtdQty'] ?? 0),
+            businessLicenceNo: (dto['businessLicenceNo'] as string) ?? '',
+            businessLicenceNoMatched: (dto['businessLicenceNoMatched'] as string) ?? '',
+            lastActionNm: (dto['lastActionNm'] as string) ?? '',
+            lastActionDtm: dto['lastActionDtm'] != null ? String(dto['lastActionDtm']) : '',
+            isChangedBusinessLicence: !!dto['isChangedBusinessLicence'],
+            latestReportPeriodYm:
+                dto['latestReportPeriodYm'] != null ? String(dto['latestReportPeriodYm']) : undefined,
+            isTakenDown: !!dto['isTakenDown'],
+            isLgTransferred: !!dto['isLgTransferred'],
+            isMatchVerified: !!dto['isMatchVerified'],
+            isMatchCorrected: !!dto['isMatchCorrected'],
+            isChangedAddress: !!dto['isChangedAddress'],
+            takeDownReason: (dto['takeDownReason'] as string) ?? undefined,
+            platformListingUrl: (dto['platformListingUrl'] as string) ?? undefined,
+            matchScoreAmt: dto['matchScoreAmt'] as number | undefined,
+            bcRegistryNo: (dto['bcRegistryNo'] as string) ?? undefined,
+            businessLicenceId: dto['businessLicenceId'] as number | undefined,
+            licenceStatusType: dto['licenceStatusType'] as ListingTableRow['licenceStatusType'],
+            filtered: true,
+            selected: !!this.selectedListings[id]?.selected,
+        };
+    }
 
-        // Update currentPage info
-        if (this.currentPage) {
-            this.currentPage.itemCount = this.displayedListings.length;
-            this.currentPage.totalCount = sortedListings.length;
+    private restoreSelectedListingsForGroup(group: AggregatedListingTableRow): void {
+        if (!group.listings?.length) {
+            return;
+        }
+        group.listings.forEach((l) => {
+            if (this.selectedListings[l.rentalListingId]) {
+                l.selected = true;
+            }
+        });
+        if (group.listings.every((l) => l.selected)) {
+            group.selected = true;
         }
     }
 
@@ -674,24 +697,6 @@ export class AggregatedListingsTableComponent implements OnInit {
         this.cd.detectChanges();
     }
 
-    private calculateIfHostsHaveMoreThanOneProperty(listings: Array<AggregatedListingTableRow>): void {
-        const uniqueObjects = new Map<string, AggregatedListingTableRow>();
-
-        listings.forEach(obj => {
-            uniqueObjects.set(obj.primaryHostNm, obj);
-        });
-
-        const hosts = Array.from(uniqueObjects.values()).map(x => ({ primaryHostNm: x.primaryHostNm, hasMultipleProperties: false }));
-
-        forkJoin(hosts.map(h => this.listingService.getHostListingsCount(h.primaryHostNm)))
-            .subscribe(hostCount => {
-                this.aggregatedListings.forEach(al => {
-                    al.hasMultipleProperties = hostCount.find(x => x.primaryHostNm === al.primaryHostNm)?.hasMultipleProperties ?? false;
-                });
-                this.cd.detectChanges();
-            });
-    }
-
     private getUrlFromState(): string {
         const state = {
             pageNumber: this.currentPage?.pageNumber || 0,
@@ -712,26 +717,23 @@ export class AggregatedListingsTableComponent implements OnInit {
     }
 
     private restoreSelectedListings(): void {
-        if (!!this.selectedListings) {
-            Object.values(this.selectedListings).forEach((value) => {
-                const listingGroup = this.aggregatedListings.find((g) =>
-                    g.listings.some((l) => l.rentalListingId === value.rentalListingId),
-                );
-                const listing = listingGroup?.listings.find(
-                    (x) => x.rentalListingId === value.rentalListingId,
-                );
-
-                if (listing) {
-                    listing.selected = true;
-                }
-
-                if (listingGroup) {
-                    if (listingGroup.listings.every((l) => l.selected)) {
-                        listingGroup.selected = true;
-                    }
-                }
-            });
+        if (!this.selectedListings) {
+            return;
         }
+        Object.values(this.selectedListings).forEach((value) => {
+            const listingGroup = this.displayedListings.find((g) =>
+                g.listings?.some((l) => l.rentalListingId === value.rentalListingId),
+            );
+            const listing = listingGroup?.listings?.find((x) => x.rentalListingId === value.rentalListingId);
+
+            if (listing) {
+                listing.selected = true;
+            }
+
+            if (listingGroup?.listings?.every((l) => l.selected)) {
+                listingGroup.selected = true;
+            }
+        });
     }
 
     private getOrganizations(): void {

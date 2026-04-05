@@ -56,16 +56,60 @@ namespace StrDss.Api.Controllers
         }
 
         [ApiAuthorize(Permissions.ListingRead)]
-        [HttpGet("grouped")]
-        public async Task<ActionResult<List<RentalListingGroupDto>>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        [HttpGet("grouped/count")]
+        [SwaggerOperation(Summary = "Count of aggregated listing groups (same filters as grouped list).")]
+        public async Task<ActionResult<int>> GetGroupedRentalListingsCount(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = false)
         {
             var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
 
-            var list = await _listingService.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+            var count = await _listingService.GetGroupedRentalListingsCountAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
 
-            return Ok(list);
+            return Ok(count);
+        }
+
+        /// <summary>
+        /// Child rows for one group; uncached. Mode A: bcRegistryNo. Mode B (no reg): matchAddressTxt + matchUnitNo (optional) + effectiveHostNm + effectiveBusinessLicenceNo (listing BL, normalized for matching).
+        /// </summary>
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("grouped/listings")]
+        [SwaggerOperation(Summary = "Expand one aggregated group into listing rows (same global filters + recent as the grid).")]
+        public async Task<ActionResult<List<RentalListingTableRowDto>>> GetGroupedListingChildren(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = false,
+            string? bcRegistryNo = null, string? matchAddressTxt = null, string? matchUnitNo = null, string? effectiveHostNm = null, string? effectiveBusinessLicenceNo = null)
+        {
+            if (string.IsNullOrWhiteSpace(bcRegistryNo)
+                && string.IsNullOrWhiteSpace(matchAddressTxt)
+                && string.IsNullOrWhiteSpace(matchUnitNo)
+                && string.IsNullOrWhiteSpace(effectiveHostNm)
+                && string.IsNullOrWhiteSpace(effectiveBusinessLicenceNo))
+            {
+                return BadRequest(
+                    "Provide bcRegistryNo for a registration-based group. For a no-registration group, supply the same composite key as the parent row: matchAddressTxt, matchUnitNo (optional), effectiveHostNm, and effectiveBusinessLicenceNo (business licence on the listing). Omitted or empty query parameters are treated as null key parts.");
+            }
+
+            var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
+
+            var rows = await _listingService.GetGroupedListingChildrenAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, bcRegistryNo, matchAddressTxt, matchUnitNo, effectiveHostNm, effectiveBusinessLicenceNo);
+
+            return Ok(rows);
+        }
+
+        [ApiAuthorize(Permissions.ListingRead)]
+        [HttpGet("grouped")]
+        [SwaggerOperation(Summary = "Paged aggregated listing groups (parent grid only; expand loads child rows separately).")]
+        public async Task<ActionResult<PagedDto<RentalListingGroupSummaryDto>>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string? statuses, bool? reassigned, bool? takedownComplete, bool recent = false,
+            int pageSize = 10, int pageNumber = 1, string orderBy = "latestReportPeriodYm", string direction = "desc", bool includeTotalCount = true)
+        {
+            var statusArray = statuses == null ? Array.Empty<string>() : statuses!.Split(',');
+
+            var page = await _listingService.GetGroupedRentalListingsPagedAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
+
+            return Ok(page);
         }
 
         [ApiAuthorize(Permissions.ListingRead)]

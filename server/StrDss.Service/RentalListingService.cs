@@ -22,8 +22,12 @@ namespace StrDss.Service
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
         Task<int> GetRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
-        Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        Task<int> GetGroupedRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
+        Task<PagedDto<RentalListingGroupSummaryDto>> GetGroupedRentalListingsPagedAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
+        Task<List<RentalListingTableRowDto>> GetGroupedListingChildrenAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
         Task CreateRentalListingExportFiles();
@@ -66,6 +70,7 @@ namespace StrDss.Service
         /// Entries are removed after use so the dictionary does not grow unbounded with unique keys.
         /// </summary>
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _listingTableCacheLocks = new();
+        private static readonly ConcurrentDictionary<string, SemaphoreSlim> _groupedListingTableCacheLocks = new();
 
         public async Task<int> GetRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
@@ -80,7 +85,7 @@ namespace StrDss.Service
             var cacheKey = BuildListingTableCacheKey(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                 prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
 
-            var cacheMinutes = _configuration.GetValue("ListingTableCacheMinutes", 2);
+            var cacheMinutes = _configuration.GetValue("LISTING_TABLE_CACHE_MINUTES", 2);
             if (cacheMinutes <= 0)
             {
                 return await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
@@ -142,11 +147,140 @@ namespace StrDss.Service
             return sb.ToString();
         }
 
-        public async Task<List<RentalListingGroupDto>> GetGroupedRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public async Task<int> GetGroupedRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
         {
-            return await _listingRepo.GetGroupedRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
+            var cacheKey = BuildGroupedListingTableCacheKey(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, isCount: true);
+
+            var cacheMinutes = _configuration.GetValue("GROUPED_LISTING_TABLE_CACHE_MINUTES", 2);
+            if (cacheMinutes <= 0)
+            {
+                return await _listingRepo.GetGroupedRentalListingsCountAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
+            }
+
+            var semaphore = _groupedListingTableCacheLocks.GetOrAdd(cacheKey, _ => new SemaphoreSlim(1, 1));
+            await semaphore.WaitAsync();
+            try
+            {
+                if (_memoryCache.TryGetValue(cacheKey, out int cachedCount))
+                {
+                    return cachedCount;
+                }
+
+                var count = await _listingRepo.GetGroupedRentalListingsCountAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
+
+                _memoryCache.Set(cacheKey, count, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(cacheMinutes)));
+                return count;
+            }
+            finally
+            {
+                semaphore.Release();
+                _groupedListingTableCacheLocks.TryRemove(cacheKey, out _);
+            }
+        }
+
+        public async Task<PagedDto<RentalListingGroupSummaryDto>> GetGroupedRentalListingsPagedAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
+        {
+            var cacheKey = BuildGroupedListingTableCacheKey(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, isCount: false, pageSize, pageNumber, orderBy, direction, includeTotalCount);
+
+            var cacheMinutes = _configuration.GetValue("GROUPED_LISTING_TABLE_CACHE_MINUTES", 2);
+            if (cacheMinutes <= 0)
+            {
+                return await LoadGroupedPageWithMultiPropertyFlagsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
+            }
+
+            var semaphore = _groupedListingTableCacheLocks.GetOrAdd(cacheKey, _ => new SemaphoreSlim(1, 1));
+            await semaphore.WaitAsync();
+            try
+            {
+                if (_memoryCache.TryGetValue(cacheKey, out PagedDto<RentalListingGroupSummaryDto>? cached) && cached != null)
+                {
+                    return cached;
+                }
+
+                var page = await LoadGroupedPageWithMultiPropertyFlagsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
+
+                _memoryCache.Set(cacheKey, page, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(cacheMinutes)));
+                return page;
+            }
+            finally
+            {
+                semaphore.Release();
+                _groupedListingTableCacheLocks.TryRemove(cacheKey, out _);
+            }
+        }
+
+        private async Task<PagedDto<RentalListingGroupSummaryDto>> LoadGroupedPageWithMultiPropertyFlagsAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount)
+        {
+            var dto = await _listingRepo.GetGroupedRentalListingsPagedAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
+
+            var list = dto.SourceList.ToList();
+            if (list.Count == 0)
+            {
+                return dto;
+            }
+
+            var flags = await _listingRepo.BatchEffectiveHostHasMultiplePropertiesAsync(list.Select(s => s.EffectiveHostNm).ToList());
+            foreach (var row in list)
+            {
+                if (row.EffectiveHostNm != null && flags.TryGetValue(row.EffectiveHostNm, out var multi))
+                {
+                    row.HasMultipleProperties = multi;
+                }
+            }
+
+            return new PagedDto<RentalListingGroupSummaryDto>
+            {
+                SourceList = list,
+                PageInfo = dto.PageInfo
+            };
+        }
+
+        private string BuildGroupedListingTableCacheKey(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, bool isCount,
+            int pageSize = 0, int pageNumber = 0, string orderBy = "", string direction = "", bool includeTotalCount = true)
+        {
+            var statuses = statusArray != null && statusArray.Length > 0 ? string.Join(",", statusArray.OrderBy(x => x)) : "";
+            var sb = new StringBuilder(isCount ? "grouped_table_count:" : "grouped_table_page:");
+            sb.Append(_currentUser.OrganizationId);
+            sb.Append('|').Append(all ?? "");
+            sb.Append('|').Append(address ?? "");
+            sb.Append('|').Append(url ?? "");
+            sb.Append('|').Append(listingId ?? "");
+            sb.Append('|').Append(hostName ?? "");
+            sb.Append('|').Append(businessLicence ?? "");
+            sb.Append('|').Append(registrationNumber ?? "");
+            sb.Append('|').Append(prRequirement?.ToString() ?? "");
+            sb.Append('|').Append(blRequirement?.ToString() ?? "");
+            sb.Append('|').Append(lgId?.ToString() ?? "");
+            sb.Append('|').Append(statuses);
+            sb.Append('|').Append(reassigned?.ToString() ?? "");
+            sb.Append('|').Append(takedownComplete?.ToString() ?? "");
+            sb.Append('|').Append(recent);
+            if (!isCount)
+            {
+                sb.Append('|').Append(pageSize).Append('|').Append(pageNumber);
+                sb.Append('|').Append(includeTotalCount);
+                sb.Append('|').Append(orderBy ?? "").Append('|').Append(direction ?? "");
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>Expand (grouped child rows): intentionally not cached — see repository.</summary>
+        public Task<List<RentalListingTableRowDto>> GetGroupedListingChildrenAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo)
+        {
+            return _listingRepo.GetGroupedListingChildrenAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, bcRegistryNo, matchAddressTxt, matchUnitNo, effectiveHostNm, effectiveBusinessLicenceNo);
         }
 
         public async Task<int> CountHostListingsAsync(string hostName)

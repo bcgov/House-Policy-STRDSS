@@ -21,10 +21,20 @@ namespace StrDss.Model.RentalReportDtos
         /// <summary>Used only for server-side search filters; not serialized to client.</summary>
         [JsonIgnore]
         public string? EffectiveBusinessLicenceNo { get; set; }
+
+        /// <summary>Host name from listing row; used for grouped views and server-side logic. Not serialized for flat table.</summary>
+        [JsonIgnore]
+        public string? EffectiveHostNm { get; set; }
+
+        public long? BusinessLicenceId { get; set; }
+        public DateOnly? BusinessLicenceExpiryDt { get; set; }
+        public string? LicenceStatusType { get; set; }
         public bool? IsLgTransferred { get; set; }
         public bool? IsTakenDown { get; set; }
         public string? BcRegistryNo { get; set; }
         public string? MatchAddressTxt { get; set; }
+        /// <summary>Platform best-match unit/suite from physical address; part of no-reg aggregation key (different unit = different group).</summary>
+        public string? MatchUnitNo { get; set; }
         public short? MatchScoreAmt { get; set; }
         public bool? IsMatchVerified { get; set; }
         public bool? IsMatchCorrected { get; set; }

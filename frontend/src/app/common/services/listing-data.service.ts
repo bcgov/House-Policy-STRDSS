@@ -187,85 +187,66 @@ export class ListingDataService {
             .pipe(map(count => ({ primaryHostNm, hasMultipleProperties: count > 1 })));
     }
 
-    getAggregatedListings(
+    getAggregatedListingsCount(
         searchReq: ListingSearchRequest = {},
         filter?: ListingFilter,
         recent: boolean = false,
-    ): Observable<AggregatedListingTableRow[]> {
-        let listingsEndpointUrl = `${environment.API_HOST}/rentallistings/grouped`;
-        const params: string[] = [];
+    ): Observable<number> {
+        const baseUrl = `${environment.API_HOST}/rentallistings/grouped/count`;
+        const filterParams = this.buildListingsFilterParams(searchReq, filter, recent);
+        const url = filterParams ? `${baseUrl}?${filterParams.slice(1)}` : baseUrl;
+        return this.httpClient.get<number>(url);
+    }
 
-        if (recent) {
-            params.push(`recent=${recent}`);
+    getAggregatedListings(
+        pageNumber: number = 1,
+        pageSize: number = 10,
+        orderBy: string = '',
+        direction: 'asc' | 'desc' = 'asc',
+        searchReq: ListingSearchRequest = {},
+        filter?: ListingFilter,
+        recent: boolean = false,
+        includeTotalCount: boolean = true,
+    ): Observable<PagingResponse<AggregatedListingTableRow>> {
+        let url = `${environment.API_HOST}/rentallistings/grouped?pageSize=${pageSize}&pageNumber=${pageNumber}`;
+        if (orderBy) {
+            url += `&orderBy=${orderBy}&direction=${direction}`;
         }
+        if (!includeTotalCount) {
+            url += '&includeTotalCount=false';
+        }
+        url += this.buildListingsFilterParams(searchReq, filter, recent);
+        return this.httpClient.get<PagingResponse<AggregatedListingTableRow>>(url);
+    }
 
-        if (searchReq.all) {
-            params.push(`all=${searchReq.all}`);
+    /**
+     * Child rows for one aggregated group (uncached server-side). Same filters + recent as the grid.
+     */
+    getAggregatedGroupListings(
+        searchReq: ListingSearchRequest,
+        filter: ListingFilter | undefined,
+        recent: boolean,
+        bcRegistryNo: string | undefined,
+        matchAddressTxt: string | undefined,
+        matchUnitNo: string | undefined,
+        effectiveHostNm: string | undefined,
+        effectiveBusinessLicenceNo: string | undefined,
+    ): Observable<Array<Record<string, unknown>>> {
+        let url = `${environment.API_HOST}/rentallistings/grouped/listings`;
+        const filterParams = this.buildListingsFilterParams(searchReq, filter, recent);
+        let query = filterParams ? filterParams.slice(1) : '';
+        if (bcRegistryNo?.trim()) {
+            query += `${query ? '&' : ''}bcRegistryNo=${encodeURIComponent(bcRegistryNo.trim())}`;
+        } else {
+            query += `${query ? '&' : ''}matchAddressTxt=${encodeURIComponent(matchAddressTxt ?? '')}`;
+            query += `&matchUnitNo=${encodeURIComponent(matchUnitNo ?? '')}`;
+            query += `&effectiveHostNm=${encodeURIComponent(effectiveHostNm ?? '')}`;
+            query += `&effectiveBusinessLicenceNo=${encodeURIComponent(effectiveBusinessLicenceNo ?? '')}`;
         }
-        if (searchReq.address) {
-            params.push(`address=${searchReq.address}`);
+        if (query) {
+            url += `?${query}`;
         }
-        if (searchReq.url) {
-            params.push(`url=${searchReq.url}`);
-        }
-        if (searchReq.listingId) {
-            params.push(`listingId=${searchReq.listingId}`);
-        }
-        if (searchReq.hostName) {
-            params.push(`hostName=${searchReq.hostName}`);
-        }
-        if (searchReq.businessLicence) {
-            params.push(`businessLicence=${searchReq.businessLicence}`);
-        }
-        if (searchReq.registrationNumber) {
-            params.push(`registrationNumber=${searchReq.registrationNumber}`);
-        }
-
-        if (filter) {
-            if (filter.byLocation) {
-                if (!!filter.byLocation?.isPrincipalResidenceRequired) {
-                    params.push(`prRequirement=${filter.byLocation.isPrincipalResidenceRequired == 'Yes'}`);
-                }
-                if (!!filter.byLocation?.isBusinessLicenceRequired) {
-                    params.push(`blRequirement=${filter.byLocation.isBusinessLicenceRequired == 'Yes'}`);
-                }
-            }
-            if (filter.byStatus) {
-                if (
-                    filter.byStatus.reassigned !== null &&
-                    filter.byStatus.reassigned !== undefined
-                ) {
-                    params.push(`reassigned=${!!filter.byStatus.reassigned}`);
-                }
-                if (
-                    filter.byStatus.takedownComplete !== null &&
-                    filter.byStatus.takedownComplete !== undefined
-                ) {
-                    params.push(`takedownComplete=${!!filter.byStatus.takedownComplete}`);
-                }
-
-                const statuses = new Array<string>();
-                if (filter.byStatus.active) {
-                    statuses.push('A');
-                    statuses.push('U'); // Include Update when Active is selected
-                }
-                if (filter.byStatus.inactive) statuses.push('I');
-                if (filter.byStatus.new) statuses.push('N');
-
-                if (statuses.length) {
-                    params.push(`statuses=${statuses.join(',')}`);
-                }
-            }
-            if (!!filter.community) {
-                params.push(`lgId=${filter.community}`);
-            }
-        }
-
-        if (params.length > 0) {
-            listingsEndpointUrl += `?${params.join('&')}`;
-        }
-
-        return this.httpClient.get<AggregatedListingTableRow[]>(listingsEndpointUrl);
+        return this.httpClient.get<Array<Record<string, unknown>>>(url);
     }
 
     getListingDetailsById(id: number): Observable<ListingDetails> {

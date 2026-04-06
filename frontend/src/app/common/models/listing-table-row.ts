@@ -42,6 +42,10 @@ export interface ListingTableRow {
     availableBedroomsQty?: number;
     separateReservationsYtdQty?: number
     bcRegistryNo?: string;
+    businessLicenceId?: number;
+    licenceStatusType?: 'EXPIRED' | 'REVOKED' | 'ISSUED' | 'CANCELLED' | 'PENDING' | 'SUSPENDED';
+    /** Set for nested aggregated rows from API expand. */
+    filtered?: boolean;
 
     rentalListingContacts?: [];
     selected?: boolean;
@@ -51,10 +55,14 @@ export interface ListingTableRow {
 export interface AggregatedListingTableRow {
     effectiveBusinessLicenceNo?: string;
     effectiveHostNm?: string;
-    primaryHostNm: string;
-    matchAddressTxt: string;
+    /** Registration-based group: used for expand Mode A. */
+    bcRegistryNo?: string;
+    primaryHostNm?: string;
+    matchAddressTxt?: string;
+    /** Best-match unit/suite; part of no-reg group key with matchAddressTxt. */
+    matchUnitNo?: string;
     nightsBookedYtdQty: number;
-    businessLicenceNo: string;
+    businessLicenceNo?: string;
     lastActionNm?: string;
     lastActionDtm?: string;
     latestReportPeriodYm?: string;
@@ -62,8 +70,9 @@ export interface AggregatedListingTableRow {
     businessLicenceId?: number;
     licenceStatusType?: 'EXPIRED' | 'REVOKED' | 'ISSUED' | 'CANCELLED' | 'PENDING' | 'SUSPENDED';
     listingCount: number;
+    /** Loaded on first expand via grouped/listings. */
     listings: Array<ListingTableRow>;
-
+    expandLoadError?: boolean;
     hasMultipleProperties: boolean;
     selected?: boolean;
     id?: string;

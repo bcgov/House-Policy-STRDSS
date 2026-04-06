@@ -1,4 +1,4 @@
-﻿using Ganss.Xss;
+using Ganss.Xss;
 using System.Collections;
 using System.IO.Compression;
 using System.Reflection;
@@ -89,6 +89,28 @@ namespace StrDss.Common
 
             // Remove non-alphanumeric characters and convert to uppercase
             return Regex.Replace(input, @"[^a-zA-Z0-9]", "").ToUpper();
+        }
+
+        /// <summary>
+        /// Normalizes listing business licence values for aggregated grouping (non-reg path): strip non-digits first so
+        /// decorative text/punctuation is ignored; if no digits remain, fall back to alphanumeric sanitize.
+        /// </summary>
+        public static string? NormalizeBusinessLicenceForAggregation(string? raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return null;
+            }
+
+            raw = raw.Trim();
+            var digits = Regex.Replace(raw, @"\D", "");
+            if (digits.Length > 0)
+            {
+                return digits;
+            }
+
+            var alnum = SanitizeAndUppercaseString(raw);
+            return string.IsNullOrEmpty(alnum) ? null : alnum;
         }
 
         public static bool IsValidEmailAddress(string email)

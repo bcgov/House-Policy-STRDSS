@@ -122,7 +122,7 @@ namespace StrDss.Api.Controllers
         /// Downloads a zipped CSV file containing all listings reported by platforms
         /// </summary>
         /// <returns>A zipped CSV file</returns>
-        [ApiAuthorize(Permissions.ListingRead)]
+        [ApiAuthorize(Permissions.RegistryView)]
         [SwaggerOperation(Tags = new string[] { Common.ApiTags.Aps })]
         [HttpGet("exports/fin")]
         public async Task<ActionResult> GetRetalListingExportFin()

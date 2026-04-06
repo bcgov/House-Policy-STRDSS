@@ -224,7 +224,7 @@ namespace StrDss.Data.Repositories
             bizLicNo = bizLicNo.ToUpper();
 
             var licences = await _dbSet.AsNoTracking()
-                .Where(x => x.BusinessLicenceNo.Contains(bizLicNo))
+                .Where(x => x.ProvidingOrganizationId == orgId && x.BusinessLicenceNo.Contains(bizLicNo))
                 .ToListAsync();
 
             return _mapper.Map<List<BizLicenceSearchDto>>(licences);

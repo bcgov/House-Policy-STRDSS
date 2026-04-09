@@ -178,11 +178,6 @@ namespace StrDss.Api.Controllers
                 return NotFound();
             }
 
-            if (_currentUser.OrganizationType == OrganizationTypes.LG && extract.FilteringOrganizationId != _currentUser.OrganizationId)
-            {
-                return Unauthorized();
-            }
-
             return File(extract.SourceBin!, "application/zip", $"STRlisting_{extract.RentalListingExtractNm}_{extract.UpdDtm.ToString("yyyyMMdd")}.zip");
         }
 

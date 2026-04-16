@@ -103,9 +103,14 @@ namespace StrDss.Model
             var textInfo = new CultureInfo("en-US", false).TextInfo;
 
             IdentityProviderNm = StrDssIdProviders.Aps;
-            DisplayName = user.GetCustomClaim(StrDssClaimTypes.ClientId)
-                ?? user.GetCustomClaim(StrDssClaimTypes.Azp)
-                ?? user.GetCustomClaim(StrDssClaimTypes.Sub);
+
+            var clientId = user.GetCustomClaim(StrDssClaimTypes.ClientId);
+            if (string.IsNullOrEmpty(clientId))
+                clientId = user.GetCustomClaim(StrDssClaimTypes.Azp);
+            if (string.IsNullOrEmpty(clientId))
+                clientId = user.GetCustomClaim(StrDssClaimTypes.Sub);
+
+            DisplayName = clientId;
         }
 
         public void AddClaim(ClaimsPrincipal user, string claimType, string value)

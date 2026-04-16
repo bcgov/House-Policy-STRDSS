@@ -31,6 +31,16 @@ namespace StrDss.Api.Authentication
 
             _currentUser.LoadApsSession(context!.Principal!);
 
+            if (string.IsNullOrEmpty(_currentUser.DisplayName))
+            {
+                var claims = context.Principal!.Claims.Select(c => $"{c.Type}={c.Value}");
+                _logger.LogWarning($"[AUTH] DisplayName is null. Available claims: {string.Join(", ", claims)}");
+
+                context.Response.StatusCode = 401;
+                context.Fail("Unauthorized: Unable to determine client identity from token claims.");
+                return;
+            }
+
             var (user, permissions) = await _userService.GetUserByDisplayNameAsync(_currentUser.DisplayName);
 
             if (user == null)

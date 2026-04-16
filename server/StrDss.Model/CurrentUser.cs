@@ -107,8 +107,6 @@ namespace StrDss.Model
             var clientId = user.GetCustomClaim(StrDssClaimTypes.ClientId);
             if (string.IsNullOrEmpty(clientId))
                 clientId = user.GetCustomClaim(StrDssClaimTypes.Azp);
-            if (string.IsNullOrEmpty(clientId))
-                clientId = user.GetCustomClaim(StrDssClaimTypes.Sub);
 
             DisplayName = clientId;
         }

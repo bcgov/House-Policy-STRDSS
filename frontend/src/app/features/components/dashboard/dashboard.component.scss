@@ -3,6 +3,10 @@
     height: 100%;
     padding: 4px;
 
+    .dashboard-home {
+        width: 100%;
+    }
+
     h2 {
         padding: 0;
         padding-top: 20px;
@@ -103,6 +107,49 @@
                     }
                 }
             }
+
+            &.dashboard-card--skeleton {
+                pointer-events: none;
+
+                .skeleton-line {
+                    border-radius: 4px;
+                    background: linear-gradient(90deg, #e8e8e8 0%, #f4f4f4 50%, #e8e8e8 100%);
+                    background-size: 200% 100%;
+                    animation: dashboard-skeleton-shimmer 1.2s ease-in-out infinite;
+                }
+
+                .skeleton-line--header {
+                    height: 20px;
+                    width: 70%;
+                    margin-bottom: 12px;
+                }
+
+                .skeleton-line--body {
+                    height: 14px;
+                    width: 100%;
+                    margin-bottom: 8px;
+
+                    &.short {
+                        width: 55%;
+                    }
+                }
+
+                .skeleton-line--action {
+                    height: 36px;
+                    width: 140px;
+                    margin-top: auto;
+                }
+            }
         }
+    }
+}
+
+@keyframes dashboard-skeleton-shimmer {
+    0% {
+        background-position: 0% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
     }
 }

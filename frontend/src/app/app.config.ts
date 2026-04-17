@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { KeycloakService } from 'keycloak-angular';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../environments/environment';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -11,6 +12,7 @@ import { MessageService } from 'primeng/api';
 import { errorInterceptor } from './common/consts/error-interceptor.const';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
+import { UserDataService } from './common/services/user-data.service';
 
 // Get the nonce value once and reuse it
 const cspNonce = document.querySelector('meta[name="csp-nonce"]')?.getAttribute('content') || undefined;
@@ -40,6 +42,12 @@ export const appConfig: ApplicationConfig = {
             multi: true,
             deps: [KeycloakService],
         },
+        {
+            provide: APP_INITIALIZER,
+            useFactory: prefetchCurrentUser,
+            multi: true,
+            deps: [KeycloakService, UserDataService],
+        },
         MessageService,
         {
             provide: CSP_NONCE,
@@ -66,6 +74,18 @@ function initializeKeycloak(keycloak: KeycloakService) {
         }).then(() => {
             setupTokenRefresh(keycloak);
         });
+}
+
+function prefetchCurrentUser(keycloak: KeycloakService, userData: UserDataService) {
+    return () => {
+        if (!keycloak.isLoggedIn()) {
+            return Promise.resolve();
+        }
+        return firstValueFrom(userData.getCurrentUser()).then(
+            () => undefined,
+            () => undefined,
+        );
+    };
 }
 
 function setupTokenRefresh(keycloak: KeycloakService) {

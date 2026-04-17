@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 import { User } from '../../../common/models/user';
 import { DashboardService } from '../../../common/services/dashboard.service';
 import { DashboardCard, DashboardCardSections } from '../../../common/models/dashboard-card';
-import { GlobalLoaderService } from '../../../common/services/global-loader.service';
 
 
 @Component({
@@ -25,6 +24,11 @@ export class DashboardComponent implements OnInit {
   userType!: '' | 'BCGov' | 'Platform' | 'LG' | 'Admin';
   currentUser!: User;
 
+  /** True until profile-driven cards are ready (avoids empty-then-full CLS and holds aria-busy). */
+  isDashboardCardsPending = true;
+
+  readonly skeletonCardPlaceholders: number[] = [0, 1, 2];
+
   cardsToDisplay = new Array<DashboardCard>();
   cardSectionsToDisplay: DashboardCardSections = {
     main: [],
@@ -37,7 +41,6 @@ export class DashboardComponent implements OnInit {
     private router: Router,
     private userDataService: UserDataService,
     private dashboardService: DashboardService,
-    private loaderService: GlobalLoaderService,
     private cd: ChangeDetectorRef,
   ) { }
 
@@ -48,19 +51,20 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    this.loaderService.loadingStart();
     this.userDataService.getCurrentUser().subscribe({
       next: (value: User) => this.applyDashboardUser(value),
-      complete: () => {
-        this.loaderService.loadingEnd();
+      error: () => {
+        this.isDashboardCardsPending = false;
         this.cd.detectChanges();
-      }
+      },
     });
   }
 
   private applyDashboardUser(user: User): void {
+    this.isDashboardCardsPending = false;
     this.currentUser = user;
     this.cardSectionsToDisplay = this.dashboardService.getCardsPerUserType(user);
+    this.cd.detectChanges();
   }
 
   navigateTo(route: string): void {

@@ -4,6 +4,18 @@
     padding: 0 24px 24px 24px;
     background-color: #FFFFFF;
 
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
     .takedown-and-notice-wrapper {
         position: absolute;
         overflow: auto;
@@ -242,9 +254,27 @@
                     -ms-user-select: none;
                     user-select: none;
 
-                    &:hover {
-                        text-decoration: underline;
+                    .sortable-header-btn {
+                        background: none;
+                        border: none;
+                        font: inherit;
+                        font-family: inherit;
+                        font-size: inherit;
+                        color: inherit;
+                        padding: 0;
+                        margin: 0;
                         cursor: pointer;
+                        text-align: left;
+                        width: 100%;
+
+                        &:hover {
+                            text-decoration: underline;
+                        }
+
+                        &:focus-visible {
+                            outline: 2px solid #053662;
+                            outline-offset: 2px;
+                        }
                     }
 
                     i {
@@ -355,7 +385,14 @@
             }
         }
 
-        p-paginator {
+        .paginator-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 3.5rem;
+        }
+
+        .paginator-wrapper p-paginator {
             display: flex;
             justify-content: center;
         }
@@ -478,6 +515,7 @@
             i.pi-spinner.text-2xl {
                 font-size: 2.5rem !important;
                 color: #053662;
+                will-change: transform;
             }
         }
     }

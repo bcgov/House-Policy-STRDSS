@@ -2,15 +2,17 @@
     <h2 class="title">Aggregated Listings</h2>
     <div class="search-container">
         <span class="vertical-spacer" *ngIf="isFilterSet"></span>
+        <label for="search-by-drd" class="sr-only">Search by</label>
         <p-select [options]="searchColumns" [showClear]="searchColumn !== 'all'" (onClear)="clearSearchBy($event)"
-            id="search-by-drd" [(ngModel)]="searchColumn" class="search-by-select"></p-select>
+            inputId="search-by-drd" [(ngModel)]="searchColumn" class="search-by-select"></p-select>
         <span class="p-input-icon-right search-input-container">
+            <label for="search-term-inp" class="sr-only">Search term</label>
             <button type="button" pButton class="search-submit-btn" id="search-submit-btn" (click)="onSearch()" aria-label="Search">
                 <i class="pi pi-search"></i></button>
             <button pButton *ngIf="!!searchTerm" id="clear-search-btn" class="colorless p-button-link search-clear-btn"
                 icon="pi pi-times" (click)="onClearSearchBox()" aria-label="Clear search"></button>
             <input type="text" id="search-term-inp" (keydown.enter)="$event.preventDefault(); onSearch()" class="search-input"
-                placeholder="Search" pInputText [(ngModel)]="searchTerm" aria-label="Search input" />
+                placeholder="Search" pInputText [(ngModel)]="searchTerm" />
         </span>
         <button pButton id="filter-open-btn" class="filter-open-btn p-button-link" [class.colorless]="!isFilterSet"
             icon="pi {{isFilterSet?'pi-filter-fill':'pi-filter'}}" (click)="openFilterSidebar()">
@@ -49,8 +51,9 @@
                 <div class="panel-header-left">
                     <div class="toggle-container">
                         <span class="toggle-label" [class.active]="showRecentOnly">Recently Reported</span>
-                        <p-toggleSwitch [ngModel]="!showRecentOnly" (ngModelChange)="showRecentOnly = !$event; onToggleChange()" 
-                            [inputId]="'recent-toggle-aggregated'"></p-toggleSwitch>
+                        <label for="recent-toggle-aggregated" class="sr-only">Choose whether to show only recently reported listings or all listings</label>
+                        <p-toggleSwitch [ngModel]="!showRecentOnly" (ngModelChange)="showRecentOnly = !$event; onToggleChange()"
+                            inputId="recent-toggle-aggregated"></p-toggleSwitch>
                         <span class="toggle-label" [class.active]="!showRecentOnly">All Listings</span>
                     </div>
                     <span class="panel-header-small" [class.hidden]="!listingsSelected">Selected
@@ -73,41 +76,49 @@
                     <th [ariaLabel]="'expand-listing'" class="expand-header-col"> </th>
 
                     <th class="sortable-header" id="lastReported_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'latestReportPeriodYm'"
-                        (click)="onSort('latestReportPeriodYm')">Last Reported
-                        <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'latestReportPeriodYm' && this.sort.dir === 'desc'"></i>
-                        <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'latestReportPeriodYm' && this.sort.dir === 'asc'"></i>
+                        [class.sorted]="this.sort && this.sort.prop === 'latestReportPeriodYm'">
+                        <button type="button" class="sortable-header-btn" (click)="onSort('latestReportPeriodYm')">
+                            Last Reported
+                            <i class="pi pi-angle-down"
+                                *ngIf="this.sort && this.sort.prop === 'latestReportPeriodYm' && this.sort.dir === 'desc'"></i>
+                            <i class="pi pi-angle-up"
+                                *ngIf="this.sort && this.sort.prop === 'latestReportPeriodYm' && this.sort.dir === 'asc'"></i>
+                        </button>
                     </th>
 
                     <th class="sortable-header" id="primaryHostNm_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'effectiveHostNm'"
-                        (click)="onSort('effectiveHostNm')">Primary Host Name
-                        <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'effectiveHostNm' && this.sort.dir === 'desc'"></i>
-                        <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'effectiveHostNm' && this.sort.dir === 'asc'"></i>
+                        [class.sorted]="this.sort && this.sort.prop === 'effectiveHostNm'">
+                        <button type="button" class="sortable-header-btn" (click)="onSort('effectiveHostNm')">
+                            Primary Host Name
+                            <i class="pi pi-angle-down"
+                                *ngIf="this.sort && this.sort.prop === 'effectiveHostNm' && this.sort.dir === 'desc'"></i>
+                            <i class="pi pi-angle-up"
+                                *ngIf="this.sort && this.sort.prop === 'effectiveHostNm' && this.sort.dir === 'asc'"></i>
+                        </button>
                     </th>
 
                     <th class="sortable-header" id="addressNormalized_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"
-                        (click)="onSort('matchAddressTxt')">Address (Best Match)
-                        <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'desc'"></i>
-                        <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'asc'"></i>
+                        [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'">
+                        <button type="button" class="sortable-header-btn" (click)="onSort('matchAddressTxt')">
+                            Address (Best Match)
+                            <i class="pi pi-angle-down"
+                                *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'desc'"></i>
+                            <i class="pi pi-angle-up"
+                                *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'asc'"></i>
+                        </button>
                     </th>
 
                     <th>Nights stayed (12M)</th>
 
                     <th class="sortable-header" id="licence_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo'"
-                        (click)="onSort('effectiveBusinessLicenceNo')">Listing’s Business Licence (BL)
-                        <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo' && this.sort.dir === 'desc'"></i>
-                        <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo' && this.sort.dir === 'asc'"></i>
+                        [class.sorted]="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo'">
+                        <button type="button" class="sortable-header-btn" (click)="onSort('effectiveBusinessLicenceNo')">
+                            Listing’s Business Licence (BL)
+                            <i class="pi pi-angle-down"
+                                *ngIf="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo' && this.sort.dir === 'desc'"></i>
+                            <i class="pi pi-angle-up"
+                                *ngIf="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo' && this.sort.dir === 'asc'"></i>
+                        </button>
                     </th>
 
                     <th> Last Action </th>
@@ -174,7 +185,7 @@
                                 <ng-template pTemplate="header" let-listing>
                 <tr>
                     <th [ariaLabel]="'select-listing'">
-                        <p-checkbox [(ngModel)]="row.selected" [inputId]="'group-select-chbx'" [binary]="true"
+                        <p-checkbox [(ngModel)]="row.selected" [inputId]="'group-select-' + row.id" [binary]="true"
                             (onChange)="onGroupRowSelected($event,row)"
                             [ariaLabel]="'Select or Deselect listing'"></p-checkbox>
 
@@ -193,7 +204,8 @@
             <ng-template pTemplate="body" let-listing let-index="rowIndex">
                 <tr [class.filtered-out]="!listing.filtered" [class.row-selected]="listing.selected" (click)="onRowClick($event, listing)" class="clickable-row">
                     <td (click)="$event.stopPropagation()">
-                        <p-checkbox [(ngModel)]="listing.selected" [binary]="true" [inputId]="'listing-select-chbx'"
+                        <p-checkbox [(ngModel)]="listing.selected" [binary]="true"
+                            [inputId]="'listing-select-' + row.id + '-' + listing.rentalListingId"
                             (onChange)="onListingRowSelected($event,listing)" ariaLabel="Select listing"></p-checkbox>
                     </td>
                     <td>
@@ -263,12 +275,14 @@
 </ng-template>
 </p-table>
 
-<p-paginator #paginator class="listings-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
-    [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showCurrentPageReport]="true"
-    [showJumpToPageInput]="true" [showPageLinks]="true" [showFirstLastIcon]="true"
-    [rowsPerPageOptions]="[10, 25, 50, 100]"
-    [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'">
-</p-paginator>
+<div class="paginator-wrapper">
+    <p-paginator #paginator class="listings-paginator" *ngIf="currentPage" (onPageChange)="onPageChange($event)"
+        [rows]="currentPage.pageSize || 25" [totalRecords]="currentPage.totalCount || 0" [showCurrentPageReport]="true"
+        [showJumpToPageInput]="true" [showPageLinks]="true" [showFirstLastIcon]="true"
+        [rowsPerPageOptions]="[10, 25, 50, 100]"
+        [currentPageReportTemplate]="'Rows per page: {rows} &nbsp; {first}-{last} of {totalRecords}'">
+    </p-paginator>
+</div>
 </p-panel>
 
 <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">

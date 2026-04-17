@@ -42,7 +42,7 @@
         &nbsp;Contact Host
     </button>
 </div>
-<div class="content">
+<div class="content" [class.is-ceu-listings]="isCEU">
     <p-panel class="listing-table-panel">
         <ng-template pTemplate="header">
             <div class="rows-info-wrapper">
@@ -66,7 +66,8 @@
 
         <p-table [ariaLabel]="'table-of-listings'" id="listings-table" [value]="listings" [scrollable]="true"
             scrollHeight="{{isCEU?'550px':'500px'}}" [(selection)]="selectedListings" size="small"
-            [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true">
+            [tableStyle]="{ 'min-width': '50rem' }" [selectionPageOnly]="true" dataKey="rentalListingId"
+            [rowTrackBy]="trackListingRow">
             <ng-template pTemplate="header">
                 <tr>
                     <th [ariaLabel]="'select-listing'" style="width: 4rem">
@@ -187,9 +188,11 @@
                             <div class="address-text">
                                 {{ row.matchAddressTxt || '-'}}
                             </div>
-                            <i class="pi pi-info-circle" pTooltip="Low Address Match Confidence"
-                                *ngIf="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)"></i>
-                            <p-tag *ngIf="row.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
+                            <div class="cell-affordances address-affordances">
+                                <i class="pi pi-info-circle" pTooltip="Low Address Match Confidence"
+                                    *ngIf="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)"></i>
+                                <p-tag *ngIf="row.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
+                            </div>
                         </div>
                     </td>
                     <td>
@@ -205,7 +208,9 @@
                             <span>
                                 {{ row.businessLicenceNoMatched || '-' }}
                             </span>
-                            <p-tag *ngIf="row.isChangedBusinessLicence" value="Updated" class="updated-tag"></p-tag>
+                            <div class="cell-affordances bl-affordances">
+                                <p-tag *ngIf="row.isChangedBusinessLicence" value="Updated" class="updated-tag"></p-tag>
+                            </div>
                         </div>
                     </td>
                     <td>

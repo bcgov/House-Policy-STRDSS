@@ -166,6 +166,16 @@
     }
 
     .content {
+        // Match p-table scrollHeight so the scroll viewport does not collapse before rows render (CLS).
+        ::ng-deep #listings-table .p-datatable-scrollable-body {
+            box-sizing: border-box;
+            min-height: 500px;
+        }
+
+        &.is-ceu-listings ::ng-deep #listings-table .p-datatable-scrollable-body {
+            min-height: 550px;
+        }
+
         p-panel {
             .rows-info-wrapper {
                 width: 100%;
@@ -318,7 +328,9 @@
 
                 .status-col {
                     width: 100%;
+                    min-width: 6.75rem;
                     display: flex;
+                    align-items: center;
                     gap: 8px;
                 }
 
@@ -328,11 +340,30 @@
                     display: flex;
                     gap: 8px;
                     align-items: center;
+                    min-width: 0;
                 }
 
                 .address-text {
                     display: flex;
                     align-items: center;
+                    min-width: 0;
+                    flex: 1 1 auto;
+                }
+
+                .cell-affordances {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    gap: 8px;
+                    flex-shrink: 0;
+                }
+
+                .address-affordances {
+                    min-width: 5.5rem;
+                }
+
+                .bl-affordances {
+                    min-width: 4.5rem;
                 }
 
                 &.low-address-score-match {

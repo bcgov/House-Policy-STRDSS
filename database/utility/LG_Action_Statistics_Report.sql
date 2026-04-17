@@ -63,3 +63,16 @@ where dud.upload_delivery_type = 'Takedown Data'
   and dud.report_period_ym = params.report_month
 group by params.report_month, org.organization_nm
 order by 2;
+
+
+-- BONUS: Unprocessed takedowns by platform within the las 12 months:
+SELECT org.organization_nm as "Platform"
+    , count(*) as "Unprocessed takedown lines"
+from dss_upload_line dul
+join dss_upload_delivery dud on dud.upload_delivery_id = dul.including_upload_delivery_id
+join dss_organization org on org.organization_id = dud.providing_organization_id
+where dud.upload_delivery_type = 'Takedown Data'
+  and dud.report_period_ym >= date_trunc('month', current_date) - interval '12 months'
+  and dul.is_processed = false
+group by org.organization_nm
+order by 1;

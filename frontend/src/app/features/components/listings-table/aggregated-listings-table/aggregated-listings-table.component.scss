@@ -237,7 +237,23 @@
                 }
             }
 
+            &.row-visited {
+                background-color: #faf9f8;
+
+                &:hover {
+                    background-color: #f0efed;
+                }
+            }
+
             &.row-selected {
+                background-color: #f5f5f5 !important;
+
+                &:hover {
+                    background-color: #e5e5e5 !important;
+                }
+            }
+
+            &.row-selected.row-visited {
                 background-color: #f5f5f5 !important;
 
                 &:hover {

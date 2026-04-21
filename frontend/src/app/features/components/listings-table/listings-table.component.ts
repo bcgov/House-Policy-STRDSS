@@ -26,6 +26,7 @@ import { ListingFilter } from '../../../common/models/listing-filter';
 import { AccordionModule } from 'primeng/accordion';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FilterPersistenceService } from '../../../common/services/filter-persistence.service';
+import { VisitedListingsSessionService } from '../../../common/services/visited-listings-session.service';
 import { OrganizationService } from '../../../common/services/organization.service';
 import { UrlProtocolPipe } from '../../../common/pipes/url-protocol.pipe';
 import { ListingDetails } from '../../../common/models/listing-details';
@@ -100,7 +101,8 @@ export class ListingsTableComponent implements OnInit {
     private route: ActivatedRoute,
     private loaderService: GlobalLoaderService,
     private cd: ChangeDetectorRef,
-    private filterPersistenceService: FilterPersistenceService
+    private filterPersistenceService: FilterPersistenceService,
+    readonly visitedListings: VisitedListingsSessionService,
   ) { }
 
   ngOnInit(): void {
@@ -196,7 +198,10 @@ export class ListingsTableComponent implements OnInit {
         target.closest('p-checkbox')) {
       return;
     }
-    
+
+    this.visitedListings.markVisited(row.rentalListingId);
+    this.cd.markForCheck();
+
     // Open listing details in a new tab
     const url = this.router.serializeUrl(this.router.createUrlTree(['/listing', row.rentalListingId]));
     window.open(url, '_blank');

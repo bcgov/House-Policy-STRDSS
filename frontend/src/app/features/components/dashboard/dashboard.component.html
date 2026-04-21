@@ -1,59 +1,73 @@
-<h2>Home</h2>
-<div class="cards">
-    <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.main" [id]="card.boxId">
-        <div class="card-header">{{card.title}}</div>
-        <div class="card-content">{{card.description}}
-            <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
-        </div>
-        <div class="card-actions">
-            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
-                <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
-                {{card.buttonText}}
-            </button>
+<section class="dashboard-home" aria-labelledby="dashboard-home-heading"
+    [attr.aria-busy]="isDashboardCardsPending ? 'true' : 'false'">
+    <h2 id="dashboard-home-heading">Home</h2>
+    <div class="cards" role="region" aria-label="Main tasks">
+        <ng-container *ngIf="isDashboardCardsPending">
+            <div class="dashboard-card dashboard-card--skeleton" *ngFor="let _ of skeletonCardPlaceholders"
+                aria-hidden="true">
+                <div class="skeleton-line skeleton-line--header"></div>
+                <div class="skeleton-line skeleton-line--body"></div>
+                <div class="skeleton-line skeleton-line--body short"></div>
+                <div class="skeleton-line skeleton-line--action"></div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="!isDashboardCardsPending">
+            <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.main" [id]="card.boxId">
+                <div class="card-header">{{card.title}}</div>
+                <div class="card-content">{{card.description}}
+                    <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
+                </div>
+                <div class="card-actions">
+                    <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
+                        <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
+                        {{card.buttonText}}
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+    <h2 *ngIf="cardSectionsToDisplay.admin.length">Administration Tools</h2>
+    <div *ngIf="cardSectionsToDisplay.admin.length" class="cards">
+        <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.admin" [id]="card.boxId">
+            <div class="card-header">{{card.title}}</div>
+            <div class="card-content">{{card.description}}
+                <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
+            </div>
+            <div class="card-actions">
+                <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
+                    <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
+                    {{card.buttonText}}</button>
+            </div>
         </div>
     </div>
-</div>
-<h2 *ngIf="cardSectionsToDisplay.admin.length">Administration Tools</h2>
-<div *ngIf="cardSectionsToDisplay.admin.length" class="cards">
-    <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.admin" [id]="card.boxId">
-        <div class="card-header">{{card.title}}</div>
-        <div class="card-content">{{card.description}}
-            <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
-        </div>
-        <div class="card-actions">
-            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
-                <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
-                {{card.buttonText}}</button>
-        </div>
-    </div>
-</div>
-<h2 *ngIf="cardSectionsToDisplay.forms.length">Forms</h2>
-<div *ngIf="cardSectionsToDisplay.forms.length" class="cards">
-    <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.forms" [id]="card.boxId">
-        <div class="card-header">{{card.title}}</div>
-        <div class="card-content">{{card.description}}
-            <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
-        </div>
-        <div class="card-actions">
-            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
-                <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
-                {{card.buttonText}}
-            </button>
+    <h2 *ngIf="cardSectionsToDisplay.forms.length">Forms</h2>
+    <div *ngIf="cardSectionsToDisplay.forms.length" class="cards">
+        <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.forms" [id]="card.boxId">
+            <div class="card-header">{{card.title}}</div>
+            <div class="card-content">{{card.description}}
+                <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
+            </div>
+            <div class="card-actions">
+                <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
+                    <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
+                    {{card.buttonText}}
+                </button>
+            </div>
         </div>
     </div>
-</div>
-<h2 *ngIf="cardSectionsToDisplay.info.length">Information and Support</h2>
-<div *ngIf="cardSectionsToDisplay.info.length" class="cards">
-    <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.info" [id]="card.boxId">
-        <div class="card-header">{{card.title}}</div>
-        <div class="card-content">{{card.description}}
-            <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
-        </div>
-        <div class="card-actions">
-            <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
-                <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
-                {{card.buttonText}}
-            </button>
+    <h2 *ngIf="cardSectionsToDisplay.info.length">Information and Support</h2>
+    <div *ngIf="cardSectionsToDisplay.info.length" class="cards">
+        <div class="dashboard-card" *ngFor="let card of cardSectionsToDisplay.info" [id]="card.boxId">
+            <div class="card-header">{{card.title}}</div>
+            <div class="card-content">{{card.description}}
+                <div *ngIf="card.isComingSoon" class="card-warning">(COMING SOON)</div>
+            </div>
+            <div class="card-actions">
+                <button pButton [disabled]="card.isButtonDisabled" [id]="card.buttonId" (click)="navigateTo(card.route)">
+                    <span class="icon {{card.buttonIcon}}" *ngIf="card.buttonIcon"></span>
+                    {{card.buttonText}}
+                </button>
+            </div>
         </div>
     </div>
-</div>
+</section>

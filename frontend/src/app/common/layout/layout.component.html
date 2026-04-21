@@ -6,13 +6,20 @@
                 <h1 class="main-title">Short-Term Rental Data Portal</h1>
             </div>
         </div>
-        <div *ngIf="userDataService.currentUser" class="user-container">
-            {{userDataService.currentUser.displayName || 'Unknown User'}} <button aria-label="Toggle dropdown to logout"
-                pButton class="do-not-print-it" icon="pi pi-angle-down" (click)="op.toggle($event)"></button>
-            <p-popover #op>
-                <button pButton [iconPos]="'right'" aria-label="Log out" class="p-button-transparent"
-                    icon="pi pi-sign-out" (click)="logout()">Logout</button>
-            </p-popover>
+        <div class="user-container-slot">
+            <div class="user-container" *ngIf="userDataService.currentUser; else userHeaderPlaceholder">
+                {{userDataService.currentUser.displayName || 'Unknown User'}} <button aria-label="Toggle dropdown to logout"
+                    pButton class="do-not-print-it" icon="pi pi-angle-down" (click)="op.toggle($event)"></button>
+                <p-popover #op>
+                    <button pButton [iconPos]="'right'" aria-label="Log out" class="p-button-transparent"
+                        icon="pi pi-sign-out" (click)="logout()">Logout</button>
+                </p-popover>
+            </div>
+            <ng-template #userHeaderPlaceholder>
+                <div class="user-container user-container--placeholder" aria-busy="true">
+                    <span class="user-container-placeholder-text">Loading&hellip;</span>
+                </div>
+            </ng-template>
         </div>
     </div>
     <div class="header-menu do-not-print-it">

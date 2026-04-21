@@ -58,8 +58,17 @@
             }
         }
 
-        .user-container {
+        .user-container-slot {
+            flex-shrink: 0;
+            min-width: 360px;
             width: 360px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .user-container {
+            width: 100%;
             height: 100%;
             font-size: 16px;
             color: #FFFFFF;
@@ -67,6 +76,16 @@
             display: flex;
             align-items: center;
             justify-content: end;
+
+            &--placeholder {
+                opacity: 0.65;
+                pointer-events: none;
+            }
+
+            .user-container-placeholder-text {
+                font-size: 16px;
+                white-space: nowrap;
+            }
 
             button {
                 padding: 12px;

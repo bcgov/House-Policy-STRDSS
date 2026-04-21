@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ListingDataService } from '../../../common/services/listing-data.service';
 import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
 import { ListingTableRow } from '../../../common/models/listing-table-row';
@@ -36,6 +36,7 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-listings-table',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     TableModule,
@@ -80,6 +81,8 @@ export class ListingsTableComponent implements OnInit {
   showRecentOnly = true; // Default to "Recently Reported"
 
   readonly addressLowScore = Number.parseInt(environment.ADDRESS_SCORE);
+
+  trackListingRow = (_index: number, row: ListingTableRow): number => row.rentalListingId;
 
   /** When true, the next onPageChange was triggered by onSearch (paginator.changePage); skip calling getListings again. */
   private skipNextPageChange = false;
@@ -146,6 +149,7 @@ export class ListingsTableComponent implements OnInit {
         this.userService.getCurrentUser().subscribe({
           next: (currentUser: User) => {
             this.isCEU = currentUser.organizationType === 'BCGov';
+            this.cd.markForCheck();
             this.getListings(page);
           },
         });
@@ -447,6 +451,7 @@ export class ListingsTableComponent implements OnInit {
           sorted.push(...uncategorized);
 
         this.groupedCommunities = sorted;
+        this.cd.markForCheck();
       }
     });
   }

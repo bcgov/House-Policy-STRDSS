@@ -28,6 +28,7 @@ import {
 } from '../../../../common/models/listing-table-row';
 import { ListingDataService } from '../../../../common/services/listing-data.service';
 import { FilterPersistenceService } from '../../../../common/services/filter-persistence.service';
+import { VisitedListingsSessionService } from '../../../../common/services/visited-listings-session.service';
 import { GlobalLoaderService } from '../../../../common/services/global-loader.service';
 import { SelectedListingsStateService } from '../../../../common/services/selected-listings-state.service';
 import { UserDataService } from '../../../../common/services/user-data.service';
@@ -107,6 +108,7 @@ export class AggregatedListingsTableComponent implements OnInit {
         private loaderService: GlobalLoaderService,
         private cd: ChangeDetectorRef,
         private filterPersistenceService: FilterPersistenceService,
+        readonly visitedListings: VisitedListingsSessionService,
     ) { }
 
     ngOnInit(): void {
@@ -337,7 +339,10 @@ export class AggregatedListingsTableComponent implements OnInit {
             target.closest('.multihost-icon')) {
             return;
         }
-        
+
+        this.visitedListings.markVisited(listing.rentalListingId);
+        this.cd.detectChanges();
+
         // Open listing details in a new tab
         const url = this.router.serializeUrl(this.router.createUrlTree(['/listing', listing.rentalListingId]));
         window.open(url, '_blank');

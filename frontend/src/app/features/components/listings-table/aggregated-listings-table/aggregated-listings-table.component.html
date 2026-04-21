@@ -202,7 +202,9 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-listing let-index="rowIndex">
-                <tr [class.filtered-out]="!listing.filtered" [class.row-selected]="listing.selected" (click)="onRowClick($event, listing)" class="clickable-row">
+                <tr [class.filtered-out]="!listing.filtered" [class.row-selected]="listing.selected"
+                    [class.row-visited]="visitedListings.isVisited(listing.rentalListingId)"
+                    (click)="onRowClick($event, listing)" class="clickable-row">
                     <td (click)="$event.stopPropagation()">
                         <p-checkbox [(ngModel)]="listing.selected" [binary]="true"
                             [inputId]="'listing-select-' + row.id + '-' + listing.rentalListingId"

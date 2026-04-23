@@ -235,6 +235,36 @@
                 &:hover {
                     background-color: #f5f5f5;
                 }
+
+                td.listing-row-select-cell {
+                    position: relative;
+                }
+
+                .listing-row-primary-link {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    z-index: 0;
+                    width: 3200px;
+                    max-width: none;
+                    opacity: 0;
+                    overflow: hidden;
+                }
+
+                td.listing-row-pass-through {
+                    pointer-events: none;
+                }
+
+                td.listing-row-pass-through .listing-id-link,
+                td.listing-row-pass-through p-tag,
+                td.listing-row-pass-through i.pi-info-circle,
+                td.listing-row-pass-through .status-flag,
+                .listing-row-interactive-control {
+                    pointer-events: auto;
+                    position: relative;
+                    z-index: 1;
+                }
             }
 
             &.row-visited {

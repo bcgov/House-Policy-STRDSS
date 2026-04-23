@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AccordionModule } from 'primeng/accordion';
@@ -109,7 +109,31 @@ export class AggregatedListingsTableComponent implements OnInit {
         private cd: ChangeDetectorRef,
         private filterPersistenceService: FilterPersistenceService,
         readonly visitedListings: VisitedListingsSessionService,
+        private readonly location: Location,
     ) { }
+
+    /** Absolute URL for listing details — real <a href> enables native link context menus on the row. */
+    listingDetailsHref(row: ListingTableRow): string {
+        const path = this.router.serializeUrl(
+            this.router.createUrlTree(['/listing', row.rentalListingId]),
+        );
+        const externalPath = this.location.prepareExternalUrl(path);
+        return typeof window !== 'undefined'
+            ? `${window.location.origin}${externalPath}`
+            : externalPath;
+    }
+
+    onListingDetailsLinkClick(_event: MouseEvent, row: ListingTableRow): void {
+        this.visitedListings.markVisited(row.rentalListingId);
+        this.cd.detectChanges();
+    }
+
+    onListingDetailsLinkAuxClick(event: MouseEvent, row: ListingTableRow): void {
+        if (event.button === 1) {
+            this.visitedListings.markVisited(row.rentalListingId);
+            this.cd.detectChanges();
+        }
+    }
 
     ngOnInit(): void {
         this.getOrganizations();
@@ -327,25 +351,6 @@ export class AggregatedListingsTableComponent implements OnInit {
         this.router.navigate([`/listings/${row.rentalListingId}`], {
             queryParams: { returnUrl: this.getUrlFromState() },
         });
-    }
-
-    onRowClick(event: MouseEvent, listing: ListingTableRow): void {
-        // Don't trigger if clicking on checkbox, link, or button
-        const target = event.target as HTMLElement;
-        if (target.closest('p-checkbox') || 
-            target.closest('a') || 
-            target.closest('button') ||
-            target.closest('input') ||
-            target.closest('.multihost-icon')) {
-            return;
-        }
-
-        this.visitedListings.markVisited(listing.rentalListingId);
-        this.cd.detectChanges();
-
-        // Open listing details in a new tab
-        const url = this.router.serializeUrl(this.router.createUrlTree(['/listing', listing.rentalListingId]));
-        window.open(url, '_blank');
     }
 
     onNoticeOpen(): void {

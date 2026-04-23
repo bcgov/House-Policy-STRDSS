@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ListingDataService } from '../../../common/services/listing-data.service';
 import { PagingResponse, PagingResponsePageInfo } from '../../../common/models/paging-response';
@@ -103,7 +104,31 @@ export class ListingsTableComponent implements OnInit {
     private cd: ChangeDetectorRef,
     private filterPersistenceService: FilterPersistenceService,
     readonly visitedListings: VisitedListingsSessionService,
+    private readonly location: Location,
   ) { }
+
+  /** Absolute URL for listing details — used as real <a href> so the browser shows link-specific context menus. */
+  listingDetailsHref(row: ListingTableRow): string {
+    const path = this.router.serializeUrl(
+      this.router.createUrlTree(['/listing', row.rentalListingId]),
+    );
+    const externalPath = this.location.prepareExternalUrl(path);
+    return typeof window !== 'undefined'
+      ? `${window.location.origin}${externalPath}`
+      : externalPath;
+  }
+
+  onListingDetailsLinkClick(_event: MouseEvent, row: ListingTableRow): void {
+    this.visitedListings.markVisited(row.rentalListingId);
+    this.cd.markForCheck();
+  }
+
+  onListingDetailsLinkAuxClick(event: MouseEvent, row: ListingTableRow): void {
+    if (event.button === 1) {
+      this.visitedListings.markVisited(row.rentalListingId);
+      this.cd.markForCheck();
+    }
+  }
 
   ngOnInit(): void {
     this.getOrganizations();
@@ -186,25 +211,6 @@ export class ListingsTableComponent implements OnInit {
 
   onDetailsOpen(row: ListingTableRow): void {
     this.router.navigateByUrl(`/listings/${row.rentalListingId}`);
-  }
-
-  onRowClick(event: MouseEvent, row: ListingTableRow): void {
-    // Don't trigger if clicking on checkbox, link, or button
-    const target = event.target as HTMLElement;
-    if (target.closest('p-tablecheckbox') || 
-        target.closest('a') || 
-        target.closest('button') ||
-        target.closest('input') ||
-        target.closest('p-checkbox')) {
-      return;
-    }
-
-    this.visitedListings.markVisited(row.rentalListingId);
-    this.cd.markForCheck();
-
-    // Open listing details in a new tab
-    const url = this.router.serializeUrl(this.router.createUrlTree(['/listing', row.rentalListingId]));
-    window.open(url, '_blank');
   }
 
   onNoticeOpen(): void {

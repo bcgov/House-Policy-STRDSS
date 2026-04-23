@@ -163,12 +163,16 @@
             <ng-template pTemplate="body" let-row let-index="rowIndex">
                 <tr [class.row-selected]="selectedListings.indexOf(row) !== -1"
                     [class.row-visited]="visitedListings.isVisited(row.rentalListingId)"
-                    (click)="onRowClick($event, row)" class="clickable-row">
-                    <td (click)="$event.stopPropagation()">
-                        <p-tableCheckbox [ariaLabel]="'select-listing-row'" inputId="select-listing-row-{{index}}"
-                            [value]="row"></p-tableCheckbox>
+                    class="clickable-row">
+                    <td class="listing-row-select-cell">
+                        <a [href]="listingDetailsHref(row)" target="_blank" rel="noopener noreferrer" tabindex="-1"
+                            class="listing-row-primary-link" aria-label="Open listing details in a new tab"
+                            (click)="onListingDetailsLinkClick($event, row)"
+                            (auxclick)="onListingDetailsLinkAuxClick($event, row)"></a>
+                        <p-tableCheckbox class="listing-row-interactive-control" [ariaLabel]="'select-listing-row'"
+                            inputId="select-listing-row-{{index}}" [value]="row"></p-tableCheckbox>
                     </td>
-                    <td>
+                    <td class="listing-row-pass-through">
                         <div class="align-center status-col">
                             <span>{{ (row.latestReportPeriodYm|date:'MMM-YY') || '-' }}</span>
                             <div *ngIf="row.isLgTransferred" class="status-flag status-reassigned"
@@ -179,12 +183,12 @@
                             </div>
                         </div>
                     </td>
-                    <td>
+                    <td class="listing-row-pass-through">
                         <span [class.no-reg-number]="!row.bcRegistryNo">
                             {{ row.bcRegistryNo || 'No Reg Number' }}
                         </span>
                     </td>
-                    <td
+                    <td class="listing-row-pass-through"
                         [class.low-address-score-match]="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)">
                         <div class="address-col">
                             <div class="address-text">
@@ -197,10 +201,10 @@
                             </div>
                         </div>
                     </td>
-                    <td>
+                    <td class="listing-row-pass-through">
                         {{ row.nightsBookedYtdQty || '-'}}
                     </td>
-                    <td>
+                    <td class="listing-row-pass-through">
                         <span>
                             {{ row.businessLicenceNo || '-'}}
                         </span>
@@ -215,13 +219,13 @@
                             </div>
                         </div>
                     </td>
-                    <td>
+                    <td class="listing-row-pass-through">
                         {{ row.lastActionNm || '-'}}
                     </td>
-                    <td>
+                    <td class="listing-row-pass-through">
                         {{ row.lastActionDtm? (row.lastActionDtm |date) : '-' }}
                     </td>
-                    <td>
+                    <td class="listing-row-pass-through">
                         <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
                             [href]="row.platformListingUrl | urlProtocol" (click)="$event.stopPropagation()">{{
                             row.offeringOrganizationNm }}<i class="pi pi-external-link"></i></a>

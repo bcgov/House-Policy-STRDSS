@@ -230,23 +230,20 @@
             }
 
             &.clickable-row {
+                /* Row is the positioning context so the invisible link can span all columns
+                   without a huge fixed width (which inflated horizontal scroll on the nested table). */
+                position: relative;
                 cursor: pointer;
 
                 &:hover {
                     background-color: #f5f5f5;
                 }
 
-                td.listing-row-select-cell {
-                    position: relative;
-                }
-
                 .listing-row-primary-link {
                     position: absolute;
-                    top: 0;
-                    left: 0;
-                    bottom: 0;
+                    inset: 0;
                     z-index: 0;
-                    width: 3200px;
+                    width: auto;
                     max-width: none;
                     opacity: 0;
                     overflow: hidden;

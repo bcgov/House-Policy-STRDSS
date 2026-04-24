@@ -258,24 +258,21 @@
             }
 
             &.clickable-row {
+                /* Row is the positioning context so the invisible link spans all columns without a
+                   huge fixed width (avoids inflating horizontal scroll on scrollable tables). */
+                position: relative;
                 cursor: pointer;
 
                 &:hover {
                     background-color: #f5f5f5;
                 }
 
-                td.listing-row-select-cell {
-                    position: relative;
-                }
-
                 /* Full-row hit target for native link context menu; see listing-row-pass-through */
                 .listing-row-primary-link {
                     position: absolute;
-                    top: 0;
-                    left: 0;
-                    bottom: 0;
+                    inset: 0;
                     z-index: 0;
-                    width: 3200px;
+                    width: auto;
                     max-width: none;
                     opacity: 0;
                     overflow: hidden;

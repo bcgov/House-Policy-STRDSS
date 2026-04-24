@@ -89,7 +89,7 @@
                     <th class="sortable-header" id="primaryHostNm_header"
                         [class.sorted]="this.sort && this.sort.prop === 'effectiveHostNm'">
                         <button type="button" class="sortable-header-btn" (click)="onSort('effectiveHostNm')">
-                            Primary Host Name
+                            Host
                             <i class="pi pi-angle-down"
                                 *ngIf="this.sort && this.sort.prop === 'effectiveHostNm' && this.sort.dir === 'desc'"></i>
                             <i class="pi pi-angle-up"
@@ -100,7 +100,7 @@
                     <th class="sortable-header" id="addressNormalized_header"
                         [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'">
                         <button type="button" class="sortable-header-btn" (click)="onSort('matchAddressTxt')">
-                            Address (Best Match)
+                            Best Match Address
                             <i class="pi pi-angle-down"
                                 *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'desc'"></i>
                             <i class="pi pi-angle-up"
@@ -113,7 +113,7 @@
                     <th class="sortable-header" id="licence_header"
                         [class.sorted]="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo'">
                         <button type="button" class="sortable-header-btn" (click)="onSort('effectiveBusinessLicenceNo')">
-                            Listing’s Business Licence (BL)
+                            Business Licence
                             <i class="pi pi-angle-down"
                                 *ngIf="this.sort && this.sort.prop === 'effectiveBusinessLicenceNo' && this.sort.dir === 'desc'"></i>
                             <i class="pi pi-angle-up"
@@ -192,9 +192,9 @@
                     </th>
                     <th>Last Reported</th>
                     <th>Registration</th>
-                    <th>Address (Best Match)</th>
+                    <th>Best Match Address</th>
                     <th>Nights stayed (12M)</th>
-                    <th>Listing BL</th>
+                    <th>Business Licence</th>
                     <th>Matched BL</th>
                     <th>Last Action</th>
                     <th>Last Action Date</th>
@@ -308,7 +308,7 @@
         <strong>Last Reported:</strong> The most recent month the platform reported the listing to the Province.
     </p>
     <p>
-        <strong>Address (Best Match):</strong> Best physical address match provided by the BC Address Geocoder based
+        <strong>Best Match Address:</strong> Best physical address match provided by the BC Address Geocoder based
         on the address from the platform listing (accuracy of {{addressLowScore}}% or above).
     </p>
     <p>

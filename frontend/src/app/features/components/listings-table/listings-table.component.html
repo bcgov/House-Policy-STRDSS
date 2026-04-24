@@ -94,7 +94,7 @@
 
                     <th class="sortable-header" id="addressNormalized_header"
                         [class.sorted]="this.sort && this.sort.prop === 'matchAddressTxt'"
-                        (click)="onSort('matchAddressTxt')">Address (Best Match)
+                        (click)="onSort('matchAddressTxt')">Best Match Address
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'matchAddressTxt' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -112,7 +112,7 @@
 
                     <th class="sortable-header" id="licence_header"
                         [class.sorted]="this.sort && this.sort.prop === 'businessLicenceNo'"
-                        (click)="onSort('businessLicenceNo')">Listing BL
+                        (click)="onSort('businessLicenceNo')">Business Licence
                         <i class="pi pi-angle-down"
                             *ngIf="this.sort && this.sort.prop === 'businessLicenceNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
@@ -261,7 +261,7 @@
             <strong>Last Reported:</strong> The most recent month the platform reported the listing to the Province.
         </p>
         <p>
-            <strong>Address (Best Match):</strong> Best physical address match provided by the BC Address Geocoder based
+            <strong>Best Match Address:</strong> Best physical address match provided by the BC Address Geocoder based
             on the address from the platform listing (accuracy of {{addressLowScore}}% or above).
         </p>
         <p>

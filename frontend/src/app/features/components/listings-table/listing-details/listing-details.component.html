@@ -95,7 +95,7 @@
             <div class="spacer-hr"> </div>
 
             <div class="row address">
-                <span class="label">Address (Best Match):</span>
+                <span class="label">Best Match Address:</span>
                 <span class="value"
                     [class.warning]="listing.matchScoreAmt<=addressWarningScoreLimit && (!listing.isMatchVerified && !listing.isMatchCorrected)">
                     {{listing.matchAddressTxt}}&nbsp; <i class="pi pi-info-circle"
@@ -111,15 +111,15 @@
                 <p-tag *ngIf="listing.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
             </div>
             <div class="row">
-                <span class="label">Address (Platform Listing):</span>
+                <span class="label">Address on Listing:</span>
                 <span class="value">{{listing.originalAddressTxt | textCleanup}}</span>
             </div>
             <div class="row">
-                <span class="label">Entire Unit? (Platform Listing):</span>
+                <span class="label">Entire Unit:</span>
                 <span class="value">{{listing.isEntireUnit?'Yes':'No'}}</span>
             </div>
             <div class="row">
-                <span class="label">Number of Bedrooms (Platform Listing):</span>
+                <span class="label">Bedrooms:</span>
                 <span class="value">{{listing.availableBedroomsQty}}</span>
             </div>
 
@@ -136,7 +136,7 @@
             <div class="spacer-hr"> </div>
 
             <div class="row">
-                <span class="label">Registration Number:</span>
+                <span class="label">Registration:</span>
                 <span class="value" [class.status-red]="!listing.bcRegistryNo">{{listing.bcRegistryNo || '-'}}
                     <i class="pi pi-info-circle" pTooltip="Registration exemption claimed"
                         *ngIf="!listing.bcRegistryNo"></i>
@@ -147,7 +147,7 @@
 
             <ng-template ngFor let-host [ngForOf]="listing.hosts" let-i="index">
                 <div class="row">
-                    <span class="label">{{host.isPropertyOwner?'Property':'STR'}} Host (Platform Listing):</span>
+                    <span class="label">Host:</span>
                     <span class="value" [class.has-multiple-properties]="listing.hasMultipleProperties">
                         @if (host.isPropertyOwner) {
 
@@ -168,7 +168,7 @@
                     </span>
                 </div>
                 <div class="row">
-                    <span class="label">{{host.isPropertyOwner?'Property':'STR'}} Host Address:</span>
+                    <span class="label">Address:</span>
                     <span class="value">{{host.fullAddressTxt}}</span>
                 </div>
                 <div class="row">
@@ -187,7 +187,7 @@
             <div class="spacer-hr"> </div>
 
             <div class="row header-row">
-                Listing History (for This Listing ID)
+                Listing History
             </div>
             <div class="row night-stayed-row">
                 <span class="label">Night Stayed (12M):</span>
@@ -544,7 +544,7 @@
         <strong>Last Reported:</strong> The most recent month the platform reported the listing to the Province.
     </p>
     <p>
-        <strong>Address (Best Match):</strong> Best physical address match provided by the BC Address Geocoder based
+        <strong>Best Match Address:</strong> Best physical address match provided by the BC Address Geocoder based
         on the address from the platform listing (accuracy of {{addressWarningScoreLimit}}% or above).
     </p>
     <p>
@@ -596,8 +596,8 @@
             </div>
         </div>
 
-        <div class="row"><strong>Address (Best Match):</strong> {{listing.matchAddressTxt}}</div>
-        <div class="row"><strong>Address (Platform Listing):</strong> {{listing.originalAddressTxt}}</div>
+        <div class="row"><strong>Best Match Address:</strong> {{listing.matchAddressTxt}}</div>
+        <div class="row"><strong>Address on Listing:</strong> {{listing.originalAddressTxt}}</div>
         <div class="row">
             <div class="radio-checkbox-item">
                 <p-checkbox [binary]="true" name="accept" [(ngModel)]="confirmTheBestMatchAddress" inputId="accept-chb"

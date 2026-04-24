@@ -149,13 +149,13 @@
                             *ngIf="this.sort && this.sort.prop === 'lastActionDtm' && this.sort.dir === 'asc'"></i>
                     </th>
 
-                    <th class="sortable-header" id="platformName_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'offeringOrganizationNm'"
-                        (click)="onSort('offeringOrganizationNm')">Platform
+                    <th class="sortable-header" id="platformListingNo_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'platformListingNo'"
+                        (click)="onSort('platformListingNo')">Listing
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'offeringOrganizationNm' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'offeringOrganizationNm' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'asc'"></i>
                     </th>
                 </tr>
             </ng-template>
@@ -228,7 +228,7 @@
                     <td class="listing-row-pass-through">
                         <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
                             [href]="row.platformListingUrl | urlProtocol" (click)="$event.stopPropagation()">{{
-                            row.offeringOrganizationNm }}<i class="pi pi-external-link"></i></a>
+                            row.platformListingNo || '-' }}<i class="pi pi-external-link"></i></a>
                     </td>
                 </tr>
             </ng-template>

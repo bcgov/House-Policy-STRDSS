@@ -125,7 +125,7 @@
 
                     <th> Last Action Date</th>
 
-                    <th> Count </th>
+                    <th> Listings </th>
                 </tr>
             </ng-template>
 
@@ -198,7 +198,7 @@
                     <th>Matched BL</th>
                     <th>Last Action</th>
                     <th>Last Action Date</th>
-                    <th>Count</th>
+                    <th>Listing</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-listing let-index="rowIndex">
@@ -265,7 +265,7 @@
                     <td class="listing-row-pass-through"> <a [ariaLabel]="'platform-listing-url'" target="_blank"
                             class="listing-id-link"
                             [href]="listing.platformListingUrl | urlProtocol" (click)="$event.stopPropagation()">{{
-                            listing.offeringOrganizationNm }}<i class="pi pi-external-link"></i></a>
+                            listing.platformListingNo || '-' }}<i class="pi pi-external-link"></i></a>
                     </td>
                 </tr>
             </ng-template>

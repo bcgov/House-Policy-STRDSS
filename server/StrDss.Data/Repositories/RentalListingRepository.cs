@@ -56,7 +56,7 @@ namespace StrDss.Data.Repositories
         private static readonly HashSet<string> AllowedSortColumns = new(StringComparer.OrdinalIgnoreCase)
         {
             "latestReportPeriodYm", "registrationNumber", "matchAddressTxt", "nightsBookedYtdQty",
-            "businessLicenceNo", "businessLicenceNoMatched", "lastActionNm", "lastActionDtm", "offeringOrganizationNm"
+            "businessLicenceNo", "businessLicenceNoMatched", "lastActionNm", "lastActionDtm", "platformListingNo"
         };
 
         private static readonly HashSet<string> GroupedAllowedSortColumns = new(StringComparer.OrdinalIgnoreCase)
@@ -302,9 +302,9 @@ namespace StrDss.Data.Repositories
                 "matchAddressTxt" => isDesc
                     ? query.OrderByDescending(x => x.MatchAddressTxt ?? "ZZZZ")
                     : query.OrderBy(x => x.MatchAddressTxt ?? "ZZZZ"),
-                "offeringOrganizationNm" => isDesc
-                    ? query.OrderByDescending(x => x.OfferingOrganizationNm ?? "ZZZZ")
-                    : query.OrderBy(x => x.OfferingOrganizationNm ?? "ZZZZ"),
+                "platformListingNo" => isDesc
+                    ? query.OrderByDescending(x => x.PlatformListingNo ?? "ZZZZ")
+                    : query.OrderBy(x => x.PlatformListingNo ?? "ZZZZ"),
                 _ => query.OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue)
             };
         }

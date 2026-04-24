@@ -125,7 +125,7 @@
 
                     <th> Last Action Date</th>
 
-                    <th> Count </th>
+                    <th> Listings </th>
                 </tr>
             </ng-template>
 
@@ -198,7 +198,7 @@
                     <th>Matched BL</th>
                     <th>Last Action</th>
                     <th>Last Action Date</th>
-                    <th>Count</th>
+                    <th>Listing</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-listing let-index="rowIndex">
@@ -208,8 +208,9 @@
                     <td class="listing-row-select-cell">
                         <a [href]="listingDetailsHref(listing)" target="_blank" rel="noopener noreferrer" tabindex="-1"
                             class="listing-row-primary-link" aria-label="Open listing details in a new tab"
-                            (click)="onListingDetailsLinkClick($event, listing)"
-                            (auxclick)="onListingDetailsLinkAuxClick($event, listing)"></a>
+                            (click)="onListingDetailsLinkInteraction($event, listing)"
+                            (auxclick)="onListingDetailsLinkInteraction($event, listing)"
+                            (contextmenu)="onListingDetailsLinkInteraction($event, listing)"></a>
                         <p-checkbox class="listing-row-interactive-control" [(ngModel)]="listing.selected"
                             [binary]="true"
                             [inputId]="'listing-select-' + row.id + '-' + listing.rentalListingId"
@@ -265,7 +266,7 @@
                     <td class="listing-row-pass-through"> <a [ariaLabel]="'platform-listing-url'" target="_blank"
                             class="listing-id-link"
                             [href]="listing.platformListingUrl | urlProtocol" (click)="$event.stopPropagation()">{{
-                            listing.offeringOrganizationNm }}<i class="pi pi-external-link"></i></a>
+                            listing.platformListingNo || '-' }}<i class="pi pi-external-link"></i></a>
                     </td>
                 </tr>
             </ng-template>

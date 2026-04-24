@@ -14,8 +14,7 @@ namespace StrDss.Model.RentalReportDtos
         [JsonIgnore]
         public long? OfferingOrganizationId { get; set; }
 
-        /// <summary>Used only for server-side search filters; not serialized to client.</summary>
-        [JsonIgnore]
+        /// <summary>Platform’s listing identifier; included for listings table and search.</summary>
         public string? PlatformListingNo { get; set; }
 
         /// <summary>Used only for server-side search filters; not serialized to client.</summary>

@@ -149,13 +149,13 @@
                             *ngIf="this.sort && this.sort.prop === 'lastActionDtm' && this.sort.dir === 'asc'"></i>
                     </th>
 
-                    <th class="sortable-header" id="platformName_header"
-                        [class.sorted]="this.sort && this.sort.prop === 'offeringOrganizationNm'"
-                        (click)="onSort('offeringOrganizationNm')">Platform
+                    <th class="sortable-header" id="platformListingNo_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'platformListingNo'"
+                        (click)="onSort('platformListingNo')">Listing
                         <i class="pi pi-angle-down"
-                            *ngIf="this.sort && this.sort.prop === 'offeringOrganizationNm' && this.sort.dir === 'desc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'desc'"></i>
                         <i class="pi pi-angle-up"
-                            *ngIf="this.sort && this.sort.prop === 'offeringOrganizationNm' && this.sort.dir === 'asc'"></i>
+                            *ngIf="this.sort && this.sort.prop === 'platformListingNo' && this.sort.dir === 'asc'"></i>
                     </th>
                 </tr>
             </ng-template>
@@ -167,8 +167,9 @@
                     <td class="listing-row-select-cell">
                         <a [href]="listingDetailsHref(row)" target="_blank" rel="noopener noreferrer" tabindex="-1"
                             class="listing-row-primary-link" aria-label="Open listing details in a new tab"
-                            (click)="onListingDetailsLinkClick($event, row)"
-                            (auxclick)="onListingDetailsLinkAuxClick($event, row)"></a>
+                            (click)="onListingDetailsLinkInteraction($event, row)"
+                            (auxclick)="onListingDetailsLinkInteraction($event, row)"
+                            (contextmenu)="onListingDetailsLinkInteraction($event, row)"></a>
                         <p-tableCheckbox class="listing-row-interactive-control" [ariaLabel]="'select-listing-row'"
                             inputId="select-listing-row-{{index}}" [value]="row"></p-tableCheckbox>
                     </td>
@@ -228,7 +229,7 @@
                     <td class="listing-row-pass-through">
                         <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"
                             [href]="row.platformListingUrl | urlProtocol" (click)="$event.stopPropagation()">{{
-                            row.offeringOrganizationNm }}<i class="pi pi-external-link"></i></a>
+                            row.platformListingNo || '-' }}<i class="pi pi-external-link"></i></a>
                     </td>
                 </tr>
             </ng-template>

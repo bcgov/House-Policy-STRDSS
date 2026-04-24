@@ -123,16 +123,13 @@ export class AggregatedListingsTableComponent implements OnInit {
             : externalPath;
     }
 
-    onListingDetailsLinkClick(_event: MouseEvent, row: ListingTableRow): void {
+    /** Marks session visited for left click, middle click (new tab), or link context menu. */
+    onListingDetailsLinkInteraction(event: MouseEvent, row: ListingTableRow): void {
+        if (event.type === 'auxclick' && event.button !== 1) {
+            return;
+        }
         this.visitedListings.markVisited(row.rentalListingId);
         this.cd.detectChanges();
-    }
-
-    onListingDetailsLinkAuxClick(event: MouseEvent, row: ListingTableRow): void {
-        if (event.button === 1) {
-            this.visitedListings.markVisited(row.rentalListingId);
-            this.cd.detectChanges();
-        }
     }
 
     ngOnInit(): void {

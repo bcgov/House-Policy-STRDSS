@@ -167,8 +167,9 @@
                     <td class="listing-row-select-cell">
                         <a [href]="listingDetailsHref(row)" target="_blank" rel="noopener noreferrer" tabindex="-1"
                             class="listing-row-primary-link" aria-label="Open listing details in a new tab"
-                            (click)="onListingDetailsLinkClick($event, row)"
-                            (auxclick)="onListingDetailsLinkAuxClick($event, row)"></a>
+                            (click)="onListingDetailsLinkInteraction($event, row)"
+                            (auxclick)="onListingDetailsLinkInteraction($event, row)"
+                            (contextmenu)="onListingDetailsLinkInteraction($event, row)"></a>
                         <p-tableCheckbox class="listing-row-interactive-control" [ariaLabel]="'select-listing-row'"
                             inputId="select-listing-row-{{index}}" [value]="row"></p-tableCheckbox>
                     </td>

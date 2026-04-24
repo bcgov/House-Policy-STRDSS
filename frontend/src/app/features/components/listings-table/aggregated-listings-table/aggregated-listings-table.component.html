@@ -295,8 +295,50 @@
 </p-panel>
 
 <p-dialog header="Legend" [modal]="true" [(visible)]="isLegendShown" [style]="{width: '50vw'}">
+    <p>
+        <strong>Best Match Address:</strong> Best physical address match provided by the BC Address Geocoder based
+        on the address from the platform listing (accuracy of {{addressLowScore}}% or above).
+    </p>
     <span>
-        <strong>Flags:</strong>
+        <strong>Business licence:</strong> Business licence number of the short-term rental.
+        <ul>
+            <li><strong>Listing BL:</strong> Business Licence (BL) number self-reported by the host on their platform listing.</li>
+            <li><strong>Matched BL:</strong> Business Licence (BL) number linked to local government business licence records. 
+                Matches can be automated or manually performed by the local government if they have uploaded their 
+                licensing data to the Portal.</li>
+        </ul>
+    </span>
+    <p>
+        <strong>Host:</strong> Person who acts as the STR operator, including the property host and any other 
+        persons who act on their behalf to arrange the short-term rental services 
+        (e.g., host, co-host, property manager).
+    </p>
+    <span>
+        <strong>Last Action:</strong> The most recent local government or platform activity recorded for this listing.
+        <ul>
+            <li>
+                <strong>Notice of Non-compliance:</strong> A Notice of Non-compliance with a business licence 
+                requirement was sent to the host and platform. 
+            </li>
+            <li>
+                <strong>Takedown Request:</strong> A Takedown Request request was sent to the platform to 
+                cease providing platform services.
+            </li>
+            <li>
+                <strong>Takedown Reported - LG Request:</strong> The platform reported the listing was 
+                removed following a local government takedown request.
+            </li>
+            <li>
+                <strong>Takedown Reported - Registration Check Failed:</strong> The platform reported 
+                the listing was removed because it failed mandatory validation of the registration number.
+            </li>
+        </ul>
+    </span>
+    <p>
+        <strong>Last Reported:</strong> The most recent month the platform reported the listing to the Province.
+    </p>
+    <span>
+        <strong>Listing Status:</strong>
         <ul class="statuses">                
             <li><span class="status-flag status-takedown-complete"></span>&nbsp;Takedown Reported: Platform reported
                 takedown of the listing</li>
@@ -305,44 +347,10 @@
         </ul>
     </span>
     <p>
-        <strong>Last Reported:</strong> The most recent month the platform reported the listing to the Province.
+        <strong>Nights Stayed (12M):</strong> Total nights short-term rental services were provided in the last 12 months.
     </p>
     <p>
-        <strong>Best Match Address:</strong> Best physical address match provided by the BC Address Geocoder based
-        on the address from the platform listing (accuracy of {{addressLowScore}}% or above).
-    </p>
-    <p>
-        <strong>Address (from platform listing):</strong> Property address of the short-term rental accommodation
-        provided to the platform by the host. May be incomplete or inaccurate.
-    </p>
-    <p>
-        <strong>Entire Unit:</strong> Is the listing for an entire dwelling unit or a bedroom within the dwelling
-        unit.
-    </p>
-    <p>
-        <strong>Nights Stayed:</strong> The number of nights short-term rental services were provided in the
-        reporting month.
-    </p>
-    <p>
-        <strong>Separate Reservations:</strong> The number of separate reservations that were "completed" in the
-        reporting month (ie. where the guest has checked out within the month). Reservations that span more than one
-        month will be reported in the month the guest checks out.
-    </p>
-    <p>
-        <strong>Business licence:</strong> Business licence number provided by the host on the listing, if
-        applicable.
-    </p>
-    <p>
-        <strong>Property Host:</strong> A person who is legally entitled to possession of the property where STR
-        accommodation is provided and acts as the STR operator responsible for arranging the short term rental
-        services.
-        <i>See Short-term Rental Accommodations Act</i> for definition.
-    </p>
-    <p>
-        <strong>STR Host:</strong> Any person who acts as the STR operator, including the property host and any
-        other persons who act on their behalf to arrange the short-term rental services (e.g., host, co-host,
-        property manager).
-        <i>See Short-term Rental Accommodations Act</i> for definition.
+        <strong>Registration:</strong> Provincial short-term rental registration number.
     </p>
 </p-dialog>
 </div>

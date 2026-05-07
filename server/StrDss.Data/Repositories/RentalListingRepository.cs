@@ -56,7 +56,7 @@ namespace StrDss.Data.Repositories
         private static readonly HashSet<string> AllowedSortColumns = new(StringComparer.OrdinalIgnoreCase)
         {
             "latestReportPeriodYm", "registrationNumber", "matchAddressTxt", "nightsBookedYtdQty",
-            "businessLicenceNo", "businessLicenceNoMatched", "lastActionNm", "lastActionDtm", "platformListingNo"
+            "businessLicenceNo", "businessLicenceNoMatched", "platformListingNo"
         };
 
         private static readonly HashSet<string> GroupedAllowedSortColumns = new(StringComparer.OrdinalIgnoreCase)
@@ -84,20 +84,6 @@ namespace StrDss.Data.Repositories
                                     group rpt by new { rl.OfferingOrganizationId, rl.PlatformListingNo } into g
                                     select new { g.Key.OfferingOrganizationId, g.Key.PlatformListingNo, MaxReportPeriodYm = g.Max(x => x.ReportPeriodYm) };
 
-            // Pre-aggregated: latest email per listing (one row per ConcernedWithRentalListingId with max MessageDeliveryDtm and type name)
-            var maxEmailDatePerListing = _dbContext.DssEmailMessages
-                .AsNoTracking()
-                .Where(em => em.ConcernedWithRentalListingId != null)
-                .GroupBy(em => em.ConcernedWithRentalListingId)
-                .Select(g => new { ConcernedWithRentalListingId = g.Key, MessageDeliveryDtm = g.Max(x => x.MessageDeliveryDtm) });
-
-            // One row per listing: join back to get type name; use Max(EmailMessageTypeNm) for tie-break when multiple messages share same max timestamp (translates to SQL)
-            var latestEmailPerListing = from maxD in maxEmailDatePerListing
-                                        join em in _dbContext.DssEmailMessages on new { maxD.ConcernedWithRentalListingId, maxD.MessageDeliveryDtm } equals new { em.ConcernedWithRentalListingId, em.MessageDeliveryDtm }
-                                        join emt in _dbContext.DssEmailMessageTypes on em.EmailMessageType equals emt.EmailMessageType
-                                        group new { maxD.ConcernedWithRentalListingId, maxD.MessageDeliveryDtm, emt.EmailMessageTypeNm } by maxD.ConcernedWithRentalListingId into g
-                                        select new { ConcernedWithRentalListingId = g.Key, MessageDeliveryDtm = g.Max(x => x.MessageDeliveryDtm), EmailMessageTypeNm = g.Max(x => x.EmailMessageTypeNm) };
-
             return from drl in currentListings
                    join org in _dbContext.DssOrganizations on drl.OfferingOrganizationId equals org.OrganizationId
                    join dlst in _dbContext.DssListingStatusTypes on drl.ListingStatusType equals dlst.ListingStatusType into dlstJ
@@ -112,8 +98,6 @@ namespace StrDss.Data.Repositories
                    from dbl in dblJ.DefaultIfEmpty()
                    join lrp in latestReportPeriod on new { drl.OfferingOrganizationId, drl.PlatformListingNo } equals new { lrp.OfferingOrganizationId, lrp.PlatformListingNo } into lrpJ
                    from lrp in lrpJ.DefaultIfEmpty()
-                   join le in latestEmailPerListing on drl.RentalListingId equals le.ConcernedWithRentalListingId into leJ
-                   from le in leJ.DefaultIfEmpty()
                    select new RentalListingTableRowDto
                    {
                        RentalListingId = drl.RentalListingId,
@@ -135,8 +119,8 @@ namespace StrDss.Data.Repositories
                        BusinessLicenceNo = drl.BusinessLicenceNo,
                        BusinessLicenceNoMatched = dbl != null ? dbl.BusinessLicenceNo : null,
                        IsChangedBusinessLicence = drl.IsChangedBusinessLicence,
-                       LastActionDtm = le != null ? (DateTime?)le.MessageDeliveryDtm : null,
-                       LastActionNm = le != null ? le.EmailMessageTypeNm : null,
+                       LastActionDtm = null,
+                       LastActionNm = null,
                        PlatformListingUrl = drl.PlatformListingUrl,
                        OfferingOrganizationNm = org.OrganizationNm,
                        TakeDownReason = drl.TakeDownReason,
@@ -148,6 +132,62 @@ namespace StrDss.Data.Repositories
                        BusinessLicenceExpiryDt = dbl != null ? (DateOnly?)dbl.ExpiryDt : null,
                        LicenceStatusType = dbl != null ? dbl.LicenceStatusType : null
                    };
+        }
+
+        /// <summary>
+        /// Hydrates LastActionDtm and LastActionNm for a batch of listing rows by querying
+        /// the email messages table only for the given listing IDs (typically one page worth).
+        /// </summary>
+        private async Task HydrateLastActionFieldsAsync(List<RentalListingTableRowDto> rows)
+        {
+            if (rows.Count == 0) return;
+
+            var listingIds = rows.Where(r => r.RentalListingId != null).Select(r => r.RentalListingId!.Value).ToList();
+            if (listingIds.Count == 0) return;
+
+            var emailData = await _dbContext.DssEmailMessages
+                .AsNoTracking()
+                .Where(em => em.ConcernedWithRentalListingId != null && listingIds.Contains(em.ConcernedWithRentalListingId.Value))
+                .GroupBy(em => em.ConcernedWithRentalListingId)
+                .Select(g => new
+                {
+                    ConcernedWithRentalListingId = g.Key,
+                    MessageDeliveryDtm = g.Max(x => x.MessageDeliveryDtm)
+                })
+                .ToListAsync();
+
+            if (emailData.Count == 0) return;
+
+            // Fetch type names for the max-date messages
+            var keys = emailData
+                .Select(e => new { e.ConcernedWithRentalListingId, e.MessageDeliveryDtm })
+                .ToList();
+
+            var emailDetails = await _dbContext.DssEmailMessages
+                .AsNoTracking()
+                .Where(em => em.ConcernedWithRentalListingId != null && listingIds.Contains(em.ConcernedWithRentalListingId.Value))
+                .Join(_dbContext.DssEmailMessageTypes, em => em.EmailMessageType, emt => emt.EmailMessageType, (em, emt) => new { em.ConcernedWithRentalListingId, em.MessageDeliveryDtm, emt.EmailMessageTypeNm })
+                .Where(x => emailData.Select(e => e.ConcernedWithRentalListingId).Contains(x.ConcernedWithRentalListingId))
+                .ToListAsync();
+
+            var lookup = emailData.ToDictionary(e => e.ConcernedWithRentalListingId!.Value, e => e.MessageDeliveryDtm);
+
+            var typeByListing = emailDetails
+                .Where(x => x.ConcernedWithRentalListingId != null && lookup.TryGetValue(x.ConcernedWithRentalListingId.Value, out var maxDtm) && x.MessageDeliveryDtm == maxDtm)
+                .GroupBy(x => x.ConcernedWithRentalListingId!.Value)
+                .ToDictionary(g => g.Key, g => g.Max(x => x.EmailMessageTypeNm));
+
+            foreach (var row in rows)
+            {
+                if (row.RentalListingId == null) continue;
+                var id = row.RentalListingId.Value;
+                if (lookup.TryGetValue(id, out var dtm))
+                {
+                    row.LastActionDtm = dtm;
+                    typeByListing.TryGetValue(id, out var nm);
+                    row.LastActionNm = nm;
+                }
+            }
         }
 
         /// <summary>
@@ -278,12 +318,6 @@ namespace StrDss.Data.Repositories
 
             return key switch
             {
-                "lastActionDtm" => isDesc
-                    ? query.OrderByDescending(x => x.LastActionDtm ?? DateTime.MinValue)
-                    : query.OrderBy(x => x.LastActionDtm ?? DateTime.MinValue),
-                "lastActionNm" => isDesc
-                    ? query.OrderByDescending(x => x.LastActionNm ?? "ZZZZ")
-                    : query.OrderBy(x => x.LastActionNm ?? "ZZZZ"),
                 "businessLicenceNo" => isDesc
                     ? query.OrderByDescending(x => x.BusinessLicenceNo ?? "ZZZZ")
                     : query.OrderBy(x => x.BusinessLicenceNo ?? "ZZZZ"),
@@ -376,6 +410,9 @@ namespace StrDss.Data.Repositories
 
             _logger.LogInformation($"Get Rental Listings - Total Listings After Paging: {pagedList.Count}, Page: {pageNumber}, PageSize: {pageSize}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
+            // Hydrate email action fields for the paged results only (avoids expensive full-table aggregation)
+            await HydrateLastActionFieldsAsync(pagedList);
+
             // Timezone and "Reg Check Failed" override in-memory (no contacts fetch for table)
             foreach (var row in pagedList)
             {
@@ -422,6 +459,7 @@ namespace StrDss.Data.Repositories
             ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
             var list = await query.ToListAsync();
+            await HydrateLastActionFieldsAsync(list);
             NormalizeGroupingKeyFields(list);
             return list;
         }
@@ -643,6 +681,7 @@ namespace StrDss.Data.Repositories
                 query = query.OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue);
 
                 var list = await query.ToListAsync();
+                await HydrateLastActionFieldsAsync(list);
                 PostProcessListingTableRows(list);
                 return list;
             }

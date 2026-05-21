@@ -384,14 +384,13 @@
                     display: flex;
                     gap: 8px;
                     align-items: center;
-                    min-width: 0;
                 }
 
                 .address-text {
                     display: flex;
                     align-items: center;
-                    min-width: 0;
-                    flex: 1 1 auto;
+                    word-break: normal;
+                    overflow-wrap: break-word;
                 }
 
                 .cell-affordances {
@@ -400,14 +399,6 @@
                     justify-content: flex-end;
                     gap: 8px;
                     flex-shrink: 0;
-                }
-
-                .address-affordances {
-                    min-width: 5.5rem;
-                }
-
-                .bl-affordances {
-                    min-width: 4.5rem;
                 }
 
                 &.low-address-score-match {

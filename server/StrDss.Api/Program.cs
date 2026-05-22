@@ -18,11 +18,9 @@ using StrDss.Api;
 using StrDss.Service.Bceid;
 using Npgsql;
 using Serilog;
-using Serilog.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using StrDss.Common;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -104,15 +102,13 @@ builder.Services.AddBceidSoapClient(builder.Configuration);
 
 builder.Services.AddMemoryCache();
 
-var loggerFactory = LoggerFactory.Create(logging => logging.AddSerilog(Log.Logger, dispose: false));
-
 var mappingConfig = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile(new EntityToModelProfile());
     cfg.AddProfile(new EntityToEntityProfile());
     cfg.AddProfile(new ModelToEntityProfile());
     cfg.AddProfile(new ModelToModelProfile());
-}, loggerFactory);
+});
 
 var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);

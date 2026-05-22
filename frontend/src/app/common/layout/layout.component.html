@@ -8,7 +8,8 @@
         </div>
         <div class="user-container-slot">
             <div class="user-container" *ngIf="userDataService.currentUser; else userHeaderPlaceholder">
-                {{userDataService.currentUser.displayName || 'Unknown User'}} <button aria-label="Toggle dropdown to logout"
+                <span class="user-display-name">{{userDataService.currentUser.displayName || 'Unknown User'}}</span>
+                <button aria-label="Toggle dropdown to logout"
                     pButton class="do-not-print-it" icon="pi pi-angle-down" (click)="op.toggle($event)"></button>
                 <p-popover #op>
                     <button pButton [iconPos]="'right'" aria-label="Log out" class="p-button-transparent"

@@ -5,6 +5,14 @@ RUN dotnet restore
 RUN dotnet publish "StrDss.Api/StrDss.Api.csproj" -c Release -o /app/published-app
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+
+# Apply Debian security patches (libgnutls30, openssl, etc.)
+USER root
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+USER $APP_UID
+
 WORKDIR /app
 COPY --from=build /app/published-app .
 EXPOSE 8080

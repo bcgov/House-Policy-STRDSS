@@ -102,7 +102,7 @@ var mappingConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile(new EntityToEntityProfile());
     cfg.AddProfile(new ModelToEntityProfile());
     cfg.AddProfile(new ModelToModelProfile());
-});
+}, null);
 
 var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);

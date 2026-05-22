@@ -15,7 +15,9 @@ using StrDss.Service.Hangfire;
 using Hangfire.PostgreSql;
 using Npgsql;
 using StrDss.Hangfire;
+using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Extensions.Logging;
 using Hangfire.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -96,13 +98,15 @@ builder.Services.AddSingleton<IFieldValidatorService, FieldValidatorService>();
 builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddBceidSoapClient(builder.Configuration);
 
+var loggerFactory = LoggerFactory.Create(logging => logging.AddSerilog(Log.Logger, dispose: false));
+
 var mappingConfig = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile(new EntityToModelProfile());
     cfg.AddProfile(new EntityToEntityProfile());
     cfg.AddProfile(new ModelToEntityProfile());
     cfg.AddProfile(new ModelToModelProfile());
-}, null);
+}, loggerFactory);
 
 var mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);

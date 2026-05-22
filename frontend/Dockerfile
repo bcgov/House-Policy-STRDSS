@@ -10,9 +10,9 @@ COPY . .
 
 RUN npm run build -- --configuration production
 
-FROM nginx:1.27.2-alpine as builder-modules
+FROM nginx:1.27.4-alpine as builder-modules
 
-ENV NGINX_VERSION 1.27.2
+ENV NGINX_VERSION 1.27.4
 ENV MORE_HEADERS_VERSION=0.34
 ENV MORE_HEADERS_GITREPO=openresty/headers-more-nginx-module
 
@@ -42,7 +42,7 @@ RUN mkdir -p ${DOWNLOADS} && \
   ./configure --with-compat $CONFARGS --add-dynamic-module=${HEADERS_MORE_MODULE} && \
   make && make install
 
-FROM nginx:1.27.2-alpine
+FROM nginx:1.27.4-alpine
 
 ENV NGINX_DIR /usr/share/nginx
 

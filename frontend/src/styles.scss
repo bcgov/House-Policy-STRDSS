@@ -622,6 +622,27 @@ body {
                 }
             }
         }
+
+        // Hamburger toggle: keep the icon clearly visible on the dark
+        // header strip with a subtle hover/focus halo.
+        .p-menubar-button {
+            color: #FFFFFF;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            width: 2.25rem;
+            height: 2.25rem;
+
+            &:hover,
+            &:focus,
+            &:focus-visible {
+                background-color: rgba(255, 255, 255, 0.12);
+                border-color: rgba(255, 255, 255, 0.4);
+                color: #FFFFFF;
+                outline: none;
+                box-shadow: none;
+            }
+        }
     }
 
     .p-datatable .p-datatable-thead > tr > th {
@@ -776,5 +797,121 @@ body {
                 width: 150px;
             }
         }
+    }
+}
+
+// ---------------------------------------------------------------------
+// Mobile-collapsed menubar styling.
+//
+// PrimeNG v19 toggles `.p-menubar-mobile` from a matchMedia listener
+// (`queryMatches`) that can lag the first paint, so styles gated on
+// that class flash with the default white theme until the user clicks.
+// PrimeUix v1 also tends to inline aliased design tokens at build time
+// (e.g. `menubar.submenu.background: "{content.background}"` compiles
+// to `var(--p-content-background)`, NOT via `--p-menubar-submenu-*`),
+// so re-coloring `--p-menubar-*` tokens doesn't reliably reach the
+// rendered CSS.
+//
+// Solution: drive the dark-blue overlay purely from a viewport media
+// query at PrimeNG's own 960px breakpoint and target the structural
+// menubar classes directly with high specificity + !important. This
+// applies from the very first paint, regardless of class timing or
+// token resolution.
+// ---------------------------------------------------------------------
+@media only screen and (max-width: 960px) {
+
+    // Outer dropdown panel.
+    body .p-menubar .p-menubar-root-list {
+        background-color: #38598A !important;
+        background-image: none !important;
+        color: #FFFFFF !important;
+        border: 1px solid #053662 !important;
+        border-radius: 4px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important;
+        padding: 0.25rem 0 !important;
+        min-width: 14rem;
+        max-width: calc(100vw - 1rem);
+        box-sizing: border-box;
+        overflow: hidden;
+        z-index: 1000;
+    }
+
+    // Nested submenu lives inside the root list -- collapse its own
+    // frame so it visually merges with the parent overlay, and stop
+    // it from forcing the dropdown to overflow on small viewports.
+    body .p-menubar .p-menubar-root-list .p-menubar-submenu {
+        background-color: #38598A !important;
+        background-image: none !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 0.25rem 0 !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    body .p-menubar .p-menubar-item-content {
+        background-color: transparent !important;
+        background-image: none !important;
+        color: #FFFFFF !important;
+        border-radius: 0 !important;
+    }
+
+    body .p-menubar .p-menubar-item-label,
+    body .p-menubar .p-menubar-item-icon,
+    body .p-menubar .p-menubar-submenu-icon,
+    body .p-menubar .p-submenu-icon,
+    body .p-menubar .p-menubar-item-link {
+        color: #FFFFFF !important;
+    }
+
+    // Subtle white overlay on hover so labels stay readable.
+    body .p-menubar .p-menubar-item-content:hover,
+    body .p-menubar .p-menubar-item:not(.p-disabled) > .p-menubar-item-content:hover {
+        background-color: rgba(255, 255, 255, 0.12) !important;
+
+        .p-menubar-item-label,
+        .p-menubar-item-icon,
+        .p-menubar-submenu-icon,
+        .p-submenu-icon {
+            color: #FFFFFF !important;
+        }
+    }
+
+    // Keyboard focus + expanded-parent highlight: subtle white overlay,
+    // NOT a full white background -- prevents the visible flicker
+    // between dark-blue and white when clicking through items.
+    //
+    // Override BOTH the outer `<li>` (which the existing desktop
+    // `.p-focus { background: #FFFFFF }` rule above paints solid white
+    // and would otherwise turn the focused/expanded parent into a
+    // blank white bar) AND its inner `.p-menubar-item-content`.
+    body .p-menubar .p-menubar-item.p-focus,
+    body .p-menubar .p-menubar-item.p-menubar-item-active {
+        background-color: transparent !important;
+        background-image: none !important;
+    }
+
+    body .p-menubar .p-menubar-item.p-focus > .p-menubar-item-content,
+    body .p-menubar .p-menubar-item.p-menubar-item-active > .p-menubar-item-content {
+        background-color: rgba(255, 255, 255, 0.18) !important;
+
+        .p-menubar-item-label,
+        .p-menubar-item-icon,
+        .p-menubar-submenu-icon,
+        .p-submenu-icon {
+            color: #FFFFFF !important;
+        }
+    }
+
+    // Submenu rows: rely on PrimeNG's built-in 1rem mobile indent
+    // (`menubar.submenu.mobileIndent`) only -- don't add extra left
+    // padding on top of it (that's what caused rows to overflow the
+    // right edge on narrow viewports).
+    body .p-menubar .p-menubar-submenu .p-menubar-item-content {
+        padding-left: 0 !important;
     }
 }

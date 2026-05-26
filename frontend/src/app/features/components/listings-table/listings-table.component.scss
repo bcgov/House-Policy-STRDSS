@@ -387,10 +387,13 @@
                 }
 
                 .address-text {
-                    display: flex;
-                    align-items: center;
                     word-break: normal;
                     overflow-wrap: break-word;
+
+                    .address-confidence-icon {
+                        margin-left: 4px;
+                        vertical-align: middle;
+                    }
                 }
 
                 .cell-affordances {

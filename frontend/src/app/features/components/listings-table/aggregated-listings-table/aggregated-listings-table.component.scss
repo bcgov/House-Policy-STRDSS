@@ -418,8 +418,21 @@
                 }
 
                 .address-text {
-                    display: flex;
+                    word-break: normal;
+                    overflow-wrap: break-word;
+
+                    .address-confidence-icon {
+                        margin-left: 4px;
+                        vertical-align: middle;
+                    }
+                }
+
+                .cell-affordances {
+                    display: inline-flex;
                     align-items: center;
+                    justify-content: flex-end;
+                    gap: 8px;
+                    flex-shrink: 0;
                 }
 
                 &.low-address-score-match {

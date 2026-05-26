@@ -192,12 +192,11 @@
                     <td class="listing-row-pass-through"
                         [class.low-address-score-match]="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)">
                         <div class="address-col">
-                            <div class="address-text">
-                                {{ row.matchAddressTxt || '-'}}
-                            </div>
+                            <div class="address-text">{{ row.matchAddressTxt || '-'
+                                }}<i class="pi pi-info-circle address-confidence-icon"
+                                    pTooltip="Low Address Match Confidence"
+                                    *ngIf="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)"></i></div>
                             <div class="cell-affordances address-affordances">
-                                <i class="pi pi-info-circle" pTooltip="Low Address Match Confidence"
-                                    *ngIf="row.matchScoreAmt<=addressLowScore && (!row.isMatchVerified && !row.isMatchCorrected)"></i>
                                 <p-tag *ngIf="row.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
                             </div>
                         </div>

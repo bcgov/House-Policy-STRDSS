@@ -235,12 +235,13 @@
                     <td class="listing-row-pass-through"
                         [class.low-address-score-match]="listing.matchScoreAmt<=addressLowScore && (!listing.isMatchVerified && !listing.isMatchCorrected)">
                         <div class="address-col">
-                            <div class="address-text">
-                                {{ listing.matchAddressTxt }}
+                            <div class="address-text">{{ listing.matchAddressTxt
+                                }}<i class="pi pi-info-circle address-confidence-icon"
+                                    pTooltip="Low Address Match Confidence"
+                                    *ngIf="listing.matchScoreAmt<=addressLowScore && (!listing.isMatchVerified && !listing.isMatchCorrected)"></i></div>
+                            <div class="cell-affordances address-affordances">
+                                <p-tag *ngIf="listing.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
                             </div>
-                            <i class="pi pi-info-circle" pTooltip="Low Address Match Confidence"
-                                *ngIf="listing.matchScoreAmt<=addressLowScore && (!listing.isMatchVerified && !listing.isMatchCorrected)"></i>
-                            <p-tag *ngIf="listing.isChangedAddress" value="Updated" class="updated-tag"></p-tag>
                         </div>
                     </td>
                     <td class="listing-row-pass-through"> {{ listing.nightsBookedYtdQty }}</td>

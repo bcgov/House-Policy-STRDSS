@@ -137,55 +137,110 @@ namespace StrDss.Data.Repositories
         /// <summary>
         /// Hydrates LastActionDtm and LastActionNm for a batch of listing rows by querying
         /// the email messages table only for the given listing IDs (typically one page worth).
+        ///
+        /// Implemented as a single grouped query: for each ConcernedWithRentalListingId we ask
+        /// the DB for both the max MessageDeliveryDtm AND the type name from the row that owns
+        /// that max (ties broken deterministically by EmailMessageId desc). EF Core 8 + Npgsql
+        /// translate the inner OrderByDescending(...).Select(...).FirstOrDefault() to a LATERAL
+        /// subquery on PostgreSQL, so this is one round trip instead of two.
         /// </summary>
         private async Task HydrateLastActionFieldsAsync(List<RentalListingTableRowDto> rows)
         {
             if (rows.Count == 0) return;
 
-            var listingIds = rows.Where(r => r.RentalListingId != null).Select(r => r.RentalListingId!.Value).ToList();
-            if (listingIds.Count == 0) return;
-
-            var emailData = await _dbContext.DssEmailMessages
-                .AsNoTracking()
-                .Where(em => em.ConcernedWithRentalListingId != null && listingIds.Contains(em.ConcernedWithRentalListingId.Value))
-                .GroupBy(em => em.ConcernedWithRentalListingId)
-                .Select(g => new
-                {
-                    ConcernedWithRentalListingId = g.Key,
-                    MessageDeliveryDtm = g.Max(x => x.MessageDeliveryDtm)
-                })
-                .ToListAsync();
-
-            if (emailData.Count == 0) return;
-
-            // Fetch type names for the max-date messages
-            var keys = emailData
-                .Select(e => new { e.ConcernedWithRentalListingId, e.MessageDeliveryDtm })
+            var listingIds = rows
+                .Where(r => r.RentalListingId != null)
+                .Select(r => r.RentalListingId!.Value)
                 .ToList();
+            Dictionary<long, (DateTime Dtm, string? TypeNm)>? byId = null;
+            if (listingIds.Count > 0)
+            {
+                var latest = await _dbContext.DssEmailMessages
+                    .AsNoTracking()
+                    .Where(em => em.ConcernedWithRentalListingId != null
+                              && listingIds.Contains(em.ConcernedWithRentalListingId!.Value))
+                    .GroupBy(em => em.ConcernedWithRentalListingId!.Value)
+                    .Select(g => new
+                    {
+                        RentalListingId = g.Key,
+                        Dtm = g.Max(x => x.MessageDeliveryDtm),
+                        TypeNm = g.OrderByDescending(x => x.MessageDeliveryDtm)
+                                  .ThenByDescending(x => x.EmailMessageId)
+                                  .Select(x => x.EmailMessageTypeNavigation.EmailMessageTypeNm)
+                                  .FirstOrDefault()
+                    })
+                    .ToListAsync();
 
-            var emailDetails = await _dbContext.DssEmailMessages
-                .AsNoTracking()
-                .Where(em => em.ConcernedWithRentalListingId != null && listingIds.Contains(em.ConcernedWithRentalListingId.Value))
-                .Join(_dbContext.DssEmailMessageTypes, em => em.EmailMessageType, emt => emt.EmailMessageType, (em, emt) => new { em.ConcernedWithRentalListingId, em.MessageDeliveryDtm, emt.EmailMessageTypeNm })
-                .Where(x => emailData.Select(e => e.ConcernedWithRentalListingId).Contains(x.ConcernedWithRentalListingId))
-                .ToListAsync();
-
-            var lookup = emailData.ToDictionary(e => e.ConcernedWithRentalListingId!.Value, e => e.MessageDeliveryDtm);
-
-            var typeByListing = emailDetails
-                .Where(x => x.ConcernedWithRentalListingId != null && lookup.TryGetValue(x.ConcernedWithRentalListingId.Value, out var maxDtm) && x.MessageDeliveryDtm == maxDtm)
-                .GroupBy(x => x.ConcernedWithRentalListingId!.Value)
-                .ToDictionary(g => g.Key, g => g.Max(x => x.EmailMessageTypeNm));
+                if (latest.Count > 0)
+                {
+                    byId = latest.ToDictionary(x => x.RentalListingId, x => (x.Dtm, x.TypeNm));
+                }
+            }
 
             foreach (var row in rows)
             {
-                if (row.RentalListingId == null) continue;
-                var id = row.RentalListingId.Value;
-                if (lookup.TryGetValue(id, out var dtm))
+                if (row.RentalListingId != null
+                    && byId != null
+                    && byId.TryGetValue(row.RentalListingId.Value, out var info))
                 {
-                    row.LastActionDtm = dtm;
-                    typeByListing.TryGetValue(id, out var nm);
-                    row.LastActionNm = nm;
+                    row.LastActionDtm = info.Dtm;
+                    row.LastActionNm = info.TypeNm;
+                }
+
+                row.LastActionDtm = row.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(row.LastActionDtm.Value);
+                if (row.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
+                {
+                    row.LastActionNm = "Reg Check Failed";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Post-paging hydrator for <see cref="RentalListingGroupSummaryDto.PrimaryHostNm"/>.
+        /// Loads the original-case property-owner contact name from dss_rental_listing_contact
+        /// for the anchor listing of each summary on the current page only (~10-50 rows). This
+        /// avoids the DSS-1311 regression of fetching contacts for the entire unpaged set while
+        /// still showing a human-readable host name instead of the sanitized/uppercased
+        /// EffectiveHostNm. Uses the indexed FK dss_rental_listing_contact_i1 (defined in
+        /// STR_DSS_Physical_DB_DDL_Sprint_14.sql) and filters to IsPropertyOwner = true.
+        /// </summary>
+        private async Task HydratePrimaryHostNmAsync(List<RentalListingGroupSummaryDto> page)
+        {
+            if (page.Count == 0) return;
+
+            var anchorIds = page
+                .Where(s => s.AnchorRentalListingId != null)
+                .Select(s => s.AnchorRentalListingId!.Value)
+                .Distinct()
+                .ToList();
+            if (anchorIds.Count == 0) return;
+
+            // One row per anchor listing, deterministically picking the first property-owner
+            // contact by RentalListingContactId when more than one exists for that listing.
+            var nameByListing = await _dbContext.DssRentalListingContacts
+                .AsNoTracking()
+                .Where(c => c.IsPropertyOwner && anchorIds.Contains(c.ContactedThroughRentalListingId))
+                .GroupBy(c => c.ContactedThroughRentalListingId)
+                .Select(g => new
+                {
+                    Id = g.Key,
+                    FullNm = g.OrderBy(x => x.RentalListingContactId)
+                              .Select(x => x.FullNm)
+                              .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            if (nameByListing.Count == 0) return;
+
+            var lookup = nameByListing.ToDictionary(x => x.Id, x => x.FullNm);
+
+            foreach (var s in page)
+            {
+                if (s.AnchorRentalListingId == null) continue;
+                if (lookup.TryGetValue(s.AnchorRentalListingId.Value, out var nm)
+                    && !string.IsNullOrWhiteSpace(nm))
+                {
+                    s.PrimaryHostNm = nm.Trim();
                 }
             }
         }
@@ -413,16 +468,6 @@ namespace StrDss.Data.Repositories
             // Hydrate email action fields for the paged results only (avoids expensive full-table aggregation)
             await HydrateLastActionFieldsAsync(pagedList);
 
-            // Timezone and "Reg Check Failed" override in-memory (no contacts fetch for table)
-            foreach (var row in pagedList)
-            {
-                row.LastActionDtm = row.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(row.LastActionDtm.Value);
-                if (row.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
-                {
-                    row.LastActionNm = "Reg Check Failed";
-                }
-            }
-
             stopwatch.Stop();
             _logger.LogInformation($"Get Rental Listings - Final Mapping and Processing Completed, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
@@ -442,7 +487,7 @@ namespace StrDss.Data.Repositories
         }
 
         private async Task<List<RentalListingTableRowDto>> GetFilteredListingTableRowsAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
+            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, bool hydrateLastAction = true, bool normalizeGroupingKeys = true)
         {
             var query = GetRentalListingsTableBaseQuery();
 
@@ -459,8 +504,14 @@ namespace StrDss.Data.Repositories
             ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
 
             var list = await query.ToListAsync();
-            await HydrateLastActionFieldsAsync(list);
-            NormalizeGroupingKeyFields(list);
+            if (hydrateLastAction)
+            {
+                await HydrateLastActionFieldsAsync(list);
+            }
+            if (normalizeGroupingKeys)
+            {
+                NormalizeGroupingKeyFields(list);
+            }
             return list;
         }
 
@@ -510,18 +561,6 @@ namespace StrDss.Data.Repositories
         private static string? NormalizeExpandKeyPart(string? value) =>
             string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
-        private static void PostProcessListingTableRows(IEnumerable<RentalListingTableRowDto> rows)
-        {
-            foreach (var row in rows)
-            {
-                row.LastActionDtm = row.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(row.LastActionDtm.Value);
-                if (row.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
-                {
-                    row.LastActionNm = "Reg Check Failed";
-                }
-            }
-        }
-
         private static List<RentalListingGroupSummaryDto> BuildGroupedSummaries(List<RentalListingTableRowDto> rows)
         {
             var withReg = rows.Where(r => !string.IsNullOrWhiteSpace(r.BcRegistryNo)).ToList();
@@ -529,7 +568,7 @@ namespace StrDss.Data.Repositories
 
             var summaries = new List<RentalListingGroupSummaryDto>(withReg.Count / 2 + withoutReg.Count / 2 + 4);
 
-            foreach (var g in withReg.GroupBy(r => r.BcRegistryNo!))
+            foreach (var g in withReg.GroupBy(r => r.BcRegistryNo!.Trim()))
             {
                 summaries.Add(BuildOneGroupSummary(g.ToList(), bcRegistryNo: g.Key));
             }
@@ -576,7 +615,8 @@ namespace StrDss.Data.Repositories
                 BusinessLicenceId = anchor.BusinessLicenceId,
                 BusinessLicenceExpiryDt = anchor.BusinessLicenceExpiryDt,
                 LicenceStatusType = anchor.LicenceStatusType,
-                HasMultipleProperties = false
+                HasMultipleProperties = false,
+                AnchorRentalListingId = anchor.RentalListingId
             };
         }
 
@@ -589,28 +629,41 @@ namespace StrDss.Data.Repositories
                 desc = true;
             }
 
+            // NULLS LAST in BOTH directions so toggling asc/desc never anchors null-host groups to the top of
+            // page 1. The previous "?? \"\"" / "?? \"\\uFFFF\"" fallbacks pinned nulls to the top of asc AND
+            // desc — combined with the BuildOneGroupSummary issue that produced spurious-null EffectiveHostNm,
+            // the user saw a block of rows whose displayed PrimaryHostNm (hydrated from contacts) was real but
+            // whose sort key was null, and toggling direction didn't reorder them. Pinned to StringComparer.Ordinal
+            // so the result is byte-deterministic across server cultures.
             return orderBy switch
             {
                 "effectiveHostNm" => desc
-                    ? summaries.OrderByDescending(s => s.EffectiveHostNm ?? "\uFFFF").ToList()
-                    : summaries.OrderBy(s => s.EffectiveHostNm ?? "").ToList(),
+                    ? summaries.OrderBy(s => s.EffectiveHostNm == null)
+                               .ThenByDescending(s => s.EffectiveHostNm, StringComparer.Ordinal).ToList()
+                    : summaries.OrderBy(s => s.EffectiveHostNm == null)
+                               .ThenBy(s => s.EffectiveHostNm, StringComparer.Ordinal).ToList(),
                 "matchAddressTxt" => desc
-                    ? summaries.OrderByDescending(s => s.MatchAddressTxt ?? "\uFFFF").ToList()
-                    : summaries.OrderBy(s => s.MatchAddressTxt ?? "").ToList(),
+                    ? summaries.OrderBy(s => s.MatchAddressTxt == null)
+                               .ThenByDescending(s => s.MatchAddressTxt, StringComparer.Ordinal).ToList()
+                    : summaries.OrderBy(s => s.MatchAddressTxt == null)
+                               .ThenBy(s => s.MatchAddressTxt, StringComparer.Ordinal).ToList(),
                 "effectiveBusinessLicenceNo" => desc
-                    ? summaries.OrderByDescending(s => s.EffectiveBusinessLicenceNo ?? "\uFFFF").ToList()
-                    : summaries.OrderBy(s => s.EffectiveBusinessLicenceNo ?? "").ToList(),
+                    ? summaries.OrderBy(s => s.EffectiveBusinessLicenceNo == null)
+                               .ThenByDescending(s => s.EffectiveBusinessLicenceNo, StringComparer.Ordinal).ToList()
+                    : summaries.OrderBy(s => s.EffectiveBusinessLicenceNo == null)
+                               .ThenBy(s => s.EffectiveBusinessLicenceNo, StringComparer.Ordinal).ToList(),
                 _ => desc
-                    ? summaries.OrderByDescending(s => s.LatestReportPeriodYm ?? DateOnly.MinValue).ToList()
-                    : summaries.OrderBy(s => s.LatestReportPeriodYm ?? DateOnly.MinValue).ToList()
+                    ? summaries.OrderBy(s => s.LatestReportPeriodYm == null)
+                               .ThenByDescending(s => s.LatestReportPeriodYm).ToList()
+                    : summaries.OrderBy(s => s.LatestReportPeriodYm == null)
+                               .ThenBy(s => s.LatestReportPeriodYm).ToList()
             };
         }
 
         public async Task<int> GetGroupedRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
         {
-            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
-            PostProcessListingTableRows(rows);
+            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, hydrateLastAction: false, normalizeGroupingKeys: false);
             var summaries = BuildGroupedSummaries(rows);
             return summaries.Count;
         }
@@ -619,7 +672,6 @@ namespace StrDss.Data.Repositories
             bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
         {
             var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
-            PostProcessListingTableRows(rows);
             var summaries = BuildGroupedSummaries(rows);
 
             if (string.IsNullOrEmpty(orderBy) || !GroupedAllowedSortColumns.Contains(orderBy))
@@ -638,6 +690,10 @@ namespace StrDss.Data.Repositories
 
             var skip = pageSize > 0 ? (pageNumber - 1) * pageSize : 0;
             var page = pageSize > 0 ? ordered.Skip(skip).Take(pageSize).ToList() : ordered;
+
+            // Replace sanitized/uppercased EffectiveHostNm fallback with original-case
+            // property-owner contact name. Runs against the paged anchors only (~pageSize rows).
+            await HydratePrimaryHostNmAsync(page);
 
             return new PagedDto<RentalListingGroupSummaryDto>
             {
@@ -682,13 +738,11 @@ namespace StrDss.Data.Repositories
 
                 var list = await query.ToListAsync();
                 await HydrateLastActionFieldsAsync(list);
-                PostProcessListingTableRows(list);
                 return list;
             }
 
             var targetKey = BuildNoRegCanonicalKeyFromExpandParams(matchAddressTxt, matchUnitNo, effectiveHostNm, effectiveBusinessLicenceNo);
             var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
-            PostProcessListingTableRows(rows);
 
             return rows
                 .Where(r => string.IsNullOrWhiteSpace(r.BcRegistryNo))

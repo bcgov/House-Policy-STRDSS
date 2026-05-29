@@ -285,13 +285,14 @@ namespace StrDss.Data.Repositories
             {
                 var allPattern = $"%{all}%";
                 var sanitizedAll = CommonUtils.SanitizeAndUppercaseString(all);
+                var sanitizedAllPattern = $"%{sanitizedAll}%";
                 query = query.Where(x =>
                     (x.MatchAddressTxt != null && EF.Functions.ILike(x.MatchAddressTxt, allPattern)) ||
                     (x.PlatformListingUrl != null && EF.Functions.ILike(x.PlatformListingUrl, allPattern)) ||
                     (x.PlatformListingNo != null && EF.Functions.ILike(x.PlatformListingNo, allPattern)) ||
                     (x.EffectiveBusinessLicenceNo != null && x.EffectiveBusinessLicenceNo.StartsWith(sanitizedAll)) ||
                     (x.BcRegistryNo != null && EF.Functions.ILike(x.BcRegistryNo, allPattern)) ||
-                    (x.RentalListingId != null && _dbContext.DssRentalListingContacts.Any(c => c.ContactedThroughRentalListingId == x.RentalListingId && c.FullNm != null && EF.Functions.ILike(c.FullNm, allPattern))));
+                    (x.EffectiveHostNm != null && EF.Functions.ILike(x.EffectiveHostNm, sanitizedAllPattern)));
             }
 
             if (address != null && address.IsNotEmpty())
@@ -313,8 +314,8 @@ namespace StrDss.Data.Repositories
 
             if (hostName != null && hostName.IsNotEmpty())
             {
-                var hostNamePattern = $"%{hostName}%";
-                query = query.Where(x => x.RentalListingId != null && _dbContext.DssRentalListingContacts.Any(c => c.ContactedThroughRentalListingId == x.RentalListingId && c.FullNm != null && EF.Functions.ILike(c.FullNm, hostNamePattern)));
+                var hostNamePattern = $"%{CommonUtils.SanitizeAndUppercaseString(hostName)}%";
+                query = query.Where(x => x.EffectiveHostNm != null && EF.Functions.ILike(x.EffectiveHostNm, hostNamePattern));
             }
 
             if (businessLicence != null && businessLicence.IsNotEmpty())

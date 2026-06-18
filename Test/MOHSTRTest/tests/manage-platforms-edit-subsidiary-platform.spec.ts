@@ -843,6 +843,13 @@ async function getDuplicateProbableNameCandidate(page: Page): Promise<string | n
 }
 
 function cssEscape(value: string): string {
-  return value.replace(/([#.;?+*~':"!^$\[\]()=>|/@])/g, '\\$1');
+   const nativeCssEscape = (globalThis as { CSS?: { escape?: (input: string) => string } }).CSS?.escape;
+   if (nativeCssEscape) {
+     return nativeCssEscape(value);
+   }
+   
+   return value
+     .replace(/\\/g, '\\\\')
+     .replace(/([#.;?+*~':"!^$\[\]()=>|/@])/g, '\\$1');
 }
 

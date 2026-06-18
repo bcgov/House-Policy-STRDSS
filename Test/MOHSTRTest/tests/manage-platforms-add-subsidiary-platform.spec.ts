@@ -570,7 +570,10 @@ function generateSubPlatformData(prefix: string): SubPlatformData {
 }
 
 function cssEscape(value: string): string {
-  return value.replace(/([#.;?+*~':"!^$\[\]()=>|/@])/g, '\\$1');
+  if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+     return CSS.escape(value);
+   }
+   return value.replace(/([\\#.;?+*~':"!^$\[\]()=>|/@])/g, '\\$1');
 }
 
 async function isAddSubPlatformFormVisible(page: Page, timeoutMs: number): Promise<boolean> {

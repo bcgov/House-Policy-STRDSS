@@ -525,7 +525,7 @@ function escapeRegExp(value: string): string {
 }
 
 function cssEscape(value: string): string {
-  return value.replace(/([#.;?+*~':"!^$\[\]()=>|/@])/g, '\\$1');
+  return value.replace(/([\\#.;?+*~':"!^$\[\]()=>|/@])/g, '\\$1');
 }
 
 async function isAddPlatformFormVisible(page: Page, timeoutMs: number): Promise<boolean> {

@@ -1,0 +1,18 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+test-output.log
+/test-output/
+/test-data/
+
+# Local secrets — never commit real credentials
+# Add env-specific secrets here; commit only the .example template files
+Config/secrets.env
+Config/secrets.dev.env
+Config/secrets.test.env
+Config/secrets.uat.env

@@ -1,0 +1,32 @@
+{
+  "name": "mohstrtest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:dev": "cross-env TEST_ENV=dev playwright test",
+    "test:test": "cross-env TEST_ENV=test playwright test",
+    "test:uat": "cross-env TEST_ENV=uat playwright test",
+    "test:idir": "playwright test tests/idir-landing-page.spec.ts --project=chromium",
+    "test:idir:headed": "playwright test tests/idir-landing-page.spec.ts --project=chromium --headed",
+    "test:idir:dev": "cross-env TEST_ENV=dev playwright test tests/idir-landing-page.spec.ts --project=chromium",
+    "test:idir:test": "cross-env TEST_ENV=test playwright test tests/idir-landing-page.spec.ts --project=chromium",
+    "test:idir:uat": "cross-env TEST_ENV=uat playwright test tests/idir-landing-page.spec.ts --project=chromium",
+    "test:smoke": "playwright test --grep \"@smoke\"",
+    "test:regression": "playwright test --grep \"@regression\"",
+    "test:smoke:chromium": "playwright test --project=chromium --grep \"@smoke\"",
+    "test:regression:chromium": "playwright test --project=chromium --grep \"@regression\"",
+    "report": "playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.2",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2"
+  }
+}

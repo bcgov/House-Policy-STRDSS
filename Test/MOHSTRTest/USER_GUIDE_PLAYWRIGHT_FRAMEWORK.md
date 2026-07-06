@@ -24,10 +24,10 @@ Top-level structure:
 ```
 package.json                  npm scripts and dependencies
 playwright.config.ts          Playwright configuration and environment loading
-Config/                       Environment config files and secrets templates
+Config/                       Environment config files and local secrets files
 tests/                        Feature-based spec files
 tests/support/auth.ts         Centralized authentication helpers
-test-data/                    Static CSV files used in upload scenarios
+test-data/                    Local CSV files used in upload scenarios (gitignored)
 test-results/                 Playwright run artifacts (screenshots, traces)
 playwright-report/            HTML report output
 test-output/                  Local execution logs and artifacts
@@ -49,7 +49,24 @@ test-output/                  Local execution logs and artifacts
 | manage-platforms-edit-subsidiary-platform.spec.ts | IDIR | Edit subsidiary platform |
 | view-aggregated-listings.spec.ts | IDIR | View aggregated listings |
 | view-individual-listings.spec.ts | IDIR | View individual listings |
+| deny-access-to-system.spec.ts | IDIR + Business BCeID | Access control / denied access validation |
+| send-notice-of-takedown-without-dss-listing.spec.ts | Business BCeID | Notice of takedown without DSS listing |
+| send-notices-of-non-compliance-with-invalid-email.spec.ts | Business BCeID | Non-compliance notice validation with invalid email |
 | send-notices-of-non-compliance.spec.ts | Business BCeID | Send Notices of Non-Compliance |
+| send-takedown-request-without-dss-listing.spec.ts | Business BCeID | Send takedown request without DSS listing |
+| send-takedown-requests.spec.ts | Business BCeID | Send takedown requests |
+
+### 3.1 Git ignore policy (important)
+
+The project `.gitignore` excludes local runtime and sensitive files. Key entries:
+
+- `Config/secrets.env`, `Config/secrets.dev.env`, `Config/secrets.test.env`, `Config/secrets.uat.env`
+- `test-results/`, `playwright-report/`, `blob-report/`, `test-output/`, `test-output.log`
+- `test-data/`
+
+Implication:
+- Any files you place in `test-data/` are local-only and are not committed by default.
+- Secret files under `Config/` are local-only and must never be committed.
 
 ---
 
@@ -85,6 +102,13 @@ Two identity provider types are supported:
 - `BCEID_USERNAME` (also accepted as `BUSINESS_BCEID_USERNAME`)
 - `BCEID_PASSWORD` (also accepted as `BUSINESS_BCEID_PASSWORD`)
 
+Additional variables used by specific suites:
+- `DENIED_BCEID_USERNAME`
+- `DENIED_BCEID_PASSWORD`
+- `DENIED_IDIR_USERNAME`
+- `DENIED_IDIR_PASSWORD`
+- `LG_SENDER_EMAIL`
+
 All credentials are loaded from the env-specific secrets file or the fallback `Config/secrets.env`.
 
 ---
@@ -112,21 +136,21 @@ npx playwright install
 ### 5.4 Create secrets file
 
 Option A — environment-specific (recommended):
-```
-Copy Config/secrets.dev.env.example  → Config/secrets.dev.env
-Copy Config/secrets.test.env.example → Config/secrets.test.env
-Create Config/secrets.uat.env
-```
+- `Config/secrets.dev.env`
+- `Config/secrets.test.env`
+- `Config/secrets.uat.env`
 
 Option B — shared fallback:
 ```
 Use Config/secrets.env
 ```
 
+Note:
+- The repository does not include `.example` secrets templates.
+- Secrets files are gitignored and are intended for local use only.
+
 Populate with the relevant credentials:
 ```
-BASE_URL=https://<portal-url>
-
 # IDIR credentials (for IDIR-based specs)
 IDIR_USERNAME=<value>
 IDIR_PASSWORD=<value>
@@ -134,7 +158,18 @@ IDIR_PASSWORD=<value>
 # BCeID credentials (for BCeID-based specs)
 BCEID_USERNAME=<value>
 BCEID_PASSWORD=<value>
+
+# Optional: denied-access users (for deny-access-to-system.spec.ts)
+DENIED_BCEID_USERNAME=<value>
+DENIED_BCEID_PASSWORD=<value>
+DENIED_IDIR_USERNAME=<value>
+DENIED_IDIR_PASSWORD=<value>
+
+# Optional: sender email used by notice/takedown tests
+LG_SENDER_EMAIL=<value>
 ```
+
+`BASE_URL` is read from the selected `Config/config.<TEST_ENV>.env` file.
 
 ---
 
@@ -319,15 +354,16 @@ BCEID_PASSWORD=<lg-password>
 
 ## 10. Data and File-Driven Testing
 
-The framework uses static input files under `test-data/`.
+The framework supports file-driven tests using CSV input files under `test-data/`.
 
 Current files:
 - Monthly CSVs using reporting-period naming: `January 2026.csv` through `December 2026.csv`
 - Used by `upload-str-data.spec.ts` for STR data upload scenarios
 
 Recommended practice:
-- Keep test data files deterministic and environment-safe
-- Do not commit environment-specific or personally identifiable data
+- Keep test data deterministic and environment-safe
+- Do not store personally identifiable data in local test files
+- `test-data/` is ignored by git in this repository; treat it as local execution data
 
 ---
 
@@ -388,6 +424,14 @@ Some modal dialogs in this portal render their title as a plain `div`, not a hea
 ### 12.7 Timeout on slow environments
 **Fix:** Increase `test.setTimeout` at the describe level (current default: `240_000ms`). For individual assertions, increase the `timeout` option on `expect(...).toBeVisible({ timeout: ... })`.
 
+### 12.8 Deny-access tests fail early
+**Symptom:** `deny-access-to-system.spec.ts` fails due to missing denied-user credentials  
+**Fix:** Set `DENIED_BCEID_USERNAME`, `DENIED_BCEID_PASSWORD`, `DENIED_IDIR_USERNAME`, and `DENIED_IDIR_PASSWORD` in the active secrets file
+
+### 12.9 Notice/takedown tests fail on sender email validation
+**Symptom:** Notice/takedown suites fail during form validation for sender email  
+**Fix:** Set `LG_SENDER_EMAIL` in the active secrets file
+
 ---
 
 ## 13. Adding a New Test Spec
@@ -412,24 +456,6 @@ Suggested workflow:
 8. Run in Chromium first (`--project=chromium`), then validate across all browsers
 
 ---
-
-## 14. Maintenance Recommendations
-
-- Keep `TEST_ENV` naming consistent across config files, npm scripts, and documentation
-- Update the spec file JSDoc header whenever test steps are modified — keep header in sync with code
-- Prefer `expect.poll(...)` over `page.waitForTimeout(...)` for waiting on dynamic state changes
-- Scope locators to their nearest container (dialog, region, table) to avoid strict-mode violations from multiple matches
-- When a new UI pattern is discovered (e.g. dialog title as div), document it in section 12 of this guide
-- Add env example for UAT secrets template if missing in repo
-
-Medium-term:
-- Extend centralized auth helper for IDIR and BCeID
-- Move reusable UI helpers to shared support modules
-- Add tagging strategy for smoke/regression suites
-
-Long-term:
-- Integrate CI pipeline matrix by environment and browser
-- Add retry and flakiness diagnostics dashboarding
 
 ## 14. Proposed BCeID Extension Placeholder (Recommended Next Step)
 To support future requirements where some specs run with IDIR and BCeID:

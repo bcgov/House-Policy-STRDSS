@@ -238,7 +238,7 @@ export class AggregatedListingsTableComponent implements OnInit {
     onMultihostClicked(group: AggregatedListingTableRow) {
         this.clearFilters();
         this.searchColumn = 'hostName';
-        this.searchTerm = group.effectiveHostNm ?? group.primaryHostNm ?? '';
+        this.searchTerm = group.primaryHostNm ?? group.effectiveHostNm ?? '';
         this.onSearch();
     }
 

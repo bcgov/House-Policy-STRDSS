@@ -45,14 +45,27 @@ select drl.rental_listing_id
 	, (select sum(drl2.separate_reservations_qty) from dss_rental_listing drl2 where drl2.offering_organization_id=drl.offering_organization_id and drl2.platform_listing_no=drl.platform_listing_no) as separate_reservations_ytd_qty
 	, drl.business_licence_no
 	, drl.bc_registry_no
-	, demt.email_message_type_nm as last_action_nm
-	, dem.message_delivery_dtm as last_action_dtm
+	, COALESCE(drla.action_long_nm, demt.email_message_type_nm) as last_action_nm
+	, COALESCE(drla.action_dtm, dem.message_delivery_dtm) as last_action_dtm
 FROM dss_rental_listing drl
 join dss_organization org on org.organization_id=drl.offering_organization_id
 LEFT JOIN dss_physical_address dpa on drl.locating_physical_address_id=dpa.physical_address_id
 left join dss_organization lgs on lgs.organization_id=dpa.containing_organization_id
 left join dss_organization lg on lgs.managing_organization_id=lg.organization_id
-LEFT JOIN dss_email_message dem on dem.concerned_with_rental_listing_id=drl.rental_listing_id
+LEFT JOIN dss_rental_listing_action drla on drla.rental_listing_action_id = (
+	select a.rental_listing_action_id
+	from dss_rental_listing_action a
+	where a.rental_listing_id = drl.rental_listing_id
+	order by a.action_dtm desc, a.rental_listing_action_id desc
+	limit 1
+)
+LEFT JOIN dss_email_message dem on dem.email_message_id = (
+	select msg.email_message_id
+	from dss_email_message msg
+	where msg.concerned_with_rental_listing_id = drl.rental_listing_id
+	order by msg.message_delivery_dtm desc, msg.email_message_id desc
+	limit 1
+)
 LEFT JOIN dss_email_message_type demt on dem.email_message_type=demt.email_message_type
 where drl.including_rental_listing_report_id is null;
 

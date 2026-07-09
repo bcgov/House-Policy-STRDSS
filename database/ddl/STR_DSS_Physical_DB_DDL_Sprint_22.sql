@@ -316,6 +316,7 @@ CREATE  TABLE dss_rental_listing (
 	is_changed_original_address boolean    ,
 	is_changed_address   boolean    ,
 	is_lg_transferred    boolean    ,
+	is_takedown_action_suspended boolean DEFAULT false    ,
 	is_changed_business_licence boolean    ,
 	is_entire_unit       boolean    ,
 	lg_transfer_dtm      timestamptz    ,
@@ -558,6 +559,7 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS SELECT drl.rental_listing_id,
     drl.is_lg_transferred,
     drl.is_changed_address,
     drl.offering_organization_id,
+    drl.is_takedown_action_suspended,
     org.organization_cd AS offering_organization_cd,
     org.organization_nm AS offering_organization_nm,
     drl.platform_listing_no,
@@ -1325,6 +1327,8 @@ COMMENT ON COLUMN dss_rental_listing.is_changed_original_address IS 'Indicates w
 COMMENT ON COLUMN dss_rental_listing.is_changed_address IS 'Indicates whether a CURRENT RENTAL LISTING has been subjected to address match changes by a user';
 
 COMMENT ON COLUMN dss_rental_listing.is_lg_transferred IS 'Indicates whether a CURRENT RENTAL LISTING has been transferred to a different Local Goverment Organization as a result of address changes';
+
+COMMENT ON COLUMN dss_rental_listing.is_takedown_action_suspended IS 'Indicates whether takedown notices, requests, and compliance orders are temporarily suspended for this specific listing';
 
 COMMENT ON COLUMN dss_rental_listing.is_changed_business_licence IS 'Indicates whether a CURRENT RENTAL LISTING has been subjected to business licence linking changes by a user';
 

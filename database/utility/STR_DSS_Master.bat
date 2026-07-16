@@ -3,6 +3,7 @@ rem by replacing 'rem' with '#', this file will run with /bin/sh under Linux
 docker cp ../database/utility house-policy-strdss-strdss-db-1:/utility
 docker cp ../database/ddl house-policy-strdss-strdss-db-1:/ddl
 docker cp ../database/seeding house-policy-strdss-strdss-db-1:/seeding
-docker exec -i house-policy-strdss-strdss-db-1 psql -U postgres  -f utility/STR_DSS_Database_Create.sql
+docker exec -i house-policy-strdss-strdss-db-1 psql -U postgres -f utility/STR_DSS_Database_Create.sql
+rem Database create requires postgres (superuser). Migrations run as strdssdev so new tables grant correctly.
 rem The SQL script below must be the correct sprint migration script for the current sprint (i.e. STR_DSS_Migration_Sprint_<SprintNumber>.sql)
-docker exec -i house-policy-strdss-strdss-db-1 psql -U postgres  -d strdssdev -f utility/STR_DSS_Migration_Sprint_18.sql
+docker exec -i house-policy-strdss-strdss-db-1 psql -U strdssdev -d strdssdev -f utility/STR_DSS_Migration_Sprint_22.sql

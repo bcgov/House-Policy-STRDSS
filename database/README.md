@@ -77,9 +77,22 @@ Each sprint delivers a planned set of incremental changes to the database. The f
 ## Database Release Management
 Each production release depends on the execution of a fixed set of scripts against the database schema. Generally, these are applied in the same order as they were applied to the UAT database during each sprint. The following is the order list of scripts applied to deliver each release.
 
-_Note: Master scripts are the preferred release method to use, starting with Release 5. To use one, connect to the target database from the `psql` command line, and execute the following command:_
+_Note: Master scripts are the preferred release method to use, starting with Release 5._
 
-`\i '<folder>/<script>' (must use / rather than \)`
+**Run migrations as `strdss<env>` (not `postgres`).** Objects created by `postgres` are not readable by the application user or a typical DBeaver connection, which causes "permission denied" on new tables.
+
+From the command line:
+
+```bash
+psql -U strdss<env> -d strdss<env> -f database/utility/STR_DSS_Migration_Sprint_22.sql
+```
+
+From an interactive `psql` session (must use `/` rather than `\` in paths):
+
+```text
+\i '<folder>/STR_DSS_Migration_Sprint_22.sql'
+```
+_Initial database creation (`STR_DSS_Database_Create.sql`) still requires the `postgres` superuser._
 
 ### Release 1 Scripts:
 - Sprint 1: N/A
@@ -213,3 +226,15 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
   - `ddl/STR_DSS_Functions_Sprint_19.sql`
   - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_19.sql`
   - `seeding/STR_DSS_Data_Seeding_Geometry_Sprint_19.sql`
+
+### Release 8 Scripts:
+- Master Scripts _(preferred release method)_:
+  - `utility/STR_DSS_Migration_Sprint_22.sql`
+
+- Sprint 22:
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_22.sql` _(unit number column resize)_
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Actions.sql`
+  - `ddl/STR_DSS_Views_Sprint_22_Listing_Actions.sql`
+  - `ddl/STR_DSS_Physical_DB_DDL_Sprint_22.sql`
+  - `seeding/STR_DSS_Data_Seeding_Sprint_22.sql`
+  - `utility/Backfill_Listing_Actions_Sprint_22.sql`

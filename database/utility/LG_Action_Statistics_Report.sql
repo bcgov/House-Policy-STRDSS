@@ -76,3 +76,33 @@ where dud.upload_delivery_type = 'Takedown Data'
   and dul.is_processed = false
 group by org.organization_nm
 order by 1;
+
+-- Sprint 22+: Listing action-based LG statistics (preferred once action hooks are live)
+SELECT coalesce(org.organization_nm,'Unknown') as "Name of Local government"
+	, sum(case drla.listing_action_type when 'NonComplianceNotice' then 1 else 0 end) as "Notice of Non-compliance sent"
+	, sum(case drla.listing_action_type when 'TakedownRequest' then 1 else 0 end) as "Takedown Request sent"
+from dss_rental_listing_action drla
+inner join dss_rental_listing drl on drl.rental_listing_id = drla.rental_listing_id
+left join dss_physical_address dpa on dpa.physical_address_id = drl.locating_physical_address_id
+left join dss_organization lgs on lgs.organization_id = dpa.containing_organization_id
+left join dss_organization org on org.organization_id = lgs.managing_organization_id
+where drla.listing_action_type in ('NonComplianceNotice', 'TakedownRequest')
+group by org.organization_nm
+order by 1;
+
+-- Sprint 22+: Listing action-based LG statistics for a specific month
+WITH params AS (SELECT '2026-03-01'::date AS report_month)
+SELECT to_char(params.report_month, 'YYYY-MM') as "Reporting Month"
+    , coalesce(org.organization_nm,'Unknown') as "Name of Local government"
+    , sum(case drla.listing_action_type when 'NonComplianceNotice' then 1 else 0 end) as "Notice of Non-compliance sent"
+    , sum(case drla.listing_action_type when 'TakedownRequest' then 1 else 0 end) as "Takedown Request sent"
+from params, dss_rental_listing_action drla
+inner join dss_rental_listing drl on drl.rental_listing_id = drla.rental_listing_id
+left join dss_physical_address dpa on dpa.physical_address_id = drl.locating_physical_address_id
+left join dss_organization lgs on lgs.organization_id = dpa.containing_organization_id
+left join dss_organization org on org.organization_id = lgs.managing_organization_id
+where drla.listing_action_type in ('NonComplianceNotice', 'TakedownRequest')
+  and drla.action_dtm >= params.report_month
+  and drla.action_dtm < params.report_month + interval '1 month'
+group by params.report_month, org.organization_nm
+order by 2;

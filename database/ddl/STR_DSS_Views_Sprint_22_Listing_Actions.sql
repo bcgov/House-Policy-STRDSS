@@ -1,9 +1,6 @@
--- Drop dependent view(s)
-DROP VIEW IF EXISTS dss_rental_listing_vw CASCADE;
+/* STR DSS Sprint 22 - Rental listing view (listing action last-action source) */
 
-ALTER TABLE dss_physical_address
-ALTER COLUMN unit_no TYPE varchar(100),
-ALTER COLUMN reg_rental_unit_no TYPE varchar(100);
+DROP VIEW IF EXISTS dss_rental_listing_vw CASCADE;
 
 CREATE OR REPLACE VIEW dss_rental_listing_vw AS SELECT drl.rental_listing_id,
     dlst.listing_status_type,
@@ -52,8 +49,8 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS SELECT drl.rental_listing_id,
     drl.separate_reservations_qty AS separate_reservations_ytd_qty,
     drl.business_licence_no,
     drl.bc_registry_no,
-    demt.email_message_type_nm AS last_action_nm,
-    dem.message_delivery_dtm AS last_action_dtm,
+    COALESCE(drla.action_long_nm, demt.email_message_type_nm) AS last_action_nm,
+    COALESCE(drla.action_dtm, dem.message_delivery_dtm) AS last_action_dtm,
     dbl.business_licence_id,
     dbl.business_licence_no AS business_licence_no_matched,
     dbl.expiry_dt AS business_licence_expiry_dt,
@@ -63,16 +60,21 @@ CREATE OR REPLACE VIEW dss_rental_listing_vw AS SELECT drl.rental_listing_id,
     drl.is_changed_business_licence,
     drl.lg_transfer_dtm,
     lgs.is_str_prohibited
-   FROM ((((((((dss_rental_listing drl
+   FROM (((((((((dss_rental_listing drl
      JOIN dss_organization org ON ((org.organization_id = drl.offering_organization_id)))
      LEFT JOIN dss_listing_status_type dlst ON (((drl.listing_status_type)::text = (dlst.listing_status_type)::text)))
      LEFT JOIN dss_physical_address dpa ON ((drl.locating_physical_address_id = dpa.physical_address_id)))
      LEFT JOIN dss_organization lgs ON (((lgs.organization_id = dpa.containing_organization_id) AND (dpa.match_score_amt > 1))))
      LEFT JOIN dss_organization lg ON ((lgs.managing_organization_id = lg.organization_id)))
+     LEFT JOIN dss_rental_listing_action drla ON ((drla.rental_listing_action_id = ( SELECT a.rental_listing_action_id
+           FROM dss_rental_listing_action a
+          WHERE (a.rental_listing_id = drl.rental_listing_id)
+          ORDER BY a.action_dtm DESC, a.rental_listing_action_id DESC
+         LIMIT 1))))
      LEFT JOIN dss_email_message dem ON ((dem.email_message_id = ( SELECT msg.email_message_id
            FROM dss_email_message msg
           WHERE (msg.concerned_with_rental_listing_id = drl.rental_listing_id)
-          ORDER BY msg.message_delivery_dtm DESC
+          ORDER BY msg.message_delivery_dtm DESC, msg.email_message_id DESC
          LIMIT 1))))
      LEFT JOIN dss_email_message_type demt ON (((dem.email_message_type)::text = (demt.email_message_type)::text)))
      LEFT JOIN dss_business_licence dbl ON ((drl.governing_business_licence_id = dbl.business_licence_id)))

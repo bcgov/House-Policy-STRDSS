@@ -127,6 +127,8 @@ public partial class DssRentalListing
 
     public virtual ICollection<DssEmailMessage> DssEmailMessages { get; } = new List<DssEmailMessage>();
 
+    public virtual ICollection<DssRentalListingAction> DssRentalListingActions { get; } = new List<DssRentalListingAction>();
+
     public virtual ICollection<DssRentalListingContact> DssRentalListingContacts { get; } = new List<DssRentalListingContact>();
 
     public virtual DssRentalListingReport? IncludingRentalListingReport { get; set; }

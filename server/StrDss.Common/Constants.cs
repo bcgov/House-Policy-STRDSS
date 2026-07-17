@@ -639,6 +639,18 @@ namespace StrDss.Common
         public const string InvalidRegistration = "Invalid Registration";
     }
 
+    public static class ListingActionTypes
+    {
+        public const string NonComplianceNotice = "NonComplianceNotice";
+        public const string NoticeOfTakedown = "NoticeOfTakedown";
+        public const string TakedownRequest = "TakedownRequest";
+        public const string DelistingWarning = "DelistingWarning";
+        public const string DelistingRequest = "DelistingRequest";
+        public const string PlatformTakedown = "PlatformTakedown";
+        public const string LgTransfer = "LgTransfer";
+        public const string ComplianceOrder = "ComplianceOrder";
+    }
+
     public static class UploadStatus
     {
         public const string Pending = "Pending";

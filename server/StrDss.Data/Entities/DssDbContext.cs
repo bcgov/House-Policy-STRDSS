@@ -25,6 +25,10 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssListingStatusType> DssListingStatusTypes { get; set; }
 
+    public virtual DbSet<DssListingActionType> DssListingActionTypes { get; set; }
+
+    public virtual DbSet<DssRentalListingAction> DssRentalListingActions { get; set; }
+
     public virtual DbSet<DssLocalGovVw> DssLocalGovVws { get; set; }
 
     public virtual DbSet<DssLocalGovernmentType> DssLocalGovernmentTypes { get; set; }
@@ -434,6 +438,98 @@ public partial class DssDbContext : DbContext
                 .HasMaxLength(50)
                 .HasComment("Business term for the listing status (e.g. New, Active, Inactive, Reassigned, Taken Down)")
                 .HasColumnName("listing_status_type_nm");
+        });
+
+        modelBuilder.Entity<DssListingActionType>(entity =>
+        {
+            entity.HasKey(e => e.ListingActionType).HasName("dss_listing_action_type_pk");
+
+            entity.ToTable("dss_listing_action_type", tb => tb.HasComment("A type of action that can be recorded against a rental listing"));
+
+            entity.Property(e => e.ListingActionType)
+                .HasMaxLength(50)
+                .HasComment("System-consistent code for the listing action type")
+                .HasColumnName("listing_action_type");
+            entity.Property(e => e.ListingActionTypeNm)
+                .HasMaxLength(250)
+                .HasComment("Business term for the listing action type")
+                .HasColumnName("listing_action_type_nm");
+            entity.Property(e => e.ListingActionSortNo)
+                .HasComment("Relative order in which the business prefers to see the action type listed")
+                .HasColumnName("listing_action_sort_no");
+            entity.Property(e => e.ActionSourceType)
+                .HasMaxLength(25)
+                .HasComment("Indicates who or what typically originates this action type (User, Platform, System)")
+                .HasColumnName("action_source_type");
+        });
+
+        modelBuilder.Entity<DssRentalListingAction>(entity =>
+        {
+            entity.HasKey(e => e.RentalListingActionId).HasName("dss_rental_listing_action_pk");
+
+            entity.ToTable("dss_rental_listing_action", tb => tb.HasComment("A user-facing action recorded against a rental listing"));
+
+            entity.HasIndex(e => e.SourceEmailMessageId, "dss_rental_listing_action_u1")
+                .IsUnique()
+                .HasFilter("(source_email_message_id IS NOT NULL)");
+
+            entity.HasIndex(e => new { e.RentalListingId, e.ActionDtm, e.RentalListingActionId }, "dss_rental_listing_action_i1")
+                .IsDescending(false, true, true);
+
+            entity.Property(e => e.RentalListingActionId)
+                .HasComment("Unique generated key")
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("rental_listing_action_id");
+            entity.Property(e => e.RentalListingId)
+                .HasComment("Foreign key to the master rental listing")
+                .HasColumnName("rental_listing_id");
+            entity.Property(e => e.ListingActionType)
+                .HasMaxLength(50)
+                .HasComment("Foreign key to the listing action type")
+                .HasColumnName("listing_action_type");
+            entity.Property(e => e.ActionDtm)
+                .HasComment("Timestamp when the action occurred")
+                .HasColumnName("action_dtm");
+            entity.Property(e => e.ActionShortNm)
+                .HasMaxLength(100)
+                .HasComment("Short-form display label for listing and aggregate pages")
+                .HasColumnName("action_short_nm");
+            entity.Property(e => e.ActionLongNm)
+                .HasMaxLength(200)
+                .HasComment("Long-form display label for detail page and data download")
+                .HasColumnName("action_long_nm");
+            entity.Property(e => e.TakedownReason)
+                .HasMaxLength(50)
+                .HasComment("Platform takedown reason when listing_action_type is PlatformTakedown (e.g. LG Request, Invalid Registration)")
+                .HasColumnName("takedown_reason");
+            entity.Property(e => e.InitiatingUserIdentityId)
+                .HasComment("User who initiated the action, when applicable")
+                .HasColumnName("initiating_user_identity_id");
+            entity.Property(e => e.SourceEmailMessageId)
+                .HasComment("Optional link to the originating email message when an email was sent")
+                .HasColumnName("source_email_message_id");
+            entity.Property(e => e.UpdDtm)
+                .HasDefaultValueSql("now()")
+                .HasComment("Trigger-updated timestamp of last change")
+                .HasColumnName("upd_dtm");
+
+            entity.HasOne(d => d.RentalListing).WithMany(p => p.DssRentalListingActions)
+                .HasForeignKey(d => d.RentalListingId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_rental_listing_action_fk_listing");
+
+            entity.HasOne(d => d.ListingActionTypeNavigation).WithMany(p => p.DssRentalListingActions)
+                .HasForeignKey(d => d.ListingActionType)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("dss_rental_listing_action_fk_type");
+
+            entity.HasOne(d => d.InitiatingUserIdentity).WithMany()
+                .HasForeignKey(d => d.InitiatingUserIdentityId)
+                .HasConstraintName("dss_rental_listing_action_fk_user");
+
+            entity.HasOne(d => d.SourceEmailMessage).WithMany()
+                .HasForeignKey(d => d.SourceEmailMessageId)
+                .HasConstraintName("dss_rental_listing_action_fk_email");
         });
 
         modelBuilder.Entity<DssLocalGovVw>(entity =>

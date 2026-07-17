@@ -9,7 +9,8 @@ USING (
 		('DelistingWarning',    'Delisting Warning',                 'User',     4),
 		('DelistingRequest',    'Delisting Request',                 'User',     5),
 		('PlatformTakedown',    'Platform Takedown Confirmed',       'Platform', 6),
-		('LgTransfer',          'Transferred to Local Government',   'System',   7)
+		('LgTransfer',          'Transferred to Local Government',   'System',   7),
+		('ComplianceOrder',     'Compliance Order',                  'User',     8)
 	) AS s (
 		listing_action_type,
 		listing_action_type_nm,

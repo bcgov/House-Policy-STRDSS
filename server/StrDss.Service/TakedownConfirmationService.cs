@@ -23,9 +23,11 @@ namespace StrDss.Service
         private IRentalListingReportRepository _listingRepo;
         private IEmailMessageRepository _emailRepo;
         private IOrganizationRepository _orgRepo;
+        private IListingActionService _listingActionService;
 
         public TakedownConfirmationService(
             IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository listingRepo, IEmailMessageRepository emailRepo, IOrganizationRepository orgRepo,
+            IListingActionService listingActionService,
             ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger) 
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
@@ -33,6 +35,7 @@ namespace StrDss.Service
             _listingRepo = listingRepo;
             _emailRepo = emailRepo;
             _orgRepo = orgRepo;
+            _listingActionService = listingActionService;
         }
 
         public async Task ProcessTakedownConfirmationUploadsAsync()
@@ -107,16 +110,19 @@ namespace StrDss.Service
                 return (row.OrgCd, row.ListingId);
             }
 
+            var normalizedReason = CommonUtils.NormalizeTakedownReason(row.TakeDownReason) ?? row.TakeDownReason;
+            DssEmailMessage? emailEntity = null;
+
             if (listing.IsTakenDown == true)
             {
-                _logger.LogDebug($"Takedown Confirmation - Skipping listing (already taken down) - ({row.OrgCd} - {row.ListingId})");
+                _logger.LogDebug($"Takedown Confirmation - Listing already taken down; recording platform takedown action - ({row.OrgCd} - {row.ListingId})");
             }
             else
             {
                 listing.IsTakenDown = true;
-                listing.TakeDownReason = CommonUtils.NormalizeTakedownReason(row.TakeDownReason) ?? row.TakeDownReason;
+                listing.TakeDownReason = normalizedReason;
 
-                var emailEntity = new DssEmailMessage
+                emailEntity = new DssEmailMessage
                 {
                     EmailMessageType = EmailMessageTypes.CompletedTakedown,
                     MessageDeliveryDtm = DateTime.UtcNow,
@@ -140,6 +146,15 @@ namespace StrDss.Service
             line.IsProcessed = true;
             line.IsRegistrationFailure = false;
 
+            _unitOfWork.Commit();
+
+            await _listingActionService.RecordActionAsync(new RecordListingActionDto
+            {
+                RentalListingId = listing.RentalListingId,
+                ListingActionType = ListingActionTypes.PlatformTakedown,
+                TakedownReason = normalizedReason,
+                SourceEmailMessageId = emailEntity?.EmailMessageId
+            });
             _unitOfWork.Commit();
 
             _logger.LogInformation($"Takedown Confirmation - listing taken down successfully - ({row.OrgCd} - {row.ListingId})");

@@ -51,10 +51,11 @@ namespace StrDss.Service
         private readonly IBizLicenceRepository _bizLicenceRepo;
         private readonly IMemoryCache _memoryCache;
         private readonly IConfiguration _configuration;
+        private readonly IListingActionService _listingActionService;
 
         public RentalListingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<StrDssLogger> logger,
             IRentalListingRepository listingRep, IGeocoderApi geocoder, IOrganizationRepository orgRepo, IBizLicenceRepository bizLicenceRepo,
-            IMemoryCache memoryCache, IConfiguration configuration)
+            IMemoryCache memoryCache, IConfiguration configuration, IListingActionService listingActionService)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _listingRepo = listingRep;
@@ -63,6 +64,7 @@ namespace StrDss.Service
             _bizLicenceRepo = bizLicenceRepo;
             _memoryCache = memoryCache;
             _configuration = configuration;
+            _listingActionService = listingActionService;
         }
 
         /// <summary>
@@ -713,6 +715,13 @@ namespace StrDss.Service
                     var (bizLicId, _) = await _bizLicenceRepo.GetMatchingBusinessLicenceIdAndNo(addressEntity.ContainingOrganizationId.Value, listingEntity.BusinessLicenceNo);
                     listingEntity.GoverningBusinessLicenceId = bizLicId;
                 }
+
+                await _listingActionService.RecordActionAsync(new RecordListingActionDto
+                {
+                    RentalListingId = listingEntity.RentalListingId,
+                    ListingActionType = ListingActionTypes.LgTransfer,
+                    InitiatingUserIdentityId = _currentUser.Id
+                });
             }
 
             listingEntity.IsChangedAddress = true;

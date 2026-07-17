@@ -137,12 +137,9 @@ namespace StrDss.Data.Repositories
         /// <summary>
         /// Hydrates LastActionDtm and LastActionNm for a batch of listing rows by querying
         /// the email messages table only for the given listing IDs (typically one page worth).
-        ///
-        /// Implemented as a single grouped query: for each ConcernedWithRentalListingId we ask
-        /// the DB for both the max MessageDeliveryDtm AND the type name from the row that owns
-        /// that max (ties broken deterministically by EmailMessageId desc). EF Core 8 + Npgsql
-        /// translate the inner OrderByDescending(...).Select(...).FirstOrDefault() to a LATERAL
-        /// subquery on PostgreSQL, so this is one round trip instead of two.
+        /// Implemented as a single grouped query: for each rental_listing_id we ask
+        /// the DB for both the max action_dtm AND the long label from the row that owns
+        /// that max (ties broken deterministically by rental_listing_action_id desc).
         /// </summary>
         private async Task HydrateLastActionFieldsAsync(List<RentalListingTableRowDto> rows)
         {
@@ -152,28 +149,27 @@ namespace StrDss.Data.Repositories
                 .Where(r => r.RentalListingId != null)
                 .Select(r => r.RentalListingId!.Value)
                 .ToList();
-            Dictionary<long, (DateTime Dtm, string? TypeNm)>? byId = null;
+            Dictionary<long, (DateTime Dtm, string? LongNm)>? byId = null;
             if (listingIds.Count > 0)
             {
-                var latest = await _dbContext.DssEmailMessages
+                var latest = await _dbContext.DssRentalListingActions
                     .AsNoTracking()
-                    .Where(em => em.ConcernedWithRentalListingId != null
-                              && listingIds.Contains(em.ConcernedWithRentalListingId!.Value))
-                    .GroupBy(em => em.ConcernedWithRentalListingId!.Value)
+                    .Where(a => listingIds.Contains(a.RentalListingId))
+                    .GroupBy(a => a.RentalListingId)
                     .Select(g => new
                     {
                         RentalListingId = g.Key,
-                        Dtm = g.Max(x => x.MessageDeliveryDtm),
-                        TypeNm = g.OrderByDescending(x => x.MessageDeliveryDtm)
-                                  .ThenByDescending(x => x.EmailMessageId)
-                                  .Select(x => x.EmailMessageTypeNavigation.EmailMessageTypeNm)
+                        Dtm = g.Max(x => x.ActionDtm),
+                        LongNm = g.OrderByDescending(x => x.ActionDtm)
+                                  .ThenByDescending(x => x.RentalListingActionId)
+                                  .Select(x => x.ActionLongNm)
                                   .FirstOrDefault()
                     })
                     .ToListAsync();
 
                 if (latest.Count > 0)
                 {
-                    byId = latest.ToDictionary(x => x.RentalListingId, x => (x.Dtm, x.TypeNm));
+                    byId = latest.ToDictionary(x => x.RentalListingId, x => (x.Dtm, x.LongNm));
                 }
             }
 
@@ -184,14 +180,10 @@ namespace StrDss.Data.Repositories
                     && byId.TryGetValue(row.RentalListingId.Value, out var info))
                 {
                     row.LastActionDtm = info.Dtm;
-                    row.LastActionNm = info.TypeNm;
+                    row.LastActionNm = info.LongNm;
                 }
 
                 row.LastActionDtm = row.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(row.LastActionDtm.Value);
-                if (row.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
-                {
-                    row.LastActionNm = "Reg Check Failed";
-                }
             }
         }
 
@@ -886,15 +878,18 @@ namespace StrDss.Data.Repositories
             }
 
             listing.ActionHistory = (await
-                _dbContext.DssEmailMessages.AsNoTracking()
-                    .Include(x => x.EmailMessageTypeNavigation)
+                _dbContext.DssRentalListingActions.AsNoTracking()
                     .Include(x => x.InitiatingUserIdentity)
-                    .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
-                    .OrderByDescending(x => x.MessageDeliveryDtm)
+                    .Where(x => x.RentalListingId == listing.RentalListingId)
+                    .OrderByDescending(x => x.ActionDtm)
+                    .ThenByDescending(x => x.RentalListingActionId)
                     .Select(x => new ActionHistoryDto
                     {
-                        Action = x.EmailMessageTypeNavigation.EmailMessageTypeNm,
-                        Date = DateUtils.ConvertUtcToPacificTime((DateTime)x.MessageDeliveryDtm!),
+                        Action = x.ActionLongNm,
+                        ActionShortNm = x.ActionShortNm,
+                        ListingActionType = x.ListingActionType,
+                        Date = DateUtils.ConvertUtcToPacificTime(x.ActionDtm),
+                        TakedownReason = x.TakedownReason,
                         FirstName = x.InitiatingUserIdentity == null ? "" : x.InitiatingUserIdentity.GivenNm,
                         LastName = x.InitiatingUserIdentity == null ? "" : x.InitiatingUserIdentity.FamilyNm
                     })
@@ -1019,52 +1014,31 @@ namespace StrDss.Data.Repositories
 
         private async Task LoadActionsFields(RentalListingExportDto listing)
         {
-            var actions = await _dbContext.DssEmailMessages
+            var actions = await _dbContext.DssRentalListingActions
                 .AsNoTracking()
-                .Where(x => x.ConcernedWithRentalListingId == listing.RentalListingId)
-                .OrderByDescending(x => x.MessageDeliveryDtm)
+                .Where(x => x.RentalListingId == listing.RentalListingId)
+                .OrderByDescending(x => x.ActionDtm)
+                .ThenByDescending(x => x.RentalListingActionId)
                 .Skip(1)
                 .Take(2)
                 .Select(x => new
                 {
-                    x.MessageDeliveryDtm,
-                    x.EmailMessageTypeNavigation.EmailMessageTypeNm
+                    x.ActionDtm,
+                    x.ActionLongNm
                 })
                 .ToListAsync();
 
             switch (actions.Count)
             {
                 case 2:
-                    listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
-                    listing.LastActionNm1 = actions[0].EmailMessageTypeNm;
-                    
-                    // Override if it's a completed takedown with invalid registration reason
-                    if (actions[0].EmailMessageTypeNm == EmailMessageTypes.CompletedTakedown && 
-                        listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
-                    {
-                        listing.LastActionNm1 = "Reg Check Failed";
-                    }
-                    
-                    listing.LastActionDtm2 = actions[1].MessageDeliveryDtm;
-                    listing.LastActionNm2 = actions[1].EmailMessageTypeNm;
-                    
-                    // Override if it's a completed takedown with invalid registration reason
-                    if (actions[1].EmailMessageTypeNm == EmailMessageTypes.CompletedTakedown && 
-                        listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
-                    {
-                        listing.LastActionNm2 = "Reg Check Failed";
-                    }
+                    listing.LastActionDtm1 = actions[0].ActionDtm;
+                    listing.LastActionNm1 = actions[0].ActionLongNm;
+                    listing.LastActionDtm2 = actions[1].ActionDtm;
+                    listing.LastActionNm2 = actions[1].ActionLongNm;
                     break;
                 case 1:
-                    listing.LastActionDtm1 = actions[0].MessageDeliveryDtm;
-                    listing.LastActionNm1 = actions[0].EmailMessageTypeNm;
-                    
-                    // Override if it's a completed takedown with invalid registration reason
-                    if (actions[0].EmailMessageTypeNm == EmailMessageTypes.CompletedTakedown && 
-                        listing.TakeDownReason == TakeDownReasonStatus.InvalidRegistration)
-                    {
-                        listing.LastActionNm1 = "Reg Check Failed";
-                    }
+                    listing.LastActionDtm1 = actions[0].ActionDtm;
+                    listing.LastActionNm1 = actions[0].ActionLongNm;
                     break;
             }
         }

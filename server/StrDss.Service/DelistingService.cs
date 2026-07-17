@@ -38,10 +38,12 @@ namespace StrDss.Service
         private IEmailMessageService _emailService;
         private IOrganizationService _orgService;
         private IEmailMessageRepository _emailRepo;
+        private IListingActionService _listingActionService;
 
         public DelistingService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IRentalListingRepository listingRepo,
-            IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, IEmailMessageRepository emailRepo, ILogger<StrDssLogger> logger)
+            IConfiguration config, IEmailMessageService emailService, IOrganizationService orgService, IEmailMessageRepository emailRepo,
+            IListingActionService listingActionService, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _listingRepo = listingRepo;
@@ -49,6 +51,7 @@ namespace StrDss.Service
             _emailService = emailService;
             _orgService = orgService;
             _emailRepo = emailRepo;
+            _listingActionService = listingActionService;
             _logger = logger;
         }
 
@@ -393,6 +396,8 @@ namespace StrDss.Service
             emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
+
+            await RecordListingActionForEmailAsync(listing.RentalListingId, ListingActionTypes.NonComplianceNotice, emailEntity.EmailMessageId);
         }
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownNoticesFromListingPreviewAsync(TakedownNoticesFromListingDto[] listings)
@@ -599,6 +604,8 @@ namespace StrDss.Service
             emailEntity.ExternalMessageNo = await template.SendEmail();
 
             _unitOfWork.Commit();
+
+            await RecordListingActionForEmailAsync(listing.RentalListingId, ListingActionTypes.TakedownRequest, emailEntity.EmailMessageId);
         }
 
         public async Task<(Dictionary<string, List<string>> errors, EmailPreview preview)> GetTakedownRequestsFromListingPreviewAsync(TakedownRequestsFromListingDto[] listings)
@@ -1051,6 +1058,20 @@ namespace StrDss.Service
 
             emailEntity.ExternalMessageNo = await template.SendEmail();
 
+            _unitOfWork.Commit();
+
+            await RecordListingActionForEmailAsync(listing.RentalListingId, ListingActionTypes.ComplianceOrder, emailEntity.EmailMessageId);
+        }
+
+        private async Task RecordListingActionForEmailAsync(long rentalListingId, string listingActionType, long emailMessageId)
+        {
+            await _listingActionService.RecordActionAsync(new RecordListingActionDto
+            {
+                RentalListingId = rentalListingId,
+                ListingActionType = listingActionType,
+                InitiatingUserIdentityId = _currentUser.Id,
+                SourceEmailMessageId = emailMessageId
+            });
             _unitOfWork.Commit();
         }
     }

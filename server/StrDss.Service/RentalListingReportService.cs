@@ -37,11 +37,12 @@ namespace StrDss.Service
         private IBizLicenceRepository _bizLicRepo;
         private IPermitValidationService _permitValidation;
         private IConfiguration _config;
+        private IListingActionService _listingActionService;
 
         public RentalListingReportService(ICurrentUser currentUser, IFieldValidatorService validator, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IOrganizationRepository orgRepo, IUploadDeliveryRepository uploadRepo, IRentalListingReportRepository reportRepo, IPhysicalAddressRepository addressRepo,
             IGeocoderApi geocoder, IUserRepository userRepo, IEmailMessageService emailService, IEmailMessageRepository emailRepo, IBizLicenceRepository bizLicRepo,
-            IPermitValidationService permitValidation, IConfiguration config, ILogger<StrDssLogger> logger)
+            IPermitValidationService permitValidation, IConfiguration config, IListingActionService listingActionService, ILogger<StrDssLogger> logger)
             : base(currentUser, validator, unitOfWork, mapper, httpContextAccessor, logger)
         {
             _orgRepo = orgRepo;
@@ -55,6 +56,7 @@ namespace StrDss.Service
             _bizLicRepo = bizLicRepo;
             _permitValidation = permitValidation;
             _config = config;
+            _listingActionService = listingActionService;
         }
 
         public async Task ProcessRentalReportUploadAsync(DssUploadDelivery upload)
@@ -216,7 +218,7 @@ namespace StrDss.Service
             using var tran = _unitOfWork.BeginTransaction();
             var listing = await CreateOrUpdateRentalListing(report, offeringOrg, row);
             AddContacts(listing, row);
-            var (physicalAddress, systemError) = await CreateOrGetPhysicalAddress(listing, row, isRegistrationValid);
+            var (physicalAddress, systemError, lgTransferOccurred) = await CreateOrGetPhysicalAddress(listing, row, isRegistrationValid);
             listing.LocatingPhysicalAddress = physicalAddress;
 
             SaveUploadLine(uploadLine, errors, false, systemError, !isRegistrationValid, registrationTxt);
@@ -235,6 +237,15 @@ namespace StrDss.Service
             }
 
             var (needUpdate, masterListing) = await CreateOrUpdateMasterListing(report.ReportPeriodYm, listing, offeringOrg, row, physicalAddress);
+
+            if (lgTransferOccurred)
+            {
+                await _listingActionService.RecordActionAsync(new RecordListingActionDto
+                {
+                    RentalListingId = masterListing.RentalListingId,
+                    ListingActionType = ListingActionTypes.LgTransfer
+                });
+            }
 
             if (needUpdate)
             {
@@ -296,8 +307,9 @@ namespace StrDss.Service
             return listing;
         }
 
-        private async Task<(DssPhysicalAddress, string)> CreateOrGetPhysicalAddress(DssRentalListing listing, RentalListingRowUntyped row, bool isRegistrationValid)
+        private async Task<(DssPhysicalAddress, string, bool)> CreateOrGetPhysicalAddress(DssRentalListing listing, RentalListingRowUntyped row, bool isRegistrationValid)
         {
+            var lgTransferOccurred = false;
             var address = row.RentalAddress;
 
             var physicalAddress = await _addressRepo.GetPhysicalAdderssFromMasterListingAsync(listing.OfferingOrganizationId, listing.PlatformListingNo, address);
@@ -319,13 +331,13 @@ namespace StrDss.Service
                 }
 
                 await _addressRepo.AddPhysicalAddressAsync(newAddress);
-                return (newAddress, error);
+                return (newAddress, error, lgTransferOccurred);
             }
 
             // same address as before
             if (physicalAddress!.OriginalAddressTxt.ToLower().Trim() == address.ToLower().Trim())
             {
-                return (physicalAddress, "");
+                return (physicalAddress, "", lgTransferOccurred);
             }
 
             // different address after user edit or confirmation
@@ -352,7 +364,7 @@ namespace StrDss.Service
 
                 _addressRepo.ReplaceAddress(listing, newAddress);
 
-                return (newAddress, error);
+                return (newAddress, error, lgTransferOccurred);
             }
             // different address without user edit or confirmation
             else
@@ -386,11 +398,12 @@ namespace StrDss.Service
                 {
                     listing.IsLgTransferred = true;
                     listing.LgTransferDtm = DateTime.UtcNow;
+                    lgTransferOccurred = true;
                 }                
 
                 _addressRepo.ReplaceAddress(listing, newAddress);
 
-                return (newAddress, error);
+                return (newAddress, error, lgTransferOccurred);
             }
         }
 

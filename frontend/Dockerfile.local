@@ -10,9 +10,9 @@ COPY . .
 
 RUN npm run build -- --configuration production
 
-FROM nginx:1.27.5-alpine as builder-modules
+FROM nginx:stable-alpine3.24 as builder-modules
 
-ENV NGINX_VERSION 1.27.5
+ENV NGINX_VERSION 1.30.4
 ENV MORE_HEADERS_VERSION=0.34
 ENV MORE_HEADERS_GITREPO=openresty/headers-more-nginx-module
 
@@ -42,10 +42,12 @@ RUN mkdir -p ${DOWNLOADS} && \
   ./configure --with-compat $CONFARGS --add-dynamic-module=${HEADERS_MORE_MODULE} && \
   make && make install
 
-FROM nginx:1.27.5-alpine
+FROM nginx:stable-alpine3.24
 
-# Apply Alpine security patches (libssl3, libxml2, libpng, zlib, etc.)
-RUN apk upgrade --no-cache
+# Apply Alpine security patches for EMERALD findings (DSS-1385)
+RUN apk update \
+    && apk upgrade --no-cache \
+    && apk add --no-cache --upgrade expat libxml2
 
 ENV NGINX_DIR /usr/share/nginx
 

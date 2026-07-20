@@ -363,7 +363,7 @@
     </ng-template>
     <ng-template pTemplate="content">
         <p-accordion *ngIf="cancelableFilter" class="borderless filter-sidebar" [multiple]="true"
-            [value]="['0','1','2']">
+            [value]="['0','1']">
             <p-accordion-panel *ngIf="isCEU" value="0">
                 <p-accordion-header>By Location</p-accordion-header>
                 <p-accordion-content>
@@ -423,49 +423,6 @@
                             <strong>{{group.label}}</strong>
                         </ng-template>
                     </p-select>
-                </p-accordion-content>
-            </p-accordion-panel>
-            
-            <p-accordion-panel value="2">
-                <p-accordion-header>By Status</p-accordion-header>
-                <p-accordion-content>
-                    <div class="row"><strong>Primary Statuses</strong></div>
-                    <div class="row">
-                        <div class="radio-checkbox-item">
-                            <p-checkbox [binary]="true" [(ngModel)]="cancelableFilter.byStatus.new"
-                                inputId="n-filter-cb"></p-checkbox>
-                            <label for="n-filter-cb">New</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="radio-checkbox-item">
-                            <p-checkbox [binary]="true" [(ngModel)]="cancelableFilter.byStatus.active"
-                                inputId="a-filter-cb"></p-checkbox>
-                            <label for="a-filter-cb">Active</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="radio-checkbox-item">
-                            <p-checkbox [binary]="true" [(ngModel)]="cancelableFilter.byStatus.inactive"
-                                inputId="i-filter-cb"></p-checkbox>
-                            <label for="i-filter-cb">Inactive</label>
-                        </div>
-                    </div>
-                    <div class="row"><strong>Secondary Statuses</strong></div>
-                    <div class="row">
-                        <div class="radio-checkbox-item">
-                            <p-checkbox [binary]="true" [(ngModel)]="cancelableFilter.byStatus.reassigned"
-                                inputId="r-filter-cb"></p-checkbox>
-                            <label for="r-filter-cb">Reassigned</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="radio-checkbox-item">
-                            <p-checkbox [binary]="true"
-                                [(ngModel)]="cancelableFilter.byStatus.takedownComplete" inputId="t-filter-cb"></p-checkbox>
-                            <label for="t-filter-cb">Takedown Reported</label>
-                        </div>
-                    </div>
                 </p-accordion-content>
             </p-accordion-panel>
         </p-accordion>

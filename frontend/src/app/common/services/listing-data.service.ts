@@ -115,30 +115,6 @@ export class ListingDataService {
                     params.push(`blRequirement=${filter.byLocation.isBusinessLicenceRequired == 'Yes'}`);
                 }
             }
-            if (filter.byStatus) {
-                if (
-                    filter.byStatus.reassigned !== null &&
-                    filter.byStatus.reassigned !== undefined
-                ) {
-                    params.push(`reassigned=${!!filter.byStatus.reassigned}`);
-                }
-                if (
-                    filter.byStatus.takedownComplete !== null &&
-                    filter.byStatus.takedownComplete !== undefined
-                ) {
-                    params.push(`takedownComplete=${!!filter.byStatus.takedownComplete}`);
-                }
-                const statuses = new Array<string>();
-                if (filter.byStatus.active) {
-                    statuses.push('A');
-                    statuses.push('U');
-                }
-                if (filter.byStatus.inactive) statuses.push('I');
-                if (filter.byStatus.new) statuses.push('N');
-                if (statuses.length) {
-                    params.push(`statuses=${statuses.join(',')}`);
-                }
-            }
             if (!!filter.community) {
                 params.push(`lgId=${filter.community}`);
             }

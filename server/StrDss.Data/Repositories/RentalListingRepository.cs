@@ -14,15 +14,15 @@ namespace StrDss.Data.Repositories
     public interface IRentalListingRepository
     {
         Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
         Task<int> GetRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent);
         Task<int> GetGroupedRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent);
         Task<PagedDto<RentalListingGroupSummaryDto>> GetGroupedRentalListingsPagedAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
         Task<List<RentalListingTableRowDto>> GetGroupedListingChildrenAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo);
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo);
         Task<Dictionary<string, bool>> BatchEffectiveHostHasMultiplePropertiesAsync(IReadOnlyList<string?> effectiveHostNms);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
@@ -279,7 +279,7 @@ namespace StrDss.Data.Repositories
         }
 
         private void ApplyFiltersTable(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, ref IQueryable<RentalListingTableRowDto> query)
+            bool? prRequirement, bool? blRequirement, long? lgId, ref IQueryable<RentalListingTableRowDto> query)
         {
             if (all != null && all.IsNotEmpty())
             {
@@ -344,23 +344,8 @@ namespace StrDss.Data.Repositories
                     : x.IsBusinessLicenceRequired == null || x.IsBusinessLicenceRequired == false);
             }
 
-            if (reassigned != null && reassigned.Value == false)
-                reassigned = null;
-            if (takedownComplete != null && takedownComplete.Value == false)
-                takedownComplete = null;
-
-            if (reassigned != null && takedownComplete != null)
-                query = query.Where(x => x.IsTakenDown == true || x.IsLgTransferred == true);
-            else if (reassigned != null)
-                query = query.Where(x => x.IsLgTransferred == true);
-            else if (takedownComplete != null)
-                query = query.Where(x => x.IsTakenDown == true);
-
             if (lgId != null)
                 query = query.Where(x => x.ManagingOrganizationId == lgId);
-
-            if (statusArray.Length > 0)
-                query = query.Where(x => x.ListingStatusType != null && statusArray.Contains(x.ListingStatusType));
         }
 
         /// <summary>
@@ -400,7 +385,7 @@ namespace StrDss.Data.Repositories
         }
 
         public async Task<int> GetRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent)
         {
             var query = GetRentalListingsTableBaseQuery();
 
@@ -414,13 +399,13 @@ namespace StrDss.Data.Repositories
                 query = ApplyRecentFilterTable(query);
             }
 
-            ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+            ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, ref query);
 
             return await query.CountAsync();
         }
 
         public async Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -439,7 +424,7 @@ namespace StrDss.Data.Repositories
             _logger.LogInformation($"Get Rental Listings - Total Listings Fetched, Recent: {recent}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             // Apply all other filters for data retrieval
-            ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+            ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, ref query);
 
             int? countAfterFilters = null;
             if (includeTotalCount)
@@ -488,7 +473,7 @@ namespace StrDss.Data.Repositories
         }
 
         private async Task<List<RentalListingTableRowDto>> GetFilteredListingTableRowsAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, bool hydrateLastAction = true, bool normalizeGroupingKeys = true)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, bool hydrateLastAction = true, bool normalizeGroupingKeys = true)
         {
             var query = GetRentalListingsTableBaseQuery();
 
@@ -502,7 +487,7 @@ namespace StrDss.Data.Repositories
                 query = ApplyRecentFilterTable(query);
             }
 
-            ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+            ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, ref query);
 
             var list = await query.ToListAsync();
             if (hydrateLastAction)
@@ -662,17 +647,17 @@ namespace StrDss.Data.Repositories
         }
 
         public async Task<int> GetGroupedRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent)
         {
-            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, hydrateLastAction: false, normalizeGroupingKeys: false);
+            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent, hydrateLastAction: false, normalizeGroupingKeys: false);
             var summaries = BuildGroupedSummaries(rows);
             return summaries.Count;
         }
 
         public async Task<PagedDto<RentalListingGroupSummaryDto>> GetGroupedRentalListingsPagedAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
         {
-            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
+            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent);
             var summaries = BuildGroupedSummaries(rows);
 
             if (string.IsNullOrEmpty(orderBy) || !GroupedAllowedSortColumns.Contains(orderBy))
@@ -715,7 +700,7 @@ namespace StrDss.Data.Repositories
         /// Expand: uncached. Mode A: bcRegistryNo (SQL filter). Mode B: same in-memory key as no-reg grouping (address + unit + effective host + normalized listing BL).
         /// </summary>
         public async Task<List<RentalListingTableRowDto>> GetGroupedListingChildrenAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo)
         {
             if (!string.IsNullOrWhiteSpace(bcRegistryNo))
             {
@@ -731,7 +716,7 @@ namespace StrDss.Data.Repositories
                     query = ApplyRecentFilterTable(query);
                 }
 
-                ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, ref query);
+                ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, ref query);
 
                 var reg = bcRegistryNo.Trim();
                 query = query.Where(x => x.BcRegistryNo != null && x.BcRegistryNo.Trim() == reg);
@@ -743,7 +728,7 @@ namespace StrDss.Data.Repositories
             }
 
             var targetKey = BuildNoRegCanonicalKeyFromExpandParams(matchAddressTxt, matchUnitNo, effectiveHostNm, effectiveBusinessLicenceNo);
-            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
+            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent);
 
             return rows
                 .Where(r => string.IsNullOrWhiteSpace(r.BcRegistryNo))

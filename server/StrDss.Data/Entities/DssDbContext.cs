@@ -181,7 +181,7 @@ public partial class DssDbContext : DbContext
                 .HasComment("Postal code component of the business mailing address")
                 .HasColumnName("mailing_postal_cd");
             entity.Property(e => e.MailingProvinceCd)
-                .HasMaxLength(2)
+                .HasMaxLength(50)
                 .HasComment("Province component of the business mailing address")
                 .HasColumnName("mailing_province_cd");
             entity.Property(e => e.MailingStreetAddressTxt)

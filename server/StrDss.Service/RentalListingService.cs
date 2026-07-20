@@ -19,15 +19,15 @@ namespace StrDss.Service
     public interface IRentalListingService
     {
         Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
         Task<int> GetRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent);
         Task<int> GetGroupedRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent);
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent);
         Task<PagedDto<RentalListingGroupSummaryDto>> GetGroupedRentalListingsPagedAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
         Task<List<RentalListingTableRowDto>> GetGroupedListingChildrenAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo);
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentalListingId);
         Task CreateRentalListingExportFiles();
@@ -73,23 +73,23 @@ namespace StrDss.Service
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _groupedListingTableCacheLocks = new();
 
         public async Task<int> GetRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent)
         {
             return await _listingRepo.GetRentalListingsCountAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
+                prRequirement, blRequirement, lgId, recent);
         }
 
         public async Task<PagedDto<RentalListingTableRowDto>> GetRentalListings(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
         {
             var cacheKey = BuildListingTableCacheKey(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
+                prRequirement, blRequirement, lgId, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
 
             var cacheMinutes = _configuration.GetValue("LISTING_TABLE_CACHE_MINUTES", 2);
             if (cacheMinutes <= 0)
             {
                 return await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent,
+                    prRequirement, blRequirement, lgId, recent,
                     pageSize, pageNumber, orderBy, direction, includeTotalCount);
             }
 
@@ -104,7 +104,7 @@ namespace StrDss.Service
                 }
 
                 var listings = await _listingRepo.GetRentalListings(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent,
+                    prRequirement, blRequirement, lgId, recent,
                     pageSize, pageNumber, orderBy, direction, includeTotalCount);
 
                 var options = new MemoryCacheEntryOptions()
@@ -121,10 +121,9 @@ namespace StrDss.Service
         }
 
         private string BuildListingTableCacheKey(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent,
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent,
             int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
         {
-            var statuses = statusArray != null && statusArray.Length > 0 ? string.Join(",", statusArray.OrderBy(x => x)) : "";
             var sb = new StringBuilder("listing_table:");
             sb.Append(_currentUser.OrganizationId);
             sb.Append('|').Append(all ?? "");
@@ -137,9 +136,6 @@ namespace StrDss.Service
             sb.Append('|').Append(prRequirement?.ToString() ?? "");
             sb.Append('|').Append(blRequirement?.ToString() ?? "");
             sb.Append('|').Append(lgId?.ToString() ?? "");
-            sb.Append('|').Append(statuses);
-            sb.Append('|').Append(reassigned?.ToString() ?? "");
-            sb.Append('|').Append(takedownComplete?.ToString() ?? "");
             sb.Append('|').Append(recent);
             sb.Append('|').Append(pageSize).Append('|').Append(pageNumber);
             sb.Append('|').Append(includeTotalCount);
@@ -148,16 +144,16 @@ namespace StrDss.Service
         }
 
         public async Task<int> GetGroupedRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent)
         {
             var cacheKey = BuildGroupedListingTableCacheKey(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, isCount: true);
+                prRequirement, blRequirement, lgId, recent, isCount: true);
 
             var cacheMinutes = _configuration.GetValue("GROUPED_LISTING_TABLE_CACHE_MINUTES", 2);
             if (cacheMinutes <= 0)
             {
                 return await _listingRepo.GetGroupedRentalListingsCountAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
+                    prRequirement, blRequirement, lgId, recent);
             }
 
             var semaphore = _groupedListingTableCacheLocks.GetOrAdd(cacheKey, _ => new SemaphoreSlim(1, 1));
@@ -170,7 +166,7 @@ namespace StrDss.Service
                 }
 
                 var count = await _listingRepo.GetGroupedRentalListingsCountAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent);
+                    prRequirement, blRequirement, lgId, recent);
 
                 _memoryCache.Set(cacheKey, count, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(cacheMinutes)));
                 return count;
@@ -183,16 +179,16 @@ namespace StrDss.Service
         }
 
         public async Task<PagedDto<RentalListingGroupSummaryDto>> GetGroupedRentalListingsPagedAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
         {
             var cacheKey = BuildGroupedListingTableCacheKey(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, isCount: false, pageSize, pageNumber, orderBy, direction, includeTotalCount);
+                prRequirement, blRequirement, lgId, recent, isCount: false, pageSize, pageNumber, orderBy, direction, includeTotalCount);
 
             var cacheMinutes = _configuration.GetValue("GROUPED_LISTING_TABLE_CACHE_MINUTES", 2);
             if (cacheMinutes <= 0)
             {
                 return await LoadGroupedPageWithMultiPropertyFlagsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
+                    prRequirement, blRequirement, lgId, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
             }
 
             var semaphore = _groupedListingTableCacheLocks.GetOrAdd(cacheKey, _ => new SemaphoreSlim(1, 1));
@@ -205,7 +201,7 @@ namespace StrDss.Service
                 }
 
                 var page = await LoadGroupedPageWithMultiPropertyFlagsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                    prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
+                    prRequirement, blRequirement, lgId, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
 
                 _memoryCache.Set(cacheKey, page, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(cacheMinutes)));
                 return page;
@@ -218,10 +214,10 @@ namespace StrDss.Service
         }
 
         private async Task<PagedDto<RentalListingGroupSummaryDto>> LoadGroupedPageWithMultiPropertyFlagsAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount)
         {
             var dto = await _listingRepo.GetGroupedRentalListingsPagedAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
+                prRequirement, blRequirement, lgId, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
 
             var list = dto.SourceList.ToList();
             if (list.Count == 0)
@@ -246,10 +242,9 @@ namespace StrDss.Service
         }
 
         private string BuildGroupedListingTableCacheKey(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, bool isCount,
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, bool isCount,
             int pageSize = 0, int pageNumber = 0, string orderBy = "", string direction = "", bool includeTotalCount = true)
         {
-            var statuses = statusArray != null && statusArray.Length > 0 ? string.Join(",", statusArray.OrderBy(x => x)) : "";
             var sb = new StringBuilder(isCount ? "grouped_table_count:" : "grouped_table_page:");
             sb.Append(_currentUser.OrganizationId);
             sb.Append('|').Append(all ?? "");
@@ -262,9 +257,6 @@ namespace StrDss.Service
             sb.Append('|').Append(prRequirement?.ToString() ?? "");
             sb.Append('|').Append(blRequirement?.ToString() ?? "");
             sb.Append('|').Append(lgId?.ToString() ?? "");
-            sb.Append('|').Append(statuses);
-            sb.Append('|').Append(reassigned?.ToString() ?? "");
-            sb.Append('|').Append(takedownComplete?.ToString() ?? "");
             sb.Append('|').Append(recent);
             if (!isCount)
             {
@@ -277,10 +269,10 @@ namespace StrDss.Service
 
         /// <summary>Expand (grouped child rows): intentionally not cached — see repository.</summary>
         public Task<List<RentalListingTableRowDto>> GetGroupedListingChildrenAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, string[] statusArray, bool? reassigned, bool? takedownComplete, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo)
         {
             return _listingRepo.GetGroupedListingChildrenAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                prRequirement, blRequirement, lgId, statusArray, reassigned, takedownComplete, recent, bcRegistryNo, matchAddressTxt, matchUnitNo, effectiveHostNm, effectiveBusinessLicenceNo);
+                prRequirement, blRequirement, lgId, recent, bcRegistryNo, matchAddressTxt, matchUnitNo, effectiveHostNm, effectiveBusinessLicenceNo);
         }
 
         public async Task<int> CountHostListingsAsync(string hostName)

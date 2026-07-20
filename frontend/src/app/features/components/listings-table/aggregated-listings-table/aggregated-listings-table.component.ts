@@ -435,10 +435,9 @@ export class AggregatedListingsTableComponent implements OnInit {
         }
 
         const byCommunity = !!this.currentFilter.community;
-        const byStatus = Object.values(this.currentFilter.byStatus).some((x) => x === true);
         const byLocation = Object.values(this.currentFilter.byLocation).some((x) => x !== '');
 
-        return byStatus || byLocation || byCommunity;
+        return byLocation || byCommunity;
     }
 
     get isCancelableFilterSet(): boolean {
@@ -447,16 +446,14 @@ export class AggregatedListingsTableComponent implements OnInit {
         }
 
         const byCommunity = !!this.cancelableFilter.community;
-        const byStatus = Object.values(this.cancelableFilter.byStatus).some((x) => x === true);
         const byLocation = Object.values(this.cancelableFilter.byLocation).some((x) => x !== '');
 
-        return byStatus || byLocation || byCommunity;
+        return byLocation || byCommunity;
     }
 
     openFilterSidebar(): void {
         this.isFilterOpened = true;
         this.cancelableFilter.byLocation = Object.assign({}, this.currentFilter.byLocation);
-        this.cancelableFilter.byStatus = Object.assign({}, this.currentFilter.byStatus);
         this.cancelableFilter.community = this.currentFilter.community;
     }
 
@@ -477,7 +474,6 @@ export class AggregatedListingsTableComponent implements OnInit {
                 isPrincipalResidenceRequired: '',
             },
             community: 0,
-            byStatus: {},
         };
         this.filterPersistenceService.listingFilter = {
             byLocation: {
@@ -485,14 +481,12 @@ export class AggregatedListingsTableComponent implements OnInit {
                 isPrincipalResidenceRequired: '',
             },
             community: 0,
-            byStatus: {},
         };
         this.isFilterOpened = false;
     }
 
     onSubmitFilters(): void {
         this.currentFilter.byLocation = Object.assign({}, this.cancelableFilter.byLocation);
-        this.currentFilter.byStatus = Object.assign({}, this.cancelableFilter.byStatus);
         this.currentFilter.community = this.cancelableFilter.community;
 
         if (!this.filterPersistenceService.listingFilter) {
@@ -502,17 +496,12 @@ export class AggregatedListingsTableComponent implements OnInit {
                     isPrincipalResidenceRequired: '',
                 },
                 community: 0,
-                byStatus: {},
             };
         }
 
         this.filterPersistenceService.listingFilter.byLocation = Object.assign(
             {},
             this.cancelableFilter.byLocation,
-        );
-        this.filterPersistenceService.listingFilter.byStatus = Object.assign(
-            {},
-            this.cancelableFilter.byStatus,
         );
         this.filterPersistenceService.listingFilter.community = this.cancelableFilter.community;
 
@@ -527,7 +516,6 @@ export class AggregatedListingsTableComponent implements OnInit {
                 isPrincipalResidenceRequired: '',
             },
             community: 0,
-            byStatus: {},
         };
 
         this.initFilters();
@@ -675,12 +663,10 @@ export class AggregatedListingsTableComponent implements OnInit {
             this.currentFilter = {
                 byLocation: this.filterPersistenceService.listingFilter.byLocation,
                 community: this.filterPersistenceService.listingFilter.community,
-                byStatus: this.filterPersistenceService.listingFilter.byStatus,
             };
             this.cancelableFilter = {
                 byLocation: this.filterPersistenceService.listingFilter.byLocation,
                 community: this.filterPersistenceService.listingFilter.community,
-                byStatus: this.filterPersistenceService.listingFilter.byStatus,
             };
         } else {
             this.currentFilter = {
@@ -689,7 +675,6 @@ export class AggregatedListingsTableComponent implements OnInit {
                     isPrincipalResidenceRequired: '',
                 },
                 community: 0,
-                byStatus: {},
             };
             this.cancelableFilter = {
                 byLocation: {
@@ -697,7 +682,6 @@ export class AggregatedListingsTableComponent implements OnInit {
                     isPrincipalResidenceRequired: '',
                 },
                 community: 0,
-                byStatus: {},
             };
         }
 

@@ -745,12 +745,12 @@ public partial class DssDbContext : DbContext
                 .HasComment("The streetType returned by the address match (e.g. St or Street)")
                 .HasColumnName("street_type_dsc");
             entity.Property(e => e.UnitNo)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasComment("The unitNumber (suite) returned by the address match (e.g. 100)")
                 .HasColumnName("unit_no");
 
             entity.Property(e => e.RegRentalUnitNo)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasComment("The unit number (suite) provided by the registry validation upload (e.g. 100)")
                 .HasColumnName("reg_rental_unit_no");
 

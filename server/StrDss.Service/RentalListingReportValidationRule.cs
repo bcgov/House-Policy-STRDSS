@@ -30,7 +30,7 @@ namespace StrDss.Service
                 FieldName = RentalListingReportFields.ListingId,
                 FieldType = FieldTypes.String,
                 Required = true,
-                MaxLength = 25,
+                MaxLength = 50,
             });
 
             rules.Add(new FieldValidationRule

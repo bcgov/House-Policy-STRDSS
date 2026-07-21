@@ -194,6 +194,44 @@ namespace StrDss.Test
 
         [Theory]
         [AutoDomainData]
+        public void Validate_ListingId_ExceedsMaxLength_ReturnsError(
+            RentalListingRowUntyped dto,
+            FieldValidatorService sut)
+        {
+            // Arrange
+            dto.ListingId = new string('A', 51);
+
+            var errors = new Dictionary<string, List<string>>();
+
+            // Act
+            var result = sut.Validate(Entities.RentalListingRowUntyped, dto, errors);
+
+            // Assert
+            Assert.Contains("ListingId", result.Keys);
+            Assert.Single(result["ListingId"]);
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public void Validate_RentalUnit_ExceedsMaxLength_ReturnsError(
+            RentalListingRowUntyped dto,
+            FieldValidatorService sut)
+        {
+            // Arrange
+            dto.RentalUnit = new string('A', 101);
+
+            var errors = new Dictionary<string, List<string>>();
+
+            // Act
+            var result = sut.Validate(Entities.RentalListingRowUntyped, dto, errors);
+
+            // Assert
+            Assert.Contains("RentalUnit", result.Keys);
+            Assert.Single(result["RentalUnit"]);
+        }
+
+        [Theory]
+        [AutoDomainData]
         public void Validate_SupplierHost2Id_ExceedsMaxLength_ReturnsError(
             RentalListingRowUntyped dto,
             FieldValidatorService sut)

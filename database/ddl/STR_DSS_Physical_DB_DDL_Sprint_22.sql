@@ -264,7 +264,7 @@ CREATE  TABLE dss_business_licence (
 	business_nm          varchar(320)    ,
 	mailing_street_address_txt varchar(100)    ,
 	mailing_city_nm      varchar(100)    ,
-	mailing_province_cd  varchar(2)    ,
+	mailing_province_cd  varchar(50)    ,
 	mailing_postal_cd    varchar(10)    ,
 	business_owner_nm    varchar(320)    ,
 	business_owner_phone_no varchar(30)    ,

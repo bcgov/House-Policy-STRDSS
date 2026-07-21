@@ -58,7 +58,7 @@ namespace StrDss.Data.Repositories
 	                    business_nm varchar(320) NULL,
 	                    mailing_street_address_txt varchar(100) NULL,
 	                    mailing_city_nm varchar(100) NULL,
-	                    mailing_province_cd varchar(2) NULL,
+	                    mailing_province_cd varchar(50) NULL,
 	                    mailing_postal_cd varchar(10) NULL,
 	                    business_owner_nm varchar(320) NULL,
 	                    business_owner_phone_no varchar(30) NULL,

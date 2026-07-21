@@ -102,16 +102,7 @@ namespace StrDss.Service
                 FieldName = BizLicenceRowFields.MailingProvinceCd,
                 FieldType = FieldTypes.String,
                 Required = false,
-                MaxLength = 2,
-            });
-
-            rules.Add(new FieldValidationRule
-            {
-                EntityName = Entities.BizLicenceRowUntyped,
-                FieldName = BizLicenceRowFields.MailingPostalCd,
-                FieldType = FieldTypes.String,
-                Required = false,
-                MaxLength = 10,
+                MaxLength = 50,
             });
 
             rules.Add(new FieldValidationRule
@@ -139,7 +130,6 @@ namespace StrDss.Service
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320,
-                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Email) 
             });
 
             rules.Add(new FieldValidationRule
@@ -167,7 +157,6 @@ namespace StrDss.Service
                 FieldType = FieldTypes.String,
                 Required = false,
                 MaxLength = 320,
-                RegexInfo = RegexDefs.GetRegexInfo(RegexDefs.Email)
             });
 
             rules.Add(new FieldValidationRule

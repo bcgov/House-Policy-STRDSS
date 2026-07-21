@@ -31,13 +31,28 @@ select 1 from information_schema.columns where table_name='dss_physical_address'
 as db_has_s22_unit_resize
 \gset
 select exists(
+select 1 from information_schema.columns where table_name='dss_business_licence' and column_name='mailing_province_cd' and character_maximum_length=50 and table_schema=:'dflt_schema')
+as db_has_s22_mailing_province_resize
+\gset
+select exists(
 select 1 from information_schema.columns where table_name='dss_rental_listing' and column_name='takedown_reason' and table_schema=:'dflt_schema')
 as db_has_s20_chg
 \gset
 \if :db_has_s22_listing_actions
-	\echo 'Sprint 22 listing action migration appears complete - Exiting without changes'
+	\if :db_has_s22_mailing_province_resize
+		\echo 'Sprint 22 migration appears complete - Exiting without changes'
+	\else
+		\echo 'Applying Sprint 22 mailing province column resize'
+		ALTER TABLE dss_business_licence ALTER COLUMN mailing_province_cd TYPE varchar(50);
+	\endif
 \elif :db_has_s22_unit_resize
-	\echo 'Sprint 22 unit resize appears complete - Beginning listing action upgrade'
+	\if :db_has_s22_mailing_province_resize
+		\echo 'Sprint 22 unit resize appears complete - Beginning listing action upgrade'
+	\else
+		\echo 'Applying Sprint 22 mailing province column resize'
+		ALTER TABLE dss_business_licence ALTER COLUMN mailing_province_cd TYPE varchar(50);
+		\echo 'Sprint 22 unit resize appears complete - Beginning listing action upgrade'
+	\endif
 	\echo 'Calling STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Actions.sql'
 	\ir '../ddl/STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Actions.sql'
 	\echo 'Calling STR_DSS_Data_Seeding_Sprint_22.sql'

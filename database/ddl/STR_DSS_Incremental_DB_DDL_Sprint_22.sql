@@ -5,6 +5,9 @@ ALTER TABLE dss_physical_address
 ALTER COLUMN unit_no TYPE varchar(100),
 ALTER COLUMN reg_rental_unit_no TYPE varchar(100);
 
+ALTER TABLE dss_business_licence
+ALTER COLUMN mailing_province_cd TYPE varchar(50);
+
 CREATE OR REPLACE VIEW dss_rental_listing_vw AS SELECT drl.rental_listing_id,
     dlst.listing_status_type,
     dlst.listing_status_type_nm,

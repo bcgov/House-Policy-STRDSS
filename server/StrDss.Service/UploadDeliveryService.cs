@@ -232,6 +232,7 @@ namespace StrDss.Service
             var orgCdMissing = 0;
             var invalidOrgCds = new List<string>();
             var listingIdMissing = 0;
+            var listingIdTooLong = 0;
             var bizLicenceMissing = 0;
             var takedownReasonMismatch = 0;
             var registrationDataMissing = 0;
@@ -268,6 +269,8 @@ namespace StrDss.Service
                     if (row.OrgCd.IsEmpty()) orgCdMissing++;
 
                     if (mandatoryFields.Contains("listing_id") && row.ListingId.IsEmpty()) listingIdMissing++;
+
+                    if (mandatoryFields.Contains("listing_id") && row.ListingId.IsNotEmpty() && row.ListingId.Length > 50) listingIdTooLong++;
 
                     if (mandatoryFields.Contains("bus_lic_no") && row.BusinessLicenceNo.IsEmpty()) bizLicenceMissing++;
 
@@ -437,6 +440,11 @@ namespace StrDss.Service
             if (listingIdMissing > 0)
             {
                 errors.AddItem("listing_id", $"Listing ID missing in {listingIdMissing} record(s). Please provide a listing ID.");
+            }
+
+            if (listingIdTooLong > 0)
+            {
+                errors.AddItem("listing_id", $"Listing ID exceeding 50 characters found in {listingIdTooLong} record(s). Please ensure the listing ID does not exceed 50 characters.");
             }
 
             if (duplicateListingIds.Count > 0)

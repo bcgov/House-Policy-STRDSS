@@ -121,9 +121,27 @@
                         </button>
                     </th>
 
-                    <th> Last Action </th>
+                    <th class="sortable-header" id="lastActionNm_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'lastActionNm'">
+                        <button type="button" class="sortable-header-btn" (click)="onSort('lastActionNm')">
+                            Last Action
+                            <i class="pi pi-angle-down"
+                                *ngIf="this.sort && this.sort.prop === 'lastActionNm' && this.sort.dir === 'desc'"></i>
+                            <i class="pi pi-angle-up"
+                                *ngIf="this.sort && this.sort.prop === 'lastActionNm' && this.sort.dir === 'asc'"></i>
+                        </button>
+                    </th>
 
-                    <th> Last Action Date</th>
+                    <th class="sortable-header" id="lastActionDtm_header"
+                        [class.sorted]="this.sort && this.sort.prop === 'lastActionDtm'">
+                        <button type="button" class="sortable-header-btn" (click)="onSort('lastActionDtm')">
+                            Last Action Date
+                            <i class="pi pi-angle-down"
+                                *ngIf="this.sort && this.sort.prop === 'lastActionDtm' && this.sort.dir === 'desc'"></i>
+                            <i class="pi pi-angle-up"
+                                *ngIf="this.sort && this.sort.prop === 'lastActionDtm' && this.sort.dir === 'asc'"></i>
+                        </button>
+                    </th>
 
                     <th> Listings </th>
                 </tr>
@@ -162,7 +180,7 @@
                         </span>
                     </td>
                     <td>{{ row.lastActionNm }}</td>
-                    <td>{{ row.lastActionDtm |date:'yyyy-MM-dd' }}</td>
+                    <td>{{ row.lastActionDtm | date:'yyyy-MM-dd':'America/Vancouver' }}</td>
                     <td>{{ row.listingCount }}</td>
                 </tr>
             </ng-template>
@@ -263,7 +281,7 @@
                         </div>
                     </td>
                     <td class="listing-row-pass-through">{{ listing.lastActionNm }}</td>
-                    <td class="listing-row-pass-through">{{ listing.lastActionDtm |date:'yyyy-MM-dd' }}</td>
+                    <td class="listing-row-pass-through">{{ listing.lastActionDtm | date:'yyyy-MM-dd':'America/Vancouver' }}</td>
                     <td class="listing-row-pass-through"> <a [ariaLabel]="'platform-listing-url'" target="_blank"
                             class="listing-id-link"
                             [href]="listing.platformListingUrl | urlProtocol" (click)="$event.stopPropagation()">{{

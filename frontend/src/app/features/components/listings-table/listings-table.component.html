@@ -223,7 +223,7 @@
                         {{ row.lastActionNm || '-'}}
                     </td>
                     <td class="listing-row-pass-through">
-                        {{ row.lastActionDtm? (row.lastActionDtm |date) : '-' }}
+                        {{ row.lastActionDtm ? (row.lastActionDtm | date:'yyyy-MM-dd':'America/Vancouver') : '-' }}
                     </td>
                     <td class="listing-row-pass-through">
                         <a [ariaLabel]="'platform-listing-url'" target="_blank" class="listing-id-link"

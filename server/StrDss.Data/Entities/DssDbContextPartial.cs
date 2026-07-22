@@ -32,7 +32,10 @@ namespace StrDss.Data.Entities
                     CheckConcurrency(entry);
 
                     entry.Member("UpdDtm").CurrentValue = utcNow;
-                    entry.Member("UpdUserGuid").CurrentValue = _currentUser.UserGuid;
+                    if (entry.Members.Any(m => m.Metadata.Name == "UpdUserGuid"))
+                    {
+                        entry.Member("UpdUserGuid").CurrentValue = _currentUser.UserGuid;
+                    }
                 }
             }
 
@@ -44,7 +47,10 @@ namespace StrDss.Data.Entities
                 if (entry.Members.Any(m => m.Metadata.Name == "UpdDtm"))
                 {
                     entry.Member("UpdDtm").CurrentValue = utcNow;
-                    entry.Member("UpdUserGuid").CurrentValue = _currentUser.UserGuid;
+                    if (entry.Members.Any(m => m.Metadata.Name == "UpdUserGuid"))
+                    {
+                        entry.Member("UpdUserGuid").CurrentValue = _currentUser.UserGuid;
+                    }
                 }
             }
 

@@ -56,18 +56,20 @@ namespace StrDss.Data.Repositories
         private static readonly HashSet<string> AllowedSortColumns = new(StringComparer.OrdinalIgnoreCase)
         {
             "latestReportPeriodYm", "registrationNumber", "matchAddressTxt", "nightsBookedYtdQty",
-            "businessLicenceNo", "businessLicenceNoMatched", "platformListingNo"
+            "businessLicenceNo", "businessLicenceNoMatched", "platformListingNo",
+            "lastActionNm", "lastActionDtm"
         };
 
         private static readonly HashSet<string> GroupedAllowedSortColumns = new(StringComparer.OrdinalIgnoreCase)
         {
-            "latestReportPeriodYm", "effectiveHostNm", "matchAddressTxt", "effectiveBusinessLicenceNo"
+            "latestReportPeriodYm", "effectiveHostNm", "matchAddressTxt", "effectiveBusinessLicenceNo",
+            "lastActionNm", "lastActionDtm"
         };
 
         /// <summary>
         /// Builds the base IQueryable for GetRentalListings from base tables (no view).
-        /// Uses set-based LEFT JOINs to pre-aggregated subqueries for LatestReportPeriodYm and last email action
-        /// instead of correlated scalar subqueries. Projects directly to <see cref="RentalListingTableRowDto"/>.
+        /// Uses set-based LEFT JOINs to pre-aggregated subqueries for LatestReportPeriodYm and latest listing action
+        /// (dss_rental_listing_action) instead of correlated scalar subqueries. Projects directly to <see cref="RentalListingTableRowDto"/>.
         /// For performance tuning: run EXPLAIN (ANALYZE, BUFFERS) on the generated SQL; indexes are defined in
         /// STR_DSS_Physical_DB_DDL (R14) and STR_DSS_Incremental_DB_Sprint_R15 (partial indexes i12, i13 on dss_rental_listing).
         /// </summary>
@@ -84,6 +86,18 @@ namespace StrDss.Data.Repositories
                                     group rpt by new { rl.OfferingOrganizationId, rl.PlatformListingNo } into g
                                     select new { g.Key.OfferingOrganizationId, g.Key.PlatformListingNo, MaxReportPeriodYm = g.Max(x => x.ReportPeriodYm) };
 
+            var latestListingAction = from a in _dbContext.DssRentalListingActions.AsNoTracking()
+                                      group a by a.RentalListingId into g
+                                      select new
+                                      {
+                                          RentalListingId = g.Key,
+                                          ActionDtm = g.Max(x => x.ActionDtm),
+                                          ActionLongNm = g.OrderByDescending(x => x.ActionDtm)
+                                              .ThenByDescending(x => x.RentalListingActionId)
+                                              .Select(x => x.ActionLongNm)
+                                              .FirstOrDefault()
+                                      };
+
             return from drl in currentListings
                    join org in _dbContext.DssOrganizations on drl.OfferingOrganizationId equals org.OrganizationId
                    join dlst in _dbContext.DssListingStatusTypes on drl.ListingStatusType equals dlst.ListingStatusType into dlstJ
@@ -98,6 +112,8 @@ namespace StrDss.Data.Repositories
                    from dbl in dblJ.DefaultIfEmpty()
                    join lrp in latestReportPeriod on new { drl.OfferingOrganizationId, drl.PlatformListingNo } equals new { lrp.OfferingOrganizationId, lrp.PlatformListingNo } into lrpJ
                    from lrp in lrpJ.DefaultIfEmpty()
+                   join la in latestListingAction on drl.RentalListingId equals la.RentalListingId into laJ
+                   from la in laJ.DefaultIfEmpty()
                    select new RentalListingTableRowDto
                    {
                        RentalListingId = drl.RentalListingId,
@@ -119,8 +135,8 @@ namespace StrDss.Data.Repositories
                        BusinessLicenceNo = drl.BusinessLicenceNo,
                        BusinessLicenceNoMatched = dbl != null ? dbl.BusinessLicenceNo : null,
                        IsChangedBusinessLicence = drl.IsChangedBusinessLicence,
-                       LastActionDtm = null,
-                       LastActionNm = null,
+                       LastActionDtm = la != null ? la.ActionDtm : null,
+                       LastActionNm = la != null ? la.ActionLongNm : null,
                        PlatformListingUrl = drl.PlatformListingUrl,
                        OfferingOrganizationNm = org.OrganizationNm,
                        TakeDownReason = drl.TakeDownReason,
@@ -132,59 +148,6 @@ namespace StrDss.Data.Repositories
                        BusinessLicenceExpiryDt = dbl != null ? (DateOnly?)dbl.ExpiryDt : null,
                        LicenceStatusType = dbl != null ? dbl.LicenceStatusType : null
                    };
-        }
-
-        /// <summary>
-        /// Hydrates LastActionDtm and LastActionNm for a batch of listing rows by querying
-        /// the email messages table only for the given listing IDs (typically one page worth).
-        /// Implemented as a single grouped query: for each rental_listing_id we ask
-        /// the DB for both the max action_dtm AND the long label from the row that owns
-        /// that max (ties broken deterministically by rental_listing_action_id desc).
-        /// </summary>
-        private async Task HydrateLastActionFieldsAsync(List<RentalListingTableRowDto> rows)
-        {
-            if (rows.Count == 0) return;
-
-            var listingIds = rows
-                .Where(r => r.RentalListingId != null)
-                .Select(r => r.RentalListingId!.Value)
-                .ToList();
-            Dictionary<long, (DateTime Dtm, string? LongNm)>? byId = null;
-            if (listingIds.Count > 0)
-            {
-                var latest = await _dbContext.DssRentalListingActions
-                    .AsNoTracking()
-                    .Where(a => listingIds.Contains(a.RentalListingId))
-                    .GroupBy(a => a.RentalListingId)
-                    .Select(g => new
-                    {
-                        RentalListingId = g.Key,
-                        Dtm = g.Max(x => x.ActionDtm),
-                        LongNm = g.OrderByDescending(x => x.ActionDtm)
-                                  .ThenByDescending(x => x.RentalListingActionId)
-                                  .Select(x => x.ActionLongNm)
-                                  .FirstOrDefault()
-                    })
-                    .ToListAsync();
-
-                if (latest.Count > 0)
-                {
-                    byId = latest.ToDictionary(x => x.RentalListingId, x => (x.Dtm, x.LongNm));
-                }
-            }
-
-            foreach (var row in rows)
-            {
-                if (row.RentalListingId != null
-                    && byId != null
-                    && byId.TryGetValue(row.RentalListingId.Value, out var info))
-                {
-                    row.LastActionDtm = info.Dtm;
-                    row.LastActionNm = info.LongNm;
-                }
-
-                row.LastActionDtm = row.LastActionDtm == null ? null : DateUtils.ConvertUtcToPacificTime(row.LastActionDtm.Value);
-            }
         }
 
         /// <summary>
@@ -372,6 +335,12 @@ namespace StrDss.Data.Repositories
                 "platformListingNo" => isDesc
                     ? query.OrderByDescending(x => x.PlatformListingNo ?? "ZZZZ")
                     : query.OrderBy(x => x.PlatformListingNo ?? "ZZZZ"),
+                "lastActionNm" => isDesc
+                    ? query.OrderByDescending(x => x.LastActionNm ?? "ZZZZ")
+                    : query.OrderBy(x => x.LastActionNm ?? "ZZZZ"),
+                "lastActionDtm" => isDesc
+                    ? query.OrderByDescending(x => x.LastActionDtm ?? DateTime.MinValue)
+                    : query.OrderBy(x => x.LastActionDtm ?? DateTime.MinValue),
                 _ => query.OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue)
             };
         }
@@ -443,9 +412,6 @@ namespace StrDss.Data.Repositories
 
             _logger.LogInformation($"Get Rental Listings - Total Listings After Paging: {pagedList.Count}, Page: {pageNumber}, PageSize: {pageSize}, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
-            // Hydrate email action fields for the paged results only (avoids expensive full-table aggregation)
-            await HydrateLastActionFieldsAsync(pagedList);
-
             stopwatch.Stop();
             _logger.LogInformation($"Get Rental Listings - Final Mapping and Processing Completed, Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
@@ -465,7 +431,7 @@ namespace StrDss.Data.Repositories
         }
 
         private async Task<List<RentalListingTableRowDto>> GetFilteredListingTableRowsAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, bool hydrateLastAction = true, bool normalizeGroupingKeys = true)
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, bool normalizeGroupingKeys = true)
         {
             var query = GetRentalListingsTableBaseQuery();
 
@@ -482,10 +448,6 @@ namespace StrDss.Data.Repositories
             ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, ref query);
 
             var list = await query.ToListAsync();
-            if (hydrateLastAction)
-            {
-                await HydrateLastActionFieldsAsync(list);
-            }
             if (normalizeGroupingKeys)
             {
                 NormalizeGroupingKeyFields(list);
@@ -630,6 +592,16 @@ namespace StrDss.Data.Repositories
                                .ThenByDescending(s => s.EffectiveBusinessLicenceNo, StringComparer.Ordinal).ToList()
                     : summaries.OrderBy(s => s.EffectiveBusinessLicenceNo == null)
                                .ThenBy(s => s.EffectiveBusinessLicenceNo, StringComparer.Ordinal).ToList(),
+                "lastActionNm" => desc
+                    ? summaries.OrderBy(s => s.LastActionNm == null)
+                               .ThenByDescending(s => s.LastActionNm, StringComparer.Ordinal).ToList()
+                    : summaries.OrderBy(s => s.LastActionNm == null)
+                               .ThenBy(s => s.LastActionNm, StringComparer.Ordinal).ToList(),
+                "lastActionDtm" => desc
+                    ? summaries.OrderBy(s => s.LastActionDtm == null)
+                               .ThenByDescending(s => s.LastActionDtm).ToList()
+                    : summaries.OrderBy(s => s.LastActionDtm == null)
+                               .ThenBy(s => s.LastActionDtm).ToList(),
                 _ => desc
                     ? summaries.OrderBy(s => s.LatestReportPeriodYm == null)
                                .ThenByDescending(s => s.LatestReportPeriodYm).ToList()
@@ -641,7 +613,7 @@ namespace StrDss.Data.Repositories
         public async Task<int> GetGroupedRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, bool recent)
         {
-            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent, hydrateLastAction: false, normalizeGroupingKeys: false);
+            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent, normalizeGroupingKeys: false);
             var summaries = BuildGroupedSummaries(rows);
             return summaries.Count;
         }
@@ -715,7 +687,6 @@ namespace StrDss.Data.Repositories
                 query = query.OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue);
 
                 var list = await query.ToListAsync();
-                await HydrateLastActionFieldsAsync(list);
                 return list;
             }
 

@@ -14,12 +14,12 @@
             <input type="text" id="search-term-inp" (keydown.enter)="$event.preventDefault(); onSearch()" class="search-input"
                 placeholder="Search" pInputText [(ngModel)]="searchTerm" />
         </span>
-        <button pButton id="filter-open-btn" class="filter-open-btn p-button-link" [class.colorless]="!isFilterSet"
+        <button *ngIf="isCEU" pButton id="filter-open-btn" class="filter-open-btn p-button-link" [class.colorless]="!isFilterSet"
             icon="pi {{isFilterSet?'pi-filter-fill':'pi-filter'}}" (click)="openFilterSidebar()">
             Filter Listings
         </button>
 
-        <button *ngIf="isFilterSet" pButton id="filter-clear-btn" icon="pi pi-filter-slash"
+        <button *ngIf="isCEU && isFilterSet" pButton id="filter-clear-btn" icon="pi pi-filter-slash"
             class="filter-clear-btn p-button-link red" (click)="onClearFilters()">
             Clear Filters
         </button>
@@ -374,7 +374,7 @@
 </p-dialog>
 </div>
 
-<p-drawer ngClass="listing-filter p-drawer-lg" [title]="'Filter Listings'" [(visible)]="isFilterOpened"
+<p-drawer *ngIf="isCEU" ngClass="listing-filter p-drawer-lg" [title]="'Filter Listings'" [(visible)]="isFilterOpened"
     [closeOnEscape]="false" position="right" [modal]="false">
     <ng-template pTemplate="header">
         <strong class="h2-big"> Filter Listings</strong>
@@ -382,7 +382,7 @@
     <ng-template pTemplate="content">
         <p-accordion *ngIf="cancelableFilter" class="borderless filter-sidebar" [multiple]="true"
             [value]="['0','1']">
-            <p-accordion-panel *ngIf="isCEU" value="0">
+            <p-accordion-panel value="0">
                 <p-accordion-header>By Location</p-accordion-header>
                 <p-accordion-content>
                     <div class="row"><strong>Principal Residence Requirement Applies?</strong></div>
@@ -430,7 +430,7 @@
                 </p-accordion-content>
             </p-accordion-panel>
             
-            <p-accordion-panel *ngIf="isCEU" value="1">
+            <p-accordion-panel value="1">
                 <p-accordion-header>By Community</p-accordion-header>
                 <p-accordion-content>
                     <p-select [showClear]="true" placeholder="Select a Community" appendTo="body"

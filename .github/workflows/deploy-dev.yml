@@ -90,8 +90,8 @@ jobs:
     
     #Run Vulnerability Scan usinig Trivy scanner
     - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
+      uses: aquasecurity/trivy-action@master
+      with:
           scan-type: image
           image-ref: artifacts.developer.gov.bc.ca/sb04-strdss/strdss-backend:dev
           format: sarif
@@ -102,9 +102,9 @@ jobs:
 
     #Upload results to the Github security tab.
     - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
           sarif_file: trivy-results.sarif
 
   docker-build-hangfire:
@@ -133,8 +133,8 @@ jobs:
     
     #Run Vulnerability Scan usinig Trivy scanner
     - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
+      uses: aquasecurity/trivy-action@master
+      with:
           scan-type: image
           image-ref: artifacts.developer.gov.bc.ca/sb04-strdss/strdss-hangfire:dev
           format: sarif
@@ -145,9 +145,9 @@ jobs:
 
     #Upload results to the Github security tab.
     - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
           sarif_file: trivy-results.sarif
 
   docker-build-frontend:
@@ -180,8 +180,8 @@ jobs:
         
     #Run Vulnerability Scan usinig Trivy scanner
     - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
+      uses: aquasecurity/trivy-action@master
+      with:
           scan-type: image
           image-ref: artifacts.developer.gov.bc.ca/sb04-strdss/strdss-frontend:dev
           format: sarif
@@ -192,9 +192,9 @@ jobs:
 
     #Upload results to the Github security tab.
     - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
           sarif_file: trivy-results.sarif
 
   deploy-emerald:

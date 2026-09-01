@@ -1,4 +1,7 @@
 name: Deploy Dev Environment
+permissions:
+  contents: wrie
+  security-events: write
 
 on:
   workflow_dispatch:
@@ -84,6 +87,25 @@ jobs:
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         docker push artifacts.developer.gov.bc.ca/sb04-strdss/strdss-backend:dev
+    
+    #Run Vulnerability Scan usinig Trivy scanner
+    - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: artifacts.developer.gov.bc.ca/sb04-strdss/strdss-backend:dev
+          format: sarif
+          output: trivy-results.sarif
+          ignore-unfixed: true
+          limit-severities-for-sarif: true
+          severity: HIGH,CRITICAL
+
+    #Upload results to the Github security tab.
+    - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
 
   docker-build-hangfire:
     runs-on: ubuntu-22.04
@@ -108,6 +130,25 @@ jobs:
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         docker push artifacts.developer.gov.bc.ca/sb04-strdss/strdss-hangfire:dev
+    
+    #Run Vulnerability Scan usinig Trivy scanner
+    - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: artifacts.developer.gov.bc.ca/sb04-strdss/strdss-hangfire:dev
+          format: sarif
+          output: trivy-results.sarif
+          ignore-unfixed: true
+          limit-severities-for-sarif: true
+          severity: HIGH,CRITICAL
+
+    #Upload results to the Github security tab.
+    - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
 
   docker-build-frontend:
     runs-on: ubuntu-22.04
@@ -136,6 +177,25 @@ jobs:
       run: |
         docker login artifacts.developer.gov.bc.ca -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }}
         docker push artifacts.developer.gov.bc.ca/sb04-strdss/strdss-frontend:dev
+        
+    #Run Vulnerability Scan usinig Trivy scanner
+    - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: artifacts.developer.gov.bc.ca/sb04-strdss/strdss-frontend:dev
+          format: sarif
+          output: trivy-results.sarif
+          ignore-unfixed: true
+          limit-severities-for-sarif: true
+          severity: HIGH,CRITICAL
+
+    #Upload results to the Github security tab.
+    - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
 
   deploy-emerald:
     needs: [test-frontend, test-backend, docker-build-frontend, docker-build-backend, docker-build-hangfire]

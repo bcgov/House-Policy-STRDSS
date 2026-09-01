@@ -1,4 +1,7 @@
 name: Deploy Dev Environment
+permissions:
+  contents: wrie
+  security-events: write
 
 on:
   workflow_dispatch:

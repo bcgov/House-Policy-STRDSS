@@ -1,6 +1,6 @@
 name: Deploy Dev Environment
 permissions:
-  contents: wrie
+  contents: write
   security-events: write
 
 on:

@@ -13,7 +13,7 @@
  * Then AC1 to AC4 validate authentication, navigation, jurisdiction options, and successful downloads
  * And when I execute the Business BCeID flow
  * Then AC5 validates default page state before selecting any jurisdiction
- * And AC6 validates successful download behavior after jurisdiction selection
+ * And AC6 validates LG users can only download for their own jurisdiction and successful download behavior
  *
  * Test Steps and Validation Checkpoints:
  *
@@ -70,16 +70,17 @@
  * - Step 5: Verify the radio button is unchecked by default
  * - Step 6: Validate Download button is present and disabled before selecting the radio button option
  *
- * AC6 [BCeID] - Download Listing Data by Jurisdiction and Verify Success:
+ * AC6 [BCeID] - Validate Jurisdiction Restriction for Downloading Listing Data:
  * - Step 1: Navigate to Download Listing Data page (after BCeID login)
- * - Step 2: Select the radio button option (first available via label.radio-label)
- * - Step 3: Verify Download button is enabled after selection
- * - Step 4: Click the Download button
- * - Step 5: Verify download event is triggered and file is downloadable
- * - Step 6: Validate suggested filename is present and not empty
- * - Step 7: Wait for success pop-up/toast to appear
- * - Step 8: Verify success message is visible (pattern: "Success")
- * - Step 9: Verify no failure or error messages appear during download
+ * - Step 2: Read LG user name from the top-right header and derive jurisdiction (for example, "NorthVancouver LG" -> "NorthVancouver")
+ * - Step 3: Verify every visible jurisdiction radio label (.radio-label) matches the user's jurisdiction text (space-insensitive, for example, "City of North Vancouver")
+ * - Step 4: Select a matching jurisdiction radio button option
+ * - Step 5: Verify the Download button (.p-button.p-component) is enabled after selection
+ * - Step 6: Click the Download button
+ * - Step 7: Verify download event is triggered and file is downloadable
+ * - Step 8: Wait for success pop-up/toast to appear
+ * - Step 9: Verify success message is visible (pattern: "Success")
+ * - Step 10: Verify no failure or error messages appear during download
  */
 
 import { expect, test, type Locator, type Page } from '@playwright/test';
@@ -106,27 +107,28 @@ test.describe('@regression Feature: DownloadListingData [IDIR]', () => {
     IDIR_AUTH_ENV_MESSAGE,
   );
 
-  test('@smoke authorized representative downloads listing data by jurisdiction and sees success popup', async ({
-    page,
-  }) => {
-    await test.step('AC1: Authenticate and land on Short-Term Rental Data Portal', async () => {
-      await loginAsIdir(page);
-      await expect(page.getByRole('region', { name: /^Home$/i })).toBeVisible({ timeout: 30_000 });
-    });
+  test('AC1 [IDIR]: authenticate and land on Short-Term Rental Data Portal', async ({ page }) => {
+    await loginAsIdirAndAssertHome(page);
+  });
 
-    await test.step('AC2: Click "Download Listing Data" and validate export-listings page', async () => {
-      await openDownloadListingDataPage(page);
-    });
+  test('AC2 [IDIR]: navigate to Download Listing Data page', async ({ page }) => {
+    await goToDownloadListingDataPageAsIdir(page);
+  });
 
-    await test.step('AC3: Validate all required jurisdiction radio button options are available', async () => {
-      for (const jurisdiction of JURISDICTIONS) {
-        const option = await getJurisdictionOption(page, jurisdiction);
-        await expect(option).toBeVisible();
-      }
-    });
+  test('AC3 [IDIR]: validate all required jurisdiction radio button options are available', async ({ page }) => {
+    await goToDownloadListingDataPageAsIdir(page);
 
     for (const jurisdiction of JURISDICTIONS) {
-      await test.step(`AC4: Download listing data for ${jurisdiction} and verify Success popup`, async () => {
+      const option = await getJurisdictionOption(page, jurisdiction);
+      await expect(option).toBeVisible();
+    }
+  });
+
+  test('@smoke AC4 [IDIR]: download listing data by jurisdiction and verify Success popup', async ({ page }) => {
+    await goToDownloadListingDataPageAsIdir(page);
+
+    for (const jurisdiction of JURISDICTIONS) {
+      await test.step(`Download listing data for ${jurisdiction} and verify Success popup`, async () => {
         await clearSuccessToastIfPresent(page);
 
         const jurisdictionOption = await getJurisdictionOption(page, jurisdiction);
@@ -175,23 +177,14 @@ test.describe('@regression Feature: DownloadListingData [BCeID]', () => {
       if (!jurisdictionOption) {
         return;
       }
-      
-      // Verify radio button is attached to DOM
-      await expect(jurisdictionOption, 'Expected a jurisdiction radio input to be present and attached in the DOM').toBeAttached();
-      
-      // Verify it has the expected class and name attributes (p-radiobutton-input and jurisdiction-radio)
-      const radioClass = await jurisdictionOption.getAttribute('class');
-      expect(radioClass, 'Expected radio input to have p-radiobutton-input class').toContain('p-radiobutton-input');
-      
-      const radioName = await jurisdictionOption.getAttribute('name');
-      expect(radioName, 'Expected radio input to have jurisdiction-radio name').toBe('jurisdiction-radio');
-      
-      // Verify it is a radio button type
+
+      await expect(jurisdictionOption).toBeVisible();
       await assertOptionIsRadio(jurisdictionOption);
-      
-      // Verify radio button is unchecked by default by checking aria-checked attribute
-      const ariaChecked = await jurisdictionOption.getAttribute('aria-checked');
-      expect(ariaChecked, 'Expected the jurisdiction radio option to be unchecked by default (aria-checked should be false)').toBe('false');
+      await expect
+        .poll(() => isOptionSelected(jurisdictionOption), {
+          message: 'Expected the jurisdiction radio option to be unchecked by default',
+        })
+        .toBe(false);
     });
 
     await test.step('Validate Download button is present and disabled before selecting the radio button option', async () => {
@@ -201,23 +194,33 @@ test.describe('@regression Feature: DownloadListingData [BCeID]', () => {
     });
   });
 
-  test('@smoke AC6 [BCeID]: select jurisdiction and download listing data successfully', async ({ page }) => {
+  test('@smoke AC6 [BCeID]: LG user can download listing data only for own jurisdiction', async ({ page }) => {
     await test.step('Authenticate as Business BCeID and navigate to Download Listing Data page', async () => {
       await loginAsBceid(page);
       await expect(page.getByRole('region', { name: /^Home$/i })).toBeVisible({ timeout: 30_000 });
       await openDownloadListingDataPage(page);
     });
 
-    await test.step('Select radio button option (first available via label.radio-label) and verify Download button is enabled', async () => {
+    await test.step('Validate LG jurisdiction radio labels match the logged-in LG user and verify Download button is enabled', async () => {
       await clearSuccessToastIfPresent(page);
-      const jurisdictionOption = await getFirstVisibleJurisdictionRadioOptionOrNull(page);
-      test.skip(
-        !jurisdictionOption,
-        'BCeID precondition not met: no jurisdiction radio options are available for this account.',
-      );
-      if (!jurisdictionOption) {
+
+      const lgJurisdictionKey = await getLgJurisdictionKeyFromDisplayName(page);
+      const visibleRadioLabels = await getVisibleJurisdictionLabels(page);
+      test.skip(!visibleRadioLabels.length, 'BCeID precondition not met: no jurisdiction radio labels are available for this account.');
+      if (!visibleRadioLabels.length) {
         return;
       }
+
+      for (const jurisdictionName of visibleRadioLabels) {
+        expect(
+          normalizeJurisdictionText(jurisdictionName),
+          `Expected LG user to only have own jurisdiction options. User jurisdiction key: ${lgJurisdictionKey}. Radio label: ${jurisdictionName}`,
+        ).toContain(lgJurisdictionKey);
+      }
+
+      const jurisdictionOption = page.getByRole('radio', {
+        name: new RegExp(`^\\s*${escapeRegExp(visibleRadioLabels[0])}\\s*$`, 'i'),
+      });
       await ensureOptionSelected(jurisdictionOption);
 
       const downloadButton = await getDownloadButton(page);
@@ -246,6 +249,16 @@ async function loginAsIdir(page: Page): Promise<void> {
   await loginAsIdirShared(page, APP_URL);
 }
 
+async function loginAsIdirAndAssertHome(page: Page): Promise<void> {
+  await loginAsIdir(page);
+  await expect(page.getByRole('region', { name: /^Home$/i })).toBeVisible({ timeout: 30_000 });
+}
+
+async function goToDownloadListingDataPageAsIdir(page: Page): Promise<void> {
+  await loginAsIdirAndAssertHome(page);
+  await openDownloadListingDataPage(page);
+}
+
 async function loginAsBceid(page: Page): Promise<void> {
   await loginAsBceidShared(page, APP_URL);
 }
@@ -256,11 +269,7 @@ async function openDownloadListingDataPage(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { name: /^Download Listing Data$/i })).toBeVisible({
     timeout: 60_000,
   });
-  // Wait for radio buttons to be rendered (they may load dynamically)
-  // Try multiple strategies to wait for radio buttons
-  const radioButtonsLoaded = await page.locator('label.radio-label, input[type="radio"]').first().isVisible({ timeout: 30_000 }).catch(() => false);
-  // Additional small delay to ensure dynamic rendering is complete
-  await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
+  await expect(page.getByRole('radio').first()).toBeVisible({ timeout: 30_000 });
 }
 /**
  * Locate the first available jurisdiction radio input for BCeID users.
@@ -322,6 +331,73 @@ async function getFirstVisibleJurisdictionRadioOptionOrNull(page: Page): Promise
   return null;
 
 }
+
+async function getVisibleJurisdictionLabels(page: Page): Promise<string[]> {
+  const labels = page.locator('label.radio-label');
+  const count = await labels.count();
+  const visibleLabels: string[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const label = labels.nth(i);
+    const isVisible = await label.isVisible({ timeout: 1_000 }).catch(() => false);
+    if (!isVisible) {
+      continue;
+    }
+
+    const labelText = (await label.innerText().catch(() => '')).trim();
+    if (labelText) {
+      visibleLabels.push(labelText);
+    }
+  }
+
+  return visibleLabels;
+}
+
+async function getJurisdictionOptionByLabelTextOrNull(page: Page, labelText: string): Promise<Locator | null> {
+  const label = page.locator('label.radio-label').filter({ hasText: new RegExp(`^\\s*${escapeRegExp(labelText)}\\s*$`, 'i') }).first();
+  const labelVisible = await label.isVisible({ timeout: 2_000 }).catch(() => false);
+  if (!labelVisible) {
+    return null;
+  }
+
+  const forId = await label.getAttribute('for').catch(() => null);
+  if (forId) {
+    const inputByFor = page.locator(`input[type="radio"][id="${forId}"]`).first();
+    if ((await inputByFor.count()) > 0) {
+      return inputByFor;
+    }
+  }
+
+  const nestedInput = label.locator('input[type="radio"]').first();
+  if ((await nestedInput.count()) > 0) {
+    return nestedInput;
+  }
+
+  const byRole = page.getByRole('radio', { name: new RegExp(`^\\s*${escapeRegExp(labelText)}\\s*$`, 'i') }).first();
+  if ((await byRole.count()) > 0) {
+    return byRole;
+  }
+
+  return null;
+}
+
+async function getLgJurisdictionKeyFromDisplayName(page: Page): Promise<string> {
+  const displayNameElement = page.locator('.user-container.ng-star-inserted').filter({ hasText: /\sLG\s*$/i }).first();
+  await expect(displayNameElement).toBeVisible({ timeout: 20_000 });
+  const displayName = (await displayNameElement.innerText()).trim();
+  expect(displayName, 'Expected an LG display name in the application banner').toBeTruthy();
+
+  const withoutLgSuffix = displayName.replace(/\bLG\b/gi, '').trim();
+  const normalized = normalizeJurisdictionText(withoutLgSuffix);
+  expect(normalized, `Unable to derive LG jurisdiction from display name: ${displayName}`).toBeTruthy();
+
+  return normalized;
+}
+
+function normalizeJurisdictionText(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 async function getJurisdictionOption(page: Page, jurisdiction: string): Promise<Locator> {
   const optionByRadioRole = page
     .getByRole('radio', { name: new RegExp(`^${escapeRegExp(jurisdiction)}$`, 'i') })

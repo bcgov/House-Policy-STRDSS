@@ -91,7 +91,7 @@ import {
 
 const APP_URL = process.env.BASE_URL ?? '';
 /** LG sender email used in notice submission tests. Set LG_SENDER_EMAIL in secrets.<env>.env. */
-const LG_SENDER_EMAIL = process.env.LG_SENDER_EMAIL ?? 'lg.test@gov.bc.ca';
+const LG_SENDER_EMAIL = process.env.LG_SENDER_EMAIL!;
 
 test.use({ browserName: 'chromium' });
 
@@ -548,7 +548,7 @@ test.describe('@regression @SendingMultipleNoticesOfNonCompliance Scenario: Send
     await expect(reviewButton).toBeDisabled();
 
     // Step 6: Fill in mandatory fields
-    await fillMandatoryFields(page, 'lg.test@gov.bc.ca');
+    await fillMandatoryFields(page, LG_SENDER_EMAIL);
 
     // Step 7: Verify all mandatory fields are clearly marked/labeled as required (proxy via enabled state after required fields are filled)
     await expect
@@ -698,7 +698,7 @@ test.describe('@regression @SendingMultipleNoticesOfNonCompliance Scenario: Send
     }
 
     // Step 5-6: Enter valid email and verify Review button becomes enabled
-    await fillLGEmailField(page, 'lg.valid@gov.bc.ca');
+    await fillLGEmailField(page, LG_SENDER_EMAIL);
     await expect
       .poll(
         async () => await reviewButton.isEnabled().catch(() => false),
@@ -991,7 +991,7 @@ test.describe('@regression @SendingMultipleNoticesOfNonCompliance Scenario: Send
 
     // Step 3/4: Click Send Notices of Non-Compliance button and verify bulk-compliance-notice page opens
     await openNoticeDetailsForm(page);
-    await fillMandatoryFields(page, 'lg.test@gov.bc.ca');
+    await fillMandatoryFields(page, LG_SENDER_EMAIL);
 
     const reviewButton = await getReviewButton(page);
 

@@ -96,7 +96,7 @@ import {
 
 const APP_URL = process.env.BASE_URL ?? '';
 /** LG sender email used in takedown submission tests. Set LG_SENDER_EMAIL in secrets.<env>.env. */
-const LG_SENDER_EMAIL = process.env.LG_SENDER_EMAIL ?? 'lg.test@gov.bc.ca';
+const LG_SENDER_EMAIL = process.env.LG_SENDER_EMAIL!;
 
 test.use({ browserName: 'chromium' });
 
@@ -1015,7 +1015,7 @@ test.describe('@regression @SendingMultipleNoticesOfTakeDown Scenario: SendingMu
 
     // Step 9-10: Test valid email format
     console.log('📝 Step 9-10: Testing valid email format...');
-    await fillAdditionalRecipientsEmail(page, 'recipient@gov.bc.ca');
+    await fillAdditionalRecipientsEmail(page, LG_SENDER_EMAIL);
     await expect(reviewButton).toBeEnabled({ timeout: 10_000 });
     console.log('✅ Step 9-10: Review button enabled with valid email');
 
@@ -1270,7 +1270,7 @@ test.describe('@regression @SendingMultipleNoticesOfTakeDown Scenario: SendingMu
     // Step 5: Complete all mandatory fields in bulk-takedown-request page
     console.log('📝 Step 5: Completing mandatory fields...');
     await openTakedownRequestForm(page);
-    await fillMandatoryFields(page, 'recipient@gov.bc.ca');
+    await fillMandatoryFields(page, LG_SENDER_EMAIL);
     console.log('✅ Step 5 Complete');
 
     // Step 6: Verify Review button is enabled
@@ -1522,7 +1522,7 @@ test.describe('@regression @SendingMultipleNoticesOfTakeDown Scenario: SendingMu
 
     // Step 7: Test valid email
     console.log('📝 Step 7: Testing valid email format...');
-    await fillAdditionalRecipientsEmail(page, 'recipient@gov.bc.ca');
+    await fillAdditionalRecipientsEmail(page, LG_SENDER_EMAIL);
     await expect(reviewButton).toBeEnabled({ timeout: 10_000 });
     console.log('✅ Step 7 Complete');
 

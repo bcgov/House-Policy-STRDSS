@@ -5,6 +5,8 @@ const IDIR_USERNAME = process.env.IDIR_USERNAME ?? '';
 const IDIR_PASSWORD = process.env.IDIR_PASSWORD ?? '';
 const BCEID_USERNAME = process.env.BCEID_USERNAME ?? process.env.BUSINESS_BCEID_USERNAME ?? '';
 const BCEID_PASSWORD = process.env.BCEID_PASSWORD ?? process.env.BUSINESS_BCEID_PASSWORD ?? '';
+const BCEID_PLATFORM_USERNAME = process.env.BCEID_PLATFORM_USERNAME ?? '';
+const BCEID_PLATFORM_PASSWORD = process.env.BCEID_PLATFORM_PASSWORD ?? '';
 
 export const IDIR_AUTH_ENV_MESSAGE =
   'Set BASE_URL, IDIR_USERNAME and IDIR_PASSWORD environment variables before running this suite.';
@@ -12,12 +14,19 @@ export const IDIR_AUTH_ENV_MESSAGE =
 export const BCEID_AUTH_ENV_MESSAGE =
   'Set BASE_URL, BCEID_USERNAME and BCEID_PASSWORD environment variables before running this suite.';
 
+export const BCEID_PLATFORM_AUTH_ENV_MESSAGE =
+  'Set BASE_URL, BCEID_PLATFORM_USERNAME and BCEID_PLATFORM_PASSWORD environment variables before running this suite.';
+
 export function hasIdirAuthConfig(): boolean {
   return DEFAULT_BASE_URL !== '' && IDIR_USERNAME !== '' && IDIR_PASSWORD !== '';
 }
 
 export function hasBceidAuthConfig(): boolean {
   return DEFAULT_BASE_URL !== '' && BCEID_USERNAME !== '' && BCEID_PASSWORD !== '';
+}
+
+export function hasBceidPlatformAuthConfig(): boolean {
+  return DEFAULT_BASE_URL !== '' && BCEID_PLATFORM_USERNAME !== '' && BCEID_PLATFORM_PASSWORD !== '';
 }
 
 async function clickIdentityProvider(page: Page, providerName: RegExp): Promise<void> {
@@ -74,6 +83,19 @@ export async function loginAsIdir(page: Page, baseUrl: string = DEFAULT_BASE_URL
 }
 
 export async function loginAsBceid(page: Page, baseUrl: string = DEFAULT_BASE_URL): Promise<void> {
+  await loginWithBceidCredentials(page, BCEID_USERNAME, BCEID_PASSWORD, baseUrl);
+}
+
+export async function loginAsBceidPlatform(page: Page, baseUrl: string = DEFAULT_BASE_URL): Promise<void> {
+  await loginWithBceidCredentials(page, BCEID_PLATFORM_USERNAME, BCEID_PLATFORM_PASSWORD, baseUrl);
+}
+
+async function loginWithBceidCredentials(
+  page: Page,
+  username: string,
+  password: string,
+  baseUrl: string,
+): Promise<void> {
   if (!baseUrl) {
     throw new Error('BASE_URL is not configured.');
   }
@@ -105,8 +127,8 @@ export async function loginAsBceid(page: Page, baseUrl: string = DEFAULT_BASE_UR
   await expect(usernameInput).toBeVisible({ timeout: 60_000 });
   await expect(passwordInput).toBeVisible({ timeout: 60_000 });
 
-  await usernameInput.fill(BCEID_USERNAME);
-  await passwordInput.fill(BCEID_PASSWORD);
+  await usernameInput.fill(username);
+  await passwordInput.fill(password);
   await page.getByRole('button', { name: /^Continue$/i }).click();
 
   await expect(page.getByText(/Enter a Business BCeID username and password/i)).toHaveCount(0);

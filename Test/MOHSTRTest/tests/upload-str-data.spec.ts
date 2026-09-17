@@ -1,20 +1,23 @@
 /// <reference types="node" />
 
 /**
- * Feature: Upload Platform STR Listing Data
+ * Feature: Upload Platform STR and Takedown Data
  * Link to a feature: https://hous-hpb.atlassian.net/browse/DSS-23
  *
  * @UploadSTRData
- * Scenario: UploadSTRData
+ * Scenario: UploadSTRDataAndTakedownData
  *
  * Test Case Summary:
- * Given I am an authenticated platform representative with IDIR credentials
- * When I navigate to the STR portal and submit STR listing data through the upload form
- * Then the data should be successfully imported and validated
- * And I should be able to view the uploaded data in the reporting history with correct column headers
+ * Given I am an authenticated platform representative with IDIR or Business BCeID credentials
+ * When I navigate to the STR portal and submit STR listing or Takedown data through the upload form
+ * Then the upload should be accepted, processed, or reported as a duplicate with the appropriate outcome
+ * And I should be able to view the matching reporting-history entry with the correct values, applying
+ * strict upload date/uploader checks only when fresh data was imported (duplicate/submitted outcomes skip them)
  * And proper validation messages should be displayed for form field requirements and file constraints
  *
  * Test Steps and Validation Checkpoints:
+ *
+ * AC1-AC6 are IDIR-only acceptance criteria.
  *
  * AC1 - Platform Staff Authentication via IDIR:
  * - Step 1: Navigate to BASE_URL
@@ -30,8 +33,7 @@
  * AC2 - Access to STR Portal and Home Region:
  * - Step 1: After successful IDIR authentication, verify landing on STR portal
  * - Step 2: Verify Home region becomes visible (timeout: 30s)
- * - Step 3: Validate browser is on the correct portal domain/URL
- * - Step 4: Verify navigation menu is accessible (Main Navigation with menuitems)
+ * - Step 3: Verify the Home region is visible and the portal navigation is available for the next action
  *
  * AC3 - Submit Platform Data Button and Upload Form Label Validation:
  * - Step 1: On home page, locate "Submit Platform Data" button
@@ -40,7 +42,7 @@
  * - Step 4: Verify form label "Select Reporting Platform Name" is visible
  * - Step 5: Verify form label "Select Reporting Month" is visible
  * - Step 6: Verify form label "Upload Your Platform Data (.CSV File Only)" is visible
- * - Step 7: Validate Upload button is present and initially disabled (until all fields filled)
+ * - Step 7: Verify the upload form is ready for field validation; the Upload button is verified disabled before file selection in AC4
  *
  * AC4 - Select Report Type, Platform Name, Reporting Month, and File Upload:
  * - Step 1: Click "Select Report Type" dropdown (PrimeNG combobox)
@@ -52,41 +54,117 @@
  * - Step 7: Select "Major 1" platform from dropdown
  * - Step 8: Click "Select Reporting Month" dropdown/date picker
  * - Step 9: Verify future month options are disabled in the dropdown
- * - Step 10: Select a valid reporting month (e.g., May 2026 — previous calendar month)
+ * - Step 10: Select the previous calendar month dynamically as the valid reporting month
  * - Step 11: Attempt to upload a non-CSV file (e.g., .txt) and verify it is rejected
  *   ✓ Validation message, "No file selected" label, or disabled Upload button confirms rejection
  * - Step 12: Reset form (navigate Home → re-open upload form) to clear invalid file state
  * - Step 13: Re-select Report Type, Platform Name, and Reporting Month with same values
  * - Step 14: Locate and click file input for CSV upload
- * - Step 15: Upload valid CSV file matching the selected reporting month (e.g., May 2026.csv for May 2026)
+ * - Step 15: Upload valid CSV from test-data/Major1 matching the selected reporting month (e.g., May 2026.csv for May 2026)
  * - Step 16: Verify selected filename is displayed on the form
  * - Step 17: Verify Upload button becomes enabled after all fields filled and valid file selected
  *
  * AC5 - Upload File and Data Import:
  * - Step 1: Click Upload button to submit the STR listing data
  * - Step 2: Verify upload request is sent and processing begins
- * - Step 3: Validate success message appears: "Data uploaded successfully|Success"
- * - Step 4: Verify STR Portal imports the listing data correctly (if data load is successful)
- * - Step 5: If data load is not successful due to invalid or wrong data, verify the error message and skip AC6
+ * - Step 3: Validate the outcome: success ("File has been uploaded successfully"), duplicate
+ *   ("The file has already been uploaded"), submitted (form reset with no explicit message), or failure
+ * - Step 4: If the import fails, verify the error message and skip AC6
+ * - Step 5: On success, duplicate, or submitted outcomes, continue to AC6 to validate reporting history
  *
  * AC6 - View Reporting History and Validate Table:
  * - Step 1: Navigate back to Home page (after successful upload)
  * - Step 2: Locate and click "View Reporting History" button
  * - Step 3: Verify reporting-history page loads (timeout: 60s)
  * - Step 4: Validate table with reporting history data is visible
- * - Step 5: Verify table headers match expected columns:
+ * - Step 5: Verify table headers match the actual reporting-history columns:
  *   ✓ Platform Name
  *   ✓ Report Type
- *   ✓ Reporting Period/Month
- *   ✓ File Name
- *   ✓ Upload Date/Time
- *   ✓ Status (e.g., "Completed", "Processing")
- * - Step 6: Confirm newly uploaded data row appears in the reporting history table
- * - Step 7: Validate row contains correct values matching the uploaded file metadata
+ *   ✓ Reported Month (YYYY-MM)
+ *   ✓ Status (e.g., "Processed", "Pending")
+ *   ✓ Total Records
+ *   ✓ Success
+ *   ✓ Errors
+ *   ✓ Upload Date
+ *   ✓ Uploaded By
+ * - Step 6: Verify the matching history row:
+ *   ✓ On a fresh ("success") upload, match the row using the selected month, today's upload date,
+ *     and the authenticated uploader identity
+ *   ✓ On a "duplicate" or "submitted" outcome (no fresh data was imported), relax the match to
+ *     platform + report type + reported month only, skipping the strict upload date/uploader checks
+ *
+ * AC7 - Platform Representative Authentication via Business BCeID:
+ * - Step 1: Authenticate with the configured Business BCeID credentials
+ * - Step 2: Verify the "Short-Term Rental Data Portal" heading and Home region are visible
+ *
+ * AC8 - BCeID Submit Platform Data Form Validation:
+ * - Step 1: Navigate to the upload-listing-data page using "Submit Platform Data"
+ * - Step 2: Verify page title "Platform Reporting" is visible
+ * - Step 3: Verify form label "Select Report Type" is visible
+ * - Step 4: Verify form label "Select Reporting Month" is visible
+ * - Step 5: Verify form label "Upload Your Platform Data (.CSV File Only)" is visible
+ * - Step 6: Verify the Upload button is present and initially disabled
+ *
+ * AC9 - BCeID Report Type, Reporting Month, and File Validation:
+ * - Step 1: Open "Select Report Type" and verify "Short-Term Rental Listing Data" and "Takedown Data"
+ * - Step 2: Select "Short-Term Rental Listing Data" and verify the selection is reflected
+ * - Step 3: Open "Select Reporting Month", verify a future month is disabled, and select the previous calendar month dynamically
+ * - Step 4: Upload a non-CSV file and verify it is rejected
+ * - Step 5: Reset the form, reselect the report type and reporting month, then upload the matching
+ *   CSV from test-data/Minor1
+ * - Step 6: Verify the selected filename is displayed and Upload becomes enabled
+ *
+ * AC10 - BCeID STR Listing Data Upload and Reporting History:
+ * - Step 1: Submit the CSV and verify a request or processing indicator
+ * - Step 2: Verify the outcome: success, duplicate, submitted, or failure
+ * - Step 3: Verify the matching reporting-history entry includes Platform, Report Type, Reported Month
+ *   (YYYY-MM), status (Processed or Pending), Total Records, Success, and Errors
+ * - Step 4: On a fresh ("success") upload, also verify the current upload date and Uploaded By derived
+ *   from the authenticated platform header (for example, ", Allura Minor1"); on a "duplicate" or
+ *   "submitted" outcome (no fresh data was imported), skip those two strict checks and match the
+ *   existing row instead; on an import failure, verify the displayed error and bypass reporting history validation
+ *
+ * AC11 - BCeID Takedown Data Form and Report Type Validation:
+ * - Step 1: Authenticate with BCEID_PLATFORM_USERNAME and land on the portal Home region
+ * - Step 2: Navigate to upload-listing-data using "Submit Platform Data"
+ * - Step 3: Open the Select Report Type PrimeNG combobox and verify both "Short-Term Rental Listing Data"
+ *   and "Takedown Data" options are present
+ * - Step 4: Select "Takedown Data" and verify the combobox reflects the selection
+ * - Step 5: Open Select Reporting Month, verify the future month is disabled, and select the previous month dynamically
+ * - Step 6: Upload a non-CSV file and verify the application rejects it
+ *
+ * AC12 - BCeID Takedown Data CSV Validation:
+ * - Step 1: Reset the upload form by navigating Home and reopening Submit Platform Data
+ * - Step 2: Reselect Takedown Data and the same reporting month
+ * - Step 3: Upload the matching CSV from test-data/Minor1/Takedown
+ * - Step 4: Verify the selected filename is displayed and Upload becomes enabled
+ *
+ * AC13 - BCeID Takedown Data Import:
+ * - Step 1: Click Upload and verify an upload request, response, or processing indicator
+ * - Step 2: Verify a success, duplicate, or submitted outcome; on import failure, verify the error message
+ *
+ * AC14 - BCeID Takedown Reporting History:
+ * - Step 1: After a successful, duplicate, or submitted outcome, navigate Home → View Reporting History
+ * - Step 2: Verify the reporting-history table and actual headers are visible
+ * - Step 3: Verify the matching Takedown Data row contains the selected month as YYYY-MM, valid status,
+ *   and record counts
+ * - Step 4: On a fresh ("success") upload, also verify the current upload date and Uploaded By derived
+ *   from the authenticated header; on a "duplicate" or "submitted" outcome (no fresh data was imported),
+ *   skip those two strict checks and match the existing row instead
+ *
+ * AC15 - BCeID Takedown Data Failure Handling:
+ * - Step 1: If import fails, verify an error message and do not assert a successful reporting-history row
  */
 
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { IDIR_AUTH_ENV_MESSAGE, hasIdirAuthConfig, loginAsIdir as loginAsIdirShared } from './support/auth';
+import {
+  BCEID_PLATFORM_AUTH_ENV_MESSAGE,
+  IDIR_AUTH_ENV_MESSAGE,
+  hasBceidPlatformAuthConfig,
+  hasIdirAuthConfig,
+  loginAsBceidPlatform as loginAsBceidPlatformShared,
+  loginAsIdir as loginAsIdirShared,
+} from './support/auth';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -119,18 +197,16 @@ test.use({ browserName: 'chromium' });
 test.describe('@regression Feature: UploadPlatformSTRData', () => {
   test.setTimeout(360_000);
 
-  test.skip(
-    !hasIdirAuthConfig(),
-    IDIR_AUTH_ENV_MESSAGE,
-  );
-
   test('@smoke authorized platform representative uploads STR listing data and validates reporting history', async ({
     page,
   }) => {
+    test.skip(!hasIdirAuthConfig(), IDIR_AUTH_ENV_MESSAGE);
+    let platformUserName = '';
     // ── AC1 + AC2: Authenticate and access the STR portal ──────────────────
     await test.step('AC1-AC2: Authenticate via IDIR and land on STR portal home', async () => {
       await loginAsIdir(page);
       await expect(page.getByRole('region', { name: /^Home$/i })).toBeVisible({ timeout: 30_000 });
+      platformUserName = await getPlatformUploadedBy(page);
     });
 
     // ── AC3: Click "Submit Platform Data" → validate upload form labels ─────
@@ -256,7 +332,7 @@ test.describe('@regression Feature: UploadPlatformSTRData', () => {
       await assertAc4ComboboxSelections(page, selectedMonthLabel);
 
       // Determine which CSV file to upload based on month actually selected in UI.
-      const csvFilePath = getCsvFilePathForMonthLabel(selectedMonthLabel);
+      const csvFilePath = getCsvFilePathForMonthLabel('Major1', selectedMonthLabel);
       selectedCsvFilename = path.basename(csvFilePath);
 
       // Ensure the fixture exists with the reporting-period naming convention.
@@ -276,81 +352,15 @@ test.describe('@regression Feature: UploadPlatformSTRData', () => {
       await waitForUploadButtonEnabled(page, selectedCsvFilename);
     });
 
-    // ── AC5: Click Upload and handle import success or failure ──────────────────
-    const ac5Outcome = await test.step('AC5: Click Upload button and verify upload outcome', async () => {
-      const uploadBtn = getUploadActionButton(page);
-      await expect(uploadBtn).toBeEnabled({ timeout: 30_000 });
-
-      // Verify upload request/processing starts after click.
-      const uploadRequestPromise = page
-        .waitForRequest(
-          (request) => {
-            const method = request.method();
-            const url = request.url().toLowerCase();
-            return ['POST', 'PUT', 'PATCH'].includes(method) && /(upload|import|report|listing|file)/i.test(url);
-          },
-          { timeout: 15_000 },
-        )
-        .catch(() => null);
-
-      const uploadResponsePromise = page
-        .waitForResponse(
-          (response) => {
-            const method = response.request().method();
-            const url = response.url().toLowerCase();
-            return ['POST', 'PUT', 'PATCH'].includes(method) && /(upload|import|report|listing|file)/i.test(url);
-          },
-          { timeout: 15_000 },
-        )
-        .catch(() => null);
-
-      await uploadBtn.click();
-
-      const [uploadRequest, uploadResponse] = await Promise.all([uploadRequestPromise, uploadResponsePromise]);
-      const processingLabel = page.getByText(/processing|uploading|importing|in progress/i).first();
-      const processingVisible = await processingLabel.isVisible({ timeout: 2_000 }).catch(() => false);
-
-      expect(
-        uploadRequest !== null || uploadResponse !== null || processingVisible,
-        'Expected upload request/response or processing indicator after clicking Upload.',
-      ).toBe(true);
-
-      const stepOutcome = await waitForImportOutcome(page);
-      // 'success'   = "File has been uploaded successfully" toast / text detected
-      // 'duplicate' = "The file has already been uploaded" – data already present
-      // 'failure'   = error message detected (invalid/wrong data, format issues, etc.)
-      // 'submitted' = form reset to placeholder state (portal's implicit acceptance signal)
-      
-      if (stepOutcome.kind === 'failure') {
-        console.error(`[AC5] Data import failed: ${stepOutcome.message}`);
-        // Verify error message is displayed
-        const errorMsg = page.locator('.p-toast-message-error, [class*="error" i], .error, [role="alert"]').first();
-        await expect(errorMsg, 'Expected error message to be visible on upload failure').toBeVisible({ timeout: 10_000 }).catch(() => {
-          console.warn('[AC5] Error message element not found; relying on outcome.message');
-        });
-        return stepOutcome; // Exit AC5 as PASS after validating failure path.
-      }
-      
-      expect(
-        stepOutcome.kind === 'success' || stepOutcome.kind === 'duplicate' || stepOutcome.kind === 'submitted',
-        `Upload outcome unclear – got kind="${stepOutcome.kind}". Details: ${stepOutcome.message}`,
-      ).toBe(true);
-      
-      if (stepOutcome.kind === 'duplicate') {
-        console.warn(`[AC5] Duplicate upload detected: ${stepOutcome.message}`);
-      } else if (stepOutcome.kind === 'submitted') {
-        console.log(`[AC5] Data import accepted (implicit signal): ${stepOutcome.message}`);
-      } else {
-        console.log(`[AC5] Data import succeeded: ${stepOutcome.message}`);
-      }
-
-      return stepOutcome;
-    });
+    // ── AC5: Click Upload and handle import success or failure ─────────────
+    const ac5Outcome = await test.step('AC5: Click Upload button and verify upload outcome', async () =>
+      submitUploadAndGetOutcome(page, 'AC5'),
+    );
 
     // ── AC6a: Navigate Home → View Reporting History (bypass if AC5 failed) ─────
     if (ac5Outcome.kind === 'failure') {
       await test.step('AC6: Bypassed because AC5 data load failed and error path was validated', async () => {
-        expect(ac5Outcome.kind, 'Expected AC5 failure path before bypassing AC6').toBe('failure');
+        await assertUploadFailureMessage(page, ac5Outcome.message);
       });
       return;
     }
@@ -368,6 +378,219 @@ test.describe('@regression Feature: UploadPlatformSTRData', () => {
       await assertPlatformReportingHistoryHeaders(page, EXPECTED_HISTORY_HEADERS);
     });
 
+    await test.step('AC6: Validate the uploaded reporting history row', async () => {
+      // ac5Outcome.kind is 'success' | 'duplicate' | 'submitted' here ('failure' returned above);
+      // duplicate/submitted mean no fresh data was imported, so the row match is relaxed accordingly.
+      await assertReportingHistoryRow(
+        page,
+        PLATFORM_NAME,
+        'Listing Data',
+        selectedMonthLabel,
+        platformUserName,
+        'AC6',
+        ac5Outcome.kind,
+      );
+    });
+
+  });
+
+  test('@smoke Business BCeID representative uploads Minor 1 STR listing data and validates reporting history', async ({ page }) => {
+    test.skip(!hasBceidPlatformAuthConfig(), BCEID_PLATFORM_AUTH_ENV_MESSAGE);
+    let platformUserName = '';
+
+    await test.step('AC7: Authenticate via Business BCeID and land on STR portal home', async () => {
+      await loginAsBceid(page);
+      await expect(page.getByRole('region', { name: /^Home$/i })).toBeVisible({ timeout: 30_000 });
+      platformUserName = await getPlatformUploadedBy(page);
+    });
+
+    await test.step('AC8: Navigate to upload-listing-data and validate BCeID form labels', async () => {
+      await page.getByRole('button', { name: /^Submit Platform Data$/i }).click();
+
+      await expect(
+        page.locator('div.title', { hasText: /^Platform Reporting$/i }).first(),
+      ).toBeVisible({ timeout: 60_000 });
+
+      for (const label of [
+        /^Select Report Type$/i,
+        /^Select Reporting Month$/i,
+      ]) {
+        await expect(page.getByText(label).first()).toBeVisible({ timeout: 60_000 });
+      }
+      await expect(page.getByText(/Upload Your Platform Data \(\.CSV File Only\)/i).first()).toBeVisible();
+      await expect(getUploadActionButton(page)).toBeDisabled();
+    });
+
+    let selectedMonthLabel = toLongMonthLabel(shiftMonth(new Date(), -1));
+    await test.step('AC9: Validate report types, future-month restriction, and select reporting month', async () => {
+      await openPrimengDropdown(page, /^Select Report Type$/i);
+      const listbox = page.locator('[role="listbox"]').first();
+      await expect(listbox.getByRole('option', { name: /Short-?Term Rental Listing Data/i }).first()).toBeVisible();
+      await expect(listbox.getByRole('option', { name: /^Takedown Data$/i }).first()).toBeVisible();
+      await choosePrimengOption(page, /Short-?Term Rental Listing Data/i);
+      await expect(page.getByRole('combobox', { name: /Short-?Term Rental Listing Data/i }).first()).toBeVisible();
+
+      await openPrimengDropdown(page, /^Select month$/i);
+      await assertFutureMonthOptionDisabled(page, shiftMonth(new Date(), 1));
+      await page.keyboard.press('Escape');
+      await page.locator('[role="listbox"]').first().waitFor({ state: 'hidden', timeout: 15_000 });
+      await selectReportingMonthWithRetry(page, selectedMonthLabel);
+      selectedMonthLabel = await getSelectedMonthLabel(page);
+    });
+
+    await test.step('AC9: Reject a non-CSV file and reset the BCeID upload form', async () => {
+      const invalidFilePath = await createInvalidTextFixture();
+      try {
+        await chooseFileForUpload(page, invalidFilePath);
+        await assertNonCsvRejected(page);
+      } finally {
+        await fs.rm(invalidFilePath, { force: true });
+      }
+
+      await page.getByRole('link', { name: /^Home$/i }).click();
+      await expect(page.getByRole('region', { name: /^Home$/i })).toBeVisible({ timeout: 30_000 });
+      await page.getByRole('button', { name: /^Submit Platform Data$/i }).click();
+      await expect(page.getByRole('combobox', { name: /^Select Report Type$/i }).first()).toBeVisible({ timeout: 30_000 });
+      await openPrimengDropdown(page, /^Select Report Type$/i);
+      await choosePrimengOption(page, /Short-?Term Rental Listing Data/i);
+      await selectReportingMonthWithRetry(page, selectedMonthLabel);
+      selectedMonthLabel = await getSelectedMonthLabel(page);
+    });
+
+    let selectedCsvFilename = '';
+    await test.step('AC9: Upload the matching Minor 1 CSV and enable submission', async () => {
+      await assertBceidAc9ComboboxSelections(page, selectedMonthLabel);
+      const csvFilePath = getCsvFilePathForMonthLabel('Minor1', selectedMonthLabel);
+      selectedCsvFilename = path.basename(csvFilePath);
+      await assertFixtureExists(csvFilePath);
+      await expect(getUploadActionButton(page)).toBeDisabled({ timeout: 5_000 });
+      await chooseFileForUpload(page, csvFilePath);
+      await assertSelectedFilename(page, selectedCsvFilename);
+      await waitForUploadButtonEnabled(page, selectedCsvFilename);
+    });
+
+    const uploadOutcome = await test.step('AC10: Submit Minor 1 data and verify upload outcome', async () =>
+      submitUploadAndGetOutcome(page, 'AC10'),
+    );
+
+    if (uploadOutcome.kind === 'failure') {
+      await test.step('AC10: Bypass reporting history after validated import failure', async () => {
+        await assertUploadFailureMessage(page, uploadOutcome.message);
+      });
+      return;
+    }
+
+    await test.step('AC10: Validate BCeID reporting history for the uploaded month', async () => {
+      await page.getByRole('link', { name: /^Home$/i }).click();
+      await expect(page.getByRole('region', { name: /^Home$/i })).toBeVisible({ timeout: 30_000 });
+      await page.getByRole('button', { name: /^View Reporting History$/i }).click();
+      const table = page.getByRole('table').first();
+      await expect(table).toBeVisible({ timeout: 60_000 });
+      await assertPlatformReportingHistoryHeaders(page, EXPECTED_HISTORY_HEADERS);
+
+      // 'submitted' is included alongside 'success'/'duplicate' - all three reach here because
+      // 'failure' already returned above. When no fresh data was imported (duplicate/submitted),
+      // assertReportingHistoryRow falls back to matching the existing row instead of failing.
+      await assertReportingHistoryRow(
+        page,
+        'Minor 1',
+        'Listing Data',
+        selectedMonthLabel,
+        platformUserName,
+        'AC10',
+        uploadOutcome.kind,
+      );
+    });
+  });
+
+  test('@smoke Business BCeID representative uploads Takedown Data and validates reporting history', async ({ page }) => {
+    test.skip(!hasBceidPlatformAuthConfig(), BCEID_PLATFORM_AUTH_ENV_MESSAGE);
+    let platformUploadedBy = '';
+    let selectedMonthLabel = toLongMonthLabel(shiftMonth(new Date(), -1));
+
+    await test.step('AC11: Authenticate with platform BCeID and open the upload form', async () => {
+      await loginAsBceid(page);
+      await expect(page.getByRole('region', { name: /^Home$/i })).toBeVisible({ timeout: 30_000 });
+      platformUploadedBy = await getPlatformUploadedBy(page);
+      await page.getByRole('button', { name: /^Submit Platform Data$/i }).click();
+      await expect(page.getByText(/Upload Your Platform Data/i).first()).toBeVisible({ timeout: 60_000 });
+    });
+
+    await test.step('AC11: Verify report type options and select Takedown Data', async () => {
+      await openPrimengDropdown(page, /^Select Report Type$/i);
+      const listbox = page.locator('[role="listbox"]').first();
+      await expect(listbox.getByRole('option', { name: /Short-?Term Rental Listing Data/i }).first()).toBeVisible();
+      await expect(listbox.getByRole('option', { name: /^Takedown Data$/i }).first()).toBeVisible();
+      await choosePrimengOption(page, /^Takedown Data$/i);
+      await expect(page.getByRole('combobox', { name: /^Takedown Data$/i }).first()).toBeVisible();
+    });
+
+    await test.step('AC11: Select a valid reporting month and reject a non-CSV file', async () => {
+      await openPrimengDropdown(page, /^Select month$/i);
+      await assertFutureMonthOptionDisabled(page, shiftMonth(new Date(), 1));
+      await page.keyboard.press('Escape');
+      await page.locator('[role="listbox"]').first().waitFor({ state: 'hidden', timeout: 15_000 });
+      await selectReportingMonthWithRetry(page, selectedMonthLabel);
+      selectedMonthLabel = await getSelectedMonthLabel(page);
+
+      const invalidFilePath = await createInvalidTextFixture();
+      try {
+        await chooseFileForUpload(page, invalidFilePath);
+        await assertNonCsvRejected(page);
+      } finally {
+        await fs.rm(invalidFilePath, { force: true });
+      }
+    });
+
+    let selectedCsvFilename = '';
+    await test.step('AC12: Reset the form and upload the matching Takedown Data CSV', async () => {
+      await page.getByRole('link', { name: /^Home$/i }).click();
+      await expect(page.getByRole('region', { name: /^Home$/i })).toBeVisible({ timeout: 30_000 });
+      await page.getByRole('button', { name: /^Submit Platform Data$/i }).click();
+      await expect(page.getByRole('combobox', { name: /^Select Report Type$/i }).first()).toBeVisible({ timeout: 30_000 });
+
+      await openPrimengDropdown(page, /^Select Report Type$/i);
+      await choosePrimengOption(page, /^Takedown Data$/i);
+      await selectReportingMonthWithRetry(page, selectedMonthLabel);
+
+      const csvFilePath = getCsvFilePathForMonthLabel('Minor1/Takedown', selectedMonthLabel);
+      selectedCsvFilename = path.basename(csvFilePath);
+      await assertFixtureExists(csvFilePath);
+      await expect(getUploadActionButton(page)).toBeDisabled({ timeout: 5_000 });
+      await chooseFileForUpload(page, csvFilePath);
+      await assertSelectedFilename(page, selectedCsvFilename);
+      await waitForUploadButtonEnabled(page, selectedCsvFilename);
+    });
+
+    const uploadOutcome = await test.step('AC13: Submit Takedown Data and verify the upload outcome', async () =>
+      submitUploadAndGetOutcome(page, 'AC13'),
+    );
+
+    if (uploadOutcome.kind === 'failure') {
+      await test.step('AC15: Verify the Takedown Data import failure message', async () => {
+        await assertUploadFailureMessage(page, uploadOutcome.message);
+      });
+      return;
+    }
+
+    await test.step('AC14: Validate the Takedown Data reporting-history row', async () => {
+      await page.getByRole('link', { name: /^Home$/i }).click();
+      await expect(page.getByRole('region', { name: /^Home$/i })).toBeVisible({ timeout: 30_000 });
+      await page.getByRole('button', { name: /^View Reporting History$/i }).click();
+      await expect(page.getByRole('table').first()).toBeVisible({ timeout: 60_000 });
+      await assertPlatformReportingHistoryHeaders(page, EXPECTED_HISTORY_HEADERS);
+      // uploadOutcome.kind is 'success' | 'duplicate' | 'submitted' here ('failure' returned above);
+      // duplicate/submitted mean no fresh data was imported, so the row match is relaxed accordingly.
+      await assertReportingHistoryRow(
+        page,
+        'Minor 1',
+        'Takedown Data',
+        selectedMonthLabel,
+        platformUploadedBy,
+        'AC14',
+        uploadOutcome.kind,
+      );
+    });
   });
 });
 
@@ -377,6 +600,30 @@ test.describe('@regression Feature: UploadPlatformSTRData', () => {
 
 async function loginAsIdir(page: Page): Promise<void> {
   await loginAsIdirShared(page, APP_URL);
+}
+
+async function loginAsBceid(page: Page): Promise<void> {
+  await loginAsBceidPlatformShared(page, APP_URL);
+}
+
+async function getPlatformUploadedBy(page: Page): Promise<string> {
+  const userNameElement = page.locator('.user-container.ng-star-inserted').first();
+  await expect(userNameElement).toBeVisible({ timeout: 20_000 });
+
+  const displayName = (await userNameElement.innerText()).trim();
+  expect(displayName, 'Expected the authenticated platform user name in the top-right header').toBeTruthy();
+
+  const identityTokens = displayName
+    .split(/\s+/)
+    .filter((token) => token && !/^HMA:/i.test(token));
+  const strdpIndex = identityTokens.findIndex((token) => /^STRDP$/i.test(token));
+
+  if (strdpIndex >= 0 && identityTokens.length > 1) {
+    const accountName = identityTokens.filter((_, index) => index !== strdpIndex).join(' ');
+    return `${accountName}, ${identityTokens[strdpIndex]}`;
+  }
+
+  return `, ${displayName}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -666,9 +913,73 @@ async function assertAc4ComboboxSelections(page: Page, monthLabel: string): Prom
   ).toBeVisible({ timeout: 10_000 });
 }
 
+async function assertBceidAc9ComboboxSelections(page: Page, monthLabel: string): Promise<void> {
+  await expect(
+    page.getByRole('combobox', { name: /Short-?Term Rental Listing Data/i }).first(),
+    'Expected report type combobox to show selected report type.',
+  ).toBeVisible({ timeout: 10_000 });
+
+  expect(monthLabel, 'Expected selected month label before upload.').not.toBe('');
+  await expect(
+    page.getByRole('combobox', { name: new RegExp(`^${escapeRegExp(monthLabel)}$`, 'i') }).first(),
+    `Expected month combobox to show selected month "${monthLabel}" before upload.`,
+  ).toBeVisible({ timeout: 10_000 });
+}
+
 // ---------------------------------------------------------------------------
 // Import outcome polling
 // ---------------------------------------------------------------------------
+
+async function submitUploadAndGetOutcome(
+  page: Page,
+  acceptanceCriteria: string,
+): Promise<{ kind: 'success' | 'failure' | 'duplicate' | 'submitted'; message: string }> {
+  const uploadButton = getUploadActionButton(page);
+  await expect(uploadButton).toBeEnabled({ timeout: 30_000 });
+
+  const isUploadRequest = (request: { method(): string; url(): string }): boolean =>
+    ['POST', 'PUT', 'PATCH'].includes(request.method()) && /(upload|import|report|listing|file)/i.test(request.url());
+
+  const uploadRequestPromise = page.waitForRequest(isUploadRequest, { timeout: 15_000 }).catch(() => null);
+  const uploadResponsePromise = page
+    .waitForResponse((response) => isUploadRequest(response.request()), { timeout: 15_000 })
+    .catch(() => null);
+
+  await uploadButton.click();
+
+  const [uploadRequest, uploadResponse] = await Promise.all([uploadRequestPromise, uploadResponsePromise]);
+  const processingVisible = await page
+    .getByText(/processing|uploading|importing|in progress/i)
+    .first()
+    .isVisible({ timeout: 2_000 })
+    .catch(() => false);
+
+  expect(
+    uploadRequest !== null || uploadResponse !== null || processingVisible,
+    'Expected upload request/response or processing indicator after clicking Upload.',
+  ).toBe(true);
+
+  const outcome = await waitForImportOutcome(page);
+  if (outcome.kind === 'failure') {
+    console.error(`[${acceptanceCriteria}] Data import failed: ${outcome.message}`);
+    return outcome;
+  }
+
+  expect(
+    outcome.kind === 'success' || outcome.kind === 'duplicate' || outcome.kind === 'submitted',
+    `Upload outcome unclear - got kind="${outcome.kind}". Details: ${outcome.message}`,
+  ).toBe(true);
+  console.log(`[${acceptanceCriteria}] Data import ${outcome.kind}: ${outcome.message}`);
+  return outcome;
+}
+
+async function assertUploadFailureMessage(page: Page, outcomeMessage: string): Promise<void> {
+  const errorMessage = page
+    .locator('.p-toast-message-error, [class*="error" i], .error, [role="alert"]')
+    .first();
+  const errorVisible = await errorMessage.isVisible({ timeout: 10_000 }).catch(() => false);
+  expect(errorVisible || outcomeMessage !== '', 'Expected an error message after upload failure.').toBe(true);
+}
 
 /**
  * Polls for an upload outcome after clicking the Upload button.
@@ -792,6 +1103,105 @@ async function assertPlatformReportingHistoryHeaders(
   }
 }
 
+/**
+ * Outcome kinds that reach reporting-history validation ('failure' is handled separately by callers).
+ * 'success' means a brand-new row was imported just now; 'duplicate'/'submitted' mean the portal
+ * recognized data uploaded in an earlier run and may not have created a fresh row at all.
+ */
+type ReportingHistoryOutcomeKind = 'success' | 'duplicate' | 'submitted';
+
+async function assertReportingHistoryRow(
+  page: Page,
+  platformName: string,
+  reportType: string,
+  monthLabel: string,
+  uploadedBy: string,
+  acceptanceCriteria: 'AC6' | 'AC10' | 'AC14',
+  outcomeKind: ReportingHistoryOutcomeKind,
+): Promise<void> {
+  const reportedMonth = toReportedMonthValue(monthLabel);
+  const uploadDate = toPortalDate(new Date());
+  const table = page.getByRole('table').first();
+  // Only a 'success' outcome guarantees a fresh row stamped with today's date and the current
+  // uploader; a duplicate/submitted outcome may point back to an older row from a prior test run,
+  // so we relax the match to platform + report type + reported month only (no fresh data to assert).
+  const hasFreshUploadData = outcomeKind === 'success';
+
+  const row = hasFreshUploadData
+    ? table
+        .getByRole('row')
+        .filter({ hasText: platformName })
+        .filter({ hasText: reportType })
+        .filter({ hasText: reportedMonth })
+        .filter({ hasText: uploadDate })
+        .filter({ hasText: uploadedBy })
+        .first()
+    : table
+        .getByRole('row')
+        .filter({ hasText: platformName })
+        .filter({ hasText: reportType })
+        .filter({ hasText: reportedMonth })
+        .first();
+
+  await expect(
+    row,
+    hasFreshUploadData
+      ? `[${acceptanceCriteria}] Expected a fresh reporting-history row for "${platformName}" / "${reportType}" / "${reportedMonth}" uploaded today by "${uploadedBy}".`
+      : `[${acceptanceCriteria}] Outcome="${outcomeKind}" (no fresh data) - expected an existing reporting-history row for "${platformName}" / "${reportType}" / "${reportedMonth}".`,
+  ).toBeVisible({ timeout: 30_000 });
+
+  const cells = row.getByRole('cell');
+  await expect(cells).toHaveCount(9);
+  await expect(cells.nth(0)).toHaveText(new RegExp(`^${escapeRegExp(platformName)}$`, 'i'));
+  await expect(cells.nth(1)).toHaveText(new RegExp(`^${escapeRegExp(reportType)}$`, 'i'));
+  await expect(cells.nth(2)).toHaveText(new RegExp(`^${escapeRegExp(reportedMonth)}$`));
+  await expect(cells.nth(3)).toHaveText(/^(Processed|Pending)$/i);
+  await expect(cells.nth(4)).toHaveText(/^\s*\d+\s*$/);
+  await expect(cells.nth(5)).toHaveText(/^\s*\d+\s*$/);
+  await expect(cells.nth(6)).toHaveText(/^\s*\d+\s*$/);
+
+  if (hasFreshUploadData) {
+    await expect(cells.nth(7)).toHaveText(new RegExp(`^${escapeRegExp(uploadDate)}$`));
+    await expect(cells.nth(8)).toContainText(uploadedBy);
+  } else {
+    // No fresh data was imported, so the Upload Date / Uploaded By columns may reflect an earlier
+    // run - skip the strict date/uploader assertions instead of failing on stale-but-valid data.
+    console.warn(
+      `[${acceptanceCriteria}] Outcome="${outcomeKind}": skipped strict Upload Date / Uploaded By ` +
+        'checks because no fresh data was uploaded; matched the existing reporting-history row instead.',
+    );
+  }
+
+  const [
+    platform,
+    reportTypeValue,
+    month,
+    status,
+    totalRecords,
+    successfulRecords,
+    errors,
+    uploadedDate,
+    uploadedByValue,
+  ] = (await cells.allTextContents()).map((value) => value.trim());
+
+  await test.info().attach(`${acceptanceCriteria} reporting history validation`, {
+    body: Buffer.from(JSON.stringify({
+      outcomeKind,
+      hasFreshUploadData,
+      platform,
+      reportType: reportTypeValue,
+      reportedMonth: month,
+      status,
+      totalRecords,
+      successfulRecords,
+      errors,
+      uploadedDate,
+      uploadedBy: uploadedByValue,
+    }, null, 2)),
+    contentType: 'application/json',
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Date utilities
 // ---------------------------------------------------------------------------
@@ -804,27 +1214,37 @@ function toLongMonthLabel(date: Date): string {
   return new Intl.DateTimeFormat('en-CA', { month: 'long', year: 'numeric' }).format(date);
 }
 
-/**
- * Extract the month number (01-12) and year from a long month label.
- * Example: "May 2026" → { month: '05', year: '2026' }
- */
-function parseMonthLabel(label: string): { month: string; year: string } {
-  const match = label.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i);
+function toReportedMonthValue(monthLabel: string): string {
+  const match = monthLabel.match(/^(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})$/i);
   if (!match) {
-    throw new Error(`Could not parse month label: "${label}"`);
+    throw new Error(`Could not convert reporting month label: "${monthLabel}"`);
   }
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const monthIndex = monthNames.findIndex(m => m.toLowerCase() === match[1].toLowerCase());
-  const monthNum = String(monthIndex + 1).padStart(2, '0');
-  return { month: monthNum, year: match[2] };
+
+  const monthNames = [
+    'january', 'february', 'march', 'april', 'may', 'june',
+    'july', 'august', 'september', 'october', 'november', 'december',
+  ];
+  const month = String(monthNames.indexOf(match[1].toLowerCase()) + 1).padStart(2, '0');
+  return `${match[2]}-${month}`;
+}
+
+function toPortalDate(date: Date): string {
+  const dateParts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Vancouver',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const parts = Object.fromEntries(dateParts.map(({ type, value }) => [type, value]));
+  return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
 /**
- * Get the CSV file path for a selected month label using reporting-period naming.
- * Example: "May 2026" → "test-data/May 2026.csv"
+ * Get a platform's CSV file path for a selected month label using reporting-period naming.
+ * Example: "Minor1", "May 2026" → "test-data/Minor1/May 2026.csv"
  */
-function getCsvFilePathForMonthLabel(monthLabel: string): string {
-  return path.resolve(process.cwd(), 'test-data', `${monthLabel}.csv`);
+function getCsvFilePathForMonthLabel(platformDirectory: 'Major1' | 'Minor1' | 'Minor1/Takedown', monthLabel: string): string {
+  return path.resolve(process.cwd(), 'test-data', platformDirectory, `${monthLabel}.csv`);
 }
 
 // ---------------------------------------------------------------------------
@@ -847,7 +1267,7 @@ async function assertFixtureExists(filePath: string): Promise<void> {
   } catch {
     throw new Error(
       `Expected reporting-period fixture file not found: ${filePath}. ` +
-        'Ensure files in test-data follow naming like "May 2026.csv".',
+        'Ensure the platform files in test-data/<platform> follow naming like "May 2026.csv".',
     );
   }
 }

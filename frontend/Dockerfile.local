@@ -12,7 +12,8 @@ RUN npm run build -- --configuration production
 
 FROM nginx:stable-alpine3.24 as builder-modules
 
-ENV NGINX_VERSION 1.30.4
+# NGINX_VERSION is inherited from the base image; nginx refuses to load a dynamic
+# module built against any other version, so it must never be pinned separately here.
 ENV MORE_HEADERS_VERSION=0.34
 ENV MORE_HEADERS_GITREPO=openresty/headers-more-nginx-module
 

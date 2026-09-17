@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scheduled Maintenance</title>
+  <style>
+    :root {
+      --bg-1: #053662;
+      --bg-2: #053662;
+      --card: #053662;
+      --text: #f4f7ec;
+      --muted: #d5dec4;
+      --accent: #b8d07a;
+      --accent-2: #eab308;
+      --border: rgba(232, 239, 216, 0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: "Avenir Next", "Trebuchet MS", "Lucida Grande", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(184, 208, 122, 0.2), transparent 60%),
+        radial-gradient(900px 500px at 85% 85%, rgba(122, 169, 78, 0.18), transparent 65%),
+        linear-gradient(160deg, var(--bg-1), var(--bg-2));
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .panel {
+      width: min(760px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 20px 60px rgba(2, 6, 23, 0.5);
+      padding: 34px 28px;
+      animation: fade-in 450ms ease-out;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(184, 208, 122, 0.65);
+      color: #e3efc5;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+      line-height: 1.15;
+      letter-spacing: 0.01em;
+      color: #fbfdf5;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(213, 222, 196, 0.55), transparent);
+      margin: 22px 0;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #e4ecd4;
+      font-size: 0.95rem;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.75);
+      animation: pulse 1.8s infinite;
+      flex: 0 0 auto;
+    }
+
+    @keyframes fade-in {
+      from {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.75);
+      }
+      70% {
+        box-shadow: 0 0 0 12px rgba(245, 158, 11, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .panel {
+        padding: 26px 20px;
+      }
+
+      p {
+        font-size: 0.96rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="panel" role="main" aria-labelledby="maintenance-title">
+    <span class="pill">Scheduled Maintenance</span>
+    <h1 id="maintenance-title">The STR Data Portal is temporarily unavailable.</h1>
+    <p>
+      We are currently performing planned maintenance. The Portal may be unavailable for up to 4 hours. 
+      We appreciate your patience as we work to improve the service.
+    </p>
+    <div class="divider" aria-hidden="true"></div>
+    <p class="meta">
+      <span class="dot" aria-hidden="true"></span>
+      Service status: maintenance in progress
+    </p>
+  </main>
+</body>
+</html>

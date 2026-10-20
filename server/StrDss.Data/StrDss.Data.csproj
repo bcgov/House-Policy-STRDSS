@@ -24,4 +24,8 @@
 	  <ProjectReference Include="..\StrDss.Common\StrDss.Common.csproj" />
 	  <ProjectReference Include="..\StrDss.Model\StrDss.Model.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <InternalsVisibleTo Include="StrDss.Test" />
+	</ItemGroup>
 </Project>

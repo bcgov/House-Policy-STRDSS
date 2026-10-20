@@ -9,11 +9,13 @@ using StrDss.Service;
 using StrDss.Service.HttpClients;
 using System.Reflection;
 using StrDss.Data.Entities;
+using StrDss.Data.Telemetry;
 using Microsoft.EntityFrameworkCore;
 using StrDss.Service.Bceid;
 using StrDss.Service.Hangfire;
 using Hangfire.PostgreSql;
 using Npgsql;
+using OpenTelemetry.Metrics;
 using StrDss.Hangfire;
 using Serilog;
 using Hangfire.Storage;
@@ -84,6 +86,13 @@ builder.Services.RegisterAssemblyPublicNonGenericClasses(assemblies)
      .Where(c => c.Name.EndsWith("Repository"))
      .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
 
+builder.Services.DecorateRepositoriesWithMetrics();
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics => metrics
+        .AddMeter(RepositoryMetrics.MeterName)
+        .AddPrometheusExporter());
+
 //Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -145,6 +154,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHealthChecks("/healthz");
+
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.Use(async (context, next) =>
 {

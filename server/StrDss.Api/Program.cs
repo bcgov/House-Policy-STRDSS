@@ -19,8 +19,10 @@ using StrDss.Service.Bceid;
 using Npgsql;
 using Serilog;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using StrDss.Common;
+using StrDss.Data.Telemetry;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -87,6 +89,13 @@ builder.Services.RegisterAssemblyPublicNonGenericClasses(assemblies)
 builder.Services.RegisterAssemblyPublicNonGenericClasses(assemblies)
      .Where(c => c.Name.EndsWith("Repository"))
      .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
+
+builder.Services.DecorateRepositoriesWithMetrics();
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics => metrics
+        .AddMeter(RepositoryMetrics.MeterName)
+        .AddPrometheusExporter());
 
 //Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -218,6 +227,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHealthChecks("/healthz");
+
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.Use(async (context, next) =>
 {

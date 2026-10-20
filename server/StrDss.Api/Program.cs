@@ -95,6 +95,15 @@ builder.Services.DecorateRepositoriesWithMetrics();
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics => metrics
         .AddMeter(RepositoryMetrics.MeterName)
+        // Built-in .NET runtime metrics (GC, JIT, thread pool, exceptions, etc.)
+        .AddRuntimeInstrumentation()
+        // Built-in ASP.NET Core server metrics (request duration, active requests, etc.)
+        .AddAspNetCoreInstrumentation()
+        // Built-in HttpClient metrics (outbound request duration, active requests, etc.)
+        .AddHttpClientInstrumentation()
+        // Built-in EF Core and Npgsql meters
+        .AddMeter("Microsoft.EntityFrameworkCore")
+        .AddMeter("Npgsql")
         .AddPrometheusExporter());
 
 //Unit of Work

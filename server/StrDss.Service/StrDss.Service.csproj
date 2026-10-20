@@ -7,40 +7,40 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSwag.ApiDescription.Client" Version="14.2.0">
+		<PackageReference Include="NSwag.ApiDescription.Client">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="NSwag.MSBuild" Version="14.2.0">
+		<PackageReference Include="NSwag.MSBuild">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="CsvHelper" Version="33.1.0" />
-		<PackageReference Include="HtmlSanitizer" Version="9.0.892" />
-		<PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="7.0.2">
+		<PackageReference Include="CsvHelper" />
+		<PackageReference Include="HtmlSanitizer" />
+		<PackageReference Include="Microsoft.Extensions.ApiDescription.Client">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
-		<PackageReference Include="AutoMapper" Version="14.0.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="NSwag.ApiDescription.Client" Version="14.2.0">
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Http" />
+		<PackageReference Include="AutoMapper" />
+		<PackageReference Include="Newtonsoft.Json" />
+		<PackageReference Include="NSwag.ApiDescription.Client">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="System.ServiceModel.Duplex" Version="4.10.*" />
-		<PackageReference Include="System.ServiceModel.Federation" Version="4.10.*" />
-		<PackageReference Include="System.ServiceModel.Http" Version="4.10.*" />
-		<PackageReference Include="System.ServiceModel.NetTcp" Version="4.10.*" />
-		<PackageReference Include="System.ServiceModel.Security" Version="4.10.*" />
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.12" />
-		<PackageReference Include="Hangfire.PostgreSql" Version="1.20.8" />
+		<PackageReference Include="System.ServiceModel.Duplex" />
+		<PackageReference Include="System.ServiceModel.Federation" />
+		<PackageReference Include="System.ServiceModel.Http" />
+		<PackageReference Include="System.ServiceModel.NetTcp" />
+		<PackageReference Include="System.ServiceModel.Security" />
+		<PackageReference Include="Hangfire.AspNetCore" />
+		<PackageReference Include="Hangfire.PostgreSql" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\StrDss.Common\StrDss.Common.csproj" />

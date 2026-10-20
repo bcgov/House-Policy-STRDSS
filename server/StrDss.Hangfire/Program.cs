@@ -148,17 +148,17 @@ app.UseHealthChecks("/healthz");
 
 app.Use(async (context, next) =>
 {
-    context.Response.Headers.Add("content-security-policy", $"default-src 'self'; style-src 'self' 'img-src 'self' data:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';");
-    context.Response.Headers.Add("strict-transport-security", "max-age=15768000; includeSubDomains; preload");
-    context.Response.Headers.Add("x-content-type-options", "nosniff");
-    context.Response.Headers.Add("x-frame-options", "SAMEORIGIN");
-    context.Response.Headers.Add("x-xss-protection", "0");
-    context.Response.Headers.Add("permissions-policy", "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()");
-    context.Response.Headers.Add("referrer-policy", "strict-origin");
-    context.Response.Headers.Add("x-dns-prefetch-control", "off");
-    context.Response.Headers.Add("cache-control", "no-cache, no-store, must-revalidate");
-    context.Response.Headers.Add("pragma", "no-cache");
-    context.Response.Headers.Add("expires", "0");
+    context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; style-src 'self' 'img-src 'self' data:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';";
+    context.Response.Headers.StrictTransportSecurity = "max-age=15768000; includeSubDomains; preload";
+    context.Response.Headers.XContentTypeOptions = "nosniff";
+    context.Response.Headers.XFrameOptions = "SAMEORIGIN";
+    context.Response.Headers.XXSSProtection = "0";
+    context.Response.Headers["permissions-policy"] = "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()";
+    context.Response.Headers["referrer-policy"] = "strict-origin";
+    context.Response.Headers["x-dns-prefetch-control"] = "off";
+    context.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
+    context.Response.Headers.Pragma = "no-cache";
+    context.Response.Headers.Expires = "0";
     await next.Invoke();
 });
 

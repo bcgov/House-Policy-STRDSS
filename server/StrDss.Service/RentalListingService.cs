@@ -450,6 +450,7 @@ namespace StrDss.Service
             var builder = new StringBuilder();
 
             // Define a mapping between CsvCols and the properties of listing
+#pragma warning disable CS8603 // Possible null reference return.
             var csvMappings = new Dictionary<string, Func<RentalListingExportDto, object>>
             {
                 { CsvCols.MostRecentPlatformReportMonth, l => l.LatestReportPeriodYm },
@@ -535,6 +536,7 @@ namespace StrDss.Service
                 { CsvCols.PreviousActionTaken2, l => l.LastActionNm2 },
                 { CsvCols.DateOfPreviousActionTaken2, l => l.LastActionDtm2 }
             };
+#pragma warning restore CS8603 // Possible null reference return.
 
             foreach (var column in csvMappings)
             {

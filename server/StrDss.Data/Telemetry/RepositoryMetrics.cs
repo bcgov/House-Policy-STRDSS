@@ -1,0 +1,25 @@
+using System.Diagnostics.Metrics;
+
+namespace StrDss.Data.Telemetry;
+
+public static class RepositoryMetrics
+{
+    public const string MeterName = "StrDss.Repositories";
+
+    private static readonly Meter Meter = new(MeterName);
+
+    internal static readonly Histogram<double> OperationDuration = Meter.CreateHistogram<double>(
+        "strdss.repository.operation.duration",
+        unit: "s",
+        description: "Duration of repository operations.");
+
+    internal static readonly Counter<long> OperationErrors = Meter.CreateCounter<long>(
+        "strdss.repository.operation.errors",
+        unit: "{error}",
+        description: "Number of repository operation errors.");
+
+    internal static readonly UpDownCounter<long> ActiveOperations = Meter.CreateUpDownCounter<long>(
+        "strdss.repository.operation.active",
+        unit: "{operation}",
+        description: "Number of repository operations currently executing.");
+}

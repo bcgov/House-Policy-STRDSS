@@ -19,8 +19,10 @@ using StrDss.Service.Bceid;
 using Npgsql;
 using Serilog;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using StrDss.Common;
+using StrDss.Data.Telemetry;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -87,6 +89,22 @@ builder.Services.RegisterAssemblyPublicNonGenericClasses(assemblies)
 builder.Services.RegisterAssemblyPublicNonGenericClasses(assemblies)
      .Where(c => c.Name.EndsWith("Repository"))
      .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
+
+builder.Services.DecorateRepositoriesWithMetrics();
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics => metrics
+        .AddMeter(RepositoryMetrics.MeterName)
+        // Built-in .NET runtime metrics (GC, JIT, thread pool, exceptions, etc.)
+        .AddRuntimeInstrumentation()
+        // Built-in ASP.NET Core server metrics (request duration, active requests, etc.)
+        .AddAspNetCoreInstrumentation()
+        // Built-in HttpClient metrics (outbound request duration, active requests, etc.)
+        .AddHttpClientInstrumentation()
+        // Built-in EF Core and Npgsql meters
+        .AddMeter("Microsoft.EntityFrameworkCore")
+        .AddMeter("Npgsql")
+        .AddPrometheusExporter());
 
 //Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -218,6 +236,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHealthChecks("/healthz");
+
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.Use(async (context, next) =>
 {

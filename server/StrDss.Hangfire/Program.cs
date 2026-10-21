@@ -9,11 +9,13 @@ using StrDss.Service;
 using StrDss.Service.HttpClients;
 using System.Reflection;
 using StrDss.Data.Entities;
+using StrDss.Data.Telemetry;
 using Microsoft.EntityFrameworkCore;
 using StrDss.Service.Bceid;
 using StrDss.Service.Hangfire;
 using Hangfire.PostgreSql;
 using Npgsql;
+using OpenTelemetry.Metrics;
 using StrDss.Hangfire;
 using Serilog;
 using Hangfire.Storage;
@@ -84,6 +86,22 @@ builder.Services.RegisterAssemblyPublicNonGenericClasses(assemblies)
      .Where(c => c.Name.EndsWith("Repository"))
      .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
 
+builder.Services.DecorateRepositoriesWithMetrics();
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics => metrics
+        .AddMeter(RepositoryMetrics.MeterName)
+        // Built-in .NET runtime metrics (GC, JIT, thread pool, exceptions, etc.)
+        .AddRuntimeInstrumentation()
+        // Built-in ASP.NET Core server metrics (request duration, active requests, etc.)
+        .AddAspNetCoreInstrumentation()
+        // Built-in HttpClient metrics (outbound request duration, active requests, etc.)
+        .AddHttpClientInstrumentation()
+        // Built-in EF Core and Npgsql meters
+        .AddMeter("Microsoft.EntityFrameworkCore")
+        .AddMeter("Npgsql")
+        .AddPrometheusExporter());
+
 //Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -146,19 +164,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHealthChecks("/healthz");
 
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
 app.Use(async (context, next) =>
 {
-    context.Response.Headers.Add("content-security-policy", $"default-src 'self'; style-src 'self' 'img-src 'self' data:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';");
-    context.Response.Headers.Add("strict-transport-security", "max-age=15768000; includeSubDomains; preload");
-    context.Response.Headers.Add("x-content-type-options", "nosniff");
-    context.Response.Headers.Add("x-frame-options", "SAMEORIGIN");
-    context.Response.Headers.Add("x-xss-protection", "0");
-    context.Response.Headers.Add("permissions-policy", "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()");
-    context.Response.Headers.Add("referrer-policy", "strict-origin");
-    context.Response.Headers.Add("x-dns-prefetch-control", "off");
-    context.Response.Headers.Add("cache-control", "no-cache, no-store, must-revalidate");
-    context.Response.Headers.Add("pragma", "no-cache");
-    context.Response.Headers.Add("expires", "0");
+    context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; style-src 'self' 'img-src 'self' data:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';";
+    context.Response.Headers.StrictTransportSecurity = "max-age=15768000; includeSubDomains; preload";
+    context.Response.Headers.XContentTypeOptions = "nosniff";
+    context.Response.Headers.XFrameOptions = "SAMEORIGIN";
+    context.Response.Headers.XXSSProtection = "0";
+    context.Response.Headers["permissions-policy"] = "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()";
+    context.Response.Headers["referrer-policy"] = "strict-origin";
+    context.Response.Headers["x-dns-prefetch-control"] = "off";
+    context.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
+    context.Response.Headers.Pragma = "no-cache";
+    context.Response.Headers.Expires = "0";
     await next.Invoke();
 });
 

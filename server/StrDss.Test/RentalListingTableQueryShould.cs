@@ -11,6 +11,124 @@ namespace StrDss.Test
     public class RentalListingTableQueryShould
     {
         [Fact]
+        public void ListingQueries_KeepEachJoinListAtOrBelowEight()
+        {
+            const int joinCollapseLimit = 8;
+            using var context = CreateContext();
+            var repository = CreateRepository(context);
+            var targetMonth = new DateOnly(2026, 9, 1);
+            var fallbackMonth = new DateOnly(2026, 8, 1);
+            var reported = context.DssRentalListingReports.AsNoTracking()
+                .Where(r => r.ReportPeriodYm == targetMonth)
+                .Select(r => r.ProvidingOrganizationId)
+                .Distinct();
+
+            var queries = new Dictionary<string, string>
+            {
+                ["base"] = repository.GetRentalListingsTableBaseQuery().ToQueryString(),
+                ["filtered and sorted"] = repository.GetRentalListingsTableBaseQuery()
+                    .Where(x => x.LatestReportPeriodYm == targetMonth)
+                    .Where(x => x.ManagingOrganizationId == 1)
+                    .Where(x => x.LastActionNm != null)
+                    .OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue)
+                    .ToQueryString(),
+                ["recent filter"] = repository.GetRentalListingsTableBaseQuery()
+                    .Where(x =>
+                        (reported.Contains(x.OfferingOrganizationId ?? 0) && x.LatestReportPeriodYm == targetMonth) ||
+                        (!reported.Contains(x.OfferingOrganizationId ?? 0) && x.LatestReportPeriodYm == fallbackMonth))
+                    .ToQueryString()
+            };
+
+            foreach (var (name, sql) in queries)
+            {
+                var joinCounts = JoinCountsByQuery(sql);
+                Assert.NotEmpty(joinCounts);
+                Assert.True(
+                    joinCounts.All(count => count <= joinCollapseLimit),
+                    $"{name} has a join list above PostgreSQL's default join_collapse_limit of {joinCollapseLimit}: {string.Join(", ", joinCounts)}");
+            }
+        }
+
+        /// <summary>
+        /// Counts JOIN keywords in each parenthesized query or expression.
+        /// Nested subqueries are counted on their own, so two five-join subqueries do not add up to ten.
+        /// The last count is the outer query.
+        /// </summary>
+        private static List<int> JoinCountsByQuery(string sql)
+        {
+            var counts = new List<int>();
+            var stack = new Stack<int>();
+            stack.Push(0);
+
+            for (var i = 0; i < sql.Length; i++)
+            {
+                if (sql[i] == '-' && i + 1 < sql.Length && sql[i + 1] == '-')
+                {
+                    while (i < sql.Length && sql[i] != '\n')
+                    {
+                        i++;
+                    }
+
+                    continue;
+                }
+
+                if (sql[i] == '\'')
+                {
+                    i++;
+                    while (i < sql.Length && sql[i] != '\'')
+                    {
+                        i++;
+                    }
+
+                    continue;
+                }
+
+                if (sql[i] == '(')
+                {
+                    stack.Push(0);
+                    continue;
+                }
+
+                if (sql[i] == ')')
+                {
+                    counts.Add(stack.Pop());
+                    continue;
+                }
+
+                if (!IsJoinKeyword(sql, i))
+                {
+                    continue;
+                }
+
+                var current = stack.Pop();
+                stack.Push(current + 1);
+                i += "JOIN".Length - 1;
+            }
+
+            counts.Add(stack.Pop());
+            return counts;
+        }
+
+        private static bool IsJoinKeyword(string sql, int index)
+        {
+            const string join = "JOIN";
+            if (index + join.Length > sql.Length)
+            {
+                return false;
+            }
+
+            if (!sql.AsSpan(index, join.Length).Equals(join, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            var beforeOk = index == 0 || !char.IsLetterOrDigit(sql[index - 1]);
+            var afterIndex = index + join.Length;
+            var afterOk = afterIndex >= sql.Length || !char.IsLetterOrDigit(sql[afterIndex]);
+            return beforeOk && afterOk;
+        }
+
+        [Fact]
         public void LatestListingAction_TranslatesToLateralJoinWithActionTieBreak()
         {
             using var context = CreateContext();

@@ -67,25 +67,19 @@ namespace StrDss.Data.Repositories
         };
 
         /// <summary>
-        /// Builds the base IQueryable for GetRentalListings from base tables (no view).
-        /// Latest report period is a set-based left join. The latest listing action is a correlated
-        /// lookup that Npgsql translates to LEFT JOIN LATERAL ... LIMIT 1, using
-        /// dss_rental_listing_action_i1 (rental_listing_id, action_dtm DESC, rental_listing_action_id DESC).
+        /// Builds the base IQueryable for the listing grid, counts, grouped listings, and grouped children.
+        /// Latest report period is a left join to dss_rental_listing_latest_report_mv.
+        /// The latest listing action is a correlated lookup that Npgsql translates to
+        /// LEFT JOIN LATERAL ... LIMIT 1, using dss_rental_listing_action_i1
+        /// (rental_listing_id, action_dtm DESC, rental_listing_action_id DESC).
         /// Projects directly to <see cref="RentalListingTableRowDto"/>.
-        /// Filters and sorts on LastActionDtm and LastActionNm stay on this IQueryable so they translate to SQL.
+        /// Filters and sorts on LatestReportPeriodYm, LastActionDtm, and LastActionNm stay on this IQueryable so they translate to SQL.
         /// </summary>
         internal IQueryable<RentalListingTableRowDto> GetRentalListingsTableBaseQuery()
         {
             var currentListings = _dbContext.DssRentalListings
                 .AsNoTracking()
                 .Where(drl => drl.IncludingRentalListingReportId == null);
-
-            // Pre-aggregated: max report period per (OfferingOrganizationId, PlatformListingNo) from reported listings
-            var latestReportPeriod = from rl in _dbContext.DssRentalListings
-                                    where rl.IncludingRentalListingReportId != null
-                                    join rpt in _dbContext.DssRentalListingReports on rl.IncludingRentalListingReportId equals rpt.RentalListingReportId
-                                    group rpt by new { rl.OfferingOrganizationId, rl.PlatformListingNo } into g
-                                    select new { g.Key.OfferingOrganizationId, g.Key.PlatformListingNo, MaxReportPeriodYm = g.Max(x => x.ReportPeriodYm) };
 
             return from drl in currentListings
                    join org in _dbContext.DssOrganizations on drl.OfferingOrganizationId equals org.OrganizationId
@@ -99,7 +93,9 @@ namespace StrDss.Data.Repositories
                    from lg in lgJ.DefaultIfEmpty()
                    join dbl in _dbContext.DssBusinessLicences on drl.GoverningBusinessLicenceId equals (long?)dbl.BusinessLicenceId into dblJ
                    from dbl in dblJ.DefaultIfEmpty()
-                   join lrp in latestReportPeriod on new { drl.OfferingOrganizationId, drl.PlatformListingNo } equals new { lrp.OfferingOrganizationId, lrp.PlatformListingNo } into lrpJ
+                   join lrp in _dbContext.DssRentalListingLatestReportMvs.AsNoTracking()
+                       on new { drl.OfferingOrganizationId, drl.PlatformListingNo }
+                       equals new { lrp.OfferingOrganizationId, lrp.PlatformListingNo } into lrpJ
                    from lrp in lrpJ.DefaultIfEmpty()
                    // drl.RentalListingId == drl.RentalListingId is a no-op that EF elides from SQL.
                    // Without it, EF Core 9 rewrites this correlated Take(1) as ROW_NUMBER() over every action.
@@ -113,7 +109,7 @@ namespace StrDss.Data.Repositories
                    select new RentalListingTableRowDto
                    {
                        RentalListingId = drl.RentalListingId,
-                       LatestReportPeriodYm = lrp != null ? (DateOnly?)lrp.MaxReportPeriodYm : null,
+                       LatestReportPeriodYm = lrp != null ? (DateOnly?)lrp.LatestReportPeriodYm : null,
                        OfferingOrganizationId = drl.OfferingOrganizationId,
                        PlatformListingNo = drl.PlatformListingNo,
                        EffectiveBusinessLicenceNo = drl.EffectiveBusinessLicenceNo,

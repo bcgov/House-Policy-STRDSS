@@ -53,6 +53,8 @@ public partial class DssDbContext : DbContext
 
     public virtual DbSet<DssRentalListingReport> DssRentalListingReports { get; set; }
 
+    public virtual DbSet<DssRentalListingLatestReportMv> DssRentalListingLatestReportMvs { get; set; }
+
     public virtual DbSet<DssRentalListingVw> DssRentalListingVws { get; set; }
 
     public virtual DbSet<DssRentalUploadHistoryView> DssRentalUploadHistoryViews { get; set; }
@@ -1219,6 +1221,21 @@ public partial class DssDbContext : DbContext
                 .HasForeignKey(d => d.ProvidingOrganizationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("dss_rental_listing_report_fk_provided_by");
+        });
+
+        modelBuilder.Entity<DssRentalListingLatestReportMv>(entity =>
+        {
+            entity.HasKey(e => new { e.OfferingOrganizationId, e.PlatformListingNo });
+
+            entity.ToView("dss_rental_listing_latest_report_mv");
+
+            entity.Property(e => e.OfferingOrganizationId)
+                .HasColumnName("offering_organization_id");
+            entity.Property(e => e.PlatformListingNo)
+                .HasMaxLength(50)
+                .HasColumnName("platform_listing_no");
+            entity.Property(e => e.LatestReportPeriodYm)
+                .HasColumnName("latest_report_period_ym");
         });
 
         modelBuilder.Entity<DssRentalListingVw>(entity =>

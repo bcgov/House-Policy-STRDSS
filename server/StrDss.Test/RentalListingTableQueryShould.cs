@@ -29,6 +29,25 @@ namespace StrDss.Test
         }
 
         [Fact]
+        public void LatestReportPeriod_JoinsMaterializedViewAndStaysInSql()
+        {
+            using var context = CreateContext();
+            var repository = CreateRepository(context);
+            var targetMonth = new DateOnly(2026, 9, 1);
+
+            var sql = repository.GetRentalListingsTableBaseQuery()
+                .Where(x => x.LatestReportPeriodYm == targetMonth)
+                .OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue)
+                .ToQueryString();
+
+            Assert.Contains("dss_rental_listing_latest_report_mv", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("latest_report_period_ym", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("ORDER BY", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("GROUP BY", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("dss_rental_listing_report", sql, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
         public void LastActionSortAndFilter_StayInSql()
         {
             using var context = CreateContext();

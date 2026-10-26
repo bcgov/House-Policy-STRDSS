@@ -43,6 +43,9 @@
 		<PackageReference Include="Hangfire.PostgreSql" />
 	</ItemGroup>
 	<ItemGroup>
+		<InternalsVisibleTo Include="StrDss.Test" />
+	</ItemGroup>
+	<ItemGroup>
 		<ProjectReference Include="..\StrDss.Common\StrDss.Common.csproj" />
 		<ProjectReference Include="..\StrDss.Data\StrDss.Data.csproj" />
 		<ProjectReference Include="..\StrDss.Model\StrDss.Model.csproj" />

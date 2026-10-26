@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using StrDss.Common;
+using StrDss.Data.Repositories;
 
 namespace StrDss.Service.Hangfire
 {
@@ -12,9 +13,11 @@ namespace StrDss.Service.Hangfire
         private IBizLicenceService _bizLicService;
         private IUploadDeliveryService _uploadService;
         private IRegistrationService _registrationService;
+        private IRentalListingLatestReportRepository _latestReportRepository;
 
         public HangfireJobs(IRentalListingReportService listingReportService, IRentalListingService listingService, IDelistingService delistingService,
-            ITakedownConfirmationService tdcService, IBizLicenceService bizLicService, IUploadDeliveryService uploadService, IRegistrationService registrationService)
+            ITakedownConfirmationService tdcService, IBizLicenceService bizLicService, IUploadDeliveryService uploadService, IRegistrationService registrationService,
+            IRentalListingLatestReportRepository latestReportRepository)
         {
             _linstingReportService = listingReportService;
             _delistingService = delistingService;
@@ -23,6 +26,20 @@ namespace StrDss.Service.Hangfire
             _bizLicService = bizLicService;
             _uploadService = uploadService;
             _registrationService = registrationService;
+            _latestReportRepository = latestReportRepository;
+        }
+
+        /// <summary>
+        /// Refreshes the latest-report materialized view after a listing upload is fully processed.
+        /// Enqueued with <see cref="BackgroundJob.Enqueue"/>; this is not a recurring job.
+        /// <see cref="SkipSameJobAttribute"/> drops a second enqueue while one is queued or running.
+        /// </summary>
+        [Queue("default")]
+        [SkipSameJob]
+        [AutomaticRetry(Attempts = 0)]
+        public async Task RefreshLatestRentalListingReportAsync()
+        {
+            await _latestReportRepository.RefreshLatestReportPeriodAsync();
         }
 
         [Queue("default")]

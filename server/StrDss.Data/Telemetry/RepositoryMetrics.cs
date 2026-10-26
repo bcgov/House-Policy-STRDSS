@@ -6,6 +6,9 @@ public static class RepositoryMetrics
 {
     public const string MeterName = "StrDss.Repositories";
 
+    public const string MaintenanceStatementDurationName =
+        "strdss.repository.maintenance.statement.duration";
+
     private static readonly Meter Meter = new(MeterName);
 
     internal static readonly Histogram<double> OperationDuration = Meter.CreateHistogram<double>(
@@ -22,4 +25,9 @@ public static class RepositoryMetrics
         "strdss.repository.operation.active",
         unit: "{operation}",
         description: "Number of repository operations currently executing.");
+
+    internal static readonly Histogram<double> MaintenanceStatementDuration = Meter.CreateHistogram<double>(
+        MaintenanceStatementDurationName,
+        unit: "s",
+        description: "Duration of individual repository maintenance SQL statements.");
 }

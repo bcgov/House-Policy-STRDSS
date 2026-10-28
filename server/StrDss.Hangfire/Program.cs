@@ -90,7 +90,7 @@ builder.Services.DecorateRepositoriesWithMetrics();
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics => metrics
-        .AddMeter(RepositoryMetrics.MeterName)
+        .AddRepositoryMetrics()
         // Built-in .NET runtime metrics (GC, JIT, thread pool, exceptions, etc.)
         .AddRuntimeInstrumentation()
         // Built-in ASP.NET Core server metrics (request duration, active requests, etc.)

@@ -5,11 +5,12 @@ namespace StrDss.Data.Telemetry;
 public static class RepositoryMetrics
 {
     public const string MeterName = "StrDss.Repositories";
+    public const string OperationDurationName = "strdss.repository.operation.duration";
 
     private static readonly Meter Meter = new(MeterName);
 
     internal static readonly Histogram<double> OperationDuration = Meter.CreateHistogram<double>(
-        "strdss.repository.operation.duration",
+        OperationDurationName,
         unit: "s",
         description: "Duration of repository operations.");
 

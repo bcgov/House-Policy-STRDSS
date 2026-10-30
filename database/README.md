@@ -234,6 +234,7 @@ _Initial database creation (`STR_DSS_Database_Create.sql`) still requires the `p
 - Sprint 22:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_22.sql` _(unit number column resize)_
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Actions.sql`
+  - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_22_Latest_Report_MV.sql` _(run separately, autocommit on, as the Hangfire role; not part of the Sprint 22 migration transaction)_
   - `ddl/STR_DSS_Views_Sprint_22_Listing_Actions.sql`
   - `ddl/STR_DSS_Physical_DB_DDL_Sprint_22.sql`
   - `seeding/STR_DSS_Data_Seeding_Sprint_22.sql`

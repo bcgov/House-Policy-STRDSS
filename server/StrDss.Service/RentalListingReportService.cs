@@ -11,8 +11,10 @@ using StrDss.Data.Repositories;
 using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
 using StrDss.Model.RentalReportDtos;
+using Hangfire;
 using StrDss.Service.CsvHelpers;
 using StrDss.Service.EmailTemplates;
+using StrDss.Service.Hangfire;
 using StrDss.Service.HttpClients;
 using System.Diagnostics;
 using System.Text;
@@ -155,6 +157,10 @@ namespace StrDss.Service
             upload.RegistrationLinesError = totalRegErrors;
             _unitOfWork.Commit();
 
+            // A batch of 500 lines leaves the upload Pending and must not refresh the view.
+            // Licence, registration, and takedown uploads do not call this method.
+            EnqueueLatestReportRefreshWhenProcessed(upload.UploadStatus);
+
             if (!isLastLine)
             {
                 processStopwatch.Stop();
@@ -166,6 +172,16 @@ namespace StrDss.Service
 
             processStopwatch.Stop();
             _logger.LogInformation($"Finished: {report.ReportPeriodYm.ToString("yyyy-MM")}, {report.ProvidingOrganization.OrganizationNm} - {processStopwatch.Elapsed.TotalSeconds} seconds");
+        }
+
+        internal void EnqueueLatestReportRefreshWhenProcessed(string? uploadStatus)
+        {
+            if (uploadStatus != UploadStatus.Processed)
+            {
+                return;
+            }
+
+            BackgroundJob.Enqueue<HangfireJobs>(job => job.RefreshLatestRentalListingReportAsync());
         }
 
         private async Task<(bool, bool)> ProcessUploadLine(DssRentalListingReport report, DssUploadDelivery upload, DssUploadLine uploadLine, RentalListingRowUntyped row,

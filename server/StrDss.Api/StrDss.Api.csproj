@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<NoWarn>1591</NoWarn>
+		<UserSecretsId>f481070c-b521-4473-8c0a-94d532bcb0f3</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -30,6 +31,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\server.ServiceDefaults\server.ServiceDefaults.csproj" />
 		<ProjectReference Include="..\StrDss.Common\StrDss.Common.csproj" />
 		<ProjectReference Include="..\StrDss.Data\StrDss.Data.csproj" />
 		<ProjectReference Include="..\StrDss.Model\StrDss.Model.csproj" />

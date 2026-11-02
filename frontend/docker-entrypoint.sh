@@ -3,6 +3,11 @@
 
 echo "hit entrypoint..."
 
+api_url=${API_URL:-http://server:8080}
+if ! sed -i "s~__API_URL__~$api_url~g" /etc/nginx/nginx.conf 2>/dev/null; then
+  echo "WARN: could not configure the API proxy URL in /etc/nginx/nginx.conf." >&2
+fi
+
 replace_placeholders_in_dir() {
   html_root=$1
   [ -d "$html_root" ] || return 0

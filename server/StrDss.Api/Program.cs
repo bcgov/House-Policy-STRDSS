@@ -27,6 +27,8 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 builder.WebHost.ConfigureKestrel((context, options) =>
 {
     options.AddServerHeader = false;
@@ -217,6 +219,8 @@ var healthCheck = new HealthCheck(connString);
 builder.Services.AddHealthChecks().AddCheck("DbConnection", healthCheck);
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

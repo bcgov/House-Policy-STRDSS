@@ -10,6 +10,8 @@ backup.sql
 docker-compose.yml
 note.txt
 Scaffolding.txt
+/strdssdev.sql
+/strdssdev.sql.gz
 /Test/UITest/Configuration/AppSettings.dev.json
 /Test/UITest/Configuration/AppSettings.test.json
 /Test/UITest/Configuration/AppSettings.uat.json

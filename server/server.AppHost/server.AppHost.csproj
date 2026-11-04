@@ -1,0 +1,16 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>a93a1a19-b303-47e0-ad63-9a83b6dc6e52</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StrDss.Api\StrDss.Api.csproj" />
+    <ProjectReference Include="..\StrDss.Hangfire\StrDss.Hangfire.csproj" />
+  </ItemGroup>
+
+</Project>

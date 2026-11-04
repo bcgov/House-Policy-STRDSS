@@ -19,8 +19,11 @@ using OpenTelemetry.Metrics;
 using StrDss.Hangfire;
 using Serilog;
 using Hangfire.Storage;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Microsoft.Extensions.Hosting.Extensions.AddServiceDefaults(builder);
 
 builder.WebHost.ConfigureKestrel((context, options) =>
 {

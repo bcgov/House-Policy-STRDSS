@@ -189,7 +189,7 @@ namespace StrDss.Service
             var cacheMinutes = _configuration.GetValue("GROUPED_LISTING_TABLE_CACHE_MINUTES", 2);
             if (cacheMinutes <= 0)
             {
-                return await LoadGroupedPageWithMultiPropertyFlagsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                return await _listingRepo.GetGroupedRentalListingsPagedAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                     prRequirement, blRequirement, lgId, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
             }
 
@@ -202,7 +202,7 @@ namespace StrDss.Service
                     return cached;
                 }
 
-                var page = await LoadGroupedPageWithMultiPropertyFlagsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
+                var page = await _listingRepo.GetGroupedRentalListingsPagedAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
                     prRequirement, blRequirement, lgId, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
 
                 _memoryCache.Set(cacheKey, page, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(cacheMinutes)));
@@ -213,34 +213,6 @@ namespace StrDss.Service
                 semaphore.Release();
                 _groupedListingTableCacheLocks.TryRemove(cacheKey, out _);
             }
-        }
-
-        private async Task<PagedDto<RentalListingGroupSummaryDto>> LoadGroupedPageWithMultiPropertyFlagsAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount)
-        {
-            var dto = await _listingRepo.GetGroupedRentalListingsPagedAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,
-                prRequirement, blRequirement, lgId, recent, pageSize, pageNumber, orderBy, direction, includeTotalCount);
-
-            var list = dto.SourceList.ToList();
-            if (list.Count == 0)
-            {
-                return dto;
-            }
-
-            var flags = await _listingRepo.BatchEffectiveHostHasMultiplePropertiesAsync(list.Select(s => s.EffectiveHostNm).ToList());
-            foreach (var row in list)
-            {
-                if (row.EffectiveHostNm != null && flags.TryGetValue(row.EffectiveHostNm, out var multi))
-                {
-                    row.HasMultipleProperties = multi;
-                }
-            }
-
-            return new PagedDto<RentalListingGroupSummaryDto>
-            {
-                SourceList = list,
-                PageInfo = dto.PageInfo
-            };
         }
 
         private string BuildGroupedListingTableCacheKey(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,

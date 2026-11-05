@@ -2,12 +2,15 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using NpgsqlTypes;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using StrDss.Model.DelistingDtos;
 using StrDss.Model.RentalReportDtos;
 using System.Diagnostics;
+using System.Data.Common;
+using System.Text;
 
 namespace StrDss.Data.Repositories
 {
@@ -23,7 +26,6 @@ namespace StrDss.Data.Repositories
             bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true);
         Task<List<RentalListingTableRowDto>> GetGroupedListingChildrenAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo);
-        Task<Dictionary<string, bool>> BatchEffectiveHostHasMultiplePropertiesAsync(IReadOnlyList<string?> effectiveHostNms);
         Task<int> CountHostListingsAsync(string hostName);
         Task<RentalListingViewDto?> GetRentalListing(long rentaListingId, bool loadHistory = true);
         Task<RentalListingForTakedownDto?> GetRentalListingForTakedownAction(long rentlListingId, bool includeHostEmails);
@@ -153,8 +155,6 @@ namespace StrDss.Data.Repositories
         /// </summary>
         private async Task HydratePrimaryHostNmAsync(List<RentalListingGroupSummaryDto> page)
         {
-            if (page.Count == 0) return;
-
             var anchorIds = page
                 .Where(s => s.AnchorRentalListingId != null)
                 .Select(s => s.AnchorRentalListingId!.Value)
@@ -422,220 +422,162 @@ namespace StrDss.Data.Repositories
             };
         }
 
-        private async Task<List<RentalListingTableRowDto>> GetFilteredListingTableRowsAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
-            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, bool normalizeGroupingKeys = true)
-        {
-            var query = GetRentalListingsTableBaseQuery();
+        internal sealed record GroupedSql(string Text, List<NpgsqlParameter> Parameters);
 
-            if (_currentUser.OrganizationType == OrganizationTypes.LG)
+        internal GroupedSql BuildGroupedSql(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent)
+        {
+            var shared = BuildFilteredNormalizedSql(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent);
+            return new GroupedSql(GroupedRentalListingSql.Grouped(shared.Text), shared.Parameters);
+        }
+
+        internal GroupedSql BuildGroupedChildrenSql(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo)
+        {
+            var shared = BuildFilteredNormalizedSql(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent);
+            if (!string.IsNullOrWhiteSpace(bcRegistryNo))
             {
-                query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
+                shared.Parameters.Add(TextParameter("bc_registry_no", bcRegistryNo));
+                return new GroupedSql(GroupedRentalListingSql.Children(shared.Text, true), shared.Parameters);
             }
 
+            shared.Parameters.Add(TextParameter("match_address_txt", matchAddressTxt));
+            shared.Parameters.Add(TextParameter("match_unit_no", matchUnitNo));
+            shared.Parameters.Add(TextParameter("effective_host_nm", effectiveHostNm));
+            shared.Parameters.Add(TextParameter("effective_business_licence_no", effectiveBusinessLicenceNo));
+            return new GroupedSql(GroupedRentalListingSql.Children(shared.Text, false), shared.Parameters);
+        }
+
+        private static NpgsqlParameter TextParameter(string name, string? value) =>
+            new(name, NpgsqlDbType.Text) { Value = (object?)value ?? DBNull.Value };
+
+        private GroupedSql BuildFilteredNormalizedSql(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+            bool? prRequirement, bool? blRequirement, long? lgId, bool recent)
+        {
+            var parameters = new List<NpgsqlParameter>();
+            var filters = new List<string> { GroupedRentalListingSql.ExcludingIncludedReport };
+            void Add(string name, object value) => parameters.Add(new NpgsqlParameter(name, value));
+
+            if (_currentUser.OrganizationType == OrganizationTypes.LG) { Add("current_lg_id", _currentUser.OrganizationId); filters.Add(GroupedRentalListingSql.CurrentLocalGovernment); }
             if (recent)
             {
-                query = ApplyRecentFilterTable(query);
+                var pacific = DateUtils.ConvertUtcToPacificTime(DateTime.UtcNow);
+                var target = new DateOnly(pacific.Year, pacific.Month, 1).AddMonths(-1);
+                Add("target_report_month", target);
+                if (pacific.Day <= 19)
+                {
+                    Add("fallback_report_month", target.AddMonths(-1));
+                    filters.Add(GroupedRentalListingSql.RecentWithFallback);
+                }
+                else filters.Add(GroupedRentalListingSql.RecentTargetMonth);
             }
+            if (all.IsNotEmpty()) { Add("all_pattern", $"%{all}%"); Add("sanitized_all", CommonUtils.SanitizeAndUppercaseString(all)); filters.Add(GroupedRentalListingSql.AllSearch); }
+            if (address.IsNotEmpty()) { Add("address_pattern", $"%{address}%"); filters.Add(GroupedRentalListingSql.Address); }
+            if (url.IsNotEmpty()) { Add("url_pattern", $"%{url}%"); filters.Add(GroupedRentalListingSql.Url); }
+            if (listingId.IsNotEmpty()) { Add("listing_id", listingId); filters.Add(GroupedRentalListingSql.ListingId); }
+            if (hostName.IsNotEmpty()) { Add("host_pattern", $"%{CommonUtils.SanitizeAndUppercaseString(hostName)}%"); filters.Add(GroupedRentalListingSql.HostName); }
+            if (businessLicence.IsNotEmpty()) { Add("business_licence", CommonUtils.SanitizeAndUppercaseString(businessLicence)); filters.Add(GroupedRentalListingSql.BusinessLicence); }
+            if (registrationNumber.IsNotEmpty()) { Add("registration_pattern", $"%{registrationNumber}%"); filters.Add(GroupedRentalListingSql.RegistrationNumber); }
+            if (prRequirement != null) filters.Add(prRequirement.Value ? GroupedRentalListingSql.PrincipalResidenceRequired : GroupedRentalListingSql.PrincipalResidenceNotRequired);
+            if (blRequirement != null) filters.Add(blRequirement.Value ? GroupedRentalListingSql.BusinessLicenceRequired : GroupedRentalListingSql.BusinessLicenceNotRequired);
+            if (lgId != null) { Add("lg_id", lgId.Value); filters.Add(GroupedRentalListingSql.LocalGovernment); }
 
-            ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, ref query);
+            return new GroupedSql(GroupedRentalListingSql.FilteredNormalized(filters), parameters);
+        }
 
-            var list = await query.ToListAsync();
-            if (normalizeGroupingKeys)
+        private async Task<T> ExecuteGroupedSqlAsync<T>(GroupedSql grouped, string query, Func<DbDataReader, T>? map = null)
+        {
+            await _dbContext.Database.OpenConnectionAsync();
+            try
             {
-                NormalizeGroupingKeyFields(list);
+                await using var command = _dbContext.Database.GetDbConnection().CreateCommand();
+                command.CommandText = grouped.Text + query;
+                command.Parameters.AddRange(grouped.Parameters.ToArray());
+                await using var reader = await command.ExecuteReaderAsync();
+                if (map == null)
+                {
+                    await reader.ReadAsync();
+                    return (T)Convert.ChangeType(reader.GetValue(0), typeof(T));
+                }
+                return map(reader);
             }
-            return list;
+            finally { await _dbContext.Database.CloseConnectionAsync(); }
+        }
+
+        private async Task<List<RentalListingGroupSummaryDto>> GetGroupedPageAsync(GroupedSql grouped, string orderBy, string direction, int pageSize, int pageNumber)
+        {
+            var pageQuery = GroupedRentalListingSql.PageQuery(orderBy, direction, pageSize);
+            if (pageSize > 0)
+            {
+                grouped.Parameters.Add(new NpgsqlParameter("page_size", pageSize));
+                grouped.Parameters.Add(new NpgsqlParameter("page_offset", (Math.Max(pageNumber, 1) - 1) * pageSize));
+            }
+
+            return await ExecuteGroupedSqlAsync(grouped, pageQuery,
+                reader =>
+                {
+                    var page = new List<RentalListingGroupSummaryDto>();
+                    while (reader.Read())
+                    {
+                        T? Value<T>(string name) => reader.IsDBNull(reader.GetOrdinal(name)) ? default : reader.GetFieldValue<T>(reader.GetOrdinal(name));
+                        var host = Value<string>("effective_host_nm");
+                        page.Add(new RentalListingGroupSummaryDto
+                        {
+                            ListingCount = Value<int>("listing_count"), BcRegistryNo = Value<string>("bc_registry_no"),
+                            EffectiveBusinessLicenceNo = Value<string>("effective_business_licence_no"), EffectiveHostNm = host, PrimaryHostNm = host,
+                            MatchAddressTxt = Value<string>("match_address_txt"), MatchUnitNo = Value<string>("match_unit_no"),
+                            NightsBookedYtdQty = Value<int>("nights_booked_ytd_qty"), BusinessLicenceNo = Value<string>("business_licence_no"),
+                            LastActionNm = Value<string>("last_action_nm"), LastActionDtm = ReadNullableDateTime(reader, "last_action_dtm"),
+                            LatestReportPeriodYm = Value<DateOnly>("latest_report_period_ym"), BusinessLicenceId = Value<long>("business_licence_id"),
+                            BusinessLicenceExpiryDt = Value<DateOnly>("business_licence_expiry_dt"), LicenceStatusType = Value<string>("licence_status_type"),
+                            AnchorRentalListingId = Value<long>("anchor_rental_listing_id")
+                        });
+                    }
+                    return page;
+                });
         }
 
         /// <summary>
-        /// Align grouped parent keys with expand (grouped/listings): trim whitespace and treat blank as null
-        /// so listing counts and child fetch use the same identity (avoids empty expand when DB has padded values).
+        /// Null action timestamps stay null. <c>Value&lt;DateTime&gt;</c> returned <see cref="DateTime.MinValue"/> for DBNull.
         /// </summary>
-        private static void NormalizeGroupingKeyFields(List<RentalListingTableRowDto> rows)
+        internal static DateTime? ReadNullableDateTime(DbDataReader reader, string name)
         {
-            foreach (var row in rows)
-            {
-                row.BcRegistryNo = string.IsNullOrWhiteSpace(row.BcRegistryNo) ? null : row.BcRegistryNo.Trim();
-                row.MatchAddressTxt = string.IsNullOrWhiteSpace(row.MatchAddressTxt) ? null : row.MatchAddressTxt.Trim();
-                row.MatchUnitNo = string.IsNullOrWhiteSpace(row.MatchUnitNo) ? null : row.MatchUnitNo.Trim();
-                row.EffectiveHostNm = string.IsNullOrWhiteSpace(row.EffectiveHostNm) ? null : row.EffectiveHostNm.Trim();
-                row.EffectiveBusinessLicenceNo = string.IsNullOrWhiteSpace(row.EffectiveBusinessLicenceNo) ? null : row.EffectiveBusinessLicenceNo.Trim();
-            }
-        }
-
-        private const string NoRegGroupKeySeparator = "\u001e";
-
-        /// <summary>No-reg groups: platform best match address + unit + effective host (listing) + normalized listing BL.</summary>
-        private static string EncodeNoRegGroupKey(string? matchAddress, string? unitNo, string? effectiveHost, string? blNormalized)
-        {
-            static string Cell(string? s) => s ?? "";
-            return string.Join(NoRegGroupKeySeparator, Cell(matchAddress), Cell(unitNo), Cell(effectiveHost?.ToUpperInvariant()), Cell(blNormalized));
-        }
-
-        private static string BuildNoRegCanonicalGroupingKey(RentalListingTableRowDto row)
-        {
-            var addr = string.IsNullOrWhiteSpace(row.MatchAddressTxt) ? null : row.MatchAddressTxt.Trim();
-            var unit = string.IsNullOrWhiteSpace(row.MatchUnitNo) ? null : row.MatchUnitNo.Trim();
-            var host = string.IsNullOrWhiteSpace(row.EffectiveHostNm) ? null : row.EffectiveHostNm.Trim();
-            var bl = CommonUtils.NormalizeBusinessLicenceForAggregation(row.BusinessLicenceNo);
-            return EncodeNoRegGroupKey(addr, unit, host, bl);
-        }
-
-        private static string BuildNoRegCanonicalKeyFromExpandParams(string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? listingBusinessLicenceNo)
-        {
-            var addr = NormalizeExpandKeyPart(matchAddressTxt);
-            var unit = NormalizeExpandKeyPart(matchUnitNo);
-            var hostNorm = NormalizeExpandKeyPart(effectiveHostNm);
-            var bl = CommonUtils.NormalizeBusinessLicenceForAggregation(listingBusinessLicenceNo);
-            return EncodeNoRegGroupKey(addr, unit, hostNorm, bl);
-        }
-
-        private static string? NormalizeExpandKeyPart(string? value) =>
-            string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-
-        private static List<RentalListingGroupSummaryDto> BuildGroupedSummaries(List<RentalListingTableRowDto> rows)
-        {
-            var withReg = rows.Where(r => !string.IsNullOrWhiteSpace(r.BcRegistryNo)).ToList();
-            var withoutReg = rows.Where(r => string.IsNullOrWhiteSpace(r.BcRegistryNo)).ToList();
-
-            var summaries = new List<RentalListingGroupSummaryDto>(withReg.Count / 2 + withoutReg.Count / 2 + 4);
-
-            foreach (var g in withReg.GroupBy(r => r.BcRegistryNo!.Trim()))
-            {
-                summaries.Add(BuildOneGroupSummary(g.ToList(), bcRegistryNo: g.Key));
-            }
-
-            foreach (var g in withoutReg.GroupBy(BuildNoRegCanonicalGroupingKey))
-            {
-                summaries.Add(BuildOneGroupSummary(g.ToList(), bcRegistryNo: null));
-            }
-
-            return summaries;
-        }
-
-        private static RentalListingGroupSummaryDto BuildOneGroupSummary(List<RentalListingTableRowDto> groupList, string? bcRegistryNo)
-        {
-            var first = groupList[0];
-            var anchor = groupList
-                .OrderByDescending(r => r.LastActionDtm ?? DateTime.MinValue)
-                .ThenByDescending(r => r.LatestReportPeriodYm ?? DateOnly.MinValue)
-                .First();
-
-            DateOnly? maxReport = null;
-            foreach (var r in groupList)
-            {
-                if (r.LatestReportPeriodYm > maxReport || maxReport == null)
-                {
-                    maxReport = r.LatestReportPeriodYm;
-                }
-            }
-
-            return new RentalListingGroupSummaryDto
-            {
-                ListingCount = groupList.Count,
-                BcRegistryNo = bcRegistryNo,
-                EffectiveBusinessLicenceNo = first.BusinessLicenceNo,
-                EffectiveHostNm = first.EffectiveHostNm,
-                MatchAddressTxt = first.MatchAddressTxt,
-                MatchUnitNo = first.MatchUnitNo,
-                PrimaryHostNm = first.EffectiveHostNm,
-                NightsBookedYtdQty = groupList.Sum(r => r.NightsBookedYtdQty ?? 0),
-                BusinessLicenceNo = anchor.BusinessLicenceNoMatched ?? anchor.BusinessLicenceNo,
-                LastActionNm = anchor.LastActionNm,
-                LastActionDtm = anchor.LastActionDtm,
-                LatestReportPeriodYm = maxReport,
-                BusinessLicenceId = anchor.BusinessLicenceId,
-                BusinessLicenceExpiryDt = anchor.BusinessLicenceExpiryDt,
-                LicenceStatusType = anchor.LicenceStatusType,
-                HasMultipleProperties = false,
-                AnchorRentalListingId = anchor.RentalListingId
-            };
-        }
-
-        private static List<RentalListingGroupSummaryDto> OrderGroupedSummaries(List<RentalListingGroupSummaryDto> summaries, string orderBy, string direction)
-        {
-            var desc = string.Equals(direction, "desc", StringComparison.OrdinalIgnoreCase);
-            if (string.IsNullOrEmpty(orderBy) || !GroupedAllowedSortColumns.Contains(orderBy))
-            {
-                orderBy = "latestReportPeriodYm";
-                desc = true;
-            }
-
-            // NULLS LAST in BOTH directions so toggling asc/desc never anchors null-host groups to the top of
-            // page 1. The previous "?? \"\"" / "?? \"\\uFFFF\"" fallbacks pinned nulls to the top of asc AND
-            // desc — combined with the BuildOneGroupSummary issue that produced spurious-null EffectiveHostNm,
-            // the user saw a block of rows whose displayed PrimaryHostNm (hydrated from contacts) was real but
-            // whose sort key was null, and toggling direction didn't reorder them. Pinned to StringComparer.Ordinal
-            // so the result is byte-deterministic across server cultures.
-            return orderBy switch
-            {
-                "effectiveHostNm" => desc
-                    ? summaries.OrderBy(s => s.EffectiveHostNm == null)
-                               .ThenByDescending(s => s.EffectiveHostNm, StringComparer.Ordinal).ToList()
-                    : summaries.OrderBy(s => s.EffectiveHostNm == null)
-                               .ThenBy(s => s.EffectiveHostNm, StringComparer.Ordinal).ToList(),
-                "matchAddressTxt" => desc
-                    ? summaries.OrderBy(s => s.MatchAddressTxt == null)
-                               .ThenByDescending(s => s.MatchAddressTxt, StringComparer.Ordinal).ToList()
-                    : summaries.OrderBy(s => s.MatchAddressTxt == null)
-                               .ThenBy(s => s.MatchAddressTxt, StringComparer.Ordinal).ToList(),
-                "effectiveBusinessLicenceNo" => desc
-                    ? summaries.OrderBy(s => s.EffectiveBusinessLicenceNo == null)
-                               .ThenByDescending(s => s.EffectiveBusinessLicenceNo, StringComparer.Ordinal).ToList()
-                    : summaries.OrderBy(s => s.EffectiveBusinessLicenceNo == null)
-                               .ThenBy(s => s.EffectiveBusinessLicenceNo, StringComparer.Ordinal).ToList(),
-                "lastActionNm" => desc
-                    ? summaries.OrderBy(s => s.LastActionNm == null)
-                               .ThenByDescending(s => s.LastActionNm, StringComparer.Ordinal).ToList()
-                    : summaries.OrderBy(s => s.LastActionNm == null)
-                               .ThenBy(s => s.LastActionNm, StringComparer.Ordinal).ToList(),
-                "lastActionDtm" => desc
-                    ? summaries.OrderBy(s => s.LastActionDtm == null)
-                               .ThenByDescending(s => s.LastActionDtm).ToList()
-                    : summaries.OrderBy(s => s.LastActionDtm == null)
-                               .ThenBy(s => s.LastActionDtm).ToList(),
-                _ => desc
-                    ? summaries.OrderBy(s => s.LatestReportPeriodYm == null)
-                               .ThenByDescending(s => s.LatestReportPeriodYm).ToList()
-                    : summaries.OrderBy(s => s.LatestReportPeriodYm == null)
-                               .ThenBy(s => s.LatestReportPeriodYm).ToList()
-            };
+            var ordinal = reader.GetOrdinal(name);
+            return reader.IsDBNull(ordinal) ? null : reader.GetFieldValue<DateTime>(ordinal);
         }
 
         public async Task<int> GetGroupedRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, bool recent)
         {
-            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent, normalizeGroupingKeys: false);
-            var summaries = BuildGroupedSummaries(rows);
-            return summaries.Count;
+            return await ExecuteGroupedSqlAsync<int>(
+                BuildGroupedSql(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent),
+                GroupedRentalListingSql.CountQuery);
         }
 
         public async Task<PagedDto<RentalListingGroupSummaryDto>> GetGroupedRentalListingsPagedAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, bool recent, int pageSize, int pageNumber, string orderBy, string direction, bool includeTotalCount = true)
         {
-            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent);
-            var summaries = BuildGroupedSummaries(rows);
-
             if (string.IsNullOrEmpty(orderBy) || !GroupedAllowedSortColumns.Contains(orderBy))
             {
                 orderBy = "latestReportPeriodYm";
                 direction = "desc";
             }
 
-            var ordered = OrderGroupedSummaries(summaries, orderBy, direction);
-            var total = ordered.Count;
-
-            if (pageNumber <= 0)
-            {
-                pageNumber = 1;
-            }
-
-            var skip = pageSize > 0 ? (pageNumber - 1) * pageSize : 0;
-            var page = pageSize > 0 ? ordered.Skip(skip).Take(pageSize).ToList() : ordered;
+            pageNumber = Math.Max(pageNumber, 1);
+            var page = await GetGroupedPageAsync(
+                BuildGroupedSql(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent),
+                orderBy, direction, pageSize, pageNumber);
+            var total = includeTotalCount
+                ? await GetGroupedRentalListingsCountAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent)
+                : 0;
 
             // Replace sanitized/uppercased EffectiveHostNm fallback with original-case
-            // property-owner contact name. Runs against the paged anchors only (~pageSize rows).
-            await HydratePrimaryHostNmAsync(page);
+            // property-owner contact name. Runs against the paged anchors only (~pageSize rows).            
+            if (page.Count > 0)
+            {
+                await HydratePrimaryHostNmAsync(page);
+                await ApplyHostMultiplePropertiesAsync(page);
+            }
 
             return new PagedDto<RentalListingGroupSummaryDto>
             {
@@ -653,48 +595,58 @@ namespace StrDss.Data.Repositories
         }
 
         /// <summary>
-        /// Expand: uncached. Mode A: bcRegistryNo (SQL filter). Mode B: same in-memory key as no-reg grouping (address + unit + effective host + normalized listing BL).
+        /// Expand: same filtered and normalized CTEs as the parent group, then the registration or no-registration key. No aggregation and no paging.
         /// </summary>
-        public async Task<List<RentalListingTableRowDto>> GetGroupedListingChildrenAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
+        public Task<List<RentalListingTableRowDto>> GetGroupedListingChildrenAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
             bool? prRequirement, bool? blRequirement, long? lgId, bool recent, string? bcRegistryNo, string? matchAddressTxt, string? matchUnitNo, string? effectiveHostNm, string? effectiveBusinessLicenceNo)
         {
-            if (!string.IsNullOrWhiteSpace(bcRegistryNo))
-            {
-                var query = GetRentalListingsTableBaseQuery();
-
-                if (_currentUser.OrganizationType == OrganizationTypes.LG)
-                {
-                    query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
-                }
-
-                if (recent)
-                {
-                    query = ApplyRecentFilterTable(query);
-                }
-
-                ApplyFiltersTable(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, ref query);
-
-                var reg = bcRegistryNo.Trim();
-                query = query.Where(x => x.BcRegistryNo != null && x.BcRegistryNo.Trim() == reg);
-                query = query.OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue);
-
-                var list = await query.ToListAsync();
-                return list;
-            }
-
-            var targetKey = BuildNoRegCanonicalKeyFromExpandParams(matchAddressTxt, matchUnitNo, effectiveHostNm, effectiveBusinessLicenceNo);
-            var rows = await GetFilteredListingTableRowsAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent);
-
-            return rows
-                .Where(r => string.IsNullOrWhiteSpace(r.BcRegistryNo))
-                .Where(r => BuildNoRegCanonicalGroupingKey(r) == targetKey)
-                .OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue)
-                .ToList();
+            return ExecuteGroupedSqlAsync(
+                BuildGroupedChildrenSql(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent,
+                    bcRegistryNo, matchAddressTxt, matchUnitNo, effectiveHostNm, effectiveBusinessLicenceNo),
+                "",
+                ReadGroupedChildRows);
         }
 
-        public async Task<Dictionary<string, bool>> BatchEffectiveHostHasMultiplePropertiesAsync(IReadOnlyList<string?> effectiveHostNms)
+        private static List<RentalListingTableRowDto> ReadGroupedChildRows(DbDataReader reader)
         {
-            var normalized = effectiveHostNms
+            var rows = new List<RentalListingTableRowDto>();
+            while (reader.Read())
+            {
+                T? Value<T>(string name) => reader.IsDBNull(reader.GetOrdinal(name)) ? default : reader.GetFieldValue<T>(reader.GetOrdinal(name));
+                rows.Add(new RentalListingTableRowDto
+                {
+                    RentalListingId = Value<long>("rental_listing_id"),
+                    LatestReportPeriodYm = Value<DateOnly>("latest_report_period_ym"),
+                    BcRegistryNo = Value<string>("bc_registry_no"),
+                    MatchAddressTxt = Value<string>("match_address_txt"),
+                    MatchScoreAmt = Value<short>("match_score_amt"),
+                    IsMatchVerified = Value<bool>("is_match_verified"),
+                    IsMatchCorrected = Value<bool>("is_match_corrected"),
+                    IsChangedAddress = Value<bool>("is_changed_address"),
+                    NightsBookedYtdQty = Value<short>("nights_booked_qty"),
+                    BusinessLicenceNo = Value<string>("listing_business_licence_no"),
+                    BusinessLicenceNoMatched = Value<string>("matched_business_licence_no"),
+                    IsChangedBusinessLicence = Value<bool>("is_changed_business_licence"),
+                    BusinessLicenceId = Value<long>("business_licence_id"),
+                    LicenceStatusType = Value<string>("licence_status_type"),
+                    LastActionNm = Value<string>("last_action_nm"),
+                    LastActionDtm = ReadNullableDateTime(reader, "last_action_dtm"),
+                    PlatformListingNo = Value<string>("platform_listing_no"),
+                    PlatformListingUrl = Value<string>("platform_listing_url"),
+                    OfferingOrganizationNm = Value<string>("offering_organization_nm"),
+                    ListingStatusType = Value<string>("listing_status_type"),
+                    TakeDownReason = Value<string>("takedown_reason"),
+                    IsLgTransferred = Value<bool>("is_lg_transferred"),
+                    IsTakenDown = Value<bool>("is_taken_down")
+                });
+            }
+            return rows;
+        }
+
+        private async Task ApplyHostMultiplePropertiesAsync(List<RentalListingGroupSummaryDto> page)
+        {
+            var normalized = page
+                .Select(s => s.EffectiveHostNm)
                 .Where(h => !string.IsNullOrEmpty(h))
                 .Select(h => h!)
                 .Distinct(StringComparer.Ordinal)
@@ -702,29 +654,38 @@ namespace StrDss.Data.Repositories
 
             if (normalized.Count == 0)
             {
-                return new Dictionary<string, bool>(StringComparer.Ordinal);
+                return;
             }
 
-            var query = GetRentalListingsTableBaseQuery();
-
-            if (_currentUser.OrganizationType == OrganizationTypes.LG)
+            var limitToCurrentLocalGovernment = _currentUser.OrganizationType == OrganizationTypes.LG;
+            var parameters = new List<NpgsqlParameter>
             {
-                query = query.Where(x => x.ManagingOrganizationId == _currentUser.OrganizationId);
-            }
-
-            var tuples = await query
-                .Where(x => x.EffectiveHostNm != null && normalized.Contains(x.EffectiveHostNm))
-                .Select(x => new { x.EffectiveHostNm, x.EffectiveBusinessLicenceNo, x.MatchAddressTxt })
-                .ToListAsync();
-
-            var result = normalized.ToDictionary(h => h, _ => false, StringComparer.Ordinal);
-            foreach (var g in tuples.GroupBy(t => t.EffectiveHostNm!, StringComparer.Ordinal))
+                new("hosts", NpgsqlDbType.Array | NpgsqlDbType.Text) { Value = normalized.ToArray() }
+            };
+            if (limitToCurrentLocalGovernment)
             {
-                var distinct = g.Select(t => (t.EffectiveBusinessLicenceNo, t.MatchAddressTxt)).Distinct().Count();
-                result[g.Key] = distinct > 1;
+                parameters.Add(new NpgsqlParameter("current_lg_id", _currentUser.OrganizationId));
             }
 
-            return result;
+            var multiple = await ExecuteGroupedSqlAsync(
+                new GroupedSql(GroupedRentalListingSql.HostMultipleProperties(limitToCurrentLocalGovernment), parameters),
+                "",
+                reader =>
+                {
+                    var hosts = new List<string>();
+                    while (reader.Read()) hosts.Add(reader.GetFieldValue<string>(0));
+                    return hosts;
+                });
+
+            var flags = normalized.ToDictionary(h => h, _ => false, StringComparer.Ordinal);
+            foreach (var host in multiple) flags[host] = true;
+            foreach (var row in page)
+            {
+                if (row.EffectiveHostNm != null && flags.TryGetValue(row.EffectiveHostNm, out var multi))
+                {
+                    row.HasMultipleProperties = multi;
+                }
+            }
         }
 
         public async Task<int> CountHostListingsAsync(string hostName)

@@ -64,7 +64,7 @@ namespace StrDss.Api.Controllers
         }
 
         /// <summary>
-        /// Child rows for one group; uncached. Mode A: bcRegistryNo. Mode B (no reg): matchAddressTxt + matchUnitNo (optional) + effectiveHostNm + effectiveBusinessLicenceNo (listing BL, normalized for matching).
+        /// Child rows for one group. Registration: bcRegistryNo. No registration: matchAddressTxt, matchUnitNo, effectiveHostNm, and effectiveBusinessLicenceNo, including when every value is blank.
         /// </summary>
         [ApiAuthorize(Permissions.ListingRead)]
         [HttpGet("grouped/listings")]
@@ -73,14 +73,15 @@ namespace StrDss.Api.Controllers
             bool? prRequirement, bool? blRequirement, long? lgId, bool recent = false,
             string? bcRegistryNo = null, string? matchAddressTxt = null, string? matchUnitNo = null, string? effectiveHostNm = null, string? effectiveBusinessLicenceNo = null)
         {
+            var query = Request.Query;
             if (string.IsNullOrWhiteSpace(bcRegistryNo)
-                && string.IsNullOrWhiteSpace(matchAddressTxt)
-                && string.IsNullOrWhiteSpace(matchUnitNo)
-                && string.IsNullOrWhiteSpace(effectiveHostNm)
-                && string.IsNullOrWhiteSpace(effectiveBusinessLicenceNo))
+                && !(query.ContainsKey("matchAddressTxt")
+                    && query.ContainsKey("matchUnitNo")
+                    && query.ContainsKey("effectiveHostNm")
+                    && query.ContainsKey("effectiveBusinessLicenceNo")))
             {
                 return BadRequest(
-                    "Provide bcRegistryNo for a registration-based group. For a no-registration group, supply the same composite key as the parent row: matchAddressTxt, matchUnitNo (optional), effectiveHostNm, and effectiveBusinessLicenceNo (business licence on the listing). Omitted or empty query parameters are treated as null key parts.");
+                    "Provide bcRegistryNo for a registration group, or matchAddressTxt, matchUnitNo, effectiveHostNm, and effectiveBusinessLicenceNo for a no-registration group. Blank values select the null key.");
             }
 
             var rows = await _listingService.GetGroupedListingChildrenAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber,

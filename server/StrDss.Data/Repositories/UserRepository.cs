@@ -4,8 +4,10 @@ using Microsoft.Extensions.Logging;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
+using StrDss.Model.OrganizationDtos;
 using StrDss.Model.UserDtos;
 using System;
+using System.Linq.Expressions;
 
 namespace StrDss.Data.Repositories
 {
@@ -33,6 +35,47 @@ namespace StrDss.Data.Repositories
     }
     public class UserRepository : RepositoryBase<DssUserIdentity>, IUserRepository
     {
+        private static readonly Expression<Func<DssUserIdentity, UserDto>> UserProjection = entity => new UserDto
+        {
+            UserIdentityId = entity.UserIdentityId,
+            UserGuid = entity.UserGuid,
+            ExternalIdentityCd = entity.ExternalIdentityCd,
+            DisplayNm = entity.DisplayNm,
+            IdentityProviderNm = entity.IdentityProviderNm,
+            IsEnabled = entity.IsEnabled,
+            AccessRequestStatusCd = entity.AccessRequestStatusCd,
+            AccessRequestDtm = entity.AccessRequestDtm,
+            AccessRequestJustificationTxt = entity.AccessRequestJustificationTxt,
+            GivenNm = entity.GivenNm,
+            FamilyNm = entity.FamilyNm,
+            EmailAddressDsc = entity.EmailAddressDsc,
+            BusinessNm = entity.BusinessNm,
+            TermsAcceptanceDtm = entity.TermsAcceptanceDtm,
+            RepresentedByOrganizationId = entity.RepresentedByOrganizationId,
+            UpdDtm = entity.UpdDtm,
+            RoleCds = entity.DssUserRoleAssignments.Select(x => x.UserRoleCd).ToList(),
+            RepresentedByOrganization = entity.RepresentedByOrganization == null ? null : new OrganizationDto
+            {
+                OrganizationId = entity.RepresentedByOrganization.OrganizationId,
+                OrganizationType = entity.RepresentedByOrganization.OrganizationType,
+                OrganizationCd = entity.RepresentedByOrganization.OrganizationCd,
+                OrganizationNm = entity.RepresentedByOrganization.OrganizationNm,
+                EconomicRegionDsc = entity.RepresentedByOrganization.EconomicRegionDsc,
+                LocalGovernmentType = entity.RepresentedByOrganization.LocalGovernmentType,
+                ManagingOrganizationId = entity.RepresentedByOrganization.ManagingOrganizationId,
+                UpdDtm = entity.RepresentedByOrganization.UpdDtm,
+                UpdUserGuid = entity.RepresentedByOrganization.UpdUserGuid,
+                IsLgParticipating = entity.RepresentedByOrganization.IsLgParticipating,
+                IsPrincipalResidenceRequired = entity.RepresentedByOrganization.IsPrincipalResidenceRequired,
+                IsBusinessLicenceRequired = entity.RepresentedByOrganization.IsBusinessLicenceRequired,
+                IsStrProhibited = entity.RepresentedByOrganization.IsStrProhibited,
+                IsStraaExempt = entity.RepresentedByOrganization.IsStraaExempt,
+                IsActive = entity.RepresentedByOrganization.IsActive,
+                PlatformType = entity.RepresentedByOrganization.PlatformType,
+                BusinessLicenceFormatTxt = entity.RepresentedByOrganization.BusinessLicenceFormatTxt
+            }
+        };
+
         public UserRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger) 
             : base(dbContext, mapper, currentUser, logger)
         {
@@ -74,89 +117,70 @@ namespace StrDss.Data.Repositories
 
         public async Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByGuidAsync(Guid guid)
         {
-            var query = await _dbSet.AsNoTracking()
-                .Include(x => x.DssUserRoleAssignments)
-                .Include(x => x.RepresentedByOrganization)
-                .FirstOrDefaultAsync(x => x.UserGuid == guid);
+            var user = await _dbSet.AsNoTracking()
+                .Where(x => x.UserGuid == guid)
+                .Select(UserProjection)
+                .FirstOrDefaultAsync();
 
-            if (query == null)
+            if (user == null)
                 return (null, new List<string>());
 
-            var user = _mapper.Map<UserDto>(query); 
-
-            var roles = query.DssUserRoleAssignments.Select(x => x.UserRoleCd).ToList(); 
-
-            var permssions = _dbContext.DssUserRoles
-                .Where(x => roles.Contains(x.UserRoleCd))
-                .SelectMany(x => x.DssUserRolePrivileges)
-                .ToLookup(x => x.UserPrivilegeCd)
-                .Select(x => x.First())
+            var permissions = await _dbContext.DssUserRoleAssignments
+                .Where(x => x.UserIdentity.UserGuid == guid)
+                .SelectMany(x => x.UserRoleCdNavigation.DssUserRolePrivileges)
                 .Select(x => x.UserPrivilegeCd)
-                .ToList();
+                .Distinct()
+                .ToListAsync();
 
-            return (user, permssions);
+            return (user, permissions);
         }
 
         public async Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByCurrentUserAsync()
         {
-            DssUserIdentity? userEntity;
+            var query = _dbSet.AsNoTracking();
 
             if (_currentUser.IsBcServicesCard)
             {
-                userEntity = await _dbSet.AsNoTracking()
-                    .Include(x => x.DssUserRoleAssignments)
-                    .Include(x => x.RepresentedByOrganization)
-                    .FirstOrDefaultAsync(x => x.ExternalIdentityCd == _currentUser.ExternalIdentityCd);
+                query = query.Where(x => x.ExternalIdentityCd == _currentUser.ExternalIdentityCd);
             }
             else
             {
-                userEntity = await _dbSet.AsNoTracking()
-                    .Include(x => x.DssUserRoleAssignments)
-                    .Include(x => x.RepresentedByOrganization)
-                    .FirstOrDefaultAsync(x => x.UserGuid == _currentUser.UserGuid);
+                query = query.Where(x => x.UserGuid == _currentUser.UserGuid);
             }
 
-            if (userEntity == null)
+            var user = await query.Select(UserProjection).FirstOrDefaultAsync();
+
+            if (user == null)
                 return (null, new List<string>());
 
-            var user = _mapper.Map<UserDto>(userEntity);
-
-            var roles = userEntity.DssUserRoleAssignments.Select(x => x.UserRoleCd).ToList();
-
-            var permssions = _dbContext.DssUserRoles
-                .Where(x => roles.Contains(x.UserRoleCd))
-                .SelectMany(x => x.DssUserRolePrivileges)
-                .ToLookup(x => x.UserPrivilegeCd)
-                .Select(x => x.First())
+            var permissions = await _dbContext.DssUserRoleAssignments
+                .Where(x => x.UserIdentityId == user.UserIdentityId)
+                .SelectMany(x => x.UserRoleCdNavigation.DssUserRolePrivileges)
                 .Select(x => x.UserPrivilegeCd)
-                .ToList();
+                .Distinct()
+                .ToListAsync();
 
-            return (user, permssions);
+            return (user, permissions);
         }
 
         public async Task<(UserDto? user, List<string> permissions)> GetUserAndPermissionsByDisplayNameAsync(string displayName)
         {
-            var query = await _dbSet.AsNoTracking()
-                .Include(x => x.DssUserRoleAssignments)
-                .Include(x => x.RepresentedByOrganization)
-                .FirstOrDefaultAsync(x => x.DisplayNm == displayName);
+            var user = await _dbSet.AsNoTracking()
+                .Where(x => x.DisplayNm == displayName)
+                .Select(UserProjection)
+                .FirstOrDefaultAsync();
 
-            if (query == null)
+            if (user == null)
                 return (null, new List<string>());
 
-            var user = _mapper.Map<UserDto>(query);
-
-            var roles = query.DssUserRoleAssignments.Select(x => x.UserRoleCd).ToList();
-
-            var permssions = _dbContext.DssUserRoles
-                .Where(x => roles.Contains(x.UserRoleCd))
-                .SelectMany(x => x.DssUserRolePrivileges)
-                .ToLookup(x => x.UserPrivilegeCd)
-                .Select(x => x.First())
+            var permissions = await _dbContext.DssUserRoleAssignments
+                .Where(x => x.UserIdentityId == user.UserIdentityId)
+                .SelectMany(x => x.UserRoleCdNavigation.DssUserRolePrivileges)
                 .Select(x => x.UserPrivilegeCd)
-                .ToList();
+                .Distinct()
+                .ToListAsync();
 
-            return (user, permssions);
+            return (user, permissions);
         }
         public async Task<UserDto?> GetUserById(long id)
         {

@@ -528,8 +528,8 @@ namespace StrDss.Data.Repositories
                             MatchAddressTxt = Value<string>("match_address_txt"), MatchUnitNo = Value<string>("match_unit_no"),
                             NightsBookedYtdQty = Value<int>("nights_booked_ytd_qty"), BusinessLicenceNo = Value<string>("business_licence_no"),
                             LastActionNm = Value<string>("last_action_nm"), LastActionDtm = ReadNullableDateTime(reader, "last_action_dtm"),
-                            LatestReportPeriodYm = Value<DateOnly>("latest_report_period_ym"), BusinessLicenceId = Value<long>("business_licence_id"),
-                            BusinessLicenceExpiryDt = Value<DateOnly>("business_licence_expiry_dt"), LicenceStatusType = Value<string>("licence_status_type"),
+                            LatestReportPeriodYm = Value<DateOnly>("latest_report_period_ym"), BusinessLicenceId = ReadNullableInt64(reader, "business_licence_id"),
+                            BusinessLicenceExpiryDt = ReadNullableDateOnly(reader, "business_licence_expiry_dt"), LicenceStatusType = Value<string>("licence_status_type"),
                             AnchorRentalListingId = Value<long>("anchor_rental_listing_id")
                         });
                     }
@@ -544,6 +544,18 @@ namespace StrDss.Data.Repositories
         {
             var ordinal = reader.GetOrdinal(name);
             return reader.IsDBNull(ordinal) ? null : reader.GetFieldValue<DateTime>(ordinal);
+        }
+
+        internal static long? ReadNullableInt64(DbDataReader reader, string name)
+        {
+            var ordinal = reader.GetOrdinal(name);
+            return reader.IsDBNull(ordinal) ? null : reader.GetFieldValue<long>(ordinal);
+        }
+
+        internal static DateOnly? ReadNullableDateOnly(DbDataReader reader, string name)
+        {
+            var ordinal = reader.GetOrdinal(name);
+            return reader.IsDBNull(ordinal) ? null : reader.GetFieldValue<DateOnly>(ordinal);
         }
 
         public async Task<int> GetGroupedRentalListingsCountAsync(string? all, string? address, string? url, string? listingId, string? hostName, string? businessLicence, string? registrationNumber,
@@ -627,7 +639,7 @@ namespace StrDss.Data.Repositories
                     BusinessLicenceNo = Value<string>("listing_business_licence_no"),
                     BusinessLicenceNoMatched = Value<string>("matched_business_licence_no"),
                     IsChangedBusinessLicence = Value<bool>("is_changed_business_licence"),
-                    BusinessLicenceId = Value<long>("business_licence_id"),
+                    BusinessLicenceId = ReadNullableInt64(reader, "business_licence_id"),
                     LicenceStatusType = Value<string>("licence_status_type"),
                     LastActionNm = Value<string>("last_action_nm"),
                     LastActionDtm = ReadNullableDateTime(reader, "last_action_dtm"),

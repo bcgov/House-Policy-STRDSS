@@ -78,6 +78,28 @@ public class GroupedRentalListingSqlShould
     }
 
     [Fact]
+    public void Read_null_licence_id_and_expiry_as_null()
+    {
+        var reader = new Mock<DbDataReader>();
+        reader.Setup(r => r.GetOrdinal("business_licence_id")).Returns(2);
+        reader.Setup(r => r.GetOrdinal("business_licence_expiry_dt")).Returns(3);
+        reader.Setup(r => r.IsDBNull(2)).Returns(true);
+        reader.Setup(r => r.IsDBNull(3)).Returns(true);
+
+        Assert.Null(RentalListingRepository.ReadNullableInt64(reader.Object, "business_licence_id"));
+        Assert.Null(RentalListingRepository.ReadNullableDateOnly(reader.Object, "business_licence_expiry_dt"));
+
+        var expiry = new DateOnly(2026, 3, 1);
+        reader.Setup(r => r.IsDBNull(2)).Returns(false);
+        reader.Setup(r => r.IsDBNull(3)).Returns(false);
+        reader.Setup(r => r.GetFieldValue<long>(2)).Returns(44L);
+        reader.Setup(r => r.GetFieldValue<DateOnly>(3)).Returns(expiry);
+
+        Assert.Equal(44L, RentalListingRepository.ReadNullableInt64(reader.Object, "business_licence_id"));
+        Assert.Equal(expiry, RentalListingRepository.ReadNullableDateOnly(reader.Object, "business_licence_expiry_dt"));
+    }
+
+    [Fact]
     public void Share_the_same_cte_for_page_and_group_count()
     {
         using var context = CreateContext();

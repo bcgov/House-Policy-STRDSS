@@ -27,13 +27,13 @@ Alternatively, build the solution and run `StrDss.Data.IntegrationTest` in Visua
 
 `database-init/.gitignore` ignores `*.sql` and `*.sql.gz`, so a dump cannot be committed by accident. PostgreSQL runs every `.sql` and `.sql.gz` file in this folder, in filename order, the first time the container data directory is created. Do not leave a compressed copy next to the same script.
 
-`Export-DatabaseInit.ps1` splits a running Postgres container into numbered plain-SQL files. It is aimed at the Aspire PostGIS container (`postgis/postgis:18-3.6`, database and role `strdssdev`). File numbers advance by 10 inside each band so a later script can be inserted without renaming the set. Set `Number` on an export entry to claim a specific slot.
+`Export-DatabaseInit.ps1` splits a Postgres database into numbered plain-SQL files. The source is either the Aspire PostGIS container (`postgis/postgis:18-3.6`, database and role `strdssdev`) or an external development server. File numbers advance by 10 inside each band so a later script can be inserted without renaming the set. Set `Number` on an export entry to claim a specific slot.
 
 | Band | Contents |
 | --- | --- |
 | `000-099` | Schema setup. The default entry is `000-pre-data.sql` (`pg_dump --section=pre-data`): schemas, PostGIS, tables, views, functions, procedures, and the initially unpopulated latest-report materialized view. |
 | `100-799` | Data loads, `--data-only`, one file per entry. Each `Tables` array is passed to `pg_dump` as repeated `-t` arguments. A very large table stays in its own entry. |
-| `800-999` | Post-data and maintenance. The defaults are `800-post-data.sql` (constraints, indexes, triggers) and `810-analyze.sql` (`ANALYZE`). |
+| `800-999` | Post-data, materialized view refresh, and maintenance. `800-post-data.sql` is constraints, indexes, and triggers. Each populated materialized view then gets its own file, in dependency order, for example `810-refresh-public.dss_rental_listing_latest_report_mv.sql`. `ANALYZE` is the last file in the band. |
 
 With the default `$dataExports` list, the data files are:
 
@@ -52,6 +52,8 @@ With the default `$dataExports` list, the data files are:
 
 `public.spatial_ref_sys` is excluded because `CREATE EXTENSION` already loads it. The script lists every other user table in the database and warns when one is missing from `$dataExports`. Dumps use `--no-owner` and `--no-acl`. Edit the three export arrays in the script when the source schema gains or drops a table, then export again.
 
+On each run the script also queries the source database for populated materialized views. It writes one `REFRESH MATERIALIZED VIEW` file per view, after `800-post-data.sql` and before `ANALYZE`. A view that reads another materialized view is refreshed after that view. The post-data dump uses `--exclude-table-data` for those views so initialization refreshes each one once. Views that are not populated, including a populated view that reads an unpopulated materialized view, stay empty. Ordinary views need no refresh. Sequence values are already in the table data files.
+
 ### Export from the Aspire container
 
 Start AppHost so the local PostGIS container is running and initialized, then from `database-init`:
@@ -62,9 +64,17 @@ if (-not $container) { throw "The AppHost PostGIS container is not running." }
 .\Export-DatabaseInit.ps1 -ContainerName $container
 ```
 
-`-Username` and `-Database` both default to `strdssdev`. Pass `-Password` when the role inside the container does not authenticate locally without one; otherwise `pg_dump` uses the container's local authentication, or `PGPASSWORD` if it is already set. `-WhatIf` prints the planned `docker exec` commands and does not write files. `-OutputDirectory` defaults to the script folder.
+`-Username` and `-Database` both default to `strdssdev`. Pass `-Password` when the role inside the container does not authenticate locally without one; otherwise `pg_dump` uses the container's local authentication, or `PGPASSWORD` if it is already set. `-WhatIf` prints the planned commands and does not write files. `-OutputDirectory` defaults to the script folder.
 
-The script talks to Postgres only through `docker exec` on the named container. A different development database can be supported by extending that connection path (host, port, and credentials for a dev instance) while keeping the same file layout and table list. Do not point that extension at production.
+### Export from an external database
+
+Pass `-Server` instead of `-ContainerName`. The script then runs `pg_dump` and `psql` on this machine. Both tools must be on `PATH`, and the client major version must be the same as the server or newer. `-Port` defaults to 5432. Hosted Postgres often needs `-SslMode require`. `-Password` sets `PGPASSWORD` for the run; a password already in the environment or in the local `pgpass` file is also used.
+
+```powershell
+.\Export-DatabaseInit.ps1 -Server dev-db.example.com -Username strdssdev -Database strdssdev -Password $env:PGPASSWORD -SslMode require
+```
+
+Both paths write the same file layout from the same table list. Use a development database only. Do not point the export at production.
 
 Remove numbered `.sql` files this run did not rewrite. Initialization executes every match, including an older `001-pre-data.sql`, `002-data.sql`, or `003-post-data.sql` left beside the new set. The script warns about those leftovers. Clean the test project after adding, renaming, or deleting scripts so the mounted build output does not keep a stale file.
 

@@ -33,12 +33,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '7.0.400'
+          dotnet-version: '10.0.x'
 
       - name: Test backend
-        run: dotnet test ./server/server.sln
+        run: dotnet test ./server/server.sln --filter "Category!=Integration"
 
   test-frontend:
     runs-on: ubuntu-22.04

@@ -69,6 +69,12 @@ $excludedTables = @(
     'public.spatial_ref_sys'
 )
 
+# Third-party schemas. Their tables are created by those products, so the
+# missing-table check does not require them in a data export.
+$excludedSchemas = @(
+    'hangfire'
+)
+
 # 000-099 schema setup.
 $schemaExports = @(
     @{
@@ -632,11 +638,21 @@ try {
     foreach ($excluded in $excludedTables) {
         $excludedSet[$excluded.ToLowerInvariant()] = $true
     }
+    $excludedSchemaSet = @{}
+    foreach ($schema in $excludedSchemas) {
+        $trimmed = $schema.Trim()
+        if ([string]::IsNullOrWhiteSpace($trimmed)) {
+            throw 'An excluded schema name is empty.'
+        }
+        Assert-SafeArgument -Argument $trimmed -Label 'Excluded schema'
+        $excludedSchemaSet[$trimmed.ToLowerInvariant()] = $true
+    }
     $omitted = @(
         $databaseTables |
             Where-Object {
                 $key = $_.ToLowerInvariant()
-                -not $listedTableOwners.ContainsKey($key) -and -not $excludedSet.ContainsKey($key)
+                $schema = ($key -split '\.', 2)[0]
+                -not $listedTableOwners.ContainsKey($key) -and -not $excludedSet.ContainsKey($key) -and -not $excludedSchemaSet.ContainsKey($schema)
             }
     )
     if ($omitted.Count -gt 0) {

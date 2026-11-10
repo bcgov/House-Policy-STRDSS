@@ -29,7 +29,7 @@ public class GroupedRentalListingRepositoryShould : RentalListingQueryTestBase
         Assert.Equal(count, page.PageInfo.TotalCount);
         Assert.Equal(page.SourceList.Count(), page.PageInfo.ItemCount);
         Assert.InRange(page.PageInfo.ItemCount, 0, 10);
-        Assert.Equal(page.PageInfo.ItemCount > 0 ? 1 : 0, interceptor.ReadersExecuted);
+        Assert.Equal(0, interceptor.ReadersExecuted);
 
         await Children(repository, filters, registration: "987654");
         await Children(repository, filters);
@@ -175,7 +175,7 @@ public class GroupedRentalListingRepositoryShould : RentalListingQueryTestBase
         var repository = CreateRepository(context);
         var page = await Groups(repository, new(), pageSize: 20);
         Assert.NotEmpty(page.SourceList);
-        Assert.Equal(1, interceptor.ReadersExecuted);
+        Assert.Equal(0, interceptor.ReadersExecuted);
         var anchorIds = page.SourceList.Select(x => x.AnchorRentalListingId).ToList();
         var contacts = await context.DssRentalListingContacts.AsNoTracking()
             .Where(x => x.IsPropertyOwner && anchorIds.Contains(x.ContactedThroughRentalListingId))

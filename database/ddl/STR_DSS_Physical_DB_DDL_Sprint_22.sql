@@ -1455,3 +1455,7 @@ COMMENT ON COLUMN dss_email_message.external_message_no IS 'External identifier 
 COMMENT ON COLUMN dss_email_message.upd_dtm IS 'Trigger-updated timestamp of last change';
 
 COMMENT ON COLUMN dss_email_message.upd_user_guid IS 'The globally unique identifier (assigned by the identity provider) for the most recent user to record a change';
+
+-- Master-listing summary (last action, latest report period, property-owner name, trimmed host name, and licence digits)
+-- is created by ddl/STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Summary.sql.
+-- STR_DSS_Migration_Sprint_22.sql applies that script. It is not part of this generated snapshot.

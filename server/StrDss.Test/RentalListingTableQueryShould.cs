@@ -129,25 +129,23 @@ namespace StrDss.Test
         }
 
         [Fact]
-        public void LatestListingAction_TranslatesToLateralJoinWithActionTieBreak()
+        public void LatestListingAction_ReadsSummaryAndDoesNotScanActions()
         {
             using var context = CreateContext();
             var repository = CreateRepository(context);
 
             var sql = repository.GetRentalListingsTableBaseQuery().ToQueryString();
 
-            Assert.Contains("LEFT JOIN LATERAL", sql, StringComparison.OrdinalIgnoreCase);
-            var actionLookup = ActionRegion(sql);
-            Assert.Contains("ORDER BY", actionLookup, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("action_dtm DESC", actionLookup, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("rental_listing_action_id DESC", actionLookup, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("LIMIT 1", actionLookup, StringComparison.OrdinalIgnoreCase);
-            Assert.DoesNotContain("GROUP BY", actionLookup, StringComparison.OrdinalIgnoreCase);
-            Assert.DoesNotContain("ROW_NUMBER()", actionLookup, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("dss_rental_listing_summary", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("last_action_nm", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("last_action_dtm", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("dss_rental_listing_action", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("LEFT JOIN LATERAL", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("ROW_NUMBER()", sql, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
-        public void LatestReportPeriod_JoinsMaterializedViewAndStaysInSql()
+        public void LatestReportPeriod_ReadsSummaryAndStaysInSql()
         {
             using var context = CreateContext();
             var repository = CreateRepository(context);
@@ -158,9 +156,10 @@ namespace StrDss.Test
                 .OrderByDescending(x => x.LatestReportPeriodYm ?? DateOnly.MinValue)
                 .ToQueryString();
 
-            Assert.Contains("dss_rental_listing_latest_report_mv", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("dss_rental_listing_summary", sql, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("latest_report_period_ym", sql, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("ORDER BY", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("dss_rental_listing_latest_report_mv", sql, StringComparison.OrdinalIgnoreCase);
             Assert.DoesNotContain("GROUP BY", sql, StringComparison.OrdinalIgnoreCase);
             Assert.DoesNotContain("dss_rental_listing_report", sql, StringComparison.OrdinalIgnoreCase);
         }
@@ -178,24 +177,12 @@ namespace StrDss.Test
 
             var sql = query.ToQueryString();
 
-            Assert.Contains("action_long_nm IS NOT NULL", sql, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("action_dtm IS NOT NULL", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("last_action_nm IS NOT NULL", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("last_action_dtm IS NOT NULL", sql, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("ORDER BY", sql, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("action_long_nm", sql, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("action_dtm", sql, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static string ActionRegion(string sql)
-        {
-            var marker = "dss_rental_listing_action";
-            var start = sql.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
-            if (start < 0)
-            {
-                return sql;
-            }
-
-            var end = sql.IndexOf("LIMIT 1", start, StringComparison.OrdinalIgnoreCase);
-            return end < 0 ? sql[start..] : sql[start..(end + "LIMIT 1".Length)];
+            Assert.Contains("last_action_nm", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("last_action_dtm", sql, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("dss_rental_listing_action", sql, StringComparison.OrdinalIgnoreCase);
         }
 
         private static DssDbContext CreateContext()

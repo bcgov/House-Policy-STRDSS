@@ -12,6 +12,10 @@ namespace StrDss.Model
         public string? MatchAddressTxt { get; set; }
         /// <summary>Best-match unit/suite; expand must send with matchAddressTxt for no-reg groups.</summary>
         public string? MatchUnitNo { get; set; }
+        /// <summary>
+        /// Trimmed property-owner name from the anchor listing. Falls back to <see cref="EffectiveHostNm"/>
+        /// when that listing has no property-owner name.
+        /// </summary>
         public string? PrimaryHostNm { get; set; }
         public int NightsBookedYtdQty { get; set; }
         public string? BusinessLicenceNo { get; set; }
@@ -24,8 +28,7 @@ namespace StrDss.Model
         public bool HasMultipleProperties { get; set; }
         /// <summary>
         /// RentalListingId of the anchor (latest LastActionDtm / LatestReportPeriodYm) row in the group.
-        /// Used after paging to hydrate <see cref="PrimaryHostNm"/> from the original-case property-owner
-        /// contact (dss_rental_listing_contact.full_nm) without re-fetching contacts for the whole unpaged set.
+        /// <see cref="PrimaryHostNm"/> is that listing's property-owner name from dss_rental_listing_summary.
         /// </summary>
         public long? AnchorRentalListingId { get; set; }
     }

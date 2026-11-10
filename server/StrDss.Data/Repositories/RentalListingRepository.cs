@@ -69,11 +69,8 @@ namespace StrDss.Data.Repositories
         };
 
         /// <summary>
-        /// Builds the base IQueryable for the listing grid, counts, grouped listings, and grouped children.
-        /// Latest report period is a left join to dss_rental_listing_latest_report_mv.
-        /// The latest listing action is a correlated lookup that Npgsql translates to
-        /// LEFT JOIN LATERAL ... LIMIT 1, using dss_rental_listing_action_i1
-        /// (rental_listing_id, action_dtm DESC, rental_listing_action_id DESC).
+        /// Builds the base IQueryable for the listing grid and counts.
+        /// Last action and latest report period come from dss_rental_listing_summary.
         /// Projects directly to <see cref="RentalListingTableRowDto"/>.
         /// Filters and sorts on LatestReportPeriodYm, LastActionDtm, and LastActionNm stay on this IQueryable so they translate to SQL.
         /// </summary>
@@ -95,23 +92,13 @@ namespace StrDss.Data.Repositories
                    from lg in lgJ.DefaultIfEmpty()
                    join dbl in _dbContext.DssBusinessLicences on drl.GoverningBusinessLicenceId equals (long?)dbl.BusinessLicenceId into dblJ
                    from dbl in dblJ.DefaultIfEmpty()
-                   join lrp in _dbContext.DssRentalListingLatestReportMvs.AsNoTracking()
-                       on new { drl.OfferingOrganizationId, drl.PlatformListingNo }
-                       equals new { lrp.OfferingOrganizationId, lrp.PlatformListingNo } into lrpJ
-                   from lrp in lrpJ.DefaultIfEmpty()
-                   // drl.RentalListingId == drl.RentalListingId is a no-op that EF elides from SQL.
-                   // Without it, EF Core 9 rewrites this correlated Take(1) as ROW_NUMBER() over every action.
-                   // With it, Npgsql emits LEFT JOIN LATERAL ... ORDER BY action_dtm DESC, rental_listing_action_id DESC LIMIT 1.
-                   from la in _dbContext.DssRentalListingActions.AsNoTracking()
-                       .Where(a => a.RentalListingId == drl.RentalListingId && drl.RentalListingId == drl.RentalListingId)
-                       .OrderByDescending(a => a.ActionDtm)
-                       .ThenByDescending(a => a.RentalListingActionId)
-                       .Take(1)
-                       .DefaultIfEmpty()
+                   join sm in _dbContext.DssRentalListingSummaries.AsNoTracking()
+                       on drl.RentalListingId equals sm.RentalListingId into smJ
+                   from sm in smJ.DefaultIfEmpty()
                    select new RentalListingTableRowDto
                    {
                        RentalListingId = drl.RentalListingId,
-                       LatestReportPeriodYm = lrp != null ? (DateOnly?)lrp.LatestReportPeriodYm : null,
+                       LatestReportPeriodYm = sm != null ? sm.LatestReportPeriodYm : null,
                        OfferingOrganizationId = drl.OfferingOrganizationId,
                        PlatformListingNo = drl.PlatformListingNo,
                        EffectiveBusinessLicenceNo = drl.EffectiveBusinessLicenceNo,
@@ -129,8 +116,8 @@ namespace StrDss.Data.Repositories
                        BusinessLicenceNo = drl.BusinessLicenceNo,
                        BusinessLicenceNoMatched = dbl != null ? dbl.BusinessLicenceNo : null,
                        IsChangedBusinessLicence = drl.IsChangedBusinessLicence,
-                       LastActionDtm = la != null ? la.ActionDtm : null,
-                       LastActionNm = la != null ? la.ActionLongNm : null,
+                       LastActionDtm = sm != null ? sm.LastActionDtm : null,
+                       LastActionNm = sm != null ? sm.LastActionNm : null,
                        PlatformListingUrl = drl.PlatformListingUrl,
                        OfferingOrganizationNm = org.OrganizationNm,
                        TakeDownReason = drl.TakeDownReason,
@@ -142,54 +129,6 @@ namespace StrDss.Data.Repositories
                        BusinessLicenceExpiryDt = dbl != null ? (DateOnly?)dbl.ExpiryDt : null,
                        LicenceStatusType = dbl != null ? dbl.LicenceStatusType : null
                    };
-        }
-
-        /// <summary>
-        /// Post-paging hydrator for <see cref="RentalListingGroupSummaryDto.PrimaryHostNm"/>.
-        /// Loads the original-case property-owner contact name from dss_rental_listing_contact
-        /// for the anchor listing of each summary on the current page only (~10-50 rows). This
-        /// avoids the DSS-1311 regression of fetching contacts for the entire unpaged set while
-        /// still showing a human-readable host name instead of the sanitized/uppercased
-        /// EffectiveHostNm. Uses the indexed FK dss_rental_listing_contact_i1 (defined in
-        /// STR_DSS_Physical_DB_DDL_Sprint_14.sql) and filters to IsPropertyOwner = true.
-        /// </summary>
-        private async Task HydratePrimaryHostNmAsync(List<RentalListingGroupSummaryDto> page)
-        {
-            var anchorIds = page
-                .Where(s => s.AnchorRentalListingId != null)
-                .Select(s => s.AnchorRentalListingId!.Value)
-                .Distinct()
-                .ToList();
-            if (anchorIds.Count == 0) return;
-
-            // One row per anchor listing, deterministically picking the first property-owner
-            // contact by RentalListingContactId when more than one exists for that listing.
-            var nameByListing = await _dbContext.DssRentalListingContacts
-                .AsNoTracking()
-                .Where(c => c.IsPropertyOwner && anchorIds.Contains(c.ContactedThroughRentalListingId))
-                .GroupBy(c => c.ContactedThroughRentalListingId)
-                .Select(g => new
-                {
-                    Id = g.Key,
-                    FullNm = g.OrderBy(x => x.RentalListingContactId)
-                              .Select(x => x.FullNm)
-                              .FirstOrDefault()
-                })
-                .ToListAsync();
-
-            if (nameByListing.Count == 0) return;
-
-            var lookup = nameByListing.ToDictionary(x => x.Id, x => x.FullNm);
-
-            foreach (var s in page)
-            {
-                if (s.AnchorRentalListingId == null) continue;
-                if (lookup.TryGetValue(s.AnchorRentalListingId.Value, out var nm)
-                    && !string.IsNullOrWhiteSpace(nm))
-                {
-                    s.PrimaryHostNm = nm.Trim();
-                }
-            }
         }
 
         /// <summary>
@@ -521,10 +460,12 @@ namespace StrDss.Data.Repositories
                     {
                         T? Value<T>(string name) => reader.IsDBNull(reader.GetOrdinal(name)) ? default : reader.GetFieldValue<T>(reader.GetOrdinal(name));
                         var host = Value<string>("effective_host_nm");
+                        var primaryHost = Value<string>("primary_host_full_nm");
                         page.Add(new RentalListingGroupSummaryDto
                         {
                             ListingCount = Value<int>("listing_count"), BcRegistryNo = Value<string>("bc_registry_no"),
-                            EffectiveBusinessLicenceNo = Value<string>("effective_business_licence_no"), EffectiveHostNm = host, PrimaryHostNm = host,
+                            EffectiveBusinessLicenceNo = Value<string>("effective_business_licence_no"), EffectiveHostNm = host,
+                            PrimaryHostNm = string.IsNullOrWhiteSpace(primaryHost) ? host : primaryHost,
                             MatchAddressTxt = Value<string>("match_address_txt"), MatchUnitNo = Value<string>("match_unit_no"),
                             NightsBookedYtdQty = Value<int>("nights_booked_ytd_qty"), BusinessLicenceNo = Value<string>("business_licence_no"),
                             LastActionNm = Value<string>("last_action_nm"), LastActionDtm = ReadNullableDateTime(reader, "last_action_dtm"),
@@ -583,11 +524,8 @@ namespace StrDss.Data.Repositories
                 ? await GetGroupedRentalListingsCountAsync(all, address, url, listingId, hostName, businessLicence, registrationNumber, prRequirement, blRequirement, lgId, recent)
                 : 0;
 
-            // Replace sanitized/uppercased EffectiveHostNm fallback with original-case
-            // property-owner contact name. Runs against the paged anchors only (~pageSize rows).            
             if (page.Count > 0)
             {
-                await HydratePrimaryHostNmAsync(page);
                 await ApplyHostMultiplePropertiesAsync(page);
             }
 

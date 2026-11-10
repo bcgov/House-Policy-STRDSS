@@ -157,7 +157,7 @@ namespace StrDss.Service
             upload.RegistrationLinesError = totalRegErrors;
             _unitOfWork.Commit();
 
-            // A batch of 500 lines leaves the upload Pending and must not refresh the view.
+            // A batch of 500 lines leaves the upload Pending and must not rebuild the listing summary.
             // Licence, registration, and takedown uploads do not call this method.
             EnqueueLatestReportRefreshWhenProcessed(upload.UploadStatus);
 

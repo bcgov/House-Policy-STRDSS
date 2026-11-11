@@ -31,7 +31,7 @@ Alternatively, build the solution and run `StrDss.Data.IntegrationTest` in Visua
 
 | Band | Contents |
 | --- | --- |
-| `000-099` | Schema setup. The default entry is `000-pre-data.sql` (`pg_dump --section=pre-data`): schemas, PostGIS, tables, views, functions, procedures, and the initially unpopulated latest-report materialized view. |
+| `000-099` | Schema setup. The default entry is `000-pre-data.sql` (`pg_dump --section=pre-data`): schemas, PostGIS, tables, views, functions, and procedures. |
 | `100-799` | Data loads, `--data-only`, one file per entry. Each `Tables` array is passed to `pg_dump` as repeated `-t` arguments. A very large table stays in its own entry. |
 | `800-999` | Post-data, materialized view refresh, and maintenance. `800-post-data.sql` is constraints, indexes, and triggers. Each populated materialized view then gets its own file, in dependency order, for example `810-refresh-public.dss_rental_listing_latest_report_mv.sql`. `ANALYZE` is the last file in the band. |
 

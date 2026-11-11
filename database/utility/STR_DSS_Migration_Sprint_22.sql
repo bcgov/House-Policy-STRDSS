@@ -38,12 +38,26 @@ select exists(
 select 1 from information_schema.columns where table_name='dss_rental_listing' and column_name='takedown_reason' and table_schema=:'dflt_schema')
 as db_has_s20_chg
 \gset
+select exists(
+select 1 from information_schema.tables where table_name='dss_rental_listing_summary' and table_schema=:'dflt_schema')
+as db_has_s22_listing_summary
+\gset
 \if :db_has_s22_listing_actions
-	\if :db_has_s22_mailing_province_resize
-		\echo 'Sprint 22 migration appears complete - Exiting without changes'
+	\if :db_has_s22_listing_summary
+		\if :db_has_s22_mailing_province_resize
+			\echo 'Sprint 22 migration appears complete - Exiting without changes'
+		\else
+			\echo 'Applying Sprint 22 mailing province column resize'
+			ALTER TABLE dss_business_licence ALTER COLUMN mailing_province_cd TYPE varchar(50);
+		\endif
 	\else
-		\echo 'Applying Sprint 22 mailing province column resize'
-		ALTER TABLE dss_business_licence ALTER COLUMN mailing_province_cd TYPE varchar(50);
+		\echo 'Calling STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Summary.sql'
+		\ir '../ddl/STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Summary.sql'
+		\if :db_has_s22_mailing_province_resize
+		\else
+			\echo 'Applying Sprint 22 mailing province column resize'
+			ALTER TABLE dss_business_licence ALTER COLUMN mailing_province_cd TYPE varchar(50);
+		\endif
 	\endif
 \elif :db_has_s22_unit_resize
 	\if :db_has_s22_mailing_province_resize
@@ -59,6 +73,8 @@ as db_has_s20_chg
 	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_22.sql'
 	\echo 'Calling Backfill_Listing_Actions_Sprint_22.sql'
 	\ir '../utility/Backfill_Listing_Actions_Sprint_22.sql'
+	\echo 'Calling STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Summary.sql'
+	\ir '../ddl/STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Summary.sql'
 \elif :db_has_s20_chg
 	\echo 'Sprint 20 migration appears complete - Beginning upgrade to Sprint 22'
 	\echo 'Calling STR_DSS_Incremental_DB_DDL_Sprint_22.sql'
@@ -69,6 +85,8 @@ as db_has_s20_chg
 	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_22.sql'
 	\echo 'Calling Backfill_Listing_Actions_Sprint_22.sql'
 	\ir '../utility/Backfill_Listing_Actions_Sprint_22.sql'
+	\echo 'Calling STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Summary.sql'
+	\ir '../ddl/STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Summary.sql'
 \elif :db_has_dss_tab
 	\echo 'Database migration state is unknown - Try an earlier release - Exiting without changes'
 \else
@@ -81,6 +99,8 @@ as db_has_s20_chg
 	\ir '../seeding/STR_DSS_Data_Seeding_Sprint_22.sql'
 	\echo 'Calling Backfill_Listing_Actions_Sprint_22.sql'
 	\ir '../utility/Backfill_Listing_Actions_Sprint_22.sql'
+	\echo 'Calling STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Summary.sql'
+	\ir '../ddl/STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Summary.sql'
 	\echo 'Users, platforms, and their contacts must be added in the application'
 \endif
 \if :ERROR

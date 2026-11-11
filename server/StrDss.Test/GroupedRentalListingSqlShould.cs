@@ -20,10 +20,15 @@ public class GroupedRentalListingSqlShould
         var sql = CreateRepository(context).BuildGroupedSql(null, null, null, null, null, null, null, null, null, null, false).Text;
 
         Assert.Contains("FROM normalized WHERE bc_registry_no IS NOT NULL GROUP BY bc_registry_no", sql);
-        Assert.Contains("FROM normalized WHERE bc_registry_no IS NULL GROUP BY match_address_txt, match_unit_no, effective_host_key, business_licence_key", sql);
-        Assert.Contains("NULLIF(btrim(effective_host_nm), '') effective_host_key", sql);
-        Assert.Contains("regexp_replace(listing_business_licence_no, '[^0-9]', '', 'g')", sql);
-        Assert.Contains("NULLIF(regexp_replace", sql);
+        Assert.Contains("FROM normalized WHERE bc_registry_no IS NULL GROUP BY match_address_txt, match_unit_no, effective_host_nm, business_licence_digits", sql);
+        Assert.Contains("dss_rental_listing_summary sm", sql);
+        Assert.Contains("sm.effective_host_nm", sql);
+        Assert.Contains("sm.business_licence_digits", sql);
+        Assert.Contains("sm.primary_host_full_nm", sql);
+        Assert.Contains("array_agg(primary_host_full_nm", sql);
+        Assert.DoesNotContain("dss_rental_listing_latest_report_mv", sql);
+        Assert.DoesNotContain("dss_rental_listing_action", sql);
+        Assert.DoesNotContain("LEFT JOIN LATERAL", sql, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -123,8 +128,13 @@ public class GroupedRentalListingSqlShould
 
         Assert.StartsWith(shared, registration);
         Assert.StartsWith(shared, noRegistration);
-        Assert.Contains("NULLIF(btrim(effective_host_nm), '') effective_host_key", shared);
-        Assert.Contains("NULLIF(regexp_replace(listing_business_licence_no, '[^0-9]', '', 'g'), '') business_licence_key", shared);
+        Assert.Contains("sm.effective_host_nm", shared);
+        Assert.Contains("sm.business_licence_digits", shared);
+        Assert.Contains("sm.bc_registry_no", shared);
+        Assert.Contains("sm.match_address_txt", shared);
+        Assert.Contains("sm.match_unit_no", shared);
+        Assert.Contains("sm.listing_business_licence_no", shared);
+        Assert.Contains("dss_rental_listing_summary sm", shared);
         Assert.Contains("dpa.match_score_amt", shared);
         Assert.Contains("dpa.is_match_verified", shared);
         Assert.Contains("dpa.is_match_corrected", shared);
@@ -167,8 +177,8 @@ public class GroupedRentalListingSqlShould
         Assert.Contains("bc_registry_no IS NULL", sql);
         Assert.Contains("match_address_txt IS NOT DISTINCT FROM NULLIF(btrim(@match_address_txt), '')", sql);
         Assert.Contains("match_unit_no IS NOT DISTINCT FROM NULLIF(btrim(@match_unit_no), '')", sql);
-        Assert.Contains("effective_host_key IS NOT DISTINCT FROM NULLIF(btrim(@effective_host_nm), '')", sql);
-        Assert.Contains("business_licence_key IS NOT DISTINCT FROM NULLIF(regexp_replace(@effective_business_licence_no, '[^0-9]', '', 'g'), '')", sql);
+        Assert.Contains("effective_host_nm IS NOT DISTINCT FROM NULLIF(btrim(@effective_host_nm), '')", sql);
+        Assert.Contains("business_licence_digits IS NOT DISTINCT FROM NULLIF(regexp_replace(@effective_business_licence_no, '[^0-9]', '', 'g'), '')", sql);
         Assert.DoesNotContain("upper(effective_host", sql, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("@bc_registry_no", sql);
     }
@@ -232,6 +242,10 @@ public class GroupedRentalListingSqlShould
 
         Assert.EndsWith(order, registration.Trim());
         Assert.EndsWith(order, noRegistration.Trim());
+        var registrationList = registration[registration.LastIndexOf("SELECT rental_listing_id", StringComparison.Ordinal)..];
+        var noRegistrationList = noRegistration[noRegistration.LastIndexOf("SELECT rental_listing_id", StringComparison.Ordinal)..];
+        Assert.DoesNotContain("primary_host_full_nm", registrationList);
+        Assert.DoesNotContain("primary_host_full_nm", noRegistrationList);
         Assert.DoesNotContain("@page_size", registration);
         Assert.DoesNotContain("OFFSET", registration);
         Assert.DoesNotContain("@page_size", noRegistration);

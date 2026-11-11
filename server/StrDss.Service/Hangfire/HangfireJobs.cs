@@ -30,7 +30,7 @@ namespace StrDss.Service.Hangfire
         }
 
         /// <summary>
-        /// Refreshes the latest-report materialized view after a listing upload is fully processed.
+        /// Rebuilds the rental listing summary after a listing upload is fully processed.
         /// Enqueued with <see cref="BackgroundJob.Enqueue"/>; this is not a recurring job.
         /// <see cref="SkipSameJobAttribute"/> drops a second enqueue while one is queued or running.
         /// </summary>

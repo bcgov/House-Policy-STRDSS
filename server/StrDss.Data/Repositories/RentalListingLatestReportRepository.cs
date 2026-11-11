@@ -9,28 +9,23 @@ namespace StrDss.Data.Repositories
     public interface IRentalListingLatestReportRepository
     {
         /// <summary>
-        /// Refreshes <c>dss_rental_listing_latest_report_mv</c> and then vacuums and analyzes it.
-        /// Each statement runs as its own autocommit command.
-        /// The method duration is the full maintenance time, and each statement records its own duration.
+        /// Rebuilds <c>dss_rental_listing_summary</c> after a listing report upload.
+        /// The statement runs as its own autocommit command.
+        /// The method duration is the full maintenance time, and the statement records its own duration.
         /// </summary>
         Task RefreshLatestReportPeriodAsync();
     }
 
     public class RentalListingLatestReportRepository : IRentalListingLatestReportRepository
     {
-        internal const string RefreshStatementName = "refresh";
-        internal const string VacuumAnalyzeStatementName = "vacuum_analyze";
+        internal const string RefreshListingSummaryStatementName = "refresh_listing_summary";
 
-        internal const string RefreshConcurrentlySql =
-            "REFRESH MATERIALIZED VIEW CONCURRENTLY dss_rental_listing_latest_report_mv";
-
-        internal const string VacuumAnalyzeSql =
-            "VACUUM ANALYZE dss_rental_listing_latest_report_mv";
+        internal const string RefreshListingSummarySql =
+            "SELECT dss_refresh_rental_listing_summary()";
 
         internal static readonly string[] MaintenanceStatements =
         [
-            RefreshConcurrentlySql,
-            VacuumAnalyzeSql
+            RefreshListingSummarySql
         ];
 
         private readonly DssDbContext _dbContext;
@@ -45,7 +40,7 @@ namespace StrDss.Data.Repositories
             if (_dbContext.Database.CurrentTransaction != null)
             {
                 throw new InvalidOperationException(
-                    "Refreshing dss_rental_listing_latest_report_mv requires autocommit. An open transaction is active.");
+                    "Rebuilding dss_rental_listing_summary requires autocommit. An open transaction is active.");
             }
 
             await _dbContext.Database.OpenConnectionAsync();
@@ -83,14 +78,9 @@ namespace StrDss.Data.Repositories
 
         internal static string MaintenanceStatementName(string sql)
         {
-            if (sql == RefreshConcurrentlySql)
+            if (sql == RefreshListingSummarySql)
             {
-                return RefreshStatementName;
-            }
-
-            if (sql == VacuumAnalyzeSql)
-            {
-                return VacuumAnalyzeStatementName;
+                return RefreshListingSummaryStatementName;
             }
 
             throw new InvalidOperationException(

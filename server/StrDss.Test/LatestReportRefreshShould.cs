@@ -18,18 +18,23 @@ namespace StrDss.Test
     public class LatestReportRefreshShould
     {
         [Fact]
-        public void MaintenanceStatements_RefreshThenVacuumAsSeparateCommands()
+        public void MaintenanceStatements_RebuildListingSummary()
         {
             Assert.Equal(
-                [
-                    "REFRESH MATERIALIZED VIEW CONCURRENTLY dss_rental_listing_latest_report_mv",
-                    "VACUUM ANALYZE dss_rental_listing_latest_report_mv"
-                ],
+                ["SELECT dss_refresh_rental_listing_summary()"],
                 RentalListingLatestReportRepository.MaintenanceStatements);
 
-            Assert.DoesNotContain(";", RentalListingLatestReportRepository.RefreshConcurrentlySql);
-            Assert.DoesNotContain(";", RentalListingLatestReportRepository.VacuumAnalyzeSql);
-            Assert.DoesNotContain("public.", RentalListingLatestReportRepository.RefreshConcurrentlySql, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain(";", RentalListingLatestReportRepository.RefreshListingSummarySql);
+            Assert.DoesNotContain(
+                "public.",
+                RentalListingLatestReportRepository.RefreshListingSummarySql,
+                StringComparison.OrdinalIgnoreCase);
+            Assert.All(
+                RentalListingLatestReportRepository.MaintenanceStatements,
+                sql => Assert.DoesNotContain(
+                    "dss_rental_listing_latest_report_mv",
+                    sql,
+                    StringComparison.OrdinalIgnoreCase));
         }
 
         [Fact]
@@ -40,10 +45,7 @@ namespace StrDss.Test
                 RepositoryMetrics.MeterName,
                 RepositoryMetrics.MaintenanceStatementDuration.Meter.Name);
             Assert.Equal(
-                [
-                    RentalListingLatestReportRepository.RefreshStatementName,
-                    RentalListingLatestReportRepository.VacuumAnalyzeStatementName
-                ],
+                [RentalListingLatestReportRepository.RefreshListingSummaryStatementName],
                 RentalListingLatestReportRepository.MaintenanceStatements
                     .Select(RentalListingLatestReportRepository.MaintenanceStatementName));
         }
@@ -53,12 +55,7 @@ namespace StrDss.Test
         {
             using var measurements = new StatementMeasurementListener();
             var connection = new ScriptedDbConnection(async (sql, cancellationToken) =>
-            {
-                var delay = sql == RentalListingLatestReportRepository.VacuumAnalyzeSql
-                    ? TimeSpan.FromMilliseconds(80)
-                    : TimeSpan.FromMilliseconds(10);
-                await Task.Delay(delay, cancellationToken);
-            });
+                await Task.Delay(TimeSpan.FromMilliseconds(10), cancellationToken));
 
             await RentalListingLatestReportRepository.ExecuteMaintenanceStatementsAsync(connection);
 
@@ -66,45 +63,13 @@ namespace StrDss.Test
                 RentalListingLatestReportRepository.MaintenanceStatements,
                 connection.Executed);
 
-            var durations = measurements.Durations;
-            Assert.Equal(2, durations.Count);
-            AssertStatement(durations[0], RentalListingLatestReportRepository.RefreshStatementName, "success");
-            AssertStatement(durations[1], RentalListingLatestReportRepository.VacuumAnalyzeStatementName, "success");
-            Assert.True(durations[0].Value >= 0);
-            Assert.True(durations[1].Value >= 0.04);
+            var duration = Assert.Single(measurements.Durations);
+            AssertStatement(duration, RentalListingLatestReportRepository.RefreshListingSummaryStatementName, "success");
+            Assert.True(duration.Value >= 0);
         }
 
         [Fact]
         public async Task MaintenanceStatements_RecordTheFailingStatementAndStop()
-        {
-            using var measurements = new StatementMeasurementListener();
-            var connection = new ScriptedDbConnection((sql, _) =>
-            {
-                if (sql == RentalListingLatestReportRepository.VacuumAnalyzeSql)
-                {
-                    throw new InvalidOperationException("vacuum failed");
-                }
-
-                return Task.CompletedTask;
-            });
-
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                () => RentalListingLatestReportRepository.ExecuteMaintenanceStatementsAsync(connection));
-
-            Assert.Equal("vacuum failed", exception.Message);
-            Assert.Equal(
-                RentalListingLatestReportRepository.MaintenanceStatements,
-                connection.Executed);
-
-            var durations = measurements.Durations;
-            Assert.Equal(2, durations.Count);
-            AssertStatement(durations[0], RentalListingLatestReportRepository.RefreshStatementName, "success");
-            AssertStatement(durations[1], RentalListingLatestReportRepository.VacuumAnalyzeStatementName, "error");
-            Assert.True(durations[1].Value >= 0);
-        }
-
-        [Fact]
-        public async Task MaintenanceStatements_DoNotRunVacuumWhenRefreshFails()
         {
             using var measurements = new StatementMeasurementListener();
             var connection = new ScriptedDbConnection((sql, _) =>
@@ -114,15 +79,15 @@ namespace StrDss.Test
                 () => RentalListingLatestReportRepository.ExecuteMaintenanceStatementsAsync(connection));
 
             Assert.Contains(
-                RentalListingLatestReportRepository.RefreshConcurrentlySql,
+                RentalListingLatestReportRepository.RefreshListingSummarySql,
                 exception.Message,
                 StringComparison.Ordinal);
             Assert.Equal(
-                [RentalListingLatestReportRepository.RefreshConcurrentlySql],
+                [RentalListingLatestReportRepository.RefreshListingSummarySql],
                 connection.Executed);
 
             var duration = Assert.Single(measurements.Durations);
-            AssertStatement(duration, RentalListingLatestReportRepository.RefreshStatementName, "error");
+            AssertStatement(duration, RentalListingLatestReportRepository.RefreshListingSummaryStatementName, "error");
         }
 
         [Fact]

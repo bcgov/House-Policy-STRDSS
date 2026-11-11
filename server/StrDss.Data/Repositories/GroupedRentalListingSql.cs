@@ -4,9 +4,9 @@ namespace StrDss.Data.Repositories
     {
         internal const string ExcludingIncludedReport = "drl.including_rental_listing_report_id IS NULL";
         internal const string CurrentLocalGovernment = "lg.organization_id = @current_lg_id";
-        internal const string RecentWithFallback = @"((drl.offering_organization_id IN (SELECT providing_organization_id FROM dss_rental_listing_report WHERE report_period_ym = @target_report_month) AND lrp.latest_report_period_ym = @target_report_month)
-OR (drl.offering_organization_id NOT IN (SELECT providing_organization_id FROM dss_rental_listing_report WHERE report_period_ym = @target_report_month) AND lrp.latest_report_period_ym = @fallback_report_month))";
-        internal const string RecentTargetMonth = "lrp.latest_report_period_ym = @target_report_month";
+        internal const string RecentWithFallback = @"((drl.offering_organization_id IN (SELECT providing_organization_id FROM dss_rental_listing_report WHERE report_period_ym = @target_report_month) AND sm.latest_report_period_ym = @target_report_month)
+OR (drl.offering_organization_id NOT IN (SELECT providing_organization_id FROM dss_rental_listing_report WHERE report_period_ym = @target_report_month) AND sm.latest_report_period_ym = @fallback_report_month))";
+        internal const string RecentTargetMonth = "sm.latest_report_period_ym = @target_report_month";
         internal const string AllSearch = "(dpa.match_address_txt ILIKE @all_pattern OR drl.platform_listing_url ILIKE @all_pattern OR drl.platform_listing_no ILIKE @all_pattern OR drl.effective_business_licence_no LIKE @sanitized_all || '%' OR drl.bc_registry_no ILIKE @all_pattern OR drl.effective_host_nm ILIKE '%' || @sanitized_all || '%')";
         internal const string Address = "dpa.match_address_txt ILIKE @address_pattern";
         internal const string Url = "drl.platform_listing_url ILIKE @url_pattern";
@@ -23,23 +23,23 @@ OR (drl.offering_organization_id NOT IN (SELECT providing_organization_id FROM d
 
         internal static string FilteredNormalized(IEnumerable<string> filters) => $@"
 WITH filtered AS (
- SELECT drl.rental_listing_id, NULLIF(btrim(drl.bc_registry_no), '') bc_registry_no, NULLIF(btrim(dpa.match_address_txt), '') match_address_txt, NULLIF(btrim(dpa.unit_no), '') match_unit_no,
-        NULLIF(btrim(drl.effective_host_nm), '') effective_host_nm, NULLIF(btrim(drl.business_licence_no), '') listing_business_licence_no, drl.nights_booked_qty, lrp.latest_report_period_ym,
-        dbl.business_licence_no matched_business_licence_no, dbl.business_licence_id, dbl.expiry_dt business_licence_expiry_dt, dbl.licence_status_type, la.action_long_nm last_action_nm, la.action_dtm last_action_dtm,
+ SELECT drl.rental_listing_id, sm.bc_registry_no, sm.match_address_txt, sm.match_unit_no,
+        sm.effective_host_nm, sm.listing_business_licence_no, drl.nights_booked_qty, sm.latest_report_period_ym,
+        dbl.business_licence_no matched_business_licence_no, dbl.business_licence_id, dbl.expiry_dt business_licence_expiry_dt, dbl.licence_status_type, sm.last_action_nm, sm.last_action_dtm,
         dpa.match_score_amt, dpa.is_match_verified, dpa.is_match_corrected, drl.is_changed_address, drl.is_changed_business_licence,
         drl.platform_listing_no, drl.platform_listing_url, offering.organization_nm offering_organization_nm, drl.listing_status_type,
-        drl.takedown_reason, drl.is_lg_transferred, drl.is_taken_down
+        drl.takedown_reason, drl.is_lg_transferred, drl.is_taken_down,
+        sm.business_licence_digits, sm.primary_host_full_nm
  FROM dss_rental_listing drl
+ LEFT JOIN dss_rental_listing_summary sm ON sm.rental_listing_id = drl.rental_listing_id
  LEFT JOIN dss_physical_address dpa ON dpa.physical_address_id = drl.locating_physical_address_id
  LEFT JOIN dss_organization lgs ON lgs.organization_id = dpa.containing_organization_id AND dpa.match_score_amt > 1
  LEFT JOIN dss_organization lg ON lg.organization_id = lgs.managing_organization_id
  LEFT JOIN dss_organization offering ON offering.organization_id = drl.offering_organization_id
  LEFT JOIN dss_business_licence dbl ON dbl.business_licence_id = drl.governing_business_licence_id
- LEFT JOIN dss_rental_listing_latest_report_mv lrp ON lrp.offering_organization_id = drl.offering_organization_id AND lrp.platform_listing_no = drl.platform_listing_no
- LEFT JOIN LATERAL (SELECT action_long_nm, action_dtm FROM dss_rental_listing_action WHERE rental_listing_id = drl.rental_listing_id ORDER BY action_dtm DESC, rental_listing_action_id DESC LIMIT 1) la ON TRUE
  WHERE {string.Join("\n   AND ", filters)}
 ), normalized AS (
- SELECT *, NULLIF(btrim(effective_host_nm), '') effective_host_key, NULLIF(regexp_replace(listing_business_licence_no, '[^0-9]', '', 'g'), '') business_licence_key FROM filtered
+ SELECT * FROM filtered
 )";
 
         internal static string Grouped(string filteredNormalized) =>
@@ -85,6 +85,7 @@ HAVING count(*) > 1";
 
         private const string Aggregation = @" SELECT count(*)::integer listing_count, bc_registry_no,
         (array_agg(effective_host_nm ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1] effective_host_nm,
+        (array_agg(primary_host_full_nm ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1] primary_host_full_nm,
         (array_agg(match_address_txt ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1] match_address_txt,
         (array_agg(match_unit_no ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1] match_unit_no,
         sum(coalesce(nights_booked_qty, 0))::integer nights_booked_ytd_qty, max(latest_report_period_ym) latest_report_period_ym,
@@ -97,7 +98,8 @@ HAVING count(*) > 1";
         (array_agg(licence_status_type ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1] licence_status_type
  FROM normalized WHERE bc_registry_no IS NOT NULL GROUP BY bc_registry_no
  UNION ALL
- SELECT count(*)::integer, NULL::text, (array_agg(effective_host_nm ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1], match_address_txt, match_unit_no,
+ SELECT count(*)::integer, NULL::text, (array_agg(effective_host_nm ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1],
+        (array_agg(primary_host_full_nm ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1], match_address_txt, match_unit_no,
         sum(coalesce(nights_booked_qty, 0))::integer, max(latest_report_period_ym),
         (array_agg(rental_listing_id ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1],
         (array_agg(listing_business_licence_no ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1],
@@ -106,7 +108,7 @@ HAVING count(*) > 1";
         (array_agg(business_licence_id ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1],
         (array_agg(business_licence_expiry_dt ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1],
         (array_agg(licence_status_type ORDER BY last_action_dtm DESC NULLS LAST, latest_report_period_ym DESC NULLS LAST, rental_listing_id))[1]
- FROM normalized WHERE bc_registry_no IS NULL GROUP BY match_address_txt, match_unit_no, effective_host_key, business_licence_key
+ FROM normalized WHERE bc_registry_no IS NULL GROUP BY match_address_txt, match_unit_no, effective_host_nm, business_licence_digits
 )";
 
         private const string RegistrationChildPredicate = "bc_registry_no IS NOT DISTINCT FROM NULLIF(btrim(@bc_registry_no), '')";
@@ -114,8 +116,8 @@ HAVING count(*) > 1";
         private const string NoRegistrationChildPredicate = @"bc_registry_no IS NULL
    AND match_address_txt IS NOT DISTINCT FROM NULLIF(btrim(@match_address_txt), '')
    AND match_unit_no IS NOT DISTINCT FROM NULLIF(btrim(@match_unit_no), '')
-   AND effective_host_key IS NOT DISTINCT FROM NULLIF(btrim(@effective_host_nm), '')
-   AND business_licence_key IS NOT DISTINCT FROM NULLIF(regexp_replace(@effective_business_licence_no, '[^0-9]', '', 'g'), '')";
+   AND effective_host_nm IS NOT DISTINCT FROM NULLIF(btrim(@effective_host_nm), '')
+   AND business_licence_digits IS NOT DISTINCT FROM NULLIF(regexp_replace(@effective_business_licence_no, '[^0-9]', '', 'g'), '')";
 
         private const string ChildOrderBy = "ORDER BY latest_report_period_ym DESC NULLS LAST, rental_listing_id";
 

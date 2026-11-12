@@ -62,8 +62,13 @@ COPY nginx.conf nginx-security-headers.inc /etc/nginx/
 COPY ./docker-entrypoint.sh /_docker-entrypoint.sh
 RUN chmod +x /_docker-entrypoint.sh
 
-RUN mkdir -p /nginx/html && chmod -R a+rw /nginx
-RUN cp -R /usr/share/nginx/html/* /nginx/html
+# chmod after the copy. cp creates assets/ and media/ as 0755 root:root, and
+# OpenShift runs as an arbitrary uid in group 0. Those directories must be
+# writable or gzip cannot create .gz files next to the svg and woff2.
+RUN mkdir -p /nginx/html \
+    && cp -R /usr/share/nginx/html/. /nginx/html/ \
+    && chgrp -R 0 /nginx \
+    && chmod -R a+rwX /nginx
 
 EXPOSE 3001
 ENV TZ America/Vancouver

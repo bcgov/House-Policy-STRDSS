@@ -47,9 +47,12 @@ RUN mkdir -p ${DOWNLOADS} && \
 FROM nginx:stable-alpine3.24
 
 # Apply Alpine security patches for EMERALD findings (DSS-1385)
+# GNU gzip provides -k. BusyBox gzip would delete the uncompressed file, which
+# clients that do not send Accept-Encoding: gzip still need.
 RUN apk update \
     && apk upgrade --no-cache \
-    && apk add --no-cache --upgrade expat libxml2
+    && apk add --no-cache --upgrade expat libxml2 gzip \
+    && nginx -V 2>&1 | grep -q 'with-http_gzip_static_module'
 
 ENV NGINX_DIR=/usr/share/nginx
 

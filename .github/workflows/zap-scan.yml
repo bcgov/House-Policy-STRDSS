@@ -14,10 +14,10 @@ on:
 jobs:
   zap-scan:
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
     permissions:
       contents: read
       issues: write
+    timeout-minutes: 10
 
     steps:
     - uses: hmarr/debug-action@a701ed95a46e6f2fb0df25e1a558c16356fae35a

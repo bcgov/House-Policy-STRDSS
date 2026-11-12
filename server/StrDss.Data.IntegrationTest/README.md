@@ -111,6 +111,16 @@ These tests load the selected local baseline into a disposable container. They d
 
 `CodeSetRepositoryShould` demonstrates successful database-reader counts and verifies that no entities are tracked after an `AsNoTracking` query. Compare unordered results using deterministic ordering. For value assertions, keep expected values explicit. Behavioral tests can compare related query results, such as ascending versus descending sort keys, a page versus an unpaged result, or grouped counts versus expanded children.
 
+## Organization query coverage
+
+`OrganizationRepositoryShould` compares projected results with the existing mappings and inspects executed SQL to verify that organization reads omit `area_geometry` and `source_attributes_json`. It covers organization type filtering and ordering, ID/code lookups (including missing records and lowercase codes), contact loading, managing-organization scalar lookups, and jurisdiction details and children. Geometry is opt-in for AutoMapper query projections; contacts are expanded only for organization lists and ID lookups, preserving existing code-lookup behavior. In-memory mappings and tracked update paths are unchanged.
+
+Run only these tests from the repository root:
+
+```powershell
+dotnet test server\StrDss.Data.IntegrationTest\StrDss.Data.IntegrationTest.csproj --filter FullyQualifiedName~OrganizationRepositoryShould
+```
+
 ## Rental listing query coverage
 
 The rental listing tests use the real repository and `UserRepository`, with no mocked database or per-test replacement records. They assert successful execution and materialization rather than hard-coded listing counts or business data:

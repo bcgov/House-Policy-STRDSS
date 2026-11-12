@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -102,24 +103,25 @@ namespace StrDss.Data.Repositories
                 query = query.Where(x => x.OrganizationType != OrganizationTypes.LGSub);
             }
 
-            query = query.Include(x => x.DssOrganizationContactPeople)
-                         .OrderBy(x => x.OrganizationNm);
-
-            return _mapper.Map<List<OrganizationDto>>(await query.ToListAsync());
+            return await query.OrderBy(x => x.OrganizationNm)
+                .ProjectTo<OrganizationDto>(_mapper.ConfigurationProvider, null, x => x.ContactPeople)
+                .ToListAsync();
         }
 
         public async Task<OrganizationDto?> GetOrganizationByIdAsync(long orgId)
         {
-            var org = await _dbSet.AsNoTracking()
-                .Include(x => x.DssOrganizationContactPeople)
-                .FirstOrDefaultAsync(x => x.OrganizationId == orgId);
-
-            return _mapper.Map<OrganizationDto>(org);
+            return await _dbSet.AsNoTracking()
+                .Where(x => x.OrganizationId == orgId)
+                .ProjectTo<OrganizationDto>(_mapper.ConfigurationProvider, null, x => x.ContactPeople)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<string>> GetManagingOrgCdsAsync(long orgId)
         {
-            var org = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == orgId);
+            var org = await _dbSet.AsNoTracking()
+                .Where(x => x.OrganizationId == orgId)
+                .Select(x => new { x.OrganizationType, x.OrganizationCd })
+                .FirstOrDefaultAsync();
 
             if (org == null) return new List<string>();
 
@@ -137,9 +139,11 @@ namespace StrDss.Data.Repositories
         public async Task<OrganizationDto> GetOrganizationByOrgCdAsync(string orgCd)
         {
             var org = await _dbSet.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.OrganizationCd == orgCd.ToUpper());
+                .Where(x => x.OrganizationCd == orgCd.ToUpper())
+                .ProjectTo<OrganizationDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
 
-            return _mapper.Map<OrganizationDto>(org);
+            return org!;
         }
 
         public async Task<long?> GetContainingOrganizationId(Point point)
@@ -167,8 +171,10 @@ namespace StrDss.Data.Repositories
 
         public async Task<long?> GetManagingOrgId(long orgId)
         {
-            var org = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationId == orgId);
-            return org?.ManagingOrganizationId;
+            return await _dbSet.AsNoTracking()
+                .Where(x => x.OrganizationId == orgId)
+                .Select(x => x.ManagingOrganizationId)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<StrRequirementsDto?> GetStrRequirements(double longitude, double latitude)
@@ -341,8 +347,10 @@ namespace StrDss.Data.Repositories
 
             foreach (var lg in lgs.SourceList)
             {
-                lg.Jurisdictions = _mapper.Map<List<JurisdictionsViewDto>>
-                    (await _dbSet.AsNoTracking().Where(x => x.ManagingOrganizationId == lg.OrganizationId).ToListAsync());
+                lg.Jurisdictions = await _dbSet.AsNoTracking()
+                    .Where(x => x.ManagingOrganizationId == lg.OrganizationId)
+                    .ProjectTo<JurisdictionsViewDto>(_mapper.ConfigurationProvider)
+                    .ToListAsync();
             }
 
             return lgs;
@@ -366,10 +374,10 @@ namespace StrDss.Data.Repositories
 
         public async Task<JurisdictionsViewDto?> GetJurisdiction(long id)
         {
-            var jurisdiction = _mapper.Map<JurisdictionsViewDto>
-                (await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.OrganizationType == OrganizationTypes.LGSub && x.OrganizationId == id));
-
-            return jurisdiction;
+            return await _dbSet.AsNoTracking()
+                .Where(x => x.OrganizationType == OrganizationTypes.LGSub && x.OrganizationId == id)
+                .ProjectTo<JurisdictionsViewDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
         }
 
         public async Task UpdateJurisdictionAsync(JurisdictionUpdateDto dto)

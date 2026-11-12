@@ -20,8 +20,12 @@ namespace StrDss.Data.Mappings
 
             CreateMap<DssUserIdentity, UserDto>();
             CreateMap<DssOrganization, OrganizationDto>()
-                .ForMember(o => o.ContactPeople, opt => opt.MapFrom(i => i.DssOrganizationContactPeople))
-                ;
+                .ForMember(o => o.AreaGeometry, opt => opt.ExplicitExpansion())
+                .ForMember(o => o.ContactPeople, opt =>
+                {
+                    opt.MapFrom(i => i.DssOrganizationContactPeople);
+                    opt.ExplicitExpansion();
+                });
             CreateMap<DssOrganizationType, OrganizationTypeDto>();
             CreateMap<DssOrganizationContactPerson, ContactPersonDto>();
             CreateMap<DssAccessRequestStatus, AccessRequestStatusDto>();

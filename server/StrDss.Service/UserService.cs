@@ -219,7 +219,7 @@ namespace StrDss.Service
                 }
             }
 
-            var orgTypes = await _orgRepo.GetOrganizationTypesAsnc();
+            var orgTypes = await _orgRepo.GetOrganizationTypesAsync();
 
             if (!orgTypes.Any(x => x.OrganizationType == dto.OrganizationType))
             {

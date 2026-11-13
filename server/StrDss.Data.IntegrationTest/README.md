@@ -115,6 +115,8 @@ These tests load the selected local baseline into a disposable container. They d
 
 `OrganizationRepositoryShould` compares projected results with the existing mappings and inspects executed SQL to verify that organization reads omit `area_geometry` and `source_attributes_json`. It covers organization type filtering and ordering, ID/code lookups (including missing records and lowercase codes), contact loading, managing-organization scalar lookups, and jurisdiction details and children. Geometry is opt-in for AutoMapper query projections; contacts are expanded only for organization lists and ID lookups, preserving existing code-lookup behavior. In-memory mappings and tracked update paths are unchanged.
 
+The generic `GetOrganizationsAsync<TDto>` overload applies an expression projection before materialization while sharing the existing type filtering and name ordering. The dropdown service uses this overload to select only organization ID, name, and local-government type, without loading contacts or allocating an intermediate `OrganizationDto` list. Tests verify equivalent values and ordering for null, `All`, explicit, and missing types, and assert that the dropdown query selects exactly those three columns in a single command without joins.
+
 Run only these tests from the repository root:
 
 ```powershell

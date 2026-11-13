@@ -55,7 +55,7 @@ namespace StrDss.Service
         }
         public async Task<List<OrganizationTypeDto>> GetOrganizationTypesAsnc()
         {
-            return await _orgRepo.GetOrganizationTypesAsnc();
+            return await _orgRepo.GetOrganizationTypesAsync();
         }
 
         public async Task<List<OrganizationDto>> GetOrganizationsAsync(string? type)
@@ -65,19 +65,19 @@ namespace StrDss.Service
 
         public async Task<List<DropdownNumDto>> GetOrganizationsDropdownAsync(string? type)
         {
-            var orgs = await _orgRepo.GetOrganizationsAsync(type);
-            return orgs.Select(x => new DropdownNumDto
+            return await _orgRepo.GetOrganizationsAsync(type, x => new DropdownNumDto
             {
                 Id = x.OrganizationId,
                 Description = x.OrganizationNm,
                 LocalGovernmentType = x.LocalGovernmentType,
-            }).ToList();
+            });
         }
 
         public async Task<OrganizationDto?> GetOrganizationByIdAsync(long id)
         {
             return await _orgRepo.GetOrganizationByIdAsync(id);
         }
+
         public async Task<long?> GetContainingOrganizationId(Point point)
         {
             return await _orgRepo.GetContainingOrganizationId(point);

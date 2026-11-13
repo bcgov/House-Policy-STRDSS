@@ -5,6 +5,7 @@ using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Model;
 using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace StrDss.Data.Repositories
 {
@@ -34,7 +35,17 @@ namespace StrDss.Data.Repositories
             _logger = logger;
         }
 
-        public async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "", string extraSort = "", bool count = true)
+        public Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction = "", string extraSort = "", bool count = true)
+        {
+            return Page<TInput, TOutput>(list, pageSize, pageNumber, orderBy, direction, extraSort, count, null);
+        }
+
+        public Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction, Expression<Func<TInput, TOutput>> projection)
+        {
+            return Page(list, pageSize, pageNumber, orderBy, direction, "", true, projection);
+        }
+
+        private async Task<PagedDto<TOutput>> Page<TInput, TOutput>(IQueryable<TInput> list, int pageSize, int pageNumber, string orderBy, string direction, string extraSort, bool count, Expression<Func<TInput, TOutput>>? projection)
         {
             var stopwatch = Stopwatch.StartNew();
             int? totalRecords = null;
@@ -73,20 +84,27 @@ namespace StrDss.Data.Repositories
 
             stopwatch.Restart();
 
-            var result = await pagedList.ToListAsync();
+            IEnumerable<TOutput> outputList;
+
+            if (projection != null)
+            {
+                outputList = await pagedList.Select(projection).ToListAsync();
+            }
+            else
+            {
+                var result = await pagedList.ToListAsync();
+
+                if (typeof(TOutput) != typeof(TInput))
+                    outputList = _mapper.Map<IEnumerable<TInput>, IEnumerable<TOutput>>(result);
+                else
+                    outputList = (IEnumerable<TOutput>)result;
+            }
 
             stopwatch.Stop();
 
             _logger.LogDebug($"Get Data  Getting Data. Time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             stopwatch.Restart();
-
-            IEnumerable<TOutput> outputList;
-
-            if (typeof(TOutput) != typeof(TInput))
-                outputList = _mapper.Map<IEnumerable<TInput>, IEnumerable<TOutput>>(result);
-            else
-                outputList = (IEnumerable<TOutput>)result;
 
             var pagedDTO = new PagedDto<TOutput>
             {

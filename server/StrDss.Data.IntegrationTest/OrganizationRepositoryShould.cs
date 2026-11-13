@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using StrDss.Common;
 using StrDss.Data.Entities;
 using StrDss.Data.Repositories;
+using StrDss.Model;
 using StrDss.Model.OrganizationDtos;
 using Xunit;
 
@@ -44,6 +45,38 @@ public class OrganizationRepositoryShould : DatabaseTestBase
         Assert.Equal(expected.Select(x => x.OrganizationId), actual.Select(x => x.OrganizationId));
         for (var i = 0; i < expected.Count; i++)
             AssertOrganizationEqual(expected[i], actual[i]);
+        AssertProjectedQueries(interceptor);
+        Assert.Empty(context.ChangeTracker.Entries());
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("All")]
+    [InlineData(OrganizationTypes.Platform)]
+    [InlineData(OrganizationTypes.LGSub)]
+    [InlineData("missing_type")]
+    public async Task GetOrganizations_CustomProjection_SelectsOnlyDropdownFields(string? type)
+    {
+        var organizations = await CreateRepository(DbContext).GetOrganizationsAsync(type);
+
+        var interceptor = new QueryCaptureInterceptor();
+        await using var context = CreateDbContext(interceptor);
+        var repository = CreateRepository(context);
+
+        var actual = await repository.GetOrganizationsAsync(type, x => new DropdownNumDto
+        {
+            Id = x.OrganizationId,
+            Description = x.OrganizationNm,
+            LocalGovernmentType = x.LocalGovernmentType
+        });
+
+        Assert.Equal(organizations.OrderBy(x => x.OrganizationId)
+                .Select(x => (x.OrganizationId, x.OrganizationNm, x.LocalGovernmentType)),
+            actual.OrderBy(x => x.Id).Select(x => (x.Id, x.Description, x.LocalGovernmentType)));
+        Assert.Equal(organizations.Select(x => x.OrganizationNm), actual.Select(x => x.Description));
+        var sql = Assert.Single(interceptor.Commands);
+        Assert.Matches(@"^SELECT \w+\.organization_id AS ""Id"", \w+\.organization_nm AS ""Description"", \w+\.local_government_type AS ""LocalGovernmentType""\s+FROM", sql);
+        Assert.DoesNotContain("JOIN", sql.ToUpperInvariant());
         AssertProjectedQueries(interceptor);
         Assert.Empty(context.ChangeTracker.Entries());
     }

@@ -116,7 +116,7 @@ namespace StrDss.Test
             UserService sut)
         {
             // Arrange
-            orgRepoMock.Setup(x => x.GetOrganizationTypesAsnc()).ReturnsAsync(new List<OrganizationTypeDto>());
+            orgRepoMock.Setup(x => x.GetOrganizationTypesAsync()).ReturnsAsync(new List<OrganizationTypeDto>());
 
             // Act
             var errors = await sut.CreateAccessRequestAsync(dto);
@@ -330,7 +330,7 @@ namespace StrDss.Test
 
         private void SetupOrganizationRepository(Mock<IOrganizationRepository> organizationRepoMock, OrganizationDto organizationDto)
         {
-            organizationRepoMock.Setup(x => x.GetOrganizationTypesAsnc()).ReturnsAsync(new List<OrganizationTypeDto>
+            organizationRepoMock.Setup(x => x.GetOrganizationTypesAsync()).ReturnsAsync(new List<OrganizationTypeDto>
             {
                 new OrganizationTypeDto { OrganizationType = "BCGov", OrganizationTypeNm = "BC Government Component" },
                 new OrganizationTypeDto { OrganizationType = "Platform", OrganizationTypeNm = "Short Term Rental Platform" },

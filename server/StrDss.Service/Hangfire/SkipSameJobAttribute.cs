@@ -4,7 +4,9 @@ using Hangfire.Server;
 using System.Text.Json;
 using Hangfire;
 using Npgsql;
+using Microsoft.Extensions.Configuration;
 using StrDss.Common;
+using StrDss.Data;
 
 namespace StrDss.Service.Hangfire
 {
@@ -104,12 +106,9 @@ namespace StrDss.Service.Hangfire
 
         private void DeleteHangfireLock(string resourceName)
         {
-            var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-            var dbName = Environment.GetEnvironmentVariable("DB_NAME");
-            var dbUser = Environment.GetEnvironmentVariable("DB_USER");
-            var dbPass = Environment.GetEnvironmentVariable("DB_PASS");
-            var dbPort = Environment.GetEnvironmentVariable("DB_PORT");
-            var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
+            // Hangfire instantiates job filter attributes without DI, so read settings straight from the environment.
+            var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+            var connString = new ConnectionStringProvider(config).GetConnectionString();
 
             string sql = @"DELETE FROM Hangfire.Lock WHERE Resource = @ResourceName;";
 

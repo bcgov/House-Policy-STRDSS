@@ -35,13 +35,10 @@ builder.WebHost.ConfigureKestrel((context, options) =>
     options.Limits.MaxResponseBufferSize = 100 * 1024 * 1024;
 });
 
-var dbHost = builder.Configuration.GetValue<string>("DB_HOST");
-var dbName = builder.Configuration.GetValue<string>("DB_NAME");
-var dbUser = builder.Configuration.GetValue<string>("DB_USER");
-var dbPass = builder.Configuration.GetValue<string>("DB_PASS");
-var dbPort = builder.Configuration.GetValue<string>("DB_PORT");
+var connectionStringProvider = new ConnectionStringProvider(builder.Configuration);
+builder.Services.AddSingleton(connectionStringProvider);
 
-var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};CommandTimeout=180";
+var connectionString = connectionStringProvider.GetConnectionString(b => b.CommandTimeout = 180);
 
 builder.Services.AddHttpContextAccessor();
 
@@ -56,7 +53,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<DssDbContext>(opt =>
 {
-    opt.UseNpgsql(connString, opt => opt.UseNetTopologySuite());
+    opt.UseNpgsql(connectionString, opt => opt.UseNetTopologySuite());
 
     if (builder.Environment.IsDevelopment())
     {
@@ -215,7 +212,7 @@ builder.Services.AddSwaggerGen(options =>
         });
 });
 
-var healthCheck = new HealthCheck(connString);
+var healthCheck = new HealthCheck(connectionString);
 builder.Services.AddHealthChecks().AddCheck("DbConnection", healthCheck);
 
 var app = builder.Build();

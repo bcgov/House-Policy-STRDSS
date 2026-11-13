@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Npgsql;
@@ -41,13 +40,13 @@ namespace StrDss.Data.Repositories
     }
     public class OrganizationRepository : RepositoryBase<DssOrganization>, IOrganizationRepository
     {
-        private IConfiguration _config;
+        private readonly ConnectionStringProvider _connectionStringProvider;
 
         public OrganizationRepository(DssDbContext dbContext, IMapper mapper, ICurrentUser currentUser, ILogger<StrDssLogger> logger,
-            IConfiguration config)
+            ConnectionStringProvider connectionStringProvider)
             : base(dbContext, mapper, currentUser, logger)
         {
-            _config = config;
+            _connectionStringProvider = connectionStringProvider;
         }
         public async Task<List<LocalGovTypeDto>> GetLocalGovTypesAsync()
         {
@@ -148,15 +147,7 @@ namespace StrDss.Data.Repositories
 
         public async Task<long?> GetContainingOrganizationId(Point point)
         {
-            var dbHost = _config.GetValue<string>("DB_HOST");
-            var dbName = _config.GetValue<string>("DB_NAME");
-            var dbUser = _config.GetValue<string>("DB_USER");
-            var dbPass = _config.GetValue<string>("DB_PASS");
-            var dbPort = _config.GetValue<string>("DB_PORT");
-
-            var connString = $"Host={dbHost};Username={dbUser};Password={dbPass};Database={dbName};Port={dbPort};";
-
-            using var connection = new NpgsqlConnection(connString);
+            using var connection = new NpgsqlConnection(_connectionStringProvider.GetConnectionString());
 
             await connection.OpenAsync();
 

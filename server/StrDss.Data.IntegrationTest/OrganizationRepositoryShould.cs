@@ -169,7 +169,7 @@ public class OrganizationRepositoryShould : DatabaseTestBase
 
     private OrganizationRepository CreateRepository(DssDbContext context) =>
         new(context, Mapper, CurrentUser, NullLogger<StrDssLogger>.Instance,
-            new ConfigurationBuilder().Build());
+            new ConnectionStringProvider(new ConfigurationBuilder().Build()));
 
     private static void AssertOrganizationEqual(OrganizationDto expected, OrganizationDto actual)
     {

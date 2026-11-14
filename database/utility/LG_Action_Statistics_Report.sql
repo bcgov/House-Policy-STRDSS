@@ -23,7 +23,7 @@ group by org.organization_nm
 order by 2;
 
 -- via setting the date:
-WITH params AS (SELECT '2026-03-01'::date AS report_month)
+WITH params AS (SELECT '2026-09-01'::date AS report_month)
 SELECT to_char(params.report_month, 'YYYY-MM') as "Reporting Month"
     , coalesce(org.organization_nm,'Unknown') as "Name of Local government"
     , sum(case dem.email_message_type when 'Notice of Takedown' then 1 else 0 end) as "Notice of Non-compliance sent"

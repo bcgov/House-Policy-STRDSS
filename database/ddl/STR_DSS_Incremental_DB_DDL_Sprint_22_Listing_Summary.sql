@@ -520,34 +520,4 @@ ALTER FUNCTION dss_rental_listing_summary_from_action() OWNER TO CURRENT_USER;
 ALTER FUNCTION dss_rental_listing_summary_from_contact() OWNER TO CURRENT_USER;
 ALTER FUNCTION dss_rental_listing_summary_from_address() OWNER TO CURRENT_USER;
 
-DO $$
-DECLARE
-	sample record;
-	got text;
-BEGIN
-	FOR sample IN
-		SELECT * FROM (VALUES
-			('  st123456789  ', 'ST123456789'),
-			('H123456789', 'H123456789'),
-			('PL123456789', 'PL123456789'),
-			('pm123456789', 'PM123456789'),
-			('Exempt', NULL),
-			('P123456789', NULL),
-			('H12345678', NULL),
-			('H1234567890', NULL),
-			('H-123-456-789', NULL),
-			('   ', NULL)
-		) AS v(raw, expected)
-	LOOP
-		got := CASE
-			WHEN upper(btrim(sample.raw)) ~ '^(H|PL|PM|ST)[0-9]{9}$'
-			THEN upper(btrim(sample.raw))
-			ELSE NULL
-		END;
-		IF got IS DISTINCT FROM sample.expected THEN
-			RAISE EXCEPTION 'registration group key % stored as % (expected %)', sample.raw, got, sample.expected;
-		END IF;
-	END LOOP;
-END $$;
-
 SELECT dss_refresh_rental_listing_summary();

@@ -5,7 +5,9 @@
  * the latest action, latest report month, property-owner name, trimmed host
  * name, and licence digits on every query.
  *
- * Safe inside a transaction. The Sprint 22 migration calls this script.
+ * Safe inside a transaction, including a second run. The table, indexes, and
+ * foreign key are created only when missing. Functions and triggers are replaced.
+ * The Sprint 22 migration calls this script.
  * Run on its own as the application role:
  *   psql -U strdssdev -d strdssdev -f STR_DSS_Incremental_DB_DDL_Sprint_22_Listing_Summary.sql
  *
@@ -14,7 +16,7 @@
 
 SET search_path TO dss, public;
 
-CREATE TABLE dss_rental_listing_summary (
+CREATE TABLE IF NOT EXISTS dss_rental_listing_summary (
 	rental_listing_id            bigint       NOT NULL,
 	last_action_nm               varchar(200),
 	last_action_dtm              timestamptz,
@@ -31,16 +33,26 @@ CREATE TABLE dss_rental_listing_summary (
 	CONSTRAINT dss_rental_listing_summary_pk PRIMARY KEY ( rental_listing_id )
 );
 
-CREATE INDEX dss_rental_listing_summary_i1
+CREATE INDEX IF NOT EXISTS dss_rental_listing_summary_i1
 	ON dss_rental_listing_summary ( latest_report_period_ym );
 
-CREATE INDEX dss_rental_listing_summary_i2
+CREATE INDEX IF NOT EXISTS dss_rental_listing_summary_i2
 	ON dss_rental_listing_summary ( last_action_dtm );
 
-ALTER TABLE dss_rental_listing_summary
-	ADD CONSTRAINT dss_rental_listing_summary_fk_listing
-	FOREIGN KEY ( rental_listing_id ) REFERENCES dss_rental_listing ( rental_listing_id )
-	ON DELETE CASCADE;
+DO $$
+BEGIN
+	IF NOT EXISTS (
+		SELECT 1
+		FROM pg_constraint
+		WHERE conname = 'dss_rental_listing_summary_fk_listing'
+		  AND conrelid = 'dss_rental_listing_summary'::regclass
+	) THEN
+		ALTER TABLE dss_rental_listing_summary
+			ADD CONSTRAINT dss_rental_listing_summary_fk_listing
+			FOREIGN KEY ( rental_listing_id ) REFERENCES dss_rental_listing ( rental_listing_id )
+			ON DELETE CASCADE;
+	END IF;
+END $$;
 
 COMMENT ON TABLE dss_rental_listing_summary IS
 	'Precomputed search values for the current master rental listing. Maintained by triggers and rebuilt by dss_refresh_rental_listing_summary after a listing report upload.';
@@ -70,7 +82,7 @@ COMMENT ON COLUMN dss_rental_listing_summary.effective_host_nm IS
 	'Trimmed effective_host_nm: NULLIF(btrim(effective_host_nm), ''''). Blank becomes null.';
 
 COMMENT ON COLUMN dss_rental_listing_summary.bc_registry_no IS
-	'Trimmed registration number: NULLIF(btrim(bc_registry_no), ''''). Null groups the listing by address, unit, host, and licence digits.';
+	'Registration group key: upper(btrim(bc_registry_no)) when it is H, PL, PM, or ST followed by exactly 9 digits; otherwise null. Null groups the listing by address, unit, host, and licence digits. dss_rental_listing.bc_registry_no keeps the host text.';
 
 COMMENT ON COLUMN dss_rental_listing_summary.match_address_txt IS
 	'Normalized matched address: NULLIF(btrim(match_address_txt), '''').';
@@ -113,7 +125,11 @@ AS $$
 		host.primary_host_full_nm,
 		NULLIF(regexp_replace(NULLIF(btrim(drl.business_licence_no), ''), '[^0-9]', '', 'g'), ''),
 		NULLIF(btrim(drl.effective_host_nm), ''),
-		NULLIF(btrim(drl.bc_registry_no), ''),
+		CASE
+			WHEN upper(btrim(drl.bc_registry_no)) ~ '^(H|PL|PM|ST)[0-9]{9}$'
+			THEN upper(btrim(drl.bc_registry_no))
+			ELSE NULL
+		END,
 		NULLIF(btrim(dpa.match_address_txt), ''),
 		NULLIF(btrim(dpa.unit_no), ''),
 		NULLIF(btrim(drl.business_licence_no), ''),
@@ -470,19 +486,19 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER dss_rental_listing_summary_ar_iud_tr
+CREATE OR REPLACE TRIGGER dss_rental_listing_summary_ar_iud_tr
 	AFTER INSERT OR UPDATE OR DELETE ON dss_rental_listing
 	FOR EACH ROW EXECUTE FUNCTION dss_rental_listing_summary_from_listing();
 
-CREATE TRIGGER dss_rental_listing_action_summary_ar_iud_tr
+CREATE OR REPLACE TRIGGER dss_rental_listing_action_summary_ar_iud_tr
 	AFTER INSERT OR UPDATE OR DELETE ON dss_rental_listing_action
 	FOR EACH ROW EXECUTE FUNCTION dss_rental_listing_summary_from_action();
 
-CREATE TRIGGER dss_rental_listing_contact_summary_ar_iud_tr
+CREATE OR REPLACE TRIGGER dss_rental_listing_contact_summary_ar_iud_tr
 	AFTER INSERT OR UPDATE OR DELETE ON dss_rental_listing_contact
 	FOR EACH ROW EXECUTE FUNCTION dss_rental_listing_summary_from_contact();
 
-CREATE TRIGGER dss_physical_address_summary_ar_iu_tr
+CREATE OR REPLACE TRIGGER dss_physical_address_summary_ar_iu_tr
 	AFTER INSERT OR UPDATE ON dss_physical_address
 	FOR EACH ROW EXECUTE FUNCTION dss_rental_listing_summary_from_address();
 

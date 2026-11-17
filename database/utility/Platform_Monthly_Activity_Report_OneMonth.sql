@@ -1,7 +1,8 @@
-
 -- DSS-1349: Platform Actions Report For Specific Month
+-- Set report_date to the first day of the month AFTER the month to report.
+-- Example: '2026-01-01' reports December 2025.
 WITH report_param AS (
-    SELECT CAST('2026-05-20' AS date) AS report_date
+    SELECT CAST('2026-01-01' AS date) AS report_date
 ),
 report_range AS (
     SELECT
@@ -50,7 +51,7 @@ CROSS JOIN (
         org.organization_cd AS platform_code
     FROM dss_organization org
     WHERE org.organization_type = 'Platform'
-      AND org.is_active IS TRUE
+      AND org.is_active IS true
 ) plat
 LEFT JOIN (
     SELECT
@@ -91,17 +92,44 @@ LEFT JOIN (
         dud.report_period_ym AS report_month,
         dud.providing_organization_id AS organization_id,
         COUNT(*) AS total_takedowns,
-        COUNT(DISTINCT dul.source_record_no) AS unique_listings,
-        SUM(CASE WHEN drl.takedown_reason = 'LG Request' THEN 1 ELSE 0 END) AS lg_request_takedowns,
-        SUM(CASE WHEN drl.takedown_reason = 'Invalid Registration' THEN 1 ELSE 0 END) AS invalid_registration_takedowns,
-        SUM(CASE WHEN drl.takedown_reason IS NULL THEN 1 ELSE 0 END) AS other_takedowns
+        COUNT(DISTINCT (dul.source_organization_cd, dul.source_record_no)) AS unique_listings,
+        SUM(CASE WHEN LOWER(REPLACE(reason.effective_reason, ' ', '')) = 'lgrequest' THEN 1 ELSE 0 END) AS lg_request_takedowns,
+        SUM(CASE WHEN LOWER(REPLACE(reason.effective_reason, ' ', '')) = 'invalidregistration' THEN 1 ELSE 0 END) AS invalid_registration_takedowns,
+        SUM(CASE WHEN LOWER(REPLACE(COALESCE(reason.effective_reason, ''), ' ', '')) NOT IN ('lgrequest', 'invalidregistration') THEN 1 ELSE 0 END) AS other_takedowns
     FROM dss_upload_delivery dud
     INNER JOIN dss_upload_line dul
         ON dul.including_upload_delivery_id = dud.upload_delivery_id
-    LEFT JOIN dss_rental_listing drl
-        ON drl.offering_organization_id = dud.providing_organization_id
-       AND drl.platform_listing_no = dul.source_record_no
-       AND drl.including_rental_listing_report_id IS NULL
+    LEFT JOIN dss_organization line_org
+        ON UPPER(line_org.organization_cd) = UPPER(dul.source_organization_cd)
+    LEFT JOIN LATERAL (
+        SELECT drl.rental_listing_id, drl.takedown_reason
+        FROM dss_rental_listing drl
+        WHERE drl.offering_organization_id = line_org.organization_id
+          AND drl.platform_listing_no = dul.source_record_no
+          AND drl.including_rental_listing_report_id IS NULL
+        ORDER BY (drl.takedown_reason IS NULL), drl.rental_listing_id DESC
+        LIMIT 1
+    ) drl ON TRUE
+    LEFT JOIN LATERAL (
+        SELECT CASE
+            WHEN COALESCE(BTRIM(drl.takedown_reason), '') <> '' THEN BTRIM(drl.takedown_reason)
+            WHEN reason_pos.pos IS NULL THEN NULL
+            ELSE NULLIF(BTRIM(TRIM(BOTH '"' FROM split_part(
+                replace(replace(dul.source_line_txt, E'\r', ''), E'\n', ''),
+                ',',
+                reason_pos.pos
+            ))), '')
+        END AS effective_reason
+        FROM (
+            SELECT array_position(
+                ARRAY(
+                    SELECT lower(trim(both '"' FROM trim(h)))
+                    FROM unnest(string_to_array(replace(replace(dud.source_header_txt, E'\r', ''), E'\n', ''), ',')) AS h
+                ),
+                'reason'
+            ) AS pos
+        ) reason_pos
+    ) reason ON TRUE
     CROSS JOIN report_range rng
     WHERE dud.upload_delivery_type = 'Takedown Data'
       AND dud.report_period_ym IS NOT NULL
@@ -110,6 +138,7 @@ LEFT JOIN (
       AND COALESCE(dul.is_system_failure, FALSE) IS FALSE
       AND dud.report_period_ym >= rng.range_start
       AND dud.report_period_ym < rng.range_end
+      AND drl.rental_listing_id IS NOT NULL
     GROUP BY dud.report_period_ym, dud.providing_organization_id
 ) tc
     ON tc.report_month = m.report_month

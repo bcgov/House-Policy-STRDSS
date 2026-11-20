@@ -13,7 +13,8 @@ The subfolders have the following content and uses:
 - **`model`** - Source documents and generated artifacts for the conceptual, logical, and physical data models
 - **`ddl`** - Data definition scripts to create or transform the database schema
 - **`seeding`** - Data manipulation (DML) scripts to populate database tables with rows that are not managed by the application
-- **`utility`** - SQL scripts to generate database output or perform special operations
+- **`migrations`** - Master migration scripts (one per sprint) that apply the `ddl`, `seeding` and `utility` scripts in order, plus `STR_DSS_Master.bat` for local Docker runs
+- **`utility`** - One-off SQL scripts, report queries, and special operations
 
 ## Database Design and Documentation
 The physical database design is documented and maintained using **DBSchema**. These are stored as XML files with the **`.dbs`** extension.
@@ -84,7 +85,7 @@ _Note: Master scripts are the preferred release method to use, starting with Rel
 From the command line:
 
 ```bash
-psql -U strdss<env> -d strdss<env> -f database/utility/STR_DSS_Migration_Sprint_22.sql
+psql -U strdss<env> -d strdss<env> -f database/migrations/STR_DSS_Migration_Sprint_22.sql
 ```
 
 From an interactive `psql` session (must use `/` rather than `\` in paths):
@@ -147,9 +148,9 @@ _Initial database creation (`STR_DSS_Database_Create.sql`) still requires the `p
 
 ### Release 5 Scripts:
 - Master Scripts _(preferred release method)_:
-  - `utility/STR_DSS_Migration_Sprint_11.sql`
-  - `utility/STR_DSS_Migration_Sprint_12.sql`
-  - `utility/STR_DSS_Migration_Sprint_13.sql`
+  - `migrations/STR_DSS_Migration_Sprint_11.sql`
+  - `migrations/STR_DSS_Migration_Sprint_12.sql`
+  - `migrations/STR_DSS_Migration_Sprint_13.sql`
 
 - Sprint 10:
   - `seeding/STR_DSS_Data_Seeding_Platforms_Sprint_10.sql`
@@ -178,10 +179,10 @@ _Initial database creation (`STR_DSS_Database_Create.sql`) still requires the `p
 
 ### Release 6 Scripts:
 - Master Scripts _(preferred release method)_:
-  - `utility/STR_DSS_Migration_Sprint_14.sql`
-  - `utility/STR_DSS_Migration_Sprint_15.sql`
-  - `utility/STR_DSS_Migration_Sprint_16.sql`
-  - `utility/STR_DSS_Migration_Sprint_17.sql`
+  - `migrations/STR_DSS_Migration_Sprint_14.sql`
+  - `migrations/STR_DSS_Migration_Sprint_15.sql`
+  - `migrations/STR_DSS_Migration_Sprint_16.sql`
+  - `migrations/STR_DSS_Migration_Sprint_17.sql`
 
 - Sprint 14:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_14.sql`
@@ -212,8 +213,8 @@ _Initial database creation (`STR_DSS_Database_Create.sql`) still requires the `p
 
 ### Release 7 Scripts:
 - Master Scripts _(preferred release method)_:
-  - `utility/STR_DSS_Migration_Sprint_18.sql`
-  - `utility/STR_DSS_Migration_Sprint_19.sql`
+  - `migrations/STR_DSS_Migration_Sprint_18.sql`
+  - `migrations/STR_DSS_Migration_Sprint_19.sql`
 
 - Sprint 18:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_18.sql`
@@ -229,7 +230,7 @@ _Initial database creation (`STR_DSS_Database_Create.sql`) still requires the `p
 
 ### Release 8 Scripts:
 - Master Scripts _(preferred release method)_:
-  - `utility/STR_DSS_Migration_Sprint_22.sql`
+  - `migrations/STR_DSS_Migration_Sprint_22.sql`
 
 - Sprint 22:
   - `ddl/STR_DSS_Incremental_DB_DDL_Sprint_22.sql` _(unit number column resize)_
@@ -239,3 +240,7 @@ _Initial database creation (`STR_DSS_Database_Create.sql`) still requires the `p
   - `ddl/STR_DSS_Physical_DB_DDL_Sprint_22.sql`
   - `seeding/STR_DSS_Data_Seeding_Sprint_22.sql`
   - `utility/Backfill_Listing_Actions_Sprint_22.sql`
+
+### Sprint August 2026 Scripts:
+- Sprint August 2026 _(data fix only, run directly, no master script)_:
+  - `seeding/STR_DSS_Data_Seeding_LGs_Sprint_August_2026.sql` _(DSS-1392: LG codes for UBC and UEL)_

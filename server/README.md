@@ -70,7 +70,7 @@ $containerId = docker ps --filter "ancestor=postgis/postgis:18-3.6" --format "{{
 if (-not $containerId) { throw "The AppHost PostGIS container is not running." }
 docker exec $containerId rm -rf /database
 docker cp ./database "${containerId}:/database"
-docker exec $containerId psql -v ON_ERROR_STOP=1 -U strdssdev -d strdssdev -f /database/utility/STR_DSS_Migration_Sprint_22.sql
+docker exec $containerId psql -v ON_ERROR_STOP=1 -U strdssdev -d strdssdev -f /database/migrations/STR_DSS_Migration_Sprint_22.sql
 ```
 
 `STR_DSS_Migration_Sprint_22.sql` is the master migration. On an empty database it runs the full Sprint 22 schema and seed scripts. It can also detect an already initialized Sprint 22 database and exit without changes. See [the database documentation](../database/README.md) for migration details.
